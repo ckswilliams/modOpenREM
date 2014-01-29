@@ -1,0 +1,68 @@
+{% extends "remapp/base.html" %}
+
+{% block col2 %}
+
+
+    {{ studyfilter }}
+
+    <form action="" method="get">
+        <table class="table table-bordered">
+            {% for field in filter.form %}
+                <tr><td>{{ field.label_tag }}</td><td>{{ field.errors }} {{ field }}</td></tr>
+            {% endfor %}
+        </table>
+        <input type="submit" />
+    </form>
+
+    <script>
+        $(function() { $( ".datepicker" ).datepicker({ dateFormat: "yy-mm-dd" }); });
+    </script>
+    <form>
+        <input type="text" name="date" class="datepicker" />
+    </form>
+ 
+
+    
+{% endblock %}
+
+{% block col1 %}
+{% load pagination_tags %}    
+    
+    <p>
+        There are {{ filter.count }} exams in this list: 
+        <ul>
+            <li><strong>Note:</strong>  Note: The filter must have be applied (even if it is blank)!</li>
+            <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
+            <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
+        </ul>
+    </p>
+
+    {% autopaginate filter.qs 25 as filter_list %}
+    {% paginate %}
+
+    <table class="table table-bordered">
+        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
+        {% for exam in filter_list %}
+        <tr>
+            <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
+            <td>
+                {{ exam.general_equipment_module_attributes_set.get.manufacturer }} |
+                {{ exam.general_equipment_module_attributes_set.get.manufacturer_model_name }} |
+                {{ exam.general_equipment_module_attributes_set.get.station_name }}        
+            </td>
+            <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
+            <td>
+                <a href="/openrem/ct/{{ exam.id }}/">{{ exam.study_description }}</a> |
+                {{ exam.accession_number }} |
+                {{ exam.patient_study_module_attributes_set.get.patient_size|floatformat:0 }} cm |
+                {{ exam.patient_study_module_attributes_set.get.patient_weight|floatformat:0 }} kg
+            </td>
+            <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
+            <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% paginate %}
+
+{% endblock %}

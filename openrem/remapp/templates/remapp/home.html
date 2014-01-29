@@ -1,0 +1,58 @@
+{% extends "remapp/base.html" %}
+
+{% block col1 %}		
+{% load humanize %}
+<h1>OpenREM database browser and export</h1>
+
+<p>
+    There are {{ homedata.total }} studies in this database. Page last refreshed on {% now "jS F Y \a\t H:i" %}.
+</p>
+
+<table class="table table-bordered">
+    <tr>
+        <th><a href="/openrem/ct/">CT</a></th><th><a href="/openrem/rf/">Fluoroscopy</a></th><th><a href="/openrem/mg/">Mammography</a></th>
+    </tr>
+    <tr>
+        <td>{{ homedata.ct }}</td><td>{{ homedata.rf }}</td><td>{{ homedata.mg }}</td>
+    </tr>
+</table>
+
+<h4>CT summary table</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+    </tr>
+    {% for key,value in homedata.CT.items %}
+        <tr>
+            <td>{{ value.institution }} (<a href="/openrem/ct/?general_equipment_module_attributes__station_name={{ key }}&accession_number=&o=-study_date">{{ key }}</a>)</td><td>{{ value.total }}</td><td>{{ value.latest|naturaltime }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h4>Fluoroscopy summary table</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+    </tr>
+    {% for key,value in homedata.RF.items %}
+        <tr>
+            <td>{{ value.institution }} (<a href="/openrem/rf/?general_equipment_module_attributes__station_name={{ key }}&accession_number=&o=-study_date">{{ key }}</a>)</td><td>{{ value.total }}</td><td>{{ value.latest|naturaltime }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h4>Mammography summary table</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+    </tr>
+    {% for key,value in homedata.MG.items %}
+        <tr>
+            <td>{{ value.institution }} (<a href="/openrem/mg/?general_equipment_module_attributes__station_name={{ key }}&accession_number=&o=-study_date">{{ key }}</a>)</td><td>{{ value.total }}</td><td>{{ value.latest|naturaltime }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+
+{% endblock %}	

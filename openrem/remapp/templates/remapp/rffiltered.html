@@ -1,0 +1,59 @@
+{% extends "remapp/base.html" %}
+
+{% block col2 %}
+
+
+    {{ studyfilter }}
+
+    <form action="" method="get">
+        <table class="table table-bordered">
+            {% for field in filter.form %}
+                <tr><td>{{ field.label_tag }}</td><td>{{ field.errors }} {{ field }}</td></tr>
+            {% endfor %}
+        </table>
+        <input type="submit" />
+    </form>
+    <script>
+        $(function() { $( ".datepicker" ).datepicker({ dateFormat: "yy-mm-dd" }); });
+    </script>
+    <form>
+        <input type="text" name="date" class="datepicker" />
+    </form>
+    
+{% endblock %}
+
+{% block col1 %}
+{% load pagination_tags %}    
+    
+    <p>There are {{ filter.count }} exams in this list: <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> <strong>Note:</strong> At least one filter must be applied!</p>
+
+    {% autopaginate filter.qs 20 as filter_list %}
+    {% paginate %}
+
+    <table class="table table-bordered">
+        <th>Institution</th><th>Unit</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>DAP Total cGy.cm2</th><th>Dose at RP total Gy</th><th>Physician</th>
+        {% for exam in filter_list %}
+        <tr>
+            <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
+            <td>
+                {{ exam.general_equipment_module_attributes_set.get.manufacturer }} |
+                {{ exam.general_equipment_module_attributes_set.get.manufacturer_model_name }} |
+                {{ exam.general_equipment_module_attributes_set.get.station_name }}        
+            </td>
+            <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">{{ exam.study_description }}</a> |
+                {{ exam.accession_number }}
+            </td>
+            <td>{{ exam.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</td>
+            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
+            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.dose_rp_total|floatformat:6 }}</td>
+            <td>{{ exam.performing_physician_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% paginate %}
+
+ 
+{% endblock %}

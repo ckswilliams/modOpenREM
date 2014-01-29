@@ -1,0 +1,143 @@
+#    OpenREM - Radiation Exposure Monitoring tools for the physicist
+#    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    Additional permission under section 7 of GPLv3:
+#    You shall not make any use of the name of The Royal Marsden NHS
+#    Foundation trust in connection with this Program in any press or 
+#    other public announcement without the prior written consent of 
+#    The Royal Marsden NHS Foundation Trust.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+..  module:: mod_filters.
+    :synopsis: Module for filtering studies on the summary filter pages.
+
+..  moduleauthor:: Ed McDonagh
+
+"""
+
+# Following three lines added so that sphinx autodocumentation works. 
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+from django.db import models
+
+import django_filters
+from django import forms
+from remapp.models import General_study_module_attributes
+
+
+class RFSummaryListFilter(django_filters.FilterSet):
+    """Filter for fluoroscopy studies to display in web interface.
+
+    """
+    from remapp.tools.johnboxall_date_filter import DateRangeFilter
+    study_date = DateRangeFilter(label = 'Study date range, yyyy-mm-dd')
+    study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
+    general_equipment_module_attributes__institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital')
+    general_equipment_module_attributes__manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer')
+    general_equipment_module_attributes__manufacturer_model_name = django_filters.CharFilter(lookup_type='icontains', label='Model')
+    general_equipment_module_attributes__station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name')
+    performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
+    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    class Meta:
+        model = General_study_module_attributes
+        fields = [
+            'general_equipment_module_attributes__institution_name', 
+            'study_date', 
+            'study_description',
+            'general_equipment_module_attributes__manufacturer', 
+            'general_equipment_module_attributes__manufacturer_model_name',
+            'general_equipment_module_attributes__station_name',
+            'performing_physician_name',
+            'accession_number',
+            ]
+        order_by = (
+            ('-study_date', 'Date of exam (newest first)'),
+            ('study_date', 'Date of exam (oldest first)'),
+            ('general_equipment_module_attributes__institution_name', 'Hospital'),
+            ('general_equipment_module_attributes__manufacturer', 'Make'),
+            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
+            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('study_description', 'Study description'),
+            ('-projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total','Total DAP'),
+            ('-projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_rp_total','Total RP Dose'),
+            )
+
+class CTSummaryListFilter(django_filters.FilterSet):
+    """Filter for CT studies to display in web interface.
+
+    """
+    from remapp.tools.johnboxall_date_filter import DateRangeFilter
+    study_date = DateRangeFilter(label = 'Study date range, yyyy-mm-dd')
+    study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
+    general_equipment_module_attributes__institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital')
+    general_equipment_module_attributes__manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make')
+    general_equipment_module_attributes__manufacturer_model_name = django_filters.CharFilter(lookup_type='icontains', label='Model')
+    general_equipment_module_attributes__station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name')
+    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    class Meta:
+        model = General_study_module_attributes
+        fields = [
+            'general_equipment_module_attributes__institution_name', 
+            'study_date', 
+            'study_description',
+            'general_equipment_module_attributes__manufacturer', 
+            'general_equipment_module_attributes__manufacturer_model_name',
+            'general_equipment_module_attributes__station_name',
+            'accession_number',
+            ]
+        order_by = (
+            ('-study_date', 'Date of exam (newest first)'),
+            ('study_date', 'Date of exam (oldest first)'),
+            ('general_equipment_module_attributes__institution_name', 'Hospital'),
+            ('general_equipment_module_attributes__manufacturer', 'Make'),
+            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
+            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('study_description', 'Study description'),
+            ('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
+            )
+
+class MGSummaryListFilter(django_filters.FilterSet):
+    """Filter for mammography studies to display in web interface.
+
+    """
+    from remapp.tools.johnboxall_date_filter import DateRangeFilter
+    study_date = DateRangeFilter(label = 'Study date range, yyyy-mm-dd')
+    procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label='Procedure')
+    general_equipment_module_attributes__institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital')
+    general_equipment_module_attributes__manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer')
+    general_equipment_module_attributes__manufacturer_model_name = django_filters.CharFilter(lookup_type='icontains', label='Model')
+    general_equipment_module_attributes__station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name')
+    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    class Meta:
+        model = General_study_module_attributes
+        fields = [
+            'general_equipment_module_attributes__institution_name', 
+            'study_date', 
+            'procedure_code_meaning',
+            'general_equipment_module_attributes__manufacturer', 
+            'general_equipment_module_attributes__manufacturer_model_name',
+            'general_equipment_module_attributes__station_name',
+            'accession_number',
+            ]
+        order_by = (
+            ('-study_date', 'Date of exam (newest first)'),
+            ('study_date', 'Date of exam (oldest first)'),
+            ('general_equipment_module_attributes__institution_name', 'Hospital'),
+            ('general_equipment_module_attributes__manufacturer', 'Make'),
+            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
+            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('procedure_code_meaning', 'Procedure'),
+            )

@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installing PostgreSQL for OpenREM on Ubuntu linux &mdash; OpenREM 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="OpenREM 0.3.2 documentation" href="index.html" />
+    <link rel="up" title="Installation instructions" href="install.html" />
+    <link rel="next" title="Importing data to OpenREM" href="import.html" />
+    <link rel="prev" title="Installation instructions" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="import.html" title="Importing data to OpenREM"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation instructions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">OpenREM 0.3.2 documentation</a> &raquo;</li>
+          <li><a href="install.html" accesskey="U">Installation instructions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installing-postgresql-for-openrem-on-ubuntu-linux">
+<h1>Installing PostgreSQL for OpenREM on Ubuntu linux<a class="headerlink" href="#installing-postgresql-for-openrem-on-ubuntu-linux" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="install-postgresql-and-the-python-connector">
+<h2>Install PostgreSQL and the python connector<a class="headerlink" href="#install-postgresql-and-the-python-connector" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">postgresql</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">build-dep</span> <span class="pre">python-psycopg2</span></tt></li>
+</ul>
+<p>The second command installed a lot of things, at least some of which are
+necessary for this to work!</p>
+<p>If you are using a virtualenv, make sure you are in it and it is active (<tt class="docutils literal"><span class="pre">source</span> <span class="pre">bin/activate</span></tt>)</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">psycopg2</span></tt></li>
+</ul>
+</div>
+<div class="section" id="create-a-user-for-the-database">
+<h2>Create a user for the database<a class="headerlink" href="#create-a-user-for-the-database" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">passwd</span> <span class="pre">postgres</span></tt></li>
+<li>Enter password, twice</li>
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">-u</span> <span class="pre">postgres</span> <span class="pre">createuser</span> <span class="pre">-P</span> <span class="pre">openrem_user</span></tt></li>
+<li>Enter password, twice</li>
+<li>Superuser, <em>No</em></li>
+<li>Create databases, <em>No</em></li>
+<li>Create new roles, <em>No</em></li>
+</ul>
+<div class="section" id="optional-specify-the-location-for-the-database">
+<h3>Optional: Specify the location for the database<a class="headerlink" href="#optional-specify-the-location-for-the-database" title="Permalink to this headline">¶</a></h3>
+<p>You might like to do this if you want to put the database on an encrypted
+location</p>
+<p>For this example, I&#8217;m going to assume all the OpenREM programs and data are in the folder <tt class="docutils literal"><span class="pre">/var/openrem/</span></tt>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">/etc/init.d/postgresql</span> <span class="pre">stop</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">mkdir</span> <span class="pre">/var/openrem/database</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">cp</span> <span class="pre">-aRv</span> <span class="pre">/var/lib/postgresql/9.1/main</span> <span class="pre">/var/openrem/database/</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">nano</span> <span class="pre">/etc/postgresql/9.1/main/postgresql.conf</span></tt></li>
+</ul>
+<dl class="docutils">
+<dt>Change the line</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">data_directory</span> <span class="pre">=</span> <span class="pre">'/var/lib/postgresql/9.1/main'</span></tt> to</li>
+<li><tt class="docutils literal"><span class="pre">data_directory</span> <span class="pre">=</span> <span class="pre">'/var/openrem/database/main'</span></tt></li>
+</ul>
+</dd>
+</dl>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">/etc/init.d/postgresql</span> <span class="pre">start</span></tt></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="create-the-database">
+<h2>Create the database<a class="headerlink" href="#create-the-database" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">su</span> <span class="pre">postgres</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">psql</span> <span class="pre">template1</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">CREATE</span> <span class="pre">DATABASE</span> <span class="pre">openrem_db</span> <span class="pre">OWNER</span> <span class="pre">openrem_user</span> <span class="pre">ENCODING</span> <span class="pre">'UTF8';</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">\q</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">exit</span></tt></li>
+</ul>
+</div>
+<div class="section" id="change-the-security-configuration">
+<h2>Change the security configuration<a class="headerlink" href="#change-the-security-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The default security settings are too restrictive to allow access to the database.</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">nano</span> <span class="pre">/etc/postgresql/9.1/main/pg_hba.conf</span></tt></p>
+</li>
+<li><dl class="first docutils">
+<dt>Add the following line:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">local</span> <span class="pre">openrem_db</span> <span class="pre">openrem_user</span> <span class="pre">md5</span></tt></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">sudo</span> <span class="pre">/etc/init.d/postgresql</span> <span class="pre">restart</span></tt></p>
+</li>
+</ul>
+</div>
+<div class="section" id="configure-openrem-to-use-the-database">
+<h2>Configure OpenREM to use the database<a class="headerlink" href="#configure-openrem-to-use-the-database" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Find and edit the settings file, eg</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">nano</span> <span class="pre">local/lib/python2.7/site-packages/openrem/openrem/settings.py</span></tt></li>
+</ul>
+</dd>
+<dt>Set the following (changing name, user and password as appropriate):</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">'ENGINE':</span> <span class="pre">'django.db.backends.postgresql_psycopg2',</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">'NAME':</span> <span class="pre">'openrem_db',</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">'USER':</span> <span class="pre">'openremuser',</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">'PASSWORD':</span> <span class="pre">'openrem_pw',</span></tt></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="fire-it-up-with-openrem">
+<h2>Fire it up with OpenREM<a class="headerlink" href="#fire-it-up-with-openrem" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">syncdb</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">convert_to_south</span> <span class="pre">remapp</span></tt></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installing PostgreSQL for OpenREM on Ubuntu linux</a><ul>
+<li><a class="reference internal" href="#install-postgresql-and-the-python-connector">Install PostgreSQL and the python connector</a></li>
+<li><a class="reference internal" href="#create-a-user-for-the-database">Create a user for the database</a><ul>
+<li><a class="reference internal" href="#optional-specify-the-location-for-the-database">Optional: Specify the location for the database</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-the-database">Create the database</a></li>
+<li><a class="reference internal" href="#change-the-security-configuration">Change the security configuration</a></li>
+<li><a class="reference internal" href="#configure-openrem-to-use-the-database">Configure OpenREM to use the database</a></li>
+<li><a class="reference internal" href="#fire-it-up-with-openrem">Fire it up with OpenREM</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation instructions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="import.html"
+                        title="next chapter">Importing data to OpenREM</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/postgresql.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="import.html" title="Importing data to OpenREM"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation instructions"
+             >previous</a> |</li>
+        <li><a href="index.html">OpenREM 0.3.2 documentation</a> &raquo;</li>
+          <li><a href="install.html" >Installation instructions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Ed McDonagh.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
+    </div>
+  </body>
+</html>
