@@ -16,7 +16,7 @@ import sys
 import os
 
 basepath = os.path.dirname(__file__)
-projectpath = os.path.abspath(os.path.join(basepath, ".."))
+projectpath = os.path.abspath(os.path.join(basepath, "..", "openrem"))
 sys.path.insert(0, projectpath)
 
 # If extensions (or modules to document with autodoc) are in another directory,
