@@ -12,8 +12,8 @@ Quick setup
 #. Configure OpenREM
     + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
     + There are two files that need renaming:
-        + ``openrem/openrem/settings.py.example`` to ``openrem/openrem/settings.py.example``
-        + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py.example``
+        + ``openrem/openrem/settings.py.example`` to ``openrem/openrem/settings.py``
+        + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
     + in the ``settings.py`` file, set the database details.
     + For testing ONLY, use 
         + ``'ENGINE': 'django.db.backends.sqlite3',``
