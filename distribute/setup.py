@@ -19,11 +19,11 @@ requires = [
 
 setup(
     name='OpenREM',
-    version='0.3.2',
+    version='0.3.3',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
-    scripts=['openrem/scripts/openrem_rdsr','openrem/scripts/openrem_mg','openrem/scripts/openrem_ctphilips'],
+    scripts=['openrem/scripts/openrem_rdsr.py','openrem/scripts/openrem_mg.py','openrem/scripts/openrem_ctphilips.py'],
     license='GPLv3 with additional permissions',  
     description='An open implementation of IHE Radiation Exposure Monitoring profile Dose Info Consumer and Dose Register actors',
     long_description=README,

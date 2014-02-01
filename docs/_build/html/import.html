@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Importing data to OpenREM &mdash; OpenREM 0.3.2 documentation</title>
+    <title>Importing data to OpenREM &mdash; OpenREM 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.2',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.2 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.3 documentation" href="index.html" />
     <link rel="next" title="Using the OpenREM interface and export function" href="interface.html" />
     <link rel="prev" title="Installing PostgreSQL for OpenREM on Ubuntu linux" href="postgresql.html" /> 
   </head>
@@ -35,12 +35,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="interface.html" title="Using the OpenREM interface and export function"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,13 +54,41 @@
             
   <div class="section" id="importing-data-to-openrem">
 <h1>Importing data to OpenREM<a class="headerlink" href="#importing-data-to-openrem" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="importing-dicom-radiation-dose-structured-reports">
-<h2>Importing DICOM Radiation Dose Structured Reports<a class="headerlink" href="#importing-dicom-radiation-dose-structured-reports" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
+<div class="section" id="importing-dose-related-data-from-dicom-files">
+<h2>Importing dose related data from DICOM files<a class="headerlink" href="#importing-dose-related-data-from-dicom-files" title="Permalink to this headline">¶</a></h2>
+<div class="versionchanged">
+<p><span>Changed in version 0.3.3: </span>The scripts now have a <tt class="docutils literal"><span class="pre">.py</span></tt> suffix</p>
 </div>
-<div class="section" id="importing-mammography-dicom-image-data">
-<h2>Importing mammography DICOM image data<a class="headerlink" href="#importing-mammography-dicom-image-data" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Installs of OpenREM earlier than 0.3.3 will break on upgrade if the scripts are called from other programs</p>
+</div>
+<p>If you are using linux or have put <tt class="docutils literal"><span class="pre">`&quot;C:\Python27\Lib\site-packages\openrem\scripts&quot;</span></tt> and
+<tt class="docutils literal"><span class="pre">&quot;C:\Python27\Lib\site-packages\openrem&quot;</span></tt> onto your path, you should be able to import from the command line:</p>
+<ul class="simple">
+<li>For Radiation Dose Structured Reports</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">openrem_rdsr.py</span> <span class="pre">filename.dcm</span></tt></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>For mammography DICOM images (see restrictions on testing)</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">openrem_mg.py</span> <span class="pre">filename.dcm</span></tt></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>For CT dose summary files from Philips CT scanners</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">openrem_ctphilips.py</span> <span class="pre">filename.dcm</span></tt></li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -70,8 +101,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Importing data to OpenREM</a><ul>
-<li><a class="reference internal" href="#importing-dicom-radiation-dose-structured-reports">Importing DICOM Radiation Dose Structured Reports</a></li>
-<li><a class="reference internal" href="#importing-mammography-dicom-image-data">Importing mammography DICOM image data</a></li>
+<li><a class="reference internal" href="#importing-dose-related-data-from-dicom-files">Importing dose related data from DICOM files</a></li>
 </ul>
 </li>
 </ul>
@@ -111,16 +141,19 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="interface.html" title="Using the OpenREM interface and export function"
              >next</a> |</li>
         <li class="right" >
           <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Ed McDonagh.
+        &copy; Copyright 2013-2014, The Royal Marsden NHS Foundation Trust.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
     </div>
   </body>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation instructions &mdash; OpenREM 0.3.2 documentation</title>
+    <title>Installation instructions &mdash; OpenREM 0.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.2',
+        VERSION:     '0.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.2 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.3 documentation" href="index.html" />
     <link rel="next" title="Installing PostgreSQL for OpenREM on Ubuntu linux" href="postgresql.html" />
     <link rel="prev" title="Welcome to OpenREM’s documentation!" href="index.html" /> 
   </head>
@@ -35,12 +35,15 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to OpenREM’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -74,8 +77,8 @@
 <li><dl class="first docutils">
 <dt>There are two files that need renaming:</dt>
 <dd><ul class="first last simple">
-<li><tt class="docutils literal"><span class="pre">openrem/openrem/settings.py.example</span></tt> to <tt class="docutils literal"><span class="pre">openrem/openrem/settings.py.example</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">openrem/openrem/wsgi.py.example</span></tt> to <tt class="docutils literal"><span class="pre">openrem/openrem/wsgi.py.example</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">openrem/openrem/settings.py.example</span></tt> to <tt class="docutils literal"><span class="pre">openrem/openrem/settings.py</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">openrem/openrem/wsgi.py.example</span></tt> to <tt class="docutils literal"><span class="pre">openrem/openrem/wsgi.py</span></tt></li>
 </ul>
 </dd>
 </dl>
@@ -84,9 +87,18 @@
 </li>
 <li><dl class="first docutils">
 <dt>For testing ONLY, use</dt>
+<dd><ul class="first last">
+<li><p class="first"><tt class="docutils literal"><span class="pre">'ENGINE':</span> <span class="pre">'django.db.backends.sqlite3',</span></tt></p>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="docutils literal"><span class="pre">'NAME':</span> <span class="pre">'/ENTER/PATH/WHERE/DB/FILE/CAN/GO'</span></tt></dt>
 <dd><ul class="first last simple">
-<li><tt class="docutils literal"><span class="pre">'ENGINE':</span> <span class="pre">'django.db.backends.sqlite3',</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">'NAME':</span> <span class="pre">'/ENTER/PATH/WHERE/DB/FILE/CAN/GO'</span></tt></li>
+<li>Windows example: <tt class="docutils literal"><span class="pre">'NAME':</span> <span class="pre">'C:\Documents\User\OpenREM\openrem.db'</span></tt></li>
+<li>Linux example: <tt class="docutils literal"><span class="pre">'NAME':</span> <span class="pre">'/var/openrem/openrem.db'</span></tt></li>
+</ul>
+</dd>
+</dl>
+</li>
 </ul>
 </dd>
 </dl>
@@ -117,7 +129,7 @@
 <li><dl class="first docutils">
 <dt>Add some data!</dt>
 <dd><ul class="first last simple">
-<li><tt class="docutils literal"><span class="pre">openrem_rdsr</span> <span class="pre">rdsrfile.dcm</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">openrem_rdsr.py</span> <span class="pre">rdsrfile.dcm</span></tt></li>
 </ul>
 </dd>
 </dl>
@@ -227,16 +239,19 @@ recommended to use a different database such as PostgreSQL or MySQL.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to OpenREM’s documentation!"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Ed McDonagh.
+        &copy; Copyright 2013-2014, The Royal Marsden NHS Foundation Trust.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
     </div>
   </body>
