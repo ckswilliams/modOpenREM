@@ -25,7 +25,7 @@ Quick setup
     + ``python path/to/openrem/manage.py runserver``
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 #. Add some data!
-    + ``openrem_rdsr rdsrfile.dcm``
+    + ``openrem_rdsr.py rdsrfile.dcm``
 
 More in depth process
 =====================
