@@ -18,6 +18,8 @@ Quick setup
     + For testing ONLY, use 
         + ``'ENGINE': 'django.db.backends.sqlite3',``
         + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
+            + Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
+            + Linux example: ``'NAME': '/var/openrem/openrem.db'``
 #. Create the database
     + ``python path/to/openrem/manage.py syncdb``
     + (optional for a test database) ``python path/to/openrem/manage.py convert_to_south remapp``
@@ -25,7 +27,7 @@ Quick setup
     + ``python path/to/openrem/manage.py runserver``
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 #. Add some data!
-    + ``openrem_rdsr rdsrfile.dcm``
+    + ``openrem_rdsr.py rdsrfile.dcm``
 
 More in depth process
 =====================
