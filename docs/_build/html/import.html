@@ -35,6 +35,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="interface.html" title="Using the OpenREM interface and export function"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -51,13 +54,34 @@
             
   <div class="section" id="importing-data-to-openrem">
 <h1>Importing data to OpenREM<a class="headerlink" href="#importing-data-to-openrem" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="importing-dicom-radiation-dose-structured-reports">
-<h2>Importing DICOM Radiation Dose Structured Reports<a class="headerlink" href="#importing-dicom-radiation-dose-structured-reports" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
-</div>
-<div class="section" id="importing-mammography-dicom-image-data">
-<h2>Importing mammography DICOM image data<a class="headerlink" href="#importing-mammography-dicom-image-data" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
+<div class="section" id="importing-dose-related-data-from-dicom-files">
+<h2>Importing dose related data from DICOM files<a class="headerlink" href="#importing-dose-related-data-from-dicom-files" title="Permalink to this headline">¶</a></h2>
+<p>If you are using linux or have put &#8220;C:Python27Libsite-packagesopenremscripts&#8221; and
+&#8220;C:Python27Libsite-packagesopenrem&#8221; onto your path, you should be able to import from the command line:</p>
+<ul class="simple">
+<li>For Radiation Dose Structured Reports</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>&#64;openrem_rdsr.py filename.dcm&#64;</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>For mammography DICOM images (see restrictions on testing)</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>&#64;openrem_mg.py filename.dcm&#64;</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>For CT dose summary files from Philips CT scanners</li>
+</ul>
+<blockquote>
+<div><ul class="simple">
+<li>&#64;openrem_ctphilips.py filename.dcm&#64;</li>
+</ul>
+</div></blockquote>
 </div>
 </div>
 
@@ -70,8 +94,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Importing data to OpenREM</a><ul>
-<li><a class="reference internal" href="#importing-dicom-radiation-dose-structured-reports">Importing DICOM Radiation Dose Structured Reports</a></li>
-<li><a class="reference internal" href="#importing-mammography-dicom-image-data">Importing mammography DICOM image data</a></li>
+<li><a class="reference internal" href="#importing-dose-related-data-from-dicom-files">Importing dose related data from DICOM files</a></li>
 </ul>
 </li>
 </ul>
@@ -111,6 +134,9 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="interface.html" title="Using the OpenREM interface and export function"
              >next</a> |</li>
         <li class="right" >
@@ -120,7 +146,7 @@
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Ed McDonagh.
+        &copy; Copyright 2013-2014, The Royal Marsden NHS Foundation Trust.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
     </div>
   </body>
