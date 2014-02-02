@@ -5,7 +5,7 @@ OpenREM
 OpenREM is a Django app to extract, store and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
-Detailed documentation is in the "docs" directory.
+Detailed documentation can be found on Read the Docs: http://openrem.rtfd.org
 
 Quick start
 -----------
@@ -30,4 +30,4 @@ Quick start
     + ``python path/to/openrem/manage.py runserver``
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 #. Add some data!
-    + ``openrem_rdsr rdsrfile.dcm``
+    + ``openrem_rdsr.py rdsrfile.dcm``
