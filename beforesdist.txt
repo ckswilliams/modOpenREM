@@ -4,8 +4,8 @@ Clean the existing distribute folder:
 Or just remove all the contents!
 
 Then get the new contents:
-	rsync -av ../OpenREM/openrem .
-	rsync -av ../OpenREM/distribute/ .
+	rsync -av ../bbOpenREM/openrem .
+	rsync -av ../bbOpenREM/distribute/ .
 
 Tidy up:
 	find . -name *.pyc -exec rm {} \;
