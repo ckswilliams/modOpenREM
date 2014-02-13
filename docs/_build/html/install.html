@@ -56,6 +56,11 @@
 <h1>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="quick-setup">
 <h2>Quick setup<a class="headerlink" href="#quick-setup" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Most path names are represented using the linux convention of a <tt class="docutils literal"><span class="pre">/</span></tt> separator.
+If you are installing in a Windows environment you will need to use the Windows <tt class="docutils literal"><span class="pre">\</span></tt> separator.</p>
+</div>
 <ol class="arabic">
 <li><p class="first">Install python (might need to be 2.7)</p>
 </li>
@@ -120,6 +125,10 @@
 <dt>Start test web server</dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">runserver</span></tt></li>
+<li>If you are using a headless server and need to be able to see the
+web interface from another machine, use
+<tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">runserver</span> <span class="pre">x.x.x.x:8000</span></tt> replacing the
+&#8216;x&#8217; with the IP address of the server and &#8216;8000&#8217; with the port you wish to use.</li>
 </ul>
 </dd>
 </dl>
@@ -138,7 +147,7 @@
 </div>
 <div class="section" id="more-in-depth-process">
 <h2>More in depth process<a class="headerlink" href="#more-in-depth-process" title="Permalink to this headline">¶</a></h2>
-<ul>
+<ol class="arabic">
 <li><dl class="first docutils">
 <dt>Install <a class="reference external" href="https://pypi.python.org/pypi/virtualenv">virtualenv</a> or maybe <a class="reference external" href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a></dt>
 <dd><p class="first last">Recommended if the server is ever going to be used for more than one
@@ -185,9 +194,26 @@ the production database details.</p>
 </dd>
 </dl>
 </li>
-<li><p class="first">Create the database</p>
-</li>
+<li><dl class="first docutils">
+<dt>Create the database</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">syncdb</span></tt></li>
 </ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Convert the database to use South</dt>
+<dd><p class="first">South is a django application to manage database migrations. Using
+South means that future changes to the database model can be calculated
+and executed automatically with simple commands when OpenREM is upgraded.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">convert_to_south</span> <span class="pre">remapp</span></tt></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
 </div>
 </div>
 

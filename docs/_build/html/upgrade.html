@@ -56,22 +56,29 @@
 <h1>Upgrade instructions<a class="headerlink" href="#upgrade-instructions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="upgrading-from-tar-gz-package">
 <h2>Upgrading from tar.gz package<a class="headerlink" href="#upgrading-from-tar-gz-package" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="code-upgrade">
+<h3>Code upgrade<a class="headerlink" href="#code-upgrade" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">OpenREM-version.tar.gz</span></tt></li>
+</ol>
+</div>
+<div class="section" id="database-migration">
+<h3>Database migration<a class="headerlink" href="#database-migration" title="Permalink to this headline">¶</a></h3>
+<p>Always do a database migration using South after an upgrade in case any of the
+database models have changed. This will normally not be the case.</p>
 <ol class="arabic">
-<li><p class="first"><tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">OpenREM-version.tar.gz</span></tt></p>
-</li>
 <li><dl class="first docutils">
 <dt><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">schemamigration</span> <span class="pre">--auto</span> <span class="pre">remapp</span></tt></dt>
-<dd><ol class="first last arabic simple">
-<li>eg <tt class="docutils literal"><span class="pre">python</span> <span class="pre">lib/python2.7/site-packages/openrem/manage.py</span> <span class="pre">schemamigration</span> <span class="pre">--auto</span> <span class="pre">remapp</span></tt></li>
-</ol>
+<dd><p class="first last">eg <tt class="docutils literal"><span class="pre">python</span> <span class="pre">lib/python2.7/site-packages/openrem/manage.py</span> <span class="pre">schemamigration</span> <span class="pre">--auto</span> <span class="pre">remapp</span></tt></p>
 </dd>
 </dl>
 </li>
-<li><p class="first">If response to the last command is &#8216;Nothing seems to have changed&#8217;, no migration is reuired. Else, follow the instructions to migrate.</p>
+<li><p class="first">If response to the last command is &#8216;Nothing seems to have changed&#8217;, no migration is required. Else, follow the instructions to migrate.</p>
 </li>
 <li><p class="first">Restart the web server, in case changes have been made to the web interface.</p>
 </li>
 </ol>
+</div>
 </div>
 </div>
 
@@ -84,7 +91,11 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Upgrade instructions</a><ul>
-<li><a class="reference internal" href="#upgrading-from-tar-gz-package">Upgrading from tar.gz package</a></li>
+<li><a class="reference internal" href="#upgrading-from-tar-gz-package">Upgrading from tar.gz package</a><ul>
+<li><a class="reference internal" href="#code-upgrade">Code upgrade</a></li>
+<li><a class="reference internal" href="#database-migration">Database migration</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
