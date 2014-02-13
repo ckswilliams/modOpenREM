@@ -69,7 +69,7 @@ More in depth process
     
     However, for performance it is recommended that a production webserver is
     used. Popular choices would be either `Apache <http://httpd.apache.org>`_ or you can do as the cool kids
-    do and use Gunicorn with nginx.
+    do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/>`_.
 
 #. Configure OpenREM
     Follow the 'Configure OpenREM' instuctions in the `Quick setup`_ section above, but this time with 
