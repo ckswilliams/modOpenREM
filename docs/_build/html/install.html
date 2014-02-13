@@ -153,16 +153,12 @@ python application &#8211; virtualenv sets up an isolated python environment</p>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Install and configure a production database</dt>
+<dt>Install a production database</dt>
 <dd><p class="first">SQLite is great for getting things running quickly and testing if the setup works,
 but is really not recommended for production use on any scale. Therefore it is
-recommended to use a different database such as PostgreSQL or MySQL.</p>
-<p>Instructions for installing and configuring these can be found at these links:</p>
-<ul class="simple">
-<li>PostgreSQL</li>
-<li>MySQL</li>
-</ul>
-<p>Alternatively, here are the authors instructions for installing PostgreSQL on linux:</p>
+recommended to use a different database such as <a class="reference external" href="http://www.postgresql.org">PostgreSQL</a> or
+<a class="reference external" href="http://www.mysql.com">MySQL</a>.</p>
+<p>Here are the authors instructions for installing PostgreSQL on linux:</p>
 <div class="toctree-wrapper last compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="postgresql.html">Installing PostgreSQL for OpenREM on Ubuntu linux</a></li>
@@ -171,16 +167,27 @@ recommended to use a different database such as PostgreSQL or MySQL.</p>
 </dd>
 </dl>
 </li>
+<li><dl class="first docutils">
+<dt>Install and configure a production webserver</dt>
+<dd><p class="first">Unlike the database, the production webserver can be left till later and
+can be changed again at any time.</p>
+<p class="last">However, for performance it is recommended that a production webserver is
+used. Popular choices would be either <a class="reference external" href="http://httpd.apache.org">Apache</a> or you can do as the cool kids
+do and use Gunicorn with nginx.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Configure OpenREM</dt>
+<dd><p class="first">Follow the &#8216;Configure OpenREM&#8217; instuctions in the <a class="reference internal" href="#quick-setup">Quick setup</a> section above, but this time with
+the production database details.</p>
+<p class="last">Configure the production webserver too.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Create the database</p>
+</li>
 </ul>
-<div class="section" id="install-and-configure-a-production-webserver">
-<h3>Install and configure a production webserver<a class="headerlink" href="#install-and-configure-a-production-webserver" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="configure-openrem">
-<h3>Configure OpenREM<a class="headerlink" href="#configure-openrem" title="Permalink to this headline">¶</a></h3>
-</div>
-<div class="section" id="create-the-database">
-<h3>Create the database<a class="headerlink" href="#create-the-database" title="Permalink to this headline">¶</a></h3>
-</div>
 </div>
 </div>
 
@@ -195,9 +202,6 @@ recommended to use a different database such as PostgreSQL or MySQL.</p>
 <li><a class="reference internal" href="#">Installation instructions</a><ul>
 <li><a class="reference internal" href="#quick-setup">Quick setup</a></li>
 <li><a class="reference internal" href="#more-in-depth-process">More in depth process</a><ul>
-<li><a class="reference internal" href="#install-and-configure-a-production-webserver">Install and configure a production webserver</a></li>
-<li><a class="reference internal" href="#configure-openrem">Configure OpenREM</a></li>
-<li><a class="reference internal" href="#create-the-database">Create the database</a></li>
 </ul>
 </li>
 </ul>
