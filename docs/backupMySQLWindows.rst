@@ -1,7 +1,7 @@
 Backing up MySQL on Windows
 ===========================
 
-..  Note::  Content contributed by DJ Platten, with edit by ET McDonagh
+..  Note::  Content contributed by DJ Platten
 
 These instructions are based on Windows XP.
 
