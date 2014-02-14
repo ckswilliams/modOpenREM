@@ -40,8 +40,6 @@ Quick setup
 More in depth process
 =====================
 
-
-
 #. Install `virtualenv`_ or maybe `virtualenvwrapper`_
     Recommended if the server is ever going to be used for more than one 
     python application -- virtualenv sets up an isolated python environment
@@ -86,7 +84,15 @@ More in depth process
     and executed automatically with simple commands when OpenREM is upgraded.
 
     + ``python path/to/openrem/manage.py convert_to_south remapp``
-    
+
+Related guides
+==============
+
+    ..  toctree::
+        :maxdepth: 1
+        
+        conquestAsWindowsService
+        backupMySQLWindows
 
 
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv

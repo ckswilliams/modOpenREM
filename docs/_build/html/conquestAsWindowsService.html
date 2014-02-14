@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Running Conquest on Windows as a service &mdash; OpenREM 0.3.3-r2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.3-r2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="OpenREM 0.3.3-r2 documentation" href="index.html" />
+    <link rel="up" title="Installation instructions" href="install.html" />
+    <link rel="next" title="Backing up MySQL on Windows" href="backupMySQLWindows.html" />
+    <link rel="prev" title="Installing PostgreSQL for OpenREM on Ubuntu linux" href="postgresql.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="backupMySQLWindows.html" title="Backing up MySQL on Windows"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">OpenREM 0.3.3-r2 documentation</a> &raquo;</li>
+          <li><a href="install.html" accesskey="U">Installation instructions</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="running-conquest-on-windows-as-a-service">
+<h1>Running Conquest on Windows as a service<a class="headerlink" href="#running-conquest-on-windows-as-a-service" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Content contributed by DJ Platten, with edit by ET McDonagh</p>
+</div>
+<p>This guide assumes Conquest has already been installed and runs ok. These
+instructions are based on Windows XP.</p>
+<div class="section" id="run-as-a-service">
+<h2>Run as a service<a class="headerlink" href="#run-as-a-service" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Make sure conquest isn&#8217;t running.</li>
+<li>Open a file browser and navigate to your conquest folder.</li>
+<li>Right-hand click on the &#8220;ConquestDICOMServer.exe&#8221; file and choose &#8220;Run as...&#8221;</li>
+<li>Enter the username and password of a Windows user with administrator rights.</li>
+<li>Once conquest is running, click on the &#8220;Install server as NT service&#8221; on the &#8220;Configuration&#8221; tab.</li>
+<li>Close the conquest Window.</li>
+<li>Log in to Windows as a user with administrator rights.</li>
+<li>Go to &#8220;Control panel&#8221; -&gt; &#8220;Administrative Tools&#8221; -&gt; &#8220;Services&#8221;.</li>
+<li>There will be a service with the same name as conquest&#8217;s AE title. Right-hand click the mouse on this service and select &#8220;Properties&#8221;.</li>
+<li>On the &#8220;Log On&#8221; tab check the box that says &#8220;Allow service to interact with the desktop&#8221;.</li>
+<li>Click &#8220;Apply&#8221; then &#8220;OK&#8221;.</li>
+<li>Right-hand click on the service again and click &#8220;Restart&#8221;.</li>
+</ol>
+<p>The &#8220;Allow service to interact with the desktop&#8221; seems to be necessary for the batch to run that puts the dose report into OpenREM.</p>
+</div>
+<div class="section" id="firewall-settings">
+<h2>Firewall settings<a class="headerlink" href="#firewall-settings" title="Permalink to this headline">¶</a></h2>
+<p>Windows is able to change its firewall settings after you think everything is
+working ok! Assuming you have control of the firewall, add three port exceptions
+to the Windows firewall on the server computer: ports 80 and 443 for Apache,
+and whichever port that was chosen for conquest (104 is <em>the</em> port allocated
+to DICOM, but you may have used a higher port above 1024 for permissions reasons).</p>
+<p>The firewall instructions at <a class="reference external" href="http://portforward.com/english/routers/firewalling/Microsoft/WindowsXPFirewallFirewall/Apache.htm">portforward.com</a>
+were found to be a useful guide for this.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Running Conquest on Windows as a service</a><ul>
+<li><a class="reference internal" href="#run-as-a-service">Run as a service</a></li>
+<li><a class="reference internal" href="#firewall-settings">Firewall settings</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="postgresql.html"
+                        title="previous chapter">Installing PostgreSQL for OpenREM on Ubuntu linux</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="backupMySQLWindows.html"
+                        title="next chapter">Backing up MySQL on Windows</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/conquestAsWindowsService.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="backupMySQLWindows.html" title="Backing up MySQL on Windows"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
+             >previous</a> |</li>
+        <li><a href="index.html">OpenREM 0.3.3-r2 documentation</a> &raquo;</li>
+          <li><a href="install.html" >Installation instructions</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013-2014, The Royal Marsden NHS Foundation Trust.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
