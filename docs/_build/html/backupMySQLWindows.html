@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Backing up MySQL on Windows &mdash; OpenREM 0.3.3-r2 documentation</title>
+    <title>Backing up MySQL on Windows &mdash; OpenREM 0.3.4 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.3-r2',
+        VERSION:     '0.3.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.3-r2 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.4 documentation" href="index.html" />
     <link rel="up" title="Installation instructions" href="install.html" />
     <link rel="next" title="Importing data to OpenREM" href="import.html" />
     <link rel="prev" title="Running Conquest on Windows as a service" href="conquestAsWindowsService.html" /> 
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="conquestAsWindowsService.html" title="Running Conquest on Windows as a service"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.3-r2 documentation</a> &raquo;</li>
+        <li><a href="index.html">OpenREM 0.3.4 documentation</a> &raquo;</li>
           <li><a href="install.html" accesskey="U">Installation instructions</a> &raquo;</li> 
       </ul>
     </div>  
@@ -62,47 +62,39 @@
 </div>
 <p>These instructions are based on Windows XP.</p>
 <p>As a one-off, create a MySQL user called <tt class="docutils literal"><span class="pre">backup</span></tt> with a password of <tt class="docutils literal"><span class="pre">backup</span></tt> that has full rights to the database:</p>
-<div class="highlight-mysql"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e &quot;CREATE USER &#39;backup&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;backup&#39;&quot;;
-</pre></div>
+<div class="highlight-mysql"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e "CREATE USER 'backup'@'localhost' IDENTIFIED BY 'backup'";</pre>
 </div>
 <p>Grant the <tt class="docutils literal"><span class="pre">backup</span></tt> user full privileges on the database called <tt class="docutils literal"><span class="pre">openremdatabasemysql</span></tt>:</p>
-<div class="highlight-mysql"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e &quot;GRANT ALL PRIVILEGES ON openremdatabasemysql .* TO &#39;backup&#39;@&#39;localhost&#39;&quot;;
-</pre></div>
+<div class="highlight-mysql"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e "GRANT ALL PRIVILEGES ON openremdatabasemysql .* TO 'backup'@'localhost'";</pre>
 </div>
 <p>Grant the <tt class="docutils literal"><span class="pre">backup</span></tt> user privileges to create databases:</p>
-<div class="highlight-mysql"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e &quot;GRANT CREATE ON *.* TO &#39;backup&#39;@&#39;localhost&#39;&quot;;
-</pre></div>
+<div class="highlight-mysql"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e "GRANT CREATE ON *.* TO 'backup'@'localhost'";</pre>
 </div>
 <p>Reload the privileges to ensure that MySQL registers the new ones:</p>
-<div class="highlight-mysql"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e &quot;FLUSH PRIVILEGES&quot;;
-</pre></div>
+<div class="highlight-mysql"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -u root -p -e "FLUSH PRIVILEGES";</pre>
 </div>
 <p>To backup the contents of the database from the command line to a file called <tt class="docutils literal"><span class="pre">backup.sql</span></tt> (note that the lack of spaces after the <tt class="docutils literal"><span class="pre">-u</span></tt> and <tt class="docutils literal"><span class="pre">-p</span></tt> is not a typo):</p>
-<div class="highlight-posh"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysqldump.exe -ubackup -pbackup openremdatabasemysql &gt; backup.sql
-</pre></div>
+<div class="highlight-posh"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysqldump.exe -ubackup -pbackup openremdatabasemysql &gt; backup.sql</pre>
 </div>
 <p>To restore the database, assuming that it doesn&#8217;t exist anymore, first it needs to be created:</p>
-<div class="highlight-posh"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -ubackup -pbackup -e &quot;CREATE DATABASE openremdatabasemysql&quot;;
-</pre></div>
+<div class="highlight-posh"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -ubackup -pbackup -e "CREATE DATABASE openremdatabasemysql";</pre>
 </div>
 <p>Then restore the contents of the database from a file called <tt class="docutils literal"><span class="pre">backup.sql</span></tt>:</p>
-<div class="highlight-posh"><div class="highlight"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -ubackup -pbackup openremdatabasemysql &lt; backup.sql
-</pre></div>
+<div class="highlight-posh"><pre>C:\Program Files\MySQL\MySQL Server 5.6\bin\mysql.exe -ubackup -pbackup openremdatabasemysql &lt; backup.sql</pre>
 </div>
 <p>An example DOS batch file to back up the contents of the <tt class="docutils literal"><span class="pre">openremdatabasemysql</span></tt> database using a time stamp of the form <tt class="docutils literal"><span class="pre">yyyy-mm-dd_hhmm</span></tt>, zip up the resulting file, delete the uncompressed version and then copy it to a network location (the network copy will only work if the user that runs the batch file has permission on the
 network):</p>
-<div class="highlight-bash"><div class="highlight"><pre>@echo off
-For /f &quot;tokens=1-4 delims=/ &quot; %%a in (&#39;date /t&#39;) do (set mydate=%%c-%%b-%%a)
-For /f &quot;tokens=1-2 delims=/:&quot; %%a in (&#39;time /t&#39;) do (set mytime=%%a%%b)
+<div class="highlight-bash"><pre>@echo off
+For /f "tokens=1-4 delims=/ " %%a in ('date /t') do (set mydate=%%c-%%b-%%a)
+For /f "tokens=1-2 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b)
 
-&quot;C:\Program Files\MySQL\MySQL Server 5.6\bin\mysqldump.exe&quot; -ubackup -pbackup openremdatabasemysql &gt; F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.sql
+"C:\Program Files\MySQL\MySQL Server 5.6\bin\mysqldump.exe" -ubackup -pbackup openremdatabasemysql &gt; F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.sql
 
-&quot;C:\Program Files\7-Zip\7z.exe&quot; a F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.zip F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.sql
+"C:\Program Files\7-Zip\7z.exe" a F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.zip F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.sql
 
 del F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.sql
 
-copy F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.zip &quot;\\Srv-mps-001\xls_protect\PATDOSE\OpenREMbackup\&quot;
-</pre></div>
+copy F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.zip "\\Srv-mps-001\xls_protect\PATDOSE\OpenREMbackup\"</pre>
 </div>
 </div>
 
@@ -155,13 +147,13 @@ copy F:\OpenREMdatabase\backup\%mydate%_%mytime%_openremdatabasemysql.zip &quot;
         <li class="right" >
           <a href="conquestAsWindowsService.html" title="Running Conquest on Windows as a service"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.3-r2 documentation</a> &raquo;</li>
+        <li><a href="index.html">OpenREM 0.3.4 documentation</a> &raquo;</li>
           <li><a href="install.html" >Installation instructions</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013-2014, The Royal Marsden NHS Foundation Trust.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b3.
     </div>
   </body>
 </html>
