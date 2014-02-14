@@ -50,6 +50,12 @@
             
   <div class="section" id="welcome-to-openrem-s-documentation">
 <h1>Welcome to OpenREM&#8217;s documentation!<a class="headerlink" href="#welcome-to-openrem-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>OpenREM is an opensource framework created for the purpose of radiation
+exposure monitoring. The software is capable of importing and displaying
+data from a wide variety of x-ray dose related sources, and then enables
+easy export of the data in a form that is suitable for further analysis
+by suitably qualified medical physics personnel.</p>
+<p>Please see <a class="reference external" href="http://openrem.org">openrem.org</a> for more details.</p>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -82,6 +88,16 @@
 </ul>
 </li>
 </ul>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>OpenREM does not currently include a DICOM Store SCP, ie you will
+need to install a DICOM store server in order to send RSDRs or other
+DICOM files from modalities.</p>
+<p class="last">If you have no preference, <a class="reference external" href="http://ingenium.home.xs4all.nl/dicom.html">Conquest</a>
+is recommended as a free, open source, scriptable DICOM server. Please
+note though that you will need to include the RSRD SOP in the dgatesop.lst
+file.</p>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
