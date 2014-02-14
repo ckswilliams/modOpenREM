@@ -2,6 +2,13 @@
 OpenREM version history
 =======================
 
+0.3.4-rc2
+---------
+
+#28     XLSX export crashed if any of the filter fields were missing. Now fills on import with 'None'
+#27     Use requested procedure description if requested procedure code description is missing
+
+
 0.3.4
 -----
 
