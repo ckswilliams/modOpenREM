@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation instructions &mdash; OpenREM 0.3.3-r2 documentation</title>
+    <title>Installation instructions &mdash; OpenREM 0.3.4 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.3-r2',
+        VERSION:     '0.3.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.3-r2 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.4 documentation" href="index.html" />
     <link rel="next" title="Installing PostgreSQL for OpenREM on Ubuntu linux" href="postgresql.html" />
     <link rel="prev" title="Welcome to OpenREM’s documentation!" href="index.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to OpenREM’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.3-r2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.4 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,6 +56,11 @@
 <h1>Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="quick-setup">
 <h2>Quick setup<a class="headerlink" href="#quick-setup" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Most path names are represented using the linux convention of a <tt class="docutils literal"><span class="pre">/</span></tt> separator.
+If you are installing in a Windows environment you will need to use the Windows <tt class="docutils literal"><span class="pre">\</span></tt> separator.</p>
+</div>
 <ol class="arabic">
 <li><p class="first">Install python (might need to be 2.7)</p>
 </li>
@@ -120,6 +125,10 @@
 <dt>Start test web server</dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">runserver</span></tt></li>
+<li>If you are using a headless server and need to be able to see the
+web interface from another machine, use
+<tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">runserver</span> <span class="pre">x.x.x.x:8000</span></tt> replacing the
+&#8216;x&#8217; with the IP address of the server and &#8216;8000&#8217; with the port you wish to use.</li>
 </ul>
 </dd>
 </dl>
@@ -138,7 +147,7 @@
 </div>
 <div class="section" id="more-in-depth-process">
 <h2>More in depth process<a class="headerlink" href="#more-in-depth-process" title="Permalink to this headline">¶</a></h2>
-<ul>
+<ol class="arabic">
 <li><dl class="first docutils">
 <dt>Install <a class="reference external" href="https://pypi.python.org/pypi/virtualenv">virtualenv</a> or maybe <a class="reference external" href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a></dt>
 <dd><p class="first last">Recommended if the server is ever going to be used for more than one
@@ -153,16 +162,12 @@ python application &#8211; virtualenv sets up an isolated python environment</p>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Install and configure a production database</dt>
+<dt>Install a production database</dt>
 <dd><p class="first">SQLite is great for getting things running quickly and testing if the setup works,
 but is really not recommended for production use on any scale. Therefore it is
-recommended to use a different database such as PostgreSQL or MySQL.</p>
-<p>Instructions for installing and configuring these can be found at these links:</p>
-<ul class="simple">
-<li>PostgreSQL</li>
-<li>MySQL</li>
-</ul>
-<p>Alternatively, here are the authors instructions for installing PostgreSQL on linux:</p>
+recommended to use a different database such as <a class="reference external" href="http://www.postgresql.org">PostgreSQL</a> or
+<a class="reference external" href="http://www.mysql.com">MySQL</a>.</p>
+<p>Here are the authors instructions for installing PostgreSQL on linux:</p>
 <div class="toctree-wrapper last compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="postgresql.html">Installing PostgreSQL for OpenREM on Ubuntu linux</a></li>
@@ -171,16 +176,55 @@ recommended to use a different database such as PostgreSQL or MySQL.</p>
 </dd>
 </dl>
 </li>
+<li><dl class="first docutils">
+<dt>Install and configure a production webserver</dt>
+<dd><p class="first">Unlike the database, the production webserver can be left till later and
+can be changed again at any time.</p>
+<p class="last">However, for performance it is recommended that a production webserver is
+used. Popular choices would be either <a class="reference external" href="http://httpd.apache.org">Apache</a> or you can do as the cool kids
+do and use <a class="reference external" href="http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/">Gunicorn with nginx</a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Configure OpenREM</dt>
+<dd><p class="first">Follow the &#8216;Configure OpenREM&#8217; instuctions in the <a class="reference internal" href="#quick-setup">Quick setup</a> section above, but this time with
+the production database details.</p>
+<p class="last">Configure the production webserver too.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Create the database</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">syncdb</span></tt></li>
 </ul>
-<div class="section" id="install-and-configure-a-production-webserver">
-<h3>Install and configure a production webserver<a class="headerlink" href="#install-and-configure-a-production-webserver" title="Permalink to this headline">¶</a></h3>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Convert the database to use South</dt>
+<dd><p class="first">South is a django application to manage database migrations. Using
+South means that future changes to the database model can be calculated
+and executed automatically with simple commands when OpenREM is upgraded.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">convert_to_south</span> <span class="pre">remapp</span></tt></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
 </div>
-<div class="section" id="configure-openrem">
-<h3>Configure OpenREM<a class="headerlink" href="#configure-openrem" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="related-guides">
+<h2>Related guides<a class="headerlink" href="#related-guides" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="conquestAsWindowsService.html">Running Conquest on Windows as a service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backupMySQLWindows.html">Backing up MySQL on Windows</a></li>
+</ul>
 </div>
-<div class="section" id="create-the-database">
-<h3>Create the database<a class="headerlink" href="#create-the-database" title="Permalink to this headline">¶</a></h3>
-</div>
+</div></blockquote>
 </div>
 </div>
 
@@ -195,9 +239,9 @@ recommended to use a different database such as PostgreSQL or MySQL.</p>
 <li><a class="reference internal" href="#">Installation instructions</a><ul>
 <li><a class="reference internal" href="#quick-setup">Quick setup</a></li>
 <li><a class="reference internal" href="#more-in-depth-process">More in depth process</a><ul>
-<li><a class="reference internal" href="#install-and-configure-a-production-webserver">Install and configure a production webserver</a></li>
-<li><a class="reference internal" href="#configure-openrem">Configure OpenREM</a></li>
-<li><a class="reference internal" href="#create-the-database">Create the database</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#related-guides">Related guides</a><ul>
 </ul>
 </li>
 </ul>
@@ -247,7 +291,7 @@ recommended to use a different database such as PostgreSQL or MySQL.</p>
         <li class="right" >
           <a href="index.html" title="Welcome to OpenREM’s documentation!"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.3-r2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

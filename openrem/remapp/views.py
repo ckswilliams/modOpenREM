@@ -41,31 +41,37 @@ from django.shortcuts import render_to_response
 
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter
+    import pkg_resources # part of setuptools
     f = RFSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'RF'))
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     return render_to_response(
         'remapp/rffiltered.html',
-        {'filter': f},
+        {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
 
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
+    import pkg_resources # part of setuptools
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     return render_to_response(
         'remapp/ctfiltered.html',
-        {'filter': f},
+        {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
 
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter
+    import pkg_resources # part of setuptools
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
     f = MGSummaryListFilter(filter_data, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'MG'))
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     return render_to_response(
         'remapp/mgfiltered.html',
-        {'filter': f},
+        {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
 
@@ -74,6 +80,7 @@ def openrem_home(request):
     from datetime import datetime
     import pytz
     from collections import OrderedDict
+    import pkg_resources # part of setuptools
     utc = pytz.UTC
     allstudies = General_study_module_attributes.objects.all()
     homedata = { 
@@ -82,6 +89,7 @@ def openrem_home(request):
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
         'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
         }
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     modalities = ('MG','CT','RF')
     for modality in modalities:
         studies = allstudies.filter(modality_type__contains = modality).all()
@@ -117,5 +125,5 @@ def openrem_home(request):
         homedata[modality] = ordereddata
     
     
-    return render(request,"remapp/home.html",{'homedata':homedata})
+    return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
