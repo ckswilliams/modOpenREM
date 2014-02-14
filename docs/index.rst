@@ -1,6 +1,12 @@
 Welcome to OpenREM's documentation!
 ===================================
 
+.. image:: openrem0105.png
+    :width: 105px
+    :align: left
+    :height: 105px
+    :alt: OpenREM logo
+
 OpenREM is an opensource framework created for the purpose of radiation 
 exposure monitoring. The software is capable of importing and displaying 
 data from a wide variety of x-ray dose related sources, and then enables 
