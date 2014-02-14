@@ -2,6 +2,16 @@
 OpenREM version history
 =======================
 
+0.3.4
+-----
+
+--      General improvements and addition of logo to docs
+#23     Added Windows XP MySQL backup guide to docs
+#22     Added running Conquest as a Windows XP service to docs
+#15     Added version number and copyright information to xlsx exports
+#14     Added version number to the web interface
+#13     Improve the docs with respect to South database migrations
+
 
 0.3.3-r2
 --------
