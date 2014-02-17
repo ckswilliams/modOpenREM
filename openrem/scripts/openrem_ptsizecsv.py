@@ -29,4 +29,4 @@ if sitepaths and not openrempathset:
 
 from remapp.extractors import ptsizecsv2db
 
-sys.exit(rdsr(sys.argv))
+sys.exit(ptsizecsv2db.csv2db(sys.argv))

@@ -31,7 +31,7 @@ def _ptsizeinsert(accno,height,weight,siuid):
        
 
     
-def _ptsizecsv():
+def csv2db(*args, **kwargs):
     """ Import patient height and weight data from csv RIS exports
         
     Arguments:
@@ -80,4 +80,4 @@ def _ptsizecsv():
 
 if __name__ == "__main__":
     import sys
-    sys.exit(_ptsizecsv())
+    sys.exit(csv2db())
