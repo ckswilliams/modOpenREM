@@ -79,7 +79,7 @@ def csv2db(*args, **kwargs):
 
     """
 
-    import os, csv
+    import os, sys, csv
     import argparse
     
     # Required and optional arguments
