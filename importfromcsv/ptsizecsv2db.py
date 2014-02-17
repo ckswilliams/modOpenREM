@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 def _patientstudymoduleattributes(exam, height, weight): # C.7.2.2
     patientatt = exam.patient_study_module_attributes_set.get()
     if height and not patientatt.patient_size:
@@ -29,15 +31,6 @@ def _ptsizeinsert(accno,height,weight,siuid):
        
 
     
-def _add_project_to_path():
-    import os, sys
-    # Add project to path, assuming openrem app has been installed within project
-    basepath = os.path.dirname(__file__)
-    projectpath = os.path.abspath(os.path.join(basepath, "..","openrem"))
-    if projectpath not in sys.path:
-        sys.path.append(projectpath)
-
-
 def _ptsizecsv():
     """ Import patient height and weight data from csv RIS exports
         
@@ -53,26 +46,35 @@ def _ptsizecsv():
     import argparse
     
     # Required and optional arguments
-    parser = argparse.ArgumentParser(description="Import height and/or weight data into an OpenREM database.")
+    parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
     parser.add_argument("-u", "--si-uid", action="store_true", help="Use Study Instance UID instead of Accession Number")
     parser.add_argument("csvfile", help="csv file containing the height and/or weight information and study identifier")
     parser.add_argument("id", help="Column title for the accession number or study instance UID")
-    parser.add_argument("-s","--size", help="Column title for the patient height (DICOM size)")
-    parser.add_argument("-w","--weight", help="Column title for the patient weight")
+    parser.add_argument("height", help="Column title for the patient height (DICOM size)")
+    parser.add_argument("weight", help="Column title for the patient weight")
     args=parser.parse_args()
     
-    print("Args were CSV file {}, study ID {}, patient height {}, patient weight {}.".format(args.csvfile, args.id, args.size, args.weight))
-    print("The Study Instance UID is set to {}".format(args.si_uid))    
-    
-    # Get the django settings
-    _add_project_to_path()
+    # This section attempts to place the openrem folder onto the python path
+    # so that openrem.settings can be found.
+    sitepaths = []
+    openrempathset=0
+    for paths in sys.path:
+        if paths.endswith('site-packages'):
+            sitepaths.append(paths)
+        if paths.endswith('openrem'):
+            openrempathset = 1
+        
+    if sitepaths and not openrempathset:
+        for paths in sitepaths:
+            sys.path.insert(1,os.path.join(paths,'openrem'))
+
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
     
     f = open(args.csvfile, 'rb')
     try:
         dataset = csv.DictReader(f)        
         for line in dataset:
-            _ptsizeinsert(line[args.id], line[args.size], line[args.weight], args.si_uid)
+            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid)
     finally:
         f.close()
 
