@@ -2,6 +2,11 @@
 OpenREM version history
 =======================
 
+0.3.5-rc2
+---------
+
+* #32   Missing sys import bug prevented new patient size import from working
+
 0.3.5
 -----
 
