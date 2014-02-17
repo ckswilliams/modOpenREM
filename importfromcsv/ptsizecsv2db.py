@@ -9,13 +9,16 @@ def _patientstudymoduleattributes(exam, height, weight): # C.7.2.2
     patientatt.save()
 
 
-def _ptsizeinsert(accno,height,weight):
+def _ptsizeinsert(accno,height,weight,siuid):
     from django.db import models
     from remapp.models import General_study_module_attributes
     from django import db
     
     if (height or weight) and accno:
-        e = General_study_module_attributes.objects.filter(accession_number__exact = accno)
+        if not siuid:
+            e = General_study_module_attributes.objects.filter(accession_number__exact = accno)
+        else:
+            e = General_study_module_attributes.objects.filter(study_instance_uid__exact = accno)
         if e:
             for exam in e:
                 print accno + ":"
@@ -35,7 +38,7 @@ def _add_project_to_path():
         sys.path.append(projectpath)
 
 
-def _ptsizecsv(csv_file):
+def _ptsizecsv():
     """ Import patient height and weight data from csv RIS exports
         
     Arguments:
@@ -47,19 +50,32 @@ def _ptsizecsv(csv_file):
     """
 
     import os, csv
+    import argparse
+    
+    # Required and optional arguments
+    parser = argparse.ArgumentParser(description="Import height and/or weight data into an OpenREM database.")
+    parser.add_argument("-u", "--si-uid", action="store_true", help="Use Study Instance UID instead of Accession Number")
+    parser.add_argument("csvfile", help="csv file containing the height and/or weight information and study identifier")
+    parser.add_argument("id", help="Column title for the accession number or study instance UID")
+    parser.add_argument("-s","--size", help="Column title for the patient height (DICOM size)")
+    parser.add_argument("-w","--weight", help="Column title for the patient weight")
+    args=parser.parse_args()
+    
+    print("Args were CSV file {}, study ID {}, patient height {}, patient weight {}.".format(args.csvfile, args.id, args.size, args.weight))
+    print("The Study Instance UID is set to {}".format(args.si_uid))    
+    
+    # Get the django settings
     _add_project_to_path()
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
     
-    f = open(csv_file, 'rb')
+    f = open(args.csvfile, 'rb')
     try:
         dataset = csv.DictReader(f)        
         for line in dataset:
-            _ptsizeinsert(line['PACS_SPS_ID'], line['HEIGHT'], line['WEIGHT'])
+            _ptsizeinsert(line[args.id], line[args.size], line[args.weight], args.si_uid)
     finally:
         f.close()
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 2:
-        sys.exit('Error: Supply one argument: the csv file')
-    sys.exit(_ptsizecsv(sys.argv[1]))
+    sys.exit(_ptsizecsv())
