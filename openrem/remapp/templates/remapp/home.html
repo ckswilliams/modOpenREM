@@ -1,12 +1,16 @@
 {% extends "remapp/base.html" %}
 
-{% block col1 %}		
-{% load humanize %}
-<h1>OpenREM database browser and export</h1>
+      {% block toprow %}
+      <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database browser and export</h1>
 
-<p>
-    There are {{ homedata.total }} studies in this database. Page last refreshed on {% now "jS F Y \a\t H:i" %}.
-</p>
+      <p>
+          There are {{ homedata.total }} studies in this database. Page last refreshed on {% now "jS F Y \a\t H:i" %}.
+      </p>
+      {% endblock %}
+
+
+      {% block mainblock %}
+{% load humanize %}
 
 <table class="table table-bordered">
     <tr>

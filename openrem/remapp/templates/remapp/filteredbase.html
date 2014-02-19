@@ -1,0 +1,15 @@
+{% extends "remapp/base.html" %}
+
+
+      {% block mainblock %}
+      <div class="row">
+        <div class="col-md-9">
+          {% block col1 %}
+          {% endblock %}
+        </div>
+        <div class="col-md-3">
+          {% block col2 %}
+          {% endblock %}
+        </div>
+      </div>
+      {% endblock %}

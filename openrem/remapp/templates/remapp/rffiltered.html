@@ -1,4 +1,10 @@
-{% extends "remapp/base.html" %}
+{% extends "remapp/filteredbase.html" %}
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li class="active"><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+{% endblock %}
 
 {% block col2 %}
 
@@ -25,12 +31,14 @@
 {% block col1 %}
 {% load pagination_tags %}    
     
-    <p>There are {{ filter.count }} exams in this list: <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> <strong>Note:</strong> At least one filter must be applied!</p>
+    <p>There are {{ filter.count }} exams in this list: <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> 
+        <strong>Note:</strong>  The filter must be applied (even if it is blank)!
+    </p>
 
     {% autopaginate filter.qs 20 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered">
+    <table class="table table-striped">
         <th>Institution</th><th>Unit</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>DAP Total cGy.cm2</th><th>Dose at RP total Gy</th><th>Physician</th>
         {% for exam in filter_list %}
         <tr>

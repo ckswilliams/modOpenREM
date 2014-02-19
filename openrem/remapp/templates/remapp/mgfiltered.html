@@ -1,4 +1,11 @@
-{% extends "remapp/base.html" %}
+{% extends "remapp/filteredbase.html" %}
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li class="active"><a href="/openrem/mg">Mammography</a></li>
+{% endblock %}
+
 
 {% block col2 %}
 
@@ -28,13 +35,13 @@
     <p>
         There are {{ filter.count }} exams in this list: 
         <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> 
-        <strong>Note:</strong>  Note: The filter must have be applied (even if it is blank)!
+        <strong>Note:</strong>  The filter must be applied (even if it is blank)!
     </p>
 
     {% autopaginate filter.qs 50 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered">
+    <table class="table table-striped">
         <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Laterality</th><th>Accumulated AGD (mGy)</th>
         {% for exam in filter_list %}
         <tr>

@@ -1,4 +1,26 @@
-{% extends "remapp/base.html" %}
+{% extends "remapp/filteredbase.html" %}
+
+{% block navbar %}
+            <li class="active"><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+{% endblock %}
+
+      {% block toprow %}
+      {% load pagination_tags %}    
+    
+      <p>
+        There are {{ filter.count }} exams in this list: 
+        <ul>
+          <li><strong>Note:</strong> The filter must be applied (even if it is blank)!</li>
+          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
+          <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
+        </ul>
+      </p>
+
+      {% endblock %}
+
+
 
 {% block col2 %}
 
@@ -26,21 +48,10 @@
 {% endblock %}
 
 {% block col1 %}
-{% load pagination_tags %}    
-    
-    <p>
-        There are {{ filter.count }} exams in this list: 
-        <ul>
-            <li><strong>Note:</strong>  Note: The filter must have be applied (even if it is blank)!</li>
-            <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
-            <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
-        </ul>
-    </p>
 
-    {% autopaginate filter.qs 25 as filter_list %}
-    {% paginate %}
-
-    <table class="table table-bordered">
+      {% autopaginate filter.qs 25 as filter_list %}
+      {% paginate %}
+    <table class="table table-striped">
         <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
         {% for exam in filter_list %}
         <tr>
