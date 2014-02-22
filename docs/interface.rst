@@ -9,7 +9,8 @@ Depending on your web server setup, your web interface to OpenREM will
 usually be at http://yourserver/openrem or if you are using the test web
 server then it might be at http://localhost:8000/openrem.
 
-The home page for OpenREM should look something like this:
+The home page for OpenREM should look something like this when it is 
+populated with studies:
 
 .. image:: img/HomeFull.png
     :width: 730px
