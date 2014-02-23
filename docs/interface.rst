@@ -47,7 +47,51 @@ The order by date function does not currently take into account the time
 of the study - `issue 37 <https://bitbucket.org/edmcdonagh/openrem/issue/37>`_
 exists to address this.
 
+Viewing study details
+=====================
+
+By clicking on the study description link (in blue), you can see more 
+details for an individual study:
+
+.. image:: img/CTStudy.png
+    :width: 730px
+    :align: center
+    :height: 476px
+    :alt: Individual CT study
+
+Not all the details stored for any one study are displayed, just those thought
+to be most useful. If there are others you'd like to see, add an issue to the tracker.
+
+The final field in the summary at the top is called 'Test patient indicators?'
+When studies are imported the ID and patient name fields are both ignored, but they
+are parsed to check if they have 'phy', 'test' or 'qa' in them to help exclude them 
+from the data analysis. If they do, then this information is added to the 
+field and is displayed both in the web interface as a Test patient indicator 
+and in the Excel export. The name and ID themselves are not reproduced, 
+simply the presence of one of the key words. Therefore a patient named
+'Phyliss' would trigger this, but only 'Phy' would be reproduced in this field.
+Other fields will also help to confirm whether a study is for a real patient
+such as the lack of an Accession Number and an unusual patient age.
+
 Exporting to csv and xlsx sheets
 ================================
 
-placeholder
+From any of the modality pages in the OpenREM interface, you can export the
+displayed studies to a csv spreadsheet by clicking on the link near the top.
+In the CT interface, you can also export to an enhanced XLSX spreadsheet. 
+In either case, the export will not work unless the 'Submit' button on the 
+filtering dialogue has been pressed.
+
+For CT, the XLSX export has multiple sheets. The first sheet contains a 
+summary of all the study descriptions, requested procedures and series
+protocol names contained in the export:
+
+.. image:: img/CTExportSummaryPage.png
+    :width: 730px
+    :align: center
+    :height: 339px
+    :alt: CT export front sheet
+    
+This information is useful for seeing what data is in the spreadsheet, and
+can also be used to prioritise which studies or protocols to analyse based on
+frequency.
