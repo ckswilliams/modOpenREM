@@ -56,15 +56,72 @@
 <h1>Using the OpenREM interface and export function<a class="headerlink" href="#using-the-openrem-interface-and-export-function" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="navigating-the-openrem-web-interface">
 <h2>Navigating the OpenREM web interface<a class="headerlink" href="#navigating-the-openrem-web-interface" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
+<p>Depending on your web server setup, your web interface to OpenREM will
+usually be at <a class="reference external" href="http://yourserver/openrem">http://yourserver/openrem</a> or if you are using the test web
+server then it might be at <a class="reference external" href="http://localhost:8000/openrem">http://localhost:8000/openrem</a>.</p>
+<p>The home page for OpenREM should look something like this when it is
+populated with studies:</p>
+<a class="reference internal image-reference" href="_images/Home.png"><img alt="OpenREM homepage screenshot" class="align-center" src="_images/Home.png" style="width: 730px; height: 630px;" /></a>
+<p>By selecting the links in the navigation bar at the top, you can view all
+of the CT, fluoroscopy or mammography studies. Alternatively, if you click
+on the station name link (in blue) you can filter to just that source modality.</p>
 </div>
 <div class="section" id="filtering-for-specific-studies">
 <h2>Filtering for specific studies<a class="headerlink" href="#filtering-for-specific-studies" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
+<p>This image shows the CT studies view, filtered by entering terms in the
+boxes on the right hand side to show just the studies where the modality
+model name includes the term &#8216;soma&#8217;:</p>
+<a class="reference internal image-reference" href="_images/CTFilter.png"><img alt="Filtering CT studies" class="align-center" src="_images/CTFilter.png" style="width: 730px; height: 499px;" /></a>
+<p>The search fields can all be used on their own or together, and they are
+all case insensitive &#8216;contains&#8217; searches. The exception is the date field,
+where both from and to have to be filled in (if either are), and the format
+must be <tt class="docutils literal"><span class="pre">yyyy-mm-dd</span></tt>. There currently isn&#8217;t any more complex filtering
+available, but it does exist as <a class="reference external" href="https://bitbucket.org/edmcdonagh/openrem/issue/17/">issue 17</a>
+for a future release.</p>
+<p>The last box below the filtering search boxes is the ordering preferance.
+The order by date function does not currently take into account the time
+of the study - <a class="reference external" href="https://bitbucket.org/edmcdonagh/openrem/issue/37">issue 37</a>
+exists to address this.</p>
+</div>
+<div class="section" id="viewing-study-details">
+<h2>Viewing study details<a class="headerlink" href="#viewing-study-details" title="Permalink to this headline">¶</a></h2>
+<p>By clicking on the study description link (in blue), you can see more
+details for an individual study:</p>
+<a class="reference internal image-reference" href="_images/CTDetail.png"><img alt="Individual CT study" class="align-center" src="_images/CTDetail.png" style="width: 730px; height: 696px;" /></a>
+<p>Not all the details stored for any one study are displayed, just those thought
+to be most useful. If there are others you&#8217;d like to see, add an issue to the tracker.</p>
+<p>The final field in the summary at the top is called &#8216;Test patient indicators?&#8217;
+When studies are imported the ID and patient name fields are both ignored, but they
+are parsed to check if they have &#8216;phy&#8217;, &#8216;test&#8217; or &#8216;qa&#8217; in them to help exclude them
+from the data analysis. If they do, then this information is added to the
+field and is displayed both in the web interface as a Test patient indicator
+and in the Excel export. The name and ID themselves are not reproduced,
+simply the presence of one of the key words. Therefore a patient named
+&#8216;Phyliss&#8217; would trigger this, but only &#8216;Phy&#8217; would be reproduced in this field.
+Other fields will also help to confirm whether a study is for a real patient
+such as the lack of an Accession Number and an unusual patient age.</p>
 </div>
 <div class="section" id="exporting-to-csv-and-xlsx-sheets">
 <h2>Exporting to csv and xlsx sheets<a class="headerlink" href="#exporting-to-csv-and-xlsx-sheets" title="Permalink to this headline">¶</a></h2>
-<p>placeholder</p>
+<p>From any of the modality pages in the OpenREM interface, you can export the
+displayed studies to a csv spreadsheet by clicking on the link near the top.
+In the CT interface, you can also export to an enhanced XLSX spreadsheet.
+In either case, the export will not work unless the &#8216;Submit&#8217; button on the
+filtering dialogue has been pressed.</p>
+<p>For CT, the XLSX export has multiple sheets. The first sheet contains a
+summary of all the study descriptions, requested procedures and series
+protocol names contained in the export:</p>
+<a class="reference internal image-reference" href="_images/CTExportSummaryPage.png"><img alt="CT export front sheet" class="align-center" src="_images/CTExportSummaryPage.png" style="width: 730px; height: 339px;" /></a>
+<p>This information is useful for seeing what data is in the spreadsheet, and
+can also be used to prioritise which studies or protocols to analyse based on
+frequency.</p>
+<p>The second sheet of the exported file lists all the studies, with each study
+taking one line and each series in the study displayed in the columns to the right.</p>
+<a class="reference internal image-reference" href="_images/CTExportAllData.png"><img alt="CT export all data sheet" class="align-center" src="_images/CTExportAllData.png" style="width: 730px; height: 339px;" /></a>
+<p>The remainder of the file has one sheet per series protocol name. Each series
+is listed one per line. If a single study
+has more than one series with the same protocol name, then the same study
+will appear on more than one line.</p>
 </div>
 </div>
 
@@ -79,6 +136,7 @@
 <li><a class="reference internal" href="#">Using the OpenREM interface and export function</a><ul>
 <li><a class="reference internal" href="#navigating-the-openrem-web-interface">Navigating the OpenREM web interface</a></li>
 <li><a class="reference internal" href="#filtering-for-specific-studies">Filtering for specific studies</a></li>
+<li><a class="reference internal" href="#viewing-study-details">Viewing study details</a></li>
 <li><a class="reference internal" href="#exporting-to-csv-and-xlsx-sheets">Exporting to csv and xlsx sheets</a></li>
 </ul>
 </li>
