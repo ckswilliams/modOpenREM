@@ -97,20 +97,20 @@ def ctxlsx(request):
 
     # Some prep
     commonheaders = [
-        'Institution name', 
+        'Institution', 
         'Manufacturer', 
-        'Model name',
+        'Model',
         'Station name',
         'Accession number',
         'Operator',
-        'Study date',
-        'Patient age', 
-        'Patient height', 
-        'Patient mass (kg)', 
+        'Date',
+        'Age', 
+        'Height', 
+        'Mass (kg)', 
         'Test patient?',
         'Study description',
         'Requested procedure',
-        'Number of events',
+        'No. events',
         'DLP total (mGy.cm)',
         ]
     protocolheaders = commonheaders + [
