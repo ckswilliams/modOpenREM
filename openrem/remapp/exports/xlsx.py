@@ -89,7 +89,8 @@ def ctxlsx(request):
 
     # create a workbook in memory
     output = StringIO.StringIO()
-    book = Workbook(output, {'default_date_format': 'dd/mm/yyyy'})
+    book = Workbook(output, {'default_date_format': 'dd/mm/yyyy',
+                             'strings_to_numbers':  True})
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
