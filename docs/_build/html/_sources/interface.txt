@@ -12,10 +12,10 @@ server then it might be at http://localhost:8000/openrem.
 The home page for OpenREM should look something like this when it is 
 populated with studies:
 
-.. image:: img/HomeFull.png
+.. image:: img/Home.png
     :width: 730px
     :align: center
-    :height: 590px
+    :height: 630px
     :alt: OpenREM homepage screenshot
 
 By selecting the links in the navigation bar at the top, you can view all
@@ -26,13 +26,13 @@ Filtering for specific studies
 ==============================
 
 This image shows the CT studies view, filtered by entering terms in the 
-boxes on the right hand side to show just the studies for a particular
-date range and for just one source modality (filtering on station name):
+boxes on the right hand side to show just the studies where the modality
+model name includes the term 'soma':
 
 .. image:: img/CTFilter.png
     :width: 730px
     :align: center
-    :height: 410px
+    :height: 499px
     :alt: Filtering CT studies
 
 The search fields can all be used on their own or together, and they are
@@ -53,10 +53,10 @@ Viewing study details
 By clicking on the study description link (in blue), you can see more 
 details for an individual study:
 
-.. image:: img/CTStudy.png
+.. image:: img/CTDetail.png
     :width: 730px
     :align: center
-    :height: 476px
+    :height: 696px
     :alt: Individual CT study
 
 Not all the details stored for any one study are displayed, just those thought
