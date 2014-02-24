@@ -2,7 +2,11 @@
 OpenREM version history
 =======================
 
+0.3.7
+-----
 
+* #38   Column titles tidied up in Excel exports
+* #35   Number no longer stored as text in Excel exports
 
 0.3.6
 -----
