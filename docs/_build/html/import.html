@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Importing data to OpenREM &mdash; OpenREM 0.3.5-rc2 documentation</title>
+    <title>Importing data to OpenREM &mdash; OpenREM 0.3.6 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.5-rc2',
+        VERSION:     '0.3.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.5-rc2 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.6 documentation" href="index.html" />
     <link rel="next" title="Using the OpenREM interface and export function" href="interface.html" />
     <link rel="prev" title="Backing up MySQL on Windows" href="backupMySQLWindows.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="backupMySQLWindows.html" title="Backing up MySQL on Windows"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.5-rc2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,30 +58,62 @@
 <h2>Importing dose related data from DICOM files<a class="headerlink" href="#importing-dose-related-data-from-dicom-files" title="Permalink to this headline">¶</a></h2>
 <p>If you are using linux or have put <tt class="docutils literal"><span class="pre">`&quot;C:\Python27\Lib\site-packages\openrem\scripts&quot;</span></tt> and
 <tt class="docutils literal"><span class="pre">&quot;C:\Python27\Lib\site-packages\openrem&quot;</span></tt> onto your path, you should be able to import from the command line:</p>
+<div class="section" id="radiation-dose-structured-reports">
+<h3>Radiation Dose Structured Reports<a class="headerlink" href="#radiation-dose-structured-reports" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>For Radiation Dose Structured Reports</li>
-</ul>
-<blockquote>
-<div><ul class="simple">
 <li><tt class="docutils literal"><span class="pre">openrem_rdsr.py</span> <span class="pre">filename.dcm</span></tt></li>
 </ul>
-</div></blockquote>
+</div>
+<div class="section" id="for-mammography-dicom-images-see-restrictions-on-testing">
+<h3>For mammography DICOM images (see restrictions on testing)<a class="headerlink" href="#for-mammography-dicom-images-see-restrictions-on-testing" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>For mammography DICOM images (see restrictions on testing)</li>
-</ul>
-<blockquote>
-<div><ul class="simple">
 <li><tt class="docutils literal"><span class="pre">openrem_mg.py</span> <span class="pre">filename.dcm</span></tt></li>
 </ul>
-</div></blockquote>
+</div>
+<div class="section" id="for-ct-dose-summary-files-from-philips-ct-scanners">
+<h3>For CT dose summary files from Philips CT scanners<a class="headerlink" href="#for-ct-dose-summary-files-from-philips-ct-scanners" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>For CT dose summary files from Philips CT scanners</li>
-</ul>
-<blockquote>
-<div><ul class="simple">
 <li><tt class="docutils literal"><span class="pre">openrem_ctphilips.py</span> <span class="pre">filename.dcm</span></tt></li>
 </ul>
-</div></blockquote>
+</div>
+</div>
+<div class="section" id="importing-dose-related-data-from-csv-files">
+<h2>Importing dose related data from csv files<a class="headerlink" href="#importing-dose-related-data-from-csv-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="patient-height-and-weight-information">
+<h3>Patient height and weight information<a class="headerlink" href="#patient-height-and-weight-information" title="Permalink to this headline">¶</a></h3>
+<p>If height and weight data is not available in the DICOM data, but is available
+from another source, then it can be imported into the database using the
+<tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span></tt> function. Normally the key to match the size information
+with the studies in the database will be the accession number; however in some
+situations this isn&#8217;t available and the Study Instance UID can be used instead.</p>
+<p>usage: <tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span> <span class="pre">[-h]</span> <span class="pre">[-u]</span> <span class="pre">csvfile</span> <span class="pre">id</span> <span class="pre">height</span> <span class="pre">weight</span></tt></p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">-h,</span> <span class="pre">--help</span></tt></dt>
+<dd>Print the help text.</dd>
+<dt><tt class="docutils literal"><span class="pre">-u,</span> <span class="pre">--si-uid</span></tt></dt>
+<dd>Use Study Instance UID instead of Accession Number.</dd>
+<dt><tt class="docutils literal"><span class="pre">csvfile</span></tt></dt>
+<dd>csv file containing the height and/or weight information and study identifier.
+Other columns will be ignored. Use quotes if the filepath has spaces.</dd>
+<dt><tt class="docutils literal"><span class="pre">id</span></tt></dt>
+<dd>Column title for the accession number or study instance UID. Use quotes
+if the title has spaces.</dd>
+<dt><tt class="docutils literal"><span class="pre">height</span></tt></dt>
+<dd>Column title for the patient height (DICOM size) - if this information
+is missing simply add a blank column with a suitable title. Use quotes
+if the title has spaces.</dd>
+<dt><tt class="docutils literal"><span class="pre">weight</span></tt></dt>
+<dd>Column title for the patient weight - if this information is missing
+simply add a blank column with a suitable title. Use quotes if the title
+has spaces.</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span></tt> currently prints out the success or otherwise
+of each line to the standard output. <a class="reference external" href="https://bitbucket.org/edmcdonagh/openrem/issue/36/">Issue 36</a>
+has been raised to suppress this output unless the verbose flag is set.</p>
+</div>
+</div>
 </div>
 </div>
 
@@ -94,7 +126,16 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Importing data to OpenREM</a><ul>
-<li><a class="reference internal" href="#importing-dose-related-data-from-dicom-files">Importing dose related data from DICOM files</a></li>
+<li><a class="reference internal" href="#importing-dose-related-data-from-dicom-files">Importing dose related data from DICOM files</a><ul>
+<li><a class="reference internal" href="#radiation-dose-structured-reports">Radiation Dose Structured Reports</a></li>
+<li><a class="reference internal" href="#for-mammography-dicom-images-see-restrictions-on-testing">For mammography DICOM images (see restrictions on testing)</a></li>
+<li><a class="reference internal" href="#for-ct-dose-summary-files-from-philips-ct-scanners">For CT dose summary files from Philips CT scanners</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#importing-dose-related-data-from-csv-files">Importing dose related data from csv files</a><ul>
+<li><a class="reference internal" href="#patient-height-and-weight-information">Patient height and weight information</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -142,7 +183,7 @@
         <li class="right" >
           <a href="backupMySQLWindows.html" title="Backing up MySQL on Windows"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.5-rc2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
