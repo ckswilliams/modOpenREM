@@ -2,6 +2,17 @@
 OpenREM version history
 =======================
 
+
+
+0.3.6
+-----
+
+* #34   Localised scripts that were on remote web servers in default Bootstrap code
+* #33   Documentation now exists for adding data via csv file
+* #24   Web interface has been upgraded to Bootstrap v3
+* #5    Web interface and export function now have some documentation with screenshots
+
+
 0.3.5-rc2
 ---------
 
