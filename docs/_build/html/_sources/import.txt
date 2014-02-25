@@ -36,13 +36,16 @@ from another source, then it can be imported into the database using the
 with the studies in the database will be the accession number; however in some
 situations this isn't available and the Study Instance UID can be used instead.
 
-usage: ``openrem_ptsizecsv.py [-h] [-u] csvfile id height weight``
+usage: ``openrem_ptsizecsv.py [-h] [-u] [-v] csvfile id height weight``
 
 ``-h, --help``
   Print the help text.
 
 ``-u, --si-uid``
   Use Study Instance UID instead of Accession Number.
+
+``-v, --verbose``
+  *New in 0.3.7* Print to the standard output the success or otherwise of inserting each value.
 
 ``csvfile``
   csv file containing the height and/or weight information and study identifier. 
@@ -62,8 +65,6 @@ usage: ``openrem_ptsizecsv.py [-h] [-u] csvfile id height weight``
   simply add a blank column with a suitable title. Use quotes if the title
   has spaces.
 
-..  Note::
-    
-    ``openrem_ptsizecsv.py`` currently prints out the success or otherwise
-    of each line to the standard output. `Issue 36 <https://bitbucket.org/edmcdonagh/openrem/issue/36/>`_
-    has been raised to suppress this output unless the verbose flag is set.
+..  versionchanged:: 0.3.7
+    Verbosity flag added to supress printing to the standard output
+    unless requested.
