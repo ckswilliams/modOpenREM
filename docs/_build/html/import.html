@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Importing data to OpenREM &mdash; OpenREM 0.3.6 documentation</title>
+    <title>Importing data to OpenREM &mdash; OpenREM 0.3.7-a1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.6',
+        VERSION:     '0.3.7-a1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.6 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.7-a1 documentation" href="index.html" />
     <link rel="next" title="Using the OpenREM interface and export function" href="interface.html" />
     <link rel="prev" title="Backing up MySQL on Windows" href="backupMySQLWindows.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="backupMySQLWindows.html" title="Backing up MySQL on Windows"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.7-a1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -86,12 +86,14 @@ from another source, then it can be imported into the database using the
 <tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span></tt> function. Normally the key to match the size information
 with the studies in the database will be the accession number; however in some
 situations this isn&#8217;t available and the Study Instance UID can be used instead.</p>
-<p>usage: <tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span> <span class="pre">[-h]</span> <span class="pre">[-u]</span> <span class="pre">csvfile</span> <span class="pre">id</span> <span class="pre">height</span> <span class="pre">weight</span></tt></p>
+<p>usage: <tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span> <span class="pre">[-h]</span> <span class="pre">[-u]</span> <span class="pre">[-v]</span> <span class="pre">csvfile</span> <span class="pre">id</span> <span class="pre">height</span> <span class="pre">weight</span></tt></p>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">-h,</span> <span class="pre">--help</span></tt></dt>
 <dd>Print the help text.</dd>
 <dt><tt class="docutils literal"><span class="pre">-u,</span> <span class="pre">--si-uid</span></tt></dt>
 <dd>Use Study Instance UID instead of Accession Number.</dd>
+<dt><tt class="docutils literal"><span class="pre">-v,</span> <span class="pre">--verbose</span></tt></dt>
+<dd><em>New in 0.3.7</em> Print to the standard output the success or otherwise of inserting each value.</dd>
 <dt><tt class="docutils literal"><span class="pre">csvfile</span></tt></dt>
 <dd>csv file containing the height and/or weight information and study identifier.
 Other columns will be ignored. Use quotes if the filepath has spaces.</dd>
@@ -107,11 +109,9 @@ if the title has spaces.</dd>
 simply add a blank column with a suitable title. Use quotes if the title
 has spaces.</dd>
 </dl>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><tt class="docutils literal"><span class="pre">openrem_ptsizecsv.py</span></tt> currently prints out the success or otherwise
-of each line to the standard output. <a class="reference external" href="https://bitbucket.org/edmcdonagh/openrem/issue/36/">Issue 36</a>
-has been raised to suppress this output unless the verbose flag is set.</p>
+<div class="versionchanged">
+<p><span>Changed in version 0.3.7: </span>Verbosity flag added to supress printing to the standard output
+unless requested.</p>
 </div>
 </div>
 </div>
@@ -183,7 +183,7 @@ has been raised to suppress this output unless the verbose flag is set.</p>
         <li class="right" >
           <a href="backupMySQLWindows.html" title="Backing up MySQL on Windows"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.7-a1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
