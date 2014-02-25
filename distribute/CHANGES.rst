@@ -2,10 +2,11 @@
 OpenREM version history
 =======================
 
-0.3.7
+0.3.7-a1
 -----
 
 * #38   Column titles tidied up in Excel exports
+* #36	openrem_ptsizecsv output of log now depends on verbose flag
 * #35   Number no longer stored as text in Excel exports
 
 0.3.6
