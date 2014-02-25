@@ -53,7 +53,8 @@ def _ptsizeinsert(accno,height,weight,siuid, verbose):
             e = General_study_module_attributes.objects.filter(study_instance_uid__exact = accno)
         if e:
             for exam in e:
-                print accno + ":"
+                if verbose:
+                    print accno + ":"
                 _patientstudymoduleattributes(exam, height, weight, verbose)
         elif verbose:
             print "Accession number " + accno + " not found in db"
