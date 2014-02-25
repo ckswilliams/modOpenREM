@@ -28,18 +28,20 @@
 
 """
 
-def _patientstudymoduleattributes(exam, height, weight): # C.7.2.2
+def _patientstudymoduleattributes(exam, height, weight, verbose): # C.7.2.2
     patientatt = exam.patient_study_module_attributes_set.get()
     if height and not patientatt.patient_size:
         patientatt.patient_size = height
-        print "Inserted height of " + height
+        if verbose:
+            print "Inserted height of " + height
     if weight and not patientatt.patient_weight:
         patientatt.patient_weight = weight
-        print "Inserted weight of " + weight
+        if verbose:
+            print "Inserted weight of " + weight
     patientatt.save()
 
 
-def _ptsizeinsert(accno,height,weight,siuid):
+def _ptsizeinsert(accno,height,weight,siuid, verbose):
     from django.db import models
     from remapp.models import General_study_module_attributes
     from django import db
@@ -51,9 +53,10 @@ def _ptsizeinsert(accno,height,weight,siuid):
             e = General_study_module_attributes.objects.filter(study_instance_uid__exact = accno)
         if e:
             for exam in e:
-                print accno + ":"
-                _patientstudymoduleattributes(exam, height, weight)
-        else:
+                if verbose:
+                    print accno + ":"
+                _patientstudymoduleattributes(exam, height, weight, verbose)
+        elif verbose:
             print "Accession number " + accno + " not found in db"
     db.reset_queries()
        
@@ -85,6 +88,7 @@ def csv2db(*args, **kwargs):
     # Required and optional arguments
     parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
     parser.add_argument("-u", "--si-uid", action="store_true", help="Use Study Instance UID instead of Accession Number")
+    parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     parser.add_argument("csvfile", help="csv file containing the height and/or weight information and study identifier")
     parser.add_argument("id", help="Column title for the accession number or study instance UID")
     parser.add_argument("height", help="Column title for the patient height (DICOM size)")
@@ -111,7 +115,7 @@ def csv2db(*args, **kwargs):
     try:
         dataset = csv.DictReader(f)        
         for line in dataset:
-            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid)
+            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid, args.verbose)
     finally:
         f.close()
 

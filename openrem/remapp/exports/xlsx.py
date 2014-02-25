@@ -89,7 +89,8 @@ def ctxlsx(request):
 
     # create a workbook in memory
     output = StringIO.StringIO()
-    book = Workbook(output, {'default_date_format': 'dd/mm/yyyy'})
+    book = Workbook(output, {'default_date_format': 'dd/mm/yyyy',
+                             'strings_to_numbers':  True})
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
@@ -97,20 +98,20 @@ def ctxlsx(request):
 
     # Some prep
     commonheaders = [
-        'Institution name', 
+        'Institution', 
         'Manufacturer', 
-        'Model name',
+        'Model',
         'Station name',
         'Accession number',
         'Operator',
-        'Study date',
-        'Patient age', 
-        'Patient height', 
-        'Patient mass (kg)', 
+        'Date',
+        'Age', 
+        'Height', 
+        'Mass (kg)', 
         'Test patient?',
         'Study description',
         'Requested procedure',
-        'Number of events',
+        'No. events',
         'DLP total (mGy.cm)',
         ]
     protocolheaders = commonheaders + [

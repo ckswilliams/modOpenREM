@@ -6,28 +6,48 @@
             <li><a href="/openrem/mg">Mammography</a></li>
 {% endblock %}
 
+      {% block toprow %}
+{% load pagination_tags %}    
+    <p>
+        There are {{ filter.count }} exams in this list: 
+        <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> 
+        <strong>Note:</strong>  The filter must be applied (even if it is blank)!
+    </p>
+{% endblock %}
+
+
+
 {% block col2 %}
 
 
     {{ studyfilter }}
 
-    <form action="" method="get">
-        <table class="table table-bordered">
-            {% for field in filter.form %}
-                <tr><td>{{ field.label_tag }}</td><td>{{ field.errors }} {{ field }}</td></tr>
-            {% endfor %}
-        </table>
-        <input type="submit" />
-    </form>
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">Exam filter</h3>
+            </div>
+            <div class="panel-body">
+                <form action="" method="get" class="form-horizontal role="form">
+                        {% for field in filter.form %}
+                            <div class="form-group">
+                                <div class="col-xs-4">
+                                    <label>{{ field.label_tag }}</label>
+                                </div>
+                                <div class="col-xs-8">
+                                  {{ field.errors }}
+                                  {{ field }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </table>
+                    <input type="submit" />
+                </form> 
+            </div>
+          </div>
     
 {% endblock %}
 
 {% block col1 %}
-{% load pagination_tags %}    
-    
-    <p>There are {{ filter.count }} exams in this list: <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> 
-        <strong>Note:</strong>  The filter must be applied (even if it is blank)!
-    </p>
 
     {% autopaginate filter.qs 20 as filter_list %}
     {% paginate %}
