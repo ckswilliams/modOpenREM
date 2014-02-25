@@ -8,7 +8,7 @@ OpenREM version history
 * #40   Restyled the filter section in the web interface and added a title to that section
 * #38   Column titles tidied up in Excel exports
 * #36	openrem_ptsizecsv output of log now depends on verbose flag
-* #35   Number no longer stored as text in Excel exports
+* #35   Numbers no longer stored as text in Excel exports
 
 0.3.6
 -----
