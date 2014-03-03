@@ -1,15 +1,10 @@
 Clean the existing distribute folder:
-	rm -r OpenREM.egg-info
-	rm -r openrem/remapp/migrations
-Or just remove all the contents!
+	rm -r *
 
 Then get the new contents:
-	rsync -av ../bbOpenREM/openrem .
-	rsync -av ../bbOpenREM/distribute/ .
+rsync -av --exclude-from='../bbOpenREM/stuff/distexclude.txt' ../bbOpenREM/ .
 
-Tidy up:
-	find . -name *.pyc -exec rm {} \;
-	rm -r openrem/remapp/migrations
+Change settings name:
 	mv openrem/openrem/settings.py{,.example}
 	mv openrem/openrem/wsgi.py{,.example}
 
