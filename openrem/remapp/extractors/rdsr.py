@@ -660,6 +660,8 @@ def _generalstudymoduleattributes(dataset,g):
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
+    if not g.performing_physician_name:
+        g.performing_physician_name = "None" #Added to avoid export filter crashing when value is not present
     g.operator_name = get_value_kw('OperatorName',dataset)
     g.procedure_code_value = get_seq_code_value('ProcedureCodeSequence',dataset)
     g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence',dataset)
