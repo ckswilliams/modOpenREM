@@ -2,6 +2,12 @@
 OpenREM version history
 =======================
 
+0.3.8
+-----
+
+* #37	Studies now sort by time and date
+
+
 0.3.7
 -----
 
