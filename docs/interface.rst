@@ -42,10 +42,10 @@ must be ``yyyy-mm-dd``. There currently isn't any more complex filtering
 available, but it does exist as `issue 17 <https://bitbucket.org/edmcdonagh/openrem/issue/17/>`_
 for a future release.
 
-The last box below the filtering search boxes is the ordering preferance.
-The order by date function does not currently take into account the time
-of the study - `issue 37 <https://bitbucket.org/edmcdonagh/openrem/issue/37>`_
-exists to address this.
+The last box below the filtering search boxes is the ordering preference.
+
+*New in 0.3.8* Ordering by date now takes account of the time of the study 
+(`issue 37 <https://bitbucket.org/edmcdonagh/openrem/issue/37>`_).
 
 Viewing study details
 =====================
