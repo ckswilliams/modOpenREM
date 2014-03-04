@@ -186,11 +186,19 @@ def _generalequipmentmoduleattributes(dataset,study):
     from remapp.tools.dcmdatetime import get_date, get_time
     equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
+    if not equip.manufacturer:
+        equip.manufacturer = "None" #Added to avoid export filter crashing when value is not present
     equip.institution_name = get_value_kw("InstitutionName",dataset)
-    equip.institution_address = get_value_kw("InstitutionAddress",dataset)
+    if not equip.institution_name:
+        equip.institution_name = "None" #Added to avoid export filter crashing when value is not present
+     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
     equip.station_name = get_value_kw("StationName",dataset)
-    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
+     if not equip.station_name:
+        equip.station_name = "None" #Added to avoid export filter crashing when value is not present
+   equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
     equip.manufacturer_model_name = get_value_kw("ManufacturerModelName",dataset)
+    if not equip.manufacturer_model_name:
+        equip.manufacturer_model_name = "None" #Added to avoid export filter crashing when value is not present
     equip.device_serial_number = get_value_kw("DeviceSerialNumber",dataset)
     equip.software_versions = get_value_kw("SoftwareVersions",dataset)
     equip.gantry_id = get_value_kw("GantryID",dataset)
@@ -235,13 +243,19 @@ def _generalstudymoduleattributes(dataset,g):
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
     g.accession_number = get_value_kw('AccessionNumber',dataset)
+    if not g.accession_number:
+        g.accession_number = "None" #Added to avoid export filter crashing when value is not present
     g.study_description = get_value_kw('StudyDescription',dataset)
+    if not g.study_description:
+        g.study_description = "None" #Added to avoid export filter crashing when value is not present
     g.modality_type = get_value_kw('Modality',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
     g.operator_name = get_value_kw('OperatorName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
+    if not g.procedure_code_meaning:
+        g.procedure_code_meaning = "None" #Added to avoid export filter crashing when value is not present
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
     g.save()
