@@ -4,10 +4,12 @@ def _xrayfilters(dataset,source):
     filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
     xray_filter_material = get_value_kw('FilterMaterial',dataset)
     if xray_filter_material:
-        if xray_filter_material.strip() == 'MOLYBDENUM':
+        if xray_filter_material.strip().lower() == 'molybdenum':
             filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-        if xray_filter_material.strip() == 'RHODIUM':
+        if xray_filter_material.strip().lower() == 'rhodium':
             filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+        if xray_filter_material.strip().lower() == 'tungsten':
+            filters.xray_filter_material = get_or_create_cid('C-164F9','Tungsten or Tungsten compound')
         filters.save()
     
 
@@ -52,10 +54,14 @@ def _irradiationeventxraysourcedata(dataset,event):
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
     anode_target_material = get_value_kw('AnodeTargetMaterial',dataset)
-    if anode_target_material.strip() == 'MOLYBDENUM':
+    if anode_target_material.strip().lower() == 'molybdenum':
         source.anode_target_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-    if anode_target_material.strip() == 'RHODIUM':
+    if anode_target_material.strip().lower() == 'rhodium':
         source.anode_target_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+    if anode_target_material.strip().lower() == 'silver':
+        source.anode_target_material = get_or_create_cid('C-137F9','Silver or Silver compound')
+    if anode_target_material.strip().lower() == 'aluminum' or anode_target_material.strip().lower() == 'aluminium':
+        source.anode_target_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
     collimated_field_area = get_value_kw('FieldOfViewDimensions',dataset)
     source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
     source.exposure_control_mode = get_value_kw('ExposureControlMode',dataset)
