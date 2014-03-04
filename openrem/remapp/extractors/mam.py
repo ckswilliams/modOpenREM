@@ -191,11 +191,11 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     if not equip.institution_name:
         equip.institution_name = "None" #Added to avoid export filter crashing when value is not present
-     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
+    equip.institution_address = get_value_kw("InstitutionAddress",dataset)
     equip.station_name = get_value_kw("StationName",dataset)
-     if not equip.station_name:
+    if not equip.station_name:
         equip.station_name = "None" #Added to avoid export filter crashing when value is not present
-   equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
+    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
     equip.manufacturer_model_name = get_value_kw("ManufacturerModelName",dataset)
     if not equip.manufacturer_model_name:
         equip.manufacturer_model_name = "None" #Added to avoid export filter crashing when value is not present
