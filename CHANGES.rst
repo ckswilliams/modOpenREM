@@ -2,9 +2,11 @@
 OpenREM version history
 =======================
 
-0.3.8
------
+0.3.8-b1
+--------
 
+* #43   Server error on export of mammo studies - beta to test fix
+* #42   Documentation updated to reflect #37
 * #37	Studies now sort by time and date
 
 
