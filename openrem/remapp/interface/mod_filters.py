@@ -74,6 +74,13 @@ class RFSummaryListFilter(django_filters.FilterSet):
             ('-projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total','Total DAP'),
             ('-projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_rp_total','Total RP Dose'),
             )
+    def get_order_by(self, order_value):
+        if order_value == 'study_date':
+            return ['study_date', 'study_time']
+        elif order_value == '-study_date':
+            return ['-study_date','-study_time']
+        return super(CTSummaryListFilter, self).get_order_by(order_value)
+
 
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
@@ -106,8 +113,14 @@ class CTSummaryListFilter(django_filters.FilterSet):
             ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
             ('general_equipment_module_attributes__station_name', 'Station name'),
             ('study_description', 'Study description'),
-            ('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
+            ('-ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
             )
+    def get_order_by(self, order_value):
+        if order_value == 'study_date':
+            return ['study_date', 'study_time']
+        elif order_value == '-study_date':
+            return ['-study_date','-study_time']
+        return super(CTSummaryListFilter, self).get_order_by(order_value)
 
 class MGSummaryListFilter(django_filters.FilterSet):
     """Filter for mammography studies to display in web interface.
@@ -141,3 +154,9 @@ class MGSummaryListFilter(django_filters.FilterSet):
             ('general_equipment_module_attributes__station_name', 'Station name'),
             ('procedure_code_meaning', 'Procedure'),
             )
+    def get_order_by(self, order_value):
+        if order_value == 'study_date':
+            return ['study_date', 'study_time']
+        elif order_value == '-study_date':
+            return ['-study_date','-study_time']
+        return super(CTSummaryListFilter, self).get_order_by(order_value)
