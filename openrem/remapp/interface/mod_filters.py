@@ -89,6 +89,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
     from remapp.tools.johnboxall_date_filter import DateRangeFilter
     study_date = DateRangeFilter(label = 'Study date range, yyyy-mm-dd')
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
+    patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
+    patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     general_equipment_module_attributes__institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital')
     general_equipment_module_attributes__manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make')
     general_equipment_module_attributes__manufacturer_model_name = django_filters.CharFilter(lookup_type='icontains', label='Model')
@@ -100,6 +102,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
             'general_equipment_module_attributes__institution_name', 
             'study_date', 
             'study_description',
+            'patient_age_min',
+            'patient_age_max',
             'general_equipment_module_attributes__manufacturer', 
             'general_equipment_module_attributes__manufacturer_model_name',
             'general_equipment_module_attributes__station_name',
