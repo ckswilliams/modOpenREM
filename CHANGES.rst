@@ -7,8 +7,8 @@ OpenREM version history
 
 * --    File layout modified to conform to norms
 * #45   mam.py was missing the licence header - fixed
-* #44   Added Tungsten, Silver and Aluminum to target/filter strings to match - thanks to DJ Platten for strings
-* #43   Mammography import and export now more robust for images with 
+* #44   Added Tungsten, Silver and Aluminum to mammo target/filter strings to match - thanks to DJ Platten for strings
+* #43   Mammography and Philips CT import and export now more robust for images with 
         missing information such as accession number and collimated field size
 * #42   Documentation updated to reflect #37
 * #37	Studies now sort by time and date
