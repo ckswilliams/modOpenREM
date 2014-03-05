@@ -145,11 +145,19 @@ def _generalequipmentmoduleattributes(dataset,study):
     from remapp.tools.dcmdatetime import get_date, get_time
     equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
+    if not equip.manufacturer:
+        equip.manufacturer = "None" #Added to avoid export filter crashing when value is not present
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
+    if not equip.institution_name:
+        equip.institution_name = "None" #Added to avoid export filter crashing when value is not present
     equip.station_name = get_value_kw("StationName",dataset)
+    if not equip.station_name:
+        equip.station_name = "None" #Added to avoid export filter crashing when value is not present
     equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
     equip.manufacturer_model_name = get_value_kw("ManufacturerModelName",dataset)
+    if not equip.manufacturer_model_name:
+        equip.manufacturer_model_name = "None" #Added to avoid export filter crashing when value is not present
     equip.device_serial_number = get_value_kw("DeviceSerialNumber",dataset)
     equip.software_versions = get_value_kw("SoftwareVersions",dataset)
     equip.gantry_id = get_value_kw("GantryID",dataset)
@@ -195,8 +203,12 @@ def _generalstudymoduleattributes(dataset,g):
     g.referring_physician_name = get_value_kw('RequestingPhysician',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
     g.accession_number = get_value_kw('AccessionNumber',dataset)
+    if not g.accession_number:
+        g.accession_number = "None" #Added to avoid export filter crashing when value is not present
     g.modality_type = 'CT'
     g.study_description = get_value_kw('ProtocolName',dataset)
+    if not g.study_description:
+        g.study_description = "None" #Added to avoid export filter crashing when value is not present
     g.operator_name = get_value_kw('OperatorsName',dataset)
     if 'RequestAttributesSequence' in dataset:
         g.procedure_code_value = get_seq_code_value('ScheduledProtocolCodeSequence',dataset.RequestAttributesSequence[0])

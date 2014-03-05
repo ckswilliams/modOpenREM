@@ -1,13 +1,44 @@
+#    OpenREM - Radiation Exposure Monitoring tools for the physicist
+#    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    Additional permission under section 7 of GPLv3:
+#    You shall not make any use of the name of The Royal Marsden NHS
+#    Foundation trust in connection with this Program in any press or 
+#    other public announcement without the prior written consent of 
+#    The Royal Marsden NHS Foundation Trust.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+..  module:: mam.
+    :synopsis: Module to extract radiation dose related data from mammography image objects.
+
+..  moduleauthor:: Ed McDonagh
+
+"""
 def _xrayfilters(dataset,source):
     from remapp.models import Xray_filters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
     xray_filter_material = get_value_kw('FilterMaterial',dataset)
     if xray_filter_material:
-        if xray_filter_material.strip() == 'MOLYBDENUM':
+        if xray_filter_material.strip().lower() == 'molybdenum':
             filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-        if xray_filter_material.strip() == 'RHODIUM':
+        if xray_filter_material.strip().lower() == 'rhodium':
             filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+        if xray_filter_material.strip().lower() == 'tungsten':
+            filters.xray_filter_material = get_or_create_cid('C-164F9','Tungsten or Tungsten compound')
         filters.save()
     
 
@@ -52,12 +83,17 @@ def _irradiationeventxraysourcedata(dataset,event):
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
     anode_target_material = get_value_kw('AnodeTargetMaterial',dataset)
-    if anode_target_material.strip() == 'MOLYBDENUM':
+    if anode_target_material.strip().lower() == 'molybdenum':
         source.anode_target_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-    if anode_target_material.strip() == 'RHODIUM':
+    if anode_target_material.strip().lower() == 'rhodium':
         source.anode_target_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+    if anode_target_material.strip().lower() == 'silver':
+        source.anode_target_material = get_or_create_cid('C-137F9','Silver or Silver compound')
+    if anode_target_material.strip().lower() == 'aluminum' or anode_target_material.strip().lower() == 'aluminium':
+        source.anode_target_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
     collimated_field_area = get_value_kw('FieldOfViewDimensions',dataset)
-    source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
+    if collimated_field_area:
+        source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
     source.exposure_control_mode = get_value_kw('ExposureControlMode',dataset)
     source.save()
     _xrayfilters(dataset,source)
@@ -186,11 +222,19 @@ def _generalequipmentmoduleattributes(dataset,study):
     from remapp.tools.dcmdatetime import get_date, get_time
     equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
+    if not equip.manufacturer:
+        equip.manufacturer = "None" #Added to avoid export filter crashing when value is not present
     equip.institution_name = get_value_kw("InstitutionName",dataset)
+    if not equip.institution_name:
+        equip.institution_name = "None" #Added to avoid export filter crashing when value is not present
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
     equip.station_name = get_value_kw("StationName",dataset)
+    if not equip.station_name:
+        equip.station_name = "None" #Added to avoid export filter crashing when value is not present
     equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
     equip.manufacturer_model_name = get_value_kw("ManufacturerModelName",dataset)
+    if not equip.manufacturer_model_name:
+        equip.manufacturer_model_name = "None" #Added to avoid export filter crashing when value is not present
     equip.device_serial_number = get_value_kw("DeviceSerialNumber",dataset)
     equip.software_versions = get_value_kw("SoftwareVersions",dataset)
     equip.gantry_id = get_value_kw("GantryID",dataset)
@@ -235,13 +279,19 @@ def _generalstudymoduleattributes(dataset,g):
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
     g.accession_number = get_value_kw('AccessionNumber',dataset)
+    if not g.accession_number:
+        g.accession_number = "None" #Added to avoid export filter crashing when value is not present
     g.study_description = get_value_kw('StudyDescription',dataset)
+    if not g.study_description:
+        g.study_description = "None" #Added to avoid export filter crashing when value is not present
     g.modality_type = get_value_kw('Modality',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
     g.operator_name = get_value_kw('OperatorName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
+    if not g.procedure_code_meaning:
+        g.procedure_code_meaning = "None" #Added to avoid export filter crashing when value is not present
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
     g.save()
@@ -311,6 +361,9 @@ def mam(mg_file):
 
     Tested with:
         * GE Senographe DS software versions ADS_43.10.1 and ADS_53.10.10 only.
+        * Limited testing: GE Senographe Essential
+        * Limited testing: Hologic Selenia
+        * Limited testing: Siemens Inspiration
     
     """
 

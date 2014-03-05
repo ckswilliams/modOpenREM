@@ -2,13 +2,27 @@
 OpenREM version history
 =======================
 
+0.3.8
+-----
+
+* --    File layout modified to conform to norms
+* #46   Updated documentation to reflect limited testing of mammo import on
+        additional modalities
+* #45   mam.py was missing the licence header - fixed
+* #44   Added Tungsten, Silver and Aluminum to mammo target/filter strings to match - thanks to DJ Platten for strings
+* #43   Mammography and Philips CT import and export now more robust for images with 
+        missing information such as accession number and collimated field size
+* #42   Documentation updated to reflect #37
+* #37	Studies now sort by time and date
+
+
 0.3.7
 -----
 
 * #40   Restyled the filter section in the web interface and added a title to that section
 * #38   Column titles tidied up in Excel exports
 * #36	openrem_ptsizecsv output of log now depends on verbose flag
-* #35   Number no longer stored as text in Excel exports
+* #35   Numbers no longer stored as text in Excel exports
 
 0.3.6
 -----

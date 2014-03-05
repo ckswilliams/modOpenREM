@@ -1,9 +1,0 @@
-include LICENSE
-include README.rst
-recursive-include openrem/remapp *
-recursive-include openrem/remapp/static *
-recursive-include openrem/remapp/templates *
-recursive-include openrem/remapp/extractors *
-recursive-include openrem/remapp/tools *
-recursive-include openrem/openrem *
-

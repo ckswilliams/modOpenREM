@@ -12,6 +12,8 @@ mammography structured reports if they start to appear.
 .. automodule:: remapp.extractors.rdsr
     :members:
 
+.. _mammo-module:
+
 Mammography module
 ++++++++++++++++++
 
