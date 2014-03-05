@@ -361,6 +361,9 @@ def mam(mg_file):
 
     Tested with:
         * GE Senographe DS software versions ADS_43.10.1 and ADS_53.10.10 only.
+        * Limited testing: GE Senographe Essential
+        * Limited testing: Hologic Selenia
+        * Limited testing: Siemens Inspiration
     
     """
 
