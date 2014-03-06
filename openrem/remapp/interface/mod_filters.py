@@ -90,8 +90,10 @@ class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
     """
-    from remapp.tools.johnboxall_date_filter import DateRangeFilter
-    study_date = DateRangeFilter(label = 'Study date range, yyyy-mm-dd')
+#    from remapp.tools.johnboxall_date_filter import DateRangeFilter
+#    study_date = DateRangeFilter(label = 'Study date range, yyyy-mm-dd')
+    date_after = django_filters.DateFilter(lookup_type='gt', label='Date: From', name='study_date')
+    date_before = django_filters.DateFilter(lookup_type='lt', label='Date: Until', name='study_date')
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
@@ -104,7 +106,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
         model = General_study_module_attributes
         fields = [
             'general_equipment_module_attributes__institution_name', 
-            'study_date', 
+            'date_after', 
+            'date_before', 
             'study_description',
             'patient_age_min',
             'patient_age_max',
