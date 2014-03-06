@@ -91,7 +91,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'id':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
@@ -125,6 +125,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
             ('study_description', 'Study description'),
             ('-ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
             )
+
     def get_order_by(self, order_value):
         if order_value == 'study_date':
             return ['study_date', 'study_time']
