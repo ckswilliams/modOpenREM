@@ -10,9 +10,9 @@
       {% load pagination_tags %}    
     
       <p>
-        There are {{ filter.count }} exams in this list: 
+        There are {{ filter.count }} studies in this list: 
         <ul>
-          <li><strong>Note:</strong> The filter must be applied (even if it is blank)!</li>
+          <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
           <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
           <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
         </ul>
