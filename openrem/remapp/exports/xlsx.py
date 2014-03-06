@@ -52,8 +52,8 @@ def ctxlsx(request):
 
     # Get the database query filters
     f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_study_date_0 = request.GET.get('study_date_0')
-    f_study_date_1 = request.GET.get('study_date_1')
+    f_date_after = request.GET.get('date_after')
+    f_date_before = request.GET.get('date_before')
     f_study_description = request.GET.get('study_description')
     f_age_min = request.GET.get('patient_age_min')
     f_age_max = request.GET.get('patient_age_max')
@@ -78,10 +78,10 @@ def ctxlsx(request):
         e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
     if f_accession_number:
         e = e.filter(accession_number__icontains = f_accession_number)
-    if f_study_date_0:
-        e = e.filter(study_date__gte = f_study_date_0)
-    if f_study_date_1:
-        e = e.filter(study_date__lte = f_study_date_1)
+    if f_date_after:
+        e = e.filter(study_date__gte = f_date_after)
+    if f_date_before:
+        e = e.filter(study_date__lte = f_date_before)
     if f_age_min:
         e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
     if f_age_max:
