@@ -415,7 +415,7 @@ class General_equipment_module_attributes(models.Model): # C.7.5.1
     manufacturer = models.CharField(max_length=64,blank=True,null=True)
     institution_name = models.CharField(max_length=64,blank=True,null=True)
     institution_address = models.CharField(max_length=64,blank=True,null=True)
-    station_name = models.CharField(max_length=32,blank=True)
+    station_name = models.CharField(max_length=32,blank=True,null=True)
     institutional_department_name = models.CharField(max_length=64,blank=True,null=True)
     manufacturer_model_name = models.CharField(max_length=64,blank=True,null=True)
     device_serial_number = models.CharField(max_length=64,blank=True,null=True)
