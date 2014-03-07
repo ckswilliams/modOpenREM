@@ -1,9 +1,15 @@
 {% extends "remapp/filteredbase.html" %}
 
+    {% block headscript %}
+    {% endblock %}
+
+
 {% block navbar %}
             <li class="active"><a href="/openrem/ct">CT</a></li>
             <li><a href="/openrem/rf">Fluoroscopy</a></li>
             <li><a href="/openrem/mg">Mammography</a></li>
+
+
 {% endblock %}
 
       {% block toprow %}
@@ -18,6 +24,8 @@
         </ul>
       </p>
 
+
+
       {% endblock %}
 
 
@@ -26,6 +34,11 @@
 
 
     {{ studyfilter }}
+
+
+
+
+
 
           <div class="panel panel-info">
             <div class="panel-heading">
@@ -51,10 +64,18 @@
           </div>
 
 
+<script>
+$('.datepicker').datepicker({
+    format: "yyyy-mm-dd",
+    autoclose: true,
+    todayHighlight: true
+    });
+</script>
     
 {% endblock %}
 
 {% block col1 %}
+
 
       {% autopaginate filter.qs 25 as filter_list %}
       {% paginate %}

@@ -24,6 +24,10 @@
       <script src="{{ STATIC_URL }}js/html5shiv.js"></script>
       <script src="{{ STATIC_URL }}js/respond.min.js"></script>
     <![endif]-->
+
+    {% block headextras %}
+    {% endblock %}
+
   </head>
 
 
@@ -75,6 +79,9 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
     <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+
+    {% block jsblock %}
+    {% endblock %}
 
   </body>
 </html>

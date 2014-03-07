@@ -91,8 +91,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'id':'datepicker'}))
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
