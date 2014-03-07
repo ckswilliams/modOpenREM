@@ -56,9 +56,9 @@ class RFSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = General_study_module_attributes
         fields = [
-            'general_equipment_module_attributes__institution_name', 
             'date_after', 
             'date_before', 
+            'general_equipment_module_attributes__institution_name', 
             'study_description',
             'patient_age_min',
             'patient_age_max',
@@ -104,9 +104,9 @@ class CTSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = General_study_module_attributes
         fields = [
-            'general_equipment_module_attributes__institution_name', 
             'date_after', 
             'date_before', 
+            'general_equipment_module_attributes__institution_name', 
             'study_description',
             'patient_age_min',
             'patient_age_max',
@@ -150,9 +150,9 @@ class MGSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = General_study_module_attributes
         fields = [
-            'general_equipment_module_attributes__institution_name', 
             'date_after', 
             'date_before', 
+            'general_equipment_module_attributes__institution_name', 
             'procedure_code_meaning',
             'patient_age_min',
             'patient_age_max',
