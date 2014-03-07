@@ -156,6 +156,7 @@ def ctxlsx(request):
         tabtext = protocol.lower().replace(" ","_")
         translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
         tabtext = tabtext.translate(translation_table) # remove illegal characters
+        tabtext = tabtext[:31]
         if tabtext not in sheetlist:
             sheetlist[tabtext] = {
                 'sheet': book.add_worksheet(tabtext),
@@ -279,6 +280,7 @@ def ctxlsx(request):
             tabtext = protocol.lower().replace(" ","_")
             translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
             tabtext = tabtext.translate(translation_table) # remove illegal characters
+            tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
             
             examdata = [
