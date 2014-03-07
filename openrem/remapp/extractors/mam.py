@@ -37,8 +37,11 @@ def _xrayfilters(dataset,source):
             filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
         if xray_filter_material.strip().lower() == 'rhodium':
             filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
-        if xray_filter_material.strip().lower() == 'tungsten':
-            filters.xray_filter_material = get_or_create_cid('C-164F9','Tungsten or Tungsten compound')
+        if xray_filter_material.strip().lower() == 'silver':
+            filters.xray_filter_material = get_or_create_cid('C-137F9','Silver or Silver compound')
+        if xray_filter_material.strip().lower() == 'aluminum' or xray_filter_material.strip().lower() == 'aluminium':
+            filters.xray_filter_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
+
         filters.save()
     
 
@@ -87,10 +90,8 @@ def _irradiationeventxraysourcedata(dataset,event):
         source.anode_target_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
     if anode_target_material.strip().lower() == 'rhodium':
         source.anode_target_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
-    if anode_target_material.strip().lower() == 'silver':
-        source.anode_target_material = get_or_create_cid('C-137F9','Silver or Silver compound')
-    if anode_target_material.strip().lower() == 'aluminum' or anode_target_material.strip().lower() == 'aluminium':
-        source.anode_target_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
+    if anode_target_material.strip().lower() == 'tungsten':
+        source.anode_target_material = get_or_create_cid('C-164F9','Tungsten or Tungsten compound')
     collimated_field_area = get_value_kw('FieldOfViewDimensions',dataset)
     if collimated_field_area:
         source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
