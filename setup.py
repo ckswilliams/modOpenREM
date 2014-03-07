@@ -19,7 +19,7 @@ requires = [
 
 setup(
     name='OpenREM',
-    version='0.3.8',
+    version='0.3.9-a1',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
