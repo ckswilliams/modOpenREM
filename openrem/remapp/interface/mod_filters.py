@@ -42,8 +42,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date')
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
@@ -56,9 +56,9 @@ class RFSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = General_study_module_attributes
         fields = [
-            'general_equipment_module_attributes__institution_name', 
             'date_after', 
             'date_before', 
+            'general_equipment_module_attributes__institution_name', 
             'study_description',
             'patient_age_min',
             'patient_age_max',
@@ -91,8 +91,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date')
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
@@ -104,9 +104,9 @@ class CTSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = General_study_module_attributes
         fields = [
-            'general_equipment_module_attributes__institution_name', 
             'date_after', 
             'date_before', 
+            'general_equipment_module_attributes__institution_name', 
             'study_description',
             'patient_age_min',
             'patient_age_max',
@@ -125,6 +125,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
             ('study_description', 'Study description'),
             ('-ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
             )
+
     def get_order_by(self, order_value):
         if order_value == 'study_date':
             return ['study_date', 'study_time']
@@ -136,8 +137,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
     """Filter for mammography studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date')
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label='Procedure')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
@@ -149,9 +150,9 @@ class MGSummaryListFilter(django_filters.FilterSet):
     class Meta:
         model = General_study_module_attributes
         fields = [
-            'general_equipment_module_attributes__institution_name', 
             'date_after', 
             'date_before', 
+            'general_equipment_module_attributes__institution_name', 
             'procedure_code_meaning',
             'patient_age_min',
             'patient_age_max',
