@@ -42,8 +42,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date')
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
@@ -137,8 +137,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
     """Filter for mammography studies to display in web interface.
 
     """
-    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date')
-    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date')
+    date_after = django_filters.DateFilter(lookup_type='gte', label='Date: From', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
+    date_before = django_filters.DateFilter(lookup_type='lte', label='Date: Until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label='Procedure')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
