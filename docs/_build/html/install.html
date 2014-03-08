@@ -116,7 +116,7 @@ If you are installing in a Windows environment you will need to use the Windows 
 <dt>Create the database</dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">syncdb</span></tt></li>
-<li>(optional for a test database) <tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">convert_to_south</span> <span class="pre">remapp</span></tt></li>
+<li>(optional when just testing) <tt class="docutils literal"><span class="pre">python</span> <span class="pre">path/to/openrem/manage.py</span> <span class="pre">convert_to_south</span> <span class="pre">remapp</span></tt></li>
 </ul>
 </dd>
 </dl>
@@ -202,7 +202,7 @@ the production database details.</p>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
+<li id="convert-to-south"><dl class="first docutils">
 <dt>Convert the database to use South</dt>
 <dd><p class="first">South is a django application to manage database migrations. Using
 South means that future changes to the database model can be calculated
