@@ -5,7 +5,7 @@ Upgrade instructions
 Upgrading from tar.gz package
 =============================
 
-..  note:: Make sure you have setup South before you upgrade - see :ref:`7. Convert the database to use South <convert-to-south>` for details.
+..  note:: Make sure you have setup South before you upgrade -- see :ref:`7. Convert the database to use South <convert-to-south>` for details.
 
 Code upgrade
 ------------
