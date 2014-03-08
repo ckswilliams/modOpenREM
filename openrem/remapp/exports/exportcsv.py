@@ -45,48 +45,49 @@ def exportFL2excel(request):
 
 
     # Get the database query filters
-    f_study_date_0 = request.GET.get('study_date_0')
-    f_study_date_1 = request.GET.get('study_date_1')
+    f_date_after = request.GET.get('date_after')
+    f_date_before = request.GET.get('date_before')
     f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
     f_study_description = request.GET.get('study_description')
+    f_age_min = request.GET.get('patient_age_min')
+    f_age_max = request.GET.get('patient_age_max')
     f_performing_physician_name = request.GET.get('performing_physician_name')
     f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
     f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
     f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
     f_accession_number = request.GET.get('accession_number')
     
-    if f_study_date_0 == '':
-        f_study_date_0 = '1970-01-01'
-    if f_study_date_1 == '':
-        f_study_date_1 = '2070-01-01'
-
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
     
     # Get the data!
     from remapp.models import General_study_module_attributes
-    e = General_study_module_attributes.objects.filter(
-        modality_type__exact = 'RF'
-        ).filter(
-            study_date__gte = f_study_date_0
-        ).filter(
-            study_date__lte = f_study_date_1
-        ).filter(
-            general_equipment_module_attributes__institution_name__icontains = f_institution_name
-        ).filter(
-            study_description__icontains = f_study_description
-        ).filter(
-            performing_physician_name__icontains = f_performing_physician_name
-        ).filter(
-            general_equipment_module_attributes__manufacturer__icontains = f_manufacturer
-        ).filter(
-            general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name
-        ).filter(
-            general_equipment_module_attributes__station_name__icontains = f_station_name
-        ).filter(
-            accession_number__icontains = f_accession_number
-        )
+
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
+    
+    if f_institution_name:
+        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
+    if f_study_description:
+        e = e.filter(study_description__icontains = f_study_description)
+    if f_performing_physician_name:
+        e = e.filter(performing_physician_name__icontains = f_performing_physician_name)
+    if f_manufacturer:
+        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
+    if f_manufacturer_model_name:
+        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
+    if f_station_name:
+        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
+    if f_accession_number:
+        e = e.filter(accession_number__icontains = f_accession_number)
+    if f_date_after:
+        e = e.filter(study_date__gte = f_date_after)
+    if f_date_before:
+        e = e.filter(study_date__lte = f_date_before)
+    if f_age_min:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
+    if f_age_max:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
 
     writer = csv.writer(response)
     writer.writerow([
@@ -153,18 +154,15 @@ def exportCT2excel(request):
 
     # Get the database query filters
     f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_study_date_0 = request.GET.get('study_date_0')
-    f_study_date_1 = request.GET.get('study_date_1')
+    f_date_after = request.GET.get('date_after')
+    f_date_before = request.GET.get('date_before')
     f_study_description = request.GET.get('study_description')
+    f_age_min = request.GET.get('patient_age_min')
+    f_age_max = request.GET.get('patient_age_max')
     f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
     f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
     f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
     f_accession_number = request.GET.get('accession_number')
-    
-    if f_study_date_0 == '':
-        f_study_date_0 = '1970-01-01'
-    if f_study_date_1 == '':
-        f_study_date_1 = '2070-01-01'
 
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(mimetype='text/csv')
@@ -175,25 +173,30 @@ def exportCT2excel(request):
     
     # Get the data!
     from remapp.models import General_study_module_attributes
-    e = General_study_module_attributes.objects.filter(
-        modality_type__exact = 'CT'
-        ).filter(
-            general_equipment_module_attributes__institution_name__icontains = f_institution_name
-        ).filter(
-            study_date__gte = f_study_date_0
-        ).filter(
-            study_date__lte = f_study_date_1
-        ).filter(
-            study_description__icontains = f_study_description
-        ).filter(
-            general_equipment_module_attributes__manufacturer__icontains = f_manufacturer
-        ).filter(
-            general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name
-        ).filter(
-            general_equipment_module_attributes__station_name__icontains = f_station_name
-        ).filter(
-            accession_number__icontains = f_accession_number
-        )
+
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    
+    if f_institution_name:
+        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
+    if f_study_description:
+        e = e.filter(study_description__icontains = f_study_description)
+    if f_manufacturer:
+        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
+    if f_manufacturer_model_name:
+        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
+    if f_station_name:
+        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
+    if f_accession_number:
+        e = e.filter(accession_number__icontains = f_accession_number)
+    if f_date_after:
+        e = e.filter(study_date__gte = f_date_after)
+    if f_date_before:
+        e = e.filter(study_date__lte = f_date_before)
+    if f_age_min:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
+    if f_age_max:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+
 
         
     numresults = e.count()
@@ -318,18 +321,15 @@ def exportMG2excel(request):
     from remapp.models import General_study_module_attributes
 
     f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_study_date_0 = request.GET.get('study_date_0')
-    f_study_date_1 = request.GET.get('study_date_1')
+    f_date_after = request.GET.get('date_after')
+    f_date_before = request.GET.get('date_before')
     f_procedure_code_meaning = request.GET.get('procedure_code_meaning')
+    f_age_min = request.GET.get('patient_age_min')
+    f_age_max = request.GET.get('patient_age_max')
     f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
     f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
     f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
     f_accession_number = request.GET.get('accession_number')
-
-    if f_study_date_0 == '':
-        f_study_date_0 = '1970-01-01'
-    if f_study_date_1 == '':
-        f_study_date_1 = '2070-01-01'
 
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(mimetype='text/csv')
@@ -337,25 +337,29 @@ def exportMG2excel(request):
     
     # Get the data!
     from remapp.models import General_study_module_attributes
-    s = General_study_module_attributes.objects.filter(
-        modality_type__exact = 'MG'
-        ).filter(
-            general_equipment_module_attributes__institution_name__icontains = f_institution_name
-        ).filter(
-            study_date__gte = f_study_date_0
-        ).filter(
-            study_date__lte = f_study_date_1
-        ).filter(
-            procedure_code_meaning__icontains = f_procedure_code_meaning
-        ).filter(
-            general_equipment_module_attributes__manufacturer__icontains = f_manufacturer
-        ).filter(
-            general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name
-        ).filter(
-            general_equipment_module_attributes__station_name__icontains = f_station_name
-        ).filter(
-            accession_number__icontains = f_accession_number
-        )
+
+    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
+    
+    if f_institution_name:
+        s = s.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
+    if f_procedure_code_meaning:
+        s = s.filter(procedure_code_meaning__icontains = f_procedure_code_meaning)
+    if f_manufacturer:
+        s = s.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
+    if f_manufacturer_model_name:
+        s = s.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
+    if f_station_name:
+        s = s.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
+    if f_accession_number:
+        s = s.filter(accession_number__icontains = f_accession_number)
+    if f_date_after:
+        s = s.filter(study_date__gte = f_date_after)
+    if f_date_before:
+        s = s.filter(study_date__lte = f_date_before)
+    if f_age_min:
+        s = s.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
+    if f_age_max:
+        s = s.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
 
     writer = csv.writer(response)
     writer.writerow([

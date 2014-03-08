@@ -52,40 +52,41 @@ def ctxlsx(request):
 
     # Get the database query filters
     f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_study_date_0 = request.GET.get('study_date_0')
-    f_study_date_1 = request.GET.get('study_date_1')
+    f_date_after = request.GET.get('date_after')
+    f_date_before = request.GET.get('date_before')
     f_study_description = request.GET.get('study_description')
+    f_age_min = request.GET.get('patient_age_min')
+    f_age_max = request.GET.get('patient_age_max')
     f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
     f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
     f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
     f_accession_number = request.GET.get('accession_number')
     
-    if f_study_date_0 == '':
-        f_study_date_0 = '1970-01-01'
-    if f_study_date_1 == '':
-        f_study_date_1 = '2070-01-01'
-
     # Get the data!
     from remapp.models import General_study_module_attributes
-    e = General_study_module_attributes.objects.filter(
-        modality_type__exact = 'CT'
-        ).filter(
-            general_equipment_module_attributes__institution_name__icontains = f_institution_name
-        ).filter(
-            study_date__gte = f_study_date_0
-        ).filter(
-            study_date__lte = f_study_date_1
-        ).filter(
-            study_description__icontains = f_study_description
-        ).filter(
-            general_equipment_module_attributes__manufacturer__icontains = f_manufacturer
-        ).filter(
-            general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name
-        ).filter(
-            general_equipment_module_attributes__station_name__icontains = f_station_name
-        ).filter(
-            accession_number__icontains = f_accession_number
-        )
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    
+    if f_institution_name:
+        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
+    if f_study_description:
+        e = e.filter(study_description__icontains = f_study_description)
+    if f_manufacturer:
+        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
+    if f_manufacturer_model_name:
+        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
+    if f_station_name:
+        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
+    if f_accession_number:
+        e = e.filter(accession_number__icontains = f_accession_number)
+    if f_date_after:
+        e = e.filter(study_date__gte = f_date_after)
+    if f_date_before:
+        e = e.filter(study_date__lte = f_date_before)
+    if f_age_min:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
+    if f_age_max:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+
 
     # create a workbook in memory
     output = StringIO.StringIO()
@@ -155,6 +156,7 @@ def ctxlsx(request):
         tabtext = protocol.lower().replace(" ","_")
         translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
         tabtext = tabtext.translate(translation_table) # remove illegal characters
+        tabtext = tabtext[:31]
         if tabtext not in sheetlist:
             sheetlist[tabtext] = {
                 'sheet': book.add_worksheet(tabtext),
@@ -278,6 +280,7 @@ def ctxlsx(request):
             tabtext = protocol.lower().replace(" ","_")
             translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
             tabtext = tabtext.translate(translation_table) # remove illegal characters
+            tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
             
             examdata = [

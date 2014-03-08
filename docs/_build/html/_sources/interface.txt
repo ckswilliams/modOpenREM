@@ -79,8 +79,6 @@ Exporting to csv and xlsx sheets
 From any of the modality pages in the OpenREM interface, you can export the
 displayed studies to a csv spreadsheet by clicking on the link near the top.
 In the CT interface, you can also export to an enhanced XLSX spreadsheet. 
-In either case, the export will not work unless the 'Submit' button on the 
-filtering dialogue has been pressed.
 
 For CT, the XLSX export has multiple sheets. The first sheet contains a 
 summary of all the study descriptions, requested procedures and series

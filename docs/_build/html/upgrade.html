@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Upgrade instructions &mdash; OpenREM 0.3.8 documentation</title>
+    <title>Upgrade instructions &mdash; OpenREM 0.3.9 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.8',
+        VERSION:     '0.3.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.8 documentation" href="index.html" />
+    <link rel="top" title="OpenREM 0.3.9 documentation" href="index.html" />
     <link rel="next" title="Documentation for the OpenREM code" href="code.html" />
     <link rel="prev" title="Using the OpenREM interface and export function" href="interface.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="interface.html" title="Using the OpenREM interface and export function"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.8 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.9 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,6 +56,10 @@
 <h1>Upgrade instructions<a class="headerlink" href="#upgrade-instructions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="upgrading-from-tar-gz-package">
 <h2>Upgrading from tar.gz package<a class="headerlink" href="#upgrading-from-tar-gz-package" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure you have setup South before you upgrade &#8211; see <a class="reference internal" href="install.html#convert-to-south"><em>7. Convert the database to use South</em></a> for details.</p>
+</div>
 <div class="section" id="code-upgrade">
 <h3>Code upgrade<a class="headerlink" href="#code-upgrade" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
@@ -75,8 +79,12 @@ database models have changed. This will normally not be the case.</p>
 </li>
 <li><p class="first">If response to the last command is &#8216;Nothing seems to have changed&#8217;, no migration is required. Else, follow the instructions to migrate.</p>
 </li>
-<li><p class="first">Restart the web server, in case changes have been made to the web interface.</p>
-</li>
+</ol>
+</div>
+<div class="section" id="restart-the-web-server">
+<h3>Restart the web server<a class="headerlink" href="#restart-the-web-server" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Restart the web server to enable any changes that have been made to the web interface.</li>
 </ol>
 </div>
 </div>
@@ -94,6 +102,7 @@ database models have changed. This will normally not be the case.</p>
 <li><a class="reference internal" href="#upgrading-from-tar-gz-package">Upgrading from tar.gz package</a><ul>
 <li><a class="reference internal" href="#code-upgrade">Code upgrade</a></li>
 <li><a class="reference internal" href="#database-migration">Database migration</a></li>
+<li><a class="reference internal" href="#restart-the-web-server">Restart the web server</a></li>
 </ul>
 </li>
 </ul>
@@ -143,7 +152,7 @@ database models have changed. This will normally not be the case.</p>
         <li class="right" >
           <a href="interface.html" title="Using the OpenREM interface and export function"
              >previous</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.8 documentation</a> &raquo;</li> 
+        <li><a href="index.html">OpenREM 0.3.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

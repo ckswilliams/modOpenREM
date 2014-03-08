@@ -26,7 +26,7 @@ Quick setup
             + Linux example: ``'NAME': '/var/openrem/openrem.db'``
 #. Create the database
     + ``python path/to/openrem/manage.py syncdb``
-    + (optional for a test database) ``python path/to/openrem/manage.py convert_to_south remapp``
+    + (optional when just testing) ``python path/to/openrem/manage.py convert_to_south remapp``
 #. Start test web server
     + ``python path/to/openrem/manage.py runserver``
     + If you are using a headless server and need to be able to see the 
@@ -78,6 +78,7 @@ More in depth process
 #. Create the database
     + ``python path/to/openrem/manage.py syncdb``
 
+    .. _convert-to-south:
 #. Convert the database to use South
     South is a django application to manage database migrations. Using
     South means that future changes to the database model can be calculated
