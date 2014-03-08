@@ -6,7 +6,7 @@ OpenREM version history
 
 0.3.9
 -----
-..  note: #51 includes changes to the database schema -- make sure South is in use before upgrading. See http://docs.openrem.org/page/upgrade.html
+..  note:: #51 includes changes to the database schema -- make sure South is in use before upgrading. See http://docs.openrem.org/page/upgrade.html
 
 * #59   CSS stylesheet referenced particular fonts that are not in the distribution -- references removed
 * #58   Export to xlsx more robust - limitation of 31 characters for sheet names now enforced
