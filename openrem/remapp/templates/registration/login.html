@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+          {% block loginlink %}
+          {% endblock %}
+
+
 {% block mainblock %}
 
 {% if form.errors %}
@@ -23,7 +27,7 @@
       {% if next %}
         <input type="hidden" name="next" value="{{ next }}" />
       {% else %}
-        <input type="hidden" name="next" value="/openrem/" />
+        <input type="hidden" name="next" value="/openrem/auth/" />
       {% endif %}</form>
 
 {% endblock %}

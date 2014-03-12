@@ -76,7 +76,7 @@ def ct_summary_list_filter_auth(request):
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
     admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     return render_to_response(
-        'remapp/ctfiltered-a.html',
+        'remapp/auth/ctfiltered.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
@@ -94,6 +94,7 @@ def mg_summary_list_filter(request):
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
+
 
 def openrem_home(request):
     from remapp.models import General_study_module_attributes
@@ -147,3 +148,55 @@ def openrem_home(request):
     
     return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
+@login_required
+def home_auth(request):
+    from remapp.models import General_study_module_attributes
+    from datetime import datetime
+    import pytz
+    from collections import OrderedDict
+    import pkg_resources # part of setuptools
+    utc = pytz.UTC
+    allstudies = General_study_module_attributes.objects.all()
+    homedata = { 
+        'total' : allstudies.count(),
+        'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
+        'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
+        'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
+        }
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    modalities = ('MG','CT','RF')
+    for modality in modalities:
+        studies = allstudies.filter(modality_type__contains = modality).all()
+        stations = studies.values_list('general_equipment_module_attributes__station_name').distinct()
+        modalitydata = {}
+        for station in stations:
+            latestdate = studies.filter(
+                general_equipment_module_attributes__station_name__exact = station[0]
+                ).latest('study_date').study_date
+            latestuid = studies.filter(general_equipment_module_attributes__station_name__exact = station[0]
+                ).filter(study_date__exact = latestdate).latest('study_time')
+            latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
+            latestdatetimeaware = utc.localize(latestdatetime)
+            
+            inst_name = studies.filter(
+                general_equipment_module_attributes__station_name__exact = station[0]
+                ).latest('study_date').general_equipment_module_attributes_set.get().institution_name
+                
+            model_name = studies.filter(
+                general_equipment_module_attributes__station_name__exact = station[0]
+                ).latest('study_date').general_equipment_module_attributes_set.get().manufacturer_model_name
+            
+            institution = '{0}, {1}'.format(inst_name,model_name)
+                       
+            modalitydata[station[0]] = {
+                'total' : studies.filter(
+                    general_equipment_module_attributes__station_name__exact = station[0]
+                    ).count(),
+                'latest' : latestdatetimeaware,
+                'institution' : institution
+            }
+        ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
+        homedata[modality] = ordereddata
+    
+    
+    return render(request,"remapp/auth/home.html",{'homedata':homedata, 'admin':admin})

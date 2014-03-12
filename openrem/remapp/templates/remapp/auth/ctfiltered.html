@@ -1,0 +1,13 @@
+{% extends "remapp/ctfiltered.html" %}
+
+            {% block navbar %}
+            <li class="active"><a href="/openrem/auth/ct">CT</a></li>
+            <li><a href="/openrem/auth/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/auth/mg">Mammography</a></li>
+            {% endblock %}
+
+          {% block loginlink %}
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/logout/"><span class="glyphicon glyphicon-user"></span> Welcome {{ user.get_full_name }} - logout</a></li>
+          </ul>
+          {% endblock %}

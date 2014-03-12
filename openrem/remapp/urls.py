@@ -61,9 +61,11 @@ urlpatterns = patterns('remapp.views',
             model=General_study_module_attributes,
             template_name='remapp/mgdetail.html')),
 
-    url(r'^ct-auth/$',
+    url(r'^auth/ct/$',
         'ct_summary_list_filter_auth'),
 
+    url(r'^auth/$',
+        'home_auth'),
 )
 
 urlpatterns += patterns('remapp.exports.exportcsv',
