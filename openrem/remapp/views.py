@@ -28,14 +28,22 @@
 
 """
 
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-import datetime
-from remapp.models import General_study_module_attributes
-
-
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template import RequestContext
 from django.shortcuts import render_to_response
+import datetime
+from remapp.models import General_study_module_attributes
+
+def logout_page(request):
+    """
+    Log users out and re-direct them to the main page.
+    """
+    logout(request)
+    return HttpResponseRedirect('/openrem/')
 
 
 
@@ -57,6 +65,18 @@ def ct_summary_list_filter(request):
     admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     return render_to_response(
         'remapp/ctfiltered.html',
+        {'filter': f, 'admin':admin},
+        context_instance=RequestContext(request)
+        )
+
+@login_required
+def ct_summary_list_filter_auth(request):
+    from remapp.interface.mod_filters import CTSummaryListFilter
+    import pkg_resources # part of setuptools
+    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    return render_to_response(
+        'remapp/ctfiltered-a.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )

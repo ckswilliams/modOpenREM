@@ -1,0 +1,7 @@
+{% extends "remapp/ctfiltered.html" %}
+
+      {% block auth %}
+      <p>
+        Welcome {{ user.get_full_name }}
+      </p>
+      {% endblock %}

@@ -7,4 +7,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^openrem/', include('remapp.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    # Login / logout.
+    url(r'^login/$', 'django.contrib.auth.views.login'),
+
 )

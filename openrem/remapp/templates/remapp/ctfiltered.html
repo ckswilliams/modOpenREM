@@ -15,6 +15,8 @@
       {% block toprow %}
       {% load pagination_tags %}    
     
+      {% block auth %}
+      {% endblock %}
       <p>
         There are {{ filter.count }} studies in this list: 
         <ul>
