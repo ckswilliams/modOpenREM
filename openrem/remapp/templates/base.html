@@ -54,6 +54,11 @@
             <li><a href="/openrem/mg">Mammography</a></li>
             {% endblock %}
           </ul>
+          {% block loginlink %}
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/login/"><span class="glyphicon glyphicon-user"></span> Anonymous - login</a></li>
+          </ul>
+          {% endblock %}
         </div><!--/.nav-collapse -->
       </div>
     </div>
