@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     # Login / logout.
     url(r'^login/$', 'django.contrib.auth.views.login'),
+    url(r'^logout/$', 'remapp.views.logout_page'),
 
 )

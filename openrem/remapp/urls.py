@@ -64,7 +64,6 @@ urlpatterns = patterns('remapp.views',
     url(r'^ct-auth/$',
         'ct_summary_list_filter_auth'),
 
-    url(r'^logout/$', 'logout_page'),
 )
 
 urlpatterns += patterns('remapp.exports.exportcsv',
