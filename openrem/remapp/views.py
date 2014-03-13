@@ -64,20 +64,15 @@ def rf_summary_list_filter(request):
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
     import pkg_resources # part of setuptools
-    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
-    exportperm = False
-    adminperm = False
-    if request.user.groups.filter(name="exportgroup"):
-        exportperm = True
-    if request.user.groups.filter(name="admingroup"):
-        adminperm = True
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version,
-            'exportperm' : exportperm,
-            'adminperm' : adminperm,
-            }
 
-    
-    
+    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
+
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version,
+            }
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
     
     return render_to_response(
         'remapp/ctfiltered.html',
