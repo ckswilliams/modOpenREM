@@ -11,3 +11,11 @@
             <li><a href="/logout/"><span class="glyphicon glyphicon-user"></span> Welcome {{ user.get_full_name }} - logout</a></li>
           </ul>
           {% endblock %}
+
+      {% block auth %}
+        <ul>
+          <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
+          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
+          <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
+        </ul>
+      {% endblock %}

@@ -56,7 +56,16 @@
           </ul>
           {% block loginlink %}
           <ul class="nav navbar-nav navbar-right">
-            <p class="navbar-text navbar-right"><span class="glyphicon glyphicon-user"></span> Not signed in - <a href="/login/" class="navbar-link">Login</a></p>
+            <p class="navbar-text navbar-right">
+              <span class="glyphicon glyphicon-user"></span>
+              {% if user.is_authenticated %}
+               Welcome {{ user.get_full_name }} -
+               <a href="/logout/" class="navbar-link">logout</a>
+              {% else %}
+               Not signed in - 
+              <a href="/login/?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
+              {% endif %}
+            </p>
           </ul>
           {% endblock %}
         </div><!--/.nav-collapse -->

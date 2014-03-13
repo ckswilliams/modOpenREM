@@ -15,15 +15,16 @@
       {% block toprow %}
       {% load pagination_tags %}    
     
-      {% block auth %}
-      {% endblock %}
       <p>
         There are {{ filter.count }} studies in this list: 
+      {% block auth %}
         <ul>
-          <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
-          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
-          <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
+          <li><strong>Note:</strong> Login to enable study export.</li>
         </ul>
+        {% if user.is_authenticated %}
+          Which you are!
+        {% endif %}
+      {% endblock %}
       </p>
 
 

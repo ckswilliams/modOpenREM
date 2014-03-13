@@ -72,7 +72,7 @@ urlpatterns += patterns('remapp.exports.exportcsv',
     url(r'^export/openrem/rf/',
         'exportFL2excel'),
 
-    url(r'^export/openrem/ct/',
+    url(r'^export/openrem/auth/ct/',
         'exportCT2excel'),
 
     url(r'^export/openrem/mg/',
@@ -80,6 +80,6 @@ urlpatterns += patterns('remapp.exports.exportcsv',
 )
 
 urlpatterns += patterns('remapp.exports',
-    url(r'^xlsx/openrem/ct/',
+    url(r'^xlsx/openrem/auth/ct/',
         'xlsx.ctxlsx'),
 )
