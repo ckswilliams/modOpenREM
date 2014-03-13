@@ -16,21 +16,23 @@
       {% load pagination_tags %}    
     
       <p>
-        There are {{ filter.count }} studies in this list: 
+        There are {{ filter.count }} studies in this list.
+      </p>
       {% block auth %}
-        {% if user.is_authenticated %}
+        {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
           <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
           <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
         </ul>
         {% else %}
-        <ul>
-          <li><strong>Note:</strong> Login to enable study export.</li>
-        </ul>
+        <p>
+          Sorry, you don't have enough permissions to enable study export.
+        </p>
         {% endif %}
+        
       {% endblock %}
-      </p>
+
 
 
 
@@ -90,6 +92,9 @@ $('.datepicker').datepicker({
       {% paginate %}
     <table class="table table-striped">
         <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
+        {% if admin.adminperm %}
+        <th>Delete?</th>
+        {% endif %}
         {% for exam in filter_list %}
         <tr>
             <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
@@ -107,6 +112,9 @@ $('.datepicker').datepicker({
             </td>
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
+            {% if admin.adminperm %}
+            <td>Delete</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>
