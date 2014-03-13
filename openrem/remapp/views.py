@@ -46,7 +46,7 @@ def logout_page(request):
     return HttpResponseRedirect('/openrem/')
 
 
-
+@login_required
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter
     import pkg_resources # part of setuptools
@@ -58,6 +58,7 @@ def rf_summary_list_filter(request):
         context_instance=RequestContext(request)
         )
 
+@login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
     import pkg_resources # part of setuptools
@@ -69,7 +70,7 @@ def ct_summary_list_filter(request):
         context_instance=RequestContext(request)
         )
 
-
+@login_required
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter
     import pkg_resources # part of setuptools
