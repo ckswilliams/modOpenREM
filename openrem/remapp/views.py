@@ -114,6 +114,17 @@ def openrem_home(request):
     from collections import OrderedDict
     import pkg_resources # part of setuptools
     utc = pytz.UTC
+    
+    if not Group.objects.filter(name="viewgroup"):
+        vg = Group(name="viewgroup")
+        vg.save()
+    if not Group.objects.filter(name="exportgroup"):
+        eg = Group(name="exportgroup")
+        eg.save()
+    if not Group.objects.filter(name="admingroup"):
+        ag = Group(name="admingroup")
+        ag.save()
+    
     allstudies = General_study_module_attributes.objects.all()
     homedata = { 
         'total' : allstudies.count(),
