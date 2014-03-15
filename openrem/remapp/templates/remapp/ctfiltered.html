@@ -1,24 +1,17 @@
 {% extends "remapp/filteredbase.html" %}
 
-    {% block headscript %}
-    {% endblock %}
-
-
 {% block navbar %}
             <li class="active"><a href="/openrem/ct">CT</a></li>
             <li><a href="/openrem/rf">Fluoroscopy</a></li>
             <li><a href="/openrem/mg">Mammography</a></li>
-
-
 {% endblock %}
 
-      {% block toprow %}
+{% block toprow %}
       {% load pagination_tags %}    
     
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
-      {% block auth %}
         {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
@@ -31,13 +24,7 @@
         </p>
         {% endif %}
         
-      {% endblock %}
-
-
-
-
-      {% endblock %}
-
+{% endblock %}
 
 
 {% block col2 %}
