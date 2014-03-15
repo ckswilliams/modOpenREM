@@ -82,7 +82,11 @@
 
       <hr>
       <footer>
+{% if admin.openremversion %}
         <p>OpenREM version {{ admin.openremversion }} &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
+{% else %}
+        <p>OpenREM &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
+{% endif %}
       </footer>
 
     </div><!-- /.container -->
