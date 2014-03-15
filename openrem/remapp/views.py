@@ -53,7 +53,13 @@ def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter
     import pkg_resources # part of setuptools
     f = RFSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'RF'))
+
     admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     return render_to_response(
         'remapp/rffiltered.html',
         {'filter': f, 'admin':admin},
@@ -67,8 +73,7 @@ def ct_summary_list_filter(request):
 
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
 
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version,
-            }
+    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
     if request.user.groups.filter(name="exportgroup"):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
@@ -88,7 +93,13 @@ def mg_summary_list_filter(request):
     if 'page' in filter_data:
         del filter_data['page']
     f = MGSummaryListFilter(filter_data, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'MG'))
+
     admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     return render_to_response(
         'remapp/mgfiltered.html',
         {'filter': f, 'admin':admin},
