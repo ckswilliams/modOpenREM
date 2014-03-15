@@ -6,13 +6,21 @@
             <li class="active"><a href="/openrem/mg">Mammography</a></li>
 {% endblock %}
 
-      {% block toprow %}
-{% load pagination_tags %}    
-    <p>
-        There are {{ filter.count }} studies in this list: 
-        <a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> 
-        <strong>Note:</strong> Apply the filter first to refine what is exported.
-    </p>
+{% block toprow %}
+      {% load pagination_tags %}    
+      <p>
+        There are {{ filter.count }} studies in this list.
+      </p>
+        {% if admin.exportperm or admin.adminperm %}
+        <ul>
+          <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
+          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
+        </ul>
+        {% else %}
+        <p>
+          Sorry, you don't have enough permissions to enable study export.
+        </p>
+        {% endif %}
 {% endblock %}
 
 
@@ -63,6 +71,9 @@ $('.datepicker').datepicker({
 
     <table class="table table-striped">
         <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Laterality</th><th>Accumulated AGD (mGy)</th>
+        {% if admin.adminperm %}
+        <th>Delete?</th>
+        {% endif %}
         {% for exam in filter_list %}
         <tr>
             <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
@@ -79,6 +90,9 @@ $('.datepicker').datepicker({
             <td>{{ exam.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</td>
             <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.laterality }}</td>
             <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.accumulated_average_glandular_dose }}</td>
+            {% if admin.adminperm %}
+            <td>Delete</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </table>
