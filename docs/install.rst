@@ -36,6 +36,12 @@ Quick setup
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 #. Add some data!
     + ``openrem_rdsr.py rdsrfile.dcm``
+#. Add some users *New in version 0.4.0*
+    + Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you created the database (``syncdb``)
+    + Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
+        + ``viewgroup`` can browse the data only
+        + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
+        + ``admingroup`` can do as export group, and will be able to delete studies in due course (See `Issue #18 <https://bitbucket.org/edmcdonagh/openrem/issue/18/>`_)
 
 More in depth process
 =====================
