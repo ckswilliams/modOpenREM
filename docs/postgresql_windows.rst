@@ -7,7 +7,7 @@ Get PostgreSQL and the python connector
 + Download the installer from http://www.enterprisedb.com/products-services-training/pgdownload#windows
 + Download psycopg2 from http://www.lfd.uci.edu/~gohlke/pythonlibs/. Make sure it matches your python and Windows version.
 
-Install PosgreSQL
+Install PostgreSQL
 =================
 
 Run the the postgresql installer. It will ask for a location. Ensure the "data" directory is *not* under "Program Files" as this can cause permissions errors.
