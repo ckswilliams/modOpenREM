@@ -1,4 +1,4 @@
-Installing PostgreSQL for OpenREM on Ubuntu linux
+Installing PostgreSQL for OpenREM on Windows
 *************************************************
 
 Get PostgreSQL and the python connector
@@ -65,3 +65,5 @@ This error is caused by the django auth_permissions system not being able to cop
 + right click on auth_permission
 + Select properties
 + Change ''name'' to ''varying(100)'' from ''varying(50)''
+
+Then run ``python path/to/openrem/manage.py syncdb`` again.
