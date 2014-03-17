@@ -59,12 +59,13 @@ More in depth process
     recommended to use a different database such as `PostgreSQL <http://www.postgresql.org>`_ or 
     `MySQL <http://www.mysql.com>`_.
     
-    Here are the authors instructions for installing PostgreSQL on linux:
+    Here are instructions for installing PostgreSQL on linux and on Windows:
     
     ..  toctree::
         :maxdepth: 1
         
         postgresql
+        postgresql_windows
 
 
 #. Install and configure a production webserver
