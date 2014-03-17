@@ -1,6 +1,8 @@
 Installing PostgreSQL for OpenREM on Windows
 *************************************************
 
+..  Note:: Author JA Cole
+
 Get PostgreSQL and the python connector
 ===========================================
     
@@ -17,6 +19,7 @@ Create a user and database
 ==============================
 
 Open pgAdmin III
+
 + Click on servers to expand
 + Double click on PostgreSQL 9.3
 + Enter your superuser password
