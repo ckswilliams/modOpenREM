@@ -248,11 +248,11 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
         patientatt.patient_age_decimal = (g.study_date.date() - pat.patient_birth_date).days/365.25
     elif patientatt.patient_age:
         if patientatt.patient_age[-1:]=='Y':
-            patientatt.patient_age_decimal = float(patientatt.patient_age[-1:])
+            patientatt.patient_age_decimal = float(patientatt.patient_age[:-1])
         elif patientatt.patient_age[-1:]=='M':
-            patientatt.patient_age_decimal = float(patientatt.patient_age[-1:])/12
+            patientatt.patient_age_decimal = float(patientatt.patient_age[:-1])/12
         elif patientatt.patient_age[-1:]=='D':
-            patientatt.patient_age_decimal = float(patientatt.patient_age[-1:])/365.25    
+            patientatt.patient_age_decimal = float(patientatt.patient_age[:-1])/365.25    
     patientatt.save()
 
 
