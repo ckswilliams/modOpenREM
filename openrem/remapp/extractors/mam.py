@@ -240,13 +240,25 @@ def _generalequipmentmoduleattributes(dataset,study):
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     from remapp.models import Patient_study_module_attributes, Patient_module_attributes
     from remapp.tools.get_values import get_value_kw
-    from datetime import timedelta
-    from decimal import *
     patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
-    pat = Patient_module_attributes.objects.get(general_study_module_attributes=g)
-    if pat.patient_birth_date:
-        patientatt.patient_age_decimal = (g.study_date.date() - pat.patient_birth_date).days/365.25
+    patientatt.save()
+
+
+def _patientmoduleattributes(dataset,g):
+    from remapp.models import Patient_module_attributes
+    from remapp.tools.get_values import get_value_kw
+    from remapp.tools.dcmdatetime import get_date
+    from remapp.tools.not_patient_indicators import get_not_pt
+    from datetime import timedelta
+    from decimal import *
+    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat.patient_sex = get_value_kw('PatientSex',dataset)
+    patient_birth_date = get_date('PatientBirthDate',dataset) # Not saved to database
+    pat.not_patient_indicator = get_not_pt(dataset)
+    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    if patient_birth_date:
+        patientatt.patient_age_decimal = (g.study_date.date() - patient_birth_date).days/365.25
     elif patientatt.patient_age:
         if patientatt.patient_age[-1:]=='Y':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
@@ -257,17 +269,6 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
-
-
-def _patientmoduleattributes(dataset,g):
-    from remapp.models import Patient_module_attributes
-    from remapp.tools.get_values import get_value_kw
-    from remapp.tools.dcmdatetime import get_date
-    from remapp.tools.not_patient_indicators import get_not_pt
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
-    pat.patient_sex = get_value_kw('PatientSex',dataset)
-    pat.patient_birth_date = get_date('PatientBirthDate',dataset)
-    pat.not_patient_indicator = get_not_pt(dataset)
     pat.save()
 
 
@@ -295,8 +296,8 @@ def _generalstudymoduleattributes(dataset,g):
 
     _generalequipmentmoduleattributes(dataset,g)
     _projectionxrayradiationdose(dataset,g)
-    _patientmoduleattributes(dataset,g)
     _patientstudymoduleattributes(dataset,g)
+    _patientmoduleattributes(dataset,g)
 
 
 def _test_if_mammo(dataset):
