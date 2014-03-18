@@ -23,7 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OpenREM 0.3.9 documentation" href="index.html" /> 
+    <link rel="top" title="OpenREM 0.3.9 documentation" href="index.html" />
+    <link rel="up" title="Installation instructions" href="install.html" />
+    <link rel="next" title="Running Conquest on Windows as a service" href="conquestAsWindowsService.html" />
+    <link rel="prev" title="Installing PostgreSQL for OpenREM on Ubuntu linux" href="postgresql.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +38,14 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.9 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="conquestAsWindowsService.html" title="Running Conquest on Windows as a service"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">OpenREM 0.3.9 documentation</a> &raquo;</li>
+          <li><a href="install.html" accesskey="U">Installation instructions</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -46,6 +56,10 @@
             
   <div class="section" id="installing-postgresql-for-openrem-on-windows">
 <h1>Installing PostgreSQL for OpenREM on Windows<a class="headerlink" href="#installing-postgresql-for-openrem-on-windows" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Author JA Cole</p>
+</div>
 <div class="section" id="get-postgresql-and-the-python-connector">
 <h2>Get PostgreSQL and the python connector<a class="headerlink" href="#get-postgresql-and-the-python-connector" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -60,15 +74,17 @@ Enter a superuser password when prompted. Make sure you keep this safe as you wi
 </div>
 <div class="section" id="create-a-user-and-database">
 <h2>Create a user and database<a class="headerlink" href="#create-a-user-and-database" title="Permalink to this headline">¶</a></h2>
-<p>Open pgAdmin III
-+ Click on servers to expand
-+ Double click on PostgreSQL 9.3
-+ Enter your superuser password
-+ Right click on &#8220;login roles&#8221; and choose &#8220;New login role&#8221;
-+ Create the openremuser (or whatever you want your user to be called) and under definition add a password.
-+ Click OK
-+ Right click on databases and choose &#8220;New database&#8221;
-+ Name the database (openremdb is fine) and assign the the owner to the user you just created.</p>
+<p>Open pgAdmin III</p>
+<ul class="simple">
+<li>Click on servers to expand</li>
+<li>Double click on PostgreSQL 9.3</li>
+<li>Enter your superuser password</li>
+<li>Right click on &#8220;login roles&#8221; and choose &#8220;New login role&#8221;</li>
+<li>Create the openremuser (or whatever you want your user to be called) and under definition add a password.</li>
+<li>Click OK</li>
+<li>Right click on databases and choose &#8220;New database&#8221;</li>
+<li>Name the database (openremdb is fine) and assign the the owner to the user you just created.</li>
+</ul>
 </div>
 <div class="section" id="install-psycopg2">
 <h2>Install psycopg2<a class="headerlink" href="#install-psycopg2" title="Permalink to this headline">¶</a></h2>
@@ -138,6 +154,12 @@ Enter a superuser password when prompted. Make sure you keep this safe as you wi
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="postgresql.html"
+                        title="previous chapter">Installing PostgreSQL for OpenREM on Ubuntu linux</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conquestAsWindowsService.html"
+                        title="next chapter">Running Conquest on Windows as a service</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/postgresql_windows.txt"
@@ -169,7 +191,14 @@ Enter a superuser password when prompted. Make sure you keep this safe as you wi
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">OpenREM 0.3.9 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="conquestAsWindowsService.html" title="Running Conquest on Windows as a service"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="postgresql.html" title="Installing PostgreSQL for OpenREM on Ubuntu linux"
+             >previous</a> |</li>
+        <li><a href="index.html">OpenREM 0.3.9 documentation</a> &raquo;</li>
+          <li><a href="install.html" >Installation instructions</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
