@@ -252,7 +252,7 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])/365.25
     elif pat.patient_birth_date: # had to add a .date() conversion to study date as was returning as datetime. Not sure why.
         patientatt.patient_age_decimal = (g.study_date.date() - pat.patient_birth_date).days/365.25 
-    else
+    else:
         patientatt.patient_age_decimal = ''    
     patientatt.save()
 
