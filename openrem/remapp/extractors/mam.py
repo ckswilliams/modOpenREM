@@ -245,7 +245,7 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     patientatt.save()
 
 
-def _patientmoduleattributes(dataset,g):
+def _patientmoduleattributes(dataset,g): # C.7.1.1
     from remapp.models import Patient_module_attributes, Patient_study_module_attributes
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
