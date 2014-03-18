@@ -243,15 +243,17 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     from datetime import timedelta
     patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
-    if patientatt.patient_age[-1:]=='D':
-	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])/365.25
-    if patientatt.patient_age[-1:]=='M':
-	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])/12
-    if patientatt.patient_age[-1:]=='Y':
-	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])    
     pat = Patient_module_attributes.objects.get(general_study_module_attributes=g)
-    if pat.patient_birth_date: # had to add a .date() conversion to study date as was returning as datetime. Not sure why.
-        patientatt.patient_age_decimal = (g.study_date.date() - pat.patient_birth_date).days/365.25
+    if patientatt.patient_age[-1:]=='Y':
+	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])  
+    elif patientatt.patient_age[-1:]=='M':
+	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])/12
+    elif patientatt.patient_age[-1:]=='D':
+	    patientatt.patient_age_decimal = float(get_value_kw('PatientAge',dataset)[:-1])/365.25
+    elif pat.patient_birth_date: # had to add a .date() conversion to study date as was returning as datetime. Not sure why.
+        patientatt.patient_age_decimal = (g.study_date.date() - pat.patient_birth_date).days/365.25 
+    else
+        patientatt.patient_age_decimal = ''    
     patientatt.save()
 
 
