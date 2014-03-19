@@ -29,7 +29,10 @@ if sitepaths and not openrempathset:
 
 from remapp.extractors import ct_philips
 
-if len(sys.argv) != 2:
-    sys.exit('Error: Supply exactly one argument - the Philips dose report image')
+if len(sys.argv) < 2:
+    sys.exit('Error: Supply at least one argument - the Philips dose report image')
 
-sys.exit(ct_philips(sys.argv[1]))
+for sr in sys.argv[1:]:
+    ct_philips(sr)
+
+sys.exit()
