@@ -29,7 +29,10 @@ if sitepaths and not openrempathset:
 
 from remapp.extractors import mam
 
-if len(sys.argv) != 2:
-    sys.exit('Error: Supply exactly one argument - the DICOM mammography image file')
+if len(sys.argv) < 2:
+    sys.exit('Error: Supply at least one argument - the DICOM mammography image file')
 
-sys.exit(mam(sys.argv[1]))
+for sr in sys.argv[1:]:
+    mam(sr)
+    
+sys.exit()

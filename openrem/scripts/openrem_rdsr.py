@@ -29,7 +29,10 @@ if sitepaths and not openrempathset:
 
 from remapp.extractors import rdsr
 
-if len(sys.argv) != 2:
-    sys.exit('Error: Supply exactly one argument - the radiation dose structured report')
+if len(sys.argv) < 2:
+    sys.exit('Error: Supply at least one argument - the radiation dose structured report')
 
-sys.exit(rdsr(sys.argv[1]))
+for sr in sys.argv[1:]:
+    rdsr(sr)
+    
+sys.exit()
