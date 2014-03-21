@@ -68,8 +68,9 @@ def get_seq_code_value(sequence,dataset):
     """
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
-        return seq[0].CodeValue
-
+        if hasattr(seq[0],'CodeValue'):  
+            return seq[0].CodeValue
+			
 def get_seq_code_meaning(sequence,dataset):
     """From a DICOM sequence, get the code meaning.
 
@@ -81,7 +82,8 @@ def get_seq_code_meaning(sequence,dataset):
     """
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
-        return seq[0].CodeMeaning
+        if hasattr(seq[0],'CodeMeaning'): 
+            return seq[0].CodeMeaning
 
 def get_or_create_cid(codevalue, codemeaning):
     """Create a code_value code_meaning pair entry in the Content_item_descriptions 
