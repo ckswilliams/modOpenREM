@@ -11,12 +11,12 @@ OpenREM version history
 * `#59`_   CSS stylesheet referenced particular fonts that are not in the distribution -- references removed
 * `#58`_   Export to xlsx more robust - limitation of 31 characters for sheet names now enforced
 * `#57`_   Modified the docs slightly to include notice to convert to South before upgrading
-* `#56`_   Corrected the mammography target and filter options added for issue #44
+* `#56`_   Corrected the mammography target and filter options added for issue `#44`_
 * `#53`_   Dates can now be selected from a date picker widget for filtering studies
 * `#52`_   Split the date field into two so either, both or neither can be specified
-* `#51`_   Remove import modifications from issue #28 and #43 now that exports are filtered in a better way after #48 and #49 changes.
+* `#51`_   Remove import modifications from issue `#28`_ and `#43`_ now that exports are filtered in a better way after `#48`_ and `#49`_ changes.
 * `#50`_   No longer necessary to apply a filter before exporting -- docs changed to reflect this
-* `#49`_   CSV exports changed to use the same filtering routine introduced for #48 to better handle missing attributes
+* `#49`_   CSV exports changed to use the same filtering routine introduced for `#48`_ to better handle missing attributes
 * `#48`_   New feature -- can now filter by patient age. Improved export to xlsx to better handle missing attributes
 * `#47`_   Install was failing on pydicom -- fixed upstream
 
@@ -28,7 +28,7 @@ OpenREM version history
 * `#45`_   mam.py was missing the licence header - fixed
 * `#44`_   Added Tungsten, Silver and Aluminum to mammo target/filter strings to match -- thanks to DJ Platten for strings
 * `#43`_   Mammography and Philips CT import and export now more robust for images with missing information such as accession number and collimated field size
-* `#42`_   Documentation updated to reflect #37
+* `#42`_   Documentation updated to reflect `#37`_
 * `#37`_   Studies now sort by time and date
 
 
