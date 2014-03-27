@@ -100,7 +100,9 @@ $('.datepicker').datepicker({
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
             {% if admin.adminperm %}
-            <td>Delete</td>
+            <td>
+              <a href="/openrem/delete/{{ exam.id }}">Delete</a>
+            </td>
             {% endif %}
         </tr>
         {% endfor %}
