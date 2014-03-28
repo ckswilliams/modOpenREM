@@ -34,9 +34,10 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.shortcuts import render_to_response
+from django.core.urlresolvers import reverse_lazy
 import datetime
 from remapp.models import General_study_module_attributes
 
@@ -181,3 +182,9 @@ def openrem_home(request):
     
     return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
+def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
+    study = get_object_or_404(General_study_module_attributes, pk=pk)    
+    if request.method=='POST':
+        study.delete()
+        return redirect('openrem_home')
+    return render(request, template_name, {'object':study})
