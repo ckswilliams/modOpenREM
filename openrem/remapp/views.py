@@ -55,7 +55,12 @@ def rf_summary_list_filter(request):
     import pkg_resources # part of setuptools
     f = RFSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'RF'))
 
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
     if request.user.groups.filter(name="exportgroup"):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
@@ -100,7 +105,12 @@ def mg_summary_list_filter(request):
         del filter_data['page']
     f = MGSummaryListFilter(filter_data, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'MG'))
 
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
     if request.user.groups.filter(name="exportgroup"):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
