@@ -73,7 +73,12 @@ def ct_summary_list_filter(request):
 
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
 
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
     if request.user.groups.filter(name="exportgroup"):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
@@ -132,7 +137,13 @@ def openrem_home(request):
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
         'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
         }
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
     modalities = ('MG','CT','RF')
     for modality in modalities:
         studies = allstudies.filter(modality_type__contains = modality).all()
