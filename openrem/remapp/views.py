@@ -186,5 +186,5 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     study = get_object_or_404(General_study_module_attributes, pk=pk)    
     if request.method=='POST':
         study.delete()
-        return redirect('openrem_home')
+        return redirect("/openrem/")
     return render(request, template_name, {'object':study})
