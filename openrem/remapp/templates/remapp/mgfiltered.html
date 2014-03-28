@@ -91,7 +91,9 @@ $('.datepicker').datepicker({
             <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.laterality }}</td>
             <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.accumulated_average_glandular_dose }}</td>
             {% if admin.adminperm %}
-            <td>Delete</td>
+            <td>
+              <a href="{% url 'study_delete' exam.id %}">Delete</a>
+            </td>
             {% endif %}
         </tr>
         {% endfor %}
