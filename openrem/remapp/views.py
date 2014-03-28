@@ -192,9 +192,16 @@ def openrem_home(request):
     
     return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
+@login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     study = get_object_or_404(General_study_module_attributes, pk=pk)    
+
     if request.method=='POST':
-        study.delete()
+        if request.user.groups.filter(name="admingroup"):
+            study.delete()
         return redirect("/openrem/")
-    return render(request, template_name, {'exam':study})
+
+    if request.user.groups.filter(name="admingroup"):
+        return render(request, template_name, {'exam':study})
+
+    return redirect("/openrem/")
