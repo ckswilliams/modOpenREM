@@ -61,6 +61,7 @@ urlpatterns = patterns('remapp.views',
             model=General_study_module_attributes,
             template_name='remapp/mgdetail.html'))),
 
+    url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),
 )
 
 urlpatterns += patterns('remapp.exports.exportcsv',
