@@ -29,3 +29,22 @@ tables don't exist in the current database. The problem scenario is if after
 the migration these tables are used and one of the new nullable fields is left as null,
 you will not be able to migrate back to the old database schema without error.
 This is not something that you will want to do, so the is ok.
+
+..      Warning::
+
+        The settings file has changed and will need to be manually edited.
+
+Changes need to be made to the ``settings.py`` file where the database details are stored.
+Normally upgrades don't touch this file and the copy in the upgrade has a ``.example`` suffix.
+**This upgrade and potentially future ones will need to change this file**, so the 
+format has been changed. The ``settings.py`` file will now be replaced
+each time the code is upgraded. In addition, there is a new ``local_settings.py``
+file that contains things that are specific to your installation, such as the
+database settings.
+
+This upgrade will include a file called ``settings.py.new`` and the ``local_settings.py``
+file. You will need to do the following:
+
+#. Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like ``../python27/site-packages/openrem/openrem/``
+#. Move the existing ``settings.py`` out of the python directories
+#. Rename the ``settings.py.new`` to ``settings.py``
