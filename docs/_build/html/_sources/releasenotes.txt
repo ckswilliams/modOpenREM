@@ -23,7 +23,7 @@ Contributing authors
 The following people have contributed to OpenREM - either with code, documentation or ideas.
 
 * `Ed McDonagh <https://bitbucket.org/edmcdonagh>`_
-* David Platten
+* `David Platten <https://bitbucket.org/dplatten>`_
 * `Jonathan Cole <https://bitbucket.org/jacole>`_
 * Elly Castellano
 * Laurence King
