@@ -76,8 +76,9 @@ STATICFILES_FINDERS = (
 # URL of the login page
 LOGIN_URL = '/login/'
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
+#
+# SECRET_KEY moved to local_settings.py
+#
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

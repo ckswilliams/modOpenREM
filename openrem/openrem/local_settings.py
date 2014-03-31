@@ -23,3 +23,5 @@ MEDIA_ROOT = ''
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = ''
 
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
