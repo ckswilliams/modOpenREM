@@ -81,6 +81,24 @@ tables don&#8217;t exist in the current database. The problem scenario is if aft
 the migration these tables are used and one of the new nullable fields is left as null,
 you will not be able to migrate back to the old database schema without error.
 This is not something that you will want to do, so the is ok.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The settings file has changed and will need to be manually edited.</p>
+</div>
+<p>Changes need to be made to the <tt class="docutils literal"><span class="pre">settings.py</span></tt> file where the database details are stored.
+Normally upgrades don&#8217;t touch this file and the copy in the upgrade has a <tt class="docutils literal"><span class="pre">.example</span></tt> suffix.
+<strong>This upgrade and potentially future ones will need to change this file</strong>, so the
+format has been changed. The <tt class="docutils literal"><span class="pre">settings.py</span></tt> file will now be replaced
+each time the code is upgraded. In addition, there is a new <tt class="docutils literal"><span class="pre">local_settings.py</span></tt>
+file that contains things that are specific to your installation, such as the
+database settings.</p>
+<p>This upgrade will include a file called <tt class="docutils literal"><span class="pre">settings.py.new</span></tt> and the <tt class="docutils literal"><span class="pre">local_settings.py</span></tt>
+file. You will need to do the following:</p>
+<ol class="arabic simple">
+<li>Copy the database settings from your current <tt class="docutils literal"><span class="pre">settings.py</span></tt> file to the <tt class="docutils literal"><span class="pre">local_settings.py</span></tt> file. Both of these files are in the <tt class="docutils literal"><span class="pre">openrem/openrem</span></tt> directory, which will be somewhere like <tt class="docutils literal"><span class="pre">../python27/site-packages/openrem/openrem/</span></tt></li>
+<li>Move the existing <tt class="docutils literal"><span class="pre">settings.py</span></tt> out of the python directories</li>
+<li>Rename the <tt class="docutils literal"><span class="pre">settings.py.new</span></tt> to <tt class="docutils literal"><span class="pre">settings.py</span></tt></li>
+</ol>
 </div>
 </div>
 
