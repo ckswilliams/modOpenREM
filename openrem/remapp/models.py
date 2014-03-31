@@ -104,7 +104,7 @@ class Projection_xray_radiation_dose(models.Model): # TID 10001
     xray_detector_data_available = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_detector')
     xray_source_data_available = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_source')
     xray_mechanical_data_available = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_mech')
-    comment = models.TextField(max_length=512,blank=True)
+    comment = models.TextField(blank=True)
     source_of_dose_information = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_infosource') # might need to be a table on its own as is 1-n, even though it should only list the primary source...
 
 class Accumulated_xray_dose(models.Model): # TID 10002
@@ -160,7 +160,7 @@ class Irradiation_event_xray_data(models.Model): # TID 10003
     reference_point_definition = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_rpdefinition')
     breast_composition = models.CharField(max_length=16,blank=True) # TID 4007, CID 6000
     percent_fibroglandular_tissue = models.DecimalField(max_digits=6,decimal_places=3,blank=True,null=True) # TID 4007
-    comment = models.TextField(max_length=512,blank=True)
+    comment = models.TextField(blank=True)
     def __unicode__(self):
         return self.irradiation_event_uid
     def convert_gym2_to_cgycm2(self): # not used anywhere?
@@ -386,7 +386,7 @@ class Patient_module_attributes(models.Model): # C.7.1.1
     patient_birth_date = models.DateField(blank=True, null=True)
     patient_sex = models.CharField(max_length=2,blank=True,null=True)
     other_patient_ids = models.CharField(max_length=64,blank=True,null=True)
-    not_patient_indicator = models.TextField(max_length=512,blank=True,null=True)
+    not_patient_indicator = models.TextField(blank=True,null=True)
 
 class Patient_study_module_attributes(models.Model): # C.7.2.2
     """Patient Study Module C.7.2.2
@@ -446,7 +446,7 @@ class Ct_radiation_dose(models.Model): # TID 10011
     start_of_xray_irradiation = models.DateTimeField(blank=True, null=True)
     end_of_xray_irradiation = models.DateTimeField(blank=True, null=True)
     scope_of_accumulation = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10011_scope')
-    comment = models.TextField(max_length=512,blank=True)
+    comment = models.TextField(blank=True)
     source_of_dose_information = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10011_source') # might need to be a table on its own as is 1-n
 
 class Ct_accumulated_dose_data(models.Model): # TID 10012
@@ -467,7 +467,7 @@ class Ct_accumulated_dose_data(models.Model): # TID 10012
     patient_model = models.CharField(max_length=256,blank=True)
     effective_dose_phantom_type = models.CharField(max_length=256,blank=True)
     dosimeter_type = models.CharField(max_length=256,blank=True)
-    comment = models.TextField(max_length=512,blank=True)
+    comment = models.TextField(blank=True)
 
 
 class Ct_irradiation_event_data(models.Model): # TID 10013
@@ -500,7 +500,7 @@ class Ct_irradiation_event_data(models.Model): # TID 10013
     measurement_method = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10013_method')
     effective_dose_conversion_factor = models.DecimalField(max_digits=8,decimal_places=4,blank=True,null=True)
     xray_modulation_type = models.CharField(max_length=128,blank=True)
-    comment = models.TextField(max_length=512,blank=True)
+    comment = models.TextField(blank=True)
     # Not in DICOM standard:
     date_time_started = models.DateTimeField(blank=True, null=True)
     series_description = models.CharField(max_length=128,blank=True)
