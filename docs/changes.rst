@@ -108,6 +108,16 @@ OpenREM version history
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#79`: https://bitbucket.org/edmcdonagh/openrem/issue/79/
+..  _`#78`: https://bitbucket.org/edmcdonagh/openrem/issue/78/
+..  _`#77`: https://bitbucket.org/edmcdonagh/openrem/issue/77/
+..  _`#76`: https://bitbucket.org/edmcdonagh/openrem/issue/76/
+..  _`#75`: https://bitbucket.org/edmcdonagh/openrem/issue/75/
+..  _`#74`: https://bitbucket.org/edmcdonagh/openrem/issue/74/
+..  _`#73`: https://bitbucket.org/edmcdonagh/openrem/issue/73/
+..  _`#72`: https://bitbucket.org/edmcdonagh/openrem/issue/72/
+..  _`#71`: https://bitbucket.org/edmcdonagh/openrem/issue/71/
+..  _`#70`: https://bitbucket.org/edmcdonagh/openrem/issue/70/
 ..  _`#69`: https://bitbucket.org/edmcdonagh/openrem/issue/69/
 ..  _`#68`: https://bitbucket.org/edmcdonagh/openrem/issue/68/
 ..  _`#67`: https://bitbucket.org/edmcdonagh/openrem/issue/67/
