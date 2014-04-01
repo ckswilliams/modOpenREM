@@ -84,6 +84,8 @@ def csv2db(*args, **kwargs):
 
     import os, sys, csv
     import argparse
+    import openrem_settings
+
     
     # Required and optional arguments
     parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
@@ -95,21 +97,8 @@ def csv2db(*args, **kwargs):
     parser.add_argument("weight", help="Column title for the patient weight")
     args=parser.parse_args()
     
-    # This section attempts to place the openrem folder onto the python path
-    # so that openrem.settings can be found.
-    sitepaths = []
-    openrempathset=0
-    for paths in sys.path:
-        if paths.endswith('site-packages'):
-            sitepaths.append(paths)
-        if paths.endswith('openrem'):
-            openrempathset = 1
-        
-    if sitepaths and not openrempathset:
-        for paths in sitepaths:
-            sys.path.insert(1,os.path.join(paths,'openrem'))
-
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+    openrem_settings.add_project_to_path()
+    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
     
     f = open(args.csvfile, 'rb')
     try:
