@@ -2,6 +2,24 @@
 OpenREM version history
 =======================
 
+0.4.0
+-----
+
+..  note::
+
+    * `#64`_ includes changes to the database schema and needs a user response - see http://docs.openrem.org/page/release-0.4.0.html
+    * `#65`_ includes changes to the settings file which require settings information to be copied and files moved/renamed - see http://docs.openrem.org/page/release-0.4.0.html
+
+* `#68`_   Now checks sequence code meaning and value exists before assigning them. Thanks to JA Cole for fix
+* `#67`_   Added 'Contributing authors' section of documentation
+* `#66`_   Added 'Release notes' section of documentation, where the primary version of this file now sits
+* `#65`_   Added new ``local_settings.py`` file for database settings and other local settings. **Requires user intervention on upgrade**
+* `#64`_   Some imports failed due to non-conforming strings that were too long. Changed field type to add flexibility. **Requires database schemamigration with user intervention**
+* `#63`_   The mammography import code stored the date of birth unnecessarily. Also now gets decimal_age from age field if necessary
+* `#60`_   Removed extraneous colon from interface data field
+* `#18`_   Studies can now be deleted from the web interface with the correct login
+* `#16`_   Added user authentication with different levels of access
+* `#9`_    Enable import of ``*.dcm``
 
 
 0.3.9
