@@ -107,7 +107,7 @@ OpenREM version history
 0.3.3
 -----
 
-..      Warning::
+..      Note::
         
         Installs of OpenREM earlier than 0.3.3 will break on upgrade if the scripts are called from other programs.
         For example openrem_rdsr is now called openrem_rdsr.py

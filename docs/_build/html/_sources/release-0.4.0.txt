@@ -28,7 +28,7 @@ nullable previously weren't. Existing data in those fields will have a value, or
 tables don't exist in the current database. The problem scenario is if after
 the migration these tables are used and one of the new nullable fields is left as null,
 you will not be able to migrate back to the old database schema without error.
-This is not something that you will want to do, so the is ok.
+This is not something that you will want to do, so this is ok.
 
 ..      Warning::
 
