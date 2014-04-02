@@ -10,6 +10,7 @@ OpenREM version history
     * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
     * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
 
+* `#73`_   Made launch scripts and ptsizecsv2db more robust
 * `#68`_   Now checks sequence code meaning and value exists before assigning them. Thanks to JA Cole
 * `#67`_   Added 'Contributing authors' section of documentation
 * `#66`_   Added 'Release notes' section of documentation, incuding this file
