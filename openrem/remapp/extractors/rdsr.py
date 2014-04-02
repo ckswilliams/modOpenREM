@@ -672,6 +672,8 @@ def _generalstudymoduleattributes(dataset,g):
         if (('RequestAttributesSequence' in dataset) and dataset[0x40,0x275].VM): # Ulgy hack to prevent issues with zero length LS16 sequence
             req = dataset.RequestAttributesSequence
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',req[0])
+            if not g.requested_procedure_code_meaning: # Sometimes the above is true, but there is no RequestedProcedureDescription in that sequence, but there is a basic field as below.
+                g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',dataset)
             g.save()
         else:
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',dataset)
