@@ -21,8 +21,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-..  module:: ptsizecsv2db.
-    :synopsis: Use to import height and weight data from csv file to existing studies in the database.
+..  module:: requestcsv2db.
+    :synopsis: Use to import Requested Procedure Description data from csv file to existing studies in the database.
+
+    To use, copy this file into openrem/remapp/extractors/ and run it using python.
 
 ..  moduleauthor:: Ed McDonagh
 
@@ -53,7 +55,7 @@ def _requestinsert(accno,request,siuid, verbose):
 
     
 def requestcsv2db(*args, **kwargs):
-    """ Import patient height and weight data from csv RIS exports. Can be called from ``openrem_ptsizecsv.py`` script
+    """ Import Requested Procedure Description data from csv files. Must be placed with extractor routines in openrem/remapp/extractors/
         
     :param --si-uid: Use Study Instance UID instead of Accession Number. Short form -s.
     :type --si-uid: bool
@@ -68,7 +70,13 @@ def requestcsv2db(*args, **kwargs):
 
     Example::
         
-        openrem_ptsizecsv.py -s MyRISExport.csv StudyInstanceUID HEIGHT weight
+        pythoon requestcsv2db.py -s MyRequests.csv StudyInstanceUID RequestedProcedureDescription
+
+    To create an appropriate csv file, you might use exiftool::
+    
+        exiftool -s -s -s -AccessionNumber -StudyInstanceUID -RequestedProcedureDescription -csv *.dcm > requests.csv
+
+    See https://bitbucket.org/edmcdonagh/openrem/issue/75/ for history
 
     """
 
