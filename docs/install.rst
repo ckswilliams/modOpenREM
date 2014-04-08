@@ -9,6 +9,20 @@ Quick setup
     If you are installing in a Windows environment you will need to use the Windows ``\`` separator.
 
 
+*Attempt at a table to separate Windows and linux instructions*
+
++------------------------------------------------------+----------------------------------------------------+
+| Linux                                                | Windows                                            |
++======================================================+====================================================+
+|                                                      |                                                    |
+|* Install python 2.7                                  |* Install python 2.7                                |
+|* ``sudo apt-get install python`` or equivalent       |* https://www.python.org/downloads/windows/         |
+|                                                      |                                                    |
++------------------------------------------------------+----------------------------------------------------+
+|* Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_                   |
++------------------------------------------------------+----------------------------------------------------+
+
+
 #. Install python (might need to be 2.7)
 #. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
 #. Install OpenREM
