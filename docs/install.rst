@@ -5,7 +5,7 @@ Installation instructions
 Quick setup
 ===========
 ..  Note::
-    Most path names are represented using the linux convention of a ``/`` separator.
+    Non-operating system specific path names are represented using the linux convention of a ``/`` separator.
     If you are installing in a Windows environment you will need to use the Windows ``\`` separator.
 
 
@@ -19,26 +19,32 @@ Quick setup
     * Locate install location
         * Linux: ``/usr/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
         * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-    + There are two files that need renaming:
-        + ``openrem/openrem/settings.py.example`` to ``openrem/openrem/settings.py``
+    * There are two files that need renaming *changed for 0.4.0*:
+        + ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py``
         + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
-    + in the ``settings.py`` file, set the database details.
-    + For testing ONLY, use 
+    * in the ``local_settings.py`` file, set the database details.
+    * For testing ONLY, use 
         + ``'ENGINE': 'django.db.backends.sqlite3',``
         + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
-            + Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
-            + Linux example: ``'NAME': '/var/openrem/openrem.db'``
+            * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
+            * Linux example: ``'NAME': '/var/openrem/openrem.db'``
+        + Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
+          http://www.miniwebtool.com/django-secret-key-generator/ for this.
 #. Create the database
-    + ``python path/to/openrem/manage.py syncdb``
-    + (optional when just testing) ``python path/to/openrem/manage.py convert_to_south remapp``
+    + Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
+    + Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
+    + For production installs
+        * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
+        * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
 #. Start test web server
-    + ``python path/to/openrem/manage.py runserver``
+    + Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver``
+    + Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py runserver``
     + If you are using a headless server and need to be able to see the 
       web interface from another machine, use 
-      ``python path/to/openrem/manage.py runserver x.x.x.x:8000`` replacing the 
+      ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` (or Windows equivalent) replacing the 
       'x' with the IP address of the server and '8000' with the port you wish to use.
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
-#. Add some data!
+#. Add some data! (See the :ref:`import documentation <scripts-on-path>` for adding the scripts to the path if this doesn't work)
     + ``openrem_rdsr.py rdsrfile.dcm``
 #. Add some users *New in version 0.4.0*
     + Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you created the database (``syncdb``)

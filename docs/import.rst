@@ -1,7 +1,8 @@
 Importing data to OpenREM
 *************************
 
-
+    .. _scripts-on-path:
+    
 Importing dose related data from DICOM files
 ============================================
 
