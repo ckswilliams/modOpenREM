@@ -9,34 +9,16 @@ Quick setup
     If you are installing in a Windows environment you will need to use the Windows ``\`` separator.
 
 
-*Attempt at a table to separate Windows and linux instructions*
-
-+------------------------------------------------------+----------------------------------------------------+
-| Linux                                                | Windows                                            |
-+======================================================+====================================================+
-|                                                      |                                                    |
-|* Install python 2.7                                  |* Install python 2.7                                |
-|* ``sudo apt-get install python`` or equivalent       |* https://www.python.org/download/releases          |
-+------------------------------------------------------+----------------------------------------------------+
-|* Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_                   |
-+------------------------------------------------------+----------------------------------------------------+
-|* Install OpenREM (requires an internet connection):                                                       |
-|    + ``pip install openrem``                                                                              |
-+------------------------------------------------------+----------------------------------------------------+
-|* Configure OpenREM                                   |* Configure OpenREM                                 |
-|    + Locate install location, something like         |    + Locate install location, something like       |
-|      ``/usr/lib/python2.7/dist-packages/openrem/`` or|      ``C:\Python27\Lib\site-packages\openrem\``    |
-|      ``/usr/lib/python2.7/site-packages/openrem/``   |                                                    |
-|    + There are two files that need renaming:         |    + There are two files that need renaming        |
-+------------------------------------------------------+----------------------------------------------------+
-
-
-#. Install python (might need to be 2.7)
+#. Install python 2.7
+    * Linux - likely to be installed already
+    * Windows - https://www.python.org/download/releases
 #. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
 #. Install OpenREM
-    + ``pip install OpenREM-ver.tar.gz``
+    * ``pip install openrem`` (Needs internet connection)
 #. Configure OpenREM
-    + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
+    * Locate install location
+        * Linux: ``/usr/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
+        * Windows: ``C:\Python27\Lib\site-packages\openrem\``
     + There are two files that need renaming:
         + ``openrem/openrem/settings.py.example`` to ``openrem/openrem/settings.py``
         + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
