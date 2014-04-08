@@ -31,24 +31,24 @@ Quick setup
         + Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
           http://www.miniwebtool.com/django-secret-key-generator/ for this.
 #. Create the database
-    + Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
-    + Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
-    + For production installs
+    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
+    * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
+    * For production installs
         * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
         * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
 #. Start test web server
-    + Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver``
-    + Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py runserver``
-    + If you are using a headless server and need to be able to see the 
+    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver``
+    * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py runserver``
+    * If you are using a headless server and need to be able to see the 
       web interface from another machine, use 
       ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` (or Windows equivalent) replacing the 
       'x' with the IP address of the server and '8000' with the port you wish to use.
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 #. Add some data! (See the :doc:`import` for adding the scripts to the path if this doesn't work)
-    + ``openrem_rdsr.py rdsrfile.dcm``
+    * ``openrem_rdsr.py rdsrfile.dcm``
 #. Add some users *New in version 0.4.0*
-    + Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you created the database (``syncdb``)
-    + Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
+    * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you created the database (``syncdb``)
+    * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
         + ``viewgroup`` can browse the data only
         + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
         + ``admingroup`` can do as export group, and will be able to delete studies in due course (See `Issue #18 <https://bitbucket.org/edmcdonagh/openrem/issue/18/>`_)
