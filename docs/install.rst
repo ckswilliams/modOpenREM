@@ -44,7 +44,7 @@ Quick setup
       ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` (or Windows equivalent) replacing the 
       'x' with the IP address of the server and '8000' with the port you wish to use.
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
-#. Add some data! (See the :ref:`import documentation <scripts-on-path>` for adding the scripts to the path if this doesn't work)
+#. Add some data! (See the :doc:`import` for adding the scripts to the path if this doesn't work)
     + ``openrem_rdsr.py rdsrfile.dcm``
 #. Add some users *New in version 0.4.0*
     + Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you created the database (``syncdb``)
