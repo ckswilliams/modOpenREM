@@ -16,10 +16,18 @@ Quick setup
 +======================================================+====================================================+
 |                                                      |                                                    |
 |* Install python 2.7                                  |* Install python 2.7                                |
-|* ``sudo apt-get install python`` or equivalent       |* https://www.python.org/downloads/windows/         |
-|                                                      |                                                    |
+|* ``sudo apt-get install python`` or equivalent       |* https://www.python.org/download/releases          |
 +------------------------------------------------------+----------------------------------------------------+
 |* Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_                   |
++------------------------------------------------------+----------------------------------------------------+
+|* Install OpenREM (requires an internet connection):                                                       |
+|    + ``pip install openrem``                                                                              |
++------------------------------------------------------+----------------------------------------------------+
+|* Configure OpenREM                                   |* Configure OpenREM                                 |
+|    + Locate install location, something like         |    + Locate install location, something like       |
+|      ``/usr/lib/python2.7/dist-packages/openrem/`` or|      ``C:\Python27\Lib\site-packages\openrem\``    |
+|      ``/usr/lib/python2.7/site-packages/openrem/``   |                                                    |
+|    + There are two files that need renaming:         |    + There are two files that need renaming        |
 +------------------------------------------------------+----------------------------------------------------+
 
 
