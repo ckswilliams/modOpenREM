@@ -13,6 +13,11 @@ Headline changes
 Specific upgrade instructions
 =============================
 
+1.  ``pip install openrem -U`` Note - this will upgrade openrem and all its dependencies.
+#.  Migrate the database: 
+    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
+    * Windows: 
+
 ..      Warning::
         
         This release requires a database migration (instructions below). This requires a choice to be made 
