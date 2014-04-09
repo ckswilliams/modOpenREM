@@ -3,7 +3,12 @@ OpenREM Release Notes version 0.4.0
 
 Headline changes
 ================================
-
+* User authentication has been added
+* Studies can be deleted from the web interface
+* Import scripts can now be passed a list of files, eg ``python openrem_rdsr.py *.dcm``
+* Date of birth no longer retained for mammography (bug fix - correct behaviour already existed for other imports)
+* General bug fixes to enable import from wider range of sources
+* Improved user documentation
 
 Specific upgrade instructions
 =============================
@@ -48,3 +53,5 @@ file. You will need to do the following:
 #. Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like ``../python27/site-packages/openrem/openrem/``
 #. Move the existing ``settings.py`` out of the python directories
 #. Rename the ``settings.py.new`` to ``settings.py``
+
+
