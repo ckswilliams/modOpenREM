@@ -12,6 +12,7 @@ OpenREM version history
 
 * `#77`_   Removed docs builds from repository
 * `#76`_   Fixed crash if exporting from development environment
+* `#75`_   Fixed bug where requested procedure wasn't being captured on one modality
 * `#73`_   Made launch scripts and ptsizecsv2db more robust
 * `#68`_   Now checks sequence code meaning and value exists before assigning them. Thanks to JA Cole
 * `#67`_   Added 'Contributing authors' section of documentation
