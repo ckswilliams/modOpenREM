@@ -85,7 +85,7 @@ Add some users *(New in version 0.4.0)*
 
     + ``viewgroup`` can browse the data only
     + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
-    + ``admingroup`` can do as export group, and will be able to delete studies in due course (See `Issue #18 <https://bitbucket.org/edmcdonagh/openrem/issue/18/>`_)
+    + ``admingroup`` can do as export group, and can delete studies
 
 Database options
 ----------------
