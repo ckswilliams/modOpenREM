@@ -19,21 +19,23 @@ Quick setup
     * Locate install location
         * Linux: ``/usr/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
         * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-    * There are two files that need renaming *changed for 0.4.0*:
-        + ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py``
-        + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
-    * in the ``local_settings.py`` file, set the database details.
-    * For testing ONLY, use 
-        + ``'ENGINE': 'django.db.backends.sqlite3',``
-        + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
-            * Linux example: ``'NAME': '/var/openrem/openrem.db'``
-            * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
-        + Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
-          http://www.miniwebtool.com/django-secret-key-generator/ for this.
+    * There are two files that need renaming: *(changed for 0.4.0)*
+        + ``openrem/local_settings.py.example`` to ``openrem/local_settings.py``
+        + ``openrem/wsgi.py.example`` to ``openrem/wsgi.py``
+    * In the ``local_settings.py`` file, set the database details.
+        * For testing you can use the SQLite3 database:
+            + ``'ENGINE': 'django.db.backends.sqlite3',``
+            + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
+                * Linux example: ``'NAME': '/var/openrem/openrem.db'``
+                * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
+        * For production use, see `Database options`_ below
+        
+    + Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
+      http://www.miniwebtool.com/django-secret-key-generator/ for this.
 #. Create the database
     * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
     * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
-    * For production installs
+    * For production installs, convert to South `(What is south?)`_
         * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
         * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
 #. Start test web server
@@ -52,6 +54,32 @@ Quick setup
         + ``viewgroup`` can browse the data only
         + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
         + ``admingroup`` can do as export group, and will be able to delete studies in due course (See `Issue #18 <https://bitbucket.org/edmcdonagh/openrem/issue/18/>`_)
+
+Database options
+----------------
+
+SQLite is great for getting things running quickly and testing if the setup works,
+but is really not recommended for production use on any scale. Therefore it is
+recommended to use a different database such as `PostgreSQL <http://www.postgresql.org>`_ or 
+`MySQL <http://www.mysql.com>`_.
+
+Here are instructions for installing PostgreSQL on linux and on Windows:
+
+..  toctree::
+    :maxdepth: 1
+    
+    postgresql
+    postgresql_windows
+
+Database migrations
+-------------------
+
+South is a django application to manage database migrations. Using
+South means that future changes to the database model can be calculated
+and executed automatically with simple commands when OpenREM is upgraded.
+
++ ``python path/to/openrem/manage.py convert_to_south remapp``
+
 
 More in depth process
 =====================
@@ -115,3 +143,4 @@ Related guides
 
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
+.. _(What is south?): `Database migrations`_
