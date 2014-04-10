@@ -74,3 +74,5 @@ Specific upgrade instructions
     *   Generate a new secret key - http://www.miniwebtool.com/django-secret-key-generator/ is a 
         suitable method of creating a new key.
     *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
+
+* Restart your webserver
