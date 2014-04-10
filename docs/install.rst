@@ -62,6 +62,10 @@ Create the database
 * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
 * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
 
+Answer each question as it is asked, do setup a superuser. This username and
+password wil be used to log into the admin interface to create the usernames
+for using the web interface. See the `Start using it!`_ section below.
+
 Help! I get a ``value too long for type character varying(50)`` error!
     This error with part of the Django auth_permissions system that we are not using, and can safely be ignored.
     This is being tracked as `Issue 62 <https://bitbucket.org/edmcdonagh/openrem/issue/62>`_
