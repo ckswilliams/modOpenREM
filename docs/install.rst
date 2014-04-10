@@ -6,7 +6,7 @@ Basic guide
 ===========
 
 Non-operating system specific path names are represented using the linux 
-convention of a ``/`` separator.If you are installing in a Windows environment 
+convention of a ``/`` separator. If you are installing in a Windows environment 
 you will need to use the Windows ``\`` separator.
 
 Installation prerequisites
