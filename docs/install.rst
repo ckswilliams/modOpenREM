@@ -2,7 +2,7 @@ Installation instructions
 *************************
 
 
-Quick setup
+Basic guide
 ===========
 ..  Note::
     Non-operating system specific path names are represented using the linux convention of a ``/`` separator.
@@ -17,6 +17,10 @@ Install python 2.7
 * Windows - https://www.python.org/download/releases
 
 Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
+
+..  Note::
+
+    Before continuing, `consider virtualenv`_
 
 Install OpenREM
 ---------------
@@ -56,20 +60,31 @@ Create the database
 
 * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
 * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
-* For production installs, convert to South `(What is south?)`_
-    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
-    * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
+
+Help! I get a ``value too long for type character varying(50)`` error!
+    This error with part of the Django auth_permissions system that we are not using, and can safely be ignored.
+    This is being tracked as `Issue 62 <https://bitbucket.org/edmcdonagh/openrem/issue/62>`_
+
+For production installs, convert to South `(What is south?)`_
+
+* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
+* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
+
+
 
 Start test web server
 ---------------------
 
 * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver``
 * Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py runserver``
-* If you are using a headless server and need to be able to see the 
-  web interface from another machine, use 
-  ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` (or Windows equivalent) replacing the 
-  'x' with the IP address of the server and '8000' with the port you wish to use.
-* Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
+
+If you are using a headless server and need to be able to see the 
+web interface from another machine, use 
+``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` 
+(or Windows equivalent) replacing the ``x`` with the IP address of the server 
+and ``8000`` with the port you wish to use.
+
+Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 
 Start using it!
 ---------------
@@ -85,7 +100,10 @@ Add some users *(New in version 0.4.0)*
 
     + ``viewgroup`` can browse the data only
     + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
-    + ``admingroup`` can do as export group, and can delete studies
+    + ``admingroup`` can delete studies in addition to anything the export group can do
+
+Further instructions
+====================
 
 Database options
 ----------------
@@ -110,58 +128,32 @@ South is a django application to manage database migrations. Using
 South means that future changes to the database model can be calculated
 and executed automatically with simple commands when OpenREM is upgraded.
 
-+ ``python path/to/openrem/manage.py convert_to_south remapp``
+Production webservers
+---------------------
+
+Unlike the database, the production webserver can be left till later and
+can be changed again at any time.
+
+For performance it is recommended that a production webserver is used instead of the inbuilt 'runserver'.
+Popular choices would be either `Apache <http://httpd.apache.org>`_ or you can do as the cool kids
+do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/>`_.
 
 
-More in depth process
-=====================
+Virtualenv and virtualenvwrapper
+--------------------------------
 
-#. Install `virtualenv`_ or maybe `virtualenvwrapper`_
-    Recommended if the server is ever going to be used for more than one 
-    python application -- virtualenv sets up an isolated python environment
+If the server is to be used for more than one python application, or you 
+wish to be able to test different versions of OpenREM or do any development,
+it is highly recommended that you use `virtualenv`_ or maybe `virtualenvwrapper`_
 
-#. Install OpenREM
-    As per the `Quick setup`_ instructions above. Don't configure OpenREM yet
+Virtualenv sets up an isolated python environment and is relatively easy to use.
 
-#. Install a production database
-    SQLite is great for getting things running quickly and testing if the setup works,
-    but is really not recommended for production use on any scale. Therefore it is
-    recommended to use a different database such as `PostgreSQL <http://www.postgresql.org>`_ or 
-    `MySQL <http://www.mysql.com>`_.
-    
-    Here are instructions for installing PostgreSQL on linux and on Windows:
-    
-    ..  toctree::
-        :maxdepth: 1
-        
-        postgresql
-        postgresql_windows
+If you do use virtualenv, all the paths referred to in the documentation will
+be changed to:
 
+* Linux: ``./lib/python2.7/site-packages/openrem/``
+* Windows: *to be filled in*
 
-#. Install and configure a production webserver
-    Unlike the database, the production webserver can be left till later and
-    can be changed again at any time.
-    
-    However, for performance it is recommended that a production webserver is
-    used. Popular choices would be either `Apache <http://httpd.apache.org>`_ or you can do as the cool kids
-    do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/>`_.
-
-#. Configure OpenREM
-    Follow the 'Configure OpenREM' instuctions in the `Quick setup`_ section above, but this time with 
-    the production database details.
-    
-    Configure the production webserver too.
-
-#. Create the database
-    + ``python path/to/openrem/manage.py syncdb``
-
-    .. _convert-to-south:
-#. Convert the database to use South
-    South is a django application to manage database migrations. Using
-    South means that future changes to the database model can be calculated
-    and executed automatically with simple commands when OpenREM is upgraded.
-
-    + ``python path/to/openrem/manage.py convert_to_south remapp``
 
 Related guides
 ==============
@@ -176,3 +168,4 @@ Related guides
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
 .. _(What is south?): `Database migrations`_
+.. _consider virtualenv: `Virtualenv and virtualenvwrapper`_
