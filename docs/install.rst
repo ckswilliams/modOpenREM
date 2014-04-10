@@ -26,8 +26,8 @@ Quick setup
     * For testing ONLY, use 
         + ``'ENGINE': 'django.db.backends.sqlite3',``
         + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
-            * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
             * Linux example: ``'NAME': '/var/openrem/openrem.db'``
+            * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
         + Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
           http://www.miniwebtool.com/django-secret-key-generator/ for this.
 #. Create the database
