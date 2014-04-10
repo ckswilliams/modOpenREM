@@ -14,15 +14,14 @@ Specific upgrade instructions
 =============================
 
 *  ``pip install openrem -U`` Note - this will upgrade openrem and all its dependencies.
-*  Migrate the database: 
-
-    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
-    * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
+*  Migrate the database
 
     ..      Warning::
         
-            This release requires a database migration (instructions below). This requires a choice to be made 
-            to allow for backwards migrations at a later date. Please consult the details below.
+            A database migration is required that will need a choice to be made
+
+    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
+    * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
 
     When South has considered the changes to the schema, you will see the following message::
     
@@ -60,9 +59,18 @@ Specific upgrade instructions
 
     *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. 
         Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like 
+        
         *   Linux: ``/usr/lib/python2.7/dist-packages/openrem/openrem/``
         *   Windows: ``C:\Python27\Lib\site-packages\openrem\openrem\``
+
     *   Move the existing ``settings.py`` out of the python directories
     *   Rename the ``settings.py.new`` to ``settings.py``
 
+* Create a new secret key
 
+    All versions of openrem ship with the same secret key. This key is used for web security
+    checks, and should be unique (and secret) for each installation.
+    
+    *   Generate a new secret key - http://www.miniwebtool.com/django-secret-key-generator/ is a 
+        suitable method of creating a new key.
+    *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
