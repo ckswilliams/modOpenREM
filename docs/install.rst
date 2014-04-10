@@ -4,9 +4,10 @@ Installation instructions
 
 Basic guide
 ===========
-..  Note::
-    Non-operating system specific path names are represented using the linux convention of a ``/`` separator.
-    If you are installing in a Windows environment you will need to use the Windows ``\`` separator.
+
+Non-operating system specific path names are represented using the linux 
+convention of a ``/`` separator.If you are installing in a Windows environment 
+you will need to use the Windows ``\`` separator.
 
 Installation prerequisites
 --------------------------
@@ -42,15 +43,15 @@ There are two files that need renaming: *(changed for 0.4.0)*
 
 In the ``local_settings.py`` file, set the database details.
 
-* For testing you can use the SQLite3 database:
+For testing you can use the SQLite3 database::
 
-    + ``'ENGINE': 'django.db.backends.sqlite3',``
-    + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
-        * Linux example: ``'NAME': '/var/openrem/openrem.db'``
-        * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db'``
+* Linux example: ``'NAME': '/var/openrem/openrem.db',``
+* Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db',``
 
-* For production use, see `Database options`_ below
+For production use, see `Database options`_ below
     
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
