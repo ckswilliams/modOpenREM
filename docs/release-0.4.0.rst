@@ -17,7 +17,7 @@ Specific upgrade instructions
 *  Migrate the database: 
 
     * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
-    * Windows: 
+    * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
 
     ..      Warning::
         
@@ -58,8 +58,11 @@ Specific upgrade instructions
     This upgrade will include a file called ``settings.py.new`` and the ``local_settings.py``
     file. You will need to do the following:
 
-    #. Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like ``../python27/site-packages/openrem/openrem/``
-    #. Move the existing ``settings.py`` out of the python directories
-    #. Rename the ``settings.py.new`` to ``settings.py``
+    *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. 
+        Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like 
+        *   Linux: ``/usr/lib/python2.7/dist-packages/openrem/openrem/``
+        *   Windows: ``C:\Python27\Lib\site-packages\openrem\openrem\``
+    *   Move the existing ``settings.py`` out of the python directories
+    *   Rename the ``settings.py.new`` to ``settings.py``
 
 
