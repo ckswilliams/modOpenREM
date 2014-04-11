@@ -158,8 +158,8 @@ Virtualenv sets up an isolated python environment and is relatively easy to use.
 If you do use virtualenv, all the paths referred to in the documentation will
 be changed to:
 
-* Linux: ``./lib/python2.7/site-packages/openrem/``
-* Windows: *to be filled in*
+* Linux: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``Lib\site-packages\openrem``
 
 
 Related guides
