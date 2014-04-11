@@ -126,6 +126,8 @@ Here are instructions for installing PostgreSQL on linux and on Windows:
     postgresql
     postgresql_windows
 
+..  _convert-to-south:
+
 Database migrations
 -------------------
 

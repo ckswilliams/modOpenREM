@@ -9,13 +9,45 @@ Version history change log
         
         changes
 
-Release notes
-=============
+Release notes and upgrade instructions
+======================================
     
+Version specific information
+----------------------------
+
     ..  toctree::
         :maxdepth: 1
         
         release-0.4.0
+
+Generic upgrade instructions
+----------------------------
+
+*   Make sure you have setup South before you upgrade -- see :ref:`Database migrations <convert-to-south>` for details.
+*   Always consult the specific version release notes linked above before upgrading.
+
+Code upgrade
+^^^^^^^^^^^^
+``pip install openrem -U``
+
+*Note* - this will upgrade OpenREM **and all** the programs it depends on (e.g. Django)
+
+Database migration
+^^^^^^^^^^^^^^^^^^
+
+Always do a database migration using South after an upgrade in case any of the
+database models have changed. This will normally not be the case.
+
+* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
+
+If response to the last command is 'Nothing seems to have changed', no migration is required. Else, follow the instructions to migrate.
+
+Restart the web server
+^^^^^^^^^^^^^^^^^^^^^^
+
+Restart the web server to enable any changes that have been made to the web interface.
+
 
 Contributing authors
 ====================

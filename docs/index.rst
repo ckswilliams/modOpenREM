@@ -25,7 +25,6 @@ Contents:
     releasenotes
     import
     interface
-    upgrade
     code
 
 ..  Note::
