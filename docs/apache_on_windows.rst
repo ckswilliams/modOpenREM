@@ -38,7 +38,9 @@ Get and Install wsgi.py and monitor.py
 
 Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki/ReloadingSourceCode
 
-+ Change wsgi.py in the openrem/openrem folder to the following::
++ Change wsgi.py in the openrem/openrem folder to the following
+
+.. code-block:: python
 
 	"""
 	WSGI config for OpenREM project.
@@ -72,7 +74,9 @@ Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki
 	import openrem.monitor
 	openrem.monitor.start(interval=1.0)
 	
-+ Create a file monitor.py in the openrem/openrem folder with the following contents::
++ Create a file monitor.py in the openrem/openrem folder with the following contents
+
+.. code-block:: python
 
 	# Code from the modwsgi wiki at https://code.google.com/p/modwsgi/wiki/ReloadingSourceCode
 	# Copyright 2007-2011 GRAHAM DUMPLETON
