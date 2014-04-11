@@ -202,6 +202,7 @@ Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki
 
 Install Micosoft C++ Distributable
 ================
+
 Install the microsoft C++ distributable making sure the version number matches the version number for the apache and mod_wsgi downloads.
 http://www.microsoft.com/en-us/download/details.aspx?id=30679#
 
@@ -215,6 +216,7 @@ c:\apache24\bin\httpd -k install
 
 Setup the URLs
 ============================================================
+
 Add the following to the openrem urls.py file::
 	from django.conf import settings
 	if settings.DEBUG:
@@ -224,6 +226,7 @@ Add the following to the openrem urls.py file::
 
 Collect the static files
 ===========================
+
 Collect your static files by running::
 	python manage.py collectstatic
 
