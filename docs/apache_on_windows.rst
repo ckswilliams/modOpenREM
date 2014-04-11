@@ -20,7 +20,7 @@ Get and Install MOD_WSGI
 
 	LoadModule wsgi_module modules/mod_wsgi.so
 	
-+ At the end of C:\apache24\confzhttpd.conf add the following::
++ At the end of C:\apache24\conf\httpd.conf add the following::
 
 	WSGIScriptAlias / "c:/Python27/Lib/site-packages/openrem/openrem/wsgi.py"
 	WSGIPythonPath "c:/Python27/Lib/site-packages/openrem"
@@ -215,6 +215,7 @@ http://www.microsoft.com/en-us/download/details.aspx?id=30679#
 Optional: Install apache as a service
 =====================================
 Run a terminal as administrator.::
+
 c:\apache24\bin\httpd -k install
 
 
@@ -222,6 +223,7 @@ Setup the URLs
 ============================================================
 
 Add the following to the openrem urls.py file::
+
 	from django.conf import settings
 	if settings.DEBUG:
 	    urlpatterns += patterns('django.contrib.staticfiles.views',
@@ -232,8 +234,10 @@ Collect the static files
 ===========================
 
 Collect your static files by running::
+
 	python manage.py collectstatic
 
 If this fails because openrem lacks a static folder either copy the static folder from remapp to the openrem directory, adjust the openrem settings or set up a link.
 To setup a link run::
+
 	mklink /D c:\python27\lib\site-packages\openrem\static c:\python27\lib\site-packages\openrem\remapp\static
