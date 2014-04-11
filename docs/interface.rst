@@ -18,6 +18,11 @@ populated with studies:
     :height: 630px
     :alt: OpenREM homepage screenshot
 
+The time displayed for the latest study may reflect the difference between the 
+time set on the modality and the current offset from UTC, ie in the UK in British
+Summer Time, an exam that has just taken place will be displayed as being in 1 hours time!
+This bug is tracked as `issue 74 <https://bitbucket.org/edmcdonagh/openrem/issue/74/>`_.
+
 By selecting the links in the navigation bar at the top, you can view all
 of the CT, fluoroscopy or mammography studies. Alternatively, if you click
 on the station name link (in blue) you can filter to just that source modality.
