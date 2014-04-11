@@ -17,8 +17,11 @@ Get and Install MOD_WSGI
 + Download mod_wsgi that mathces your Windows, Apache and Python versions from http://www.lfd.uci.edu/~gohlke/pythonlibs/#mod_wsgi
 + Extract the mod_wsgi.so file to C:\apache24\modules\
 + Add the following module  C:\apache24\conf\httpd.conf::
+
 	LoadModule wsgi_module modules/mod_wsgi.so
+	
 + At the end of C:\apache24\confzhttpd.conf add the following::
+
 	WSGIScriptAlias / "c:/Python27/Lib/site-packages/openrem/openrem/wsgi.py"
 	WSGIPythonPath "c:/Python27/Lib/site-packages/openrem"
 
@@ -36,6 +39,7 @@ Get and Install wsgi.py and monitor.py
 Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki/ReloadingSourceCode
 
 + Change wsgi.py in the openrem/openrem folder to the following::
+
 	"""
 	WSGI config for OpenREM project.
 
