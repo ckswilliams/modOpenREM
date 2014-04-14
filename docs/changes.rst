@@ -10,6 +10,7 @@ OpenREM version history
     * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
     * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
 
+* `#80`_   Added docs for installing Apache with auto-start on Windows Server 2012. Contributed by JA Cole
 * `#78`_   Moved upgrade documentation into the release notes page
 * `#77`_   Removed docs builds from repository
 * `#76`_   Fixed crash if exporting from development environment
@@ -133,6 +134,16 @@ OpenREM version history
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#89`: https://bitbucket.org/edmcdonagh/openrem/issue/89/
+..  _`#88`: https://bitbucket.org/edmcdonagh/openrem/issue/88/
+..  _`#87`: https://bitbucket.org/edmcdonagh/openrem/issue/87/
+..  _`#86`: https://bitbucket.org/edmcdonagh/openrem/issue/86/
+..  _`#85`: https://bitbucket.org/edmcdonagh/openrem/issue/85/
+..  _`#84`: https://bitbucket.org/edmcdonagh/openrem/issue/84/
+..  _`#83`: https://bitbucket.org/edmcdonagh/openrem/issue/83/
+..  _`#82`: https://bitbucket.org/edmcdonagh/openrem/issue/82/
+..  _`#81`: https://bitbucket.org/edmcdonagh/openrem/issue/81/
+..  _`#80`: https://bitbucket.org/edmcdonagh/openrem/issue/80/
 ..  _`#79`: https://bitbucket.org/edmcdonagh/openrem/issue/79/
 ..  _`#78`: https://bitbucket.org/edmcdonagh/openrem/issue/78/
 ..  _`#77`: https://bitbucket.org/edmcdonagh/openrem/issue/77/
