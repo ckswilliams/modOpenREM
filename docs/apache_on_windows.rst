@@ -1,5 +1,5 @@
-Installing Apache for OpenREM on Windows Server 2012
-****************************************************
+Installing Apache on Windows Server 2012 with auto-restart
+**********************************************************************
 
 ..  Note:: Author JA Cole
 
