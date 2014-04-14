@@ -1,26 +1,26 @@
 Installing Apache for OpenREM on Windows Server 2012
-*************************************************
+****************************************************
 
 ..  Note:: Author JA Cole
 
 These instructions are for installing OpenREM under Apache on Windows as an alternative to the built in HTTP server. They have been written using Windows Server 2012.
 
 Get and Install Apache
-===========================================
+======================
     
 + Download the zip of the appropriate version from https://www.apachelounge.com/
-+ Extract the zip somewhere useful. For this guide we will assume C:\apache24\
++ Extract the zip somewhere useful. For this guide we will assume ``C:\apache24\``
 
 Get and Install MOD_WSGI
 ========================
 
-+ Download mod_wsgi that mathces your Windows, Apache and Python versions from http://www.lfd.uci.edu/~gohlke/pythonlibs/#mod_wsgi
-+ Extract the mod_wsgi.so file to C:\apache24\modules\
-+ Add the following module  C:\apache24\conf\httpd.conf::
++ Download mod_wsgi that matches your Windows, Apache and Python versions from http://www.lfd.uci.edu/~gohlke/pythonlibs/#mod_wsgi
++ Extract the mod_wsgi.so file to ``C:\apache24\modules\``
++ Add the following module  ``C:\apache24\conf\httpd.conf``::
 
 	LoadModule wsgi_module modules/mod_wsgi.so
 	
-+ At the end of C:\apache24\conf\httpd.conf add the following::
++ At the end of ``C:\apache24\conf\httpd.conf`` add the following::
 
 	WSGIScriptAlias / "c:/Python27/Lib/site-packages/openrem/openrem/wsgi.py"
 	WSGIPythonPath "c:/Python27/Lib/site-packages/openrem"
@@ -34,7 +34,7 @@ Get and Install MOD_WSGI
 
 
 Get and Install wsgi.py and monitor.py
-==============================
+======================================
 
 Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki/ReloadingSourceCode
 
@@ -209,10 +209,10 @@ Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki
     	_lock.release()
 
 Install Micosoft C++ Distributable
-================
+==================================
 
 Install the microsoft C++ distributable making sure the version number matches the version number for the apache and mod_wsgi downloads.
-http://www.microsoft.com/en-us/download/details.aspx?id=30679#
+`<http://www.microsoft.com/en-us/download/details.aspx?id=30679#>`_
 
 
 
@@ -220,11 +220,11 @@ Optional: Install apache as a service
 =====================================
 Run a terminal as administrator.::
 
-c:\apache24\bin\httpd -k install
+    c:\apache24\bin\httpd -k install
 
 
 Setup the URLs
-============================================================
+==============
 
 Add the following to the openrem urls.py file::
 
@@ -235,7 +235,7 @@ Add the following to the openrem urls.py file::
 	    )
 
 Collect the static files
-===========================
+========================
 
 Collect your static files by running::
 
