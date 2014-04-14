@@ -3,7 +3,10 @@ Installing Apache for OpenREM on Windows Server 2012
 
 ..  Note:: Author JA Cole
 
-These instructions are for installing OpenREM under Apache on Windows as an alternative to the built in HTTP server. They have been written using Windows Server 2012.
+These instructions are for installing OpenREM under Apache on Windows as 
+a developers alternative to the built-in HTTP server. They have been written 
+using Windows Server 2012, and feature automatic restarts of the Apache server
+when the code changes, much as the built-in server does.
 
 Get and Install Apache
 ======================

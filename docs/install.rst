@@ -170,6 +170,13 @@ Related guides
         
         conquestAsWindowsService
         backupMySQLWindows
+
+Advanced guides for developers
+------------------------------
+
+    ..  toctree::
+        :maxdepth: 1
+        
         apache_on_windows
 
 
