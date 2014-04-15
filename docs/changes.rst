@@ -10,7 +10,9 @@ OpenREM version history
     * `#64`_ includes **changes to the database schema and needs a user response** - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
     * `#65`_ includes changes to the settings file which **require settings information to be copied** and files moved/renamed - see `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
 
+
 * `#80`_   Added docs for installing Apache with auto-start on Windows Server 2012. Contributed by JA Cole
+* `#79`_   Updated README.rst instructions
 * `#78`_   Moved upgrade documentation into the release notes page
 * `#77`_   Removed docs builds from repository
 * `#76`_   Fixed crash if exporting from development environment
@@ -18,6 +20,7 @@ OpenREM version history
 * `#73`_   Made launch scripts and ptsizecsv2db more robust
 * `#72`_   Moved the secret key into the local documentation and added instructions to change it to release notes and install instructions
 * `#71`_   Added information about configuring users to the install documentation
+* `#69`_   Added documentation about the new delete study function
 * `#68`_   Now checks sequence code meaning and value exists before assigning them. Thanks to JA Cole
 * `#67`_   Added 'Contributing authors' section of documentation
 * `#66`_   Added 'Release notes' section of documentation, incuding this file
