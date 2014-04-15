@@ -9,6 +9,7 @@ Full documentation can be found on Read the Docs: http://docs.openrem.org
 
 Quick start
 -----------
+*(Linux path notation - use back slashes for Windows paths)*
 
 #. Install python 2.7
 #. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
@@ -22,11 +23,12 @@ Quick start
     + in the ``local_settings.py`` file, set the database details.
     + For testing purposes, use 
         + ``'ENGINE': 'django.db.backends.sqlite3',``
-        + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
+        + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO.db'``
 #. Create the database
     + ``python path/to/openrem/manage.py syncdb``
 #. Start test web server
     + ``python path/to/openrem/manage.py runserver``
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
+#. Create some users and add them to the viewgroup, exportgroup or admingroup in the admin interface, eg http://localhost:8000/admin
 #. Add some data!
     + ``openrem_rdsr.py rdsrfile.dcm``
