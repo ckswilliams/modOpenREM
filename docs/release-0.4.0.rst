@@ -40,6 +40,11 @@ Specific upgrade instructions
     you will not be able to migrate back to the old database schema without error.
     This is not something that you will want to do, so this is ok.
 
+    Do the migration:
+    
+    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp``
+    * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp``    
+
 *  Update the settings files
 
     ..      Warning::
