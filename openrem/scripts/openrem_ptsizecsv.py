@@ -13,6 +13,23 @@
 
 import sys,os
 
-from openrem.remapp.extractors import ptsizecsv2db
+# This section places the openrem folder onto the python path
+# so that openrem.settings can be found.
+
+sitepaths = []
+openrempathset=0
+therealready = os.path.join('site-packages','openrem')
+
+for paths in sys.path:
+    if paths.endswith('site-packages'):
+        sitepaths.append(paths)
+    if paths.endswith(therealready):
+        openrempathset = 1
+
+if sitepaths and not openrempathset:
+    for paths in sitepaths:
+        sys.path.insert(1,os.path.join(paths,'openrem'))
+
+from remapp.extractors import ptsizecsv2db
 
 sys.exit(ptsizecsv2db.csv2db(sys.argv))
