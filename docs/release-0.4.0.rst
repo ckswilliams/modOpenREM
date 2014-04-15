@@ -59,10 +59,11 @@ Specific upgrade instructions
     file that contains things that are specific to your installation, such as the
     database settings.
 
-    This upgrade will include a file called ``settings.py.new`` and the ``local_settings.py``
+    This upgrade will include a file called ``settings.py.new`` and the ``local_settings.py.example``
     file. You will need to do the following:
 
-    *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. 
+    *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py.example`` file
+        and rename the ``local_settings.py`` file to remove the ``.example``. 
         Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like 
         
         *   Linux: ``/usr/lib/python2.7/dist-packages/openrem/openrem/``
@@ -81,3 +82,14 @@ Specific upgrade instructions
     *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
 
 * Restart your webserver
+
+* Add some users
+
+    * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally created the database (``manage.py syncdb``)
+    * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
+
+        + ``viewgroup`` can browse the data only
+        + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
+        + ``admingroup`` can delete studies in addition to anything the export group can do
+
+

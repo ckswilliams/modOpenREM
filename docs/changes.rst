@@ -2,6 +2,11 @@
 OpenREM version history
 =======================
 
+0.4.0-rc2
+---------
+
+* `#82`_   Added instructions for adding users to the release notes
+
 0.4.0
 -----
 
