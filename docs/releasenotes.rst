@@ -18,6 +18,7 @@ Version specific information
     ..  toctree::
         :maxdepth: 1
         
+        release-0.4.1
         release-0.4.0
 
 Generic upgrade instructions

@@ -63,7 +63,7 @@ Specific upgrade instructions
     file. You will need to do the following:
 
     *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py.example`` file
-        and rename the ``local_settings.py`` file to remove the ``.example``. 
+        and rename it to remove the ``.example``. 
         Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like 
         
         *   Linux: ``/usr/lib/python2.7/dist-packages/openrem/openrem/``
