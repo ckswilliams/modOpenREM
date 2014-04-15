@@ -51,9 +51,6 @@ for a future release.
 
 The last box below the filtering search boxes is the ordering preference.
 
-*New in 0.3.8* Ordering by date now takes account of the study time 
-(`issue 37 <https://bitbucket.org/edmcdonagh/openrem/issue/37>`_).
-
 Viewing study details
 =====================
 
