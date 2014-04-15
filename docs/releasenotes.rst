@@ -41,7 +41,10 @@ database models have changed. This will normally not be the case.
 * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
 
-If response to the last command is 'Nothing seems to have changed', no migration is required. Else, follow the instructions to migrate.
+If response to the last command is 'Nothing seems to have changed', no migration is required. Else, follow the instructions to migrate:
+
+* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp``    
 
 Restart the web server
 ^^^^^^^^^^^^^^^^^^^^^^
