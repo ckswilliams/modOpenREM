@@ -59,10 +59,11 @@ Specific upgrade instructions
     file that contains things that are specific to your installation, such as the
     database settings.
 
-    This upgrade will include a file called ``settings.py.new`` and the ``local_settings.py``
+    This upgrade will include a file called ``settings.py.new`` and the ``local_settings.py.example``
     file. You will need to do the following:
 
-    *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py`` file. 
+    *   Copy the database settings from your current ``settings.py`` file to the ``local_settings.py.example`` file
+        and rename the ``local_settings.py`` file to remove the ``.example``. 
         Both of these files are in the ``openrem/openrem`` directory, which will be somewhere like 
         
         *   Linux: ``/usr/lib/python2.7/dist-packages/openrem/openrem/``
