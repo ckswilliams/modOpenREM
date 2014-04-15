@@ -81,3 +81,14 @@ Specific upgrade instructions
     *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
 
 * Restart your webserver
+
+* Add some users
+
+    * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally created the database (``manage.py syncdb``)
+    * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
+
+        + ``viewgroup`` can browse the data only
+        + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
+        + ``admingroup`` can delete studies in addition to anything the export group can do
+
+
