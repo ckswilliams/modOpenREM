@@ -29,6 +29,6 @@ Quick start
 #. Start test web server
     + ``python path/to/openrem/manage.py runserver``
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
-#. Create some users and add them to the viewgroup, exportgroup or admingroup in the admin interface, eg http://localhost:8000/admin
+#. Create some users and add them to the ``viewgroup``, ``exportgroup`` or ``admingroup`` in the admin interface, eg http://localhost:8000/admin
 #. Add some data!
     + ``openrem_rdsr.py rdsrfile.dcm``
