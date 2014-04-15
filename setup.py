@@ -19,7 +19,7 @@ requires = [
 
 setup(
     name='OpenREM',
-    version='0.3.9',
+    version='0.4.0',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
@@ -29,7 +29,7 @@ setup(
     long_description=README,
     url='http://openrem.org/',
     author='Ed McDonagh',
-    author_email='ed@mcdonagh.org.uk',
+    author_email='ed@openrem.org',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
