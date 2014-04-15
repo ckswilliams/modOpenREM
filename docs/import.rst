@@ -1,7 +1,6 @@
 Importing data to OpenREM
 *************************
 
-
 Importing dose related data from DICOM files
 ============================================
 

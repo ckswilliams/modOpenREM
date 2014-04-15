@@ -176,13 +176,21 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from datetime import timedelta
     pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate",dataset)
-    # create the decimal version of the age to make analysis easier
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
-    if patient_birth_date:
-        patientatt.patient_age_decimal = (g.study_date - patient_birth_date).days/365.25
-        patientatt.save()
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
+    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    if patient_birth_date:
+        patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
+    elif patientatt.patient_age:
+        if patientatt.patient_age[-1:]=='Y':
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
+        elif patientatt.patient_age[-1:]=='M':
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('12')
+        elif patientatt.patient_age[-1:]=='D':
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('365.25') 
+    if patientatt.patient_age_decimal:
+        patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
+    patientatt.save()
     pat.save()
 
 

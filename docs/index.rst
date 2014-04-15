@@ -22,9 +22,9 @@ Contents:
     :maxdepth: 2
 
     install
+    releasenotes
     import
     interface
-    upgrade
     code
 
 ..  Note::

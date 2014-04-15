@@ -54,6 +54,20 @@
             <li><a href="/openrem/mg">Mammography</a></li>
             {% endblock %}
           </ul>
+          {% block loginlink %}
+          <ul class="nav navbar-nav navbar-right">
+            <p class="navbar-text navbar-right">
+              <span class="glyphicon glyphicon-user"></span>
+              {% if user.is_authenticated %}
+               Welcome {{ user.get_full_name }} -
+               <a href="/logout/" class="navbar-link">logout</a>
+              {% else %}
+               Not signed in - 
+              <a href="/login/?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
+              {% endif %}
+            </p>
+          </ul>
+          {% endblock %}
         </div><!--/.nav-collapse -->
       </div>
     </div>
@@ -68,7 +82,11 @@
 
       <hr>
       <footer>
+{% if admin.openremversion %}
         <p>OpenREM version {{ admin.openremversion }} &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
+{% else %}
+        <p>OpenREM &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
+{% endif %}
       </footer>
 
     </div><!-- /.container -->

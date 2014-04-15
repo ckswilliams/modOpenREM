@@ -1,3 +1,4 @@
+
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -623,15 +624,24 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
+    from decimal import Decimal
     pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
-    patient_birth_date = get_date("PatientBirthDate",dataset)
-    # create the decimal version of the age to make analysis easier
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
-    if patient_birth_date is not None:
-        patientatt.patient_age_decimal = (g.study_date - patient_birth_date).days/365.25
-        patientatt.save()
+    patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
+    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    if patient_birth_date:
+        patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
+    elif patientatt.patient_age:
+        if patientatt.patient_age[-1:]=='Y':
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
+        elif patientatt.patient_age[-1:]=='M':
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('12')
+        elif patientatt.patient_age[-1:]=='D':
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('365.25') 
+    if patientatt.patient_age_decimal:
+        patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
+    patientatt.save()
     pat.save()
 
 def _generalstudymoduleattributes(dataset,g):
@@ -662,6 +672,8 @@ def _generalstudymoduleattributes(dataset,g):
         if (('RequestAttributesSequence' in dataset) and dataset[0x40,0x275].VM): # Ulgy hack to prevent issues with zero length LS16 sequence
             req = dataset.RequestAttributesSequence
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',req[0])
+            if not g.requested_procedure_code_meaning: # Sometimes the above is true, but there is no RequestedProcedureDescription in that sequence, but there is a basic field as below.
+                g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',dataset)
             g.save()
         else:
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',dataset)

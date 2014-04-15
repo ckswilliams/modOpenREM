@@ -13,23 +13,12 @@
 
 import sys,os
 
-# This section attempts to place the openrem folder onto the python path
-# so that openrem.settings can be found.
-sitepaths = []
-openrempathset=0
-for paths in sys.path:
-    if paths.endswith('site-packages'):
-        sitepaths.append(paths)
-    if paths.endswith('openrem'):
-        openrempathset = 1
-        
-if sitepaths and not openrempathset:
-    for paths in sitepaths:
-        sys.path.insert(1,os.path.join(paths,'openrem'))
+from openrem.remapp.extractors import mam
 
-from remapp.extractors import mam
+if len(sys.argv) < 2:
+    sys.exit('Error: Supply at least one argument - the DICOM mammography image file')
 
-if len(sys.argv) != 2:
-    sys.exit('Error: Supply exactly one argument - the DICOM mammography image file')
-
-sys.exit(mam(sys.argv[1]))
+for sr in sys.argv[1:]:
+    mam(sr)
+    
+sys.exit()

@@ -349,7 +349,13 @@ def ctxlsx(request):
     # Populate summary sheet
     import pkg_resources  # part of setuptools
     from datetime import datetime
-    version = pkg_resources.require("openrem")[0].version
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+
+    version = vers
     titleformat = book.add_format()
     titleformat.set_font_size=(22)
     titleformat.set_font_color=('#FF0000')

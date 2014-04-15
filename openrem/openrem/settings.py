@@ -14,16 +14,11 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
 )
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'openremdb',                      # Or path to database file if using sqlite3.
-        'USER': 'openremuser',                      # Not used with sqlite3.
-        'PASSWORD': 'rem',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
-}
+# **********************************************************************
+#
+# Database settings have been moved to local_settings.py
+#
+# **********************************************************************
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -48,20 +43,18 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+#
+# MEDIA_ROOT filepath has been moved to local_settings.py
+#
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
-# Absolute path to the directory static files should be collected to.
-# Don't put anything in this directory yourself; store your static files
-# in apps' "static/" subdirectories and in STATICFILES_DIRS.
-# Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+#
+# STATIC_ROOT filepath has been moved to local_settings.py
+#
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -80,8 +73,12 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
+# URL of the login page
+LOGIN_URL = '/login/'
+
+#
+# SECRET_KEY moved to local_settings.py
+#
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -157,3 +154,12 @@ LOGGING = {
         },
     }
 }
+
+
+try:
+    LOCAL_SETTINGS
+except NameError:
+    try:
+        from local_settings import *
+    except ImportError:
+        pass

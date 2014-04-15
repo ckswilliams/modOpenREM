@@ -18,14 +18,21 @@ populated with studies:
     :height: 630px
     :alt: OpenREM homepage screenshot
 
+The time displayed for the latest study may reflect the difference between the 
+time set on the modality and the current offset from UTC, ie in the UK in British
+Summer Time, an exam that has just taken place will be displayed as being in 1 hours time!
+This bug is tracked as `issue 74 <https://bitbucket.org/edmcdonagh/openrem/issue/74/>`_.
+
 By selecting the links in the navigation bar at the top, you can view all
 of the CT, fluoroscopy or mammography studies. Alternatively, if you click
 on the station name link (in blue) you can filter to just that source modality.
 
+*New in 0.4.0:* If you are not logged in, clicking any of the links will bring up the log in page.
+
 Filtering for specific studies
 ==============================
 
-This image shows the CT studies view, filtered by entering terms in the 
+This image shows the CT studies view, available to any logged in user, filtered by entering terms in the 
 boxes on the right hand side to show just the studies where the modality
 model name includes the term 'soma':
 
@@ -43,9 +50,6 @@ available, but it does exist as `issue 17 <https://bitbucket.org/edmcdonagh/open
 for a future release.
 
 The last box below the filtering search boxes is the ordering preference.
-
-*New in 0.3.8* Ordering by date now takes account of the time of the study 
-(`issue 37 <https://bitbucket.org/edmcdonagh/openrem/issue/37>`_).
 
 Viewing study details
 =====================
@@ -80,6 +84,8 @@ From any of the modality pages in the OpenREM interface, you can export the
 displayed studies to a csv spreadsheet by clicking on the link near the top.
 In the CT interface, you can also export to an enhanced XLSX spreadsheet. 
 
+*New in 0.4.0:* These links only appear if you are logged in as a user in the ``exportgroup`` or the ``admingroup``.
+
 For CT, the XLSX export has multiple sheets. The first sheet contains a 
 summary of all the study descriptions, requested procedures and series
 protocol names contained in the export:
@@ -108,4 +114,17 @@ is listed one per line. If a single study
 has more than one series with the same protocol name, then the same study
 will appear on more than one line.
 
+Deleting studies
+================
+*New in 0.4.0*
 
+If you log in as a user that is in the ``admingroup``, then an extra column is appended in
+the filtered view tables to allow studies to be deleted:
+
+.. image:: img/Delete.png
+    :width: 730px
+    :align: center
+    :height: 196px
+    :alt: Deleting studies
+
+Clicking on delete takes you to a confirmation page before the delete takes place.

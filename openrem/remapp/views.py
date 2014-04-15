@@ -28,39 +28,75 @@
 
 """
 
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template import RequestContext
+from django.shortcuts import render_to_response
+from django.core.urlresolvers import reverse_lazy
 import datetime
 from remapp.models import General_study_module_attributes
 
+def logout_page(request):
+    """
+    Log users out and re-direct them to the main page.
+    """
+    logout(request)
+    return HttpResponseRedirect('/openrem/')
 
-from django.shortcuts import render
-from django.template import RequestContext
-from django.shortcuts import render_to_response
 
-
-
+@login_required
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter
     import pkg_resources # part of setuptools
     f = RFSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'RF'))
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     return render_to_response(
         'remapp/rffiltered.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
 
+@login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
     import pkg_resources # part of setuptools
+
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+    
     return render_to_response(
         'remapp/ctfiltered.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
 
+@login_required
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter
     import pkg_resources # part of setuptools
@@ -68,12 +104,24 @@ def mg_summary_list_filter(request):
     if 'page' in filter_data:
         del filter_data['page']
     f = MGSummaryListFilter(filter_data, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'MG'))
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     return render_to_response(
         'remapp/mgfiltered.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
+
 
 def openrem_home(request):
     from remapp.models import General_study_module_attributes
@@ -82,6 +130,17 @@ def openrem_home(request):
     from collections import OrderedDict
     import pkg_resources # part of setuptools
     utc = pytz.UTC
+    
+    if not Group.objects.filter(name="viewgroup"):
+        vg = Group(name="viewgroup")
+        vg.save()
+    if not Group.objects.filter(name="exportgroup"):
+        eg = Group(name="exportgroup")
+        eg.save()
+    if not Group.objects.filter(name="admingroup"):
+        ag = Group(name="admingroup")
+        ag.save()
+    
     allstudies = General_study_module_attributes.objects.all()
     homedata = { 
         'total' : allstudies.count(),
@@ -89,7 +148,13 @@ def openrem_home(request):
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
         'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
         }
-    admin = {'openremversion' : pkg_resources.require("openrem")[0].version}
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
     modalities = ('MG','CT','RF')
     for modality in modalities:
         studies = allstudies.filter(modality_type__contains = modality).all()
@@ -127,3 +192,16 @@ def openrem_home(request):
     
     return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
+@login_required
+def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
+    study = get_object_or_404(General_study_module_attributes, pk=pk)    
+
+    if request.method=='POST':
+        if request.user.groups.filter(name="admingroup"):
+            study.delete()
+        return redirect("/openrem/")
+
+    if request.user.groups.filter(name="admingroup"):
+        return render(request, template_name, {'exam':study})
+
+    return redirect("/openrem/")

@@ -21,32 +21,23 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-..  module:: ptsizecsv2db.
-    :synopsis: Use to import height and weight data from csv file to existing studies in the database.
+..  module:: requestcsv2db.
+    :synopsis: Use to import Requested Procedure Description data from csv file to existing studies in the database.
+
+    To use, copy this file into openrem/remapp/extractors/ and run it using python.
 
 ..  moduleauthor:: Ed McDonagh
 
 """
 
-def _patientstudymoduleattributes(exam, height, weight, verbose): # C.7.2.2
-    patientatt = exam.patient_study_module_attributes_set.get()
-    if height and not patientatt.patient_size:
-        patientatt.patient_size = height
-        if verbose:
-            print "Inserted height of " + height
-    if weight and not patientatt.patient_weight:
-        patientatt.patient_weight = weight
-        if verbose:
-            print "Inserted weight of " + weight
-    patientatt.save()
 
 
-def _ptsizeinsert(accno,height,weight,siuid, verbose):
+def _requestinsert(accno,request,siuid, verbose):
     from django.db import models
     from remapp.models import General_study_module_attributes
     from django import db
     
-    if (height or weight) and accno:
+    if request and accno:
         if not siuid:
             e = General_study_module_attributes.objects.filter(accession_number__exact = accno)
         else:
@@ -54,16 +45,17 @@ def _ptsizeinsert(accno,height,weight,siuid, verbose):
         if e:
             for exam in e:
                 if verbose:
-                    print accno + ": " + request
-                _patientstudymoduleattributes(exam, height, weight, verbose)
+                    print accno + ":"
+                exam.requested_procedure_code_meaning = request
+                exam.save()
         elif verbose:
             print "Accession number " + accno + " not found in db"
     db.reset_queries()
        
 
     
-def csv2db(*args, **kwargs):
-    """ Import patient height and weight data from csv RIS exports. Can be called from ``openrem_ptsizecsv.py`` script
+def requestcsv2db(*args, **kwargs):
+    """ Import Requested Procedure Description data from csv files. Must be placed with extractor routines in openrem/remapp/extractors/
         
     :param --si-uid: Use Study Instance UID instead of Accession Number. Short form -s.
     :type --si-uid: bool
@@ -78,7 +70,13 @@ def csv2db(*args, **kwargs):
 
     Example::
         
-        openrem_ptsizecsv.py -s MyRISExport.csv StudyInstanceUID HEIGHT weight
+        pythoon requestcsv2db.py -s MyRequests.csv StudyInstanceUID RequestedProcedureDescription
+
+    To create an appropriate csv file, you might use exiftool::
+    
+        exiftool -s -s -s -AccessionNumber -StudyInstanceUID -RequestedProcedureDescription -csv *.dcm > requests.csv
+
+    See https://bitbucket.org/edmcdonagh/openrem/issue/75/ for history
 
     """
 
@@ -93,8 +91,7 @@ def csv2db(*args, **kwargs):
     parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     parser.add_argument("csvfile", help="csv file containing the height and/or weight information and study identifier")
     parser.add_argument("id", help="Column title for the accession number or study instance UID")
-    parser.add_argument("height", help="Column title for the patient height (DICOM size)")
-    parser.add_argument("weight", help="Column title for the patient weight")
+    parser.add_argument("request", help="Column title for the requested procedure description")
     args=parser.parse_args()
     
     openrem_settings.add_project_to_path()
@@ -104,10 +101,10 @@ def csv2db(*args, **kwargs):
     try:
         dataset = csv.DictReader(f)        
         for line in dataset:
-            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid, args.verbose)
+            _requestinsert(line[args.id], line[args.request], args.si_uid, args.verbose)
     finally:
         f.close()
 
 if __name__ == "__main__":
     import sys
-    sys.exit(csv2db())
+    sys.exit(requestcsv2db())
