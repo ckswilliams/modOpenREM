@@ -13,7 +13,24 @@
 
 import sys,os
 
-from openrem.remapp.extractors import ct_philips
+# This section places the openrem folder onto the python path
+# so that openrem.settings can be found.
+
+sitepaths = []
+openrempathset=0
+therealready = os.path.join('site-packages','openrem')
+
+for paths in sys.path:
+    if paths.endswith('site-packages'):
+        sitepaths.append(paths)
+    if paths.endswith(therealready):
+        openrempathset = 1
+
+if sitepaths and not openrempathset:
+    for paths in sitepaths:
+        sys.path.insert(1,os.path.join(paths,'openrem'))
+
+from remapp.extractors import ct_philips
 
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the Philips dose report image')
