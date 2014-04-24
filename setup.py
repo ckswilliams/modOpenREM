@@ -15,6 +15,7 @@ requires = [
     'django-pagination',
     'xlsxwriter',
     'south',
+    'django-celery',
     ]
 
 setup(
