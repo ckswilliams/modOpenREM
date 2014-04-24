@@ -5,7 +5,7 @@ OpenREM version history
 0.4.2
 -----
 
-* `#83`_   Fix for `#73`_ introduced bug that prevents the import scripts from working. Fixed.
+* `#83`_   Fix for bug introduced in `#73`_ that prevents the import scripts from working.
 
 0.4.1
 -----
