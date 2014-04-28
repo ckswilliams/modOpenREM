@@ -2,6 +2,11 @@
 OpenREM version history
 =======================
 
+0.4.3
+------
+
+* `#85`_   Fix for bug introduced in `#75`_ where adaption of ptsize import for procedure import broke ptsize imports
+
 0.4.2
 -----
 
