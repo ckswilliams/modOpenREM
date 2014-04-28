@@ -54,7 +54,7 @@ def _ptsizeinsert(accno,height,weight,siuid, verbose):
         if e:
             for exam in e:
                 if verbose:
-                    print accno + ": " + request
+                    print accno + ":"
                 _patientstudymoduleattributes(exam, height, weight, verbose)
         elif verbose:
             print "Accession number " + accno + " not found in db"
