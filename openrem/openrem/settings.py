@@ -1,13 +1,14 @@
 # Django settings for OpenREM project.
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
 from __future__ import absolute_import
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
 # becomes `proj.celery.schedules` in Python 2.x since it allows
 # for relative imports by default.
+
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
 
 # Celery settings
 
@@ -170,11 +171,11 @@ LOGGING = {
     }
 }
 
-
 try:
     LOCAL_SETTINGS
 except NameError:
     try:
-        from local_settings import *
+        from openrem.local_settings import *
     except ImportError:
         pass
+
