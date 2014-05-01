@@ -79,9 +79,10 @@ urlpatterns += patterns('remapp.exports',
     url(r'^xlsx/openrem/ct/',
         'xlsx.ctxlsx'),
 )
-from django.views.decorators.csrf import csrf_exempt
+
 urlpatterns += patterns('remapp.views',
     url(r'^celerytest$', 'celerytest', name="celerytest"),
     url(r'^do_task$', 'do_task', name="do_task"),
     url(r'^poll_state$', 'poll_state', name="poll_state"),
+    url(r'^exportCTcelery/','do_CT_csv'),
 )

@@ -28,3 +28,5 @@ def do_work():
         print i
         current_task.update_state(state='PROGRESS',
             meta={'process_percent': i})
+
+from remapp.exports.exportcsv import exportCT2excel

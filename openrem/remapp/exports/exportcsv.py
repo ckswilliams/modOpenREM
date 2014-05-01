@@ -138,6 +138,9 @@ def exportFL2excel(request):
             ])
     return response
 
+from celery import shared_task
+
+@shared_task
 def exportCT2excel(request):
     """Export filtered CT database data to a single-sheet CSV file.
 
