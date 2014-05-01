@@ -58,7 +58,7 @@ def exportFL2excel(request):
     f_accession_number = request.GET.get('accession_number')
     
     # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
     
     # Get the data!
@@ -139,15 +139,8 @@ def exportFL2excel(request):
     return response
 
 from celery import shared_task
-from django.utils import simplejson as json
+import json
 from django.views.decorators.csrf import csrf_exempt
-
-
-    
-
-
-
-
 
 @shared_task
 def exportCT2excel(query_filters):
@@ -165,7 +158,7 @@ def exportCT2excel(query_filters):
 
 
     # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
 
 
@@ -332,7 +325,7 @@ def exportMG2excel(request):
     f_accession_number = request.GET.get('accession_number')
 
     # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
     
     # Get the data!
@@ -458,5 +451,5 @@ def do_CT_csv(request):
     job = exportCT2excel.delay(query_filters)
     data = job.id
     json_data = json.dumps(data)
-    return HttpResponse(json_data, mimetype='application/json')
+    return HttpResponse(json_data, content_type='application/json')
 
