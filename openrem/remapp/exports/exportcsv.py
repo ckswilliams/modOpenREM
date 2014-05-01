@@ -140,6 +140,15 @@ def exportFL2excel(request):
 
 from celery import shared_task
 
+@csrf_exempt
+def do_CT_csv(request):
+    from remapp.exports.exportcsv import exportCT2excel
+    job = exportCT2excel.delay(request)
+    data = job.id
+    json_data = json.dumps(data)
+    return HttpResponse(json_data, mimetype='application/json')
+
+
 @shared_task
 def exportCT2excel(request):
     """Export filtered CT database data to a single-sheet CSV file.
