@@ -139,6 +139,8 @@ def exportFL2excel(request):
     return response
 
 from celery import shared_task
+from django.utils import simplejson as json
+from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def do_CT_csv(request):
