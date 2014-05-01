@@ -142,17 +142,15 @@ from celery import shared_task
 from django.utils import simplejson as json
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
-def do_CT_csv(request):
-    from remapp.exports.exportcsv import exportCT2excel
-    job = exportCT2excel.delay(request)
-    data = job.id
-    json_data = json.dumps(data)
-    return HttpResponse(json_data, mimetype='application/json')
+
+    
+
+
+
 
 
 @shared_task
-def exportCT2excel(request):
+def exportCT2excel(query_filters):
     """Export filtered CT database data to a single-sheet CSV file.
 
     :param request: Query parameters from the CT filtered page URL.
@@ -162,21 +160,9 @@ def exportCT2excel(request):
 
     from django.http import HttpResponse
     from django.shortcuts import render
-    from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import General_study_module_attributes
 
-    # Get the database query filters
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_study_description = request.GET.get('study_description')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
 
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(mimetype='text/csv')
@@ -190,26 +176,26 @@ def exportCT2excel(request):
 
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
     
-    if f_institution_name:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_study_description:
-        e = e.filter(study_description__icontains = f_study_description)
-    if f_manufacturer:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        e = e.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        e = e.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        e = e.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    if query_filters['institution_name']:
+        e = e.filter(general_equipment_module_attributes__institution_name__icontains = query_filters['institution_name'])
+    if query_filters['study_description']:
+        e = e.filter(study_description__icontains = query_filters['study_description'])
+    if query_filters['manufacturer']:
+        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = query_filters['manufacturer'])
+    if query_filters['manufacturer_model_name']:
+        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = query_filters['manufacturer_model_name'])
+    if query_filters['station_name']:
+        e = e.filter(general_equipment_module_attributes__station_name__icontains = query_filters['station_name'])
+    if query_filters['accession_number']:
+        e = e.filter(accession_number__icontains = query_filters['accession_number'])
+    if query_filters['date_after']:
+        e = e.filter(study_date__gte = query_filters['date_after'])
+    if query_filters['date_before']:
+        e = e.filter(study_date__lte = query_filters['date_before'])
+    if query_filters['age_min']:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = query_filters['age_min'])
+    if query_filters['age_max']:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = query_filters['age_max'])
 
 
         
@@ -443,3 +429,34 @@ def exportMG2excel(request):
                 exp.comment,
                 ])
     return response
+
+
+def getQueryFilters(request):
+    from django.template import RequestContext
+
+    query_filters = {
+        'institution_name'        : request.GET.get('general_equipment_module_attributes__institution_name'),
+        'date_after'              : request.GET.get('date_after'),
+        'date_before'             : request.GET.get('date_before'),
+        'study_description'       : request.GET.get('study_description'),
+        'age_min'                 : request.GET.get('patient_age_min'),
+        'age_max'                 : request.GET.get('patient_age_max'),
+        'manufacturer'            : request.GET.get('general_equipment_module_attributes__manufacturer'),
+        'manufacturer_model_name' : request.GET.get('general_equipment_module_attributes__manufacturer_model_name'),
+        'station_name'            : request.GET.get('general_equipment_module_attributes__station_name'),
+        'accession_number'        : request.GET.get('accession_number'),
+    }
+    return query_filters
+
+
+@csrf_exempt
+def do_CT_csv(request):
+    from django.http import HttpResponse
+    
+    query_filters = getQueryFilters(request)
+    from remapp.exports.exportcsv import exportCT2excel
+    job = exportCT2excel.delay(query_filters)
+    data = job.id
+    json_data = json.dumps(data)
+    return HttpResponse(json_data, mimetype='application/json')
+
