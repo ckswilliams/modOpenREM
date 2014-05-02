@@ -142,6 +142,8 @@ from celery import shared_task
 import json
 from django.views.decorators.csrf import csrf_exempt
 
+
+
 @shared_task
 def exportCT2excel(query_filters):
     """Export filtered CT database data to a single-sheet CSV file.
@@ -154,15 +156,20 @@ def exportCT2excel(query_filters):
     from django.http import HttpResponse
     from django.shortcuts import render
     from django.shortcuts import render_to_response
+    from django.conf import settings
     from remapp.models import General_study_module_attributes
+    import os
+
 
 
     # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(content_type="text/csv")
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+#    response = HttpResponse(content_type="text/csv")
+#    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
 
+    csvfilename = "ctexport.csv"
+    csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
 
-    writer = csv.writer(response)
+    writer = csv.writer(csvfile)
     
     # Get the data!
     from remapp.models import General_study_module_attributes
@@ -297,7 +304,6 @@ def exportCT2excel(query_filters):
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-    return response
 
 def exportMG2excel(request):
     """Export filtered mammography database data to a single-sheet CSV file.
