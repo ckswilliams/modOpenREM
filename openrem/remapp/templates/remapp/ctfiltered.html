@@ -19,6 +19,10 @@
           <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
           <li><a href="/openrem/celery{{ request.get_full_path }}">Export to CSV using celery</a> </li>
         </ul>
+            <div id="action">
+   <button id="do-task">Click here!</button>
+  </div>
+
         {% else %}
         <p>
           Sorry, you don't have enough permissions to enable study export.
@@ -111,4 +115,24 @@ $('.datepicker').datepicker({
 
     {% paginate %}
 
+{% endblock %}
+
+{% block jsblock %}
+ <script type="text/javascript">
+  jQuery('#do-task').click( function() {
+   jQuery.ajax({
+    url: "do_ct_csv",
+    data: {},
+    success: function(){
+     jQuery.ajax({
+      url: "",
+      context: document.body,
+      success: function(s, x) {
+       jQuery(this).html(s);
+      }
+     });
+    }
+   })
+  });
+ </script>
 {% endblock %}
