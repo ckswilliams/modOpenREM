@@ -68,7 +68,7 @@ urlpatterns += patterns('remapp.exports.exportcsv',
     url(r'^export/openrem/rf/', 'exportFL2excel'),
     url(r'^export/openrem/ct/', 'exportCT2excel'),
     url(r'^export/openrem/mg/', 'exportMG2excel'),
-    url(r'^celery/openrem/ct/', 'do_CT_csv'),
+    url(r'^ct/do_ct_csv$', 'do_CT_csv', name="do_CT_csv"),
 )
 
 urlpatterns += patterns('remapp.exports',
