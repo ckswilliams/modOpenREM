@@ -465,6 +465,7 @@ def do_CT_csv(request):
     query_filters = getQueryFilters(request)
     from remapp.exports.exportcsv import exportCT2excel
     job = exportCT2excel.delay(query_filters)
+    request.session['task_id'] = job.id
     data = job.id
     json_data = json.dumps(data)
     return HttpResponse(json_data, content_type='application/json')
