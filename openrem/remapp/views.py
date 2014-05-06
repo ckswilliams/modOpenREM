@@ -37,7 +37,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.utils import simplejson as json
+import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from remapp.models import General_study_module_attributes
