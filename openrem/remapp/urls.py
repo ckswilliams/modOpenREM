@@ -54,6 +54,10 @@ urlpatterns = patterns('remapp.views',
             model=General_study_module_attributes,
             template_name='remapp/ctdetail.html'))),
 
+    url(r'^ct$',
+        'ct_summary_list_filter'),
+
+
     url(r'^mg/$',
         'mg_summary_list_filter'),
     url(r'^mg/(?P<pk>\d+)/$',
@@ -69,6 +73,7 @@ urlpatterns += patterns('remapp.exports',
     url(r'^export/openrem/ct/', 'exportcsv.exportCT2excel'),
     url(r'^export/openrem/mg/', 'exportcsv.exportMG2excel'),
     url(r'^ct/do_ct_csv$', 'ajaxviews.do_CT_csv', name="do_CT_csv"),
+    url(r'^do_ct_csv$', 'ajaxviews.do_CT_csv', name="do_CT_csv"),
     url(r'^ct/poll_state$', 'ajaxviews.poll_state'),
 )
 
