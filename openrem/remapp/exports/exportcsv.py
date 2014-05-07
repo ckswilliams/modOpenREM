@@ -139,8 +139,6 @@ def exportFL2excel(request):
     return response
 
 from celery import shared_task, current_task
-import json
-from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -458,15 +456,4 @@ def getQueryFilters(request):
     return query_filters
 
 
-@csrf_exempt
-def do_CT_csv(request):
-    from django.http import HttpResponse
-    
-    query_filters = getQueryFilters(request)
-    from remapp.exports.exportcsv import exportCT2excel
-    job = exportCT2excel.delay(query_filters)
-    request.session['task_id'] = job.id
-    data = job.id
-    json_data = json.dumps(data)
-    return HttpResponse(json_data, content_type='application/json')
 
