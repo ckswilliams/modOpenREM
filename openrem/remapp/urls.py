@@ -75,6 +75,7 @@ urlpatterns += patterns('remapp.exports',
     url(r'^ct/do_ct_csv$', 'ajaxviews.do_CT_csv', name="do_CT_csv"),
     url(r'^do_ct_csv$', 'ajaxviews.do_CT_csv', name="do_CT_csv"),
     url(r'^ct/poll_state$', 'ajaxviews.poll_state'),
+    url(r'^ct/csv_export_task$', 'ajaxviews.ct_csv'),
 )
 
 urlpatterns += patterns('remapp.exports',
