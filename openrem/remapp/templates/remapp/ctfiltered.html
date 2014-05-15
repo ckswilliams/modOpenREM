@@ -20,7 +20,7 @@
           <li><a href="/openrem/celery{{ request.get_full_path }}">Export to CSV using celery</a> </li>
         </ul>
         <div id="action">
-            <button id="do-task">Click here!</button>
+            <button id="do-csv-export">Click here!</button>
         </div>
 
   <div class="progress_container">
@@ -88,6 +88,17 @@ $('.datepicker').datepicker({
     todayHighlight: true
     });
 </script>
+
+<div>
+    <ul>
+        {% for field in filter.form %}
+        <li>{{ field.id }} : {{ field.value }}</li>
+        {% endfor %}
+    </ul>
+    <ul>
+        {{ filter.qs }}
+    </ul>
+</div>
     
 {% endblock %}
 
@@ -182,4 +193,23 @@ $('.datepicker').datepicker({
    })
   });
  </script>
+
+ <script type="text/javascript">
+    var filters = {"qfilters":"{{ request.GET.urlencode }}"};
+    var stringFilters = JSON.stringify(filters);
+    jQuery('#do-csv-export').click( function() {
+        jQuery.ajax({
+            url: "ct/csv_export_task",
+            data: stringFilters,
+            type: "POST",
+            dataType: "json",
+            success: function( json ) {
+                jQuery('.status').html(task);
+            },
+        })
+    })
+ </script>
+
+ 
+ 
 {% endblock %}
