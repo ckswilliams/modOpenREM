@@ -6,11 +6,18 @@ from django.http import HttpResponse
 def ct_csv(request):
     from remapp.exports.exportcsv import exportCT2excel
     from remapp.exports.exportcsv import getQueryFilters
+    from django.template import RequestContext
+    from urlparse import parse_qs
+    
+    print "Request body json.loads:"
+    postdata = json.loads(request.body)
+    queryfilters = parse_qs(postdata['qfilters'], keep_blank_values=True)
+    print queryfilters
+    print "Done"
     
     data = 'Fail'
     if request.is_ajax():
-        query_filters = getQueryFilters(request)
-        job = exportCT2excel.delay(query_filters)
+        job = exportCT2excel.delay(queryfilters)
         request.session['task_id'] = job.id
         data = job.id
     else:
