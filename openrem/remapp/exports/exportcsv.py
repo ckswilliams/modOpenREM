@@ -170,6 +170,7 @@ def exportCT2excel(query_filters):
     writer = csv.writer(csvfile)
     
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV file created'})
+    print "CSV file created"
     
     # Get the data!
     from remapp.models import General_study_module_attributes
@@ -198,7 +199,7 @@ def exportCT2excel(query_filters):
         e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = query_filters['patient_age_max'][0])
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
-
+    print "Studies filtered"
         
     numresults = e.count()
 
@@ -252,8 +253,9 @@ def exportCT2excel(query_filters):
     writer.writerow(headers)
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV header row written.'})
+    print "Header row written"
 
-    for exams in e:
+    for i, exams in enumerate(e):
         examdata = [
 			exams.general_equipment_module_attributes_set.get().institution_name,
 			exams.general_equipment_module_attributes_set.get().manufacturer,
@@ -311,7 +313,10 @@ def exportCT2excel(query_filters):
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-        current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
+        print "{0} of {1}".format(i+1, numresults)
+        current_task.update_state(state='PROGRESS', meta={'statupdate': "{0} of {1}".format(i+1, numresults)})
+    current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
+    print "All done"    
 
 def exportMG2excel(request):
     """Export filtered mammography database data to a single-sheet CSV file.
