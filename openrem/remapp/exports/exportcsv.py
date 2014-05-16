@@ -176,26 +176,26 @@ def exportCT2excel(query_filters):
 
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
     
-    if query_filters['institution_name']:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = query_filters['institution_name'])
-    if query_filters['study_description']:
-        e = e.filter(study_description__icontains = query_filters['study_description'])
-    if query_filters['manufacturer']:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = query_filters['manufacturer'])
-    if query_filters['manufacturer_model_name']:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = query_filters['manufacturer_model_name'])
-    if query_filters['station_name']:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = query_filters['station_name'])
-    if query_filters['accession_number']:
-        e = e.filter(accession_number__icontains = query_filters['accession_number'])
-    if query_filters['date_after']:
-        e = e.filter(study_date__gte = query_filters['date_after'])
-    if query_filters['date_before']:
-        e = e.filter(study_date__lte = query_filters['date_before'])
-    if query_filters['age_min']:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = query_filters['age_min'])
-    if query_filters['age_max']:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = query_filters['age_max'])
+    if query_filters['general_equipment_module_attributes__institution_name'][0]:
+        e = e.filter(general_equipment_module_attributes__institution_name__icontains = query_filters['general_equipment_module_attributes__institution_name'][0])
+    if query_filters['study_description'][0]:
+        e = e.filter(study_description__icontains = query_filters['study_description'][0])
+    if query_filters['general_equipment_module_attributes__manufacturer'][0]:
+        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = query_filters['general_equipment_module_attributes__manufacturer'][0])
+    if query_filters['general_equipment_module_attributes__manufacturer_model_name'][0]:
+        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = query_filters['general_equipment_module_attributes__manufacturer_model_name'][0])
+    if query_filters['general_equipment_module_attributes__station_name'][0]:
+        e = e.filter(general_equipment_module_attributes__station_name__icontains = query_filters['general_equipment_module_attributes__station_name'][0])
+    if query_filters['accession_number'][0]:
+        e = e.filter(accession_number__icontains = query_filters['accession_number'][0])
+    if query_filters['date_after'][0]:
+        e = e.filter(study_date__gte = query_filters['date_after'][0])
+    if query_filters['date_before'][0]:
+        e = e.filter(study_date__lte = query_filters['date_before'][0])
+    if query_filters['patient_age_min'][0]:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = query_filters['patient_age_min'][0])
+    if query_filters['patient_age_max'][0]:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = query_filters['patient_age_max'][0])
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
 
