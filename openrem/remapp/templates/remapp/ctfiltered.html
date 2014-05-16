@@ -89,17 +89,6 @@ $('.datepicker').datepicker({
     });
 </script>
 
-<div>
-    <ul>
-        {% for field in filter.form %}
-        <li>{{ field.id }} : {{ field.value }}</li>
-        {% endfor %}
-    </ul>
-    <ul>
-        {{ filter.qs }}
-    </ul>
-</div>
-    
 {% endblock %}
 
 {% block col1 %}
