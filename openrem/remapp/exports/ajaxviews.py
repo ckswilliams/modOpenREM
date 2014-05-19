@@ -6,7 +6,6 @@ from django.http import HttpResponse
 def ct_csv(request):
     from remapp.exports.exportcsv import exportCT2excel
     from remapp.exports.exportcsv import getQueryFilters
-    from django.template import RequestContext
     from urlparse import parse_qs
     
     postdata = json.loads(request.body)
