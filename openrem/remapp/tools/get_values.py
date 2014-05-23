@@ -96,10 +96,11 @@ def get_or_create_cid(codevalue, codemeaning):
     :returns:           Content_item_descriptions entry for code value passed
     """
     from remapp.models import Content_item_descriptions
-    if not Content_item_descriptions.objects.all().filter(code_value=codevalue).exists():
-        cid = Content_item_descriptions(
-            code_value = codevalue,
-            code_meaning = codemeaning,
-            )
-        cid.save()
-    return Content_item_descriptions.objects.get(code_value=codevalue)
+    if codevalue:
+        if not Content_item_descriptions.objects.all().filter(code_value=codevalue).exists():
+            cid = Content_item_descriptions(
+                code_value = codevalue,
+                code_meaning = codemeaning,
+                )
+            cid.save()
+        return Content_item_descriptions.objects.get(code_value=codevalue)
