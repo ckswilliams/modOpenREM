@@ -3,6 +3,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 @csrf_exempt
+def export_ct_csv(request):
+    from django.template import RequestContext  
+    from django.shortcuts import render_to_response
+
+    print request.session.keys()
+
+    if 'task_id' in request.session.keys() and request.session['task_id']:
+        task_id = request.session['task_id']
+    return render_to_response('remapp/exports.html', locals(), context_instance=RequestContext(request))
+
+@csrf_exempt
 def ct_csv(request):
     from remapp.exports.exportcsv import exportCT2excel
     from remapp.exports.exportcsv import getQueryFilters
