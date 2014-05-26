@@ -71,7 +71,7 @@
     var stringFilters = JSON.stringify(filters);
     jQuery('#do-csv-export').click( function() {
         jQuery.ajax({
-            url: "ct/csv_export_task",
+            url: "/openrem/ct/csv_export_task",
             data: stringFilters,
             type: "POST",
             dataType: "json",
