@@ -46,7 +46,7 @@ def poll_state(request):
             task = AsyncResult(task_id)
             data = task.result or task.state
         else:
-            data = request
+            data = 'No task_id in the request'
     else:
         data = 'This is not an ajax request'
 

@@ -20,6 +20,8 @@
    <div class="current-task">
     <h4> Task ID: {{ task_id }} </h4>
    </div>
+   <div class="statupdate"></div>
+
    
    <div class="status"></div>
    {% if task_id %}
@@ -46,6 +48,8 @@
      data: "task_id=" + task_id,
     }).done(function(task){
      console.log(task);
+     jQuery('.statupdate').html(task.statupdate);
+      jQuery('.status').html(task);
      if (task.process_percent) {
       jQuery('.bar').css({'width': task.process_percent + '%'});
       jQuery('.bar').html(task.process_percent + '%')
