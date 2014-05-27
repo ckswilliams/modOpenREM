@@ -24,11 +24,6 @@
 
    
    <div class="status"></div>
-   {% if task_id %}
-   <div class="progress">
-    <div class="bar"></div>
-   </div>
-   {% endif %}
   </div>
 
 {% endblock %}	
@@ -48,14 +43,8 @@
      data: "task_id=" + task_id,
     }).done(function(task){
      console.log(task);
-     jQuery('.statupdate').html(task.statupdate);
-      jQuery('.status').html(task);
-     if (task.process_percent) {
-      jQuery('.bar').css({'width': task.process_percent + '%'});
-      jQuery('.bar').html(task.process_percent + '%')
-     } else {
-      jQuery('.status').html(task);
-     };
+     jQuery('.statupdate').html('statupdate: ' + task.statupdate);
+     jQuery('.status').html('task' + task);
      
      // create the infinite loop of Ajax calls to check the state
      // of the current task

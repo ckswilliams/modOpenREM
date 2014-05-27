@@ -74,7 +74,7 @@ urlpatterns += patterns('remapp.exports',
     url(r'^export/openrem/mg/', 'exportcsv.exportMG2excel'),
     url(r'^ct/do_ct_csv$', 'ajaxviews.ct_csv', name="ct_csv"),
     url(r'^do_ct_csv$', 'ajaxviews.ct_csv', name="ct_csv"),
-    url(r'^ct/poll_state$', 'ajaxviews.poll_state'),
+    url(r'^exportct/poll_state$', 'ajaxviews.poll_state'),
     url(r'^ct/csv_export_task$', 'ajaxviews.ct_csv'),
     url(r'^exportct/', 'ajaxviews.export_ct_csv'),
 )
