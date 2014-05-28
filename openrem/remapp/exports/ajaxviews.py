@@ -44,7 +44,8 @@ def poll_state(request):
         if 'task_id' in request.POST.keys() and request.POST['task_id']:
             task_id = request.POST['task_id']
             task = AsyncResult(task_id)
-            data = task.result or task.state
+#            data = task.result or task.state
+            data = task.result
         else:
             data = 'No task_id in the request'
     else:

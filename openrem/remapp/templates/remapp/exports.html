@@ -44,7 +44,7 @@
     }).done(function(task){
      console.log(task);
      jQuery('.statupdate').html('statupdate: ' + task.statupdate);
-     jQuery('.status').html('task' + task);
+     jQuery('.status').html('task: ' + task);
      
      if (task != 'SUCCESS') {
         PollState(task_id);
