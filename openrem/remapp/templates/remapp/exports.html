@@ -21,9 +21,8 @@
     <h4> Task ID: {{ task_id }} </h4>
    </div>
    <div class="statupdate"></div>
-
-   
    <div class="status"></div>
+   <div class="filename"></div> 
   </div>
 
 {% endblock %}	
@@ -45,6 +44,7 @@
      console.log(task);
      jQuery('.statupdate').html('statupdate: ' + task.statupdate);
      jQuery('.status').html('task: ' + task);
+     jQuery('.filename').html('filename: ' + task.filename);
      
      if (task != 'SUCCESS') {
         PollState(task_id);
