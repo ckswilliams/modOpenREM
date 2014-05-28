@@ -46,9 +46,9 @@
      jQuery('.statupdate').html('statupdate: ' + task.statupdate);
      jQuery('.status').html('task' + task);
      
-     // create the infinite loop of Ajax calls to check the state
-     // of the current task
-     PollState(task_id);
+     if (task != 'SUCCESS') {
+        PollState(task_id);
+     };
     });
    }
    
