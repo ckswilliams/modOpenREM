@@ -27,10 +27,11 @@
 
     <table class="table table-striped">
         <th>Task ID</th><th>Status</th><th>Download</th>
-        {% for tsk in exptsk %}
+        {% for tsk in exptsks %}
         <tr>
-            <td>tsk.task_id</td>
-            <td>tsk.status</td>
+            <td>{{ tsk.task_id }}</td>
+            <td>{{ tsk.status }}</td>
+            <td><a href="{{ MEDIA_URL }}{{ tsk.filename }}">{{ tsk.filename }}</a></td>
         </tr>
         {% endfor %}
 
