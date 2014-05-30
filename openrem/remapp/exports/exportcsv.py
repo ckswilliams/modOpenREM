@@ -156,10 +156,16 @@ def exportCT2excel(query_filters):
     from django.shortcuts import render_to_response
     from django.conf import settings
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
     import os
     import datetime
 
+    tsk = Exports.objects.create()
+
+    tsk.task_id = exportCT2excel.request.id
+    tsk.status = 'Query filters imported, task started'
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started'})
+    tsk.save()
 
     # Create the HttpResponse object with the appropriate CSV header.
 #    response = HttpResponse(content_type="text/csv")
@@ -168,7 +174,9 @@ def exportCT2excel(query_filters):
     csvfilename = "ctexport{0}.csv".format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f"))
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started', 'filename': csvfilename})
     csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
-
+    tsk.filename = csvfilename
+    tsk.save()
+    
     writer = csv.writer(csvfile)
     
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV file created'})
