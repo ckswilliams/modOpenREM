@@ -25,6 +25,17 @@
    <div class="filename"></div> 
   </div>
 
+    <table class="table table-striped">
+        <th>Task ID</th><th>Status</th><th>Download</th>
+        {% for tsk in exptsk %}
+        <tr>
+            <td>tsk.task_id</td>
+            <td>tsk.status</td>
+        </tr>
+        {% endfor %}
+
+
+
 {% endblock %}	
 
 {% block jsblock %}

@@ -6,6 +6,9 @@ from django.http import HttpResponse
 def export_ct_csv(request):
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
+    from remapp.models import Exports
+    
+    exptsks = Exports.objects.all()
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']
