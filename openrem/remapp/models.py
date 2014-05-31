@@ -39,6 +39,10 @@ class Exports(models.Model):
     task_id = models.TextField()
     filename = models.TextField(blank=True, null=True)
     status = models.TextField(blank=True, null=True)
+    modality = models.CharField(max_length=8, blank=True, null=True)
+    num_records = models.IntegerField(blank=True, null=True)
+    export_type = models.TextField(blank=True, null=True)
+    export_date = models.DateTimeField(blank=True, null=True)
 
 class Content_item_descriptions(models.Model):
     """Table to hold all the context ID code values and code meanings.

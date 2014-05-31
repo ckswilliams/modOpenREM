@@ -163,15 +163,15 @@ def exportCT2excel(query_filters):
     tsk = Exports.objects.create()
 
     tsk.task_id = exportCT2excel.request.id
+    tsk.modality = "CT"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
     tsk.status = 'Query filters imported, task started'
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started'})
     tsk.save()
 
-    # Create the HttpResponse object with the appropriate CSV header.
-#    response = HttpResponse(content_type="text/csv")
-#    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
-
-    csvfilename = "ctexport{0}.csv".format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started', 'filename': csvfilename})
     tsk.status = 'Query filters imported, task started'
     csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
@@ -218,6 +218,7 @@ def exportCT2excel(query_filters):
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': '{0} studies in query.'.format(numresults)})
     tsk.status = '{0} studies in query.'.format(numresults)
+    tsk.num_records = numresults
     tsk.save()
 
 #    writer.writerow([f_institution_name,f_study_date_0,f_study_date_1,f_study_description,f_manufacturer,f_model,f_device_observer_name])
