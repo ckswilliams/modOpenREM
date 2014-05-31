@@ -55,3 +55,20 @@ def poll_state(request):
     json_data = json.dumps(data)
 
     return HttpResponse(json_data, content_type='application/json')
+
+
+def download(request, file_name):
+    from openrem.settings import MEDIA_ROOT
+    from django.core.servers.basehttp import FileWrapper
+    from django.utils.encoding import smart_str
+    import mimetypes
+    import os
+    
+    file_path = MEDIA_ROOT +'/'+ file_name
+    file_wrapper = FileWrapper(file(file_path,'rb'))
+    file_mimetype = mimetypes.guess_type(file_path)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype )
+    response['X-Sendfile'] = file_path
+    response['Content-Length'] = os.stat(file_path).st_size
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file_name) 
+    return response
