@@ -173,6 +173,7 @@ def exportCT2excel(query_filters):
 
     csvfilename = "ctexport{0}.csv".format(datetime.datetime.now().strftime("%Y%m%d-%H%M%S%f"))
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started', 'filename': csvfilename})
+    tsk.status = 'Query filters imported, task started'
     csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
     tsk.filename = csvfilename
     tsk.save()
@@ -180,8 +181,9 @@ def exportCT2excel(query_filters):
     writer = csv.writer(csvfile)
     
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV file created'})
-    print "CSV file created"
-    
+    tsk.status = 'CSV file created'
+    tsk.save()
+        
     # Get the data!
     from remapp.models import General_study_module_attributes
 
@@ -209,11 +211,14 @@ def exportCT2excel(query_filters):
         e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = query_filters['patient_age_max'][0])
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
-    print "Studies filtered"
+    tsk.status = 'Required study filter complete.'
+    tsk.save()
         
     numresults = e.count()
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': '{0} studies in query.'.format(numresults)})
+    tsk.status = '{0} studies in query.'.format(numresults)
+    tsk.save()
 
 #    writer.writerow([f_institution_name,f_study_date_0,f_study_date_1,f_study_description,f_manufacturer,f_model,f_device_observer_name])
     headers = [
@@ -263,7 +268,8 @@ def exportCT2excel(query_filters):
     writer.writerow(headers)
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV header row written.'})
-    print "Header row written"
+    tsk.status = 'CSV header row written.'
+    tsk.save()
 
     for i, exams in enumerate(e):
         examdata = [
@@ -323,10 +329,12 @@ def exportCT2excel(query_filters):
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-        print "{0} of {1}".format(i+1, numresults)
         current_task.update_state(state='PROGRESS', meta={'statupdate': "{0} of {1}".format(i+1, numresults)})
+        tsk.status = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
-    print "All done"    
+    tsk.status = 'All study data written.'
+    tsk.save()
 
 def exportMG2excel(request):
     """Export filtered mammography database data to a single-sheet CSV file.
