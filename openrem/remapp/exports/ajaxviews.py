@@ -7,8 +7,9 @@ def export_ct_csv(request):
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
     from remapp.models import Exports
+    from remapp.exports.exportcsv import exportCT2excel
     
-    job = exportCT2excel.delay(request)
+    job = exportCT2excel.delay(request.GET)
     request.session['task_id'] = job.id
     data = job.id    
     

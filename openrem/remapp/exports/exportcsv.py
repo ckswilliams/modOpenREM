@@ -143,7 +143,7 @@ from celery import shared_task, current_task
 
 
 @shared_task
-def exportCT2excel(request):
+def exportCT2excel(filterdict):
     """Export filtered CT database data to a single-sheet CSV file.
 
     :param request: Query parameters from the CT filtered page URL.
@@ -185,16 +185,16 @@ def exportCT2excel(request):
     tsk.save()
         
     # Get the database query filters
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_study_description = request.GET.get('study_description')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
+    f_institution_name = filterdict['general_equipment_module_attributes__institution_name']
+    f_date_after = filterdict['date_after']
+    f_date_before = filterdict['date_before']
+    f_study_description = filterdict['study_description']
+    f_age_min = filterdict['patient_age_min']
+    f_age_max = filterdict['patient_age_max']
+    f_manufacturer = filterdict['general_equipment_module_attributes__manufacturer']
+    f_manufacturer_model_name = filterdict['general_equipment_module_attributes__manufacturer_model_name']
+    f_station_name = filterdict['general_equipment_module_attributes__station_name']
+    f_accession_number = filterdict['accession_number']
 
     # Get the data!
     from remapp.models import General_study_module_attributes
