@@ -8,6 +8,10 @@ def export_ct_csv(request):
     from django.shortcuts import render_to_response
     from remapp.models import Exports
     
+    job = exportCT2excel.delay(request)
+    request.session['task_id'] = job.id
+    data = job.id    
+    
     exptsks = Exports.objects.all()
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
