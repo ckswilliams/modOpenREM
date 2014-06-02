@@ -3,28 +3,23 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 @csrf_exempt
+def ctcsv1(request):
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportCT2excel
+    
+    job = exportCT2excel.delay(request.GET)
+    request.session['task_id'] = job.id
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
 def export(request):
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
     from remapp.models import Exports
     from remapp.exports.exportcsv import exportCT2excel
-    
-    modality = request.GET.get('mod')
-    export_id = request.GET.get('export_id')
-    
-    if modality == 'ct':
-        if export_id == 'csv1':
-            job = exportCT2excel.delay(request.GET)
-            request.session['task_id'] = job.id
 
-        req = request.GET.copy()
-        del req['mod']
-        del req['export_id']
-        req.urlencode()
-
-    
     exptsks = Exports.objects.all()
-    
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']
