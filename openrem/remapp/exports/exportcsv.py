@@ -184,43 +184,31 @@ def exportCT2excel(filterdict):
     tsk.status = 'CSV file created'
     tsk.save()
         
-    # Get the database query filters
-    f_institution_name = filterdict['general_equipment_module_attributes__institution_name']
-    f_date_after = filterdict['date_after']
-    f_date_before = filterdict['date_before']
-    f_study_description = filterdict['study_description']
-    f_age_min = filterdict['patient_age_min']
-    f_age_max = filterdict['patient_age_max']
-    f_manufacturer = filterdict['general_equipment_module_attributes__manufacturer']
-    f_manufacturer_model_name = filterdict['general_equipment_module_attributes__manufacturer_model_name']
-    f_station_name = filterdict['general_equipment_module_attributes__station_name']
-    f_accession_number = filterdict['accession_number']
-
     # Get the data!
     from remapp.models import General_study_module_attributes
 
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
     
-    if f_institution_name:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_study_description:
-        e = e.filter(study_description__icontains = f_study_description)
-    if f_manufacturer:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        e = e.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        e = e.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        e = e.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    if 'institution_name' in filterdict and filterdict['institution_name']:
+        e = e.filter(general_equipment_module_attributes__institution_name__icontains = filterdict['institution_name'])
+    if 'study_description' in filterdict and filterdict['study_description']:
+        e = e.filter(study_description__icontains = filterdict['study_description'])
+    if 'manufacturer' in filterdict and filterdict['manufacturer']:
+        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = filterdict['manufacturer'])
+    if 'model_name' in filterdict and filterdict['model_name']:
+        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = filterdict['model_name'])
+    if 'station_name' in filterdict and filterdict['station_name']:
+        e = e.filter(general_equipment_module_attributes__station_name__icontains = filterdict['station_name'])
+    if 'accession_number' in filterdict and filterdict['accession_number']:
+        e = e.filter(accession_number__icontains = filterdict['accession_number'])
+    if 'date_after' in filterdict and filterdict['date_after']:
+        e = e.filter(study_date__gte = filterdict['date_after'])
+    if 'date_before' in filterdict and filterdict['date_before']:
+        e = e.filter(study_date__lte = filterdict['date_before'])
+    if 'patient_age_min' in filterdict and filterdict['patient_age_min']:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = filterdict['patient_age_min'])
+    if 'patient_age_max' in filterdict and filterdict['patient_age_max']:
+        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = filterdict['patient_age_max'])
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
     tsk.status = 'Required study filter complete.'
