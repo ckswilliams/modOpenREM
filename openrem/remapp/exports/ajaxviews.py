@@ -18,7 +18,7 @@ def export(request):
     from remapp.models import Exports
     from remapp.exports.exportcsv import exportCT2excel
 
-    exptsks = Exports.objects.all()
+    exptsks = Exports.objects.all().order_by('-export_date')
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']
