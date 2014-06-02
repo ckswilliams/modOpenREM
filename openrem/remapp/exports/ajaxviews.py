@@ -11,7 +11,6 @@ def export_ct_csv(request):
     
     job = exportCT2excel.delay(request.GET)
     request.session['task_id'] = job.id
-    data = job.id    
     
     exptsks = Exports.objects.all()
 
