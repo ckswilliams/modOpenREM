@@ -6,9 +6,8 @@ from django.http import HttpResponse
 def ctcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportCT2excel
-    
+
     job = exportCT2excel.delay(request.GET)
-    request.session['task_id'] = job.id
     
     return redirect('/openrem/export/')
 
