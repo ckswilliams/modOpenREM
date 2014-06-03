@@ -138,7 +138,7 @@ def exportFL2excel(request):
             ])
     return response
 
-from celery import shared_task, current_task
+from celery import shared_task
 
 
 
@@ -169,11 +169,9 @@ def exportCT2excel(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started'})
     tsk.save()
 
     csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started', 'filename': csvfilename})
     tsk.progress = 'Query filters imported, task started'
     csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
     tsk.filename = csvfilename
@@ -181,7 +179,6 @@ def exportCT2excel(filterdict):
     
     writer = csv.writer(csvfile)
     
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV file created'})
     tsk.progress = 'CSV file created'
     tsk.save()
         
@@ -196,18 +193,15 @@ def exportCT2excel(filterdict):
         if filt in filterdict and filterdict[filt]:
             e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
     
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
     numresults = e.count()
 
-    current_task.update_state(state='PROGRESS', meta={'statupdate': '{0} studies in query.'.format(numresults)})
     tsk.progress = '{0} studies in query.'.format(numresults)
     tsk.num_records = numresults
     tsk.save()
 
-#    writer.writerow([f_institution_name,f_study_date_0,f_study_date_1,f_study_description,f_manufacturer,f_model,f_device_observer_name])
     headers = [
         'Institution name', 
         'Manufacturer', 
@@ -254,7 +248,6 @@ def exportCT2excel(filterdict):
             ]
     writer.writerow(headers)
 
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV header row written.'})
     tsk.progress = 'CSV header row written.'
     tsk.save()
 
@@ -316,10 +309,8 @@ def exportCT2excel(filterdict):
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-        current_task.update_state(state='PROGRESS', meta={'statupdate': "{0} of {1}".format(i+1, numresults)})
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
     tsk.save()
