@@ -167,13 +167,13 @@ def exportCT2excel(filterdict):
     tsk.export_type = "CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.status = 'Query filters imported, task started'
+    tsk.progress = 'Query filters imported, task started'
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started'})
     tsk.save()
 
     csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started', 'filename': csvfilename})
-    tsk.status = 'Query filters imported, task started'
+    tsk.progress = 'Query filters imported, task started'
     csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
     tsk.filename = csvfilename
     tsk.save()
@@ -181,7 +181,7 @@ def exportCT2excel(filterdict):
     writer = csv.writer(csvfile)
     
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV file created'})
-    tsk.status = 'CSV file created'
+    tsk.progress = 'CSV file created'
     tsk.save()
         
     # Get the data!
@@ -211,13 +211,13 @@ def exportCT2excel(filterdict):
         e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = filterdict['patient_age_max'])
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
-    tsk.status = 'Required study filter complete.'
+    tsk.progress = 'Required study filter complete.'
     tsk.save()
         
     numresults = e.count()
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': '{0} studies in query.'.format(numresults)})
-    tsk.status = '{0} studies in query.'.format(numresults)
+    tsk.progress = '{0} studies in query.'.format(numresults)
     tsk.num_records = numresults
     tsk.save()
 
@@ -269,7 +269,7 @@ def exportCT2excel(filterdict):
     writer.writerow(headers)
 
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV header row written.'})
-    tsk.status = 'CSV header row written.'
+    tsk.progress = 'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
@@ -331,10 +331,10 @@ def exportCT2excel(filterdict):
 
         writer.writerow(examdata)
         current_task.update_state(state='PROGRESS', meta={'statupdate': "{0} of {1}".format(i+1, numresults)})
-        tsk.status = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
-    tsk.status = 'All study data written.'
+    tsk.progress = 'All study data written.'
     tsk.save()
 
 def exportMG2excel(request):

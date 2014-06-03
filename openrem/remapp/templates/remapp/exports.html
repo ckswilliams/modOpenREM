@@ -27,7 +27,7 @@
   </div>
 
     <table class="table table-striped">
-        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Status</th><th>Download</th>
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th><th>Download</th>
         {% for tsk in exptsks %}
         <tr>
             <td>{{ tsk.task_id }}</td>
@@ -35,7 +35,7 @@
             <td>{{ tsk.modality }}</td>
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
-            <td>{{ tsk.status }}</td>
+            <td>{{ tsk.progress }}</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
         </tr>
         {% endfor %}
