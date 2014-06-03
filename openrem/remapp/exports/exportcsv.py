@@ -168,6 +168,7 @@ def exportCT2excel(filterdict):
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started'})
     tsk.save()
 
@@ -335,6 +336,7 @@ def exportCT2excel(filterdict):
         tsk.save()
     current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
     tsk.progress = 'All study data written.'
+    tsk.status = 'COMPLETE'
     tsk.save()
 
 def exportMG2excel(request):

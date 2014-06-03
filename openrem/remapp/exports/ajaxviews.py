@@ -19,6 +19,9 @@ def export(request):
     from remapp.exports.exportcsv import exportCT2excel
 
     exptsks = Exports.objects.all().order_by('-export_date')
+    
+    current = exptsks.filter(status__contains = 'CURRENT')
+    complete = exptsks.filter(status__contains = 'COMPLETE')
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']

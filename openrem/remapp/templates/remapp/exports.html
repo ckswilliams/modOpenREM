@@ -9,26 +9,13 @@
 
 
 {% block mainblock %}		
-
-        <div id="action">
-            <button id="do-csv-export">Click here!</button>
-        </div>
-
-
-  <div class="progress_container">
-   
    {% load humanize %}
-   <div class="current-task">
-    <h4> Task ID: {{ task_id }} </h4>
-   </div>
-   <div class="statupdate"></div>
-   <div class="status"></div>
-   <div class="filename"></div> 
-  </div>
-
+    
+    {% if current %}
+    <h4>Export tasks in progress</h4>
     <table class="table table-striped">
-        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th><th>Download</th>
-        {% for tsk in exptsks %}
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th>
+        {% for tsk in current %}
         <tr>
             <td>{{ tsk.task_id }}</td>
             <td>{{ tsk.export_date|naturaltime }}</td>
@@ -36,11 +23,25 @@
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
             <td>{{ tsk.progress }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <h4>Completed export tasks</h4>
+    <table class="table table-striped">
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th>
+        {% for tsk in complete %}
+        <tr>
+            <td>{{ tsk.task_id }}</td>
+            <td>{{ tsk.export_date|naturaltime }}</td>
+            <td>{{ tsk.modality }}</td>
+            <td>{{ tsk.export_type }}</td>
+            <td>{{ tsk.num_records }}</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
         </tr>
         {% endfor %}
     </table>
-
 
 
 {% endblock %}	
