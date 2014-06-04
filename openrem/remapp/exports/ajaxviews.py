@@ -21,6 +21,15 @@ def ctxlsx1(request):
     return redirect('/openrem/export/')
 
 @csrf_exempt
+def flcsv1(request):
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportFL2excel
+
+    job = exportFL2excel.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
 def export(request):
     from django.template import RequestContext  
     from django.shortcuts import render_to_response

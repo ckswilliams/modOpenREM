@@ -80,6 +80,7 @@ urlpatterns += patterns('remapp.exports',
     url(r'^download/(?P<file_name>.+)$', 'ajaxviews.download'),
     url(r'^exportctcsv1/$', 'ajaxviews.ctcsv1'),
     url(r'^exportctxlsx1/$', 'ajaxviews.ctxlsx1'),
+    url(r'^exportflcsv1/$', 'ajaxviews.flcsv1'),
 )
 
 urlpatterns += patterns('remapp.exports',

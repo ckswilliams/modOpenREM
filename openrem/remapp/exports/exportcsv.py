@@ -86,7 +86,6 @@ def exportFL2excel(filterdict):
     tsk.num_records = numresults
     tsk.save()
 
-    writer = csv.writer(response)
     writer.writerow([
         'Manufacturer', 
         'Model name',
@@ -109,7 +108,7 @@ def exportFL2excel(filterdict):
         'RP definition',
         'Physician',
         'Operator'])
-    for exams in e:
+    for i, exams in enumerate(e):
         writer.writerow([
             exams.general_equipment_module_attributes_set.get().manufacturer, 
             exams.projection_xray_radiation_dose_set.get().observer_context_set.get().device_observer_name,
@@ -137,12 +136,13 @@ def exportFL2excel(filterdict):
         tsk.save()
 
 
-    tsk.progress = 'Export complete.'
+    tsk.progress = 'All study data written.'
+    tsk.status = 'COMPLETE'
     tsk.save()
 
+
+
 from celery import shared_task
-
-
 
 @shared_task
 def exportCT2excel(filterdict):
