@@ -54,6 +54,10 @@ urlpatterns = patterns('remapp.views',
             model=General_study_module_attributes,
             template_name='remapp/ctdetail.html'))),
 
+    url(r'^ct$',
+        'ct_summary_list_filter'),
+
+
     url(r'^mg/$',
         'mg_summary_list_filter'),
     url(r'^mg/(?P<pk>\d+)/$',
@@ -64,18 +68,29 @@ urlpatterns = patterns('remapp.views',
     url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),
 )
 
-urlpatterns += patterns('remapp.exports.exportcsv',
-    url(r'^export/openrem/rf/',
-        'exportFL2excel'),
-
-    url(r'^export/openrem/ct/',
-        'exportCT2excel'),
-
-    url(r'^export/openrem/mg/',
-        'exportMG2excel'),
+urlpatterns += patterns('remapp.exports',
+#    url(r'^export/openrem/rf/', 'exportcsv.exportFL2excel'),
+#    url(r'^export/openrem/ct/', 'exportcsv.exportCT2excel'),
+#    url(r'^export/openrem/mg/', 'exportcsv.exportMG2excel'),
+    url(r'^ct/do_ct_csv$', 'ajaxviews.ct_csv', name="ct_csv"),
+    url(r'^do_ct_csv$', 'ajaxviews.ct_csv', name="ct_csv"),
+    url(r'^export/poll_state$', 'ajaxviews.poll_state'),
+    url(r'^ct/csv_export_task$', 'ajaxviews.ct_csv'),
+    url(r'^export/$', 'ajaxviews.export'),
+    url(r'^download/(?P<file_name>.+)$', 'ajaxviews.download'),
+    url(r'^exportctcsv1/$', 'ajaxviews.ctcsv1'),
+    url(r'^exportctxlsx1/$', 'ajaxviews.ctxlsx1'),
+    url(r'^exportflcsv1/$', 'ajaxviews.flcsv1'),
+    url(r'^exportmgcsv1/$', 'ajaxviews.mgcsv1'),
 )
 
 urlpatterns += patterns('remapp.exports',
     url(r'^xlsx/openrem/ct/',
         'xlsx.ctxlsx'),
+)
+
+urlpatterns += patterns('remapp.views',
+    url(r'^celerytest$', 'celerytest', name="celerytest"),
+    url(r'^do_task$', 'do_task', name="do_task"),
+    url(r'^poll_state$', 'poll_state', name="poll_state"),
 )

@@ -1,0 +1,61 @@
+{% extends "remapp/base.html" %}
+
+{% block headextras %}
+{% if current %}
+<meta http-equiv="refresh" content="1" />
+{% endif %}
+{% endblock %}
+
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+            <li class="active"><a href="/openrem/exports">Exports</a>
+{% endblock %}
+
+
+{% block mainblock %}		
+   {% load humanize %}
+    
+    {% if current %}
+    <h4>Export tasks in progress</h4>
+    <table class="table table-striped">
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th>
+        {% for tsk in current %}
+        <tr>
+            <td>{{ tsk.task_id }}</td>
+            <td>{{ tsk.export_date|naturaltime }}</td>
+            <td>{{ tsk.modality }}</td>
+            <td>{{ tsk.export_type }}</td>
+            <td>{{ tsk.num_records }}</td>
+            <td>{{ tsk.progress }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <h4>Completed export tasks</h4>
+    <table class="table table-striped">
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th>
+        {% for tsk in complete %}
+        <tr>
+            <td>{{ tsk.task_id }}</td>
+            <td>{{ tsk.export_date|naturaltime }}</td>
+            <td>{{ tsk.modality }}</td>
+            <td>{{ tsk.export_type }}</td>
+            <td>{{ tsk.num_records }}</td>
+            <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+{% endblock %}	
+
+{% block jsblock %}
+
+
+ 
+ 
+{% endblock %}

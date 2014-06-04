@@ -33,6 +33,18 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 from django.db import models
 
+class Exports(models.Model):
+    """Table to hold the export status and filenames
+    """
+    task_id = models.TextField()
+    filename = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
+    progress = models.TextField(blank=True, null=True)
+    modality = models.CharField(max_length=8, blank=True, null=True)
+    num_records = models.IntegerField(blank=True, null=True)
+    export_type = models.TextField(blank=True, null=True)
+    export_date = models.DateTimeField(blank=True, null=True)
+
 class Content_item_descriptions(models.Model):
     """Table to hold all the context ID code values and code meanings.
     

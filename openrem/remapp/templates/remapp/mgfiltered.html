@@ -13,8 +13,7 @@
       </p>
         {% if admin.exportperm or admin.adminperm %}
         <ul>
-          <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
-          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportmgcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
         </ul>
         {% else %}
         <p>

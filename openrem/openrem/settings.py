@@ -1,8 +1,26 @@
 # Django settings for OpenREM project.
 
+from __future__ import absolute_import
+# ^^^ The above is required if you want to import from the celery
+# library.  If you don't have this then `from celery.schedules import`
+# becomes `proj.celery.schedules` in Python 2.x since it allows
+# for relative imports by default.
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+
+# Celery settings
+
+BROKER_URL = 'amqp://guest:guest@localhost//'
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 import os
@@ -50,7 +68,7 @@ USE_TZ = False
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 #
 # STATIC_ROOT filepath has been moved to local_settings.py
@@ -119,7 +137,6 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'remapp',
-#    'django_extensions',
     'django_filters',
     'pagination',
     'django.contrib.humanize',
@@ -155,11 +172,11 @@ LOGGING = {
     }
 }
 
-
 try:
     LOCAL_SETTINGS
 except NameError:
     try:
-        from local_settings import *
+        from openrem.local_settings import *
     except ImportError:
         pass
+

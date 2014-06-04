@@ -32,12 +32,13 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
+import json
+from django.views.decorators.csrf import csrf_exempt
 import datetime
 from remapp.models import General_study_module_attributes
 
@@ -205,3 +206,51 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
         return render(request, template_name, {'exam':study})
 
     return redirect("/openrem/")
+
+
+#**********************************************************************#
+#                    Testing celery                                    #
+@csrf_exempt
+def celerytest(request):
+    if 'task_id' in request.session.keys() and request.session['task_id']:
+        task_id = request.session['task_id']
+    return render_to_response('remapp/celerytest.html', locals(), context_instance=RequestContext(request))
+
+@csrf_exempt
+def do_task(request):
+    """ A view the call the task and write the task id to the session """
+    from remapp.tasks import do_work
+    data = 'Fail'
+    if request.is_ajax():
+        job = do_work.delay()
+        request.session['task_id'] = job.id
+        data = job.id
+    else:
+        data = 'This is not an ajax request!'
+
+    json_data = json.dumps(data)
+
+    return HttpResponse(json_data, mimetype='application/json')
+
+@csrf_exempt
+def poll_state(request):
+    """ A view to report the progress to the user """
+    from celery.result import AsyncResult
+    data = 'Fail'
+    if request.is_ajax():
+        if 'task_id' in request.POST.keys() and request.POST['task_id']:
+            task_id = request.POST['task_id']
+            task = AsyncResult(task_id)
+            data = task.result or task.state
+        else:
+            data = 'No task_id in the request'
+    else:
+        data = 'This is not an ajax request'
+
+    json_data = json.dumps(data)
+
+    return HttpResponse(json_data, mimetype='application/json')
+
+
+
+#**********************************************************************#
