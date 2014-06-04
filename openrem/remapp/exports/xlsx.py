@@ -217,7 +217,7 @@ def ctxlsx(filterdict):
 
     for row,exams in enumerate(e):
 
-        tsk.progress = 'Writing All data sheet row {0} of {1}...'.format(row + 1, numrows)
+        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
 
         examdata = [
@@ -294,9 +294,6 @@ def ctxlsx(filterdict):
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
             
-            tsk.progress = 'Now populating protocol pages. Currently on {0} sheet row {1}...'.format(tabtext, sheetlist[tabtext]['count'])
-            tsk.save()
-
             examdata = [
                 exams.general_equipment_module_attributes_set.get().institution_name,
                 exams.general_equipment_module_attributes_set.get().manufacturer,
