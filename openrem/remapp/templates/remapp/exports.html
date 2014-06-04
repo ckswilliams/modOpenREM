@@ -1,5 +1,12 @@
 {% extends "remapp/base.html" %}
 
+{% block headextras %}
+{% if current %}
+<meta http-equiv="refresh" content="1" />
+{% endif %}
+{% endblock %}
+
+
 {% block navbar %}
             <li><a href="/openrem/ct">CT</a></li>
             <li><a href="/openrem/rf">Fluoroscopy</a></li>
@@ -9,94 +16,45 @@
 
 
 {% block mainblock %}		
-
-        <div id="action">
-            <button id="do-csv-export">Click here!</button>
-        </div>
-
-
-  <div class="progress_container">
-   
    {% load humanize %}
-   <div class="current-task">
-    <h4> Task ID: {{ task_id }} </h4>
-   </div>
-   <div class="statupdate"></div>
-   <div class="status"></div>
-   <div class="filename"></div> 
-  </div>
-
+    
+    {% if current %}
+    <h4>Export tasks in progress</h4>
     <table class="table table-striped">
-        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Status</th><th>Download</th>
-        {% for tsk in exptsks %}
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th>
+        {% for tsk in current %}
         <tr>
             <td>{{ tsk.task_id }}</td>
             <td>{{ tsk.export_date|naturaltime }}</td>
             <td>{{ tsk.modality }}</td>
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
-            <td>{{ tsk.status }}</td>
+            <td>{{ tsk.progress }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <h4>Completed export tasks</h4>
+    <table class="table table-striped">
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th>
+        {% for tsk in complete %}
+        <tr>
+            <td>{{ tsk.task_id }}</td>
+            <td>{{ tsk.export_date|naturaltime }}</td>
+            <td>{{ tsk.modality }}</td>
+            <td>{{ tsk.export_type }}</td>
+            <td>{{ tsk.num_records }}</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
         </tr>
         {% endfor %}
-
+    </table>
 
 
 {% endblock %}	
 
 {% block jsblock %}
 
-{% if task_id %}
-
- <script type="text/javascript">
-  jQuery(document).ready(function() {
-   
-   // poll state of the current task
-   var PollState = function(task_id) {
-    jQuery.ajax({
-     url: "poll_state",
-     type: "POST",
-     data: "task_id=" + task_id,
-    }).done(function(task){
-     console.log(task);
-     jQuery('.statupdate').html('statupdate: ' + task.statupdate);
-     jQuery('.status').html('task: ' + task);
-     jQuery('.filename').html('filename: ' + task.filename);
-     
-     if (task != 'SUCCESS') {
-        PollState(task_id);
-     };
-    });
-   }
-   
-   PollState('{{ task_id }}');
-  });
- </script>
- {% endif %}
- 
-
-
- <script type="text/javascript">
-    var filters = {"qfilters":"{{ request.GET.urlencode }}"};
-    var stringFilters = JSON.stringify(filters);
-    jQuery('#do-csv-export').click( function() {
-        jQuery.ajax({
-            url: "/openrem/ct/csv_export_task",
-            data: stringFilters,
-            type: "POST",
-            dataType: "json",
-            success: function( ) {
-                jQuery.ajax({
-                    url: "",
-                    context: document.body,
-                    success: function(s, x) {
-                        jQuery(this).html(s);
-                    }
-                });
-            },
-        })
-    })
- </script>
 
  
  

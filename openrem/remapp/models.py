@@ -39,6 +39,7 @@ class Exports(models.Model):
     task_id = models.TextField()
     filename = models.TextField(blank=True, null=True)
     status = models.TextField(blank=True, null=True)
+    progress = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=8, blank=True, null=True)
     num_records = models.IntegerField(blank=True, null=True)
     export_type = models.TextField(blank=True, null=True)

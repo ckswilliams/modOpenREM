@@ -28,7 +28,7 @@
     </tr>
     {% for key,value in homedata.CT.items %}
         <tr>
-            <td>{{ value.institution }} (<a href="/openrem/ct/?general_equipment_module_attributes__station_name={{ key }}&accession_number=&o=-study_date">{{ key }}</a>)</td><td>{{ value.total }}</td><td>{{ value.latest|naturaltime }}</td>
+            <td>{{ value.institution }} (<a href="/openrem/ct/?station_name={{ key }}&o=-study_date">{{ key }}</a>)</td><td>{{ value.total }}</td><td>{{ value.latest|naturaltime }}</td>
         </tr>
     {% endfor %}
 </table>

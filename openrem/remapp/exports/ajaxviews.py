@@ -3,12 +3,52 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 @csrf_exempt
-def export_ct_csv(request):
+def ctcsv1(request):
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportCT2excel
+
+    job = exportCT2excel.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+def ctxlsx1(request):
+    from django.shortcuts import redirect
+    from remapp.exports.xlsx import ctxlsx
+
+    job = ctxlsx.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+def flcsv1(request):
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportFL2excel
+
+    job = exportFL2excel.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+def mgcsv1(request):
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportMG2excel
+
+    job = exportMG2excel.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+def export(request):
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
     from remapp.models import Exports
+    from remapp.exports.exportcsv import exportCT2excel
+
+    exptsks = Exports.objects.all().order_by('-export_date')
     
-    exptsks = Exports.objects.all()
+    current = exptsks.filter(status__contains = 'CURRENT')
+    complete = exptsks.filter(status__contains = 'COMPLETE')
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']

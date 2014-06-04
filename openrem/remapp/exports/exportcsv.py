@@ -29,7 +29,11 @@
 """
 
 import csv
-def exportFL2excel(request):
+from celery import shared_task
+
+
+@shared_task
+def exportFL2excel(filterdict):
     """Export filtered fluoro database data to a single-sheet CSV file.
 
     :param request: Query parameters from the fluoro filtered page URL.
@@ -37,59 +41,51 @@ def exportFL2excel(request):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
+    import os, datetime
+    from django.conf import settings
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import RFSummaryListFilter
 
+    tsk = Exports.objects.create()
 
-    # Get the database query filters
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_study_description = request.GET.get('study_description')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_performing_physician_name = request.GET.get('performing_physician_name')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
+    tsk.task_id = exportFL2excel.request.id
+    tsk.modality = "RF"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.progress = 'Query filters imported, task started'
+    csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
+    tsk.filename = csvfilename
+    tsk.save()
     
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    writer = csv.writer(csvfile)
     
+    tsk.progress = 'CSV file created'
+    tsk.save()
+        
     # Get the data!
-    from remapp.models import General_study_module_attributes
-
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
     
-    if f_institution_name:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_study_description:
-        e = e.filter(study_description__icontains = f_study_description)
-    if f_performing_physician_name:
-        e = e.filter(performing_physician_name__icontains = f_performing_physician_name)
-    if f_manufacturer:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        e = e.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        e = e.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        e = e.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
+    f = RFSummaryListFilter.base_filters
 
-    writer = csv.writer(response)
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = e.count()
+
+    tsk.num_records = numresults
+    tsk.save()
+
     writer.writerow([
         'Manufacturer', 
         'Model name',
@@ -112,7 +108,7 @@ def exportFL2excel(request):
         'RP definition',
         'Physician',
         'Operator'])
-    for exams in e:
+    for i, exams in enumerate(e):
         writer.writerow([
             exams.general_equipment_module_attributes_set.get().manufacturer, 
             exams.projection_xray_radiation_dose_set.get().observer_context_set.get().device_observer_name,
@@ -136,14 +132,19 @@ def exportFL2excel(request):
             exams.performing_physician_name,
             exams.operator_name,
             ])
-    return response
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
 
-from celery import shared_task, current_task
+
+    tsk.progress = 'All study data written.'
+    tsk.status = 'COMPLETE'
+    tsk.save()
+
 
 
 
 @shared_task
-def exportCT2excel(query_filters):
+def exportCT2excel(filterdict):
     """Export filtered CT database data to a single-sheet CSV file.
 
     :param request: Query parameters from the CT filtered page URL.
@@ -151,9 +152,6 @@ def exportCT2excel(query_filters):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.shortcuts import render_to_response
     from django.conf import settings
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
@@ -167,61 +165,41 @@ def exportCT2excel(query_filters):
     tsk.export_type = "CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.status = 'Query filters imported, task started'
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started'})
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
     tsk.save()
 
     csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'Query filters imported, task started', 'filename': csvfilename})
-    tsk.status = 'Query filters imported, task started'
+    tsk.progress = 'Query filters imported, task started'
     csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
     tsk.filename = csvfilename
     tsk.save()
     
     writer = csv.writer(csvfile)
     
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV file created'})
-    tsk.status = 'CSV file created'
+    tsk.progress = 'CSV file created'
     tsk.save()
         
     # Get the data!
     from remapp.models import General_study_module_attributes
-
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    from remapp.interface.mod_filters import CTSummaryListFilter
     
-    if query_filters['general_equipment_module_attributes__institution_name'][0]:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = query_filters['general_equipment_module_attributes__institution_name'][0])
-    if query_filters['study_description'][0]:
-        e = e.filter(study_description__icontains = query_filters['study_description'][0])
-    if query_filters['general_equipment_module_attributes__manufacturer'][0]:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = query_filters['general_equipment_module_attributes__manufacturer'][0])
-    if query_filters['general_equipment_module_attributes__manufacturer_model_name'][0]:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = query_filters['general_equipment_module_attributes__manufacturer_model_name'][0])
-    if query_filters['general_equipment_module_attributes__station_name'][0]:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = query_filters['general_equipment_module_attributes__station_name'][0])
-    if query_filters['accession_number'][0]:
-        e = e.filter(accession_number__icontains = query_filters['accession_number'][0])
-    if query_filters['date_after'][0]:
-        e = e.filter(study_date__gte = query_filters['date_after'][0])
-    if query_filters['date_before'][0]:
-        e = e.filter(study_date__lte = query_filters['date_before'][0])
-    if query_filters['patient_age_min'][0]:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = query_filters['patient_age_min'][0])
-    if query_filters['patient_age_max'][0]:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = query_filters['patient_age_max'][0])
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    f = CTSummaryListFilter.base_filters
 
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'Required study filter complete.'})
-    tsk.status = 'Required study filter complete.'
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    
+    tsk.progress = 'Required study filter complete.'
     tsk.save()
         
     numresults = e.count()
 
-    current_task.update_state(state='PROGRESS', meta={'statupdate': '{0} studies in query.'.format(numresults)})
-    tsk.status = '{0} studies in query.'.format(numresults)
+    tsk.progress = '{0} studies in query.'.format(numresults)
     tsk.num_records = numresults
     tsk.save()
 
-#    writer.writerow([f_institution_name,f_study_date_0,f_study_date_1,f_study_description,f_manufacturer,f_model,f_device_observer_name])
     headers = [
         'Institution name', 
         'Manufacturer', 
@@ -268,8 +246,7 @@ def exportCT2excel(query_filters):
             ]
     writer.writerow(headers)
 
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'CSV header row written.'})
-    tsk.status = 'CSV header row written.'
+    tsk.progress = 'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
@@ -330,14 +307,14 @@ def exportCT2excel(query_filters):
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-        current_task.update_state(state='PROGRESS', meta={'statupdate': "{0} of {1}".format(i+1, numresults)})
-        tsk.status = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
-    current_task.update_state(state='PROGRESS', meta={'statupdate': 'All study data written.'})
-    tsk.status = 'All study data written.'
+    tsk.progress = 'All study data written.'
+    tsk.status = 'COMPLETE'
     tsk.save()
 
-def exportMG2excel(request):
+@shared_task
+def exportMG2excel(filterdict):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param request: Query parameters from the mammo filtered page URL.
@@ -345,54 +322,51 @@ def exportMG2excel(request):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
+    import os, datetime
+    from django.conf import settings
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import MGSummaryListFilter
 
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_procedure_code_meaning = request.GET.get('procedure_code_meaning')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
+    tsk = Exports.objects.create()
 
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    tsk.task_id = exportMG2excel.request.id
+    tsk.modality = "MG"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    csvfilename = "mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.progress = 'Query filters imported, task started'
+    csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
+    tsk.filename = csvfilename
+    tsk.save()
     
+    writer = csv.writer(csvfile)
+    
+    tsk.progress = 'CSV file created'
+    tsk.save()
+        
     # Get the data!
-    from remapp.models import General_study_module_attributes
-
-    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
     
-    if f_institution_name:
-        s = s.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_procedure_code_meaning:
-        s = s.filter(procedure_code_meaning__icontains = f_procedure_code_meaning)
-    if f_manufacturer:
-        s = s.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        s = s.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        s = s.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        s = s.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        s = s.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        s = s.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        s = s.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        s = s.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
+    f = MGSummaryListFilter.base_filters
 
-    writer = csv.writer(response)
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = s.count()
+
+    tsk.num_records = numresults
+    tsk.save()
+    
     writer.writerow([
         'Institution name', 
         'Manufacturer', 
@@ -425,7 +399,7 @@ def exportMG2excel(request):
         'Exposure Mode Description'
         ])
     
-    for study in s:
+    for i, study in enumerate(s):
         e = study.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()
         for exp in e:
             writer.writerow([
@@ -459,7 +433,12 @@ def exportMG2excel(request):
                 exp.percent_fibroglandular_tissue,
                 exp.comment,
                 ])
-    return response
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+
+    tsk.progress = 'All study data written.'
+    tsk.status = 'COMPLETE'
+    tsk.save()
 
 
 def getQueryFilters(request):
