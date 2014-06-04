@@ -151,9 +151,6 @@ def exportCT2excel(filterdict):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.shortcuts import render_to_response
     from django.conf import settings
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
