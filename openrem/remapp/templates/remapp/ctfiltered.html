@@ -15,9 +15,8 @@
         {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
-          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
-          <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
-          <li><a href="/openrem/exportctcsv1/?{{ request.GET.urlencode }}">Export to CSV using celery</a> </li>
+          <li><a href="/openrem/exportctcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportctxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
         </ul>
 
         {% else %}

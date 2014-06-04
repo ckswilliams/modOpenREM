@@ -35,9 +35,12 @@ except ImportError:
     import StringIO
 
 from xlsxwriter.workbook import Workbook
+from celery import shared_task
 
 
-def ctxlsx(request):
+
+@shared_task
+def ctxlsx(filterdict):
     """Export filtered CT database data to multi-sheet Microsoft XSLX files.
 
     :param request: Query parameters from the CT filtered page URL.
@@ -45,53 +48,47 @@ def ctxlsx(request):
     
     """
 
+    import os, datetime
+    from django.conf import settings
     from remapp.models import General_study_module_attributes
-    from django.http import HttpResponse
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import CTSummaryListFilter
 
+    tsk = Exports.objects.create()
+
+    tsk.task_id = ctxlsx.request.id
+    tsk.modality = "CT"
+    tsk.export_type = "XLSX export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    filename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfile = open(os.path.join(settings.MEDIA_ROOT,filename),"w")
+    tsk.filename = filename
+    tsk.save()
     
 
-    # Get the database query filters
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_study_description = request.GET.get('study_description')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
-    
-    # Get the data!
-    from remapp.models import General_study_module_attributes
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
-    
-    if f_institution_name:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_study_description:
-        e = e.filter(study_description__icontains = f_study_description)
-    if f_manufacturer:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        e = e.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        e = e.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        e = e.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
-
-
-    # create a workbook in memory
-    output = StringIO.StringIO()
-    book = Workbook(output, {'default_date_format': 'dd/mm/yyyy',
+    # create a workbook on disk
+    book = Workbook(xlsxfile, {'default_date_format': 'dd/mm/yyyy',
                              'strings_to_numbers':  True})
+    tsk.progress = 'Workbook created'
+    tsk.save()
+
+    # Get the data
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    f = CTSummaryListFilter.base_filters
+
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.num_records = e.count()
+    tsk.save()
+
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
@@ -141,6 +138,9 @@ def ctxlsx(request):
         ]
         
     # Generate list of protocols in queryset and create worksheets for each
+    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.save()
+
     sheetlist = {}
     protocolslist = []
     for exams in e:
@@ -152,6 +152,10 @@ def ctxlsx(request):
             if safeprotocol not in protocolslist:
                 protocolslist.append(safeprotocol)
     protocolslist.sort()
+
+    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.save()
+
     for protocol in protocolslist:
         tabtext = protocol.lower().replace(" ","_")
         translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
@@ -177,6 +181,9 @@ def ctxlsx(request):
     max_events = e.aggregate(Max('ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events'))
 
     alldataheaders = commonheaders
+
+    tsk.progress = 'Generating headers for the all data sheet...'
+    tsk.save()
 
     for h in xrange(max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']):
         alldataheaders += [
@@ -209,6 +216,10 @@ def ctxlsx(request):
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
     for row,exams in enumerate(e):
+
+        tsk.progress = 'Writing All data sheet row {0} of {1}...'.format(row + 1, numrows)
+        tsk.save()
+
         examdata = [
 			exams.general_equipment_module_attributes_set.get().institution_name,
 			exams.general_equipment_module_attributes_set.get().manufacturer,
@@ -283,6 +294,9 @@ def ctxlsx(request):
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
             
+            tsk.progress = 'Now populating protocol pages. Currently on {0} sheet row {1}...'.format(tabtext, sheetlist[tabtext]['count'])
+            tsk.save()
+
             examdata = [
                 exams.general_equipment_module_attributes_set.get().institution_name,
                 exams.general_equipment_module_attributes_set.get().manufacturer,
@@ -347,6 +361,9 @@ def ctxlsx(request):
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
     # Populate summary sheet
+    tsk.progress = 'Now populating the summary sheet...'
+    tsk.save()
+
     import pkg_resources  # part of setuptools
     from datetime import datetime
 
@@ -402,11 +419,6 @@ def ctxlsx(request):
     book.close()
         
 
-
-
-    # construct response
-    output.seek(0)
-    response = HttpResponse(output.read(), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response['Content-Disposition'] = "attachment; filename=test.xlsx"
-
-    return response
+    tsk.progress = 'XLSX book written.'
+    tsk.status = 'COMPLETE'
+    tsk.save()
