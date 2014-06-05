@@ -21,6 +21,9 @@
 
 {% block mainblock %}		
    {% load humanize %}
+ 
+    {% if admin.exportperm or admin.adminperm %}
+
     
     {% if current %}
     <h4>Export tasks in progress</h4>
@@ -53,6 +56,13 @@
         </tr>
         {% endfor %}
     </table>
+
+        {% else %}
+        <p>
+          Sorry, you don't have enough permissions to enable study export.
+        </p>
+        {% endif %}
+    
 
 
 {% endblock %}	
