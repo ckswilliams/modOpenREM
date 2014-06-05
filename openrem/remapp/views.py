@@ -156,6 +156,11 @@ def openrem_home(request):
         vers = ''
     admin = {'openremversion' : vers}
 
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     modalities = ('MG','CT','RF')
     for modality in modalities:
         studies = allstudies.filter(modality_type__contains = modality).all()

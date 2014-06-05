@@ -40,6 +40,7 @@ def mgcsv1(request):
 
 @csrf_exempt
 def export(request):
+    import pkg_resources # part of setuptools
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
     from remapp.models import Exports
@@ -49,6 +50,18 @@ def export(request):
     
     current = exptsks.filter(status__contains = 'CURRENT')
     complete = exptsks.filter(status__contains = 'COMPLETE')
+    
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']
