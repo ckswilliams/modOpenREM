@@ -9,9 +9,11 @@ def ctcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportCT2excel
 
-    job = exportCT2excel.delay(request.GET)
-    
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = exportCT2excel.delay(request.GET)
+
     return redirect('/openrem/export/')
+
 
 @csrf_exempt
 @login_required
@@ -19,7 +21,8 @@ def ctxlsx1(request):
     from django.shortcuts import redirect
     from remapp.exports.xlsx import ctxlsx
 
-    job = ctxlsx.delay(request.GET)
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = ctxlsx.delay(request.GET)
     
     return redirect('/openrem/export/')
 
@@ -29,7 +32,8 @@ def flcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportFL2excel
 
-    job = exportFL2excel.delay(request.GET)
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = exportFL2excel.delay(request.GET)
     
     return redirect('/openrem/export/')
 
@@ -39,7 +43,8 @@ def mgcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportMG2excel
 
-    job = exportMG2excel.delay(request.GET)
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = exportMG2excel.delay(request.GET)
     
     return redirect('/openrem/export/')
 
