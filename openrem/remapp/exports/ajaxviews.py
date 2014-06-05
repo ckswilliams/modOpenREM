@@ -1,8 +1,10 @@
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 @csrf_exempt
+@login_required
 def ctcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportCT2excel
@@ -12,6 +14,7 @@ def ctcsv1(request):
     return redirect('/openrem/export/')
 
 @csrf_exempt
+@login_required
 def ctxlsx1(request):
     from django.shortcuts import redirect
     from remapp.exports.xlsx import ctxlsx
@@ -21,6 +24,7 @@ def ctxlsx1(request):
     return redirect('/openrem/export/')
 
 @csrf_exempt
+@login_required
 def flcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportFL2excel
@@ -30,6 +34,7 @@ def flcsv1(request):
     return redirect('/openrem/export/')
 
 @csrf_exempt
+@login_required
 def mgcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportMG2excel
@@ -39,6 +44,7 @@ def mgcsv1(request):
     return redirect('/openrem/export/')
 
 @csrf_exempt
+@login_required
 def export(request):
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
@@ -67,7 +73,9 @@ def export(request):
         task_id = request.session['task_id']
     return render_to_response('remapp/exports.html', locals(), context_instance=RequestContext(request))
 
+
 @csrf_exempt
+@login_required
 def ct_csv(request):
     from remapp.exports.exportcsv import exportCT2excel
     from remapp.exports.exportcsv import getQueryFilters
@@ -89,27 +97,7 @@ def ct_csv(request):
     return HttpResponse(json_data, content_type='application/json')
 
 
-@csrf_exempt
-def poll_state(request):
-    """ A view to report the progress to the user """
-    from celery.result import AsyncResult
-    data = 'Fail'
-    if request.is_ajax():
-        if 'task_id' in request.POST.keys() and request.POST['task_id']:
-            task_id = request.POST['task_id']
-            task = AsyncResult(task_id)
-#            data = task.result or task.state
-            data = task.result
-        else:
-            data = 'No task_id in the request'
-    else:
-        data = 'This is not an ajax request'
-
-    json_data = json.dumps(data)
-
-    return HttpResponse(json_data, content_type='application/json')
-
-
+@login_required
 def download(request, file_name):
     from openrem.settings import MEDIA_ROOT
     from django.core.servers.basehttp import FileWrapper
