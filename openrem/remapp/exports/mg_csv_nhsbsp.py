@@ -19,7 +19,7 @@ def mg_csv_nhsbsp(filterdict):
 
     tsk = Exports.objects.create()
 
-    tsk.task_id = exportMG2excel.request.id
+    tsk.task_id = mg_csv_nhsbsp.request.id
     tsk.modality = "MG"
     tsk.export_type = "NHSBSP CSV export"
     datestamp = datetime.datetime.now()
@@ -127,14 +127,14 @@ def mg_csv_nhsbsp(filterdict):
                 '', # not in DICOM headers
                 '', # no consistent behaviour for recording density mode on FFDM units
                 ])
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = "{0} of {1}".format(patNum, numresults)
         tsk.save()
 
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
     tsk.save()
     
-if __name__ == "__main__":
-    import sys
-    sys.exit(mg_csv_nhsbsp(filterdict))
+#if __name__ == "__main__":
+#    import sys
+#    sys.exit(mg_csv_nhsbsp(filterdict))
 

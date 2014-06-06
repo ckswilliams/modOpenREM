@@ -50,6 +50,17 @@ def mgcsv1(request):
 
 @csrf_exempt
 @login_required
+def mgnhsbsp(request):
+    from django.shortcuts import redirect
+    from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
+
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = mg_csv_nhsbsp.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+@login_required
 def export(request):
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
