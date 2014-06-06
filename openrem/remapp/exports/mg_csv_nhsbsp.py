@@ -127,8 +127,5 @@ def exportMG2NHSBSP(request):
     
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the DICOM RDSR file')
-
-    sys.exit(rdsr(sys.argv[1]))
+    sys.exit(exportMG2NHSBSP(request))
 
