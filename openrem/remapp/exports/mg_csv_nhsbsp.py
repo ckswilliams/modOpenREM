@@ -1,4 +1,4 @@
-def exportMG2NHSBSP(request):
+def mg_csv_nhsbsp(request):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param request: Query parameters from the mammo filtered page URL.
@@ -127,5 +127,5 @@ def exportMG2NHSBSP(request):
     
 if __name__ == "__main__":
     import sys
-    sys.exit(exportMG2NHSBSP(request))
+    sys.exit(mg_csv_nhsbsp(request))
 
