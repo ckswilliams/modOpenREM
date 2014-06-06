@@ -124,3 +124,11 @@ def exportMG2NHSBSP(request):
                 '', # no consistent behaviour for recording density mode on FFDM units
                 ])
     return response
+    
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        sys.exit('Error: Supply exactly one argument - the DICOM RDSR file')
+
+    sys.exit(rdsr(sys.argv[1]))
+
