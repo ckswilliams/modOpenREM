@@ -1,4 +1,9 @@
-def mg_csv_nhsbsp(request):
+import csv
+from celery import shared_task
+
+
+@shared_task
+def mg_csv_nhsbsp(filterdict):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param request: Query parameters from the mammo filtered page URL.
@@ -6,54 +11,51 @@ def mg_csv_nhsbsp(request):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
+    import os, datetime
+    from django.conf import settings
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import MGSummaryListFilter
 
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_procedure_code_meaning = request.GET.get('procedure_code_meaning')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
+    tsk = Exports.objects.create()
 
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    tsk.task_id = exportMG2excel.request.id
+    tsk.modality = "MG"
+    tsk.export_type = "NHSBSP CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    csvfilename = "mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.progress = 'Query filters imported, task started'
+    csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
+    tsk.filename = csvfilename
+    tsk.save()
     
+    writer = csv.writer(csvfile)
+    
+    tsk.progress = 'CSV file created'
+    tsk.save()
+        
     # Get the data!
-    from remapp.models import General_study_module_attributes
-
-    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
     
-    if f_institution_name:
-        s = s.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_procedure_code_meaning:
-        s = s.filter(procedure_code_meaning__icontains = f_procedure_code_meaning)
-    if f_manufacturer:
-        s = s.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        s = s.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        s = s.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        s = s.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        s = s.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        s = s.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        s = s.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        s = s.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
+    f = MGSummaryListFilter.base_filters
 
-    writer = csv.writer(response)
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = s.count()
+
+    tsk.num_records = numresults
+    tsk.save()
+
     writer.writerow([
         'Survey number',
         'Patient number',
@@ -71,6 +73,8 @@ def mg_csv_nhsbsp(request):
         'Comment',
         'AEC density mode',		
         ])
+
+
     patNum = 0
     for study in s:
         e = study.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()
@@ -123,9 +127,14 @@ def mg_csv_nhsbsp(request):
                 '', # not in DICOM headers
                 '', # no consistent behaviour for recording density mode on FFDM units
                 ])
-    return response
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+
+    tsk.progress = 'All study data written.'
+    tsk.status = 'COMPLETE'
+    tsk.save()
     
 if __name__ == "__main__":
     import sys
-    sys.exit(mg_csv_nhsbsp(request))
+    sys.exit(mg_csv_nhsbsp(filterdict))
 
