@@ -1,7 +1,6 @@
-
 Export from database
 ====================
-
+    
 Multi-sheet Microsoft Excel XLSX exports
 ++++++++++++++++++++++++++++++++++++++++
 This export has a summary sheet of all the requested and performed 
@@ -18,4 +17,10 @@ Single sheet CSV exports
 ++++++++++++++++++++++++
    
 .. automodule:: remapp.exports.exportcsv
+    :members:
+
+Specialised csv exports - NHSBSP formatted mammography export
+-------------------------------------------------------------
+
+.. automodule:: remapp.exports.mg_csv_nhsbsp
     :members:
