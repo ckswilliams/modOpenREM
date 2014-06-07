@@ -34,10 +34,11 @@ from celery import shared_task
 
 @shared_task
 def mg_csv_nhsbsp(filterdict):
-    """Export filtered mammography database data to a single-sheet CSV file.
+    """Export filtered mammography database data to a NHSBSP formatted single-sheet CSV file.
 
-    :param request: Query parameters from the mammo filtered page URL.
-    :type request: HTTP get
+    :param filterdict: Dictionary of query parameters from the mammo filtered page URL.
+    :type filterdict: dict
+    :returns: None
     
     """
 
