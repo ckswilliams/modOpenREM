@@ -43,8 +43,8 @@ from celery import shared_task
 def ctxlsx(filterdict):
     """Export filtered CT database data to multi-sheet Microsoft XSLX files.
 
-    :param request: Query parameters from the CT filtered page URL.
-    :type request: HTTP get
+    :param filterdict: Query parameters from the CT filtered page URL.
+    :type filterdict: HTTP get
     
     """
 
