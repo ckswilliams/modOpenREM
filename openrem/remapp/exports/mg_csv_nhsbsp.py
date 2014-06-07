@@ -74,11 +74,8 @@ def mg_csv_nhsbsp(filterdict):
         'AEC density mode',		
         ])
 
-
-    patNum = 0
-    for study in s:
+    for i, study in enumerate(s):
         e = study.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()
-        patNum = patNum + 1
         for exp in e:
             viewCode = str(exp.laterality)
             viewCode = viewCode[:1]
@@ -112,7 +109,7 @@ def mg_csv_nhsbsp(filterdict):
 			
             writer.writerow([
                 '1',
-                patNum,
+                i+1,
                 viewCode,
                 exp.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
                 target,
@@ -127,14 +124,10 @@ def mg_csv_nhsbsp(filterdict):
                 '', # not in DICOM headers
                 '', # no consistent behaviour for recording density mode on FFDM units
                 ])
-        tsk.progress = "{0} of {1}".format(patNum, numresults)
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
 
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
     tsk.save()
     
-#if __name__ == "__main__":
-#    import sys
-#    sys.exit(mg_csv_nhsbsp(filterdict))
-
