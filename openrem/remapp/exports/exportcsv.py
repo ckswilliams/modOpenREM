@@ -37,8 +37,8 @@ from django.conf import settings
 def exportFL2excel(filterdict):
     """Export filtered fluoro database data to a single-sheet CSV file.
 
-    :param filterdict: Query parameters from the fluoro filtered page URL.
-    :type filterdict: Dictionary
+    :param request: Query parameters from the fluoro filtered page URL.
+    :type request: HTTP get
     
     """
 
