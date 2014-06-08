@@ -15,7 +15,6 @@ same protocol name, each one has a line of its own.
 Single sheet CSV exports
 ++++++++++++++++++++++++
    
-.. autotask:: remapp.exports.exportcsv.exportFL2excel
 .. autotask:: remapp.exports.exportcsv.exportCT2excel
 .. autotask:: remapp.exports.exportcsv.exportMG2excel
 
@@ -23,3 +22,6 @@ Specialised csv exports - NHSBSP formatted mammography export
 -------------------------------------------------------------
 
 .. autotask:: remapp.exports.mg_csv_nhsbsp.mg_csv_nhsbsp
+
+.. autotask:: remapp.exports.xlsx.ctxlsx
+.. autotask:: remapp.exports.exportcsv.exportFL2excel
