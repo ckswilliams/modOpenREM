@@ -318,8 +318,8 @@ def exportCT2excel(filterdict):
 def exportMG2excel(filterdict):
     """Export filtered mammography database data to a single-sheet CSV file.
 
-    :param filterdict: Query parameters from the mammo filtered page URL.
-    :type filterdict: Dictionary
+    :param request: Query parameters from the mammo filtered page URL.
+    :type request: HTTP get
     
     """
 
