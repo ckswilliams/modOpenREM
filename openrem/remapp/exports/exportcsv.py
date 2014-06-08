@@ -37,8 +37,8 @@ from django.conf import settings
 def exportFL2excel(filterdict):
     """Export filtered fluoro database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the fluoro filtered page URL.
-    :type request: HTTP get
+    :param filterdict: Query parameters from the fluoro filtered page URL.
+    :type filterdict: Dictionary
     
     """
 
@@ -318,8 +318,8 @@ def exportCT2excel(filterdict):
 def exportMG2excel(filterdict):
     """Export filtered mammography database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the mammo filtered page URL.
-    :type request: HTTP get
+    :param filterdict: Query parameters from the mammo filtered page URL.
+    :type filterdict: Dictionary
     
     """
 
