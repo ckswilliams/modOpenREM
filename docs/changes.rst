@@ -5,7 +5,15 @@ OpenREM version history
 0.4.3
 ------
 
+* `#93`_   Set the security of the new exports to prevent users below export level from creating or downloading exports
+* `#92`_   Add `NHSBSP specific mammography csv export`_ from Jonathan Cole - with Celery
+* `#89`_   Added the Exports navigation item to all templates, limited to export or admin users
+* `#88`_   Converted fluoroscopy objects to using the Celery task manager after starting with CT for `#19`_
+* `#87`_   Converted mammography objects to using the Celery task manager after starting with CT for `#19`_ 
+* `#86`_   Digital Breast Tomosynthesis systems have a projections object that for Hologic contains required dosimetry information
 * `#85`_   Fix for bug introduced in `#75`_ where adaption of ptsize import for procedure import broke ptsize imports
+* `#19`_   Exports are now sent to a task manager instead of locking up the web interface.
+
 
 0.4.2
 -----
@@ -152,6 +160,37 @@ OpenREM version history
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#120`: https://bitbucket.org/edmcdonagh/openrem/issue/120/
+..  _`#119`: https://bitbucket.org/edmcdonagh/openrem/issue/119/
+..  _`#118`: https://bitbucket.org/edmcdonagh/openrem/issue/118/
+..  _`#117`: https://bitbucket.org/edmcdonagh/openrem/issue/117/
+..  _`#116`: https://bitbucket.org/edmcdonagh/openrem/issue/116/
+..  _`#115`: https://bitbucket.org/edmcdonagh/openrem/issue/115/
+..  _`#114`: https://bitbucket.org/edmcdonagh/openrem/issue/114/
+..  _`#113`: https://bitbucket.org/edmcdonagh/openrem/issue/113/
+..  _`#112`: https://bitbucket.org/edmcdonagh/openrem/issue/112/
+..  _`#111`: https://bitbucket.org/edmcdonagh/openrem/issue/111/
+..  _`#110`: https://bitbucket.org/edmcdonagh/openrem/issue/110/
+..  _`#109`: https://bitbucket.org/edmcdonagh/openrem/issue/109/
+..  _`#108`: https://bitbucket.org/edmcdonagh/openrem/issue/108/
+..  _`#107`: https://bitbucket.org/edmcdonagh/openrem/issue/107/
+..  _`#106`: https://bitbucket.org/edmcdonagh/openrem/issue/106/
+..  _`#105`: https://bitbucket.org/edmcdonagh/openrem/issue/105/
+..  _`#104`: https://bitbucket.org/edmcdonagh/openrem/issue/104/
+..  _`#103`: https://bitbucket.org/edmcdonagh/openrem/issue/103/
+..  _`#102`: https://bitbucket.org/edmcdonagh/openrem/issue/102/
+..  _`#101`: https://bitbucket.org/edmcdonagh/openrem/issue/101/
+..  _`#100`: https://bitbucket.org/edmcdonagh/openrem/issue/100/
+..  _`#99`: https://bitbucket.org/edmcdonagh/openrem/issue/99/
+..  _`#98`: https://bitbucket.org/edmcdonagh/openrem/issue/98/
+..  _`#97`: https://bitbucket.org/edmcdonagh/openrem/issue/97/
+..  _`#96`: https://bitbucket.org/edmcdonagh/openrem/issue/96/
+..  _`#95`: https://bitbucket.org/edmcdonagh/openrem/issue/95/
+..  _`#94`: https://bitbucket.org/edmcdonagh/openrem/issue/94/
+..  _`#93`: https://bitbucket.org/edmcdonagh/openrem/issue/93/
+..  _`#92`: https://bitbucket.org/edmcdonagh/openrem/issue/92/
+..  _`#91`: https://bitbucket.org/edmcdonagh/openrem/issue/91/
+..  _`#90`: https://bitbucket.org/edmcdonagh/openrem/issue/90/
 ..  _`#89`: https://bitbucket.org/edmcdonagh/openrem/issue/89/
 ..  _`#88`: https://bitbucket.org/edmcdonagh/openrem/issue/88/
 ..  _`#87`: https://bitbucket.org/edmcdonagh/openrem/issue/87/
@@ -241,3 +280,6 @@ OpenREM version history
 ..  _`#3`: https://bitbucket.org/edmcdonagh/openrem/issue/3/
 ..  _`#2`: https://bitbucket.org/edmcdonagh/openrem/issue/2/
 ..  _`#1`: https://bitbucket.org/edmcdonagh/openrem/issue/1/
+
+
+..  _`NHSBSP specific mammography csv export` : https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
