@@ -136,10 +136,14 @@ def download(request, file_name):
         
 def deletefile(request):
     import os
+    from django.shortcuts import redirect
     from openrem.settings import MEDIA_ROOT
     from remapp.models import Exports
 
     for task in request.GET:
-        export = Exports.objects.filter(task_id__exact = task)
-        file_path = os.path.join(MEDIA_ROOT, 
+        export = Exports.objects.filter(task_id__exact = request.GET[task])
+        file_path = os.path.join(MEDIA_ROOT, export[0].filename)
+        os.remove(file_path)
+        export.delete()
     
+    return redirect('/openrem/export')

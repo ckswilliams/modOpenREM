@@ -55,7 +55,7 @@
             <td>{{ tsk.num_records }}</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
             <td>
-            <input type="checkbox" name="task_id" value="{{ tsk.task_id }}">
+            <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
             </td>
         </tr>
         {% endfor %}
