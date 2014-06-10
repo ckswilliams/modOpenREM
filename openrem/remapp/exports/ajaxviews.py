@@ -123,7 +123,7 @@ def download(request, file_name):
     from openrem.settings import MEDIA_ROOT
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        file_path = MEDIA_ROOT +'/'+ file_name
+        file_path = os.path.join(MEDIA_ROOT, file_name)
         file_wrapper = FileWrapper(file(file_path,'rb'))
         file_mimetype = mimetypes.guess_type(file_path)
         response = HttpResponse(file_wrapper, content_type=file_mimetype )
