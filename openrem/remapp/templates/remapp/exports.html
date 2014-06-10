@@ -43,6 +43,7 @@
     {% endif %}
 
     <h4>Completed export tasks</h4>
+    <form action="" method="get">
     <table class="table table-striped">
         <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th>
         {% for tsk in complete %}
@@ -56,6 +57,8 @@
         </tr>
         {% endfor %}
     </table>
+    <input type="submit" />
+    </form>
 
         {% else %}
         <p>
