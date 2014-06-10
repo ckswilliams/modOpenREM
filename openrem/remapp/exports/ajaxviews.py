@@ -133,3 +133,13 @@ def download(request, file_name):
         return response
     else:
         return redirect('/openrem/export/')
+        
+def deletefile(request):
+    import os
+    from openrem.settings import MEDIA_ROOT
+    from remapp.models import Exports
+
+    for task in request.GET:
+        export = Exports.objects.filter(task_id__exact = task)
+        file_path = os.path.join(MEDIA_ROOT, 
+    

@@ -82,6 +82,7 @@ urlpatterns += patterns('remapp.exports',
     url(r'^exportflcsv1/$', 'ajaxviews.flcsv1'),
     url(r'^exportmgcsv1/$', 'ajaxviews.mgcsv1'),
     url(r'^exportmgnhsbsp/$', 'ajaxviews.mgnhsbsp'),
+    url(r'^deletefile/$', 'ajaxviews.deletefile'),
 )
 
 urlpatterns += patterns('remapp.exports',

@@ -43,9 +43,9 @@
     {% endif %}
 
     <h4>Completed export tasks</h4>
-    <form action="" method="get">
+    <form action="/openrem/deletefile/" method="get">
     <table class="table table-striped">
-        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th>
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th><th>Delete?</th>
         {% for tsk in complete %}
         <tr>
             <td>{{ tsk.task_id }}</td>
@@ -54,10 +54,16 @@
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
+            <td>
+            <input type="checkbox" name="task_id" value="{{ tsk.task_id }}">
+            </td>
         </tr>
         {% endfor %}
+        <tr>
+            <td colspan="6"></td>
+            <td><input type="submit" /></td>
+        </tr>
     </table>
-    <input type="submit" />
     </form>
 
         {% else %}
