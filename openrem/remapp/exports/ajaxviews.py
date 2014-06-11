@@ -133,3 +133,29 @@ def download(request, file_name):
         return response
     else:
         return redirect('/openrem/export/')
+        
+@csrf_exempt
+@login_required
+def deletefile(request):
+    import os, sys
+    from django.http import HttpResponseRedirect
+    from django.core.urlresolvers import reverse
+    from django.contrib import messages
+    from openrem.settings import MEDIA_ROOT
+    from remapp.models import Exports
+    from remapp.exports import ajaxviews
+    
+    
+    for task in request.POST:
+        export = Exports.objects.filter(task_id__exact = request.POST[task])
+        file_path = os.path.join(MEDIA_ROOT, export[0].filename)
+        try:
+            os.remove(file_path)
+            export.delete()
+            messages.success(request, "Export file and database entry deleted successfully.")
+        except OSError as e:
+            messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+        except:
+            messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+    
+    return HttpResponseRedirect(reverse(ajaxviews.export))
