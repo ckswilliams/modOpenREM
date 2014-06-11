@@ -135,6 +135,7 @@ def download(request, file_name):
         return redirect('/openrem/export/')
         
 @csrf_exempt
+@login_required
 def deletefile(request):
     import os
     from django.shortcuts import redirect
