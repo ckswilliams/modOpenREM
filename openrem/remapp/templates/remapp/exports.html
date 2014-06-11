@@ -55,13 +55,21 @@
             <td>{{ tsk.num_records }}</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
             <td>
-            <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
+                <div class = "checkbox">
+                    <label>
+                        <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
+                    </label>
+                </div>
             </td>
         </tr>
         {% endfor %}
         <tr>
             <td colspan="6"></td>
-            <td><input type="submit" /></td>
+            <td>
+            {% if complete.count > 0 %}
+                <button type="submit" class = "btn btn-default">Delete</button>
+            {% endif %}
+            </td>
         </tr>
     </table>
     </form>
