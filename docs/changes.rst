@@ -7,6 +7,7 @@ OpenREM version history
 
 * `#93`_   Set the security of the new exports to prevent users below export level from creating or downloading exports
 * `#92`_   Add `NHSBSP specific mammography csv export`_ from Jonathan Cole - with Celery
+* `#90`_   Added delete function for exports
 * `#89`_   Added the Exports navigation item to all templates, limited to export or admin users
 * `#88`_   Converted fluoroscopy objects to using the Celery task manager after starting with CT for `#19`_
 * `#87`_   Converted mammography objects to using the Celery task manager after starting with CT for `#19`_ 
