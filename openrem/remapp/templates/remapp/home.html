@@ -49,7 +49,7 @@
     {% for key,value in homedata.RF.items %}
         <tr>
             <td>
-                {{ value.institution }} (<a href="/openrem/rf/?general_equipment_module_attributes__station_name={{ key }}&accession_number=&o=-study_date">{{ key }}</a>)
+                {{ value.institution }} (<a href="/openrem/rf/?station_name={{ key }}&o=-study_date">{{ key }}</a>)
             </td>
             <td>
                 {{ value.total }}
@@ -69,7 +69,7 @@
     {% for key,value in homedata.MG.items %}
         <tr>
             <td>
-                {{ value.institution }} (<a href="/openrem/mg/?general_equipment_module_attributes__station_name={{ key }}&accession_number=&o=-study_date">{{ key }}</a>)
+                {{ value.institution }} (<a href="/openrem/mg/?station_name={{ key }}&o=-study_date">{{ key }}</a>)
             </td>
             <td>
                 {{ value.total }}
