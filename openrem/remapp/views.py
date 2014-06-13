@@ -173,8 +173,6 @@ def openrem_home(request):
             latestuid = studies.filter(general_equipment_module_attributes__station_name__exact = station[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
-#            latestdatetimeaware = utc.localize(latestdatetime)
-            latestdatetimeaware = latestdatetime
             
             inst_name = studies.filter(
                 general_equipment_module_attributes__station_name__exact = station[0]
@@ -190,7 +188,7 @@ def openrem_home(request):
                 'total' : studies.filter(
                     general_equipment_module_attributes__station_name__exact = station[0]
                     ).count(),
-                'latest' : latestdatetimeaware,
+                'latest' : latestdatetime,
                 'institution' : institution
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
