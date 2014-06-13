@@ -173,7 +173,8 @@ def openrem_home(request):
             latestuid = studies.filter(general_equipment_module_attributes__station_name__exact = station[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
-            latestdatetimeaware = utc.localize(latestdatetime)
+#            latestdatetimeaware = utc.localize(latestdatetime)
+            latestdatetimeaware = latestdatetime
             
             inst_name = studies.filter(
                 general_equipment_module_attributes__station_name__exact = station[0]
