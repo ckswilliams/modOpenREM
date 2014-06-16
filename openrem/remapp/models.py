@@ -33,6 +33,10 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 from django.db import models
 
+class Size_upload(models.Model):
+    sizefile = models.FileField(upload_to='sizeupload/%Y/%m/%d')
+
+
 class Exports(models.Model):
     """Table to hold the export status and filenames
     """

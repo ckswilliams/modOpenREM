@@ -212,6 +212,40 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     return redirect("/openrem/")
 
 
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+
+from remapp.models import Size_upload
+from remapp.forms import SizeUploadForm
+
+def size_upload(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = SizeUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            newdoc = Size_upload(sizefile = request.FILES['sizefile'])
+            newdoc.save()
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect(reverse('remapp.views.size_upload'))
+    else:
+        form = SizeUploadForm() # A empty, unbound form
+
+    # Load documents for the list page
+    sizefiles = Size_upload.objects.all()
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/sizeupload.html',
+        {'documents': sizefiles, 'form': form},
+        context_instance=RequestContext(request)
+    )
+
+
+
+
 #**********************************************************************#
 #                    Testing celery                                    #
 @csrf_exempt

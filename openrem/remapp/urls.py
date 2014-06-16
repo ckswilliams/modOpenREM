@@ -66,6 +66,7 @@ urlpatterns = patterns('remapp.views',
             template_name='remapp/mgdetail.html'))),
 
     url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),
+    url(r'^admin/sizeupload$', 'size_upload', name='size_upload'),
 )
 
 urlpatterns += patterns('remapp.exports',
