@@ -211,12 +211,14 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
 
     return redirect("/openrem/")
 
-
+import os, sys, csv
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 
+from openrem.settings import MEDIA_ROOT
 from remapp.models import Size_upload
 from remapp.forms import SizeUploadForm
 
@@ -225,8 +227,16 @@ def size_upload(request):
     if request.method == 'POST':
         form = SizeUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            newdoc = Size_upload(sizefile = request.FILES['sizefile'])
-            newdoc.save()
+            newcsv = Size_upload(sizefile = request.FILES['sizefile'])
+            newcsv.save()
+            with open(os.path.join(MEDIA_ROOT, newcsv.sizefile.name), 'rb') as csvfile:
+                try:
+                    dialect = csv.Sniffer().sniff(csvfile.read(1024))
+                    messages.success(request, "Hoorah. Dialect information: {0}".format(dialect))
+                except csv.Error as e:
+                    messages.error(request, "Doesn't appear to be a csv file. Error({0})".format(e))
+                except:
+                    messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('remapp.views.size_upload'))
