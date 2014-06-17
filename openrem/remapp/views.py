@@ -229,17 +229,9 @@ def size_upload(request):
         if form.is_valid():
             newcsv = Size_upload(sizefile = request.FILES['sizefile'])
             newcsv.save()
-            with open(os.path.join(MEDIA_ROOT, newcsv.sizefile.name), 'rb') as csvfile:
-                try:
-                    dialect = csv.Sniffer().sniff(csvfile.read(1024))
-                    messages.success(request, "Hoorah. Dialect information: {0}".format(dialect))
-                except csv.Error as e:
-                    messages.error(request, "Doesn't appear to be a csv file. Error({0})".format(e))
-                except:
-                    messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
             # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('remapp.views.size_upload'))
+            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(newcsv.id))
     else:
         form = SizeUploadForm() # A empty, unbound form
 
@@ -253,7 +245,36 @@ def size_upload(request):
         context_instance=RequestContext(request)
     )
 
+from remapp.forms import SizeHeadersForm
+def size_process(self, *args, **kwargs):
+    
+    csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
 
+    with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            csvfile.seek(0)
+            if csv.Sniffer().has_header(csvfile.read(1024)):
+                csvfile.seek(0)
+                dataset = csv.DictReader(csvfile)
+                messages.success(self, "Hoorah. CSV file found with delimiter {0}. Headers are {1}.".format(dialect.delimiter, dataset.fieldnames))
+            else:
+                csvfile.seek(0)
+                messages.error(self, "Doesn't appear to have a header row. First row: {0}".format(next(csvfile)))
+        except csv.Error as e:
+            messages.error(self, "Doesn't appear to be a csv file. Error({0})".format(e))
+        except:
+            messages.error(self, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+
+    
+    form = SizeHeadersForm()
+    
+    
+    return render_to_response(
+        'remapp/sizeprocess.html',
+        {'form':form},
+        context_instance=RequestContext(self)
+    )
 
 
 #**********************************************************************#
