@@ -267,7 +267,7 @@ def size_process(self, *args, **kwargs):
             messages.error(self, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
     
-    form = SizeHeadersForm(initial={'choice':('c', 'other')})
+    form = SizeHeadersForm(my_choice = (('1', dataset.fieldnames[0]), ('2', dataset.fieldnames[1]), ('3', dataset.fieldnames[2])))
     
     
     return render_to_response(
