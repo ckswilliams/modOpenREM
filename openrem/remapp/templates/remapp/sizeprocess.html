@@ -33,8 +33,31 @@
 		<!-- Upload form. Note enctype attribute! -->
 		<form action="/openrem/admin/sizeprocess/3/" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
-			{{ form.as_table }}
-		</form>
+            <table>
+                <th>{{ form.height_field.label_tag }}</th>
+                <th>{{ form.weight_field.label_tag }}</th>
+                <th>{{ form.id_field.label_tag }}</th>
+                <th>{{ form.id_type.label_tag }}</th>
+                <tr>
+                    <td>
+                        {{ form.height_field.errors }}
+                        {{ form.height_field }}
+                    </td>
+                    <td>
+                        {{ form.weight_field.errors }}
+                        {{ form.weight_field }}
+                    </td>
+                    <td>
+                        {{ form.id_field.errors }}
+                        {{ form.id_field }}
+                    </td>
+                    <td>
+                        {{ form.id_type.errors }}
+                        {{ form.id_type }}
+                    </td>
+                </tr>
+            </table>
+			<p><input type="submit" value="Upload" /></p>		</form>
 		
 	</body>
 

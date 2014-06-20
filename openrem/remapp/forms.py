@@ -16,7 +16,7 @@ class SizeHeadersForm(forms.Form):
             self.fields['weight_field'] = forms.ChoiceField(choices=my_choice)
             self.fields['id_field'] = forms.ChoiceField(choices=my_choice)
             ID_TYPES = (("si-uid", "Study instance UID"), ("acc-no", "Accession Number"))
-            id_type = forms.ChoiceField(widget=forms.RadioSelect, choices=ID_TYPES)
+            self.fields['id_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=ID_TYPES)
 
 
 
