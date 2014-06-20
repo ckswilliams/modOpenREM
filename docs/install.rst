@@ -36,10 +36,11 @@ Locate install location
 * Linux: ``/usr/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 
-There are two files that need renaming: *(changed for 0.4.0)*
+There are three files that need renaming: *(changed for 0.4.0)*
 
 + ``openrem/local_settings.py.example`` to ``openrem/local_settings.py``
 + ``openrem/wsgi.py.example`` to ``openrem/wsgi.py``
++ ``openrem/settings.py.new`` to ``openrem/settings.py`` **This file will be ``settings.py`` in future installs!**
 
 In the ``local_settings.py`` file, set the database details.
 
