@@ -246,7 +246,7 @@ def size_upload(request):
     )
 
 from remapp.forms import SizeHeadersForm
-def size_process(self, *args, **kwargs):
+def size_process(request, *args, **kwargs):
     
     csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
 
@@ -257,24 +257,26 @@ def size_process(self, *args, **kwargs):
             if csv.Sniffer().has_header(csvfile.read(1024)):
                 csvfile.seek(0)
                 dataset = csv.DictReader(csvfile)
-                messages.success(self, "Hoorah. CSV file found with delimiter {0}. Headers are {1}.".format(dialect.delimiter, dataset.fieldnames))
+                messages.success(request, "Hoorah. CSV file found with delimiter {0}. Headers are {1}.".format(dialect.delimiter, dataset.fieldnames))
+                fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
+                form = SizeHeadersForm(my_choice = fieldnames)
             else:
                 csvfile.seek(0)
-                messages.error(self, "Doesn't appear to have a header row. First row: {0}".format(next(csvfile)))
+                messages.error(request, "Doesn't appear to have a header row. First row: {0}".format(next(csvfile)))
+                return HttpResponseRedirect("/openrem/admin/sizeupload")
         except csv.Error as e:
-            messages.error(self, "Doesn't appear to be a csv file. Error({0})".format(e))
+            messages.error(request, "Doesn't appear to be a csv file. Error({0})".format(e))
+            return HttpResponseRedirect("/openrem/admin/sizeupload")
         except:
-            messages.error(self, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+            messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+            return HttpResponseRedirect("/openrem/admin/sizeupload")
 
-    fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
-    
-    form = SizeHeadersForm(my_choice = fieldnames)
     
     
     return render_to_response(
         'remapp/sizeprocess.html',
         {'form':form},
-        context_instance=RequestContext(self)
+        context_instance=RequestContext(request)
     )
 
 
