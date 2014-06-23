@@ -7,6 +7,9 @@ class SizeUploadForm(forms.Form):
 
 class SizeHeadersForm(forms.Form):
     height_field = forms.ChoiceField(choices='')
+    weight_field = forms.ChoiceField(choices='')
+    id_field = forms.ChoiceField(choices='')
+    id_type = forms.ChoiceField(choices='')
 
     def __init__(self, my_choice=None, **kwargs):
         super(SizeHeadersForm, self).__init__(**kwargs)

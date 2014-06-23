@@ -248,9 +248,13 @@ def size_upload(request):
 from remapp.forms import SizeHeadersForm
 def size_process(request, *args, **kwargs):
 
-    if request.method == 'POST': # If the form has been submitted...
-        # ContactForm was defined in the previous section
-        form = SizeHeadersForm(data = request.POST) # A form bound to the POST data
+    if request.method == 'POST': 
+        print request.POST
+        csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
+        with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
+            dataset = csv.DictReader(csvfile)
+            fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
+        form = SizeHeadersForm(request.POST) # A form bound to the POST data
         if form.is_valid(): # All validation rules pass
             # Process the data in form.cleaned_data
             # ...
