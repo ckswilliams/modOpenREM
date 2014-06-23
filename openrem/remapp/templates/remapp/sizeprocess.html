@@ -31,7 +31,7 @@
 
 
 		<!-- Upload form. Note enctype attribute! -->
-		<form action="/openrem/admin/sizeprocess/" method="post" enctype="multipart/form-data">
+		<form action="/openrem/admin/sizeprocess/{{ csvid }}/" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
             <table>
                 <th>{{ form.height_field.label_tag }}</th>
