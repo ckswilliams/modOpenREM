@@ -249,18 +249,18 @@ from remapp.forms import SizeHeadersForm
 def size_process(request, *args, **kwargs):
 
     if request.method == 'POST': 
-        print request.POST
-        csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
-        with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
-            dataset = csv.DictReader(csvfile)
-            fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
-        form = SizeHeadersForm(request.POST) # A form bound to the POST data
-        if form.is_valid(): # All validation rules pass
-            # Process the data in form.cleaned_data
-            # ...
-            return HttpResponseRedirect('/thanks/') # Redirect after POST
+              
+        itemsInPost = len(request.POST.values())
+        uniqueItemsInPost = len(set(request.POST.values()))
+        
+        if itemsInPost == uniqueItemsInPost:
+            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
+            csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
+            print "Launch data upload with openrem_ptsizecsv.py -v {0} {1} {2} {3} {4}".format("idtype", csvfile, request.POST['id_field'], request.POST['height_field'], request.POST['weight_field'] )
         else:
-            print request.POST
+            print "Duplicate column header selection."
+            
+
     else:
     
         csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
