@@ -28,20 +28,28 @@
 
 """
 
-def _patientstudymoduleattributes(exam, height, weight, verbose): # C.7.2.2
+def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord): # C.7.2.2
     patientatt = exam.patient_study_module_attributes_set.get()
     if height and not patientatt.patient_size:
         patientatt.patient_size = height
         if verbose:
-            print "Inserted height of " + height
+            if csvrecord:
+                csvrecord.log += "Inserted height of {0} \n".format(height)
+                csvrecord.save()
+            else:
+                print "Inserted height of " + height
     if weight and not patientatt.patient_weight:
         patientatt.patient_weight = weight
         if verbose:
-            print "Inserted weight of " + weight
+            if csvrecord:
+                csvrecord.log += "Inserted weight of {0} \n".format(weight)
+                csvrecord.save()
+            else:
+                print "Inserted weight of " + weight
     patientatt.save()
 
 
-def _ptsizeinsert(accno,height,weight,siuid, verbose):
+def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord):
     from django.db import models
     from remapp.models import General_study_module_attributes
     from django import db
@@ -54,11 +62,50 @@ def _ptsizeinsert(accno,height,weight,siuid, verbose):
         if e:
             for exam in e:
                 if verbose:
-                    print accno + ":"
-                _patientstudymoduleattributes(exam, height, weight, verbose)
+                    if csvrecord:
+                        csvrecord.log += accno + ":"
+                        csvrecord.save()
+                    else:
+                        print accno + ":"
+                _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord)
         elif verbose:
-            print "Accession number " + accno + " not found in db"
+            if csvrecord:
+                csvrecord.log += "Accession number {0} not found in db \n".format(accno)
+                csvrecord.save()
+            else:
+                print "Accession number {0} not found in db".format(accno)
     db.reset_queries()
+
+
+def websizeimport(csv_pk = None, *args, **kwargs):
+
+    import os, sys, csv
+    from openrem.settings import MEDIA_ROOT
+    from remapp.models import Size_upload
+
+    if csv_pk:
+        csvrecord = Size_upload.objects.all().filter(id__exact = csv_pk)[0]
+        if csvrecord.id_type and csvrecord.id_field and csvrecord.height_field and csvrecord.weight_field:
+            si_uid = False
+            verbose = True
+            if csvrecord.id_type == "si-uid":
+                si_uid = True
+            if not csvrecord.log:
+                csvrecord.log = ""
+                csvrecord.save()
+            f = open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb')
+            try:
+                dataset = csv.DictReader(f)
+                for line in dataset:
+                    _ptsizeinsert(
+                        line[csvrecord.id_field],
+                        line[csvrecord.height_field],
+                        line[csvrecord.weight_field],
+                        si_uid,
+                        verbose,
+                        csvrecord)
+            finally:
+                f.close()
        
 
     
@@ -102,9 +149,10 @@ def csv2db(*args, **kwargs):
     
     f = open(args.csvfile, 'rb')
     try:
-        dataset = csv.DictReader(f)        
+        dataset = csv.DictReader(f)
+        csvrecord = None
         for line in dataset:
-            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid, args.verbose)
+            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid, args.verbose, csvrecord)
     finally:
         f.close()
 
