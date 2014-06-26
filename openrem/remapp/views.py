@@ -254,6 +254,15 @@ def size_process(request, *args, **kwargs):
         uniqueItemsInPost = len(set(request.POST.values()))
         
         if itemsInPost == uniqueItemsInPost:
+            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+            csvrecord.height_field = request.POST['height_field']
+            csvrecord.weight_field = request.POST['weight_field']
+            csvrecord.id_field = request.POST['id_field']
+            csvrecord.id_type = request.POST['id_type']
+            csvrecord.save()
+
+            return HttpResponseRedirect("/openrem/admin/sizeimport/{0}/".format(kwargs['pk']))
+
             csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
             csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
             print "Launch data upload with openrem_ptsizecsv.py -v {0} {1} {2} {3} {4}".format("idtype", csvfile, request.POST['id_field'], request.POST['height_field'], request.POST['weight_field'] )
@@ -292,6 +301,16 @@ def size_process(request, *args, **kwargs):
         {'form':form, 'csvid':kwargs['pk']},
         context_instance=RequestContext(request)
     )
+
+def size_import(request, *args, **kwargs):
+    import os
+    from remapp.extractors.ptsizecsv2db import websizeimport
+
+    websizeimport(csv_pk = kwargs['pk'])
+
+
+
+
 
 
 #**********************************************************************#
