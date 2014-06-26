@@ -35,6 +35,11 @@ from django.db import models
 
 class Size_upload(models.Model):
     sizefile = models.FileField(upload_to='sizeupload/%Y/%m/%d')
+    log = models.TextField(blank=True, null=True)
+    height_field = models.TextField(blank=True, null=True)
+    weight_field = models.TextField(blank=True, null=True)
+    id_field = models.TextField(blank=True, null=True)
+    id_type = models.TextField(blank=True, null=True)
 
 
 class Exports(models.Model):
