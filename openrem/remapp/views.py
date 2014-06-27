@@ -247,6 +247,7 @@ def size_upload(request):
 
 from remapp.forms import SizeHeadersForm
 def size_process(request, *args, **kwargs):
+    from remapp.extractors.ptsizecsv2db import websizeimport
 
     if request.method == 'POST': 
               
@@ -260,6 +261,8 @@ def size_process(request, *args, **kwargs):
             csvrecord.id_field = request.POST['id_field']
             csvrecord.id_type = request.POST['id_type']
             csvrecord.save()
+
+            job = websizeimport.delay(csv_pk = kwargs['pk'])
 
             return HttpResponseRedirect("/openrem/admin/sizeimport/{0}/".format(kwargs['pk']))
 
@@ -304,9 +307,6 @@ def size_process(request, *args, **kwargs):
 
 def size_import(request, *args, **kwargs):
     import os
-    from remapp.extractors.ptsizecsv2db import websizeimport
-
-    job = websizeimport.delay(csv_pk = kwargs['pk'])
 
     csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
     
