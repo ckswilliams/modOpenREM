@@ -76,7 +76,9 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord):
                 print "Accession number {0} not found in db".format(accno)
     db.reset_queries()
 
+from celery import shared_task
 
+@shared_task
 def websizeimport(csv_pk = None, *args, **kwargs):
 
     import os, sys, csv

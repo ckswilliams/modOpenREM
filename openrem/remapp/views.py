@@ -306,8 +306,16 @@ def size_import(request, *args, **kwargs):
     import os
     from remapp.extractors.ptsizecsv2db import websizeimport
 
-    websizeimport(csv_pk = kwargs['pk'])
+    job = websizeimport.delay(csv_pk = kwargs['pk'])
 
+    csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+    
+    return render_to_response(
+        'remapp/sizeimport.html',
+        {'csvrecord': csvrecord},
+        context_instance = RequestContext(request)
+    )
+    
 
 
 

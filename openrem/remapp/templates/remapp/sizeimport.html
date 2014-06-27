@@ -1,0 +1,58 @@
+{% extends "remapp/base.html" %}
+
+
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+{% endblock %}
+
+{% block exportnav %}
+            <li class="active"><a href="/openrem/export">Exports</a></li>
+{% endblock %}
+
+
+
+{% block mainblock %}		
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {% if message.level == 40 %}
+                    <strong>Warning!</strong>
+                {% endif %}
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <h3>Import csv filename</h3>
+    <table>
+        <tr>
+            <td>{{ csvrecord.sizefile.name }}</td>
+        </tr>
+    </table>
+
+    <h3>Selected csv fieldnames</h3>
+    <table>
+        <th>Height field</th><th>Weight field</th><th>ID field</th><th>ID type</th>
+        <tr>
+            <td>{{ csvrecord.height_field }}</td>
+            <td>{{ csvrecord.weight_field }}</td>
+            <td>{{ csvrecord.id_field }}</td>
+            <td>{{ csvrecord.id_type }}</td>
+        </tr>
+    </table>
+    
+    <h3>Import log</h3>
+    <p>
+        {{ csvrecord.log|linebreaks }}
+    </p>
+    
+	</body>
+
+</html> 
+{% endblock %}	
