@@ -45,7 +45,8 @@ class Size_upload(models.Model):
     progress = models.TextField(blank=True, null=True)
     num_records = models.IntegerField(blank=True, null=True)
     logfile = models.TextField(blank=True, null=True)
-    processtime = models.DecimalField(max_digits=30,decimal_places=10,blank=True,null=True)
+    import_date = models.DateTimeField(blank=True, null=True)
+    processtime = models.FloatField(blank=True,null=True)
 
 class Exports(models.Model):
     """Table to hold the export status and filenames
