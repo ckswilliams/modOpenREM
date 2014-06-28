@@ -40,7 +40,12 @@ class Size_upload(models.Model):
     weight_field = models.TextField(blank=True, null=True)
     id_field = models.TextField(blank=True, null=True)
     id_type = models.TextField(blank=True, null=True)
-
+    task_id = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
+    progress = models.TextField(blank=True, null=True)
+    num_records = models.IntegerField(blank=True, null=True)
+    logfile = models.TextField(blank=True, null=True)
+    processtime = models.DecimalField(max_digits=30,decimal_places=10,blank=True,null=True)
 
 class Exports(models.Model):
     """Table to hold the export status and filenames
@@ -53,6 +58,7 @@ class Exports(models.Model):
     num_records = models.IntegerField(blank=True, null=True)
     export_type = models.TextField(blank=True, null=True)
     export_date = models.DateTimeField(blank=True, null=True)
+    processtime = models.DecimalField(max_digits=30,decimal_places=10,blank=True,null=True)
 
 class Content_item_descriptions(models.Model):
     """Table to hold all the context ID code values and code meanings.
