@@ -81,12 +81,18 @@ from celery import shared_task
 @shared_task
 def websizeimport(csv_pk = None, *args, **kwargs):
 
-    import os, sys, csv
+    import os, sys, csv, datetime
     from openrem.settings import MEDIA_ROOT
     from remapp.models import Size_upload
 
     if csv_pk:
         csvrecord = Size_upload.objects.all().filter(id__exact = csv_pk)[0]
+        csvrecord.task_id = websizeimport.request.id
+        datestamp = datetime.datetime.now()
+        csvrecord.import_date = datestamp
+        csvrecord.progress = 'Patient size data import started'
+        csvrecord.status = 'CURRENT'
+        csvrecord.save()
         if csvrecord.id_type and csvrecord.id_field and csvrecord.height_field and csvrecord.weight_field:
             si_uid = False
             verbose = True
@@ -108,6 +114,9 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                         csvrecord)
             finally:
                 f.close()
+                csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+                csvrecord.status = 'COMPLETE'
+                csvrecord.save()
        
 
     

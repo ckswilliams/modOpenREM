@@ -2,7 +2,9 @@
 
 
 {% block headextras %}
+{% if current %}
 <meta http-equiv="refresh" content="1" />
+{% endif %}
 {% endblock %}
 
 
@@ -19,6 +21,8 @@
 
 
 {% block mainblock %}		
+   {% load humanize %}
+
 
     {% if messages %}
         {% for message in messages %}
@@ -33,23 +37,52 @@
     {% endif %}
 
 
-    <h3>Import csv filename</h3>
-    <table class="table table-striped table-bordered">
+    {% if current %}
+    <h4>Import tasks in progress</h4>
+    <table class="table table-striped">
+        <th>Filename</th><th>Import started</th><th>No. records</th><th>Progress</th>
+        {% for tsk in current %}
         <tr>
-            <td>{{ csvrecord.sizefile.name }}</td>
+            <td>{{ tsk.sizefile.name }}</td>
+            <td>{{ tsk.import_date|naturaltime }}</td>
+            <td>{{ tsk.num_records }}</td>
+            <td>{{ tsk.progress }}</td>
         </tr>
+        {% endfor %}
     </table>
+    {% endif %}
 
-    <h3>Selected csv fieldnames</h3>
-    <table class="table table-striped table-bordered">
-        <th>Height field</th><th>Weight field</th><th>ID field</th><th>ID type</th>
+    <h4>Completed export tasks</h4>
+    <form action="/openrem/deletefile/" method="POST">
+    <table class="table table-striped">
+        <th>File name</th><th>Import started</th><th>Import time</th><th>No. records</th><th>Download logfile</th><th>Delete?</th>
+        {% for tsk in complete %}
         <tr>
-            <td>{{ csvrecord.height_field }}</td>
-            <td>{{ csvrecord.weight_field }}</td>
-            <td>{{ csvrecord.id_field }}</td>
-            <td>{{ csvrecord.id_type }}</td>
+            <td>{{ tsk.sizefile.name }}</td>
+            <td>{{ tsk.import_date|naturaltime }}</td>
+            <td>{{ tsk.processtime }}</td>
+            <td>{{ tsk.num_records }}</td>
+            <td>(coming)</a></td>
+            <td>
+                <div class = "checkbox">
+                    <label>
+                        <input type="checkbox" name="tsk{{ tsk.task_id }}" value="{{ tsk.task_id }}">
+                    </label>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="5"></td>
+            <td>
+            {% if complete.count > 0 %}
+                <button type="submit" class = "btn btn-default">Delete</button>
+            {% endif %}
+            </td>
         </tr>
     </table>
+    </form>
+
     
     <h3>Import log</h3>
     <p>

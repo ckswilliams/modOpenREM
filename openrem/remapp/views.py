@@ -264,7 +264,7 @@ def size_process(request, *args, **kwargs):
 
             job = websizeimport.delay(csv_pk = kwargs['pk'])
 
-            return HttpResponseRedirect("/openrem/admin/sizeimport/{0}/".format(kwargs['pk']))
+            return HttpResponseRedirect("/openrem/admin/sizeimport/")
 
             csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
             csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
@@ -307,12 +307,31 @@ def size_process(request, *args, **kwargs):
 
 def size_import(request, *args, **kwargs):
     import os
+    import pkg_resources # part of setuptools
+    from django.template import RequestContext  
+    from django.shortcuts import render_to_response
+    from remapp.models import Size_upload
 
-    csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+    imports = Size_upload.objects.all().order_by('-import_date')
     
+    current = imports.filter(status__contains = 'CURRENT')
+    complete = imports.filter(status__contains = 'COMPLETE')
+    
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+
     return render_to_response(
         'remapp/sizeimport.html',
-        {'csvrecord': csvrecord},
+        {'admin': admin, 'current': current, 'complete': complete},
         context_instance = RequestContext(request)
     )
     
