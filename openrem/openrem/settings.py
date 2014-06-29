@@ -14,7 +14,6 @@ TEMPLATE_DEBUG = DEBUG
 
 BROKER_URL = 'amqp://guest:guest@localhost//'
 CELERY_RESULT_BACKEND = 'amqp'
-# CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 
 #: Only add pickle to this list if your broker is secured
