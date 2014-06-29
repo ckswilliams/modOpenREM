@@ -28,31 +28,38 @@
 
 """
 
-def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord): # C.7.2.2
+def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
+
+    imp_log = None
+    if 'imp_log' in kwargs:
+        imp_log = kwargs['imp_log']
+
     patientatt = exam.patient_study_module_attributes_set.get()
     if height and not patientatt.patient_size:
         patientatt.patient_size = height
         if verbose:
-            if csvrecord:
-                csvrecord.log += "Inserted height of {0} \n".format(height)
-                csvrecord.save()
+            if imp_log:
+                imp_log.write("Inserted height of {0} \n".format(height))
             else:
                 print "Inserted height of " + height
     if weight and not patientatt.patient_weight:
         patientatt.patient_weight = weight
         if verbose:
-            if csvrecord:
-                csvrecord.log += "Inserted weight of {0} \n".format(weight)
-                csvrecord.save()
+            if imp_log:
+                imp_log.write("Inserted weight of {0} \n".format(weight))
             else:
                 print "Inserted weight of " + weight
     patientatt.save()
 
 
-def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord):
+def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwargs):
     from django.db import models
     from remapp.models import General_study_module_attributes
     from django import db
+    
+    imp_log = None
+    if 'imp_log' in kwargs:
+        imp_log = kwargs['imp_log']
     
     if (height or weight) and accno:
         if not siuid:
@@ -62,15 +69,14 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord):
         if e:
             for exam in e:
                 if verbose:
-                    if csvrecord:
-                        csvrecord.log += accno + ":"
-                        csvrecord.save()
+                    if imp_log:
+                        imp_log.write("{0}:".format(accno))
                     else:
                         print accno + ":"
-                _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord)
+                _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, imp_log = imp_log)
         elif verbose:
-            if csvrecord:
-                csvrecord.log += "Accession number {0} not found in db \n".format(accno)
+            if imp_log:
+                imp_log.write("Accession number {0} not found in db \n".format(accno))
                 csvrecord.save()
             else:
                 print "Accession number {0} not found in db".format(accno)
@@ -98,9 +104,16 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             verbose = True
             if csvrecord.id_type == "si-uid":
                 si_uid = True
-            if not csvrecord.log:
-                csvrecord.log = ""
-                csvrecord.save()
+
+            logfile = "pt_size_import_log_{0}.txt".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+            date_path = datetime.datetime.now().strftime("%Y/%m/%d")
+            full_path = os.path.join(MEDIA_ROOT,"sizelogs",date_path,logfile)
+            if not os.path.exists(os.path.dirname(full_path)):
+                os.makedirs(os.path.dirname(full_path))
+            imp_log = open(full_path,"w")
+            csvrecord.logfile = logfile
+            csvrecord.save()
+    
             f = open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb')
             try:
                 dataset = csv.DictReader(f)
@@ -111,9 +124,11 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                         line[csvrecord.weight_field],
                         si_uid,
                         verbose,
-                        csvrecord)
+                        csvrecord,
+                        imp_log = imp_log)
             finally:
                 f.close()
+                imp_log.close()
                 csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
                 csvrecord.status = 'COMPLETE'
                 csvrecord.save()
