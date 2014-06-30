@@ -60,9 +60,9 @@
         <tr>
             <td>{{ tsk.sizefile.name }}</td>
             <td>{{ tsk.import_date|naturaltime }}</td>
-            <td>{{ tsk.processtime|floatformat:1 }}</td>
+            <td>{{ tsk.processtime|floatformat:1 }} s</td>
             <td>{{ tsk.num_records }}</td>
-            <td>(coming)</a></td>
+            <td><a href="/openrem/download/{{ tsk.logfile }}">Download</a></a></td>
             <td>
                 <div class = "checkbox">
                     <label>

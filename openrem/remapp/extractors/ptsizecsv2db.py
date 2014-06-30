@@ -107,11 +107,11 @@ def websizeimport(csv_pk = None, *args, **kwargs):
 
             logfile = "pt_size_import_log_{0}.txt".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
             date_path = datetime.datetime.now().strftime("%Y/%m/%d")
-            full_path = os.path.join(MEDIA_ROOT,"sizelogs",date_path,logfile)
-            if not os.path.exists(os.path.dirname(full_path)):
-                os.makedirs(os.path.dirname(full_path))
-            imp_log = open(full_path,"w")
-            csvrecord.logfile = logfile
+            rel_path = os.path.join("sizelogs",date_path,logfile)
+            if not os.path.exists(os.path.dirname(os.path.join(MEDIA_ROOT, rel_path))):
+                os.makedirs(os.path.dirname(os.path.join(MEDIA_ROOT, rel_path)))
+            imp_log = open(os.path.join(MEDIA_ROOT, rel_path),"w")
+            csvrecord.logfile = rel_path
             csvrecord.save()
     
             f = open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb')
