@@ -40,12 +40,11 @@
     {% if current %}
     <h4>Import tasks in progress</h4>
     <table class="table table-striped">
-        <th>Filename</th><th>Import started</th><th>No. records</th><th>Progress</th>
+        <th>Filename</th><th>Import started</th><th>Progress</th>
         {% for tsk in current %}
         <tr>
             <td>{{ tsk.sizefile.name }}</td>
             <td>{{ tsk.import_date|naturaltime }}</td>
-            <td>{{ tsk.num_records }}</td>
             <td>{{ tsk.progress }}</td>
         </tr>
         {% endfor %}
@@ -55,7 +54,7 @@
     <h4>Completed export tasks</h4>
     <form action="/openrem/deletefile/" method="POST">
     <table class="table table-striped">
-        <th>File name</th><th>Import started</th><th>Import time</th><th>No. records</th><th>Download logfile</th><th>Delete?</th>
+        <th>File name</th><th>Import started</th><th>Import time</th><th>No. rows</th><th>Download logfile</th><th>Delete?</th>
         {% for tsk in complete %}
         <tr>
             <td>{{ tsk.sizefile.name }}</td>

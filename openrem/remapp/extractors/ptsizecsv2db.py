@@ -113,11 +113,16 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             imp_log = open(os.path.join(MEDIA_ROOT, rel_path),"w")
             csvrecord.logfile = rel_path
             csvrecord.save()
-    
+
+            with open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb') as r:
+                csvrecord.num_records = len(r.readlines())
+                csvrecord.save()
             f = open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb')
             try:
                 dataset = csv.DictReader(f)
-                for line in dataset:
+                for i, line in enumerate(dataset):
+                    csvrecord.progress = "Processing row {0} of {1}".format(i + 1, csvrecord.num_records)
+                    csvrecord.save()
                     _ptsizeinsert(
                         line[csvrecord.id_field],
                         line[csvrecord.height_field],
