@@ -29,16 +29,6 @@
     {% endif %}
 
 
-		<!-- List of uploaded documents -->
-		{% if documents %}
-			<ul>
-			{% for document in documents %}
-				<li><a href="{{ document.sizefile.url }}">{{ document.sizefile.name }}</a></li>
-			{% endfor %}
-			</ul>
-		{% else %}
-			<p>No documents.</p>
-		{% endif %}
 
 		<!-- Upload form. Note enctype attribute! -->
 		<form action="{% url "size_upload" %}" method="post" enctype="multipart/form-data">

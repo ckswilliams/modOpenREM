@@ -235,8 +235,6 @@ def size_upload(request):
     else:
         form = SizeUploadForm() # A empty, unbound form
 
-    # Load documents for the list page
-    sizefiles = Size_upload.objects.all()
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -252,7 +250,7 @@ def size_upload(request):
     # Render list page with the documents and the form
     return render_to_response(
         'remapp/sizeupload.html',
-        {'documents': sizefiles, 'form': form, 'admin':admin},
+        {'form': form, 'admin':admin},
         context_instance=RequestContext(request)
     )
 
