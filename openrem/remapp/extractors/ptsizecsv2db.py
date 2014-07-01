@@ -114,10 +114,10 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             csvrecord.logfile = rel_path
             csvrecord.save()
 
-            with open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb') as r:
-                csvrecord.num_records = len(r.readlines())
-                csvrecord.save()
-            f = open(os.path.join(MEDIA_ROOT, csvrecord.sizefile.name), 'rb')
+            csvrecord.sizefile.open(mode='rb')
+            f = csvrecord.sizefile.readlines()
+            csvrecord.num_records = len(f)
+            csvrecord.save()
             try:
                 dataset = csv.DictReader(f)
                 for i, line in enumerate(dataset):
@@ -132,7 +132,7 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                         csvrecord,
                         imp_log = imp_log)
             finally:
-                f.close()
+                csvrecord.sizefile.delete()
                 imp_log.close()
                 csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
                 csvrecord.status = 'COMPLETE'

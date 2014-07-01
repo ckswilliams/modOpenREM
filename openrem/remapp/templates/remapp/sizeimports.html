@@ -54,10 +54,9 @@
     <h4>Completed export tasks</h4>
     <form action="/openrem/deletefile/" method="POST">
     <table class="table table-striped">
-        <th>File name</th><th>Import started</th><th>Import time</th><th>No. rows</th><th>Download logfile</th><th>Delete?</th>
+        <th>Import started</th><th>Import time</th><th>No. rows</th><th>Download logfile</th><th>Delete?</th>
         {% for tsk in complete %}
         <tr>
-            <td>{{ tsk.sizefile.name }}</td>
             <td>{{ tsk.import_date|naturaltime }}</td>
             <td>{{ tsk.processtime|floatformat:1 }} s</td>
             <td>{{ tsk.num_records }}</td>
@@ -81,12 +80,6 @@
         </tr>
     </table>
     </form>
-
-    
-    <h3>Import log</h3>
-    <p>
-        {{ csvrecord.log|linebreaks }}
-    </p>
     
 	</body>
 
