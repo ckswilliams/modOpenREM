@@ -264,7 +264,7 @@ def size_process(request, *args, **kwargs):
 
             job = websizeimport.delay(csv_pk = kwargs['pk'])
 
-            return HttpResponseRedirect("/openrem/admin/sizeimport/")
+            return HttpResponseRedirect("/openrem/admin/sizeimports")
 
             csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
             csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
@@ -289,7 +289,7 @@ def size_process(request, *args, **kwargs):
                 else:
                     csvfile.seek(0)
                     messages.error(request, "Doesn't appear to have a header row. First row: {0}".format(next(csvfile)))
-                    return HttpResponseRedirect("/openrem/admin/sizeupload")
+                    return HttpResponseRedirect("/openrem/admin/sizeuploads")
             except csv.Error as e:
                 messages.error(request, "Doesn't appear to be a csv file. Error({0})".format(e))
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
@@ -305,7 +305,7 @@ def size_process(request, *args, **kwargs):
         context_instance=RequestContext(request)
     )
 
-def size_import(request, *args, **kwargs):
+def size_imports(request, *args, **kwargs):
     import os
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
@@ -330,7 +330,7 @@ def size_import(request, *args, **kwargs):
 
 
     return render_to_response(
-        'remapp/sizeimport.html',
+        'remapp/sizeimports.html',
         {'admin': admin, 'current': current, 'complete': complete},
         context_instance = RequestContext(request)
     )
