@@ -238,10 +238,21 @@ def size_upload(request):
     # Load documents for the list page
     sizefiles = Size_upload.objects.all()
 
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     # Render list page with the documents and the form
     return render_to_response(
         'remapp/sizeupload.html',
-        {'documents': sizefiles, 'form': form},
+        {'documents': sizefiles, 'form': form, 'admin':admin},
         context_instance=RequestContext(request)
     )
 
@@ -297,11 +308,20 @@ def size_process(request, *args, **kwargs):
                 messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
 
-    
-    
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
     return render_to_response(
         'remapp/sizeprocess.html',
-        {'form':form, 'csvid':kwargs['pk']},
+        {'form':form, 'csvid':kwargs['pk'], 'admin':admin},
         context_instance=RequestContext(request)
     )
 
