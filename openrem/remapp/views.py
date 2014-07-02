@@ -354,6 +354,27 @@ def size_imports(request, *args, **kwargs):
     )
     
 
+@csrf_exempt
+@login_required
+def size_delete(request):
+    from django.http import HttpResponseRedirect
+    from django.core.urlresolvers import reverse
+    from django.contrib import messages
+    from remapp.models import Size_upload
+
+    for task in request.POST:
+        uploads = Size_upload.objects.filter(task_id__exact = request.POST[task])
+        for upload in uploads:
+            try:
+                upload.logfile.delete()
+                upload.delete()
+                messages.success(request, "Export file and database entry deleted successfully.")
+            except OSError as e:
+                messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+            except:
+                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+
+    return HttpResponseRedirect(reverse(size_imports))
 
 
 

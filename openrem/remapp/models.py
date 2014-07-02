@@ -43,7 +43,7 @@ class Size_upload(models.Model):
     status = models.TextField(blank=True, null=True)
     progress = models.TextField(blank=True, null=True)
     num_records = models.IntegerField(blank=True, null=True)
-    logfile = models.TextField(blank=True, null=True)
+    logfile = models.FileField(upload_to='sizelogs/%Y/%m/%d', null=True)
     import_date = models.DateTimeField(blank=True, null=True)
     processtime = models.FloatField(blank=True,null=True)
 

@@ -39,14 +39,18 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         patientatt.patient_size = height
         if verbose:
             if imp_log:
+                imp_log.file.open("ab")
                 imp_log.write("Inserted height of {0} \n".format(height))
+                imp_log.file.close()
             else:
                 print "Inserted height of " + height
     if weight and not patientatt.patient_weight:
         patientatt.patient_weight = weight
         if verbose:
             if imp_log:
+                imp_log.file.open("ab")
                 imp_log.write("Inserted weight of {0} \n".format(weight))
+                imp_log.file.close()
             else:
                 print "Inserted weight of " + weight
     patientatt.save()
@@ -70,13 +74,17 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
             for exam in e:
                 if verbose:
                     if imp_log:
+                        imp_log.file.open("ab")
                         imp_log.write("{0}:".format(accno))
+                        imp_log.file.close()
                     else:
                         print accno + ":"
                 _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, imp_log = imp_log)
         elif verbose:
             if imp_log:
+                imp_log.file.open("ab")
                 imp_log.write("Accession number {0} not found in db \n".format(accno))
+                imp_log.file.close()
                 csvrecord.save()
             else:
                 print "Accession number {0} not found in db".format(accno)
@@ -88,7 +96,7 @@ from celery import shared_task
 def websizeimport(csv_pk = None, *args, **kwargs):
 
     import os, sys, csv, datetime
-    from openrem.settings import MEDIA_ROOT
+    from django.core.files.base import ContentFile
     from remapp.models import Size_upload
 
     if csv_pk:
@@ -106,13 +114,11 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                 si_uid = True
 
             logfile = "pt_size_import_log_{0}.txt".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-            date_path = datetime.datetime.now().strftime("%Y/%m/%d")
-            rel_path = os.path.join("sizelogs",date_path,logfile)
-            if not os.path.exists(os.path.dirname(os.path.join(MEDIA_ROOT, rel_path))):
-                os.makedirs(os.path.dirname(os.path.join(MEDIA_ROOT, rel_path)))
-            imp_log = open(os.path.join(MEDIA_ROOT, rel_path),"w")
-            csvrecord.logfile = rel_path
-            csvrecord.save()
+            headerrow = ContentFile("Patient size import from {0}\n".format(csvrecord.sizefile.name))
+            csvrecord.logfile.save(logfile,headerrow)
+            l = csvrecord.logfile
+            l.file.close()
+                # Method used for opening and writing to file as per https://code.djangoproject.com/ticket/13809
 
             csvrecord.sizefile.open(mode='rb')
             f = csvrecord.sizefile.readlines()
@@ -130,10 +136,9 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                         si_uid,
                         verbose,
                         csvrecord,
-                        imp_log = imp_log)
+                        imp_log = l)
             finally:
                 csvrecord.sizefile.delete()
-                imp_log.close()
                 csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
                 csvrecord.status = 'COMPLETE'
                 csvrecord.save()
