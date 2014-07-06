@@ -292,18 +292,21 @@ def size_process(request, *args, **kwargs):
                 if csv.Sniffer().has_header(csvfile.read(1024)):
                     csvfile.seek(0)
                     dataset = csv.DictReader(csvfile)
-                    messages.success(request, "Hoorah. CSV file found with delimiter {0}. Headers are {1}.".format(dialect.delimiter, dataset.fieldnames))
+                    messages.success(request, "CSV file with column headers found.")
                     fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
                     form = SizeHeadersForm(my_choice = fieldnames)
                 else:
                     csvfile.seek(0)
-                    messages.error(request, "Doesn't appear to have a header row. First row: {0}".format(next(csvfile)))
-                    return HttpResponseRedirect("/openrem/admin/sizeuploads")
+                    messages.error(request, "Doesn't appear to have a header row. First row: {0}. The uploaded file has been deleted.".format(next(csvfile)))
+                    csvrecord[0].sizefile.delete()
+                    return HttpResponseRedirect("/openrem/admin/sizeupload")
             except csv.Error as e:
-                messages.error(request, "Doesn't appear to be a csv file. Error({0})".format(e))
+                messages.error(request, "Doesn't appear to be a csv file. Error({0}). The uploaded file has been deleted.".format(e))
+                csvrecord[0].sizefile.delete()
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
             except:
-                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+                messages.error(request, "Unexpected error - please contact an administrator: {0}.".format(sys.exc_info()[0]))
+                csvrecord[0].sizefile.delete()
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
 
     try:
