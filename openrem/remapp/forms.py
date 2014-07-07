@@ -15,9 +15,9 @@ class SizeHeadersForm(forms.Form):
         super(SizeHeadersForm, self).__init__(**kwargs)
         if my_choice:
 
-            self.fields['height_field'] = forms.ChoiceField(choices=my_choice)
-            self.fields['weight_field'] = forms.ChoiceField(choices=my_choice)
-            self.fields['id_field'] = forms.ChoiceField(choices=my_choice)
-            ID_TYPES = (("si-uid", "Study instance UID"), ("acc-no", "Accession Number"))
-            self.fields['id_type'] = forms.ChoiceField(widget=forms.RadioSelect, choices=ID_TYPES)
+            self.fields['height_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
+            self.fields['weight_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
+            self.fields['id_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
+            ID_TYPES = (("acc-no", "Accession Number"),("si-uid", "Study instance UID"))
+            self.fields['id_type'] = forms.ChoiceField(choices=ID_TYPES, widget=forms.Select(attrs={"class":"form-control"}))
 
