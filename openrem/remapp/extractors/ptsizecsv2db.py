@@ -35,24 +35,41 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         imp_log = kwargs['imp_log']
 
     patientatt = exam.patient_study_module_attributes_set.get()
-    if height and not patientatt.patient_size:
-        patientatt.patient_size = height
-        if verbose:
+    if height:
+        if not patientatt.patient_size:
+            patientatt.patient_size = height
+            if verbose:
+                if imp_log:
+                    imp_log.file.open("ab")
+                    imp_log.write("\n    Inserted height of {0} cm".format(height))
+                    imp_log.file.close()
+                else:
+                    print "Inserted height of " + height
+        elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("Inserted height of {0} \n".format(height))
+                imp_log.write("\n    Height of {0} m not inserted as {1} cm already in the database".format(height, patientatt.patient_size))
                 imp_log.file.close()
             else:
-                print "Inserted height of " + height
-    if weight and not patientatt.patient_weight:
-        patientatt.patient_weight = weight
-        if verbose:
+                print "Height of {0} m not inserted as {1} cm already in the database".format(height, patientatt.patient_size)
+
+    if weight:
+        if not patientatt.patient_weight:
+            patientatt.patient_weight = weight
+            if verbose:
+                if imp_log:
+                    imp_log.file.open("ab")
+                    imp_log.write("\n    Inserted weight of {0} kg".format(weight))
+                    imp_log.file.close()
+                else:
+                    print "Inserted weight of " + weight
+        elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("Inserted weight of {0} \n".format(weight))
+                imp_log.write("\n    Weight of {0} kg not inserted as {1} kg already in the database".format(weight, patientatt.patient_weight))
                 imp_log.file.close()
             else:
-                print "Inserted weight of " + weight
+                print "Weight of {0} kg not inserted as {1} kg already in the database".format(weight, patientatt.patient_weight)
     patientatt.save()
 
 
@@ -75,19 +92,19 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
                 if verbose:
                     if imp_log:
                         imp_log.file.open("ab")
-                        imp_log.write("{0}:".format(accno))
+                        imp_log.write("\n{0}:".format(accno))
                         imp_log.file.close()
                     else:
                         print accno + ":"
                 _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, imp_log = imp_log)
-        elif verbose:
-            if imp_log:
-                imp_log.file.open("ab")
-                imp_log.write("Accession number {0} not found in db \n".format(accno))
-                imp_log.file.close()
-                csvrecord.save()
-            else:
-                print "Accession number {0} not found in db".format(accno)
+#        elif verbose:
+#            if imp_log:
+#                imp_log.file.open("ab")
+#                imp_log.write("Accession number {0} not found in db \n".format(accno))
+#                imp_log.file.close()
+#                csvrecord.save()
+#            else:
+#                print "Accession number {0} not found in db".format(accno)
     db.reset_queries()
 
 from celery import shared_task
