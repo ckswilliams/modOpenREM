@@ -33,6 +33,20 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 from django.db import models
 
+class Size_upload(models.Model):
+    sizefile = models.FileField(upload_to='sizeupload/%Y/%m/%d')
+    height_field = models.TextField(blank=True, null=True)
+    weight_field = models.TextField(blank=True, null=True)
+    id_field = models.TextField(blank=True, null=True)
+    id_type = models.TextField(blank=True, null=True)
+    task_id = models.TextField(blank=True, null=True)
+    status = models.TextField(blank=True, null=True)
+    progress = models.TextField(blank=True, null=True)
+    num_records = models.IntegerField(blank=True, null=True)
+    logfile = models.FileField(upload_to='sizelogs/%Y/%m/%d', null=True)
+    import_date = models.DateTimeField(blank=True, null=True)
+    processtime = models.FloatField(blank=True,null=True)
+
 class Exports(models.Model):
     """Table to hold the export status and filenames
     """
@@ -44,6 +58,7 @@ class Exports(models.Model):
     num_records = models.IntegerField(blank=True, null=True)
     export_type = models.TextField(blank=True, null=True)
     export_date = models.DateTimeField(blank=True, null=True)
+    processtime = models.DecimalField(max_digits=30,decimal_places=10,blank=True,null=True)
 
 class Content_item_descriptions(models.Model):
     """Table to hold all the context ID code values and code meanings.

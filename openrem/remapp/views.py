@@ -211,6 +211,177 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
 
     return redirect("/openrem/")
 
+import os, sys, csv
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.contrib import messages
+
+from openrem.settings import MEDIA_ROOT
+from remapp.models import Size_upload
+from remapp.forms import SizeUploadForm
+
+def size_upload(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = SizeUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            newcsv = Size_upload(sizefile = request.FILES['sizefile'])
+            newcsv.save()
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(newcsv.id))
+    else:
+        form = SizeUploadForm() # A empty, unbound form
+
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/sizeupload.html',
+        {'form': form, 'admin':admin},
+        context_instance=RequestContext(request)
+    )
+
+from remapp.forms import SizeHeadersForm
+def size_process(request, *args, **kwargs):
+    from remapp.extractors.ptsizecsv2db import websizeimport
+
+    if request.method == 'POST': 
+              
+        itemsInPost = len(request.POST.values())
+        uniqueItemsInPost = len(set(request.POST.values()))
+        
+        if itemsInPost == uniqueItemsInPost:
+            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+            csvrecord.height_field = request.POST['height_field']
+            csvrecord.weight_field = request.POST['weight_field']
+            csvrecord.id_field = request.POST['id_field']
+            csvrecord.id_type = request.POST['id_type']
+            csvrecord.save()
+
+            job = websizeimport.delay(csv_pk = kwargs['pk'])
+
+            return HttpResponseRedirect("/openrem/admin/sizeimports")
+
+            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
+            csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
+            print "Launch data upload with openrem_ptsizecsv.py -v {0} {1} {2} {3} {4}".format("idtype", csvfile, request.POST['id_field'], request.POST['height_field'], request.POST['weight_field'] )
+        else:
+            messages.error(request, "Duplicate column header selection. Each field must have a different header.")
+            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
+            
+
+    else:
+    
+        csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
+        with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
+            try:
+                dialect = csv.Sniffer().sniff(csvfile.read(1024))
+                csvfile.seek(0)
+                if csv.Sniffer().has_header(csvfile.read(1024)):
+                    csvfile.seek(0)
+                    dataset = csv.DictReader(csvfile)
+                    messages.success(request, "CSV file with column headers found.")
+                    fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
+                    form = SizeHeadersForm(my_choice = fieldnames)
+                else:
+                    csvfile.seek(0)
+                    messages.error(request, "Doesn't appear to have a header row. First row: {0}. The uploaded file has been deleted.".format(next(csvfile)))
+                    csvrecord[0].sizefile.delete()
+                    return HttpResponseRedirect("/openrem/admin/sizeupload")
+            except csv.Error as e:
+                messages.error(request, "Doesn't appear to be a csv file. Error({0}). The uploaded file has been deleted.".format(e))
+                csvrecord[0].sizefile.delete()
+                return HttpResponseRedirect("/openrem/admin/sizeupload")
+            except:
+                messages.error(request, "Unexpected error - please contact an administrator: {0}.".format(sys.exc_info()[0]))
+                csvrecord[0].sizefile.delete()
+                return HttpResponseRedirect("/openrem/admin/sizeupload")
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    return render_to_response(
+        'remapp/sizeprocess.html',
+        {'form':form, 'csvid':kwargs['pk'], 'admin':admin},
+        context_instance=RequestContext(request)
+    )
+
+def size_imports(request, *args, **kwargs):
+    import os
+    import pkg_resources # part of setuptools
+    from django.template import RequestContext  
+    from django.shortcuts import render_to_response
+    from remapp.models import Size_upload
+
+    imports = Size_upload.objects.all().order_by('-import_date')
+    
+    current = imports.filter(status__contains = 'CURRENT')
+    complete = imports.filter(status__contains = 'COMPLETE')
+    
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+
+    return render_to_response(
+        'remapp/sizeimports.html',
+        {'admin': admin, 'current': current, 'complete': complete},
+        context_instance = RequestContext(request)
+    )
+    
+
+@csrf_exempt
+@login_required
+def size_delete(request):
+    from django.http import HttpResponseRedirect
+    from django.core.urlresolvers import reverse
+    from django.contrib import messages
+    from remapp.models import Size_upload
+
+    for task in request.POST:
+        uploads = Size_upload.objects.filter(task_id__exact = request.POST[task])
+        for upload in uploads:
+            try:
+                upload.logfile.delete()
+                upload.delete()
+                messages.success(request, "Export file and database entry deleted successfully.")
+            except OSError as e:
+                messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+            except:
+                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+
+    return HttpResponseRedirect(reverse(size_imports))
+
+
+
 
 #**********************************************************************#
 #                    Testing celery                                    #
