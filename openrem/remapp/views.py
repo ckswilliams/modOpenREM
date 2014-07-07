@@ -279,7 +279,8 @@ def size_process(request, *args, **kwargs):
             csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
             print "Launch data upload with openrem_ptsizecsv.py -v {0} {1} {2} {3} {4}".format("idtype", csvfile, request.POST['id_field'], request.POST['height_field'], request.POST['weight_field'] )
         else:
-            print "Duplicate column header selection."
+            messages.error(request, "Duplicate column header selection. Each field must have a different header.")
+            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
             
 
     else:

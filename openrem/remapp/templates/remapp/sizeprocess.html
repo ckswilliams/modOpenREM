@@ -46,6 +46,7 @@
 		<form action="/openrem/admin/sizeprocess/{{ csvid }}/" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
             <div class="row">
+            <div class="form-group">
             <table>
                 <th>{{ form.height_field.label_tag }}</th>
                 <th>{{ form.weight_field.label_tag }}</th>
@@ -71,9 +72,11 @@
                 </tr>
             </table>
             </div>
+            </div>
             <div class="row">
-              <p></p>
+              <div class="col-md-offset-7">
 			  <button type="submit" class="btn btn-default">Process the data</button>
+              </div>
             </div>
         </form>
       </div> <!-- class="col-md-8 col-md-offset-2" -->
