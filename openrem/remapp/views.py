@@ -222,6 +222,7 @@ from openrem.settings import MEDIA_ROOT
 from remapp.models import Size_upload
 from remapp.forms import SizeUploadForm
 
+@login_required
 def size_upload(request):
     # Handle file upload
     if request.method == 'POST':
@@ -255,6 +256,8 @@ def size_upload(request):
     )
 
 from remapp.forms import SizeHeadersForm
+
+@login_required
 def size_process(request, *args, **kwargs):
     from remapp.extractors.ptsizecsv2db import websizeimport
 

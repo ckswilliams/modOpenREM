@@ -28,6 +28,8 @@
         {% endfor %}
     {% endif %}
 
+{% if admin.adminperm %}
+
       <div class="col-md-8 col-md-offset-2">
         <h2>Uploading patient size data to OpenREM</h2>
 
@@ -82,4 +84,23 @@
       </div> <!-- class="col-md-8 col-md-offset-2" -->
 		
       <div class="row"></div>
+
+{% else %}
+
+      <div class="row col-md-offset-2">
+        <h3>Uploading patient size data to OpenREM</h3>
+      </div>
+
+      <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+      <p>
+        This function can only be accessed if you are logged in to OpenREM with admin
+        permissions.
+      </p>
+      </div>
+      </div>
+      
+{% endif %}
+
+
 {% endblock %}	
