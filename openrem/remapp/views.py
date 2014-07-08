@@ -265,6 +265,11 @@ def size_process(request, *args, **kwargs):
         
         if itemsInPost == uniqueItemsInPost:
             csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+            
+            if not csvrecord.sizefile:
+                messages.error(request, "File to be processed doesn't exist. Do you wish to try again?")
+                return HttpResponseRedirect("/openrem/admin/sizeupload")
+            
             csvrecord.height_field = request.POST['height_field']
             csvrecord.weight_field = request.POST['weight_field']
             csvrecord.id_field = request.POST['id_field']
@@ -275,9 +280,6 @@ def size_process(request, *args, **kwargs):
 
             return HttpResponseRedirect("/openrem/admin/sizeimports")
 
-            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
-            csvfile = os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name)
-            print "Launch data upload with openrem_ptsizecsv.py -v {0} {1} {2} {3} {4}".format("idtype", csvfile, request.POST['id_field'], request.POST['height_field'], request.POST['weight_field'] )
         else:
             messages.error(request, "Duplicate column header selection. Each field must have a different header.")
             return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
