@@ -36,6 +36,7 @@
         {% endfor %}
     {% endif %}
 
+{% if admin.adminperm %}
 
     {% if current %}
     <h4>Import tasks in progress</h4>
@@ -51,7 +52,7 @@
     </table>
     {% endif %}
 
-    <h4>Completed export tasks</h4>
+    <h4>Completed import tasks</h4>
     <form action="/openrem/admin/sizedelete/" method="POST">
     {% csrf_token %} 
     <table class="table table-striped">
@@ -82,7 +83,21 @@
     </table>
     </form>
     
-	</body>
+{% else %}
 
-</html> 
+      <div class="row col-md-offset-2">
+        <h3>Uploading patient size data to OpenREM</h3>
+      </div>
+
+      <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+      <p>
+        This function can only be accessed if you are logged in to OpenREM with admin
+        permissions.
+      </p>
+      </div>
+      </div>
+      
+{% endif %}
+
 {% endblock %}	

@@ -256,6 +256,8 @@ def size_upload(request):
     )
 
 from remapp.forms import SizeHeadersForm
+
+@login_required
 def size_process(request, *args, **kwargs):
     from remapp.extractors.ptsizecsv2db import websizeimport
 
