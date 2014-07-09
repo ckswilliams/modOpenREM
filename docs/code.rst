@@ -8,7 +8,7 @@ Contents:
    
     dicomimport
     nondicomimport
-    export
+    code_export
     tools
     models
     filters
