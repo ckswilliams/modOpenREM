@@ -6,12 +6,12 @@ Contents:
 ..  toctree::
     :maxdepth: 2
    
-    dicomimport
-    nondicomimport
+    code_dicomimport
+    code_nondicomimport
     code_export
-    tools
-    models
-    filters
+    code_tools
+    code_models
+    code_filters
 
 
 
