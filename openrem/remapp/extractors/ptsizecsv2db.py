@@ -97,14 +97,7 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
                     else:
                         print accno + ":"
                 _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, imp_log = imp_log)
-#        elif verbose:
-#            if imp_log:
-#                imp_log.file.open("ab")
-#                imp_log.write("Accession number {0} not found in db \n".format(accno))
-#                imp_log.file.close()
-#                csvrecord.save()
-#            else:
-#                print "Accession number {0} not found in db".format(accno)
+
     db.reset_queries()
 
 from celery import shared_task
