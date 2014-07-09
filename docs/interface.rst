@@ -1,5 +1,5 @@
-Using the OpenREM interface and export function
-***********************************************
+Using the OpenREM web interface
+*******************************
 
 Contents:
 
