@@ -56,13 +56,13 @@ On the next page select the column header that corresponds to each of the
 head, weight and ID fields. Also select whether the ID field is an Accession number
 or a Study UID:
 
+When the column headers are selected, click the 'Process the data' button.
+
 .. image:: img/AdminSizeHeaders.png
     :width: 730px
     :align: center
     :height: 357px
     :alt: Selecting header information
-
-When the column headers are selected, click the 'Process the data' button.
 
 The progress of the import is then reported on the patient size imports page:
 
