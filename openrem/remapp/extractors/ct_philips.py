@@ -174,6 +174,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
+    from decimal import Decimal
     pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate",dataset)
     pat.patient_sex = get_value_kw("PatientSex",dataset)
