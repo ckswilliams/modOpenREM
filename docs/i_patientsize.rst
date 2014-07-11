@@ -62,3 +62,24 @@ The progress of the import is then reported on the patient size imports page:
 
 As soon as the import is complete, the source csv file is deleted from the
 server.
+
+Reviewing previous imports
+==========================
+
+After an import is complete, it is listed in the Completed import tasks
+table. You can also get to this page from the Admin menu:
+
+.. image:: img/AdminImports.png
+    :width: 730px
+    :align: center
+    :height: 155px
+    :alt: Imports link
+
+For each import, there is a link to the logfile, which looks like this:
+
+.. image:: img/AdminSizeLog.png
+    :width: 618px
+    :align: center
+    :height: 291px
+    :alt: Size import logs
+
