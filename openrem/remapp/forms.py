@@ -1,11 +1,16 @@
 from django import forms
 
 class SizeUploadForm(forms.Form):
+    """Form for patient size csv file upload
+    """
     sizefile = forms.FileField(
         label='Select a file'
     )
 
 class SizeHeadersForm(forms.Form):
+    """Form for csv column header patient size imports through the web interface
+    """
+
     height_field = forms.ChoiceField(choices='')
     weight_field = forms.ChoiceField(choices='')
     id_field = forms.ChoiceField(choices='')
