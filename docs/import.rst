@@ -34,8 +34,8 @@ For CT dose summary files from Philips CT scanners
 * ``openrem_ctphilips.py filename.dcm``
 
 
-Importing dose related data from csv files
-==========================================
+Importing dose related data from csv files using the command line
+=================================================================
 
 Patient height and weight information
 -------------------------------------

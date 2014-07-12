@@ -104,6 +104,13 @@ from celery import shared_task
 
 @shared_task
 def websizeimport(csv_pk = None, *args, **kwargs):
+    """Task to import patient size data from the OpenREM web interface.
+
+    :param csv_pk: Database index key for the import record, containing
+        the path to the import csv file and the field header details.
+
+    """
+
 
     import os, sys, csv, datetime
     from django.core.files.base import ContentFile
