@@ -66,7 +66,7 @@ server.
 Reviewing previous imports
 ==========================
 
-After an import is complete, it is listed in the Completed import tasks
+After an import is complete, it is listed in the completed import tasks
 table. You can also get to this page from the Admin menu:
 
 .. image:: img/AdminImports.png
@@ -75,7 +75,9 @@ table. You can also get to this page from the Admin menu:
     :height: 155px
     :alt: Imports link
 
-For each import, there is a link to the logfile, which looks like this:
+For each import, there is a link to the logfile, which looks something like this.
+With this import accession numbers weren't available so the patient size
+information was matched to the study instance UID:
 
 .. image:: img/AdminSizeLog.png
     :width: 618px
@@ -83,3 +85,10 @@ For each import, there is a link to the logfile, which looks like this:
     :height: 291px
     :alt: Size import logs
 
+Deleting import logs
+====================
+
+The completed import tasks table also has a delete check box against each
+record and a delete button at the bottom. The csv file originally imported
+has already been deleted - this delete function is to remove the record
+of the import and the log file associated with it from the database/disk.
