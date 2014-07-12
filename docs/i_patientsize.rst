@@ -2,6 +2,8 @@ Adding patient size information from csv using the web interface
 ****************************************************************
 *New in 0.4.3*
 
+.. contents::
+
 Uploading patient size data
 ===========================
 
