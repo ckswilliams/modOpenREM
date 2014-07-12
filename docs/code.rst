@@ -12,6 +12,7 @@ Contents:
     code_tools
     code_models
     code_filters
+    code_views
 
 
 

@@ -27,6 +27,9 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+# Following two lines added so that sphinx autodocumentation works.
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -41,6 +44,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from remapp.models import General_study_module_attributes
+
+
 
 def logout_page(request):
     """
@@ -224,6 +229,10 @@ from remapp.forms import SizeUploadForm
 
 @login_required
 def size_upload(request):
+    """Form for upload of csv file containing patient size information. POST request passes database entry ID to size_process
+
+    :param request: If POST, contains the file upload information
+    """
     # Handle file upload
     if request.method == 'POST':
         form = SizeUploadForm(request.POST, request.FILES)
@@ -259,6 +268,12 @@ from remapp.forms import SizeHeadersForm
 
 @login_required
 def size_process(request, *args, **kwargs):
+    """Form for csv column header patient size imports through the web interface. POST request launches import task
+
+    :param request: If POST, contains the field header information
+    :param pk: From URL, identifies database patient size import record
+    :type pk: kwarg
+    """
     from remapp.extractors.ptsizecsv2db import websizeimport
 
     if request.method == 'POST': 
@@ -333,6 +348,10 @@ def size_process(request, *args, **kwargs):
     )
 
 def size_imports(request, *args, **kwargs):
+    """Lists patient size imports in the web interface
+
+    :param request:
+    """
     import os
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
@@ -366,6 +385,11 @@ def size_imports(request, *args, **kwargs):
 @csrf_exempt
 @login_required
 def size_delete(request):
+    """Task to delete records of patient size imports through the web interface
+
+    :param request: Contains the task ID
+    :type request: POST
+    """
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
@@ -384,53 +408,3 @@ def size_delete(request):
                 messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
     return HttpResponseRedirect(reverse(size_imports))
-
-
-
-
-#**********************************************************************#
-#                    Testing celery                                    #
-@csrf_exempt
-def celerytest(request):
-    if 'task_id' in request.session.keys() and request.session['task_id']:
-        task_id = request.session['task_id']
-    return render_to_response('remapp/celerytest.html', locals(), context_instance=RequestContext(request))
-
-@csrf_exempt
-def do_task(request):
-    """ A view the call the task and write the task id to the session """
-    from remapp.tasks import do_work
-    data = 'Fail'
-    if request.is_ajax():
-        job = do_work.delay()
-        request.session['task_id'] = job.id
-        data = job.id
-    else:
-        data = 'This is not an ajax request!'
-
-    json_data = json.dumps(data)
-
-    return HttpResponse(json_data, mimetype='application/json')
-
-@csrf_exempt
-def poll_state(request):
-    """ A view to report the progress to the user """
-    from celery.result import AsyncResult
-    data = 'Fail'
-    if request.is_ajax():
-        if 'task_id' in request.POST.keys() and request.POST['task_id']:
-            task_id = request.POST['task_id']
-            task = AsyncResult(task_id)
-            data = task.result or task.state
-        else:
-            data = 'No task_id in the request'
-    else:
-        data = 'This is not an ajax request'
-
-    json_data = json.dumps(data)
-
-    return HttpResponse(json_data, mimetype='application/json')
-
-
-
-#**********************************************************************#
