@@ -9,9 +9,7 @@ If you log in as a user that is in the ``admingroup``, then a menu is
 available at the right hand end of the navigation bar:
 
 .. image:: img/AdminImportMenu.png
-    :width: 314px
     :align: right
-    :height: 110px
     :alt: Admin import patient size data menu
 
 The first option takes you to a page where you can upload a csv file
@@ -19,15 +17,11 @@ containing details of the patient height and weight, plus either the
 accession number or the Study Instance UID.
 
 .. image:: img/AdminUploadPtSzCSV.png
-    :width: 730px
     :align: center
-    :height: 497px
     :alt: Uploading CSV files containing patient size information
 
 .. image:: img/AdminUploadButton.png
-    :width: 252px
     :align: right
-    :height: 114px
     :alt: Upload patient size csv file button
 
 The csv file needs to have at least the required columns. Additional columns
@@ -47,17 +41,13 @@ or a Study UID:
 When the column headers are selected, click the 'Process the data' button.
 
 .. image:: img/AdminSizeHeaders.png
-    :width: 730px
     :align: center
-    :height: 357px
     :alt: Selecting header information
 
 The progress of the import is then reported on the patient size imports page:
 
 .. image:: img/AdminSizeImporting.png
-    :width: 730px
     :align: center
-    :height: 86px
     :alt: Patient size importing
 
 As soon as the import is complete, the source csv file is deleted from the
@@ -70,9 +60,7 @@ After an import is complete, it is listed in the completed import tasks
 table. You can also get to this page from the Admin menu:
 
 .. image:: img/AdminImports.png
-    :width: 730px
     :align: center
-    :height: 155px
     :alt: Imports link
 
 For each import, there is a link to the logfile, which looks something like this.
@@ -80,9 +68,7 @@ With this import accession numbers weren't available so the patient size
 information was matched to the study instance UID:
 
 .. image:: img/AdminSizeLog.png
-    :width: 618px
     :align: center
-    :height: 291px
     :alt: Size import logs
 
 Deleting import logs
