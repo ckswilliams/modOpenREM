@@ -94,8 +94,3 @@ urlpatterns += patterns('remapp.exports',
         'xlsx.ctxlsx'),
 )
 
-urlpatterns += patterns('remapp.views',
-    url(r'^celerytest$', 'celerytest', name="celerytest"),
-    url(r'^do_task$', 'do_task', name="do_task"),
-    url(r'^poll_state$', 'poll_state', name="poll_state"),
-)
