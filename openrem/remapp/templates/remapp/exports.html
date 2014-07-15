@@ -59,13 +59,14 @@
     <h4>Completed export tasks</h4>
     <form action="/openrem/deletefile/" method="POST">
     <table class="table table-striped">
-        <th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Download</th><th>Delete?</th>
+        <th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Export time</th><th>Download</th><th>Delete?</th>
         {% for tsk in complete %}
         <tr>
             <td>{{ tsk.export_date|naturaltime }}</td>
             <td>{{ tsk.modality }}</td>
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
+            <td>{{ tsk.processtime|floatformat:1 }} s</td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
             <td>
                 <div class = "checkbox">
