@@ -21,6 +21,7 @@
 
 {% block mainblock %}		
    {% load humanize %}
+   {% load remappduration %}
  
     {% if admin.exportperm or admin.adminperm %}
 
@@ -66,7 +67,7 @@
             <td>{{ tsk.modality }}</td>
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
-            <td>{{ tsk.processtime|floatformat:1 }} s</td>
+            <td>{{ tsk.processtime|naturalduration }} </td>
             <td><a href="/openrem/download/{{ tsk.filename }}">{{ tsk.filename }}</a></td>
             <td>
                 <div class = "checkbox">
@@ -78,7 +79,7 @@
         </tr>
         {% endfor %}
         <tr>
-            <td colspan="5"></td>
+            <td colspan="6"></td>
             <td>
             {% if complete.count > 0 %}
                 <button type="submit" class = "btn btn-default">Delete</button>
