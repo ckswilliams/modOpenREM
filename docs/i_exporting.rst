@@ -42,11 +42,13 @@ is listed one per line. If a single study
 has more than one series with the same protocol name, then the same study
 will appear on more than one line.
 
-Clicking the link for an export redirects you to the Exports page, which 
+Clicking the link for an export redirects you to the Exports page, which
 you can also get to using the link at the top right of the navigation bar:
 
 .. image:: img/Exports.png
     :align: center
+    :width: 1261px
+    :height: 454px
     :alt: Exports list
 
 Whilst an export is being processed, it will be listed in the first table
