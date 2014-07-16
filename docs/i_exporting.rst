@@ -5,9 +5,14 @@ Exporting to csv and xlsx sheets
 ================================
 
 If you are logged in as a user in the ``exportgroup`` or the ``admingroup``,
-the csv export links will be available near the top of the modality filter pages
-in the OpenREM interface. In the CT interface, you can also export to an 
-enhanced XLSX spreadsheet. 
+the export links will be available near the top of the modality filter pages
+in the OpenREM interface. The following exports are currently available (version 0.4.3)
+
+* CT basic, single sheet csv
+* CT advanced, XLSX muliple-sheets
+* Fluoroscopy basic, single sheet csv
+* Mammography, single sheet csv
+* Mammogrpahy NHSBSP, single sheet csv designed to satisfy NHSPSB reporting
 
 For CT, the XLSX export has multiple sheets. The first sheet contains a 
 summary of all the study descriptions, requested procedures and series
@@ -36,3 +41,16 @@ The remainder of the file has one sheet per series protocol name. Each series
 is listed one per line. If a single study
 has more than one series with the same protocol name, then the same study
 will appear on more than one line.
+
+Clicking the link for an export redirects you to the Exports page, which 
+you can also get to using the link at the top right of the navigation bar:
+
+.. image:: img/Exports.png
+    :align: center
+    :alt: Exports list
+
+Whilst an export is being processed, it will be listed in the first table
+at the top. The current status is displayed to indicate export progress.
+
+Completed exports are then listed in the second table, with a link to
+download the csv or xlsx file.
