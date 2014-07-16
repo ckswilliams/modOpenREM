@@ -56,3 +56,12 @@ at the top. The current status is displayed to indicate export progress.
 
 Completed exports are then listed in the second table, with a link to
 download the csv or xlsx file.
+
+When the export is no longer needed, it can be deleted from the server
+by ticking the delete checkbox and clicking the delete button at the bottom:
+
+.. image:: img/ExportsDelete.png
+    :align: center
+    :width: 679px
+    :height: 404px
+    :alt: Deleting exports
