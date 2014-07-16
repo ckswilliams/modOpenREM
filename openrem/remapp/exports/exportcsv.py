@@ -139,6 +139,7 @@ def exportFL2excel(filterdict):
 
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
 
@@ -312,6 +313,7 @@ def exportCT2excel(filterdict):
         tsk.save()
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
 @shared_task
@@ -439,6 +441,7 @@ def exportMG2excel(filterdict):
 
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
 
