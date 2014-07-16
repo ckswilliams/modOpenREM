@@ -22,7 +22,7 @@
 
 {% block mainblock %}		
    {% load humanize %}
-
+   {% load remappduration %}
 
     {% if messages %}
         {% for message in messages %}
@@ -60,7 +60,7 @@
         {% for tsk in complete %}
         <tr>
             <td>{{ tsk.import_date|naturaltime }}</td>
-            <td>{{ tsk.processtime|floatformat:1 }} s</td>
+            <td>{{ tsk.processtime|naturalduration }}</td>
             <td>{{ tsk.num_records }}</td>
             <td><a href="/openrem/download/{{ tsk.logfile }}">Download</a></a></td>
             <td>

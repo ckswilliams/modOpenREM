@@ -162,5 +162,6 @@ def mg_csv_nhsbsp(filterdict):
 
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
     

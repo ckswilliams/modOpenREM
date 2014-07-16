@@ -364,7 +364,7 @@ def ctxlsx(filterdict):
     tsk.save()
 
     import pkg_resources  # part of setuptools
-    from datetime import datetime
+    import datetime
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -376,7 +376,7 @@ def ctxlsx(filterdict):
     titleformat.set_font_size=(22)
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
-    toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.now()))
+    toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
     linetwostring = 'OpenREM is copyright 2014 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
@@ -420,4 +420,5 @@ def ctxlsx(filterdict):
 
     tsk.progress = 'XLSX book written.'
     tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
