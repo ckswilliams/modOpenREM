@@ -62,6 +62,6 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
 
 .. image:: img/ExportsDelete.png
     :align: center
-    :width: 679px
-    :height: 404px
+    :width: 450px
+    :height: 268px
     :alt: Deleting exports
