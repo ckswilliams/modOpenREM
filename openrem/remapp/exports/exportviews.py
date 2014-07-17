@@ -12,7 +12,7 @@ from django.http import HttpResponse
 def ctcsv1(request):
     """View to launch celery task to export CT studies to csv file
 
-    :param request: Contains the database filtering parameters
+    :param request: Contains the database filtering parameters. Also used to get user group.
     :type request: GET
     """
     from django.shortcuts import redirect
@@ -27,6 +27,11 @@ def ctcsv1(request):
 @csrf_exempt
 @login_required
 def ctxlsx1(request):
+    """View to launch celery task to export CT studies to xlsx file
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
     from django.shortcuts import redirect
     from remapp.exports.xlsx import ctxlsx
 
@@ -38,6 +43,11 @@ def ctxlsx1(request):
 @csrf_exempt
 @login_required
 def flcsv1(request):
+    """View to launch celery task to export fluoroscopy studies to csv file
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportFL2excel
 
@@ -49,6 +59,11 @@ def flcsv1(request):
 @csrf_exempt
 @login_required
 def mgcsv1(request):
+    """View to launch celery task to export mammography studies to csv file
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportMG2excel
 
@@ -60,6 +75,11 @@ def mgcsv1(request):
 @csrf_exempt
 @login_required
 def mgnhsbsp(request):
+    """View to launch celery task to export mammography studies to csv file using a NHSBSP template
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
     from django.shortcuts import redirect
     from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 
@@ -71,6 +91,10 @@ def mgnhsbsp(request):
 @csrf_exempt
 @login_required
 def export(request):
+    """View to list current and completed exports to track progress, download and delete
+
+    :param request: Used to get user group.
+    """
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
@@ -101,6 +125,15 @@ def export(request):
 
 @login_required
 def download(request, file_name):
+    """View to handle downloads of files from the server
+
+    :param request: Used to get user group.
+    :param file_name: Passes name of file to be downloaded.
+    :type filename: string
+
+    Originally used for download of the export spreadsheets, now also used
+    for downloading the patient size import logfiles.
+    """
     import mimetypes
     import os
     from django.core.servers.basehttp import FileWrapper
@@ -123,6 +156,11 @@ def download(request, file_name):
 @csrf_exempt
 @login_required
 def deletefile(request):
+    """View to delete export files from the server
+
+    :param request: Contains the task ID
+    :type request: POST
+    """
     import os, sys
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
