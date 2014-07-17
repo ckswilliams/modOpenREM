@@ -1,3 +1,7 @@
+# Following two lines added so that sphinx autodocumentation works.
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -6,6 +10,11 @@ from django.http import HttpResponse
 @csrf_exempt
 @login_required
 def ctcsv1(request):
+    """View to launch celery task to export CT studies to csv file
+
+    :param request: Contains the database filtering parameters
+    :type request: GET
+    """
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportCT2excel
 
