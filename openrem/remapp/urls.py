@@ -73,19 +73,13 @@ urlpatterns = patterns('remapp.views',
 )
 
 urlpatterns += patterns('remapp.exports',
-#    url(r'^export/openrem/rf/', 'exportcsv.exportFL2excel'),
-#    url(r'^export/openrem/ct/', 'exportcsv.exportCT2excel'),
-#    url(r'^export/openrem/mg/', 'exportcsv.exportMG2excel'),
-    url(r'^ct/do_ct_csv$', 'ajaxviews.ct_csv', name="ct_csv"),
-    url(r'^do_ct_csv$', 'ajaxviews.ct_csv', name="ct_csv"),
-    url(r'^ct/csv_export_task$', 'ajaxviews.ct_csv'),
     url(r'^export/$', 'ajaxviews.export'),
-    url(r'^download/(?P<file_name>.+)$', 'ajaxviews.download'),
     url(r'^exportctcsv1/$', 'ajaxviews.ctcsv1'),
     url(r'^exportctxlsx1/$', 'ajaxviews.ctxlsx1'),
     url(r'^exportflcsv1/$', 'ajaxviews.flcsv1'),
     url(r'^exportmgcsv1/$', 'ajaxviews.mgcsv1'),
     url(r'^exportmgnhsbsp/$', 'ajaxviews.mgnhsbsp'),
+    url(r'^download/(?P<file_name>.+)$', 'ajaxviews.download'),
     url(r'^deletefile/$', 'ajaxviews.deletefile'),
 )
 

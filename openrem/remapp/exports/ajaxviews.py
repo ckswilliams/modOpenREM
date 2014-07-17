@@ -90,29 +90,6 @@ def export(request):
     return render_to_response('remapp/exports.html', locals(), context_instance=RequestContext(request))
 
 
-@csrf_exempt
-@login_required
-def ct_csv(request):
-    from remapp.exports.exportcsv import exportCT2excel
-    from remapp.exports.exportcsv import getQueryFilters
-    from urlparse import parse_qs
-    
-    postdata = json.loads(request.body)
-    queryfilters = parse_qs(postdata['qfilters'], keep_blank_values=True)
-    
-    data = 'Fail'
-    if request.is_ajax():
-        job = exportCT2excel.delay(queryfilters)
-        request.session['task_id'] = job.id
-        data = job.id
-    else:
-        data = "Not ajax request!"
-        
-    json_data = json.dumps(data)
-
-    return HttpResponse(json_data, content_type='application/json')
-
-
 @login_required
 def download(request, file_name):
     import mimetypes
