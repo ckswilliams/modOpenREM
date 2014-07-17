@@ -120,7 +120,7 @@ def deletefile(request):
     from django.contrib import messages
     from openrem.settings import MEDIA_ROOT
     from remapp.models import Exports
-    from remapp.exports import ajaxviews
+    from remapp.exports import exportviews
     
     
     for task in request.POST:
@@ -135,4 +135,4 @@ def deletefile(request):
         except:
             messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
     
-    return HttpResponseRedirect(reverse(ajaxviews.export))
+    return HttpResponseRedirect(reverse(exportviews.export))
