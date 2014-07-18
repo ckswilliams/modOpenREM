@@ -127,12 +127,13 @@ def export(request):
 def download(request, file_name):
     """View to handle downloads of files from the server
 
+    Originally used for download of the export spreadsheets, now also used
+    for downloading the patient size import logfiles.
+
     :param request: Used to get user group.
     :param file_name: Passes name of file to be downloaded.
     :type filename: string
 
-    Originally used for download of the export spreadsheets, now also used
-    for downloading the patient size import logfiles.
     """
     import mimetypes
     import os
