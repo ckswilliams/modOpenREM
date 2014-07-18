@@ -13,6 +13,7 @@ Contents:
     code_models
     code_filters
     code_views
+    code_exportviews
     code_forms
 
 
