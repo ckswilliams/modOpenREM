@@ -21,7 +21,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-..  module:: export views.
+..  module:: exportviews.py
     :synopsis: Module to render appropriate content according to request, specific to the exports.
 
 ..  moduleauthor:: Ed McDonagh
