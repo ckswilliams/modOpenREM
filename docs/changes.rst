@@ -5,6 +5,16 @@ OpenREM version history
 0.4.3
 ------
 
+* `#106`_  Added the duration of export time to the exports table. Also added template formatting tag to convert seconds to natural time
+* `#105`_  Fixed bug in Philips CT import where :py:class:`decimal.Decimal` was not imported before being used in the age calculation
+* `#104`_  Added documentation for the additional study export functions as a result of using Celery tasks in task `#19`_ as well as documentation for the code
+* `#103`_  Added documentation for using the web import of patient size information as well as the new code
+* `#102`_  Improved handling of attempts to process patient size files that have been deleted for when users go back in the browser after the process is finished
+* `#101`_  Set the security of the new patient size imports to prevent users below admin level from using it
+* `#100`_  Logging information for patient size imports was being written to the database - changed to write to file
+* `#98`_   Versions 0.4.0 to 0.4.2 had a settings.py.new file to avoid overwriting settings files on upgrades; renaming this file was missing from the installation documentation for new installs
+* `#97`_   Changed the name of the export views file from ajaxviews as ajax wasn't used in the end
+* `#96`_   Changed mammo and fluoro filters to use named fields to avoid needing to use the full database path
 * `#93`_   Set the security of the new exports to prevent users below export level from creating or downloading exports
 * `#92`_   Add `NHSBSP specific mammography csv export`_ from Jonathan Cole - with Celery
 * `#90`_   Added delete function for exports
@@ -13,7 +23,9 @@ OpenREM version history
 * `#87`_   Converted mammography objects to using the Celery task manager after starting with CT for `#19`_ 
 * `#86`_   Digital Breast Tomosynthesis systems have a projections object that for Hologic contains required dosimetry information
 * `#85`_   Fix for bug introduced in `#75`_ where adaption of ptsize import for procedure import broke ptsize imports
-* `#19`_   Exports are now sent to a task manager instead of locking up the web interface.
+* `#74`_   'Time since last study' is now correct when daylight saving time kicks in
+* `#21`_   Height and weight data can now be imported through forms in the web interface
+* `#19`_   Exports are now sent to a task manager instead of locking up the web interface
 
 
 0.4.2
