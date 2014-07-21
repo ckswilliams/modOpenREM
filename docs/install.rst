@@ -13,6 +13,7 @@ Installation prerequisites
 --------------------------
 
 Install python 2.7
+``````````````````
 
 * Linux - likely to be installed already
 * Windows - https://www.python.org/download/releases
@@ -22,6 +23,15 @@ Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.h
 ..  Note::
 
     Before continuing, `consider virtualenv`_
+
+Install RabbitMQ
+````````````````
+*(New for version 0.4.3)*
+
+* Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
+* Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
+
+For either install, just follow the defaults - no special configurations required.
 
 Install OpenREM
 ---------------
