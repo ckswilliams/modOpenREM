@@ -50,7 +50,7 @@ There are three files that need renaming: *(changed for 0.4.0)*
 
 + ``openrem/local_settings.py.example`` to ``openrem/local_settings.py``
 + ``openrem/wsgi.py.example`` to ``openrem/wsgi.py``
-+ ``openrem/settings.py.new`` to ``openrem/settings.py`` **This file will be** ``settings.py`` **from 0.4.3 onward!**
++ ``openrem/settings.py.new`` to ``openrem/settings.py`` *Not applicable from 0.4.3 onwards*
 
 In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path and the secret key.
 
