@@ -67,7 +67,7 @@ For testing you can use the SQLite3 database::
 
 For production use, see `Database options`_ below
 
-Location settings for imports and exports
+Location setting for imports and exports
 `````````````````````````````````````````
 
 Csv and xlsx study information exports and patient size csv imports are

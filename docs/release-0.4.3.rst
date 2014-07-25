@@ -28,8 +28,8 @@ The message broker RabbitMQ needs to be installed to enable the export and uploa
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
-Edit local_settings.py file
-```````````````````````````
+Edit the location setting for imports and exports in the local_settings.py file
+```````````````````````````````````````````````````````````````````````````````
 
 The ``MEDIA_ROOT`` path needs to be defined in the ``local_settings.py`` file. This is
 the place where the study exports will be stored for download and where the
