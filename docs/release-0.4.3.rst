@@ -53,7 +53,9 @@ this is likely to be ``www-data`` for a production install.
 Upgrading from 0.3.9 or earlier
 -------------------------------
 
-It is essential that you uprade to 0.4.0 first, then upgrade to 0.4.3. Otherwise the settings file
-will be overwritten and you will lose your database settings.
+It is essential that you upgrade to at least 0.4.2 first, then upgrade to
+0.4.3. Otherwise the settings file will be overwritten and you will lose
+your database settings. There is also a trickier than usual database
+migration and instructions for setting up users.
 
 Follow the instructions in :doc:`release-0.4.0`
