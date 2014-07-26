@@ -13,6 +13,7 @@ Installation prerequisites
 --------------------------
 
 Install python 2.7
+``````````````````
 
 * Linux - likely to be installed already
 * Windows - https://www.python.org/download/releases
@@ -22,6 +23,15 @@ Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.h
 ..  Note::
 
     Before continuing, `consider virtualenv`_
+
+Install RabbitMQ
+````````````````
+*(New for version 0.4.3)*
+
+* Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
+* Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
+
+For either install, just follow the defaults - no special configurations required.
 
 Install OpenREM
 ---------------
@@ -40,9 +50,12 @@ There are three files that need renaming: *(changed for 0.4.0)*
 
 + ``openrem/local_settings.py.example`` to ``openrem/local_settings.py``
 + ``openrem/wsgi.py.example`` to ``openrem/wsgi.py``
-+ ``openrem/settings.py.new`` to ``openrem/settings.py`` **This file will be** ``settings.py`` **in future installs!**
++ ``openrem/settings.py.new`` to ``openrem/settings.py`` *Not applicable from 0.4.3 onwards*
 
-In the ``local_settings.py`` file, set the database details.
+In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path and the secret key.
+
+Database settings
+`````````````````
 
 For testing you can use the SQLite3 database::
 
@@ -53,7 +66,22 @@ For testing you can use the SQLite3 database::
 * Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db',``
 
 For production use, see `Database options`_ below
-    
+
+Location setting for imports and exports
+`````````````````````````````````````````
+
+Csv and xlsx study information exports and patient size csv imports are
+written to disk at a location defined by ``MEDIA_ROOT``.
+
+The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
+webserver must have read/write access to the location specified because
+it is the webserver than reads and writes the files. In a debian linux,
+this is likely to be www-data for a production install.
+
+
+Secret key
+``````````
+
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
 
