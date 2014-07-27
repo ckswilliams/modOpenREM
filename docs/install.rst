@@ -122,6 +122,7 @@ Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openre
 
 Start the Celery task queue
 ---------------------------
+*(New for version 0.4.3)*
 
 Celery will have been automatically installed with OpenREM, and along with
 RabbitMQ allows for asynchronous task processing for imports and exports.
@@ -137,6 +138,8 @@ In a new shell:
 
  * ``cd C:\Python27\Lib\site-packages\openrem\``
  * ``celery -A openrem worker -l info``
+
+See also `Daemonising Celery`_
 
 Start using it!
 ---------------
@@ -197,6 +200,7 @@ has instructions and links to get you set up with Apache.
 
 Daemonising Celery
 ------------------
+*(New for version 0.4.3)*
 
 In a production environment, Celery will need to start automatically and
 not depend on a particular user being logged in. Therefore, much like
