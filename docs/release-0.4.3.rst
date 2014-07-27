@@ -19,6 +19,7 @@ Upgrading from 0.4.0 or above
 * Install RabbitMQ
 * Add the ``MEDIA_ROOT`` path to the ``local_settings.py``
 * Then follow the :ref:`generic-upgrade-instructions`. A database migration is required.
+* Start the Celery task queue
 
 RabbitMQ
 ````````
@@ -47,7 +48,10 @@ webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
 this is likely to be ``www-data`` for a production install.
 
+Start the Celery task queue
+```````````````````````````
 
+Follow the Celery instructions on the :doc:`install` page.
 
 
 Upgrading from 0.3.9 or earlier

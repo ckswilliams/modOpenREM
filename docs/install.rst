@@ -127,10 +127,14 @@ Celery will have been automatically installed with OpenREM, and along with
 RabbitMQ allows for asynchronous task processing for imports and exports.
 
 In a new shell:
+
 * Linux:
+
  * ``cd /usr/lib/python2.7/dist-packages/openrem/``
  * ``celery -A openrem worker -l info``
+
 * Windows:
+
  * ``cd C:\Python27\Lib\site-packages\openrem\``
  * ``celery -A openrem worker -l info``
 
@@ -196,9 +200,8 @@ Daemonising Celery
 
 In a production environment, Celery will need to start automatically and
 not depend on a particular user being logged in. Therefore, much like
-the webserver, it will need to be daemonised. Please refer to the
-instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
-for now.
+the webserver, it will need to be daemonised. For now, please refer to the
+instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
 
 Virtualenv and virtualenvwrapper
 --------------------------------
