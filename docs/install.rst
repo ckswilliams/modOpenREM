@@ -139,7 +139,7 @@ In a new shell:
  * ``cd C:\Python27\Lib\site-packages\openrem\``
  * ``celery -A openrem worker -l info``
 
-See also `Daemonising Celery`_
+For production use, see `Daemonising Celery`_ below
 
 Start using it!
 ---------------
