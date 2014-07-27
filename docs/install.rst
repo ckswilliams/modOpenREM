@@ -120,6 +120,20 @@ and ``8000`` with the port you wish to use.
 
 Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 
+Start the Celery task queue
+---------------------------
+
+Celery will have been automatically installed with OpenREM, and along with
+RabbitMQ allows for asynchronous task processing for imports and exports.
+
+In a new shell:
+* Linux:
+ * ``cd /usr/lib/python2.7/dist-packages/openrem/``
+ * ``celery -A openrem worker -l info``
+* Windows:
+ * ``cd C:\Python27\Lib\site-packages\openrem\``
+ * ``celery -A openrem worker -l info``
+
 Start using it!
 ---------------
 
@@ -133,8 +147,8 @@ Add some users *(New in version 0.4.0)*
 * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
 
     + ``viewgroup`` can browse the data only
-    + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
-    + ``admingroup`` can delete studies in addition to anything the export group can do
+    + ``exportgroup`` can do as view group plus export data to a spreadsheet
+    + ``admingroup`` can delete studies and import height and weight data in addition to anything the export group can do
 
 Further instructions
 ====================
@@ -176,6 +190,15 @@ do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/djang
 
 The `django website <https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/modwsgi/>`_ 
 has instructions and links to get you set up with Apache.
+
+Daemonising Celery
+------------------
+
+In a production environment, Celery will need to start automatically and
+not depend on a particular user being logged in. Therefore, much like
+the webserver, it will need to be daemonised. Please refer to the
+instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
+for now.
 
 Virtualenv and virtualenvwrapper
 --------------------------------
