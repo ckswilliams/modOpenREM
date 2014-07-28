@@ -41,7 +41,7 @@ Database migration
 ^^^^^^^^^^^^^^^^^^
 
 Always do a database migration using South after an upgrade in case any of the
-database models have changed. This will normally not be the case.
+database models have changed. This is not always the case.
 
 * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``

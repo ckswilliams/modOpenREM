@@ -62,6 +62,6 @@ It is essential that you upgrade to at least 0.4.2 first, then upgrade to
 your database settings. There is also a trickier than usual database
 migration and instructions for setting up users.
 
-*Instructions for upgrading to 0.4.3, something like* ``sudo pip install openrem==0.4.2``
+*Instructions for upgrading to 0.4.2, something like* ``sudo pip install openrem==0.4.2``
 
 Follow the instructions in :doc:`release-0.4.0`
