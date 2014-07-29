@@ -50,6 +50,10 @@ Install OpenREM
 
 * ``pip install openrem`` (Needs internet connection)
 
+With Windows, and assuming Python is on the path, it might need to be:
+
+* ``python -m pip install openrem``
+
 Configure OpenREM
 -----------------
 
