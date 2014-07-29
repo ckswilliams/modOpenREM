@@ -16,9 +16,9 @@ Install python 2.7
 ``````````````````
 
 * Linux - likely to be installed already
-* Windows - https://www.python.org/download/releases
+* Windows - https://www.python.org/downloads
 
-Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
+Install setuptools and pip - http://www.pip-installer.org/en/latest/installing.html
 
 ..  Note::
 
