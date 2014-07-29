@@ -12,11 +12,23 @@ you will need to use the Windows ``\`` separator.
 Installation prerequisites
 --------------------------
 
-Install python 2.7
-``````````````````
+Install Python 2.7.x
+````````````````````
 
 * Linux - likely to be installed already
 * Windows - https://www.python.org/downloads
+
+.. image:: img/pythonpath.png
+    :align: right
+    :alt: Select to add Python to the path during installation
+
+During a Windows Python installation, the choice is offered to add python.exe
+to the system Path variable. If this is selected, further use of Python will
+be simply a case of typing ``python command`` rather than having to reference
+the path to the python.exe file each time.
+
+Setuptools and pip
+``````````````````
 
 Install setuptools and pip - http://www.pip-installer.org/en/latest/installing.html
 
