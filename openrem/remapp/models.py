@@ -34,7 +34,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 from django.db import models
 
 class Size_upload(models.Model):
-    sizefile = models.FileField(upload_to='sizeupload/%Y/%m/%d')
+    sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)
     weight_field = models.TextField(blank=True, null=True)
     id_field = models.TextField(blank=True, null=True)
