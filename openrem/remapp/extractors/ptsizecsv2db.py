@@ -48,10 +48,10 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\n    Height of {0} m not inserted as {1} cm already in the database".format(height, patientatt.patient_size))
+                imp_log.write("\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size))
                 imp_log.file.close()
             else:
-                print "    Height of {0} m not inserted as {1} cm already in the database".format(height, patientatt.patient_size)
+                print "    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size)
 
     if weight:
         if not patientatt.patient_weight:
@@ -66,10 +66,10 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\n    Weight of {0} kg not inserted as {1} kg already in the database".format(weight, patientatt.patient_weight))
+                imp_log.write("\n    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight))
                 imp_log.file.close()
             else:
-                print "    Weight of {0} kg not inserted as {1} kg already in the database".format(weight, patientatt.patient_weight)
+                print "    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight)
     patientatt.save()
 
 
