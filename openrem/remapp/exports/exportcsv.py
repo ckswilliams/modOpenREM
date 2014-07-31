@@ -155,6 +155,7 @@ def exportCT2excel(filterdict):
     """
 
     from django.conf import settings
+    from django.core.files.base import ContentFile
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     import os
@@ -172,11 +173,11 @@ def exportCT2excel(filterdict):
     tsk.save()
 
     csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.progress = 'Query filters imported, task started'
-    csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
-    tsk.filename = csvfilename
-    tsk.save()
-    
+    tsk.filename.save(csvfilename,ContentFile(''))
+    csvfile = tsk.filename
+    csvfile.file.close()
+
+    csvfile.file.open("ab")
     writer = csv.writer(csvfile)
     
     tsk.progress = 'CSV file created'
@@ -312,6 +313,9 @@ def exportCT2excel(filterdict):
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
     tsk.progress = 'All study data written.'
+
+    csvfile.file.close()
+
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()

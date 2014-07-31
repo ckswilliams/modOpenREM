@@ -51,7 +51,7 @@ class Exports(models.Model):
     """Table to hold the export status and filenames
     """
     task_id = models.TextField()
-    filename = models.TextField(blank=True, null=True)
+    filename = models.FileField(upload_to='exports/%Y/%m/%d', null=True)
     status = models.TextField(blank=True, null=True)
     progress = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=8, blank=True, null=True)
