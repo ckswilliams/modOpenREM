@@ -6,6 +6,7 @@ OpenREM version history
 ------
 
 * `#113`_  Fixed units spelling error in patient size import logs
+* `#110`_  Converted exports to use the FileField handling for storage and access, plus modified folder structure.
 * `#106`_  Added the duration of export time to the exports table. Also added template formatting tag to convert seconds to natural time
 * `#105`_  Fixed bug in Philips CT import where :py:class:`decimal.Decimal` was not imported before being used in the age calculation
 * `#104`_  Added documentation for the additional study export functions as a result of using Celery tasks in task `#19`_ as well as documentation for the code
