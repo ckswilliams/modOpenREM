@@ -64,10 +64,10 @@ def ctxlsx(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    filename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
     tmpxlsx = TemporaryFile()
     book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
                              'strings_to_numbers':  True})
+
     tsk.progress = 'Workbook created'
     tsk.save()
 
@@ -408,10 +408,12 @@ def ctxlsx(filterdict):
 
 
     book.close()
-
-    tsk.filename.save(filename,File(tmpxlsx))
-
     tsk.progress = 'XLSX book written.'
+    tsk.save()
+
+    xlsxfilename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.filename.save(xlsxfilename,File(tmpxlsx))
+
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
