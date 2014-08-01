@@ -34,7 +34,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 from django.db import models
 
 class Size_upload(models.Model):
-    sizefile = models.FileField(upload_to='sizeupload/%Y/%m/%d')
+    sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)
     weight_field = models.TextField(blank=True, null=True)
     id_field = models.TextField(blank=True, null=True)
@@ -51,7 +51,7 @@ class Exports(models.Model):
     """Table to hold the export status and filenames
     """
     task_id = models.TextField()
-    filename = models.TextField(blank=True, null=True)
+    filename = models.FileField(upload_to='exports/%Y/%m/%d', null=True)
     status = models.TextField(blank=True, null=True)
     progress = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=8, blank=True, null=True)

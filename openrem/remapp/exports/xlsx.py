@@ -29,11 +29,6 @@
 """
 
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
-
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
@@ -51,7 +46,9 @@ def ctxlsx(filterdict):
     """
 
     import os, datetime
+    from tempfile import TemporaryFile
     from django.conf import settings
+    from django.core.files import File
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     from remapp.interface.mod_filters import CTSummaryListFilter
@@ -67,15 +64,10 @@ def ctxlsx(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    filename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    xlsxfile = open(os.path.join(settings.MEDIA_ROOT,filename),"w")
-    tsk.filename = filename
-    tsk.save()
-    
-
-    # create a workbook on disk
-    book = Workbook(xlsxfile, {'default_date_format': 'dd/mm/yyyy',
+    tmpxlsx = TemporaryFile()
+    book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
                              'strings_to_numbers':  True})
+
     tsk.progress = 'Workbook created'
     tsk.save()
 
@@ -416,9 +408,12 @@ def ctxlsx(filterdict):
 
 
     book.close()
-        
-
     tsk.progress = 'XLSX book written.'
+    tsk.save()
+
+    xlsxfilename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.filename.save(xlsxfilename,File(tmpxlsx))
+
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
