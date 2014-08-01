@@ -135,11 +135,12 @@ def exportFL2excel(filterdict):
 
 
     tsk.progress = 'All study data written.'
-    tsk.status = 'COMPLETE'
+    tsk.save()
 
     csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
     tsk.filename.save(csvfilename,File(tmpfile))
 
+    tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
@@ -155,12 +156,12 @@ def exportCT2excel(filterdict):
     
     """
 
+    import os, datetime
+    from tempfile import TemporaryFile
     from django.conf import settings
-    from django.core.files.base import ContentFile
+    from django.core.files import File
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
-    import os
-    import datetime
 
     tsk = Exports.objects.create()
 
@@ -173,13 +174,8 @@ def exportCT2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(csvfilename,ContentFile(''))
-    csvfile = tsk.filename
-    csvfile.file.close()
-
-    csvfile.file.open("ab")
-    writer = csv.writer(csvfile)
+    tmpfile = TemporaryFile()    
+    writer = csv.writer(tmpfile)
     
     tsk.progress = 'CSV file created'
     tsk.save()
@@ -314,8 +310,10 @@ def exportCT2excel(filterdict):
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
     tsk.progress = 'All study data written.'
+    tsk.save()
 
-    csvfile.file.close()
+    csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.filename.save(csvfilename,File(tmpfile))
 
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
@@ -442,11 +440,12 @@ def exportMG2excel(filterdict):
         tsk.save()
 
     tsk.progress = 'All study data written.'
-    tsk.status = 'COMPLETE'
+    tsk.save()
 
     csvfilename = "mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
     tsk.filename.save(csvfilename,File(tmpfile))
 
+    tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
