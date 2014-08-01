@@ -43,7 +43,9 @@ def exportFL2excel(filterdict):
     """
 
     import os, datetime
+    from tempfile import TemporaryFile
     from django.conf import settings
+    from django.core.files import File
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
@@ -59,13 +61,8 @@ def exportFL2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.progress = 'Query filters imported, task started'
-    csvfile = open(os.path.join(settings.MEDIA_ROOT,csvfilename),"w")
-    tsk.filename = csvfilename
-    tsk.save()
-    
-    writer = csv.writer(csvfile)
+    tmpfile = TemporaryFile()    
+    writer = csv.writer(tmpfile)
     
     tsk.progress = 'CSV file created'
     tsk.save()
@@ -139,6 +136,10 @@ def exportFL2excel(filterdict):
 
     tsk.progress = 'All study data written.'
     tsk.status = 'COMPLETE'
+
+    filename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    tsk.filename.save(filename,File(tmpfile))
+
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
