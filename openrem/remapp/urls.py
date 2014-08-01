@@ -81,6 +81,7 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
     url(r'^download/(?P<file_name>.+)$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
+    url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
 )
 
 urlpatterns += patterns('remapp.exports',

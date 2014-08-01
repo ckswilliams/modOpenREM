@@ -2,7 +2,7 @@
 
 {% block headextras %}
 {% if current %}
-<meta http-equiv="refresh" content="1" />
+<meta http-equiv="refresh" content="3" />
 {% endif %}
 {% endblock %}
 
@@ -43,7 +43,7 @@
     {% if current %}
     <h4>Export tasks in progress</h4>
     <table class="table table-striped">
-        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th>
+        <th>Task ID</th><th>Exported</th><th>Modality</th><th>Export type</th><th>No. records</th><th>Progress</th><th>Abort</th>
         {% for tsk in current %}
         <tr>
             <td>{{ tsk.task_id }}</td>
@@ -52,6 +52,7 @@
             <td>{{ tsk.export_type }}</td>
             <td>{{ tsk.num_records }}</td>
             <td>{{ tsk.progress }}</td>
+            <td><a href="/openrem/export/abort/{{ tsk.pk }}">Abort</a></td>
         </tr>
         {% endfor %}
     </table>

@@ -214,3 +214,15 @@ def deletefile(request):
             messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
     
     return HttpResponseRedirect(reverse(exportviews.export))
+
+@login_required
+def export_abort(request, pk):
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render, redirect, get_object_or_404
+    from remapp.models import Exports
+
+    export = get_object_or_404(Exports, pk=pk)    
+
+    if request.user.groups.filter(name="admingroup"):
+        export.delete()
+    return HttpResponseRedirect("/openrem/export/")
