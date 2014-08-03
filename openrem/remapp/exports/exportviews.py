@@ -202,16 +202,16 @@ def deletefile(request):
     
     
     for task in request.POST:
-        export = Exports.objects.filter(task_id__exact = request.POST[task])
-        file_path = os.path.join(MEDIA_ROOT, export[0].filename)
-        try:
-            os.remove(file_path)
-            export.delete()
-            messages.success(request, "Export file and database entry deleted successfully.")
-        except OSError as e:
-            messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        exports = Exports.objects.filter(task_id__exact = request.POST[task])
+        for export in exports:
+            try:
+                export.filename.delete()
+                export.delete()
+                messages.success(request, "Export file and database entry deleted successfully.")
+            except OSError as e:
+                messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+            except:
+                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
     
     return HttpResponseRedirect(reverse(exportviews.export))
 
