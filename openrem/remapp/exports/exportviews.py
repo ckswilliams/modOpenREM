@@ -217,6 +217,7 @@ def deletefile(request):
 
 @login_required
 def export_abort(request, pk):
+    from celery.task.control import revoke
     from django.http import HttpResponseRedirect
     from django.shortcuts import render, redirect, get_object_or_404
     from remapp.models import Exports
@@ -224,5 +225,7 @@ def export_abort(request, pk):
     export = get_object_or_404(Exports, pk=pk)    
 
     if request.user.groups.filter(name="admingroup"):
+        revoke(export.task_id, terminate=True)
         export.delete()
+
     return HttpResponseRedirect("/openrem/export/")
