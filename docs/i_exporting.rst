@@ -47,12 +47,15 @@ you can also get to using the link at the top right of the navigation bar:
 
 .. image:: img/Exports.png
     :align: center
-    :width: 1261px
-    :height: 454px
+    :width: 1277px
+    :height: 471px
     :alt: Exports list
 
 Whilst an export is being processed, it will be listed in the first table
 at the top. The current status is displayed to indicate export progress.
+If an export gets stuck for whatever reason, you may be able to abort the
+process by clicking the 'Abort' button. However this does not always cause
+an active export to terminate - you may find it completes anyway!
 
 Completed exports are then listed in the second table, with a link to
 download the csv or xlsx file.
