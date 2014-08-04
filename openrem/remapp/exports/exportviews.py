@@ -224,7 +224,7 @@ def export_abort(request, pk):
 
     export = get_object_or_404(Exports, pk=pk)    
 
-    if request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="admingroup") or request.user.groups.filter(name="exportgroup"):
         revoke(export.task_id, terminate=True)
         export.delete()
 
