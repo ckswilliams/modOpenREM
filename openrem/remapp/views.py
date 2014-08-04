@@ -411,7 +411,11 @@ def size_delete(request):
 
 @login_required
 def size_abort(request, pk):
+    """View to abort current patient size imports
 
+    :param request: Contains the task primary key
+    :type request: POST
+    """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
     from django.shortcuts import render, redirect, get_object_or_404

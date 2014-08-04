@@ -217,6 +217,11 @@ def deletefile(request):
 
 @login_required
 def export_abort(request, pk):
+    """View to abort current export job
+
+    :param request: Contains the task primary key
+    :type request: POST
+    """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
     from django.shortcuts import render, redirect, get_object_or_404
