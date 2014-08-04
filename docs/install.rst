@@ -6,8 +6,8 @@ Basic guide
 ===========
 
 Non-operating system specific path names are represented using the linux 
-convention of a ``/`` separator. If you are installing in a Windows environment 
-you will need to use the Windows ``\`` separator.
+convention of a ``/`` separator - in Windows a ``\`` would be used. However,
+in the settings file even Windows paths are separated with a ``/``.
 
 Installation prerequisites
 --------------------------
@@ -79,7 +79,7 @@ For testing you can use the SQLite3 database::
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
 * Linux example: ``'NAME': '/var/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db',``
+* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',``
 
 For production use, see `Database options`_ below
 
@@ -93,6 +93,9 @@ The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
 this is likely to be www-data for a production install.
+
+* Linux example: ``MEDIA_ROOT = "/var/openrem/exportfiles/"``
+* Windows example: ``MEDIA_ROOT = "C:/Documents/User/OpenREM/exportfiles"``
 
 
 Secret key
