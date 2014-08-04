@@ -202,15 +202,35 @@ def deletefile(request):
     
     
     for task in request.POST:
-        export = Exports.objects.filter(task_id__exact = request.POST[task])
-        file_path = os.path.join(MEDIA_ROOT, export[0].filename)
-        try:
-            os.remove(file_path)
-            export.delete()
-            messages.success(request, "Export file and database entry deleted successfully.")
-        except OSError as e:
-            messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
-        except:
-            messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        exports = Exports.objects.filter(task_id__exact = request.POST[task])
+        for export in exports:
+            try:
+                export.filename.delete()
+                export.delete()
+                messages.success(request, "Export file and database entry deleted successfully.")
+            except OSError as e:
+                messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+            except:
+                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
     
     return HttpResponseRedirect(reverse(exportviews.export))
+
+@login_required
+def export_abort(request, pk):
+    """View to abort current export job
+
+    :param request: Contains the task primary key
+    :type request: POST
+    """
+    from celery.task.control import revoke
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render, redirect, get_object_or_404
+    from remapp.models import Exports
+
+    export = get_object_or_404(Exports, pk=pk)    
+
+    if request.user.groups.filter(name="admingroup") or request.user.groups.filter(name="exportgroup"):
+        revoke(export.task_id, terminate=True)
+        export.delete()
+
+    return HttpResponseRedirect("/openrem/export/")

@@ -3,7 +3,7 @@
 
 {% block headextras %}
 {% if current %}
-<meta http-equiv="refresh" content="1" />
+<meta http-equiv="refresh" content="3" />
 {% endif %}
 {% endblock %}
 
@@ -41,12 +41,13 @@
     {% if current %}
     <h4>Import tasks in progress</h4>
     <table class="table table-striped">
-        <th>Filename</th><th>Import started</th><th>Progress</th>
+        <th>Filename</th><th>Import started</th><th>Progress</th><th></th>
         {% for tsk in current %}
         <tr>
             <td>{{ tsk.sizefile.name }}</td>
             <td>{{ tsk.import_date|naturaltime }}</td>
             <td>{{ tsk.progress }}</td>
+            <td><a href="/openrem/admin/sizeimport/abort/{{ tsk.pk }}" class="btn btn-danger">Abort</a></td>
         </tr>
         {% endfor %}
     </table>

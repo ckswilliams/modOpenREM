@@ -52,6 +52,11 @@ The progress of the import is then reported on the patient size imports page:
     :align: center
     :alt: Patient size importing
 
+During the import, it is possible to abort the process by clicking the button
+seen in the image above. The log file is available from the completed
+table whether it completed or not - there is no indication that the import
+was aborted.
+
 As soon as the import is complete, the source csv file is deleted from the
 server.
 
