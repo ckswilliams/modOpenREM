@@ -48,6 +48,7 @@ def ctxlsx(filterdict):
     import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
+    from django.contrib import messages
     from django.core.files import File
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
@@ -416,7 +417,14 @@ def ctxlsx(filterdict):
     tsk.save()
 
     xlsxfilename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(xlsxfilename,File(tmpxlsx))
+
+    try:
+        tsk.filename.save(xlsxfilename,File(tmpxlsx))
+    except:
+#        messages.error(request, "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        tsk.status = 'ERROR'
+        tsk.save()
+        return redirect('/openrem/export/')
 
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
