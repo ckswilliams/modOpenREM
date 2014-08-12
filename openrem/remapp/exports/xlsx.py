@@ -48,7 +48,6 @@ def ctxlsx(filterdict):
     import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
-    from django.contrib import messages
     from django.core.files import File
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
@@ -421,7 +420,7 @@ def ctxlsx(filterdict):
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
     except:
-#        messages.error(request, "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
         tsk.status = 'ERROR'
         tsk.save()
         return redirect('/openrem/export/')
