@@ -166,8 +166,19 @@ def mg_csv_nhsbsp(filterdict):
     tsk.save()
 
     csvfilename = "mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(csvfilename,File(tmpfile))
 
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
