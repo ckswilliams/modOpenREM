@@ -73,7 +73,9 @@ In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` 
 Database settings
 `````````````````
 
-For testing you can use the SQLite3 database::
+For testing you can use the SQLite3 database
+
+.. code:: python
 
     'ENGINE': 'django.db.backends.sqlite3',
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
