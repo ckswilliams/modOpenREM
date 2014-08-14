@@ -97,7 +97,7 @@ it is the webserver than reads and writes the files. In a debian linux,
 this is likely to be www-data for a production install.
 
 * Linux example: ``MEDIA_ROOT = "/var/openrem/exportfiles/"``
-* Windows example: ``MEDIA_ROOT = "C:/Documents/User/OpenREM/exportfiles"``
+* Windows example: ``MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles"``
 
 
 Secret key
