@@ -6,6 +6,7 @@ OpenREM version history
 ------
 
 * `#113`_  Fixed units spelling error in patient size import logs
+* `#112`_  File system errors during imports and exports are now handled properly with tasks listed in error states on the summary pages
 * `#111`_  Added abort function to patient size imports and study exports
 * `#110`_  Converted exports to use the FileField handling for storage and access, plus modified folder structure.
 * `#106`_  Added the duration of export time to the exports table. Also added template formatting tag to convert seconds to natural time
