@@ -9,6 +9,7 @@ OpenREM version history
 * `#112`_  File system errors during imports and exports are now handled properly with tasks listed in error states on the summary pages
 * `#111`_  Added abort function to patient size imports and study exports
 * `#110`_  Converted exports to use the FileField handling for storage and access, plus modified folder structure.
+* `#109`_  Added example ``MEDIA_ROOT`` path for Windows to the install docs
 * `#106`_  Added the duration of export time to the exports table. Also added template formatting tag to convert seconds to natural time
 * `#105`_  Fixed bug in Philips CT import where :py:class:`decimal.Decimal` was not imported before being used in the age calculation
 * `#104`_  Added documentation for the additional study export functions as a result of using Celery tasks in task `#19`_ as well as documentation for the code
