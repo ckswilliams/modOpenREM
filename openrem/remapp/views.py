@@ -426,5 +426,8 @@ def size_abort(request, pk):
 
     if request.user.groups.filter(name="admingroup"):
         revoke(size.task_id, terminate=True)
+        size.logfile.delete()
+        size.sizefile.delete()
+        size.delete()
 
     return HttpResponseRedirect("/openrem/admin/sizeimports/")
