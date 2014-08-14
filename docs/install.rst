@@ -75,7 +75,7 @@ Database settings
 
 For testing you can use the SQLite3 database
 
-.. code:: python
+.. sourcecode:: python
 
     'ENGINE': 'django.db.backends.sqlite3',
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
