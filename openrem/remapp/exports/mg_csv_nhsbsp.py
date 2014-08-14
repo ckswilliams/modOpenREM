@@ -44,10 +44,11 @@ def mg_csv_nhsbsp(filterdict):
     
     """
 
-    import os, datetime
+    import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
     from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
@@ -63,11 +64,15 @@ def mg_csv_nhsbsp(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    tmpfile = TemporaryFile()    
-    writer = csv.writer(tmpfile)
-    
-    tsk.progress = 'CSV file created'
-    tsk.save()
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
         
     # Get the data!
     
@@ -161,8 +166,19 @@ def mg_csv_nhsbsp(filterdict):
     tsk.save()
 
     csvfilename = "mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(csvfilename,File(tmpfile))
 
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()

@@ -132,7 +132,20 @@ def websizeimport(csv_pk = None, *args, **kwargs):
 
             logfile = "pt_size_import_log_{0}.txt".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
             headerrow = ContentFile("Patient size import from {0}\n".format(csvrecord.sizefile.name))
-            csvrecord.logfile.save(logfile,headerrow)
+
+            try:
+                csvrecord.logfile.save(logfile,headerrow)
+            except OSError as e:
+                csvrecord.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+                csvrecord.status = 'ERROR'
+                csvrecord.save()
+                return
+            except:
+                csvrecord.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+                csvrecord.status = 'ERROR'
+                csvrecord.save()
+                return
+
             l = csvrecord.logfile
             l.file.close()
                 # Method used for opening and writing to file as per https://code.djangoproject.com/ticket/13809

@@ -45,10 +45,11 @@ def ctxlsx(filterdict):
     
     """
 
-    import os, datetime
+    import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
     from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     from remapp.interface.mod_filters import CTSummaryListFilter
@@ -64,12 +65,15 @@ def ctxlsx(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    tmpxlsx = TemporaryFile()
-    book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
-                             'strings_to_numbers':  True})
-
-    tsk.progress = 'Workbook created'
-    tsk.save()
+    try:
+        tmpxlsx = TemporaryFile()
+        book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
+                                 'strings_to_numbers':  True})
+        tsk.progress = 'Workbook created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
 
     # Get the data
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
@@ -412,7 +416,19 @@ def ctxlsx(filterdict):
     tsk.save()
 
     xlsxfilename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(xlsxfilename,File(tmpxlsx))
+
+    try:
+        tsk.filename.save(xlsxfilename,File(tmpxlsx))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
 
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()

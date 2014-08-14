@@ -42,10 +42,11 @@ def exportFL2excel(filterdict):
     
     """
 
-    import os, datetime
+    import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
     from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
@@ -61,11 +62,15 @@ def exportFL2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    tmpfile = TemporaryFile()    
-    writer = csv.writer(tmpfile)
-    
-    tsk.progress = 'CSV file created'
-    tsk.save()
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
         
     # Get the data!
     
@@ -138,13 +143,24 @@ def exportFL2excel(filterdict):
     tsk.save()
 
     csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(csvfilename,File(tmpfile))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
 
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-
-
 
 
 @shared_task
@@ -156,10 +172,11 @@ def exportCT2excel(filterdict):
     
     """
 
-    import os, datetime
+    import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
     from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
 
@@ -174,11 +191,15 @@ def exportCT2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    tmpfile = TemporaryFile()    
-    writer = csv.writer(tmpfile)
-    
-    tsk.progress = 'CSV file created'
-    tsk.save()
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
         
     # Get the data!
     from remapp.models import General_study_module_attributes
@@ -313,7 +334,19 @@ def exportCT2excel(filterdict):
     tsk.save()
 
     csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(csvfilename,File(tmpfile))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
 
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
@@ -328,10 +361,11 @@ def exportMG2excel(filterdict):
     
     """
 
-    import os, datetime
+    import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
     from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
@@ -347,11 +381,15 @@ def exportMG2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    tmpfile = TemporaryFile()
-    writer = csv.writer(tmpfile)
-    
-    tsk.progress = 'CSV file created'
-    tsk.save()
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
         
     # Get the data!
     
@@ -443,7 +481,19 @@ def exportMG2excel(filterdict):
     tsk.save()
 
     csvfilename = "mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-    tsk.filename.save(csvfilename,File(tmpfile))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
 
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()

@@ -135,6 +135,7 @@ def export(request):
     
     current = exptsks.filter(status__contains = 'CURRENT')
     complete = exptsks.filter(status__contains = 'COMPLETE')
+    errors = exptsks.filter(status__contains = 'ERROR')
     
     try:
         vers = pkg_resources.require("openrem")[0].version
