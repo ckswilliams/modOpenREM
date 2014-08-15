@@ -20,7 +20,7 @@ to process a number of files at once, ie::
 
     openrem_rdsr.py *.dcm
 
-this feature will be added to Windows users with the standard cmd.exe shell in
+this feature will be added for Windows users with the standard cmd.exe shell in
 a future version, and is tracked as `issue #9`_
 
 For mammography DICOM images
