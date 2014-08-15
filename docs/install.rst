@@ -100,7 +100,8 @@ written to disk at a location defined by ``MEDIA_ROOT``.
 The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
-this is likely to be www-data for a production install.
+this is likely to be www-data for a production install. Remember to use
+forward slashes for the config file, even for Windows.
 
 Linux example::
 
@@ -108,7 +109,7 @@ Linux example::
 
 Windows example::
     
-    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles"
+    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
 
 
 Secret key
