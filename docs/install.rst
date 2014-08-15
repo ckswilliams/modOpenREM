@@ -150,8 +150,13 @@ Windows::
 Start test web server
 ---------------------
 
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver``
-* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py runserver``
+Linux::
+
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver
+
+Windows::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py runserver
 
 If you are using a headless server and need to be able to see the 
 web interface from another machine, use 
@@ -170,15 +175,15 @@ RabbitMQ allows for asynchronous task processing for imports and exports.
 
 In a new shell:
 
-* Linux:
+Linux::
 
- * ``cd /usr/lib/python2.7/dist-packages/openrem/``
- * ``celery -A openrem worker -l info``
+    cd /usr/lib/python2.7/dist-packages/openrem/
+    celery -A openrem worker -l info
 
-* Windows:
+Windows::
 
- * ``cd C:\Python27\Lib\site-packages\openrem\``
- * ``celery -A openrem worker -l info``
+    cd C:\Python27\Lib\site-packages\openrem\
+    celery -A openrem worker -l info
 
 For production use, see `Daemonising Celery`_ below
 
@@ -187,7 +192,9 @@ Start using it!
 
 Add some data! (See the :doc:`import` for adding the scripts to the path if this doesn't work)
 
-* ``openrem_rdsr.py rdsrfile.dcm``
+.. sourcecode:: bash
+
+    openrem_rdsr.py rdsrfile.dcm
 
 Add some users *(New in version 0.4.0)*
 
