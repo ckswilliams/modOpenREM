@@ -13,13 +13,29 @@ Headline changes
 Specific upgrade instructions
 =============================
 
+Upgrading from 0.3.9 or earlier
+-------------------------------
+
+**It is essential that you upgrade to at least 0.4.0 first**, then upgrade to
+0.4.3. Otherwise the settings file will be overwritten and you will lose
+your database settings. There is also a trickier than usual database
+migration and instructions for setting up users. Fresh installs should start
+with the latest version.
+
+Install version 0.4.2
+
+.. sourcecode:: bash
+
+    pip install openrem==0.4.2
+
+(Will need ``sudo`` or equivalent if using linux without a virtualenv)
+
+Then follow the instructions in :doc:`release-0.4.0` from migrating the
+database onwards, before coming back to these instructions.
+
+
 Upgrading from 0.4.0 or above
 -----------------------------
-
-* Install RabbitMQ
-* Add the ``MEDIA_ROOT`` path to the ``local_settings.py``
-* Then follow the :ref:`generic-upgrade-instructions`. A database migration is required.
-* Start the Celery task queue
 
 RabbitMQ
 ````````
@@ -54,14 +70,3 @@ Start the Celery task queue
 Follow the Celery instructions on the :doc:`install` page.
 
 
-Upgrading from 0.3.9 or earlier
--------------------------------
-
-It is essential that you upgrade to at least 0.4.2 first, then upgrade to
-0.4.3. Otherwise the settings file will be overwritten and you will lose
-your database settings. There is also a trickier than usual database
-migration and instructions for setting up users.
-
-*Instructions for upgrading to 0.4.2, something like* ``sudo pip install openrem==0.4.2``
-
-Follow the instructions in :doc:`release-0.4.0`

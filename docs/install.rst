@@ -47,12 +47,18 @@ For either install, just follow the defaults - no special configurations require
 
 Install OpenREM
 ---------------
+.. sourcecode:: bash
 
-* ``pip install openrem`` (Needs internet connection)
+    pip install openrem
+
+(Needs internet connection, will need ``sudo`` or equivalent if installing 
+on linux without using a virtualenv)
 
 With Windows, and assuming Python is on the path, it might need to be:
 
-* ``python -m pip install openrem``
+.. sourcecode:: bash
+
+    python -m pip install openrem
 
 Configure OpenREM
 -----------------
@@ -96,8 +102,13 @@ webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
 this is likely to be www-data for a production install.
 
-* Linux example: ``MEDIA_ROOT = "/var/openrem/exportfiles/"``
-* Windows example: ``MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles"``
+Linux example::
+
+    MEDIA_ROOT = "/var/openrem/exportfiles/"
+
+Windows example::
+    
+    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles"
 
 
 Secret key
