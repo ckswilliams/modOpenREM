@@ -64,6 +64,14 @@ webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
 this is likely to be ``www-data`` for a production install.
 
+Linux example::
+
+    MEDIA_ROOT = "/var/openrem/exportfiles/"
+
+Windows example::
+
+    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles"
+
 Start the Celery task queue
 ```````````````````````````
 

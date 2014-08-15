@@ -120,8 +120,13 @@ http://www.miniwebtool.com/django-secret-key-generator/ for this.
 Create the database
 -------------------
 
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
-* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
+Linux::
+
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb
+
+Windows::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py syncdb
 
 Answer each question as it is asked, do setup a superuser. This username and
 password wil be used to log into the admin interface to create the usernames
@@ -133,9 +138,13 @@ Help! I get a ``value too long for type character varying(50)`` error!
 
 For production installs, convert to South `(What is south?)`_
 
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
-* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
+Linux::
 
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+
+Windows::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
 
 Start test web server
