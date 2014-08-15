@@ -4,18 +4,30 @@ Importing data to OpenREM
 Importing dose related data from DICOM files
 ============================================
 
-If you are using linux or have put ```"C:\Python27\Lib\site-packages\openrem\scripts"`` and
-``"C:\Python27\Lib\site-packages\openrem"`` onto your path, you should be able to import from the command line:
+If you are using linux, or for Windows if you have put
+``C:\Python27\;C:\Python27\Lib\site-packages;C:\Python27\Scripts`` onto
+your system path, you should be able to import from the command line:
 
 Radiation Dose Structured Reports
 ---------------------------------
 
-* ``openrem_rdsr.py filename.dcm``
+.. sourcecode:: bash
+
+    openrem_rdsr.py filename.dcm
+
+In linux, or using an advanced shell in Windows, you can use wildcards
+to process a number of files at once, ie::
+
+    openrem_rdsr.py *.dcm
+
+this feature will be added to Windows users with the standard cmd.exe shell in
+a future version, and is tracked as `issue #9`_
 
 For mammography DICOM images
 ----------------------------
+.. sourcecode:: bash
 
-* ``openrem_mg.py filename.dcm``
+    openrem_mg.py filename.dcm
 
 The facility for extracting dose information from mammography DICOM images
 has been designed and tested with images created with the GE Senographe DS.
@@ -30,8 +42,9 @@ See :ref:`mammo-module` for testing restrictions.
 
 For CT dose summary files from Philips CT scanners
 --------------------------------------------------
+.. sourcecode:: bash
 
-* ``openrem_ctphilips.py filename.dcm``
+    openrem_ctphilips.py filename.dcm
 
 
 Importing dose related data from csv files using the command line
@@ -46,7 +59,9 @@ from another source, then it can be imported into the database using the
 with the studies in the database will be the accession number; however in some
 situations this isn't available and the Study Instance UID can be used instead.
 
-usage: ``openrem_ptsizecsv.py [-h] [-u] [-v] csvfile id height weight``
+usage::
+
+    openrem_ptsizecsv.py [-h] [-u] [-v] csvfile id height weight
 
 ``-h, --help``
   Print the help text.
@@ -78,3 +93,6 @@ usage: ``openrem_ptsizecsv.py [-h] [-u] [-v] csvfile id height weight``
 ..  versionchanged:: 0.3.7
     Verbosity flag added to supress printing to the standard output
     unless requested.
+
+
+..  _`issue #9`: https://bitbucket.org/edmcdonagh/openrem/issue/9/
