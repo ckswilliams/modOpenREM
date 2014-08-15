@@ -206,8 +206,8 @@ Add some users *(New in version 0.4.0)*
     + ``admingroup`` can delete studies and import height and weight data in addition to anything the export group can do
 
 * Return to the OpenREM interface (eg http://localhost:8000/openrem) and 
-    log out of the superuser in the top right corner and log in again using
-    one of the new users you have just created.
+log out of the superuser in the top right corner and log in again using
+one of the new users you have just created.
 
 Further instructions
 ====================
