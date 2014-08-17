@@ -73,6 +73,20 @@ Windows example::
 
     MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
 
+Database migration
+^^^^^^^^^^^^^^^^^^
+
+Linux::
+
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+
+Windows::
+
+    C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+    C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+
+
 Start the Celery task queue
 ```````````````````````````
 
