@@ -27,7 +27,7 @@ setup(
     install_requires = requires,
     scripts=['openrem/scripts/openrem_rdsr.py','openrem/scripts/openrem_mg.py','openrem/scripts/openrem_ctphilips.py','openrem/scripts/openrem_ptsizecsv.py'],
     license='GPLv3 with additional permissions',  
-    description='An open implementation of IHE Radiation Exposure Monitoring profile Dose Info Consumer and Dose Register actors',
+    description='Radiation Exposure Monitoring for physicists',
     long_description=README,
     url='http://openrem.org/',
     author='Ed McDonagh',
