@@ -10,6 +10,8 @@ OpenREM version history
 * `#111`_  Added abort function to patient size imports and study exports
 * `#110`_  Converted exports to use the FileField handling for storage and access, plus modified folder structure.
 * `#109`_  Added example ``MEDIA_ROOT`` path for Windows to the install docs
+* `#108`_  Documented ownership issues between the webserver and Celery
+* `#107`_  Documented process for upgrading to 0.4.2 before 0.4.3 for versions 0.3.9 or earlier
 * `#106`_  Added the duration of export time to the exports table. Also added template formatting tag to convert seconds to natural time
 * `#105`_  Fixed bug in Philips CT import where :py:class:`decimal.Decimal` was not imported before being used in the age calculation
 * `#104`_  Added documentation for the additional study export functions as a result of using Celery tasks in task `#19`_ as well as documentation for the code
@@ -22,6 +24,7 @@ OpenREM version history
 * `#96`_   Changed mammo and fluoro filters to use named fields to avoid needing to use the full database path
 * `#93`_   Set the security of the new exports to prevent users below export level from creating or downloading exports
 * `#92`_   Add `NHSBSP specific mammography csv export`_ from Jonathan Cole - with Celery
+* `#91`_   Added documentation for Celery and RabbitMQ
 * `#90`_   Added delete function for exports
 * `#89`_   Added the Exports navigation item to all templates, limited to export or admin users
 * `#88`_   Converted fluoroscopy objects to using the Celery task manager after starting with CT for `#19`_
@@ -32,6 +35,7 @@ OpenREM version history
 * `#21`_   Height and weight data can now be imported through forms in the web interface
 * `#19`_   Exports are now sent to a task manager instead of locking up the web interface
 
+* `#9`_    Issue tracking import using *.dcm style wildcards reopened as Windows ``cmd.exe`` shell doesn't do wildcard expansion, so this will need to be handled by OpenREM in a future version
 
 0.4.2
 -----
