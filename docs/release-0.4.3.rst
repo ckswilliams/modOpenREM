@@ -37,6 +37,14 @@ database onwards, before coming back to these instructions.
 Upgrading from 0.4.0 or above
 -----------------------------
 
+Install OpenREM version 0.4.3
+`````````````````````````````
+.. sourcecode:: bash
+
+    pip install --pre openrem==0.4.3b3
+
+(Will need ``sudo`` or equivalent if using linux without a virtualenv)
+
 RabbitMQ
 ````````
 
