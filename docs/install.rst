@@ -6,19 +6,31 @@ Basic guide
 ===========
 
 Non-operating system specific path names are represented using the linux 
-convention of a ``/`` separator. If you are installing in a Windows environment 
-you will need to use the Windows ``\`` separator.
+convention of a ``/`` separator - in Windows a ``\`` would be used. However,
+in the settings file even Windows paths are separated with a ``/``.
 
 Installation prerequisites
 --------------------------
 
-Install python 2.7
-``````````````````
+Install Python 2.7.x
+````````````````````
 
 * Linux - likely to be installed already
-* Windows - https://www.python.org/download/releases
+* Windows - https://www.python.org/downloads
 
-Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
+.. image:: img/pythonpath.png
+    :align: right
+    :alt: Select to add Python to the path during installation
+
+During a Windows Python installation, the choice is offered to add python.exe
+to the system Path variable. If this is selected, further use of Python will
+be simply a case of typing ``python command`` rather than having to reference
+the path to the python.exe file each time.
+
+Setuptools and pip
+``````````````````
+
+Install setuptools and pip - http://www.pip-installer.org/en/latest/installing.html
 
 ..  Note::
 
@@ -35,8 +47,18 @@ For either install, just follow the defaults - no special configurations require
 
 Install OpenREM
 ---------------
+.. sourcecode:: bash
 
-* ``pip install openrem`` (Needs internet connection)
+    pip install openrem
+
+(Needs internet connection, will need ``sudo`` or equivalent if installing 
+on linux without using a virtualenv)
+
+With Windows, and assuming Python is on the path, it might need to be:
+
+.. sourcecode:: bash
+
+    python -m pip install openrem
 
 Configure OpenREM
 -----------------
@@ -57,13 +79,15 @@ In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` 
 Database settings
 `````````````````
 
-For testing you can use the SQLite3 database::
+For testing you can use the SQLite3 database
+
+.. sourcecode:: python
 
     'ENGINE': 'django.db.backends.sqlite3',
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
 * Linux example: ``'NAME': '/var/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:\Documents\User\OpenREM\openrem.db',``
+* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',``
 
 For production use, see `Database options`_ below
 
@@ -76,7 +100,16 @@ written to disk at a location defined by ``MEDIA_ROOT``.
 The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
-this is likely to be www-data for a production install.
+this is likely to be www-data for a production install. Remember to use
+forward slashes for the config file, even for Windows.
+
+Linux example::
+
+    MEDIA_ROOT = "/var/openrem/exportfiles/"
+
+Windows example::
+    
+    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
 
 
 Secret key
@@ -88,8 +121,13 @@ http://www.miniwebtool.com/django-secret-key-generator/ for this.
 Create the database
 -------------------
 
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb``
-* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py syncdb``
+Linux::
+
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb
+
+Windows::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py syncdb
 
 Answer each question as it is asked, do setup a superuser. This username and
 password wil be used to log into the admin interface to create the usernames
@@ -101,16 +139,25 @@ Help! I get a ``value too long for type character varying(50)`` error!
 
 For production installs, convert to South `(What is south?)`_
 
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp``
-* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp``
+Linux::
 
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+
+Windows::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
 
 Start test web server
 ---------------------
 
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver``
-* Windows: ``python C:\Python27\Lib\site-packages\openrem\manage.py runserver``
+Linux::
+
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver
+
+Windows::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py runserver
 
 If you are using a headless server and need to be able to see the 
 web interface from another machine, use 
@@ -129,15 +176,15 @@ RabbitMQ allows for asynchronous task processing for imports and exports.
 
 In a new shell:
 
-* Linux:
+Linux::
 
- * ``cd /usr/lib/python2.7/dist-packages/openrem/``
- * ``celery -A openrem worker -l info``
+    cd /usr/lib/python2.7/dist-packages/openrem/
+    celery -A openrem worker -l info
 
-* Windows:
+Windows::
 
- * ``cd C:\Python27\Lib\site-packages\openrem\``
- * ``celery -A openrem worker -l info``
+    cd C:\Python27\Lib\site-packages\openrem\
+    celery -A openrem worker -l info
 
 For production use, see `Daemonising Celery`_ below
 
@@ -146,7 +193,9 @@ Start using it!
 
 Add some data! (See the :doc:`import` for adding the scripts to the path if this doesn't work)
 
-* ``openrem_rdsr.py rdsrfile.dcm``
+.. sourcecode:: bash
+
+    openrem_rdsr.py rdsrfile.dcm
 
 Add some users *(New in version 0.4.0)*
 
@@ -156,6 +205,8 @@ Add some users *(New in version 0.4.0)*
     + ``viewgroup`` can browse the data only
     + ``exportgroup`` can do as view group plus export data to a spreadsheet
     + ``admingroup`` can delete studies and import height and weight data in addition to anything the export group can do
+
+* Return to the OpenREM interface (eg http://localhost:8000/openrem) and log out of the superuser in the top right corner and log in again using one of the new users you have just created.
 
 Further instructions
 ====================

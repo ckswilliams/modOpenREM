@@ -362,6 +362,7 @@ def size_imports(request, *args, **kwargs):
     
     current = imports.filter(status__contains = 'CURRENT')
     complete = imports.filter(status__contains = 'COMPLETE')
+    errors = imports.filter(status__contains = 'ERROR')
     
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -377,7 +378,7 @@ def size_imports(request, *args, **kwargs):
 
     return render_to_response(
         'remapp/sizeimports.html',
-        {'admin': admin, 'current': current, 'complete': complete},
+        {'admin': admin, 'current': current, 'complete': complete, 'errors': errors},
         context_instance = RequestContext(request)
     )
     
@@ -408,3 +409,25 @@ def size_delete(request):
                 messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
     return HttpResponseRedirect(reverse(size_imports))
+
+@login_required
+def size_abort(request, pk):
+    """View to abort current patient size imports
+
+    :param request: Contains the task primary key
+    :type request: POST
+    """
+    from celery.task.control import revoke
+    from django.http import HttpResponseRedirect
+    from django.shortcuts import render, redirect, get_object_or_404
+    from remapp.models import Size_upload
+
+    size = get_object_or_404(Size_upload, pk=pk)
+
+    if request.user.groups.filter(name="admingroup"):
+        revoke(size.task_id, terminate=True)
+        size.logfile.delete()
+        size.sizefile.delete()
+        size.delete()
+
+    return HttpResponseRedirect("/openrem/admin/sizeimports/")

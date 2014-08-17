@@ -13,13 +13,29 @@ Headline changes
 Specific upgrade instructions
 =============================
 
+Upgrading from 0.3.9 or earlier
+-------------------------------
+
+**It is essential that you upgrade to at least 0.4.0 first**, then upgrade to
+0.4.3. Otherwise the settings file will be overwritten and you will lose
+your database settings. There is also a trickier than usual database
+migration and instructions for setting up users. *Fresh installs should start
+with the latest version.*
+
+Upgrade to version 0.4.2
+
+.. sourcecode:: bash
+
+    pip install openrem==0.4.2
+
+(Will need ``sudo`` or equivalent if using linux without a virtualenv)
+
+Then follow the instructions in :doc:`release-0.4.0` from migrating the
+database onwards, before coming back to these instructions.
+
+
 Upgrading from 0.4.0 or above
 -----------------------------
-
-* Install RabbitMQ
-* Add the ``MEDIA_ROOT`` path to the ``local_settings.py``
-* Then follow the :ref:`generic-upgrade-instructions`. A database migration is required.
-* Start the Celery task queue
 
 RabbitMQ
 ````````
@@ -46,22 +62,56 @@ The ``local_settings.py`` file will be in the ``openrem/openrem`` folder, for ex
 The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
 it is the webserver than reads and writes the files. In a debian linux,
-this is likely to be ``www-data`` for a production install.
+this is likely to be ``www-data`` for a production install. Remember to use
+forward slashes in the config file, even for Windows.
+
+Linux example::
+
+    MEDIA_ROOT = "/var/openrem/exportfiles/"
+
+Windows example::
+
+    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
+
+Database migration
+``````````````````
+*Assuming no virtualenv*
+
+Linux::
+
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+    python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+
+Windows::
+
+    C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+    C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+
+Web server
+``````````
+
+Restart the web server.
 
 Start the Celery task queue
 ```````````````````````````
+..  Note::
 
-Follow the Celery instructions on the :doc:`install` page.
+    The webserver and Celery both need to be able to read and write to the
+    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
+    Celery using the same user or group as the webserver, and setting the
+    file permissions accordingly.
 
+For testing, in a new shell: *(assuming no virtualenv)*
 
-Upgrading from 0.3.9 or earlier
--------------------------------
+Linux::
 
-It is essential that you upgrade to at least 0.4.2 first, then upgrade to
-0.4.3. Otherwise the settings file will be overwritten and you will lose
-your database settings. There is also a trickier than usual database
-migration and instructions for setting up users.
+    cd /usr/lib/python2.7/dist-packages/openrem/
+    celery -A openrem worker -l info
 
-*Instructions for upgrading to 0.4.2, something like* ``sudo pip install openrem==0.4.2``
+Windows::
 
-Follow the instructions in :doc:`release-0.4.0`
+    cd C:\Python27\Lib\site-packages\openrem\
+    celery -A openrem worker -l info
+
+For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
+
