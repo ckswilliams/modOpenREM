@@ -74,7 +74,8 @@ Windows example::
     MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
 
 Database migration
-^^^^^^^^^^^^^^^^^^
+``````````````````
+*Assuming no virtualenv*
 
 Linux::
 
@@ -86,10 +87,31 @@ Windows::
     C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
     C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
+Web server
+``````````
+
+Restart the web server.
 
 Start the Celery task queue
 ```````````````````````````
+..  Note::
 
-Follow the Celery instructions on the :doc:`install` page.
+    The webserver and Celery both need to be able to read and write to the
+    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
+    Celery using the same user or group as the webserver, and setting the
+    file permissions accordingly.
 
+For testing, in a new shell: *(assuming no virtualenv)*
+
+Linux::
+
+    cd /usr/lib/python2.7/dist-packages/openrem/
+    celery -A openrem worker -l info
+
+Windows::
+
+    cd C:\Python27\Lib\site-packages\openrem\
+    celery -A openrem worker -l info
+
+For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
 
