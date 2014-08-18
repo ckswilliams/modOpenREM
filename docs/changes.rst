@@ -35,7 +35,10 @@ OpenREM version history
 * `#21`_   Height and weight data can now be imported through forms in the web interface
 * `#19`_   Exports are now sent to a task manager instead of locking up the web interface
 
-* `#9`_    Issue tracking import using *.dcm style wildcards reopened as Windows ``cmd.exe`` shell doesn't do wildcard expansion, so this will need to be handled by OpenREM in a future version
+Reopened issue
+``````````````
+
+* `#9`_    Issue tracking import using \*.dcm style wildcards reopened as Windows ``cmd.exe`` shell doesn't do wildcard expansion, so this will need to be handled by OpenREM in a future version
 
 0.4.2 (2014-04-15)
 ------------------
