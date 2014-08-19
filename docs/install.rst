@@ -55,6 +55,12 @@ Windows
 
     Before continuing, `consider virtualenv`_
 
+To check everything is installed correctly so far, type the following in a 
+command window/shell. You should have the version number of pip returned to 
+you::
+
+    pip -V
+
 Install RabbitMQ
 ````````````````
 *(New for version 0.4.3)*
@@ -72,12 +78,6 @@ Install OpenREM
 
 (Needs internet connection, will need ``sudo`` or equivalent if installing 
 on linux without using a virtualenv)
-
-With Windows, and assuming Python is on the path, it might need to be:
-
-.. sourcecode:: bash
-
-    python -m pip install openrem
 
 Configure OpenREM
 -----------------
@@ -210,7 +210,7 @@ For production use, see `Daemonising Celery`_ below
 Start using it!
 ---------------
 
-Add some data! (See the :doc:`import` for adding the scripts to the path if this doesn't work)
+Add some data!
 
 .. sourcecode:: bash
 
