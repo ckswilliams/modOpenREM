@@ -5,6 +5,7 @@ OpenREM version history
 0.4.3
 ------
 
+* `#117`_  Added Windows line endings to patient size import logs
 * `#113`_  Fixed units spelling error in patient size import logs
 * `#112`_  File system errors during imports and exports are now handled properly with tasks listed in error states on the summary pages
 * `#111`_  Added abort function to patient size imports and study exports
