@@ -1,12 +1,11 @@
 Installation instructions
 *************************
 
-
-Basic guide
-===========
-
 Installation prerequisites
---------------------------
+==========================
+
+Python, pip and RabbitMQ
+------------------------
 
 Install Python 2.7.x
 ````````````````````
@@ -66,8 +65,12 @@ Install RabbitMQ
 
 For either install, just follow the defaults - no special configurations required.
 
-Install OpenREM
----------------
+Install and configure OpenREM
+=============================
+
+Install
+--------
+
 .. sourcecode:: bash
 
     pip install openrem
@@ -75,8 +78,8 @@ Install OpenREM
 (Needs internet connection, will need ``sudo`` or equivalent if installing 
 on linux without using a virtualenv)
 
-Configure OpenREM
------------------
+Configure
+---------
 
 Locate install location
 
@@ -162,6 +165,9 @@ Windows::
 
     python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
+
+Start all the services
+======================
 
 Start test web server
 ---------------------
