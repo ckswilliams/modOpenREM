@@ -1,8 +1,8 @@
 Installation instructions
 *************************
 
-Installation prerequisites
-==========================
+Prerequisites
+=============
 
 Python, pip and RabbitMQ
 ------------------------
