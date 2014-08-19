@@ -18,14 +18,14 @@ Install Python 2.7.x
 * Linux - likely to be installed already
 * Windows - https://www.python.org/downloads
 
-.. image:: img/pythonpath.png
-    :align: right
-    :alt: Select to add Python to the path during installation
+Add Python and the scripts folder to the path
+`````````````````````````````````````````````
+*Windows only*
 
-During a Windows Python installation, the choice is offered to add python.exe
-to the system Path variable. If this is selected, further use of Python will
-be simply a case of typing ``python command`` rather than having to reference
-the path to the python.exe file each time.
+Add the following to the end of the ``path`` environment variable (to see
+how to edit the environment variables, see http://www.computerhope.com/issues/ch000549.htm)::
+
+    ;C:\Python27\;C:\Python27\Scripts\
 
 Setuptools and pip
 ``````````````````
