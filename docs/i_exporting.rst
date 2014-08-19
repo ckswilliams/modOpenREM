@@ -72,10 +72,10 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
 .. warning::
 
     Large exports have been killed by the operating system due to running 
-    out of memory - 6500 CT exams with an xlsx export was killed after 3400 
+    out of memory - a 6500 CT exam xlsx export was killed after 3400 
     studies for example. This issue is being tracked as `#116`_ and will
     hopefully be addressed in the next release. It is possible that if debug 
-    mode is turned off then memoery will be managed better, but I also need
+    mode is turned off then memory will be managed better, but I also need
     to modify the xlsx export to make use of the memory optimisation mode in 
     xlsxwriter.
 
