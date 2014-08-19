@@ -30,7 +30,26 @@ the path to the python.exe file each time.
 Setuptools and pip
 ``````````````````
 
-Install setuptools and pip - http://www.pip-installer.org/en/latest/installing.html
+Install setuptools and pip - for details go to
+http://www.pip-installer.org/en/latest/installing.html. The quick version
+is as follows:
+
+Linux
+
+    Download the latest version using the same method as for Windows, or get the version in your package manager, for example::
+
+        sudo apt-get install python-pip
+
+Windows
+
+    Download the installer script `get-pip.py <https://bootstrap.pypa.io/get-pip.py>`_
+    and save it locally - right click and *Save link as...* or equivalent
+
+    Open a command window (Start menu, cmd.exe) and navigate to the place
+    you saved the get-pip.py file::
+
+        python get-pip.py
+
 
 ..  Note::
 
