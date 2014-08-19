@@ -5,10 +5,6 @@ Installation instructions
 Basic guide
 ===========
 
-Non-operating system specific path names are represented using the linux 
-convention of a ``/`` separator - in Windows a ``\`` would be used. However,
-in the settings file even Windows paths are separated with a ``/``.
-
 Installation prerequisites
 --------------------------
 
@@ -106,7 +102,7 @@ For testing you can use the SQLite3 database
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
 * Linux example: ``'NAME': '/var/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',``
+* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
 
 For production use, see `Database options`_ below
 
