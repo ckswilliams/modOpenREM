@@ -20,7 +20,7 @@ Install Python 2.7.x
 
 Add Python and the scripts folder to the path
 `````````````````````````````````````````````
-*Windows only*
+*Windows only - this is usually automatic in linux*
 
 Add the following to the end of the ``path`` environment variable (to see
 how to edit the environment variables, see http://www.computerhope.com/issues/ch000549.htm)::
