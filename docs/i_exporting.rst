@@ -69,7 +69,7 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
     :height: 268px
     :alt: Deleting exports
 
-.. warning:
+.. warning::
 
     Large exports have been killed by the operating system due to running 
     out of memory - 6500 CT exams with an xlsx export was killed after 3400 
