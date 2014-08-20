@@ -46,7 +46,7 @@ Windows
     and save it locally - right click and *Save link as...* or equivalent
 
     Open a command window (Start menu, cmd.exe) and navigate to the place
-    you saved the get-pip.py file::
+    you saved the get‑pip.py file::
 
         python get-pip.py
 
