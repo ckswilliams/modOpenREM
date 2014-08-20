@@ -5,14 +5,15 @@ OpenREM can be installed with a single command; however, there are two
 prerequisites that need to be installed first – python and pip – and
 RabbitMQ needs to be installed for exports and patient size imports to work.
 
+Once installed, there are a few configuration choices that need to be made,
+and finally a couple of services that need to be started. Then you are
+ready to go!
+
 Install the prerequisites
 =========================
 
-Python, pip and RabbitMQ
-------------------------
-
 Install Python 2.7.x
-````````````````````
+--------------------
 
 * Linux - likely to be installed already
 * Windows - https://www.python.org/downloads
@@ -27,7 +28,7 @@ how to edit the environment variables, see http://www.computerhope.com/issues/ch
     ;C:\Python27\;C:\Python27\Scripts\
 
 Setuptools and pip
-``````````````````
+------------------
 
 Install setuptools and pip - for details go to
 http://www.pip-installer.org/en/latest/installing.html. The quick version
@@ -54,6 +55,9 @@ Windows
 
     Before continuing, `consider virtualenv`_
 
+Quick check of python and pip
+`````````````````````````````
+
 To check everything is installed correctly so far, type the following in a 
 command window/shell. You should have the version number of pip returned to 
 you::
@@ -61,7 +65,7 @@ you::
     pip -V
 
 Install RabbitMQ
-````````````````
+----------------
 *(New for version 0.4.3)*
 
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
