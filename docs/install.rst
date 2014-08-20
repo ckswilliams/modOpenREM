@@ -15,12 +15,12 @@ Install the prerequisites
 Install Python 2.7.x
 --------------------
 
-* Linux - likely to be installed already
-* Windows - https://www.python.org/downloads
+* Linux – likely to be installed already
+* Windows – https://www.python.org/downloads
 
 Add Python and the scripts folder to the path
 `````````````````````````````````````````````
-*Windows only - this is usually automatic in linux*
+*Windows only – this is usually automatic in linux*
 
 Add the following to the end of the ``path`` environment variable (to see
 how to edit the environment variables, see http://www.computerhope.com/issues/ch000549.htm)::
@@ -30,20 +30,21 @@ how to edit the environment variables, see http://www.computerhope.com/issues/ch
 Setuptools and pip
 ------------------
 
-Install setuptools and pip - for details go to
+Install setuptools and pip – for details go to
 http://www.pip-installer.org/en/latest/installing.html. The quick version
 is as follows:
 
 Linux
 
-    Download the latest version using the same method as for Windows, or get the version in your package manager, for example::
+    Download the latest version using the same method as for Windows, or
+    get the version in your package manager, for example::
 
         sudo apt-get install python-pip
 
 Windows
 
     Download the installer script `get-pip.py <https://bootstrap.pypa.io/get-pip.py>`_
-    and save it locally - right click and *Save link as...* or equivalent
+    and save it locally – right click and *Save link as...* or equivalent.
 
     Open a command window (Start menu, cmd.exe) and navigate to the place
     you saved the get‑pip.py file::
@@ -71,7 +72,7 @@ Install RabbitMQ
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
-For either install, just follow the defaults - no special configurations required.
+For either install, just follow the defaults – no special configurations required.
 
 Install and configure OpenREM
 =============================
