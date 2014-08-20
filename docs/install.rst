@@ -1,8 +1,12 @@
 Installation instructions
 *************************
 
-Prerequisites
-=============
+OpenREM can be installed with a single command; however, there are two
+prerequisites that need to be installed first – python and pip – and
+RabbitMQ needs to be installed for exports and patient size imports to work.
+
+Install the prerequisites
+=========================
 
 Python, pip and RabbitMQ
 ------------------------
@@ -75,8 +79,7 @@ Install
 
     pip install openrem
 
-(Needs internet connection, will need ``sudo`` or equivalent if installing 
-on linux without using a virtualenv)
+*Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
 Configure
 ---------
