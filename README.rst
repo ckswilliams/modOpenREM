@@ -17,8 +17,10 @@ Quick start - please refer to the `full documentation <http://docs.openrem.org>`
 #. Install python 2.7
 #. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
 #. Install `RabbitMQ <http://www.rabbitmq.com/>`_
-#. Install OpenREM
-    + ``pip install openrem``
+#. Install OpenREM::
+
+    pip install openrem
+
 #. Configure OpenREM
     + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
     + There are two files that need renaming:
