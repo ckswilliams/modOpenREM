@@ -7,12 +7,12 @@ Monitoring related information, primarily from DICOM files.
 
 Full documentation can be found on Read the Docs: http://docs.openrem.org
 
-**For upgrades**, please look at the `version 0.4.0 release notes <http://docs.openrem.org/page/release-0.4.0.html>`_
+**For upgrades**, please look at the `version 0.4.3 release notes <http://docs.openrem.org/en/latest/release-0.4.3.html>`_
 
 Quick start - please refer to the `full documentation <http://docs.openrem.org>`_ for details
 ---------------------------------------------------------------------------------------------
 
-*(Linux path notation - use back slashes for Windows paths)*
+*(Linux path notation - use back slashes for Windows paths except in config files)*
 
 #. Install python 2.7
 #. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
