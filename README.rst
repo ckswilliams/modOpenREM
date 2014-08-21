@@ -37,11 +37,11 @@ Quick start - please refer to the `full documentation <http://docs.openrem.org>`
 
     python path/to/openrem/manage.py syncdb
 
-#. Start test web server
+#. Start test web server::
 
     python path/to/openrem/manage.py runserver
 
-# Start the Celery task queue. For testing purposes, in a shell go to the openrem folder and use
+# Start the Celery task queue. For testing purposes, in a shell go to the openrem folder and use::
 
     celery -A openrem worker -l info
 
