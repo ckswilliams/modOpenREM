@@ -24,8 +24,10 @@ Quick start - please refer to the `full documentation <http://docs.openrem.org>`
 #. Configure OpenREM
     + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
     + There are two files that need renaming:
-        + ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py``
-        + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
+
+        ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py``
+        ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
+
     + in the ``local_settings.py`` file, set the database details.
     + For testing purposes, use::
 
@@ -41,7 +43,7 @@ Quick start - please refer to the `full documentation <http://docs.openrem.org>`
 
     python path/to/openrem/manage.py runserver
 
-# Start the Celery task queue. For testing purposes, in a shell go to the openrem folder and use::
+#. Start the Celery task queue. For testing purposes, in a shell go to the openrem folder and use::
 
     celery -A openrem worker -l info
 
