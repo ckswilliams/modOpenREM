@@ -25,7 +25,7 @@ Quick start - please refer to the `full documentation <http://docs.openrem.org>`
     + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
     + There are two files that need renaming:
 
-        ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py``
+        ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py`` and
         ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
 
     + in the ``local_settings.py`` file, set the database details.
