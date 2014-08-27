@@ -211,8 +211,8 @@ def csv2db(*args, **kwargs):
     args=parser.parse_args()
     
     openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
-    
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
+
     f = open(args.csvfile, 'rb')
     try:
         dataset = csv.DictReader(f)
