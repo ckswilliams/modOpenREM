@@ -220,7 +220,7 @@ def _philips_ct2db(dataset):
     import openrem_settings
 
     openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
 
     from django.db import models
     from remapp.models import General_study_module_attributes
