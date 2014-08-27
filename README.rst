@@ -17,25 +17,38 @@ Quick start - please refer to the `full documentation <http://docs.openrem.org>`
 #. Install python 2.7
 #. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
 #. Install `RabbitMQ <http://www.rabbitmq.com/>`_
-#. Install OpenREM
-    + ``pip install openrem``
+#. Install OpenREM::
+
+    pip install openrem
+
 #. Configure OpenREM
     + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
     + There are two files that need renaming:
-        + ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py``
-        + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
+
+        ``openrem/openrem/local_settings.py.example`` to ``openrem/openrem/local_settings.py`` and
+        ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py``
+
     + in the ``local_settings.py`` file, set the database details.
-    + For testing purposes, use 
-        + ``'ENGINE': 'django.db.backends.sqlite3',``
-        + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO.db'``
+    + For testing purposes, use::
+
+        'ENGINE': 'django.db.backends.sqlite3'
+        'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO.db'
+
     + in the ``local_settings.py`` file, set the upload and download folder ``MEDIA_ROOT``
-#. Create the database
-    + ``python path/to/openrem/manage.py syncdb``
-#. Start test web server
-    + ``python path/to/openrem/manage.py runserver``
-# Start the Celery task queue. For testing purposes, in a shell go to the openrem folder and use
-    + ``celery -A openrem worker -l info``
+#. Create the database::
+
+    python path/to/openrem/manage.py syncdb
+
+#. Start test web server::
+
+    python path/to/openrem/manage.py runserver
+
+#. Start the Celery task queue. For testing purposes, in a shell go to the openrem folder and use::
+
+    celery -A openrem worker -l info
+
 #. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
 #. Create some users and add them to the ``viewgroup``, ``exportgroup`` or ``admingroup`` in the admin interface, eg http://localhost:8000/admin
-#. Add some data!
-    + ``openrem_rdsr.py rdsrfile.dcm``
+#. Add some data::
+
+    openrem_rdsr.py rdsrfile.dcm
