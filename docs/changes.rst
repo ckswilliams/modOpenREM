@@ -30,7 +30,7 @@ OpenREM version history
 * `#90`_   Added delete function for exports
 * `#89`_   Added the Exports navigation item to all templates, limited to export or admin users
 * `#88`_   Converted fluoroscopy objects to using the Celery task manager after starting with CT for `#19`_
-* `#87`_   Converted mammography objects to using the Celery task manager after starting with CT for `#19`_ 
+* `#87`_   Converted mammography objects to using the Celery task manager after starting with CT for `#19`_
 * `#86`_   Digital Breast Tomosynthesis systems have a projections object that for Hologic contains required dosimetry information
 * `#85`_   Fix for bug introduced in `#75`_ where adaption of ptsize import for procedure import broke ptsize imports
 * `#74`_   'Time since last study' is now correct when daylight saving time kicks in
