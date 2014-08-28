@@ -1,67 +1,93 @@
 Installation instructions
 *************************
 
+OpenREM can be installed with a single command; however, there are two
+prerequisites that need to be installed first – python and pip – and
+RabbitMQ needs to be installed for exports and patient size imports to work.
 
-Basic guide
-===========
+Once installed, there are a few configuration choices that need to be made,
+and finally a couple of services that need to be started. Then you are
+ready to go!
 
-Non-operating system specific path names are represented using the linux 
-convention of a ``/`` separator - in Windows a ``\`` would be used. However,
-in the settings file even Windows paths are separated with a ``/``.
-
-Installation prerequisites
---------------------------
+Install the prerequisites
+=========================
 
 Install Python 2.7.x
-````````````````````
+--------------------
 
-* Linux - likely to be installed already
-* Windows - https://www.python.org/downloads
+* Linux – likely to be installed already
+* Windows – https://www.python.org/downloads
 
-.. image:: img/pythonpath.png
-    :align: right
-    :alt: Select to add Python to the path during installation
+Add Python and the scripts folder to the path
+`````````````````````````````````````````````
+*Windows only – this is usually automatic in linux*
 
-During a Windows Python installation, the choice is offered to add python.exe
-to the system Path variable. If this is selected, further use of Python will
-be simply a case of typing ``python command`` rather than having to reference
-the path to the python.exe file each time.
+Add the following to the end of the ``path`` environment variable (to see
+how to edit the environment variables, see http://www.computerhope.com/issues/ch000549.htm)::
+
+    ;C:\Python27\;C:\Python27\Scripts\
 
 Setuptools and pip
-``````````````````
+------------------
 
-Install setuptools and pip - http://www.pip-installer.org/en/latest/installing.html
+Install setuptools and pip – for details go to
+http://www.pip-installer.org/en/latest/installing.html. The quick version
+is as follows:
+
+Linux
+
+    Download the latest version using the same method as for Windows, or
+    get the version in your package manager, for example::
+
+        sudo apt-get install python-pip
+
+Windows
+
+    Download the installer script `get-pip.py <https://bootstrap.pypa.io/get-pip.py>`_
+    and save it locally – right click and *Save link as...* or equivalent.
+
+    Open a command window (Start menu, cmd.exe) and navigate to the place
+    you saved the get‑pip.py file::
+
+        python get-pip.py
+
 
 ..  Note::
 
     Before continuing, `consider virtualenv`_
 
+Quick check of python and pip
+`````````````````````````````
+
+To check everything is installed correctly so far, type the following in a 
+command window/shell. You should have the version number of pip returned to 
+you::
+
+    pip -V
+
 Install RabbitMQ
-````````````````
+----------------
 *(New for version 0.4.3)*
 
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
-For either install, just follow the defaults - no special configurations required.
+For either install, just follow the defaults – no special configurations required.
 
-Install OpenREM
----------------
+Install and configure OpenREM
+=============================
+
+Install
+--------
+
 .. sourcecode:: bash
 
     pip install openrem
 
-(Needs internet connection, will need ``sudo`` or equivalent if installing 
-on linux without using a virtualenv)
+*Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
-With Windows, and assuming Python is on the path, it might need to be:
-
-.. sourcecode:: bash
-
-    python -m pip install openrem
-
-Configure OpenREM
------------------
+Configure
+---------
 
 Locate install location
 
@@ -87,7 +113,7 @@ For testing you can use the SQLite3 database
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
 * Linux example: ``'NAME': '/var/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',``
+* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
 
 For production use, see `Database options`_ below
 
@@ -148,6 +174,9 @@ Windows::
     python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
 
+Start all the services
+======================
+
 Start test web server
 ---------------------
 
@@ -191,7 +220,7 @@ For production use, see `Daemonising Celery`_ below
 Start using it!
 ---------------
 
-Add some data! (See the :doc:`import` for adding the scripts to the path if this doesn't work)
+Add some data!
 
 .. sourcecode:: bash
 

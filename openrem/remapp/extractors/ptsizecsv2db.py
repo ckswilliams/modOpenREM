@@ -41,14 +41,14 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
             if verbose:
                 if imp_log:
                     imp_log.file.open("ab")
-                    imp_log.write("\n    Inserted height of {0} cm".format(height))
+                    imp_log.write("\r\n    Inserted height of {0} cm".format(height))
                     imp_log.file.close()
                 else:
                     print "    Inserted height of " + height
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size))
+                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size))
                 imp_log.file.close()
             else:
                 print "    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size)
@@ -59,14 +59,14 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
             if verbose:
                 if imp_log:
                     imp_log.file.open("ab")
-                    imp_log.write("\n    Inserted weight of {0} kg".format(weight))
+                    imp_log.write("\r\n    Inserted weight of {0} kg".format(weight))
                     imp_log.file.close()
                 else:
                     print "    Inserted weight of " + weight
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\n    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight))
+                imp_log.write("\r\n    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight))
                 imp_log.file.close()
             else:
                 print "    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight)
@@ -92,7 +92,7 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
                 if verbose:
                     if imp_log:
                         imp_log.file.open("ab")
-                        imp_log.write("\n{0}:".format(accno))
+                        imp_log.write("\r\n{0}:".format(accno))
                         imp_log.file.close()
                     else:
                         print accno + ":"
@@ -131,7 +131,7 @@ def websizeimport(csv_pk = None, *args, **kwargs):
                 si_uid = True
 
             logfile = "pt_size_import_log_{0}.txt".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
-            headerrow = ContentFile("Patient size import from {0}\n".format(csvrecord.sizefile.name))
+            headerrow = ContentFile("Patient size import from {0}\r\n".format(csvrecord.sizefile.name))
 
             try:
                 csvrecord.logfile.save(logfile,headerrow)
@@ -211,8 +211,8 @@ def csv2db(*args, **kwargs):
     args=parser.parse_args()
     
     openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
-    
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
+
     f = open(args.csvfile, 'rb')
     try:
         dataset = csv.DictReader(f)

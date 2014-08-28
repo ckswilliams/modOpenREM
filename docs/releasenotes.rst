@@ -29,6 +29,17 @@ Generic upgrade instructions
 ----------------------------
 
 *   Make sure you have setup South before you upgrade -- see :ref:`Database migrations <convert-to-south>` for details.
+
+    Quick reminder of how, if you haven't done it already:
+
+        Linux::
+
+            python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+
+        Windows::
+
+            python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
+
 *   Always consult the specific version release notes linked above before upgrading.
 
 Code upgrade

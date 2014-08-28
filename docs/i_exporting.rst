@@ -68,3 +68,16 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
     :width: 450px
     :height: 268px
     :alt: Deleting exports
+
+.. warning::
+
+    Large exports have been killed by the operating system due to running 
+    out of memory - a 6500 CT exam xlsx export was killed after 3400 
+    studies for example. This issue is being tracked as `#116`_ and will
+    hopefully be addressed in the next release. It is possible that if debug 
+    mode is turned off then memory will be managed better, but I also need
+    to modify the xlsx export to make use of the memory optimisation mode in 
+    xlsxwriter.
+
+
+..  _`#116`: https://bitbucket.org/edmcdonagh/openrem/issue/116/

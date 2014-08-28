@@ -13,6 +13,18 @@ Headline changes
 Specific upgrade instructions
 =============================
 
+**Always make sure you have converted your database to South before attempting an upgrade**
+
+Quick reminder of how, if you haven't done it already:
+
+    Linux::
+
+        python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+
+    Windows::
+
+        python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
+
 Upgrading from 0.3.9 or earlier
 -------------------------------
 
