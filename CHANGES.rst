@@ -2,18 +2,58 @@
 OpenREM version history
 =======================
 
-0.4.2
------
+0.4.3
+------
 
-* `#83`_   Fix for `#73`_ introduced bug that prevents the import scripts from working. Fixed.
+* `#117`_  Added Windows line endings to patient size import logs
+* `#113`_  Fixed units spelling error in patient size import logs
+* `#112`_  File system errors during imports and exports are now handled properly with tasks listed in error states on the summary pages
+* `#111`_  Added abort function to patient size imports and study exports
+* `#110`_  Converted exports to use the FileField handling for storage and access, plus modified folder structure.
+* `#109`_  Added example ``MEDIA_ROOT`` path for Windows to the install docs
+* `#108`_  Documented ownership issues between the webserver and Celery
+* `#107`_  Documented process for upgrading to 0.4.2 before 0.4.3 for versions 0.3.9 or earlier
+* `#106`_  Added the duration of export time to the exports table. Also added template formatting tag to convert seconds to natural time
+* `#105`_  Fixed bug in Philips CT import where :py:class:`decimal.Decimal` was not imported before being used in the age calculation
+* `#104`_  Added documentation for the additional study export functions as a result of using Celery tasks in task `#19`_ as well as documentation for the code
+* `#103`_  Added documentation for using the web import of patient size information as well as the new code
+* `#102`_  Improved handling of attempts to process patient size files that have been deleted for when users go back in the browser after the process is finished
+* `#101`_  Set the security of the new patient size imports to prevent users below admin level from using it
+* `#100`_  Logging information for patient size imports was being written to the database - changed to write to file
+* `#99`_   Method for importing remapp from scripts and for setting the `DJANGO_SETTINGS_MODULE` made more robust so that it should work out of the box on Windows, debian derivatives and virtualenvs
+* `#98`_   Versions 0.4.0 to 0.4.2 had a settings.py.new file to avoid overwriting settings files on upgrades; renaming this file was missing from the installation documentation for new installs
+* `#97`_   Changed the name of the export views file from ajaxviews as ajax wasn't used in the end
+* `#96`_   Changed mammo and fluoro filters to use named fields to avoid needing to use the full database path
+* `#93`_   Set the security of the new exports to prevent users below export level from creating or downloading exports
+* `#92`_   Add `NHSBSP specific mammography csv export`_ from Jonathan Cole - with Celery
+* `#91`_   Added documentation for Celery and RabbitMQ
+* `#90`_   Added delete function for exports
+* `#89`_   Added the Exports navigation item to all templates, limited to export or admin users
+* `#88`_   Converted fluoroscopy objects to using the Celery task manager after starting with CT for `#19`_
+* `#87`_   Converted mammography objects to using the Celery task manager after starting with CT for `#19`_
+* `#86`_   Digital Breast Tomosynthesis systems have a projections object that for Hologic contains required dosimetry information
+* `#85`_   Fix for bug introduced in `#75`_ where adaption of ptsize import for procedure import broke ptsize imports
+* `#74`_   'Time since last study' is now correct when daylight saving time kicks in
+* `#21`_   Height and weight data can now be imported through forms in the web interface
+* `#19`_   Exports are now sent to a task manager instead of locking up the web interface
 
-0.4.1
------
+Reopened issue
+``````````````
+
+* `#9`_    Issue tracking import using \*.dcm style wildcards reopened as Windows ``cmd.exe`` shell doesn't do wildcard expansion, so this will need to be handled by OpenREM in a future version
+
+0.4.2 (2014-04-15)
+------------------
+
+* `#83`_   Fix for bug introduced in `#73`_ that prevents the import scripts from working.
+
+0.4.1 (2014-04-15)
+------------------
 
 * `#82`_   Added instructions for adding users to the release notes
 
-0.4.0
------
+0.4.0 (2014-04-15)
+------------------
 
 ..  note::
 
@@ -43,8 +83,8 @@ OpenREM version history
 * `#9`_    Enable import of ``*.dcm``
 
 
-0.3.9
------
+0.3.9 (2014-03-08)
+------------------
 ..  note:: `#51`_ includes changes to the database schema -- make sure South is in use before upgrading. See http://docs.openrem.org/page/upgrade.html
 
 * `#59`_   CSS stylesheet referenced particular fonts that are not in the distribution -- references removed
@@ -59,8 +99,8 @@ OpenREM version history
 * `#48`_   New feature -- can now filter by patient age. Improved export to xlsx to better handle missing attributes
 * `#47`_   Install was failing on pydicom -- fixed upstream
 
-0.3.8
------
+0.3.8 (2014-03-05)
+------------------
 
 * --    File layout modified to conform to norms
 * `#46`_   Updated documentation to reflect limited testing of mammo import on additional modalities
@@ -71,16 +111,16 @@ OpenREM version history
 * `#37`_   Studies now sort by time and date
 
 
-0.3.7
------
+0.3.7 (2014-02-25)
+------------------
 
 * `#40`_   Restyled the filter section in the web interface and added a title to that section
 * `#38`_   Column titles tidied up in Excel exports
 * `#36`_	openrem_ptsizecsv output of log now depends on verbose flag
 * `#35`_   Numbers no longer stored as text in Excel exports
 
-0.3.6
------
+0.3.6 (2014-02-24)
+------------------
 
 * `#34`_   Localised scripts that were on remote web servers in default Bootstrap code
 * `#33`_   Documentation now exists for adding data via csv file
@@ -88,28 +128,28 @@ OpenREM version history
 * `#5`_    Web interface and export function now have some documentation with screenshots
 
 
-0.3.5-rc2
----------
+0.3.5-rc2 (2014-02-17)
+----------------------
 
 * `#32`_   Missing sys import bug prevented new patient size import from working
 
-0.3.5
------
+0.3.5 (2014-02-17)
+------------------
 
 * --    Prettified this document!
 * `#31`_   Promoted patient size import from csv function to the scripts folder so it will install and can be called from the path
 * `#30`_   Improved patient size import from csv to allow for arbitary column titles and study instance UID in addition to accession number.
 * `#29`_   Corrected the docs URL in the readme
 
-0.3.4-rc2
----------
+0.3.4-rc2 (2014-02-14)
+----------------------
 
 * `#28`_   XLSX export crashed if any of the filter fields were missing. Now fills on import with 'None'
 * `#27`_   Use requested procedure description if requested procedure code description is missing
 
 
-0.3.4
------
+0.3.4 (2014-02-14)
+------------------
 
 * --    General improvements and addition of logo to docs
 * `#23`_   Added Windows XP MySQL backup guide to docs
@@ -119,14 +159,14 @@ OpenREM version history
 * `#13`_   Improve the docs with respect to South database migrations
 
 
-0.3.3-r2
---------
+0.3.3-r2 (2014-02-04)
+---------------------
 
 * `#12`_   Added this version history
 * `#11`_   Documentation is no longer included in the tar.gz install file -- see http://openrem.trfd.org instead
 
-0.3.3
------
+0.3.3 (2014-02-01)
+------------------
 
 ..      Note::
         
@@ -142,11 +182,42 @@ OpenREM version history
 * `#3`_    Corrected copyright notice in documentation
 
 
-0.3.2
------
+0.3.2 (2014-01-29)
+------------------
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#120`: https://bitbucket.org/edmcdonagh/openrem/issue/120/
+..  _`#119`: https://bitbucket.org/edmcdonagh/openrem/issue/119/
+..  _`#118`: https://bitbucket.org/edmcdonagh/openrem/issue/118/
+..  _`#117`: https://bitbucket.org/edmcdonagh/openrem/issue/117/
+..  _`#116`: https://bitbucket.org/edmcdonagh/openrem/issue/116/
+..  _`#115`: https://bitbucket.org/edmcdonagh/openrem/issue/115/
+..  _`#114`: https://bitbucket.org/edmcdonagh/openrem/issue/114/
+..  _`#113`: https://bitbucket.org/edmcdonagh/openrem/issue/113/
+..  _`#112`: https://bitbucket.org/edmcdonagh/openrem/issue/112/
+..  _`#111`: https://bitbucket.org/edmcdonagh/openrem/issue/111/
+..  _`#110`: https://bitbucket.org/edmcdonagh/openrem/issue/110/
+..  _`#109`: https://bitbucket.org/edmcdonagh/openrem/issue/109/
+..  _`#108`: https://bitbucket.org/edmcdonagh/openrem/issue/108/
+..  _`#107`: https://bitbucket.org/edmcdonagh/openrem/issue/107/
+..  _`#106`: https://bitbucket.org/edmcdonagh/openrem/issue/106/
+..  _`#105`: https://bitbucket.org/edmcdonagh/openrem/issue/105/
+..  _`#104`: https://bitbucket.org/edmcdonagh/openrem/issue/104/
+..  _`#103`: https://bitbucket.org/edmcdonagh/openrem/issue/103/
+..  _`#102`: https://bitbucket.org/edmcdonagh/openrem/issue/102/
+..  _`#101`: https://bitbucket.org/edmcdonagh/openrem/issue/101/
+..  _`#100`: https://bitbucket.org/edmcdonagh/openrem/issue/100/
+..  _`#99`: https://bitbucket.org/edmcdonagh/openrem/issue/99/
+..  _`#98`: https://bitbucket.org/edmcdonagh/openrem/issue/98/
+..  _`#97`: https://bitbucket.org/edmcdonagh/openrem/issue/97/
+..  _`#96`: https://bitbucket.org/edmcdonagh/openrem/issue/96/
+..  _`#95`: https://bitbucket.org/edmcdonagh/openrem/issue/95/
+..  _`#94`: https://bitbucket.org/edmcdonagh/openrem/issue/94/
+..  _`#93`: https://bitbucket.org/edmcdonagh/openrem/issue/93/
+..  _`#92`: https://bitbucket.org/edmcdonagh/openrem/issue/92/
+..  _`#91`: https://bitbucket.org/edmcdonagh/openrem/issue/91/
+..  _`#90`: https://bitbucket.org/edmcdonagh/openrem/issue/90/
 ..  _`#89`: https://bitbucket.org/edmcdonagh/openrem/issue/89/
 ..  _`#88`: https://bitbucket.org/edmcdonagh/openrem/issue/88/
 ..  _`#87`: https://bitbucket.org/edmcdonagh/openrem/issue/87/
@@ -236,3 +307,6 @@ OpenREM version history
 ..  _`#3`: https://bitbucket.org/edmcdonagh/openrem/issue/3/
 ..  _`#2`: https://bitbucket.org/edmcdonagh/openrem/issue/2/
 ..  _`#1`: https://bitbucket.org/edmcdonagh/openrem/issue/1/
+
+
+..  _`NHSBSP specific mammography csv export` : https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
