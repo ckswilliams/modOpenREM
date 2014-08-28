@@ -20,6 +20,7 @@ OpenREM version history
 * `#102`_  Improved handling of attempts to process patient size files that have been deleted for when users go back in the browser after the process is finished
 * `#101`_  Set the security of the new patient size imports to prevent users below admin level from using it
 * `#100`_  Logging information for patient size imports was being written to the database - changed to write to file
+* `#99`_   Method for importing remapp from scripts and for setting the `DJANGO_SETTINGS_MODULE` made more robust so that it should work out of the box on Windows, debian derivatives and virtualenvs
 * `#98`_   Versions 0.4.0 to 0.4.2 had a settings.py.new file to avoid overwriting settings files on upgrades; renaming this file was missing from the installation documentation for new installs
 * `#97`_   Changed the name of the export views file from ajaxviews as ajax wasn't used in the end
 * `#96`_   Changed mammo and fluoro filters to use named fields to avoid needing to use the full database path
