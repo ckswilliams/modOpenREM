@@ -169,7 +169,9 @@ Help! I get a ``value too long for type character varying(50)`` error!
     This error with part of the Django auth_permissions system that we are not using, and can safely be ignored.
     This is being tracked as `Issue 62 <https://bitbucket.org/edmcdonagh/openrem/issue/62>`_
 
-For production installs, convert to South `(What is south?)`_
+For production installs, convert to South
+`````````````````````````````````````````
+`(What is south?)`_
 
 Linux::
 
