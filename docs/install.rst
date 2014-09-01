@@ -105,7 +105,7 @@ In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` 
 ..  Note::
 
     Windows notepad will not recognise the Unix style line endings.
-    Please use an editor such as Notepad++ if you can, else use WordPad -
+    Please use an editor such as Notepad++ if you can, else use WordPad –
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
 Database settings
