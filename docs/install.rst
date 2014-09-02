@@ -91,7 +91,7 @@ Configure
 
 Locate install location
 
-* Linux: ``/usr/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux: ``/usr/local/lib/python2.7/dist-packages/`` or ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 
 There are three files that need renaming: *(changed for 0.4.0)*
@@ -155,7 +155,7 @@ Create the database
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py syncdb
 
 Windows::
 
@@ -175,7 +175,7 @@ For production installs, convert to South
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
 
 Windows::
 
@@ -190,7 +190,7 @@ Start test web server
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver
 
 Windows::
 
@@ -215,7 +215,7 @@ In a new shell:
 
 Linux::
 
-    cd /usr/lib/python2.7/dist-packages/openrem/
+    cd /usr/local/lib/python2.7/dist-packages/openrem/
     celery -A openrem worker -l info
 
 Windows::
