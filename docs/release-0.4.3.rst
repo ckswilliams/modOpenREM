@@ -19,7 +19,7 @@ Quick reminder of how, if you haven't done it already:
 
     Linux::
 
-        python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
 
     Windows::
 
@@ -75,7 +75,7 @@ are bing processed.
 
 The ``local_settings.py`` file will be in the ``openrem/openrem`` folder, for example:
 
-* Linux: ``/usr/lib/python2.7/dist-packages/openrem/openrem/local_settings.py``
+* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openrem/local_settings.py``
 * Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/openrem/local_settings.py``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\openrem\local_settings.py``
 
@@ -99,8 +99,8 @@ Database migration
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
 
 Windows::
 
@@ -125,7 +125,7 @@ For testing, in a new shell: *(assuming no virtualenv)*
 
 Linux::
 
-    cd /usr/lib/python2.7/dist-packages/openrem/
+    cd /usr/local/lib/python2.7/dist-packages/openrem/
     celery -A openrem worker -l info
 
 Windows::
