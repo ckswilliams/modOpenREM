@@ -91,7 +91,7 @@ Configure
 
 Locate install location
 
-* Linux: ``/usr/local/lib/python2.7/dist-packages/`` or ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 
 There are three files that need renaming: *(changed for 0.4.0)*
