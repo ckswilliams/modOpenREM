@@ -52,9 +52,6 @@ Windows
         python get-pip.py
 
 
-..  Note::
-
-    Before continuing, `consider virtualenv`_
 
 Quick check of python and pip
 `````````````````````````````
@@ -73,6 +70,10 @@ Install RabbitMQ
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
 For either install, just follow the defaults – no special configurations required.
+
+..  Note::
+
+    Before continuing, `consider virtualenv`_
 
 Install and configure OpenREM
 =============================
