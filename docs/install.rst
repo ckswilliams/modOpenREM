@@ -212,6 +212,13 @@ Start the Celery task queue
 Celery will have been automatically installed with OpenREM, and along with
 RabbitMQ allows for asynchronous task processing for imports and exports.
 
+..  Note::
+
+    The webserver and Celery both need to be able to read and write to the
+    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
+    Celery using the same user or group as the webserver, and setting the
+    file permissions accordingly.
+
 In a new shell:
 
 Linux::
