@@ -685,7 +685,7 @@ def _rsdr2db(dataset):
     import openrem_settings
 
     openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
 
     from django.db import models
     from remapp.models import General_study_module_attributes
