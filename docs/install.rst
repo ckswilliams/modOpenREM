@@ -52,9 +52,6 @@ Windows
         python get-pip.py
 
 
-..  Note::
-
-    Before continuing, `consider virtualenv`_
 
 Quick check of python and pip
 `````````````````````````````
@@ -74,6 +71,10 @@ Install RabbitMQ
 
 For either install, just follow the defaults – no special configurations required.
 
+..  Note::
+
+    Before continuing, `consider virtualenv`_
+
 Install and configure OpenREM
 =============================
 
@@ -91,7 +92,7 @@ Configure
 
 Locate install location
 
-* Linux: ``/usr/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 
 There are three files that need renaming: *(changed for 0.4.0)*
@@ -101,6 +102,12 @@ There are three files that need renaming: *(changed for 0.4.0)*
 + ``openrem/settings.py.new`` to ``openrem/settings.py`` *Not applicable from 0.4.3 onwards*
 
 In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path and the secret key.
+
+..  Note::
+
+    Windows notepad will not recognise the Unix style line endings.
+    Please use an editor such as Notepad++ or Notepad2 if you can, else use WordPad –
+    on the View tab you may wish to set the Word wrap to 'No wrap'
 
 Database settings
 `````````````````
@@ -112,8 +119,8 @@ For testing you can use the SQLite3 database
     'ENGINE': 'django.db.backends.sqlite3',
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
-* Linux example: ``'NAME': '/var/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
+* Linux example: ``'NAME': '/home/user/openrem/openrem.db',``
+* Windows example: ``'NAME': 'C:/Users/myusername/Documents/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
 
 For production use, see `Database options`_ below
 
@@ -131,11 +138,11 @@ forward slashes for the config file, even for Windows.
 
 Linux example::
 
-    MEDIA_ROOT = "/var/openrem/exportfiles/"
+    MEDIA_ROOT = "/var/openrem/media/"
 
 Windows example::
     
-    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
+    MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
 Secret key
@@ -149,7 +156,7 @@ Create the database
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py syncdb
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py syncdb
 
 Windows::
 
@@ -163,11 +170,13 @@ Help! I get a ``value too long for type character varying(50)`` error!
     This error with part of the Django auth_permissions system that we are not using, and can safely be ignored.
     This is being tracked as `Issue 62 <https://bitbucket.org/edmcdonagh/openrem/issue/62>`_
 
-For production installs, convert to South `(What is south?)`_
+For production installs, convert to South
+`````````````````````````````````````````
+`(What is south?)`_
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
 
 Windows::
 
@@ -182,7 +191,7 @@ Start test web server
 
 Linux::
 
-    python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver
 
 Windows::
 
@@ -203,11 +212,18 @@ Start the Celery task queue
 Celery will have been automatically installed with OpenREM, and along with
 RabbitMQ allows for asynchronous task processing for imports and exports.
 
+..  Note::
+
+    The webserver and Celery both need to be able to read and write to the
+    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
+    Celery using the same user or group as the webserver, and setting the
+    file permissions accordingly.
+
 In a new shell:
 
 Linux::
 
-    cd /usr/lib/python2.7/dist-packages/openrem/
+    cd /usr/local/lib/python2.7/dist-packages/openrem/
     celery -A openrem worker -l info
 
 Windows::

@@ -178,5 +178,7 @@ except NameError:
     try:
         from openrem.local_settings import *
     except ImportError:
-        pass
-
+        try:
+            from openrem.openrem.local_settings import *
+        except ImportError:
+            pass
