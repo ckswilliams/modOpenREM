@@ -313,10 +313,10 @@ def _mammo2db(dataset):
     import os, sys
     import openrem_settings
 
-    openrem_settings.add_project_to_path()
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
-
     from django.db import models
+
+    openrem_settings.add_project_to_path()
     from remapp.models import General_study_module_attributes
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
