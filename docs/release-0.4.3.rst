@@ -53,7 +53,7 @@ Install OpenREM version 0.4.3
 `````````````````````````````
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.4.3b4
+    pip install --pre openrem==0.4.3b5
 
 (Will need ``sudo`` or equivalent if using linux without a virtualenv)
 
@@ -87,11 +87,11 @@ forward slashes in the config file, even for Windows.
 
 Linux example::
 
-    MEDIA_ROOT = "/var/openrem/exportfiles/"
+    MEDIA_ROOT = "/var/openrem/media/"
 
 Windows example::
 
-    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
+    MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 Database migration
 ``````````````````
