@@ -106,7 +106,7 @@ In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` 
 ..  Note::
 
     Windows notepad will not recognise the Unix style line endings.
-    Please use an editor such as Notepad++ if you can, else use WordPad –
+    Please use an editor such as Notepad++ or Notepad2 if you can, else use WordPad –
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
 Database settings
@@ -119,8 +119,8 @@ For testing you can use the SQLite3 database
     'ENGINE': 'django.db.backends.sqlite3',
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
-* Linux example: ``'NAME': '/var/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:/Documents/User/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
+* Linux example: ``'NAME': '/home/user/openrem/openrem.db',``
+* Windows example: ``'NAME': 'C:/Users/myusername/Documents/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
 
 For production use, see `Database options`_ below
 
@@ -138,11 +138,11 @@ forward slashes for the config file, even for Windows.
 
 Linux example::
 
-    MEDIA_ROOT = "/var/openrem/exportfiles/"
+    MEDIA_ROOT = "/var/openrem/media/"
 
 Windows example::
     
-    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
+    MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
 Secret key

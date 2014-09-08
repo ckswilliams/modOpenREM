@@ -4,7 +4,7 @@ from settings import *
 
 # Choose your database and fill in the details below. If testing, you
 # can use the sqlite3 database as it doesn't require any further configuration
-# A Windows example path might be: 'C:/Users/myusernane/Documents/OpenREM/openrem.db'
+# A Windows example path might be: 'C:/Users/myusername/Documents/OpenREM/openrem.db'
 # Note, forward slashes are used in the config files, even for Windows.
 
 DATABASES = {
@@ -22,7 +22,7 @@ DATABASES = {
 # Absolute filesystem path to the directory that will hold xlsx and csv
 # exports patient size import files
 # Linux example: "/var/openrem/media/"
-# Windows example: "C:/Users/myusername/OpenREM/exportfiles/"
+# Windows example: "C:/Users/myusername/Documents/OpenREM/media/"
 MEDIA_ROOT = ''
 
 # Absolute path to the directory static files should be collected to.

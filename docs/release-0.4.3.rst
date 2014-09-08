@@ -87,11 +87,11 @@ forward slashes in the config file, even for Windows.
 
 Linux example::
 
-    MEDIA_ROOT = "/var/openrem/exportfiles/"
+    MEDIA_ROOT = "/var/openrem/media/"
 
 Windows example::
 
-    MEDIA_ROOT = "C:/Users/myusername/OpenREM/exportfiles/"
+    MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 Database migration
 ``````````````````
