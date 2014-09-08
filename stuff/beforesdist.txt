@@ -1,3 +1,5 @@
+Change the version number in docs/conf.py, setup.py and in the install instructions in the release notes where applicable
+
 Clean the existing distribute folder:
 	rm -r *
 
