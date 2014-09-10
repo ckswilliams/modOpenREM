@@ -95,4 +95,4 @@ usage::
     unless requested.
 
 
-..  _`issue #9`: https://bitbucket.org/edmcdonagh/openrem/issue/9/
+..  _`issue #9`: https://bitbucket.org/openrem/openrem/issue/9/

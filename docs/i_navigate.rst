@@ -41,7 +41,7 @@ The search fields can all be used on their own or together, and they are
 all case insensitive 'contains' searches. The exception is the date field,
 where both from and to have to be filled in (if either are), and the format
 must be ``yyyy-mm-dd``. There currently isn't any more complex filtering
-available, but it does exist as `issue 17 <https://bitbucket.org/edmcdonagh/openrem/issue/17/>`_
+available, but it does exist as `issue 17 <https://bitbucket.org/openrem/openrem/issue/17/>`_
 for a future release.
 
 The last box below the filtering search boxes is the ordering preference.

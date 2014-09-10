@@ -80,4 +80,4 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
     xlsxwriter.
 
 
-..  _`#116`: https://bitbucket.org/edmcdonagh/openrem/issue/116/
+..  _`#116`: https://bitbucket.org/openrem/openrem/issue/116/
