@@ -168,7 +168,7 @@ for using the web interface. See the `Start using it!`_ section below.
 
 Help! I get a ``value too long for type character varying(50)`` error!
     This error with part of the Django auth_permissions system that we are not using, and can safely be ignored.
-    This is being tracked as `Issue 62 <https://bitbucket.org/edmcdonagh/openrem/issue/62>`_
+    This is being tracked as `Issue 62 <https://bitbucket.org/openrem/openrem/issue/62>`_
 
 For production installs, convert to South
 `````````````````````````````````````````
@@ -317,6 +317,12 @@ be changed to:
 
 * Linux: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``Lib\site-packages\openrem``
+
+In Windows, even when the virtualenv is activated you will need to call `python`
+and provide the full path to script in the `Scripts` folder. If you call the
+script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
+system wide Python will be used instead. This doesn't apply to Linux, where
+once activated, the scripts can be called without a `python` prefix from anywhere. 
 
 
 Related guides

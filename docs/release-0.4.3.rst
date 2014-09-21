@@ -4,6 +4,12 @@ OpenREM Release Notes version 0.4.3
 Headline changes
 ================
 
+**Special release just for reproducing the Windows issue with Celery**
+
+* Django release set to 1.6; OpenREM isn't ready for Django 1.7 yet
+
+*Changes contained in previous beta releases*
+
 * Export of study information is now handled by a task queue - no more export time-outs.
 * Patient size information in csv files can now be uploaded and imported via a web interface.
 * Proprietary projection image object created by Hologic tomography units can now be interrogated for details of the tomosynthesis exam.
@@ -49,11 +55,11 @@ database onwards, before coming back to these instructions.
 Upgrading from 0.4.0 or above
 -----------------------------
 
-Install OpenREM version 0.4.3
-`````````````````````````````
+Install OpenREM version 0.4.3b6Celery
+`````````````````````````````````````
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.4.3b5
+    pip install --pre openrem==0.4.3b6Celery
 
 (Will need ``sudo`` or equivalent if using linux without a virtualenv)
 

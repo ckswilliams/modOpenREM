@@ -89,7 +89,7 @@ Specific upgrade instructions
     * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
 
         + ``viewgroup`` can browse the data only
-        + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/edmcdonagh/openrem/issue/21/>`_)
+        + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/openrem/openrem/issue/21/>`_)
         + ``admingroup`` can delete studies in addition to anything the export group can do
 
 
