@@ -210,7 +210,7 @@ def csv2db(*args, **kwargs):
     parser.add_argument("weight", help="Column title for the patient weight")
     args=parser.parse_args()
     
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     openrem_settings.add_project_to_path()
 
     f = open(args.csvfile, 'rb')

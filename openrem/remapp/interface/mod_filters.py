@@ -30,7 +30,7 @@
 
 # Following three lines added so that sphinx autodocumentation works. 
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
 import django_filters
