@@ -684,7 +684,7 @@ def _rsdr2db(dataset):
     import os, sys
     import openrem_settings
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openrem.settings'
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     from django.db import models
 
     openrem_settings.add_project_to_path()

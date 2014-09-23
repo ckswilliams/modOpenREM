@@ -30,7 +30,7 @@
 
 # Following two lines added so that sphinx autodocumentation works.
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -171,7 +171,7 @@ def download(request, file_name):
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
     from django.shortcuts import redirect
-    from openrem.settings import MEDIA_ROOT
+    from openremproject.settings import MEDIA_ROOT
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         file_path = os.path.join(MEDIA_ROOT, file_name)
@@ -197,7 +197,7 @@ def deletefile(request):
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from openrem.settings import MEDIA_ROOT
+    from openremproject.settings import MEDIA_ROOT
     from remapp.models import Exports
     from remapp.exports import exportviews
     
