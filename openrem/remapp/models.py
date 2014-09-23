@@ -30,7 +30,7 @@
 
 # Following two lines added so that sphinx autodocumentation works. 
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
 class Size_upload(models.Model):

@@ -116,10 +116,10 @@ MIDDLEWARE_CLASSES = (
     'pagination.middleware.PaginationMiddleware',
 )
 
-ROOT_URLCONF = 'openrem.urls'
+ROOT_URLCONF = 'openremproject.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'openrem.wsgi.application'
+WSGI_APPLICATION = 'openremproject.wsgi.application'
 
 TEMPLATE_DIRS = (
 #    "rmphysics/templates",
@@ -176,9 +176,9 @@ try:
     LOCAL_SETTINGS
 except NameError:
     try:
-        from openrem.local_settings import *
+        from openremproject.local_settings import *
     except ImportError:
         try:
-            from openrem.openrem.local_settings import *
+            from openrem.openremproject.local_settings import *
         except ImportError:
             pass

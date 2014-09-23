@@ -29,7 +29,7 @@
 """
 # Following two lines added so that sphinx autodocumentation works.
 import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -223,7 +223,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from openrem.settings import MEDIA_ROOT
+from openremproject.settings import MEDIA_ROOT
 from remapp.models import Size_upload
 from remapp.forms import SizeUploadForm
 

@@ -3,5 +3,5 @@
 docs/
 stuff/
 openrem/remapp/migrations
-openrem/openrem/local_settings.py
+openrem/openremproject/local_settings.py
 *.pyc

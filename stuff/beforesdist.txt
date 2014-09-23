@@ -7,7 +7,7 @@ Then get the new contents:
 rsync -av --exclude-from='../bbOpenREM/stuff/distexclude.txt' ../bbOpenREM/ .
 
 Change settings name:
-	mv openrem/openrem/wsgi.py{,.example}
+	mv openrem/openremproject/wsgi.py{,.example}
 
 Build:
 	python setup.py sdist
