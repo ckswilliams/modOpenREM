@@ -11,6 +11,7 @@ Headline changes
 * Settings.py now ships with its proper name, this will overwrite important local settings if upgrade is from 0.3.9 or earlier.
 * Time since last study is no longer wrong just because of daylight saving time!
 * Django release set to 1.6; OpenREM isn't ready for Django 1.7 yet
+* The inner `openrem` Django project folder is now called `openremproject` to avoid import conflicts with Celery on Windows
 
 Specific upgrade instructions
 =============================
@@ -75,11 +76,11 @@ the place where the study exports will be stored for download and where the
 patient size information csv files will be stored temporarily whilst they
 are bing processed.
 
-The ``local_settings.py`` file will be in the ``openrem/openrem`` folder, for example:
+The ``local_settings.py`` file will be in the ``openrem/openremproject`` folder, for example:
 
-* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openrem/local_settings.py``
-* Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/openrem/local_settings.py``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\openrem\local_settings.py``
+* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
+* Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
 
 The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
@@ -128,12 +129,12 @@ For testing, in a new shell: *(assuming no virtualenv)*
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
 

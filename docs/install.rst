@@ -97,9 +97,9 @@ Locate install location
 
 There are three files that need renaming: *(changed for 0.4.0)*
 
-+ ``openrem/local_settings.py.example`` to ``openrem/local_settings.py``
-+ ``openrem/wsgi.py.example`` to ``openrem/wsgi.py``
-+ ``openrem/settings.py.new`` to ``openrem/settings.py`` *Not applicable from 0.4.3 onwards*
++ ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
++ ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
++ ``openremproject/settings.py.new`` to ``openremproject/settings.py`` *Not applicable from 0.4.3 onwards, and for 0.4.2 folder is called openrem*
 
 In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path and the secret key.
 
@@ -224,12 +224,12 @@ In a new shell:
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 For production use, see `Daemonising Celery`_ below
 
