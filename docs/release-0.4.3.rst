@@ -11,7 +11,7 @@ Headline changes
 * Settings.py now ships with its proper name, this will overwrite important local settings if upgrade is from 0.3.9 or earlier.
 * Time since last study is no longer wrong just because of daylight saving time!
 * Django release set to 1.6; OpenREM isn't ready for Django 1.7 yet
-* The inner `openrem` Django project folder is now called `openremproject` to avoid import conflicts with Celery on Windows
+* The inner ``openrem`` Django project folder is now called ``openremproject`` to avoid import conflicts with Celery on Windows
 
 Specific upgrade instructions
 =============================
@@ -70,12 +70,12 @@ The message broker RabbitMQ needs to be installed to enable the export and uploa
 
 Move and edit local_settings.py file and wsgi.py files
 ``````````````````````````````````````````````````````
-The inner `openrem` Django project folder has now been renamed `openremproject`
+The inner ``openrem`` Django project folder has now been renamed ``openremproject``
 to avoid import confusion that prevented Celery working on Windows.
 
-When you upgrade, the `local_settings.py` file and the `wsgi.py` file will
-remain in the old `openrem` folder. Both need to be moved across to the
-`openremproject` folder, and edited as below:
+When you upgrade, the ``local_settings.py`` file and the ``wsgi.py`` file will
+remain in the old ``openrem`` folder. Both need to be moved across to the
+``openremproject`` folder, and edited as below:
 
 Edit the location setting for imports and exports in the local_settings.py file
 ```````````````````````````````````````````````````````````````````````````````
@@ -108,8 +108,8 @@ Windows example::
 Edit the wsgi.py file with the new project folder name
 ``````````````````````````````````````````````````````
 If you aren't using the wsgi.py file as part of your webserver setup,
-you might like to simply rename the `wsgi.py.example` file in the
-`openremproject` folder.
+you might like to simply rename the ``wsgi.py.example`` file in the
+``openremproject`` folder.
 
 If you are using it, edit the line::
 
@@ -121,7 +121,7 @@ to read::
 
 Tidying up
 ``````````
-Finally, you should delete the old `openrem` folder - you might like to
+Finally, you should delete the old ``openrem`` folder - you might like to
 take a backup first!
 
 Database migration
