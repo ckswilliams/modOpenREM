@@ -68,6 +68,15 @@ The message broker RabbitMQ needs to be installed to enable the export and uploa
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
+Move and edit local_settings.py file and wsgi.py files
+``````````````````````````````````````````````````````
+The inner `openrem` Django project folder has now been renamed `openremproject`
+to avoid import confusion that prevented Celery working on Windows.
+
+When you upgrade, the `local_settings.py` file and the `wsgi.py` file will
+remain in the old `openrem` folder. Both need to be moved across to the
+`openremproject` folder, and edited as below:
+
 Edit the location setting for imports and exports in the local_settings.py file
 ```````````````````````````````````````````````````````````````````````````````
 
@@ -95,6 +104,25 @@ Linux example::
 Windows example::
 
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
+
+Edit the wsgi.py file with the new project folder name
+``````````````````````````````````````````````````````
+If you aren't using the wsgi.py file as part of your webserver setup,
+you might like to simply rename the `wsgi.py.example` file in the
+`openremproject` folder.
+
+If you are using it, edit the line::
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openrem.settings")
+
+to read::
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openremproject.settings")
+
+Tidying up
+``````````
+Finally, you should delete the old `openrem` folder - you might like to
+take a backup first!
 
 Database migration
 ``````````````````
