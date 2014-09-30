@@ -191,19 +191,26 @@ Start test web server
 
 Linux::
 
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver --insecure
 
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py runserver
+    python C:\Python27\Lib\site-packages\openrem\manage.py runserver --insecure
 
 If you are using a headless server and need to be able to see the 
 web interface from another machine, use 
-``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` 
+``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000 --insecure`` 
 (or Windows equivalent) replacing the ``x`` with the IP address of the server 
 and ``8000`` with the port you wish to use.
 
 Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
+
+..  Note::
+
+    Why are we using the ``--insecure`` option? With ``DEBUG`` mode set to ``True``
+    the test web server would serve up the static files. In this release,
+    ``DEBUG`` mode is set to ``False``, which prevents the test web server
+    serving those files. The ``--insecure`` option allows them to be served again.
 
 Start the Celery task queue
 ---------------------------
