@@ -42,5 +42,5 @@ SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
 # This is required if the DEBUG mode is set to False (default)
 # Example: '.doseserver.' or '10.23.123.123'. A dot before a name allows subdomains, a dot after allows for FQDN eg doseserver.ad.trust.nhs.uk
 ALLOWED_HOSTS = [
-    '192.168.56.102'
+    '192.168.56.102',
 ]
