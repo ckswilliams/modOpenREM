@@ -34,3 +34,13 @@ STATIC_ROOT = ''
 # You should generate a new secret key. Make this unique, and don't
 # share it with anybody. See the docs.
 SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
+
+# Debug mode is now set to False by default. If you need to troubleshoot, can turn it back on here:
+# DEBUG = True
+
+# Set the domain name that people will use to access your OpenREM server.
+# This is required if the DEBUG mode is set to False (default)
+# Example: '.doseserver.' or '10.23.123.123'. A dot before a name allows subdomains, a dot after allows for FQDN eg doseserver.ad.trust.nhs.uk
+ALLOWED_HOSTS = [
+    '192.168.56.102'
+]

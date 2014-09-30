@@ -6,7 +6,8 @@ from __future__ import absolute_import
 # becomes `proj.celery.schedules` in Python 2.x since it allows
 # for relative imports by default.
 
-DEBUG = True
+# Debug is now set to false - you can turn it back on in local_settings if you need to
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 
