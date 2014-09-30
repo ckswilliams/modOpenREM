@@ -12,6 +12,7 @@ Headline changes
 * Time since last study is no longer wrong just because of daylight saving time!
 * Django release set to 1.6; OpenREM isn't ready for Django 1.7 yet
 * The inner ``openrem`` Django project folder is now called ``openremproject`` to avoid import conflicts with Celery on Windows
+* DEBUG mode now defaults to False
 
 Specific upgrade instructions
 =============================
@@ -75,21 +76,22 @@ to avoid import confusion that prevented Celery working on Windows.
 
 When you upgrade, the ``local_settings.py`` file and the ``wsgi.py`` file will
 remain in the old ``openrem`` folder. Both need to be moved across to the
-``openremproject`` folder, and edited as below:
+``openremproject`` folder, and edited as below.
 
-Edit the location setting for imports and exports in the local_settings.py file
-```````````````````````````````````````````````````````````````````````````````
+The new and old folders will be found in:
 
-The ``MEDIA_ROOT`` path needs to be defined in the ``local_settings.py`` file. This is
+* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+
+
+Edit the local_settings.py file
+```````````````````````````````
+
+The ``MEDIA_ROOT`` path needs to be defined. This is
 the place where the study exports will be stored for download and where the
 patient size information csv files will be stored temporarily whilst they
 are bing processed.
-
-The ``local_settings.py`` file will be in the ``openrem/openremproject`` folder, for example:
-
-* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
-* Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
 
 The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
@@ -104,6 +106,19 @@ Linux example::
 Windows example::
 
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
+
+The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
+set to ``False``. This needs to contain the server name or IP address that
+will be used in the URL in the web browser. For example::
+
+    ALLOWED_HOSTS = [
+        '192.168.56.102',
+        '.doseserver.',
+        'localhost',
+    ]
+
+A dot before a hostname allows for subdomains (eg www.doseserver), a dot
+after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk)
 
 Edit the wsgi.py file with the new project folder name
 ``````````````````````````````````````````````````````
@@ -141,7 +156,18 @@ Windows::
 Web server
 ``````````
 
-Restart the web server.
+If you are using a production webserver, you will probably need to edit
+some of the configuration to reflect the change in location of ``settings.py``
+from ``openrem.settings.py`` to ``openremproject.settings.py``, and then
+restart the web server.
+
+If you are using the built-in test web server (`not for production use`),
+then the static files will not be served unless you add ``--insecure``
+to the command. This is one of the consequences of setting ``DEBUG`` to
+``False``::
+
+    python manage.py runserver x.x.x.x:8000 --insecure
+
 
 Start the Celery task queue
 ```````````````````````````
