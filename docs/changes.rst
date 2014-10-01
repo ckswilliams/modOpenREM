@@ -2,9 +2,10 @@
 OpenREM version history
 =======================
 
-0.4.3
-------
+0.4.3 (2014-10-01)
+------------------
 
+* `#119`_  Fixed issue where Celery didn't work on Windows. Django project folder is now called openremproject instead of openrem
 * `#117`_  Added Windows line endings to patient size import logs
 * `#113`_  Fixed units spelling error in patient size import logs
 * `#112`_  File system errors during imports and exports are now handled properly with tasks listed in error states on the summary pages
@@ -34,6 +35,7 @@ OpenREM version history
 * `#86`_   Digital Breast Tomosynthesis systems have a projections object that for Hologic contains required dosimetry information
 * `#85`_   Fix for bug introduced in `#75`_ where adaption of ptsize import for procedure import broke ptsize imports
 * `#74`_   'Time since last study' is now correct when daylight saving time kicks in
+* `#39`_   Debug mode now defaults to False
 * `#21`_   Height and weight data can now be imported through forms in the web interface
 * `#19`_   Exports are now sent to a task manager instead of locking up the web interface
 

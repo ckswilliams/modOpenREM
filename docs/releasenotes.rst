@@ -11,6 +11,9 @@ Version history change log
 
 Release notes and upgrade instructions
 ======================================
+
+Each release comes with specific upgrade instructions, so please follow
+the links below for the appropriate version.
     
 Version specific information
 ----------------------------
@@ -23,50 +26,6 @@ Version specific information
         release-0.4.1
         release-0.4.0
 
-..  _generic-upgrade-instructions:
-
-Generic upgrade instructions
-----------------------------
-
-*   Make sure you have setup South before you upgrade -- see :ref:`Database migrations <convert-to-south>` for details.
-
-    Quick reminder of how, if you haven't done it already:
-
-        Linux::
-
-            python /usr/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
-
-        Windows::
-
-            python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
-
-*   Always consult the specific version release notes linked above before upgrading.
-
-Code upgrade
-^^^^^^^^^^^^
-``pip install openrem -U``
-
-*Note* - this will upgrade OpenREM **and all** the programs it depends on (e.g. Django)
-
-Database migration
-^^^^^^^^^^^^^^^^^^
-
-Always do a database migration using South after an upgrade in case any of the
-database models have changed. This is not always the case.
-
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
-
-If response to the last command is 'Nothing seems to have changed', no migration is required. Else, follow the instructions to migrate:
-
-* Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp``    
-
-Restart the web server and Celery
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Restart the web server to enable any changes that have been made to the web interface,
-and likewise for Celery to reload the task files (0.4.3 onwards).
 
 
 Contributing authors
