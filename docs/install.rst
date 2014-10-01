@@ -95,11 +95,10 @@ Locate install location
 * Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 
-There are three files that need renaming: *(changed for 0.4.0)*
+There are two files that need renaming:
 
 + ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
 + ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
-+ ``openremproject/settings.py.new`` to ``openremproject/settings.py`` *Not applicable from 0.4.3 onwards, and for 0.4.2 folder is called openrem*
 
 In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path, the secret key and the ``ALLOWED_HOSTS``.
 
