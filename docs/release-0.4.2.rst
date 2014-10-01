@@ -10,12 +10,13 @@ Headline changes
 Specific upgrade instructions
 =============================
 
-Upgrading from 0.4.1 or 0.4.0
------------------------------
-
-Follow the :ref:`generic-upgrade-instructions`
 
 Upgrading from 0.3.9 or earlier
 -------------------------------
 
 Follow the instructions in :doc:`release-0.4.0`
+
+Upgrading from 0.4.0 or above
+-----------------------------
+
+Move straight to version 0.4.3 and follow the instructions in :doc:`release-0.4.3`
