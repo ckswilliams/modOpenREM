@@ -13,7 +13,7 @@ Headline changes
 Specific upgrade instructions
 =============================
 
-*  ``pip install openrem -U`` Note - this will upgrade openrem and all its dependencies.
+*  ``pip install openrem==0.4.2`` `Go straight to 0.4.2`
 *  Migrate the database
 
     ..      Warning::
