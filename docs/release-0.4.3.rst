@@ -159,7 +159,8 @@ Web server
 If you are using a production webserver, you will probably need to edit
 some of the configuration to reflect the change in location of ``settings.py``,
 for example ``DJANGO_SETTINGS_MODULE = openremproject.settings``, and then
-restart the web server.
+restart the web server. You may need to do something similar for the location
+of ``wsgi.py``.
 
 If you are using the built-in test web server (`not for production use`),
 then the static files will not be served unless you add ``--insecure``
