@@ -62,10 +62,11 @@ If response to the last command is 'Nothing seems to have changed', no migration
 * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py migrate remapp``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp``    
 
-Restart the web server
-^^^^^^^^^^^^^^^^^^^^^^
+Restart the web server and Celery
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Restart the web server to enable any changes that have been made to the web interface.
+Restart the web server to enable any changes that have been made to the web interface,
+and likewise for Celery to reload the task files (0.4.3 onwards).
 
 
 Contributing authors

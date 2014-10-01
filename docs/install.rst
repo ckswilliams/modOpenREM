@@ -97,11 +97,11 @@ Locate install location
 
 There are three files that need renaming: *(changed for 0.4.0)*
 
-+ ``openrem/local_settings.py.example`` to ``openrem/local_settings.py``
-+ ``openrem/wsgi.py.example`` to ``openrem/wsgi.py``
-+ ``openrem/settings.py.new`` to ``openrem/settings.py`` *Not applicable from 0.4.3 onwards*
++ ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
++ ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
++ ``openremproject/settings.py.new`` to ``openremproject/settings.py`` *Not applicable from 0.4.3 onwards, and for 0.4.2 folder is called openrem*
 
-In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path and the secret key.
+In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path, the secret key and the ``ALLOWED_HOSTS``.
 
 ..  Note::
 
@@ -151,6 +151,22 @@ Secret key
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
 
+Allowed hosts
+`````````````
+
+The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
+set to ``False``. This needs to contain the server name or IP address that
+will be used in the URL in the web browser. For example::
+
+    ALLOWED_HOSTS = [
+        '192.168.56.102',
+        '.doseserver.',
+        'localhost',
+    ]
+
+A dot before a hostname allows for subdomains (eg www.doseserver), a dot
+after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk)
+
 Create the database
 -------------------
 
@@ -191,19 +207,26 @@ Start test web server
 
 Linux::
 
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver --insecure
 
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py runserver
+    python C:\Python27\Lib\site-packages\openrem\manage.py runserver --insecure
 
 If you are using a headless server and need to be able to see the 
 web interface from another machine, use 
-``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000`` 
+``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000 --insecure`` 
 (or Windows equivalent) replacing the ``x`` with the IP address of the server 
 and ``8000`` with the port you wish to use.
 
 Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
+
+..  Note::
+
+    Why are we using the ``--insecure`` option? With ``DEBUG`` mode set to ``True``
+    the test web server would serve up the static files. In this release,
+    ``DEBUG`` mode is set to ``False``, which prevents the test web server
+    serving those files. The ``--insecure`` option allows them to be served again.
 
 Start the Celery task queue
 ---------------------------
@@ -224,12 +247,12 @@ In a new shell:
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 For production use, see `Daemonising Celery`_ below
 

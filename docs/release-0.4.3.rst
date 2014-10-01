@@ -11,6 +11,8 @@ Headline changes
 * Settings.py now ships with its proper name, this will overwrite important local settings if upgrade is from 0.3.9 or earlier.
 * Time since last study is no longer wrong just because of daylight saving time!
 * Django release set to 1.6; OpenREM isn't ready for Django 1.7 yet
+* The inner ``openrem`` Django project folder is now called ``openremproject`` to avoid import conflicts with Celery on Windows
+* DEBUG mode now defaults to False
 
 Specific upgrade instructions
 =============================
@@ -55,7 +57,7 @@ Install OpenREM version 0.4.3
 `````````````````````````````
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.4.3b7
+    pip install --pre openrem==0.4.3b8
 
 (Will need ``sudo`` or equivalent if using linux without a virtualenv)
 
@@ -67,19 +69,29 @@ The message broker RabbitMQ needs to be installed to enable the export and uploa
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
-Edit the location setting for imports and exports in the local_settings.py file
-```````````````````````````````````````````````````````````````````````````````
+Move and edit local_settings.py file and wsgi.py files
+``````````````````````````````````````````````````````
+The inner ``openrem`` Django project folder has now been renamed ``openremproject``
+to avoid import confusion that prevented Celery working on Windows.
 
-The ``MEDIA_ROOT`` path needs to be defined in the ``local_settings.py`` file. This is
+When you upgrade, the ``local_settings.py`` file and the ``wsgi.py`` file will
+remain in the old ``openrem`` folder. Both need to be moved across to the
+``openremproject`` folder, and edited as below.
+
+The new and old folders will be found in:
+
+* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+
+
+Edit the local_settings.py file
+```````````````````````````````
+
+The ``MEDIA_ROOT`` path needs to be defined. This is
 the place where the study exports will be stored for download and where the
 patient size information csv files will be stored temporarily whilst they
 are bing processed.
-
-The ``local_settings.py`` file will be in the ``openrem/openrem`` folder, for example:
-
-* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openrem/local_settings.py``
-* Linux with virtualenv: ``/home/myname/openrem/lib/python2.7/site-packages/openrem/openrem/local_settings.py``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\openrem\local_settings.py``
 
 The path set for ``MEDIA_ROOT`` is up to you, but the user that runs the
 webserver must have read/write access to the location specified because
@@ -94,6 +106,38 @@ Linux example::
 Windows example::
 
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
+
+The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
+set to ``False``. This needs to contain the server name or IP address that
+will be used in the URL in the web browser. For example::
+
+    ALLOWED_HOSTS = [
+        '192.168.56.102',
+        '.doseserver.',
+        'localhost',
+    ]
+
+A dot before a hostname allows for subdomains (eg www.doseserver), a dot
+after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk)
+
+Edit the wsgi.py file with the new project folder name
+``````````````````````````````````````````````````````
+If you aren't using the wsgi.py file as part of your webserver setup,
+you might like to simply rename the ``wsgi.py.example`` file in the
+``openremproject`` folder.
+
+If you are using it, edit the line::
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openrem.settings")
+
+to read::
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openremproject.settings")
+
+Tidying up
+``````````
+Finally, you should delete the old ``openrem`` folder - you might like to
+take a backup first!
 
 Database migration
 ``````````````````
@@ -112,7 +156,18 @@ Windows::
 Web server
 ``````````
 
-Restart the web server.
+If you are using a production webserver, you will probably need to edit
+some of the configuration to reflect the change in location of ``settings.py``,
+for example ``DJANGO_SETTINGS_MODULE = openremproject.settings``, and then
+restart the web server.
+
+If you are using the built-in test web server (`not for production use`),
+then the static files will not be served unless you add ``--insecure``
+to the command. This is one of the consequences of setting ``DEBUG`` to
+``False``::
+
+    python manage.py runserver x.x.x.x:8000 --insecure
+
 
 Start the Celery task queue
 ```````````````````````````
@@ -128,12 +183,12 @@ For testing, in a new shell: *(assuming no virtualenv)*
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
-    celery -A openrem worker -l info
+    celery -A openremproject worker -l info
 
 For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
 
