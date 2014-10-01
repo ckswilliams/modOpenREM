@@ -151,6 +151,22 @@ Secret key
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
 
+Allowed hosts
+`````````````
+
+The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
+set to ``False``. This needs to contain the server name or IP address that
+will be used in the URL in the web browser. For example::
+
+    ALLOWED_HOSTS = [
+        '192.168.56.102',
+        '.doseserver.',
+        'localhost',
+    ]
+
+A dot before a hostname allows for subdomains (eg www.doseserver), a dot
+after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk)
+
 Create the database
 -------------------
 
