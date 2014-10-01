@@ -101,7 +101,7 @@ There are three files that need renaming: *(changed for 0.4.0)*
 + ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
 + ``openremproject/settings.py.new`` to ``openremproject/settings.py`` *Not applicable from 0.4.3 onwards, and for 0.4.2 folder is called openrem*
 
-In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path and the secret key.
+In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path, the secret key and the ``ALLOWED_HOSTS``.
 
 ..  Note::
 
