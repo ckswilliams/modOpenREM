@@ -79,7 +79,13 @@ def exportFL2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -210,7 +216,13 @@ def exportCT2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -398,7 +410,13 @@ def exportMG2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
