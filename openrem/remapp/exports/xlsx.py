@@ -81,8 +81,13 @@ def ctxlsx(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            if (filterdict[filt])[0] <> '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : (filterdict[filt])[0]})
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                print "Filter string is {0}, filterstring type is {1}".format(filterstring, type(filterstring))
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
 
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
