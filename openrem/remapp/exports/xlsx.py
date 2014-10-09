@@ -81,6 +81,7 @@ def ctxlsx(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
             if isinstance(filterdict[filt], basestring):
                 filterstring = filterdict[filt]
             else:
