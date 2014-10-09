@@ -86,7 +86,6 @@ def ctxlsx(filterdict):
             else:
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
-                print "Filter string is {0}, filterstring type is {1}".format(filterstring, type(filterstring))
                 e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
 
     tsk.progress = 'Required study filter complete.'
