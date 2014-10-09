@@ -416,7 +416,7 @@ def exportMG2excel(filterdict):
             else:
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
