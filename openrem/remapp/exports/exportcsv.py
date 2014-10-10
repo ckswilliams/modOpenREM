@@ -518,22 +518,6 @@ def exportMG2excel(filterdict):
     tsk.save()
 
 
-def getQueryFilters(request):
-    from django.template import RequestContext
-
-    query_filters = {
-        'institution_name'        : request.GET.get('general_equipment_module_attributes__institution_name'),
-        'date_after'              : request.GET.get('date_after'),
-        'date_before'             : request.GET.get('date_before'),
-        'study_description'       : request.GET.get('study_description'),
-        'age_min'                 : request.GET.get('patient_age_min'),
-        'age_max'                 : request.GET.get('patient_age_max'),
-        'manufacturer'            : request.GET.get('general_equipment_module_attributes__manufacturer'),
-        'manufacturer_model_name' : request.GET.get('general_equipment_module_attributes__manufacturer_model_name'),
-        'station_name'            : request.GET.get('general_equipment_module_attributes__station_name'),
-        'accession_number'        : request.GET.get('accession_number'),
-    }
-    return query_filters
 
 
 
