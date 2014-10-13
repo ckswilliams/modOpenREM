@@ -28,23 +28,59 @@
 
 """
 
-def _patientstudymoduleattributes(exam, height, weight, verbose): # C.7.2.2
+def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
+
+    imp_log = None
+    if 'imp_log' in kwargs:
+        imp_log = kwargs['imp_log']
+
     patientatt = exam.patient_study_module_attributes_set.get()
-    if height and not patientatt.patient_size:
-        patientatt.patient_size = height
-        if verbose:
-            print "Inserted height of " + height
-    if weight and not patientatt.patient_weight:
-        patientatt.patient_weight = weight
-        if verbose:
-            print "Inserted weight of " + weight
+    if height:
+        if not patientatt.patient_size:
+            patientatt.patient_size = height
+            if verbose:
+                if imp_log:
+                    imp_log.file.open("ab")
+                    imp_log.write("\r\n    Inserted height of {0} cm".format(height))
+                    imp_log.file.close()
+                else:
+                    print "    Inserted height of " + height
+        elif verbose:
+            if imp_log:
+                imp_log.file.open("ab")
+                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size))
+                imp_log.file.close()
+            else:
+                print "    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size)
+
+    if weight:
+        if not patientatt.patient_weight:
+            patientatt.patient_weight = weight
+            if verbose:
+                if imp_log:
+                    imp_log.file.open("ab")
+                    imp_log.write("\r\n    Inserted weight of {0} kg".format(weight))
+                    imp_log.file.close()
+                else:
+                    print "    Inserted weight of " + weight
+        elif verbose:
+            if imp_log:
+                imp_log.file.open("ab")
+                imp_log.write("\r\n    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight))
+                imp_log.file.close()
+            else:
+                print "    Weight of {0} kg not inserted as {1:.1f} kg already in the database".format(weight, patientatt.patient_weight)
     patientatt.save()
 
 
-def _ptsizeinsert(accno,height,weight,siuid, verbose):
+def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwargs):
     from django.db import models
     from remapp.models import General_study_module_attributes
     from django import db
+    
+    imp_log = None
+    if 'imp_log' in kwargs:
+        imp_log = kwargs['imp_log']
     
     if (height or weight) and accno:
         if not siuid:
@@ -54,11 +90,88 @@ def _ptsizeinsert(accno,height,weight,siuid, verbose):
         if e:
             for exam in e:
                 if verbose:
-                    print accno + ":"
-                _patientstudymoduleattributes(exam, height, weight, verbose)
-        elif verbose:
-            print "Accession number " + accno + " not found in db"
+                    if imp_log:
+                        imp_log.file.open("ab")
+                        imp_log.write("\r\n{0}:".format(accno))
+                        imp_log.file.close()
+                    else:
+                        print accno + ":"
+                _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, imp_log = imp_log)
+
     db.reset_queries()
+
+from celery import shared_task
+
+@shared_task
+def websizeimport(csv_pk = None, *args, **kwargs):
+    """Task to import patient size data from the OpenREM web interface.
+
+    :param csv_pk: Database index key for the import record, containing
+        the path to the import csv file and the field header details.
+
+    """
+
+
+    import os, sys, csv, datetime
+    from django.core.files.base import ContentFile
+    from remapp.models import Size_upload
+
+    if csv_pk:
+        csvrecord = Size_upload.objects.all().filter(id__exact = csv_pk)[0]
+        csvrecord.task_id = websizeimport.request.id
+        datestamp = datetime.datetime.now()
+        csvrecord.import_date = datestamp
+        csvrecord.progress = 'Patient size data import started'
+        csvrecord.status = 'CURRENT'
+        csvrecord.save()
+        if csvrecord.id_type and csvrecord.id_field and csvrecord.height_field and csvrecord.weight_field:
+            si_uid = False
+            verbose = True
+            if csvrecord.id_type == "si-uid":
+                si_uid = True
+
+            logfile = "pt_size_import_log_{0}.txt".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+            headerrow = ContentFile("Patient size import from {0}\r\n".format(csvrecord.sizefile.name))
+
+            try:
+                csvrecord.logfile.save(logfile,headerrow)
+            except OSError as e:
+                csvrecord.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+                csvrecord.status = 'ERROR'
+                csvrecord.save()
+                return
+            except:
+                csvrecord.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+                csvrecord.status = 'ERROR'
+                csvrecord.save()
+                return
+
+            l = csvrecord.logfile
+            l.file.close()
+                # Method used for opening and writing to file as per https://code.djangoproject.com/ticket/13809
+
+            csvrecord.sizefile.open(mode='rb')
+            f = csvrecord.sizefile.readlines()
+            csvrecord.num_records = len(f)
+            csvrecord.save()
+            try:
+                dataset = csv.DictReader(f)
+                for i, line in enumerate(dataset):
+                    csvrecord.progress = "Processing row {0} of {1}".format(i + 1, csvrecord.num_records)
+                    csvrecord.save()
+                    _ptsizeinsert(
+                        line[csvrecord.id_field],
+                        line[csvrecord.height_field],
+                        line[csvrecord.weight_field],
+                        si_uid,
+                        verbose,
+                        csvrecord,
+                        imp_log = l)
+            finally:
+                csvrecord.sizefile.delete()
+                csvrecord.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+                csvrecord.status = 'COMPLETE'
+                csvrecord.save()
        
 
     
@@ -84,6 +197,8 @@ def csv2db(*args, **kwargs):
 
     import os, sys, csv
     import argparse
+    import openrem_settings
+
     
     # Required and optional arguments
     parser = argparse.ArgumentParser(description="Import height and weight data into an OpenREM database. If either is missing just add a blank column with appropriate title.")
@@ -95,27 +210,15 @@ def csv2db(*args, **kwargs):
     parser.add_argument("weight", help="Column title for the patient weight")
     args=parser.parse_args()
     
-    # This section attempts to place the openrem folder onto the python path
-    # so that openrem.settings can be found.
-    sitepaths = []
-    openrempathset=0
-    for paths in sys.path:
-        if paths.endswith('site-packages'):
-            sitepaths.append(paths)
-        if paths.endswith('openrem'):
-            openrempathset = 1
-        
-    if sitepaths and not openrempathset:
-        for paths in sitepaths:
-            sys.path.insert(1,os.path.join(paths,'openrem'))
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
+    openrem_settings.add_project_to_path()
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.settings'
-    
     f = open(args.csvfile, 'rb')
     try:
-        dataset = csv.DictReader(f)        
+        dataset = csv.DictReader(f)
+        csvrecord = None
         for line in dataset:
-            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid, args.verbose)
+            _ptsizeinsert(line[args.id], line[args.height], line[args.weight], args.si_uid, args.verbose, csvrecord)
     finally:
         f.close()
 

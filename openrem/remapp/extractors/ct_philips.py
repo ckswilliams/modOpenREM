@@ -174,6 +174,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
+    from decimal import Decimal
     pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate",dataset)
     pat.patient_sex = get_value_kw("PatientSex",dataset)
@@ -218,10 +219,10 @@ def _philips_ct2db(dataset):
     import os, sys
     import openrem_settings
 
-    openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
-
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     from django.db import models
+
+    openrem_settings.add_project_to_path()
     from remapp.models import General_study_module_attributes
     
     if 'StudyInstanceUID' in dataset:

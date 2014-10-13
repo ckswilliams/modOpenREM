@@ -22,18 +22,11 @@
 
 """
 ..  module:: openrem_settings.
-    :synopsis: Helper module to define the name of the project and to add the project to the path.
+    :synopsis: Helper module to add the project to the path.
 
 ..  moduleauthor:: Ed McDonagh
 
 """
-
-def name_of_project():
-    """Returns the name of the project. Default OpenREM
-    
-    """
-    PROJECT_NAME = 'openrem'
-    return PROJECT_NAME
 
 def add_project_to_path():
     """Add project to path, assuming this file is within project

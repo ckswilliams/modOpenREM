@@ -15,9 +15,10 @@
         {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
-          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
-          <li><a href="/openrem/xlsx{{ request.get_full_path }}">Export to XLSX</a></li>
+          <li><a href="/openrem/exportctcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportctxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
         </ul>
+
         {% else %}
         <p>
           Sorry, you don't have enough permissions to enable study export.
@@ -43,7 +44,7 @@
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal role="form">
+                <form action="" method="get" class="form-horizontal" role="form">
                         {% for field in filter.form %}
                             <div class="form-group">
                                 <div class="col-xs-4">
@@ -69,7 +70,7 @@ $('.datepicker').datepicker({
     todayHighlight: true
     });
 </script>
-    
+
 {% endblock %}
 
 {% block col1 %}
@@ -100,7 +101,9 @@ $('.datepicker').datepicker({
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
             {% if admin.adminperm %}
-            <td>Delete</td>
+            <td>
+              <a href="{% url 'study_delete' exam.id %}">Delete</a>
+            </td>
             {% endif %}
         </tr>
         {% endfor %}
@@ -108,4 +111,7 @@ $('.datepicker').datepicker({
 
     {% paginate %}
 
+{% endblock %}
+
+{% block jsblock %}
 {% endblock %}

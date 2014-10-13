@@ -29,7 +29,12 @@
 """
 
 import csv
-def exportFL2excel(request):
+from celery import shared_task
+from django.conf import settings
+
+
+@shared_task
+def exportFL2excel(filterdict):
     """Export filtered fluoro database data to a single-sheet CSV file.
 
     :param request: Query parameters from the fluoro filtered page URL.
@@ -37,59 +42,59 @@ def exportFL2excel(request):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import RFSummaryListFilter
 
+    tsk = Exports.objects.create()
 
-    # Get the database query filters
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_study_description = request.GET.get('study_description')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_performing_physician_name = request.GET.get('performing_physician_name')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
-    
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
-    
+    tsk.task_id = exportFL2excel.request.id
+    tsk.modality = "RF"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+        
     # Get the data!
-    from remapp.models import General_study_module_attributes
-
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
     
-    if f_institution_name:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_study_description:
-        e = e.filter(study_description__icontains = f_study_description)
-    if f_performing_physician_name:
-        e = e.filter(performing_physician_name__icontains = f_performing_physician_name)
-    if f_manufacturer:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        e = e.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        e = e.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        e = e.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
+    f = RFSummaryListFilter.base_filters
 
-    writer = csv.writer(response)
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = e.count()
+
+    tsk.num_records = numresults
+    tsk.save()
+
     writer.writerow([
         'Manufacturer', 
         'Model name',
@@ -112,7 +117,7 @@ def exportFL2excel(request):
         'RP definition',
         'Physician',
         'Operator'])
-    for exams in e:
+    for i, exams in enumerate(e):
         writer.writerow([
             exams.general_equipment_module_attributes_set.get().manufacturer, 
             exams.projection_xray_radiation_dose_set.get().observer_context_set.get().device_observer_name,
@@ -136,9 +141,36 @@ def exportFL2excel(request):
             exams.performing_physician_name,
             exams.operator_name,
             ])
-    return response
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
 
-def exportCT2excel(request):
+
+    tsk.progress = 'All study data written.'
+    tsk.save()
+
+    csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
+
+
+@shared_task
+def exportCT2excel(filterdict):
     """Export filtered CT database data to a single-sheet CSV file.
 
     :param request: Query parameters from the CT filtered page URL.
@@ -146,61 +178,61 @@ def exportCT2excel(request):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
 
-    # Get the database query filters
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_study_description = request.GET.get('study_description')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
+    tsk = Exports.objects.create()
 
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+    tsk.task_id = exportCT2excel.request.id
+    tsk.modality = "CT"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
 
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
 
-    writer = csv.writer(response)
-    
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+        
     # Get the data!
     from remapp.models import General_study_module_attributes
-
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    from remapp.interface.mod_filters import CTSummaryListFilter
     
-    if f_institution_name:
-        e = e.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_study_description:
-        e = e.filter(study_description__icontains = f_study_description)
-    if f_manufacturer:
-        e = e.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        e = e.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        e = e.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        e = e.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        e = e.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        e = e.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        e = e.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    f = CTSummaryListFilter.base_filters
 
-
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
         
     numresults = e.count()
-#    writer.writerow([f_institution_name,f_study_date_0,f_study_date_1,f_study_description,f_manufacturer,f_model,f_device_observer_name])
+
+    tsk.progress = '{0} studies in query.'.format(numresults)
+    tsk.num_records = numresults
+    tsk.save()
+
     headers = [
         'Institution name', 
         'Manufacturer', 
@@ -246,7 +278,11 @@ def exportCT2excel(request):
             'E' + str(h+1) + ' mA Modulation type',
             ]
     writer.writerow(headers)
-    for exams in e:
+
+    tsk.progress = 'CSV header row written.'
+    tsk.save()
+
+    for i, exams in enumerate(e):
         examdata = [
 			exams.general_equipment_module_attributes_set.get().institution_name,
 			exams.general_equipment_module_attributes_set.get().manufacturer,
@@ -304,9 +340,32 @@ def exportCT2excel(request):
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-    return response
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+    tsk.progress = 'All study data written.'
+    tsk.save()
 
-def exportMG2excel(request):
+    csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
+
+@shared_task
+def exportMG2excel(filterdict):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param request: Query parameters from the mammo filtered page URL.
@@ -314,54 +373,59 @@ def exportMG2excel(request):
     
     """
 
-    from django.http import HttpResponse
-    from django.shortcuts import render
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import MGSummaryListFilter
 
-    f_institution_name = request.GET.get('general_equipment_module_attributes__institution_name')
-    f_date_after = request.GET.get('date_after')
-    f_date_before = request.GET.get('date_before')
-    f_procedure_code_meaning = request.GET.get('procedure_code_meaning')
-    f_age_min = request.GET.get('patient_age_min')
-    f_age_max = request.GET.get('patient_age_max')
-    f_manufacturer = request.GET.get('general_equipment_module_attributes__manufacturer')
-    f_manufacturer_model_name = request.GET.get('general_equipment_module_attributes__manufacturer_model_name')
-    f_station_name = request.GET.get('general_equipment_module_attributes__station_name')
-    f_accession_number = request.GET.get('accession_number')
+    tsk = Exports.objects.create()
 
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
-    
+    tsk.task_id = exportMG2excel.request.id
+    tsk.modality = "MG"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+        
     # Get the data!
-    from remapp.models import General_study_module_attributes
-
-    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
     
-    if f_institution_name:
-        s = s.filter(general_equipment_module_attributes__institution_name__icontains = f_institution_name)
-    if f_procedure_code_meaning:
-        s = s.filter(procedure_code_meaning__icontains = f_procedure_code_meaning)
-    if f_manufacturer:
-        s = s.filter(general_equipment_module_attributes__manufacturer__icontains = f_manufacturer)
-    if f_manufacturer_model_name:
-        s = s.filter(general_equipment_module_attributes__manufacturer_model_name__icontains = f_manufacturer_model_name)
-    if f_station_name:
-        s = s.filter(general_equipment_module_attributes__station_name__icontains = f_station_name)
-    if f_accession_number:
-        s = s.filter(accession_number__icontains = f_accession_number)
-    if f_date_after:
-        s = s.filter(study_date__gte = f_date_after)
-    if f_date_before:
-        s = s.filter(study_date__lte = f_date_before)
-    if f_age_min:
-        s = s.filter(patient_study_module_attributes__patient_age_decimal__gte = f_age_min)
-    if f_age_max:
-        s = s.filter(patient_study_module_attributes__patient_age_decimal__lte = f_age_max)
+    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
+    f = MGSummaryListFilter.base_filters
 
-    writer = csv.writer(response)
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = s.count()
+
+    tsk.num_records = numresults
+    tsk.save()
+    
     writer.writerow([
         'Institution name', 
         'Manufacturer', 
@@ -394,7 +458,7 @@ def exportMG2excel(request):
         'Exposure Mode Description'
         ])
     
-    for study in s:
+    for i, study in enumerate(s):
         e = study.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()
         for exp in e:
             writer.writerow([
@@ -428,4 +492,32 @@ def exportMG2excel(request):
                 exp.percent_fibroglandular_tissue,
                 exp.comment,
                 ])
-    return response
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+
+    tsk.progress = 'All study data written.'
+    tsk.save()
+
+    csvfilename = "mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
+
+
+
+
+

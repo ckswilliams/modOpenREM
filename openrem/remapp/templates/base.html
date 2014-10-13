@@ -56,6 +56,23 @@
           </ul>
           {% block loginlink %}
           <ul class="nav navbar-nav navbar-right">
+            {% if admin.exportperm or admin.adminperm %}
+            {% block exportnav %}
+            <li><a href="/openrem/export">Exports</a></li>
+            {% endblock %}
+            {% endif %}
+
+            {% if admin.adminperm %}
+            {% block adminnav %}
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-blank fa-fw"></i>Admin <b class="caret"></b></a>
+            {% endblock %}
+              <ul class="dropdown-menu">
+                <li><a href="/openrem/admin/sizeupload"><i class="fa fa-external-link fa-fw"></i>Import patient size info</a></li>
+                <li><a href="/openrem/admin/sizeimports"><i class="fa fa-envelope fa-fw"></i>Previous patient size imports</a></li>
+              </ul>
+            </li>
+            {% endif %}
+
             <p class="navbar-text navbar-right">
               <span class="glyphicon glyphicon-user"></span>
               {% if user.is_authenticated %}
@@ -83,9 +100,9 @@
       <hr>
       <footer>
 {% if admin.openremversion %}
-        <p>OpenREM version {{ admin.openremversion }} &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
+        <p>OpenREM version {{ admin.openremversion }} is &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
 {% else %}
-        <p>OpenREM &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
+        <p>OpenREM is &copy; 2014 The Royal Marsden NHS Foundation Trust</p>
 {% endif %}
       </footer>
 

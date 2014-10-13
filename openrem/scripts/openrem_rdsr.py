@@ -11,23 +11,8 @@
         * Fluoro: Siemens Artis Zee RDSR
 """
 
-import sys,os
-
-# This section attempts to place the openrem folder onto the python path
-# so that openrem.settings can be found.
-sitepaths = []
-openrempathset=0
-for paths in sys.path:
-    if paths.endswith('site-packages'):
-        sitepaths.append(paths)
-    if paths.endswith('openrem'):
-        openrempathset = 1
-        
-if sitepaths and not openrempathset:
-    for paths in sitepaths:
-        sys.path.insert(1,os.path.join(paths,'openrem'))
-
-from remapp.extractors import rdsr
+import sys
+from openrem.remapp.extractors import rdsr
 
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the radiation dose structured report')

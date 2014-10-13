@@ -54,6 +54,10 @@ urlpatterns = patterns('remapp.views',
             model=General_study_module_attributes,
             template_name='remapp/ctdetail.html'))),
 
+    url(r'^ct$',
+        'ct_summary_list_filter'),
+
+
     url(r'^mg/$',
         'mg_summary_list_filter'),
     url(r'^mg/(?P<pk>\d+)/$',
@@ -61,20 +65,28 @@ urlpatterns = patterns('remapp.views',
             model=General_study_module_attributes,
             template_name='remapp/mgdetail.html'))),
 
+    url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),
+    url(r'^admin/sizeupload$', 'size_upload', name='size_upload'),
+    url(r'^admin/sizeprocess/(?P<pk>\d+)/$', 'size_process', name='size_process'),
+    url(r'^admin/sizeimports', 'size_imports', name='size_imports'),
+    url(r'^admin/sizedelete', 'size_delete', name='size_delete'),
+    url(r'^admin/sizeimport/abort/(?P<pk>\d+)$', 'size_abort'),
 )
 
-urlpatterns += patterns('remapp.exports.exportcsv',
-    url(r'^export/openrem/rf/',
-        'exportFL2excel'),
-
-    url(r'^export/openrem/ct/',
-        'exportCT2excel'),
-
-    url(r'^export/openrem/mg/',
-        'exportMG2excel'),
+urlpatterns += patterns('remapp.exports.exportviews',
+    url(r'^export/$', 'export'),
+    url(r'^exportctcsv1/$', 'ctcsv1'),
+    url(r'^exportctxlsx1/$', 'ctxlsx1'),
+    url(r'^exportflcsv1/$', 'flcsv1'),
+    url(r'^exportmgcsv1/$', 'mgcsv1'),
+    url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
+    url(r'^download/(?P<file_name>.+)$', 'download'),
+    url(r'^deletefile/$', 'deletefile'),
+    url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
 )
 
 urlpatterns += patterns('remapp.exports',
     url(r'^xlsx/openrem/ct/',
         'xlsx.ctxlsx'),
 )
+

@@ -5,29 +5,12 @@ OpenREM
 OpenREM is a Django app to extract, store and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
-Detailed documentation can be found on Read the Docs: http://docs.openrem.org
+Full documentation can be found on Read the Docs: http://docs.openrem.org
 
-Quick start
------------
+**For upgrades**, please look at the `version 0.4.3 release notes <http://docs.openrem.org/en/latest/release-0.4.3.html>`_
 
-#. Install python (might need to be 2.7)
-#. Install `setuptools and pip <http://www.pip-installer.org/en/latest/installing.html>`_
-#. Install OpenREM
-    + ``pip install OpenREM-ver.tar.gz``
-#. Configure OpenREM
-    + Locate install location, typically ``something/lib/python2.7/site-packages/openrem``
-    + There are two files that need renaming:
-        + ``openrem/openrem/settings.py.example`` to ``openrem/openrem/settings.py.example``
-        + ``openrem/openrem/wsgi.py.example`` to ``openrem/openrem/wsgi.py.example``
-    + in the ``settings.py`` file, set the database details.
-    + For testing ONLY, use 
-        + ``'ENGINE': 'django.db.backends.sqlite3',``
-        + ``'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO'``
-#. Create the database
-    + ``python path/to/openrem/manage.py syncdb``
-    + (optional for a test database) ``python path/to/openrem/manage.py convert_to_south remapp``
-#. Start test web server
-    + ``python path/to/openrem/manage.py runserver``
-#. Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
-#. Add some data!
-    + ``openrem_rdsr.py rdsrfile.dcm``
+For fresh installs, please look at the `install docs <http://docs.openrem.org/page/install.html>`_
+
+Contribution of code, ideas, bug reports documentation is all welcome.
+Please feel free to fork the repository and send me pull requests. See
+`the website <http://openrem.org/getinvolved>`_ for more information.

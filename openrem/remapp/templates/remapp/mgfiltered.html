@@ -13,8 +13,8 @@
       </p>
         {% if admin.exportperm or admin.adminperm %}
         <ul>
-          <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
-          <li><a href="/openrem/export{{ request.get_full_path }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportmgcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportmgnhsbsp/?{{ request.GET.urlencode }}">Export to CSV using the NHSBSP format</a> </li>
         </ul>
         {% else %}
         <p>
@@ -36,7 +36,7 @@
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal role="form">
+                <form action="" method="get" class="form-horizontal" role="form">
                         {% for field in filter.form %}
                             <div class="form-group">
                                 <div class="col-xs-4">
@@ -91,7 +91,9 @@ $('.datepicker').datepicker({
             <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.laterality }}</td>
             <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.accumulated_average_glandular_dose }}</td>
             {% if admin.adminperm %}
-            <td>Delete</td>
+            <td>
+              <a href="{% url 'study_delete' exam.id %}">Delete</a>
+            </td>
             {% endif %}
         </tr>
         {% endfor %}

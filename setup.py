@@ -7,7 +7,7 @@ README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 requires = [
-    'django >= 1.5',
+    'django == 1.6',
     'django-filter',
     'pytz >= 0a',
     'humanize',
@@ -15,21 +15,23 @@ requires = [
     'django-pagination',
     'xlsxwriter',
     'south',
+    'celery >= 3.1',
+    'argparse >= 1.2.1'
     ]
 
 setup(
     name='OpenREM',
-    version='0.3.9',
+    version='0.4.3',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
     scripts=['openrem/scripts/openrem_rdsr.py','openrem/scripts/openrem_mg.py','openrem/scripts/openrem_ctphilips.py','openrem/scripts/openrem_ptsizecsv.py'],
     license='GPLv3 with additional permissions',  
-    description='An open implementation of IHE Radiation Exposure Monitoring profile Dose Info Consumer and Dose Register actors',
+    description='Radiation Exposure Monitoring for physicists',
     long_description=README,
     url='http://openrem.org/',
     author='Ed McDonagh',
-    author_email='ed@mcdonagh.org.uk',
+    author_email='ed@openrem.org',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',

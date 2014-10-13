@@ -302,19 +302,21 @@ def _generalstudymoduleattributes(dataset,g):
 
 def _test_if_mammo(dataset):
     """ Test if dicom object passed is a mammo file by looking at SOP Class UID"""
-    if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.1.2.1' and dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.1.2':
-        return 0
-    return 1
+    if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1' or dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2':
+        return 1
+    elif dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7' and dataset.Modality == 'MG' and 'ORIGINAL' in dataset.ImageType:
+        return 1
+    return 0
 
 
 def _mammo2db(dataset):
     import os, sys
     import openrem_settings
 
-    openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
-
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     from django.db import models
+
+    openrem_settings.add_project_to_path()
     from remapp.models import General_study_module_attributes
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw

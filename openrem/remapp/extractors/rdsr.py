@@ -672,6 +672,8 @@ def _generalstudymoduleattributes(dataset,g):
         if (('RequestAttributesSequence' in dataset) and dataset[0x40,0x275].VM): # Ulgy hack to prevent issues with zero length LS16 sequence
             req = dataset.RequestAttributesSequence
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',req[0])
+            if not g.requested_procedure_code_meaning: # Sometimes the above is true, but there is no RequestedProcedureDescription in that sequence, but there is a basic field as below.
+                g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',dataset)
             g.save()
         else:
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription',dataset)
@@ -682,12 +684,12 @@ def _rsdr2db(dataset):
     import os, sys
     import openrem_settings
 
-    openrem_settings.add_project_to_path()
-    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.name_of_project())
-
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     from django.db import models
+
+    openrem_settings.add_project_to_path()
     from remapp.models import General_study_module_attributes
-    
+
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
         existing = General_study_module_attributes.objects.filter(study_instance_uid__exact = uid)
