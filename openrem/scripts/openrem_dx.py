@@ -1,0 +1,23 @@
+#!/usr/local/bin/python
+# scripts/openrem_dx
+
+"""Script to launch the mam module to import information from radiographic images 
+
+    :param filename: relative or absolute path to radiographic DICOM image file.
+    :type filename: str.
+
+    Tested with:
+        * Nothing yet...
+
+"""
+
+import sys
+from openrem.remapp.extractors import dx
+
+if len(sys.argv) < 2:
+    sys.exit('Error: Supply at least one argument - the DICOM radiography image file')
+
+for sr in sys.argv[1:]:
+    dx(sr)
+    
+sys.exit()

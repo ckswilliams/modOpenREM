@@ -79,13 +79,7 @@ def exportFL2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -153,7 +147,7 @@ def exportFL2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -216,13 +210,7 @@ def exportCT2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -350,7 +338,7 @@ def exportCT2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -410,13 +398,7 @@ def exportMG2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+            s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
     
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -503,7 +485,7 @@ def exportMG2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -518,6 +500,212 @@ def exportMG2excel(filterdict):
     tsk.save()
 
 
+def getQueryFilters(request):
+    from django.template import RequestContext
+
+    query_filters = {
+        'institution_name'        : request.GET.get('general_equipment_module_attributes__institution_name'),
+        'date_after'              : request.GET.get('date_after'),
+        'date_before'             : request.GET.get('date_before'),
+        'study_description'       : request.GET.get('study_description'),
+        'age_min'                 : request.GET.get('patient_age_min'),
+        'age_max'                 : request.GET.get('patient_age_max'),
+        'manufacturer'            : request.GET.get('general_equipment_module_attributes__manufacturer'),
+        'manufacturer_model_name' : request.GET.get('general_equipment_module_attributes__manufacturer_model_name'),
+        'station_name'            : request.GET.get('general_equipment_module_attributes__station_name'),
+        'accession_number'        : request.GET.get('accession_number'),
+    }
+    return query_filters
 
 
+@shared_task
+def exportDX2excel(filterdict):
+    """Export filtered DX database data to a single-sheet CSV file.
 
+    :param request: Query parameters from the DX filtered page URL.
+    :type request: HTTP get
+    
+    """
+
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
+    from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from django.db.models import Q # For the Q "OR" query used for DX and CR
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = exportDX2excel.request.id
+    tsk.modality = "DX"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+        
+    # Get the data!
+    from remapp.models import General_study_module_attributes
+    from remapp.interface.mod_filters import DXSummaryListFilter
+    
+    #e = General_study_module_attributes.objects.filter(modality_type__exact = 'CR')
+    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+
+    f = DXSummaryListFilter.base_filters
+
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = e.count()
+
+    tsk.progress = '{0} studies in query.'.format(numresults)
+    tsk.num_records = numresults
+    tsk.save()
+
+    headers = [
+        'Institution name', 
+        'Manufacturer', 
+        'Model name',
+        'Station name',
+        'Accession number',
+        'Operator',
+        'Study date',
+        'Patient age', 
+        'Patient height', 
+        'Patient mass (kg)', 
+        'Study description',
+        'Requested procedure',
+        'Number of events',
+        'DLP total (mGy.cm)',
+        ]
+
+    from django.db.models import Max
+    max_events = e.aggregate(Max('dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events'))
+
+    for h in xrange(max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']):
+        headers += [
+            'E' + str(h+1) + ' Protocol',
+            'E' + str(h+1) + ' Type',
+            'E' + str(h+1) + ' Exposure time',
+            'E' + str(h+1) + ' Scanning length',
+            'E' + str(h+1) + ' Slice thickness',
+            'E' + str(h+1) + ' Total collimation',
+            'E' + str(h+1) + ' Pitch',
+            'E' + str(h+1) + ' No. sources',
+            'E' + str(h+1) + ' CTDIvol',
+            'E' + str(h+1) + ' DLP',
+            'E' + str(h+1) + ' S1 name',
+            'E' + str(h+1) + ' S1 kVp',
+            'E' + str(h+1) + ' S1 max mA',
+            'E' + str(h+1) + ' S1 mA',
+            'E' + str(h+1) + ' S1 Exposure time/rotation',
+            'E' + str(h+1) + ' S2 name',
+            'E' + str(h+1) + ' S2 kVp',
+            'E' + str(h+1) + ' S2 max mA',
+            'E' + str(h+1) + ' S2 mA',
+            'E' + str(h+1) + ' S2 Exposure time/rotation',
+            'E' + str(h+1) + ' mA Modulation type',
+            ]
+    writer.writerow(headers)
+
+    tsk.progress = 'CSV header row written.'
+    tsk.save()
+
+    for i, exams in enumerate(e):
+        examdata = [
+			exams.general_equipment_module_attributes_set.get().institution_name,
+			exams.general_equipment_module_attributes_set.get().manufacturer,
+			exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
+			exams.general_equipment_module_attributes_set.get().station_name,
+            exams.accession_number,
+            exams.operator_name,
+            exams.study_date,
+            exams.patient_study_module_attributes_set.get().patient_age_decimal,
+            exams.patient_study_module_attributes_set.get().patient_size,
+            exams.patient_study_module_attributes_set.get().patient_weight,
+            exams.study_description,
+            exams.requested_procedure_code_meaning,
+            exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events,
+            exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total,
+			]
+        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
+            examdata += [
+                s.acquisition_protocol,
+                s.ct_acquisition_type,
+                s.exposure_time,
+                s.scanning_length_set.get().scanning_length,
+                s.nominal_single_collimation_width,
+                s.nominal_total_collimation_width,
+                s.pitch_factor,
+                s.number_of_xray_sources,
+                s.mean_ctdivol,
+                s.dlp,
+                ]
+            if s.number_of_xray_sources > 1:
+                for source in s.dx_xray_source_parameters_set.all():
+                    examdata += [
+                        source.identification_of_the_xray_source,
+                        source.kvp,
+                        source.maximum_xray_tube_current,
+                        source.xray_tube_current,
+                        source.exposure_time_per_rotation,
+                        ]
+            else:
+                try:
+                    examdata += [
+                        s.dx_xray_source_parameters_set.get().identification_of_the_xray_source,
+                        s.dx_xray_source_parameters_set.get().kvp,
+                        s.dx_xray_source_parameters_set.get().maximum_xray_tube_current,
+                        s.dx_xray_source_parameters_set.get().xray_tube_current,
+                        s.dx_xray_source_parameters_set.get().exposure_time_per_rotation,
+                        'n/a',
+                        'n/a',
+                        'n/a',
+                        'n/a',
+                        'n/a',
+                        ]
+                except:
+                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
+            examdata += [s.xray_modulation_type,]
+
+        writer.writerow(examdata)
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+    tsk.progress = 'All study data written.'
+    tsk.save()
+
+    csvfilename = "dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()

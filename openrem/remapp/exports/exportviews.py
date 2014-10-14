@@ -72,6 +72,38 @@ def ctxlsx1(request):
 
 @csrf_exempt
 @login_required
+def dxcsv1(request):
+    """View to launch celery task to export DX and CR studies to csv file
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportDX2excel
+
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = exportDX2excel.delay(request.GET)
+
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+@login_required
+def dxxlsx1(request):
+    """View to launch celery task to export DX and CR studies to xlsx file
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
+    from django.shortcuts import redirect
+    from remapp.exports.xlsx import dxxlsx
+
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = dxxlsx.delay(request.GET)
+    
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+@login_required
 def flcsv1(request):
     """View to launch celery task to export fluoroscopy studies to csv file
 
