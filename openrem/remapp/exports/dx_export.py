@@ -21,26 +21,222 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-..  module:: xlsx.
-    :synopsis: Module to export database data to multi-sheet Microsoft XLSX files.
+..  module:: dx_csv.
+    :synopsis: Module to export database data to single-sheet CSV files.
 
-..  moduleauthor:: Ed McDonagh
+..  moduleauthor:: David Platten and Ed McDonagh
 
 """
 
-
+import csv
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 
 
+@shared_task
+def exportDX2excel(filterdict):
+    """Export filtered DX database data to a single-sheet CSV file.
 
+    :param request: Query parameters from the DX filtered page URL.
+    :type request: HTTP get
+    
+    """
+
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
+    from remapp.models import General_study_module_attributes
+    from remapp.models import Exports
+    from django.db.models import Q # For the Q "OR" query used for DX and CR
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = exportDX2excel.request.id
+    tsk.modality = "DX"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+        
+    # Get the data!
+    from remapp.models import General_study_module_attributes
+    from remapp.interface.mod_filters import DXSummaryListFilter
+    
+    #e = General_study_module_attributes.objects.filter(modality_type__exact = 'CR')
+    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+
+    f = DXSummaryListFilter.base_filters
+
+    for filt in f:
+        if filt in filterdict and filterdict[filt]:
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+        
+    numresults = e.count()
+
+    tsk.progress = '{0} studies in query.'.format(numresults)
+    tsk.num_records = numresults
+    tsk.save()
+
+    headers = [
+        'Institution name', 
+        'Manufacturer', 
+        'Model name',
+        'Station name',
+        'Accession number',
+        'Operator',
+        'Study date',
+        'Patient age', 
+        'Patient height', 
+        'Patient mass (kg)', 
+        'Study description',
+        'Requested procedure',
+        'Number of events',
+        'DLP total (mGy.cm)',
+        ]
+
+    from django.db.models import Max
+    max_events = e.aggregate(Max('dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events'))
+
+    for h in xrange(max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']):
+        headers += [
+            'E' + str(h+1) + ' Protocol',
+            'E' + str(h+1) + ' Type',
+            'E' + str(h+1) + ' Exposure time',
+            'E' + str(h+1) + ' Scanning length',
+            'E' + str(h+1) + ' Slice thickness',
+            'E' + str(h+1) + ' Total collimation',
+            'E' + str(h+1) + ' Pitch',
+            'E' + str(h+1) + ' No. sources',
+            'E' + str(h+1) + ' CTDIvol',
+            'E' + str(h+1) + ' DLP',
+            'E' + str(h+1) + ' S1 name',
+            'E' + str(h+1) + ' S1 kVp',
+            'E' + str(h+1) + ' S1 max mA',
+            'E' + str(h+1) + ' S1 mA',
+            'E' + str(h+1) + ' S1 Exposure time/rotation',
+            'E' + str(h+1) + ' S2 name',
+            'E' + str(h+1) + ' S2 kVp',
+            'E' + str(h+1) + ' S2 max mA',
+            'E' + str(h+1) + ' S2 mA',
+            'E' + str(h+1) + ' S2 Exposure time/rotation',
+            'E' + str(h+1) + ' mA Modulation type',
+            ]
+    writer.writerow(headers)
+
+    tsk.progress = 'CSV header row written.'
+    tsk.save()
+
+    for i, exams in enumerate(e):
+        examdata = [
+			exams.general_equipment_module_attributes_set.get().institution_name,
+			exams.general_equipment_module_attributes_set.get().manufacturer,
+			exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
+			exams.general_equipment_module_attributes_set.get().station_name,
+            exams.accession_number,
+            exams.operator_name,
+            exams.study_date,
+            exams.patient_study_module_attributes_set.get().patient_age_decimal,
+            exams.patient_study_module_attributes_set.get().patient_size,
+            exams.patient_study_module_attributes_set.get().patient_weight,
+            exams.study_description,
+            exams.requested_procedure_code_meaning,
+            exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events,
+            exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total,
+			]
+        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
+            examdata += [
+                s.acquisition_protocol,
+                s.ct_acquisition_type,
+                s.exposure_time,
+                s.scanning_length_set.get().scanning_length,
+                s.nominal_single_collimation_width,
+                s.nominal_total_collimation_width,
+                s.pitch_factor,
+                s.number_of_xray_sources,
+                s.mean_ctdivol,
+                s.dlp,
+                ]
+            if s.number_of_xray_sources > 1:
+                for source in s.dx_xray_source_parameters_set.all():
+                    examdata += [
+                        source.identification_of_the_xray_source,
+                        source.kvp,
+                        source.maximum_xray_tube_current,
+                        source.xray_tube_current,
+                        source.exposure_time_per_rotation,
+                        ]
+            else:
+                try:
+                    examdata += [
+                        s.dx_xray_source_parameters_set.get().identification_of_the_xray_source,
+                        s.dx_xray_source_parameters_set.get().kvp,
+                        s.dx_xray_source_parameters_set.get().maximum_xray_tube_current,
+                        s.dx_xray_source_parameters_set.get().xray_tube_current,
+                        s.dx_xray_source_parameters_set.get().exposure_time_per_rotation,
+                        'n/a',
+                        'n/a',
+                        'n/a',
+                        'n/a',
+                        'n/a',
+                        ]
+                except:
+                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
+            examdata += [s.xray_modulation_type,]
+
+        writer.writerow(examdata)
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+    tsk.progress = 'All study data written.'
+    tsk.save()
+
+    csvfilename = "dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
 
 @shared_task
-def ctxlsx(filterdict):
-    """Export filtered CT database data to multi-sheet Microsoft XSLX files.
+def dxxlsx(filterdict):
+    """Export filtered DX and CR database data to multi-sheet Microsoft XSLX files.
 
-    :param filterdict: Query parameters from the CT filtered page URL.
+    :param filterdict: Query parameters from the DX and CR filtered page URL.
     :type filterdict: HTTP get
     
     """
@@ -52,12 +248,13 @@ def ctxlsx(filterdict):
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
-    from remapp.interface.mod_filters import CTSummaryListFilter
+    from remapp.interface.mod_filters import DXSummaryListFilter
+    from django.db.models import Q # For the Q "OR" query used for DX and CR
 
     tsk = Exports.objects.create()
 
     tsk.task_id = ctxlsx.request.id
-    tsk.modality = "CT"
+    tsk.modality = "DX"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
@@ -76,15 +273,12 @@ def ctxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
-    f = CTSummaryListFilter.base_filters
+    #e = General_study_module_attributes.objects.filter(modality_type__exact = 'CR')
+    #e = General_study_module_attributes.objects.filter(or_(modality_type__exact = 'CR', modality_type__exact = 'DX'))
+    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
-#    for filt in f:
-#        print "Filt is {0}; filt type is {1}".format(filt, type(filt))
-#        if filt in filterdict and filterdict[filt]:
-#            print "filterdict[filt] is {0}; filterdict[filt] type is {1}".format(filterdict[filt], type(filterdict[filt]))
-#            print "f[filt].name is {0}; f[filt].lookup_type is {1}".format(f[filt].name, f[filt].lookup_type)
-#            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
+    f = DXSummaryListFilter.base_filters
+
     for filt in f:
         print filt
         if filt in filterdict and filterdict[filt]:
@@ -150,7 +344,7 @@ def ctxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -184,14 +378,14 @@ def ctxlsx(filterdict):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events'))
+    max_events = e.aggregate(Max('dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events'))
 
     alldataheaders = commonheaders
 
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']):
+    for h in xrange(max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Type',
@@ -217,7 +411,7 @@ def ctxlsx(filterdict):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']) + 14 - 1
+    numcolumns = (22 * max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -240,13 +434,13 @@ def ctxlsx(filterdict):
             exams.patient_module_attributes_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-            str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
+            str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events),
+            str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total),
 			]
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
             examdata += [
                 s.acquisition_protocol,
-                str(s.ct_acquisition_type),
+                str(s.dx_acquisition_type),
                 str(s.exposure_time),
                 str(s.scanning_length_set.get().scanning_length),
                 str(s.nominal_single_collimation_width),
@@ -257,7 +451,7 @@ def ctxlsx(filterdict):
                 str(s.dlp),
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.dx_xray_source_parameters_set.all():
                     examdata += [
                         str(source.identification_of_the_xray_source),
                         str(source.kvp),
@@ -268,11 +462,11 @@ def ctxlsx(filterdict):
             else:
                 try:
                     examdata += [
-                        str(s.ct_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.ct_xray_source_parameters_set.get().kvp),
-                        str(s.ct_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().exposure_time_per_rotation),
+                        str(s.dx_xray_source_parameters_set.get().identification_of_the_xray_source),
+                        str(s.dx_xray_source_parameters_set.get().kvp),
+                        str(s.dx_xray_source_parameters_set.get().maximum_xray_tube_current),
+                        str(s.dx_xray_source_parameters_set.get().xray_tube_current),
+                        str(s.dx_xray_source_parameters_set.get().exposure_time_per_rotation),
                         'n/a',
                         'n/a',
                         'n/a',
@@ -290,7 +484,7 @@ def ctxlsx(filterdict):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
@@ -314,12 +508,12 @@ def ctxlsx(filterdict):
                 exams.patient_module_attributes_set.get().not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-                str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
+                str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events),
+                str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total),
                 ]
             examdata += [
                 s.acquisition_protocol,
-                str(s.ct_acquisition_type),
+                str(s.dx_acquisition_type),
                 str(s.exposure_time),
                 str(s.scanning_length_set.get().scanning_length),
                 str(s.nominal_single_collimation_width),
@@ -330,7 +524,7 @@ def ctxlsx(filterdict):
                 str(s.dlp),
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.dx_xray_source_parameters_set.all():
                     examdata += [
                         str(source.identification_of_the_xray_source),
                         str(source.kvp),
@@ -341,11 +535,11 @@ def ctxlsx(filterdict):
             else:
                 try:
                     examdata += [
-                        str(s.ct_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.ct_xray_source_parameters_set.get().kvp),
-                        str(s.ct_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().exposure_time_per_rotation),
+                        str(s.dx_xray_source_parameters_set.get().identification_of_the_xray_source),
+                        str(s.dx_xray_source_parameters_set.get().kvp),
+                        str(s.dx_xray_source_parameters_set.get().maximum_xray_tube_current),
+                        str(s.dx_xray_source_parameters_set.get().xray_tube_current),
+                        str(s.dx_xray_source_parameters_set.get().exposure_time_per_rotation),
                         'n/a',
                         'n/a',
                         'n/a',
@@ -423,7 +617,7 @@ def ctxlsx(filterdict):
     tsk.progress = 'XLSX book written.'
     tsk.save()
 
-    xlsxfilename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfilename = "dxexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
@@ -441,4 +635,3 @@ def ctxlsx(filterdict):
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-

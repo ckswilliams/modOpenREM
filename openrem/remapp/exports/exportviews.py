@@ -79,7 +79,7 @@ def dxcsv1(request):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.exportcsv import exportDX2excel
+    from remapp.exports.dx_export import exportDX2excel
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         job = exportDX2excel.delay(request.GET)
@@ -95,7 +95,7 @@ def dxxlsx1(request):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.xlsx import dxxlsx
+    from remapp.exports.dx_export import dxxlsx
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         job = dxxlsx.delay(request.GET)
