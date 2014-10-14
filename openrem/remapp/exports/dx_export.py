@@ -280,10 +280,14 @@ def dxxlsx(filterdict):
     f = DXSummaryListFilter.base_filters
 
     for filt in f:
-        print filt
         if filt in filterdict and filterdict[filt]:
-            if (filterdict[filt])[0] <> '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : (filterdict[filt])[0]})
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
     
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
