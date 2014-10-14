@@ -253,7 +253,7 @@ def dxxlsx(filterdict):
 
     tsk = Exports.objects.create()
 
-    tsk.task_id = ctxlsx.request.id
+    tsk.task_id = dxxlsx.request.id
     tsk.modality = "DX"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
