@@ -220,11 +220,9 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     event.irradiation_event_uid = get_value_kw('SOPInstanceUID',dataset)
     event_time = get_value_kw('AcquisitionTime',dataset)
-    if str(event_time) == 'None':
-        event_time = get_value_kw('StudyTime',dataset)
+    if not event_time: event_time = get_value_kw('StudyTime',dataset)
     event_date = get_value_kw('AcquisitionDate',dataset)
-    if str(event_date) == 'None':
-        event_date = get_value_kw('StudyDate',dataset)
+    if not event_date: event_date = get_value_kw('StudyDate',dataset)
     event.date_time_started = make_date_time('{0}{1}'.format(event_date,event_time))
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
@@ -410,11 +408,9 @@ def _dx2db(dataset):
         # versions of the same irradiation event don't get imported twice
         same_study_uid = General_study_module_attributes.objects.filter(study_instance_uid__exact = study_uid)
         event_time = get_value_kw('AcquisitionTime',dataset)
-        if str(event_time) == 'None':
-            event_time = get_value_kw('StudyTime',dataset)
+        if not event_time: event_time = get_value_kw('StudyTime',dataset)
         event_date = get_value_kw('AcquisitionDate',dataset)
-        if str(event_date) == 'None':
-            event_date = get_value_kw('StudyDate',dataset)
+        if not event_date: event_date = get_value_kw('StudyDate',dataset)
         event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
         for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             if event_date_time == events.date_time_started:
