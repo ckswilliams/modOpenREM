@@ -331,15 +331,17 @@ def _mammo2db(dataset):
         inst_in_db = check_uid.check_uid(event_uid,'Event')
         if inst_in_db:
             return 0
-        # further check required to ensure 'for processing' and 'for presentation' 
-        # versions of the same irradiation event don't get imported twice
         same_study_uid = General_study_module_attributes.objects.filter(study_instance_uid__exact = study_uid)
-        event_time = get_value_kw('AcquisitionTime',dataset)
-        event_date = get_value_kw('AcquisitionDate',dataset)
-        event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-        for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
-            if event_date_time == events.date_time_started:
-                return 0
+        if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7':
+            # further check required to ensure 'for processing' and 'for presentation' 
+            # versions of the same irradiation event don't get imported twice
+            # check first to make sure this isn't a Hologic SC tomo file
+            event_time = get_value_kw('AcquisitionTime',dataset)
+            event_date = get_value_kw('AcquisitionDate',dataset)
+            event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
+            for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+                if event_date_time == events.date_time_started:
+                    return 0
         # study exists, but event doesn't
         _irradiationeventxraydata(dataset,same_study_uid.get().projection_xray_radiation_dose_set.get())
         # update the accumulated tables
