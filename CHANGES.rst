@@ -5,7 +5,8 @@ OpenREM version history
 0.4.4 (future)
 --------------
 
-* `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs.
+* `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
+* `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs
 
 0.4.3 (2014-10-01)
 ------------------
