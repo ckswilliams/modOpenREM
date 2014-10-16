@@ -214,7 +214,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     from remapp.models import Irradiation_event_xray_data
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
+    from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
     event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
@@ -245,15 +245,11 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
     event.comment = get_value_kw('ExposureControlModeDescription',dataset)
     
-    # 28/3/2014 DJP added dose area product. What happens if the 1st is used and the 2nd one blank?
-    event.dose_area_product = get_value_kw('ImageAreaDoseProduct',dataset)
-    event.dose_area_product = get_value_kw('DoseAreaProduct',dataset)
-    
+    event.dose_area_product = get_value_num(0x0018115e,dataset) # Value of DICOM tag (0018,115e)
     event.save()
     
     # 28/3/2014 DJP put the line below in
     _irradiationeventxraydetectordata(dataset,event)
-    
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
 
