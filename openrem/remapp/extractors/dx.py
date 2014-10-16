@@ -254,15 +254,29 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     _irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
+    _accumulatedxraydose_update(dataset,event)
 
 
 # 28/3/2014 DJP: removed the mammo bits from the routine below
 def _accumulatedxraydose(dataset,proj):
-    from remapp.models import Accumulated_xray_dose
+    from remapp.models import Accumulated_xray_dose, Accumulated_projection_xray_dose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
     accum.save()
+    accumdx = Accumulated_projection_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accumdx.dose_area_product_total = 0.0
+    accumdx.save()
+
+
+def _accumulatedxraydose_update(dataset,event):
+    from remapp.tools.get_values import get_value_kw, get_or_create_cid
+    from decimal import Decimal
+    accumdx = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get()
+    test = event.dose_area_product
+    if event.dose_area_product:
+        accumdx.dose_area_product_total += Decimal(event.dose_area_product)
+    accumdx.save()
 
 
 def _projectionxrayradiationdose(dataset,g):
