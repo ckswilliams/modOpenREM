@@ -117,11 +117,6 @@ def _irradiationeventxraysourcedata(dataset,event):
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.irradiation_duration = get_value_kw('IrradiationDuration',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
-    print "focal spot size is:"
-    print source.focal_spot_size
-    if not source.focal_spot_size: source.focal_spot_size = get_value_kw('FocalSpotSize',dataset)
-    print "focal spot size is now:"
-    print source.focal_spot_size
     collimated_field_area = get_value_kw('FieldOfViewDimensions',dataset)
     if collimated_field_area:
         source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
