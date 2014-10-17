@@ -35,9 +35,10 @@
     <th>View</th>
     <th>kVp</th>
     <th>mA</th>
-    <th>Exposure time</th>
+    <th>Exposure time (ms)</th>
+    <th>Exposure index</th>
     <th>Exposure control mode</th>
-    <th>DAP (units?)</th>
+    <th>DAP (cGy.cm<sup>2</sup>)</th>
     {% for event in general_study_module_attributes.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
@@ -46,6 +47,7 @@
         <td>{{ event.irradiation_event_xray_source_data_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.average_xray_tube_current|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_time|floatformat:0 }}</td>
+        <td>{{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_control_mode }}</td>
         <td>{{ event.dose_area_product }}</td>
     </tr>
