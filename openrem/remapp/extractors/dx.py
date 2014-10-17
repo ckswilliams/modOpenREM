@@ -116,8 +116,8 @@ def _irradiationeventxraysourcedata(dataset,event):
     agd_dgy = get_value_kw('OrganDose',dataset) #AGD in dGy 
     if agd_dgy:
         source.average_glandular_dose = float(agd_dgy) * 100.0 #AGD in mGy
-	source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
-	source.average_xray_tube_current = get_value_kw('AverageXRayTubeCurrent',dataset)
+    source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
+    if not source.average_xray_tube_current: source.average_xray_tube_current = get_value_kw('AverageXRayTubeCurrent',dataset)
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.irradiation_duration = get_value_kw('IrradiationDuration',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
