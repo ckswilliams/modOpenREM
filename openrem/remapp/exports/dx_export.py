@@ -63,6 +63,8 @@ def exportDX2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
+    print "I've started..."
+
     try:
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
@@ -115,7 +117,7 @@ def exportDX2excel(filterdict):
         'Study description',
         'Requested procedure',
         'Number of events',
-        'DLP total (mGy.cm)',
+        'DAP total (cGy.cm^2)',
         ]
 
     from django.db.models import Max
@@ -124,26 +126,19 @@ def exportDX2excel(filterdict):
     for h in xrange(max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Type',
-            'E' + str(h+1) + ' Exposure time',
-            'E' + str(h+1) + ' Scanning length',
-            'E' + str(h+1) + ' Slice thickness',
-            'E' + str(h+1) + ' Total collimation',
-            'E' + str(h+1) + ' Pitch',
-            'E' + str(h+1) + ' No. sources',
-            'E' + str(h+1) + ' CTDIvol',
-            'E' + str(h+1) + ' DLP',
+            'E' + str(h+1) + ' Total DAP',
             'E' + str(h+1) + ' S1 name',
             'E' + str(h+1) + ' S1 kVp',
-            'E' + str(h+1) + ' S1 max mA',
             'E' + str(h+1) + ' S1 mA',
-            'E' + str(h+1) + ' S1 Exposure time/rotation',
+            'E' + str(h+1) + ' S1 Exposure time',
+            'E' + str(h+1) + ' S1 Exposure index',
+            'E' + str(h+1) + ' S1 DAP',
             'E' + str(h+1) + ' S2 name',
             'E' + str(h+1) + ' S2 kVp',
-            'E' + str(h+1) + ' S2 max mA',
             'E' + str(h+1) + ' S2 mA',
-            'E' + str(h+1) + ' S2 Exposure time/rotation',
-            'E' + str(h+1) + ' mA Modulation type',
+            'E' + str(h+1) + ' S2 Exposure time',
+            'E' + str(h+1) + ' S1 Exposure index',
+            'E' + str(h+1) + ' S1 DAP',
             ]
     writer.writerow(headers)
 
@@ -152,10 +147,10 @@ def exportDX2excel(filterdict):
 
     for i, exams in enumerate(e):
         examdata = [
-			exams.general_equipment_module_attributes_set.get().institution_name,
-			exams.general_equipment_module_attributes_set.get().manufacturer,
-			exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-			exams.general_equipment_module_attributes_set.get().station_name,
+            exams.general_equipment_module_attributes_set.get().institution_name,
+            exams.general_equipment_module_attributes_set.get().manufacturer,
+            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
+            exams.general_equipment_module_attributes_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -164,21 +159,13 @@ def exportDX2excel(filterdict):
             exams.patient_study_module_attributes_set.get().patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events,
-            exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total,
-			]
-        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
+            exams.radiation_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_irradiation_events,
+            exams.radiation_dose_set.get().accumulated_projection_xray_dose_set.get().dose_length_product_total,
+            ]
+        for s in exams.radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
-                s.ct_acquisition_type,
-                s.exposure_time,
-                s.scanning_length_set.get().scanning_length,
-                s.nominal_single_collimation_width,
-                s.nominal_total_collimation_width,
-                s.pitch_factor,
-                s.number_of_xray_sources,
-                s.mean_ctdivol,
-                s.dlp,
+                s.dose_area_product,
                 ]
             if s.number_of_xray_sources > 1:
                 for source in s.dx_xray_source_parameters_set.all():
@@ -192,20 +179,15 @@ def exportDX2excel(filterdict):
             else:
                 try:
                     examdata += [
-                        s.dx_xray_source_parameters_set.get().identification_of_the_xray_source,
-                        s.dx_xray_source_parameters_set.get().kvp,
-                        s.dx_xray_source_parameters_set.get().maximum_xray_tube_current,
-                        s.dx_xray_source_parameters_set.get().xray_tube_current,
-                        s.dx_xray_source_parameters_set.get().exposure_time_per_rotation,
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
+                        s.name, # Probably won't work
+                        s.irradiation_event_xray_source_set.get().kvp,
+                        s.irradiation_event_xray_source_set.get().average_xray_tube_current,
+                        s.irradiation_event_xray_source_set.get().exposure_time,
+                        s.exposure_index,    # Probably won't work
+                        s.dose_area_product, # ditto
                         ]
                 except:
                         examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
-            examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
         tsk.progress = "{0} of {1}".format(i+1, numresults)
