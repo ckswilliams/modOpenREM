@@ -66,7 +66,6 @@ $('.datepicker').datepicker({
 {% endblock %}
 
 {% block col1 %}
-    {% load mathfilters %}
     {% autopaginate filter.qs 50 as filter_list %}
     {% paginate %}
 
@@ -89,7 +88,7 @@ $('.datepicker').datepicker({
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.dose_area_product_total|mul:1000000 }}</td>
+            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.convert_gym2_to_cgycm2 }}</td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>

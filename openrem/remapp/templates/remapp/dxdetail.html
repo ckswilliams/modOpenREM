@@ -9,8 +9,6 @@
 
 {% block mainblock %}		
 
-{% load mathfilters %}
-
 <h1>Detail list of events</h1>
 
 <ul>
@@ -53,7 +51,7 @@
         <td>{{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_detector_data_set.get.relative_xray_exposure|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_control_mode }}</td>
-        <td>{{ event.dose_area_product|mul:1000000 }}</td>
+        <td>{{ event.convert_gym2_to_cgycm2 }}</td>
     </tr>
     {% endfor %}
 </table>
