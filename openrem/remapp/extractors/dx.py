@@ -98,9 +98,9 @@ def _irradiationeventxraydetectordata(dataset,event):
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
     # Try the old "Relative X-ray Exposure" first
-    detector.exposure_index = get_value_kw('RelativeX-rayExposure',dataset)
+    detector.exposure_index = get_value_kw('RelativeXRayExposure',dataset)
     # Now try the newer "Exposure Index", and over-write if it's found
-    detector.exposure_index = get_value_kw('ExposureIndex',dataset)
+    if not detector.exposure_index: detector.exposure_index = get_value_kw('ExposureIndex',dataset)
     # Look for the "Target Exposure Index"
     detector.target_exposure_index = get_value_kw('TargetExposureIndex',dataset)
     # Look for the "Deviation Index"
