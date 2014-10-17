@@ -1,5 +1,4 @@
 {% extends "remapp/base.html" %}
-{% load mathfilters %}
 {% block navbar %}
             <li><a href="/openrem/ct">CT</a></li>
             <li><a href="/openrem/rf">Fluoroscopy</a></li>
@@ -9,6 +8,9 @@
 
 
 {% block mainblock %}		
+
+{% load mathfilters %}
+
 <h1>Detail list of events</h1>
 
 <ul>
@@ -39,7 +41,7 @@
     <th>Exposure index</th>
     <th>Relative x-ray exposure</th>
     <th>Exposure control mode</th>
-    <th>DAP (Gy.m<sup>2</sup>)</th>
+    <th>DAP (cGy.cm<sup>2</sup>)</th>
     {% for event in general_study_module_attributes.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
@@ -51,7 +53,7 @@
         <td>{{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_detector_data_set.get.relative_xray_exposure|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_control_mode }}</td>
-        <td>{{ event.dose_area_product }}</td>
+        <td>{{ event.dose_area_product|mul:1000000 }}</td>
     </tr>
     {% endfor %}
 </table>

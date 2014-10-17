@@ -233,7 +233,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
     event.comment = get_value_kw('ExposureControlModeDescription',dataset)
     
-    event.dose_area_product = get_value_num(0x0018115e,dataset) / 10 / 10000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
+    event.dose_area_product = get_value_num(0x0018115e,dataset) / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
     
     # 28/3/2014 DJP put the line below in
@@ -261,7 +261,7 @@ def _accumulatedxraydose_update(dataset,event):
     accumdx = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get()
     test = event.dose_area_product
     if event.dose_area_product:
-        accumdx.dose_area_product_total += Decimal(event.dose_area_product) / 10 / 10000 # Conversion from dGy.cm2 to Gy.m2
+        accumdx.dose_area_product_total += Decimal(event.dose_area_product)
     accumdx.save()
 
 
