@@ -232,8 +232,9 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
         if '%' in pc_fibroglandular:
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
     event.comment = get_value_kw('ExposureControlModeDescription',dataset)
-    
-    event.dose_area_product = get_value_num(0x0018115e,dataset) / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
+
+    dap = get_value_num(0x0018115e,dataset)
+    if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
     
     # 28/3/2014 DJP put the line below in
