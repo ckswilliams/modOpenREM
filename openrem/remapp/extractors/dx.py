@@ -99,7 +99,15 @@ def _irradiationeventxraydetectordata(dataset,event):
     detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
     detector.exposure_index = get_value_kw('ExposureIndex',dataset)
     detector.relative_xray_exposure = get_value_kw('RelativeXRayExposure',dataset)
-    detector.relative_exposure_unit = get_value_kw('RelativeExposureUnit',dataset)
+    # manufacturer = some code that I can't work out to get the manufacturer text
+    # if 'Fuji'       in manufacturer: detector.relative_exposure_unit = 'S ()'
+    # if 'Carestream' in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
+    # if 'Agfa'       in manufacturer: detector.relative_exposure_unit = 'lgM (Bels)'
+    # if 'Konica'     in manufacturer: detector.relative_exposure_unit = 'S ()'
+    # if 'Canon'      in manufacturer: detector.relative_exposure_unit = 'REX ()'
+    # if 'Swissray'   in manufacturer: detector.relative_exposure_unit = 'DI ()'
+    # if 'Philips'    in manufacturer: detector.relative_exposure_unit = 'EI ()'
+    # if 'Siemens'    in manufacturer: detector.relative_exposure_unit = 'EXI (uGy)'
     detector.sensitivity = get_value_kw('Sensitivity',dataset)
     detector.target_exposure_index = get_value_kw('TargetExposureIndex',dataset)
     detector.deviation_index = get_value_kw('DeviationIndex',dataset)
