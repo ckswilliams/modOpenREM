@@ -112,23 +112,16 @@ def _irradiationeventxraysourcedata(dataset,event):
     from remapp.models import Irradiation_event_xray_source_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
-    # AGD/MGD is dGy in Mammo headers, and was dGy in Radiation Dose SR - CP1194 changes this to mGy!
-    agd_dgy = get_value_kw('OrganDose',dataset) #AGD in dGy 
-    if agd_dgy:
-        source.average_glandular_dose = float(agd_dgy) * 100.0 #AGD in mGy
     source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
     if not source.average_xray_tube_current: source.average_xray_tube_current = get_value_kw('AverageXRayTubeCurrent',dataset)
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.irradiation_duration = get_value_kw('IrradiationDuration',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
-    source.focal_spot_size = get_value_kw('FocalSpotSize',dataset)
-#    anode_target_material = get_value_kw('AnodeTargetMaterial',dataset)
-#    if anode_target_material.strip().lower() == 'molybdenum':
-#        source.anode_target_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-#    if anode_target_material.strip().lower() == 'rhodium':
-#        source.anode_target_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
-#    if anode_target_material.strip().lower() == 'tungsten':
-#        source.anode_target_material = get_or_create_cid('C-164F9','Tungsten or Tungsten compound')
+    print "focal spot size is:"
+    print source.focal_spot_size
+    if not source.focal_spot_size: source.focal_spot_size = get_value_kw('FocalSpotSize',dataset)
+    print "focal spot size is now:"
+    print source.focal_spot_size
     collimated_field_area = get_value_kw('FieldOfViewDimensions',dataset)
     if collimated_field_area:
         source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
