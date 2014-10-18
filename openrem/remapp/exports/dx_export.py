@@ -121,9 +121,9 @@ def exportDX2excel(filterdict):
         ]
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events'))
+    max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
 
-    for h in xrange(max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']):
+    for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Total DAP',
