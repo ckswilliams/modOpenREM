@@ -124,6 +124,8 @@ def exportDX2excel(filterdict):
     for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
+            'E' + str(h+1) + ' Image view',
+            'E' + str(h+1) + ' Exposure control mode',
             'E' + str(h+1) + ' kVp',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
@@ -157,6 +159,8 @@ def exportDX2excel(filterdict):
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
+                s.image_view,
+                s.irradiation_event_xray_source_data_set.get().exposure_control_mode,
                 s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
                 s.irradiation_event_xray_source_data_set.get().average_xray_tube_current,
                 s.irradiation_event_xray_source_data_set.get().exposure_time,
@@ -274,6 +278,8 @@ def dxxlsx(filterdict):
         ]
     protocolheaders = commonheaders + [
         'Protocol',
+        'Image view',
+        'Exposure control mode',
         'kVp',
         'mA',
         'Exposure time (ms)',
@@ -333,6 +339,8 @@ def dxxlsx(filterdict):
     for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
+            'E' + str(h+1) + ' Image view',
+            'E' + str(h+1) + ' Exposure control mode',
             'E' + str(h+1) + ' kVp',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
@@ -351,10 +359,10 @@ def dxxlsx(filterdict):
         tsk.save()
 
         examdata = [
-			exams.general_equipment_module_attributes_set.get().institution_name,
-			exams.general_equipment_module_attributes_set.get().manufacturer,
-			exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-			exams.general_equipment_module_attributes_set.get().station_name,
+            exams.general_equipment_module_attributes_set.get().institution_name,
+            exams.general_equipment_module_attributes_set.get().manufacturer,
+            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
+            exams.general_equipment_module_attributes_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
@@ -370,6 +378,8 @@ def dxxlsx(filterdict):
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
+                s.image_view,
+                str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
                 str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
                 str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_time),
@@ -411,6 +421,8 @@ def dxxlsx(filterdict):
                 ]
             examdata += [
                 s.acquisition_protocol,
+                s.image_view,
+                str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
                 str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
                 str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_time),
