@@ -79,7 +79,6 @@ def exportDX2excel(filterdict):
     from remapp.models import General_study_module_attributes
     from remapp.interface.mod_filters import DXSummaryListFilter
     
-    #e = General_study_module_attributes.objects.filter(modality_type__exact = 'CR')
     e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
     f = DXSummaryListFilter.base_filters
@@ -117,7 +116,7 @@ def exportDX2excel(filterdict):
         'Study description',
         'Requested procedure',
         'Number of events',
-        'DAP total (cGy.cm^2)',
+        'DAP total (Gy.m^2)',
         ]
 
     from django.db.models import Max
@@ -232,8 +231,6 @@ def dxxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    #e = General_study_module_attributes.objects.filter(modality_type__exact = 'CR')
-    #e = General_study_module_attributes.objects.filter(or_(modality_type__exact = 'CR', modality_type__exact = 'DX'))
     e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
     f = DXSummaryListFilter.base_filters
@@ -261,43 +258,28 @@ def dxxlsx(filterdict):
     commonheaders = [
         'Institution', 
         'Manufacturer', 
-        'Model',
+        'Model name',
         'Station name',
         'Accession number',
         'Operator',
-        'Date',
-        'Age', 
-        'Height', 
-        'Mass (kg)', 
+        'Study date',
+        'Patient age', 
+        'Patient height', 
+        'Patient mass (kg)', 
         'Test patient?',
         'Study description',
         'Requested procedure',
-        'No. events',
-        'DLP total (mGy.cm)',
+        'Number of events',
+        'DAP total (Gy.m^2)',
         ]
     protocolheaders = commonheaders + [
         'Protocol',
-        'Type',
-        'Exposure time',
-        'Scanning length',
-        'Slice thickness',
-        'Total collimation',
-        'Pitch',
-        'No. sources',
-        'CTDIvol',
-        'DLP',
-        'S1 name',
-        'S1 kVp',
-        'S1 max mA',
-        'S1 mA',
-        'S1 Exposure time/rotation',
-        'S2 name',
-        'S2 kVp',
-        'S2 max mA',
-        'S2 mA',
-        'S2 Exposure time/rotation',
-        'mA Modulation type',
-        'Comments',
+        'kVp',
+        'mA',
+        'Exposure time (ms)',
+        'Exposure index',
+        'Relative x-ray exposure',
+        'DAP (Gy.m^2)',
         ]
         
     # Generate list of protocols in queryset and create worksheets for each
@@ -307,7 +289,7 @@ def dxxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
+        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -341,40 +323,25 @@ def dxxlsx(filterdict):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events'))
+    max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
 
     alldataheaders = commonheaders
 
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']):
+    for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Type',
-            'E' + str(h+1) + ' Exposure time',
-            'E' + str(h+1) + ' Scanning length',
-            'E' + str(h+1) + ' Slice thickness',
-            'E' + str(h+1) + ' Total collimation',
-            'E' + str(h+1) + ' Pitch',
-            'E' + str(h+1) + ' No. sources',
-            'E' + str(h+1) + ' CTDIvol',
-            'E' + str(h+1) + ' DLP',
-            'E' + str(h+1) + ' S1 name',
-            'E' + str(h+1) + ' S1 kVp',
-            'E' + str(h+1) + ' S1 max mA',
-            'E' + str(h+1) + ' S1 mA',
-            'E' + str(h+1) + ' S1 Exposure time/rotation',
-            'E' + str(h+1) + ' S2 name',
-            'E' + str(h+1) + ' S2 kVp',
-            'E' + str(h+1) + ' S2 max mA',
-            'E' + str(h+1) + ' S2 mA',
-            'E' + str(h+1) + ' S2 Exposure time/rotation',
-            'E' + str(h+1) + ' mA Modulation type',
-            'E' + str(h+1) + ' Comments',
+            'E' + str(h+1) + ' kVp',
+            'E' + str(h+1) + ' mA',
+            'E' + str(h+1) + ' Exposure time (ms)',
+            'E' + str(h+1) + ' Exposure index',
+            'E' + str(h+1) + ' Relative x-ray exposure',
+            'E' + str(h+1) + ' DAP (Gy.m^2)',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['dx_radiation_dose__dx_accumulated_dose_data__total_number_of_irradiation_events__max']) + 14 - 1
+    numcolumns = (22 * max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -397,57 +364,25 @@ def dxxlsx(filterdict):
             exams.patient_module_attributes_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-            str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
 			]
-        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
+        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
-                str(s.dx_acquisition_type),
-                str(s.exposure_time),
-                str(s.scanning_length_set.get().scanning_length),
-                str(s.nominal_single_collimation_width),
-                str(s.nominal_total_collimation_width),
-                str(s.pitch_factor),
-                str(s.number_of_xray_sources),
-                str(s.mean_ctdivol),
-                str(s.dlp),
-                ]
-            if s.number_of_xray_sources > 1:
-                for source in s.dx_xray_source_parameters_set.all():
-                    examdata += [
-                        str(source.identification_of_the_xray_source),
-                        str(source.kvp),
-                        str(source.maximum_xray_tube_current),
-                        str(source.xray_tube_current),
-                        str(source.exposure_time_per_rotation),
-                        ]
-            else:
-                try:
-                    examdata += [
-                        str(s.dx_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.dx_xray_source_parameters_set.get().kvp),
-                        str(s.dx_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.dx_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.dx_xray_source_parameters_set.get().exposure_time_per_rotation),
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        ]
-                except:
-                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
-            examdata += [
-                s.xray_modulation_type,
-                str(s.comment),
+                str(s.irradiation_event_xray_source_date_set.get().kvp_set.get().kvp),
+                str(s.irradiation_event_xray_source_date_set.get().average_xray_tube_current),
+                str(s.irradiation_event_xray_source_date_set.get().exposure_time),
+                str(s.irradiation_event_xray_detector_date_set.get().exposure_index),
+                str(s.irradiation_event_xray_detector_date_set.get().relative_xray_exposure),
+                str(s.dose_area_product),
                 ]
 
         wsalldata.write_row(row+1,0, examdata)
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.dx_radiation_dose_set.get().dx_irradiation_event_data_set.all():
+        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
@@ -471,49 +406,17 @@ def dxxlsx(filterdict):
                 exams.patient_module_attributes_set.get().not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-                str(exams.dx_radiation_dose_set.get().dx_accumulated_dose_data_set.get().dx_dose_length_product_total),
+                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
+                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
                 ]
             examdata += [
                 s.acquisition_protocol,
-                str(s.dx_acquisition_type),
-                str(s.exposure_time),
-                str(s.scanning_length_set.get().scanning_length),
-                str(s.nominal_single_collimation_width),
-                str(s.nominal_total_collimation_width),
-                str(s.pitch_factor),
-                str(s.number_of_xray_sources),
-                str(s.mean_ctdivol),
-                str(s.dlp),
-                ]
-            if s.number_of_xray_sources > 1:
-                for source in s.dx_xray_source_parameters_set.all():
-                    examdata += [
-                        str(source.identification_of_the_xray_source),
-                        str(source.kvp),
-                        str(source.maximum_xray_tube_current),
-                        str(source.xray_tube_current),
-                        str(source.exposure_time_per_rotation),
-                        ]
-            else:
-                try:
-                    examdata += [
-                        str(s.dx_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.dx_xray_source_parameters_set.get().kvp),
-                        str(s.dx_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.dx_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.dx_xray_source_parameters_set.get().exposure_time_per_rotation),
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        ]
-                except:
-                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
-            examdata += [
-                s.xray_modulation_type,
-                s.comment,
+                str(s.irradiation_event_xray_source_date_set.get().kvp_set.get().kvp),
+                str(s.irradiation_event_xray_source_date_set.get().average_xray_tube_current),
+                str(s.irradiation_event_xray_source_date_set.get().exposure_time),
+                str(s.irradiation_event_xray_detector_date_set.get().exposure_index),
+                str(s.irradiation_event_xray_detector_date_set.get().relative_xray_exposure),
+                str(s.dose_area_product),
                 ]
 
             sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
