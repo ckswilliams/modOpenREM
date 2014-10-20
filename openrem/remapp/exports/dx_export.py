@@ -122,23 +122,15 @@ def exportDX2excel(filterdict):
 
     from django.db.models import Max
     max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
-
     for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Total DAP',
-            'E' + str(h+1) + ' S1 name',
-            'E' + str(h+1) + ' S1 kVp',
-            'E' + str(h+1) + ' S1 mA',
-            'E' + str(h+1) + ' S1 Exposure time',
-            'E' + str(h+1) + ' S1 Exposure index',
-            'E' + str(h+1) + ' S1 DAP',
-            'E' + str(h+1) + ' S2 name',
-            'E' + str(h+1) + ' S2 kVp',
-            'E' + str(h+1) + ' S2 mA',
-            'E' + str(h+1) + ' S2 Exposure time',
-            'E' + str(h+1) + ' S1 Exposure index',
-            'E' + str(h+1) + ' S1 DAP',
+            'E' + str(h+1) + ' kVp',
+            'E' + str(h+1) + ' mA',
+            'E' + str(h+1) + ' Exposure time (ms)',
+            'E' + str(h+1) + ' Exposure index',
+            'E' + str(h+1) + ' Relative x-ray exposure',
+            'E' + str(h+1) + ' DAP (Gy.m^2)',
             ]
     writer.writerow(headers)
 
@@ -159,35 +151,20 @@ def exportDX2excel(filterdict):
             exams.patient_study_module_attributes_set.get().patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.radiation_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_irradiation_events,
-            exams.radiation_dose_set.get().accumulated_projection_xray_dose_set.get().dose_length_product_total,
+            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames,
+            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total,
             ]
-        for s in exams.radiation_dose_set.get().irradiation_event_xray_data_set.all():
+
+        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
+                s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
+                s.irradiation_event_xray_source_data_set.get().average_xray_tube_current,
+                s.irradiation_event_xray_source_data_set.get().exposure_time,
+                s.irradiation_event_xray_detector_data_set.get().exposure_index,
+                s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure,
                 s.dose_area_product,
                 ]
-            if s.number_of_xray_sources > 1:
-                for source in s.dx_xray_source_parameters_set.all():
-                    examdata += [
-                        source.identification_of_the_xray_source,
-                        source.kvp,
-                        source.maximum_xray_tube_current,
-                        source.xray_tube_current,
-                        source.exposure_time_per_rotation,
-                        ]
-            else:
-                try:
-                    examdata += [
-                        s.name, # Probably won't work
-                        s.irradiation_event_xray_source_set.get().kvp,
-                        s.irradiation_event_xray_source_set.get().average_xray_tube_current,
-                        s.irradiation_event_xray_source_set.get().exposure_time,
-                        s.exposure_index,    # Probably won't work
-                        s.dose_area_product, # ditto
-                        ]
-                except:
-                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
 
         writer.writerow(examdata)
         tsk.progress = "{0} of {1}".format(i+1, numresults)
