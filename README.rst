@@ -2,7 +2,7 @@ This fork of OpenREM includes the ability to import data from radiographic DICOM
 
 The import of the data works in a similar way to the existing mammography import: the dx.py script must be run with the path to the DICOM file as an argument. For example:
 
-python dx.py C:\\temp\image.dcm.
+python dx.py C:\\temp\\image.dcm.
 
 
 =======
