@@ -364,17 +364,17 @@ def dxxlsx(filterdict):
             exams.patient_module_attributes_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
 			]
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
-                str(s.irradiation_event_xray_source_date_set.get().kvp_set.get().kvp),
-                str(s.irradiation_event_xray_source_date_set.get().average_xray_tube_current),
-                str(s.irradiation_event_xray_source_date_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_date_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_date_set.get().relative_xray_exposure),
+                str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
+                str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
+                str(s.irradiation_event_xray_source_data_set.get().exposure_time),
+                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
+                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
                 str(s.dose_area_product),
                 ]
 
@@ -406,16 +406,16 @@ def dxxlsx(filterdict):
                 exams.patient_module_attributes_set.get().not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set_get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
+                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
                 ]
             examdata += [
                 s.acquisition_protocol,
-                str(s.irradiation_event_xray_source_date_set.get().kvp_set.get().kvp),
-                str(s.irradiation_event_xray_source_date_set.get().average_xray_tube_current),
-                str(s.irradiation_event_xray_source_date_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_date_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_date_set.get().relative_xray_exposure),
+                str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
+                str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
+                str(s.irradiation_event_xray_source_data_set.get().exposure_time),
+                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
+                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
                 str(s.dose_area_product),
                 ]
 
