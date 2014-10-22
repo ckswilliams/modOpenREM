@@ -2,19 +2,20 @@
 
 {% block navbar %}
             <li><a href="/openrem/ct">CT</a></li>
-            <li class="active"><a href="/openrem/rf">Fluoroscopy</a></li>
-            <li><a href="/openrem/mg">Mammography</a></li>
-            <li><a href="/openrem/dx">Radiography</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/rf">Mammography</a></li>
+            <li class="active"><a href="/openrem/dx">Radiography</a></li>
 {% endblock %}
 
 {% block toprow %}
-{% load pagination_tags %}    
+      {% load pagination_tags %}    
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
         {% if admin.exportperm or admin.adminperm %}
         <ul>
-          <li><a href="/openrem/exportflcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportdxcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
+          <li><a href="/openrem/exportdxxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
         </ul>
         {% else %}
         <p>
@@ -53,7 +54,7 @@
                 </form> 
             </div>
           </div>
-          
+    
 <script>
 $('.datepicker').datepicker({
     format: "yyyy-mm-dd",
@@ -62,16 +63,14 @@ $('.datepicker').datepicker({
     });
 </script>
 
-    
 {% endblock %}
 
 {% block col1 %}
-
-    {% autopaginate filter.qs 20 as filter_list %}
+    {% autopaginate filter.qs 50 as filter_list %}
     {% paginate %}
 
     <table class="table table-striped">
-        <th>Institution</th><th>Unit</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>DAP Total cGy.cm2</th><th>Dose at RP total Gy</th><th>Physician</th>
+        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
         {% if admin.adminperm %}
         <th>Delete?</th>
         {% endif %}
@@ -79,19 +78,17 @@ $('.datepicker').datepicker({
         <tr>
             <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
             <td>
-                {{ exam.general_equipment_module_attributes_set.get.manufacturer }} |
+                {{ exam.general_equipment_module_attributes_set.get.manufacturer }} | 
                 {{ exam.general_equipment_module_attributes_set.get.manufacturer_model_name }} |
-                {{ exam.general_equipment_module_attributes_set.get.station_name }}        
+                {{ exam.general_equipment_module_attributes_set.get.station_name }}
             </td>
             <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
             <td>
-                <a href="/openrem/rf/{{ exam.id }}/">{{ exam.study_description }}</a> |
+                <a href="/openrem/dx/{{ exam.id }}/">{{ exam.procedure_code_meaning }}</a> |
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.dose_rp_total|floatformat:6 }}</td>
-            <td>{{ exam.performing_physician_name }}</td>
+            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.convert_gym2_to_cgycm2 | floatformat:3 }}</td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>
