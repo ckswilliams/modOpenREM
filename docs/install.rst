@@ -78,8 +78,8 @@ For either install, just follow the defaults – no special configurations requi
 Install and configure OpenREM
 =============================
 
-Install
---------
+Install latest beta version
+---------------------------
 
 .. sourcecode:: bash
 
