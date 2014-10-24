@@ -6,6 +6,7 @@ Headline changes
 
 
 * Import, display and export of CR/DX data from image headers
+* Hologic tomography projection images are no longer excluded if part of a Combo exposure
 
 Specific upgrade instructions
 =============================
