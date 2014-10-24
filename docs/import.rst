@@ -40,6 +40,17 @@ following systems:
 
 See :ref:`mammo-module` for testing restrictions.
 
+For radiographic DICOM images
+-----------------------------
+.. sourcecode:: bash
+
+    openrem_dx.py filename.dcm
+
+It is now possible with OpenREM version 0.5.0 to import dose information
+from DX and CR images from digital radiography units. As yet, it hasn't
+been tested extensively.
+
+
 For CT dose summary files from Philips CT scanners
 --------------------------------------------------
 .. sourcecode:: bash

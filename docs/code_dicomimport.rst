@@ -26,6 +26,16 @@ also capture any rejected images.
 .. automodule:: remapp.extractors.mam
     :members:
 
+CR and DR module
+++++++++++++++++
+
+In practice this is only useful for DR modalities, but most of them use the
+CR IOD instead of the DX one, so both are catered for. This module makes use
+of the image headers much like the mammography module.
+
+.. automodule:: remapp.extractors.dx
+    :members:
+
 CT non-standard modules
 +++++++++++++++++++++++
 

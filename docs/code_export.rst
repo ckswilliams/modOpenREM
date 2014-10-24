@@ -11,6 +11,7 @@ order, with one series per line. If one study has three series with the
 same protocol name, each one has a line of its own.
 
 .. autotask:: remapp.exports.xlsx.ctxlsx
+.. autotask:: remapp.exports.dx_export.dxxlsx
 
 
 Single sheet CSV exports
@@ -19,6 +20,7 @@ Single sheet CSV exports
 .. autotask:: remapp.exports.exportcsv.exportFL2excel
 .. autotask:: remapp.exports.exportcsv.exportCT2excel
 .. autotask:: remapp.exports.exportcsv.exportMG2excel
+.. autotask:: remapp.exports.dx_export.exportDX2excel
 
 Specialised csv exports - NHSBSP formatted mammography export
 -------------------------------------------------------------
