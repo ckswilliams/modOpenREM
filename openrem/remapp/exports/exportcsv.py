@@ -86,7 +86,7 @@ def exportFL2excel(filterdict):
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
                 e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
@@ -153,7 +153,7 @@ def exportFL2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -223,7 +223,7 @@ def exportCT2excel(filterdict):
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
                 e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
@@ -350,7 +350,7 @@ def exportCT2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -416,8 +416,8 @@ def exportMG2excel(filterdict):
             else:
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
-                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
@@ -503,7 +503,7 @@ def exportMG2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -516,8 +516,4 @@ def exportMG2excel(filterdict):
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-
-
-
-
 

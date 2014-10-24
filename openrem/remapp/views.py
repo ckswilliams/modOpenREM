@@ -19,7 +19,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+#
+#    8/10/2014: DJP added new DX section and added DX to home page.
+#    9/10/2014: DJP changed DX to CR
+#
 """
 ..  module:: views.
     :synopsis: Module to render appropriate content according to request.
@@ -54,6 +57,32 @@ def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/openrem/')
 
+
+@login_required
+def dx_summary_list_filter(request):
+    from remapp.interface.mod_filters import DXSummaryListFilter
+    from django.db.models import Q # For the Q "OR" query used for DX and CR
+    import pkg_resources # part of setuptools
+    # 10/10/2014, DJP: altered the line below so that DX or CR is included
+    #f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'CR'))
+    f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    return render_to_response(
+        'remapp/dxfiltered.html',
+        {'filter': f, 'admin':admin},
+        context_instance=RequestContext(request)
+        )
 
 @login_required
 def rf_summary_list_filter(request):
@@ -131,6 +160,7 @@ def mg_summary_list_filter(request):
 
 def openrem_home(request):
     from remapp.models import General_study_module_attributes
+    from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
     from collections import OrderedDict
@@ -153,6 +183,8 @@ def openrem_home(request):
         'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
         'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
+        #'dx' : allstudies.filter(modality_type__contains = 'CR').count(),
+        'dx' : allstudies.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).count(),
         }
 
     try:
@@ -166,9 +198,16 @@ def openrem_home(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    modalities = ('MG','CT','RF')
+    modalities = ('MG','CT','RF','DX')
     for modality in modalities:
-        studies = allstudies.filter(modality_type__contains = modality).all()
+        # 10/10/2014, DJP: added code to combine DX with CR
+        if modality == 'DX':
+            #studies = allstudies.filter(modality_type__contains = modality).all()
+            studies = allstudies.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).all()
+        else:
+            studies = allstudies.filter(modality_type__contains = modality).all()
+        # End of 10/10/2014 DJP code changes
+
         stations = studies.values_list('general_equipment_module_attributes__station_name').distinct()
         modalitydata = {}
         for station in stations:

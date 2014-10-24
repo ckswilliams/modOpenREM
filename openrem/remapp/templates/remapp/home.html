@@ -14,10 +14,10 @@
 
 <table class="table table-bordered">
     <tr>
-        <th><a href="/openrem/ct/">CT</a></th><th><a href="/openrem/rf/">Fluoroscopy</a></th><th><a href="/openrem/mg/">Mammography</a></th>
+        <th><a href="/openrem/ct/">CT</a></th><th><a href="/openrem/rf/">Fluoroscopy</a></th><th><a href="/openrem/mg/">Mammography</a></th><th><a href="/openrem/dx/">Radiography</a></th>
     </tr>
     <tr>
-        <td>{{ homedata.ct }}</td><td>{{ homedata.rf }}</td><td>{{ homedata.mg }}</td>
+        <td>{{ homedata.ct }}</td><td>{{ homedata.rf }}</td><td>{{ homedata.mg }}</td><td>{{ homedata.dx }}</td>
     </tr>
 </table>
 
@@ -81,6 +81,25 @@
     {% endfor %}
 </table>
 
+<h4>Radiography summary table</h4>
+<table class="table table-bordered">
+    <tr>
+        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+    </tr>
+    {% for key,value in homedata.DX.items %}
+        <tr>
+            <td>
+                {{ value.institution }} (<a href="/openrem/dx/?station_name={{ key }}&o=-study_date">{{ key }}</a>)
+            </td>
+            <td>
+                {{ value.total }}
+            </td>
+            <td>
+                {{ value.latest|naturaltime }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
 
 
 {% endblock %}	
