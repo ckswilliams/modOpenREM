@@ -2,6 +2,15 @@
 OpenREM version history
 =======================
 
+0.5.0b1 (future)
+----------------
+
+* `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
+* `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs
+* `#26`_   Extractors created for radiographic DICOM images. Contributed by DJ Platten
+* `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_. Contributed by DJ Platten
+
+
 0.4.3 (2014-10-01)
 ------------------
 
@@ -189,6 +198,26 @@ Reopened issue
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#140`: https://bitbucket.org/openrem/openrem/issue/140/
+..  _`#139`: https://bitbucket.org/openrem/openrem/issue/139/
+..  _`#138`: https://bitbucket.org/openrem/openrem/issue/138/
+..  _`#137`: https://bitbucket.org/openrem/openrem/issue/137/
+..  _`#136`: https://bitbucket.org/openrem/openrem/issue/136/
+..  _`#135`: https://bitbucket.org/openrem/openrem/issue/135/
+..  _`#134`: https://bitbucket.org/openrem/openrem/issue/134/
+..  _`#133`: https://bitbucket.org/openrem/openrem/issue/133/
+..  _`#132`: https://bitbucket.org/openrem/openrem/issue/132/
+..  _`#131`: https://bitbucket.org/openrem/openrem/issue/131/
+..  _`#130`: https://bitbucket.org/openrem/openrem/issue/130/
+..  _`#129`: https://bitbucket.org/openrem/openrem/issue/129/
+..  _`#128`: https://bitbucket.org/openrem/openrem/issue/128/
+..  _`#127`: https://bitbucket.org/openrem/openrem/issue/127/
+..  _`#126`: https://bitbucket.org/openrem/openrem/issue/126/
+..  _`#125`: https://bitbucket.org/openrem/openrem/issue/125/
+..  _`#124`: https://bitbucket.org/openrem/openrem/issue/124/
+..  _`#123`: https://bitbucket.org/openrem/openrem/issue/123/
+..  _`#122`: https://bitbucket.org/openrem/openrem/issue/122/
+..  _`#121`: https://bitbucket.org/openrem/openrem/issue/121/
 ..  _`#120`: https://bitbucket.org/openrem/openrem/issue/120/
 ..  _`#119`: https://bitbucket.org/openrem/openrem/issue/119/
 ..  _`#118`: https://bitbucket.org/openrem/openrem/issue/118/

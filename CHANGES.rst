@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.5.0 (future)
---------------
+0.5.0b1 (future)
+----------------
 
 * `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
 * `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs
