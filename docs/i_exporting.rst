@@ -12,7 +12,7 @@ in the OpenREM interface. The following exports are currently available (version
 * CT advanced, XLSX muliple-sheets
 * Fluoroscopy basic, single sheet csv
 * Mammography, single sheet csv
-* Mammogrpahy NHSBSP, single sheet csv designed to satisfy NHSPSB reporting
+* Mammography NHSBSP, single sheet csv designed to satisfy NHSPSB reporting
 
 For CT, the XLSX export has multiple sheets. The first sheet contains a 
 summary of all the study descriptions, requested procedures and series
