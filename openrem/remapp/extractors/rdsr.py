@@ -718,7 +718,8 @@ def rdsr(rdsr_file):
     dataset = dicom.read_file(rdsr_file)
 
     if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22':
-        print '{0}{1}'.format(rdsr_file," is not an RDSR, but it is an enhanced structured report, so we'll attempt to use it")
+        # print '{0}{1}'.format(rdsr_file," is not an RDSR, but it is an enhanced structured report, so we'll attempt to use it")
+        pass
     elif dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.88.67':
         return ('{0}{1}'.format(rdsr_file," is not a Radiation Dose Structured Report"))
     elif dataset.ConceptNameCodeSequence[0].CodeValue != '113701':

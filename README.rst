@@ -14,3 +14,8 @@ For fresh installs, please look at the `install docs <http://docs.openrem.org/pa
 Contribution of code, ideas, bug reports documentation is all welcome.
 Please feel free to fork the repository and send me pull requests. See
 `the website <http://openrem.org/getinvolved>`_ for more information.
+
+Beta version with DR and CR import/display/export
+-------------------------------------------------
+
+This is a development version with DR and CR support, developed by David Platten.

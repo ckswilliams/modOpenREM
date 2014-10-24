@@ -78,12 +78,12 @@ For either install, just follow the defaults – no special configurations requi
 Install and configure OpenREM
 =============================
 
-Install
---------
+Install latest beta version
+---------------------------
 
 .. sourcecode:: bash
 
-    pip install openrem
+    pip install --pre openrem==0.5.0b1
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -95,11 +95,10 @@ Locate install location
 * Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 
-There are three files that need renaming: *(changed for 0.4.0)*
+There are two files that need renaming:
 
 + ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
 + ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
-+ ``openremproject/settings.py.new`` to ``openremproject/settings.py`` *Not applicable from 0.4.3 onwards, and for 0.4.2 folder is called openrem*
 
 In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path, the secret key and the ``ALLOWED_HOSTS``.
 
@@ -165,7 +164,9 @@ will be used in the URL in the web browser. For example::
     ]
 
 A dot before a hostname allows for subdomains (eg www.doseserver), a dot
-after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk)
+after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
+Alternatively, a single ``'*'`` allows any host, but removes the security
+the feature gives you.
 
 Create the database
 -------------------

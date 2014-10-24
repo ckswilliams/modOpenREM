@@ -79,8 +79,14 @@ def exportFL2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
-    
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
@@ -147,7 +153,7 @@ def exportFL2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -210,8 +216,14 @@ def exportCT2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
-    
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
@@ -338,7 +350,7 @@ def exportCT2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -398,8 +410,14 @@ def exportMG2excel(filterdict):
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
-            s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
-    
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
         
@@ -485,7 +503,7 @@ def exportMG2excel(filterdict):
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -498,24 +516,4 @@ def exportMG2excel(filterdict):
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-
-
-def getQueryFilters(request):
-    from django.template import RequestContext
-
-    query_filters = {
-        'institution_name'        : request.GET.get('general_equipment_module_attributes__institution_name'),
-        'date_after'              : request.GET.get('date_after'),
-        'date_before'             : request.GET.get('date_before'),
-        'study_description'       : request.GET.get('study_description'),
-        'age_min'                 : request.GET.get('patient_age_min'),
-        'age_max'                 : request.GET.get('patient_age_max'),
-        'manufacturer'            : request.GET.get('general_equipment_module_attributes__manufacturer'),
-        'manufacturer_model_name' : request.GET.get('general_equipment_module_attributes__manufacturer_model_name'),
-        'station_name'            : request.GET.get('general_equipment_module_attributes__station_name'),
-        'accession_number'        : request.GET.get('accession_number'),
-    }
-    return query_filters
-
-
 
