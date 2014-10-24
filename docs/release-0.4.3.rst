@@ -119,7 +119,7 @@ will be used in the URL in the web browser. For example::
 
 A dot before a hostname allows for subdomains (eg www.doseserver), a dot
 after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
-Alternatively, a single '*' allows any host, but removes the security
+Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
 Edit the wsgi.py file with the new project folder name
