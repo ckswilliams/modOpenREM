@@ -1,10 +1,3 @@
-This fork of OpenREM includes the ability to import data from radiographic DICOM images of "DX" and "CR" type. The data from these images is displayed under a "Radiography" heading alongside the existing "CT", "Fluoroscopy" and "Mammography" titles. The stored data can be filtered and exported to a csv or xlsx file.
-
-The import of the data works in a similar way to the existing mammography import: the dx.py script must be run with the path to the DICOM file as an argument. For example:
-
-python dx.py C:\\temp\\image.dcm.
-
-
 =======
 OpenREM
 =======
@@ -21,3 +14,8 @@ For fresh installs, please look at the `install docs <http://docs.openrem.org/pa
 Contribution of code, ideas, bug reports documentation is all welcome.
 Please feel free to fork the repository and send me pull requests. See
 `the website <http://openrem.org/getinvolved>`_ for more information.
+
+Beta version with DR and CR import/display/export
+-------------------------------------------------
+
+This is a development version with DR and CR support, developed by David Platten.
