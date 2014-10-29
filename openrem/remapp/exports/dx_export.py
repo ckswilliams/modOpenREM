@@ -21,7 +21,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-..  module:: dx_csv.
+..  module:: dx_export.
     :synopsis: Module to export database data to single-sheet CSV files.
 
 ..  moduleauthor:: David Platten and Ed McDonagh
