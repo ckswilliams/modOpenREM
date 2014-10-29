@@ -79,17 +79,15 @@ def ctxlsx(filterdict):
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
     f = CTSummaryListFilter.base_filters
 
-#    for filt in f:
-#        print "Filt is {0}; filt type is {1}".format(filt, type(filt))
-#        if filt in filterdict and filterdict[filt]:
-#            print "filterdict[filt] is {0}; filterdict[filt] type is {1}".format(filterdict[filt], type(filterdict[filt]))
-#            print "f[filt].name is {0}; f[filt].lookup_type is {1}".format(f[filt].name, f[filt].lookup_type)
-#            e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterdict[filt]})
     for filt in f:
-        print filt
         if filt in filterdict and filterdict[filt]:
-            if (filterdict[filt])[0] <> '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : (filterdict[filt])[0]})
+            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
+            if isinstance(filterdict[filt], basestring):
+                filterstring = filterdict[filt]
+            else:
+                filterstring = (filterdict[filt])[0]
+            if filterstring != '':
+                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
     
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
