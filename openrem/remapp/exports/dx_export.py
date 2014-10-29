@@ -378,7 +378,7 @@ def dxxlsx(filterdict):
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
-                s.image_view,
+                str(s.image_view),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
                 str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
                 str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
@@ -421,7 +421,7 @@ def dxxlsx(filterdict):
                 ]
             examdata += [
                 s.acquisition_protocol,
-                s.image_view,
+                str(s.image_view),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
                 str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
                 str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
