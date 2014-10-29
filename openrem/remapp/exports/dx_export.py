@@ -22,7 +22,7 @@
 
 """
 ..  module:: dx_export.
-    :synopsis: Module to export database data to single-sheet CSV files.
+    :synopsis: Module to export radiographic data to single-sheet CSV files and to multi-sheet XLSX files.
 
 ..  moduleauthor:: David Platten and Ed McDonagh
 
