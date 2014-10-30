@@ -50,6 +50,7 @@ def exportDX2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
+    from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q # For the Q "OR" query used for DX and CR
 
     tsk = Exports.objects.create()
@@ -63,8 +64,6 @@ def exportDX2excel(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    print "I've started..."
-
     try:
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
@@ -76,9 +75,6 @@ def exportDX2excel(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    from remapp.models import General_study_module_attributes
-    from remapp.interface.mod_filters import DXSummaryListFilter
-    
     e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
     f = DXSummaryListFilter.base_filters
