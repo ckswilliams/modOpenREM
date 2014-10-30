@@ -50,7 +50,7 @@ def exportRF2csv(filterdict):
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
-#    from django.db.models import Q # For the Q "OR" query used for DX and CR
+    from remapp.interface.mod_filters import RFSummaryListFilter
 
     tsk = Exports.objects.create()
 
@@ -63,8 +63,6 @@ def exportRF2csv(filterdict):
     tsk.status = 'CURRENT'
     tsk.save()
 
-    print "I've started..."
-
     try:
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
@@ -76,9 +74,6 @@ def exportRF2csv(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    from remapp.models import General_study_module_attributes
-    from remapp.interface.mod_filters import DXSummaryListFilter
-    
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
 
     f = RFSummaryListFilter.base_filters
@@ -195,10 +190,10 @@ def exportRF2csv(filterdict):
     tsk.save()
 
 @shared_task
-def dxxlsx(filterdict):
-    """Export filtered DX and CR database data to multi-sheet Microsoft XSLX files.
+def rfxlsx(filterdict):
+    """Export filtered RF database data to multi-sheet Microsoft XSLX files.
 
-    :param filterdict: Query parameters from the DX and CR filtered page URL.
+    :param filterdict: Query parameters from the RF filtered page URL.
     :type filterdict: HTTP get
     
     """
@@ -210,8 +205,7 @@ def dxxlsx(filterdict):
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
-    from remapp.interface.mod_filters import DXSummaryListFilter
-    from django.db.models import Q # For the Q "OR" query used for DX and CR
+    from remapp.interface.mod_filters import RFSummaryListFilter
 
     tsk = Exports.objects.create()
 
@@ -235,7 +229,7 @@ def dxxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
 
     f = DXSummaryListFilter.base_filters
 
