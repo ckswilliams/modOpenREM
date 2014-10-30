@@ -35,7 +35,7 @@ from django.conf import settings
 
 
 @shared_task
-def exportRF2csv(filterdict):
+def rfcsv(filterdict):
     """Export filtered RF database data to a single-sheet CSV file.
 
     :param request: Query parameters from the RF filtered page URL.
