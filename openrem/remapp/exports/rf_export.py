@@ -35,10 +35,10 @@ from django.conf import settings
 
 
 @shared_task
-def exportDX2excel(filterdict):
-    """Export filtered DX database data to a single-sheet CSV file.
+def exportRF2csv(filterdict):
+    """Export filtered RF database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the DX filtered page URL.
+    :param request: Query parameters from the RF filtered page URL.
     :type request: HTTP get
     
     """
@@ -50,12 +50,12 @@ def exportDX2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import General_study_module_attributes
     from remapp.models import Exports
-    from django.db.models import Q # For the Q "OR" query used for DX and CR
+#    from django.db.models import Q # For the Q "OR" query used for DX and CR
 
     tsk = Exports.objects.create()
 
-    tsk.task_id = exportDX2excel.request.id
-    tsk.modality = "DX"
+    tsk.task_id = exportRF2csv.request.id
+    tsk.modality = "RF"
     tsk.export_type = "CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
@@ -79,9 +79,9 @@ def exportDX2excel(filterdict):
     from remapp.models import General_study_module_attributes
     from remapp.interface.mod_filters import DXSummaryListFilter
     
-    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
 
-    f = DXSummaryListFilter.base_filters
+    f = RFSummaryListFilter.base_filters
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
