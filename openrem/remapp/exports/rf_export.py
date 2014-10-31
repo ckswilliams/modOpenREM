@@ -369,6 +369,11 @@ def rfxlsx(filterdict):
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
 			]
+
+        angle = 5.0 #plus or minus range considered to be the same position
+        pos1 = exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
+        similarexams = exams.projection_xray_radiation_dose_set.all().filter(irradiation_event_xray_data__irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(pos1) - angle, float(pos1) + angle))
+
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
