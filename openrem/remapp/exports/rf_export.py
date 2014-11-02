@@ -372,7 +372,25 @@ def rfxlsx(filterdict):
 
         angle = 5.0 #plus or minus range considered to be the same position
         pos1 = exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
-        similarexams = exams.projection_xray_radiation_dose_set.all().filter(irradiation_event_xray_data__irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(pos1) - angle, float(pos1) + angle))
+        #TODO Get Protocol and field size too, and filter on them. And of course add all this to a loop
+        similarexposures = exams.projection_xray_radiation_dose_set.all().filter(irradiation_event_xray_data__irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(pos1) - angle, float(pos1) + angle))
+
+        dap = similarexposures.all().aggregate(
+            Min('irradiation_event_xray_data__dose_area_product'),
+            Max('irradiation_event_xray_data__dose_area_product'),
+            Avg('irradiation_event_xray_data__dose_area_product'))
+        kvp = similarexposures.all().aggregate(
+            Min('irradiation_event_xray_data__irradiation_event_xray_source_data__kvp__kvp'),
+            Max('irradiation_event_xray_data__irradiation_event_xray_source_data__kvp__kvp'),
+            Avg('irradiation_event_xray_data__irradiation_event_xray_source_data__kvp__kvp'))
+        tube_current = similarexposures.all().aggregate(
+            Min('irradiation_event_xray_data__irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
+            Max('irradiation_event_xray_data__irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
+            Avg('irradiation_event_xray_data__irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'))
+        exp_time = similarexposures.all().aggregate(
+            Min('irradiation_event_xray_data__irradiation_event_xray_source_data__exposure_time'),
+            Max('irradiation_event_xray_data__irradiation_event_xray_source_data__exposure_time'),
+            Avg('irradiation_event_xray_data__irradiation_event_xray_source_data__exposure_time'))
 
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
