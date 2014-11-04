@@ -203,7 +203,7 @@ def rfxlsx(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import General_study_module_attributes, Irradiation_event_xray_data
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
 
@@ -370,10 +370,20 @@ def rfxlsx(filterdict):
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
 			]
 
-        angle = 5.0 #plus or minus range considered to be the same position
-        pos1 = exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
-        #TODO Get Protocol and field size too, and filter on them. And of course add all this to a loop
-        similarexposures = exams.projection_xray_radiation_dose_set.all().filter(irradiation_event_xray_data__irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(pos1) - angle, float(pos1) + angle))
+        angle_range = 5.0 #plus or minus range considered to be the same position
+        studyiuid = exams.study_instance_uid
+        inst = Irradiation_event_xray_data.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
+        angle = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
+        protocol = inst[0].acquisition_protocol
+        #TODO need to make field size an optional filter as it isn't a DICOM field.
+        fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
+        similarexposures = inst.filter(
+            irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(pos1) - angle_range, float(pos1) + angle_range)
+        ).filter(
+            acquisition_protocol__exact = protocol
+        ).filter(
+            irradiation_event_xray_source_data__ii_field_size__exact = fieldsize
+        )
 
         dap = similarexposures.all().aggregate(
             Min('irradiation_event_xray_data__dose_area_product'),
