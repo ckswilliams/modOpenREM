@@ -120,6 +120,22 @@ def flcsv1(request):
 
 @csrf_exempt
 @login_required
+def rfxlsx1(request):
+    """View to launch celery task to export fluoroscopy studies to xlsx file
+
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :type request: GET
+    """
+    from django.shortcuts import redirect
+    from remapp.exports.rf_export import rfxlsx
+
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = rfxlsx.delay(request.GET)
+
+    return redirect('/openrem/export/')
+
+@csrf_exempt
+@login_required
 def mgcsv1(request):
     """View to launch celery task to export mammography studies to csv file
 
