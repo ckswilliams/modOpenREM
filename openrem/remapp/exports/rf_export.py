@@ -322,31 +322,7 @@ def rfxlsx(filterdict):
     ##################
     # All data sheet
 
-    from django.db.models import Max
-    max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
-
-    alldataheaders = commonheaders
-
-    tsk.progress = 'Generating headers for the all data sheet...'
-    tsk.save()
-
-    for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
-        alldataheaders += [
-            'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Image view',
-            'E' + str(h+1) + ' Exposure control mode',
-            'E' + str(h+1) + ' kVp',
-            'E' + str(h+1) + ' mA',
-            'E' + str(h+1) + ' Exposure time (ms)',
-            'E' + str(h+1) + ' Exposure index',
-            'E' + str(h+1) + ' Relative x-ray exposure',
-            'E' + str(h+1) + ' DAP (Gy.m^2)',
-            ]
-    wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']) + 14 - 1
-    numrows = e.count()
-    wsalldata.autofilter(0,0,numrows,numcolumns)
-
+    num_groups_max = 0
     for row,exams in enumerate(e):
 
         tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
@@ -374,7 +350,9 @@ def rfxlsx(filterdict):
         studyiuid = exams.study_instance_uid
         inst = Irradiation_event_xray_data.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
 
+        num_groups_this_exam = 0
         while inst:
+            num_groups_this_exam += 1
             angle0 = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
             protocol = inst[0].acquisition_protocol
             #TODO need to make field size an optional filter as it isn't a DICOM field.
@@ -428,8 +406,40 @@ def rfxlsx(filterdict):
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
                 str(fieldsize),
 
+        if num_groups_this_exam > num_groups_max:
+            num_groups_max = num_groups_this_exam
 
         wsalldata.write_row(row+1,0, examdata)
+
+    tsk.progress = 'Generating headers for the all data sheet...'
+    tsk.save()
+
+    alldataheaders = commonheaders
+
+    for h in xrange(num_groups_max):
+        alldataheaders += [
+            'G' + str(h+1) + ' Protocol',
+            'G' + str(h+1) + ' kVp min',
+            'G' + str(h+1) + ' kVp max',
+            'G' + str(h+1) + ' kVp mean',
+            'G' + str(h+1) + ' mA min',
+            'G' + str(h+1) + ' mA max',
+            'G' + str(h+1) + ' mA mean',
+            'G' + str(h+1) + ' Exp time min (ms)',
+            'G' + str(h+1) + ' Exp time max (ms)',
+            'G' + str(h+1) + ' Exp time mean (ms)',
+            'G' + str(h+1) + ' DAP min (Gy.m^2)',
+            'G' + str(h+1) + ' DAP max (Gy.m^2)',
+            'G' + str(h+1) + ' DAP mean (Gy.m^2)',
+            'G' + str(h+1) + ' Angle min',
+            'G' + str(h+1) + ' Angle max',
+            'G' + str(h+1) + ' Angle mean',
+            ]
+    wsalldata.write_row('A1', alldataheaders)
+    numcolumns = (16 * num_groups_max + 14 - 1
+    numrows = e.count()
+    wsalldata.autofilter(0,0,numrows,numcolumns)
+
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
