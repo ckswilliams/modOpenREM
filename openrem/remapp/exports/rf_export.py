@@ -373,47 +373,61 @@ def rfxlsx(filterdict):
         angle_range = 5.0 #plus or minus range considered to be the same position
         studyiuid = exams.study_instance_uid
         inst = Irradiation_event_xray_data.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
-        angle = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
-        protocol = inst[0].acquisition_protocol
-        #TODO need to make field size an optional filter as it isn't a DICOM field.
-        fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
-        similarexposures = inst.filter(
-            irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(pos1) - angle_range, float(pos1) + angle_range)
-        ).filter(
-            acquisition_protocol__exact = protocol
-        ).filter(
-            irradiation_event_xray_source_data__ii_field_size__exact = fieldsize
-        )
 
-        dap = similarexposures.all().aggregate(
-            Min('irradiation_event_xray_data__dose_area_product'),
-            Max('irradiation_event_xray_data__dose_area_product'),
-            Avg('irradiation_event_xray_data__dose_area_product'))
-        kvp = similarexposures.all().aggregate(
-            Min('irradiation_event_xray_data__irradiation_event_xray_source_data__kvp__kvp'),
-            Max('irradiation_event_xray_data__irradiation_event_xray_source_data__kvp__kvp'),
-            Avg('irradiation_event_xray_data__irradiation_event_xray_source_data__kvp__kvp'))
-        tube_current = similarexposures.all().aggregate(
-            Min('irradiation_event_xray_data__irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
-            Max('irradiation_event_xray_data__irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
-            Avg('irradiation_event_xray_data__irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'))
-        exp_time = similarexposures.all().aggregate(
-            Min('irradiation_event_xray_data__irradiation_event_xray_source_data__exposure_time'),
-            Max('irradiation_event_xray_data__irradiation_event_xray_source_data__exposure_time'),
-            Avg('irradiation_event_xray_data__irradiation_event_xray_source_data__exposure_time'))
+        while inst:
+            angle0 = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
+            protocol = inst[0].acquisition_protocol
+            #TODO need to make field size an optional filter as it isn't a DICOM field.
+            fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
+            similarexposures = inst.filter(
+                irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle0) - angle_range, float(angle0) + angle_range),
+                acquisition_protocol__exact = protocol,
+                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize)
+            inst = inst.exclude(
+                irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle0) - angle_range, float(angle0) + angle_range),
+                acquisition_protocol__exact = protocol,
+                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize)
 
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+            angle = similarexposures.all().aggregate(
+                Min('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
+                Max('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
+                Avg('irradiation_event_xray_mechanical_data__positioner_primary_angle'))
+            dap = similarexposures.all().aggregate(
+                Min('dose_area_product'),
+                Max('dose_area_product'),
+                Avg('dose_area_product'))
+            kvp = similarexposures.all().aggregate(
+                Min('irradiation_event_xray_source_data__kvp__kvp'),
+                Max('irradiation_event_xray_source_data__kvp__kvp'),
+                Avg('irradiation_event_xray_source_data__kvp__kvp'))
+            tube_current = similarexposures.all().aggregate(
+                Min('irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
+                Max('irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
+                Avg('irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'))
+            exp_time = similarexposures.all().aggregate(
+                Min('irradiation_event_xray_source_data__exposure_time'),
+                Max('irradiation_event_xray_source_data__exposure_time'),
+                Avg('irradiation_event_xray_source_data__exposure_time'))
+
             examdata += [
-                s.acquisition_protocol,
-                str(s.image_view),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
-                str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
-                str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
-                str(s.dose_area_product),
-                ]
+                protocol,
+                str(kvp['irradiation_event_xray_source_data__kvp__kvp__min']),
+                str(kvp['irradiation_event_xray_source_data__kvp__kvp__max']),
+                str(kvp['irradiation_event_xray_source_data__kvp__kvp__avg']),
+                str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__min']),
+                str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__max']),
+                str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__avg']),
+                str(exp_time['irradiation_event_xray_source_data__exposure_time__min']),
+                str(exp_time['irradiation_event_xray_source_data__exposure_time__max']),
+                str(exp_time['irradiation_event_xray_source_data__exposure_time__avg']),
+                str(dap['dose_area_product__min']),
+                str(dap['dose_area_product__max']),
+                str(dap['dose_area_product__avg']),
+                str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__min']),
+                str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__max']),
+                str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
+                str(fieldsize),
+
 
         wsalldata.write_row(row+1,0, examdata)
         
