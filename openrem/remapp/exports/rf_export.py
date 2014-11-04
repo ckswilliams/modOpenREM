@@ -203,13 +203,14 @@ def rfxlsx(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
+    from django.db.models import Max, Min, Avg
     from remapp.models import General_study_module_attributes, Irradiation_event_xray_data
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
 
     tsk = Exports.objects.create()
 
-    tsk.task_id = dxxlsx.request.id
+    tsk.task_id = rfxlsx.request.id
     tsk.modality = "DX"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
@@ -231,7 +232,7 @@ def rfxlsx(filterdict):
     # Get the data
     e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
 
-    f = DXSummaryListFilter.base_filters
+    f = RFSummaryListFilter.base_filters
 
     for filt in f:
         if filt in filterdict and filterdict[filt]:
@@ -325,7 +326,7 @@ def rfxlsx(filterdict):
     num_groups_max = 0
     for row,exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
+        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, e.count())
         tsk.save()
 
         examdata = [
@@ -405,6 +406,7 @@ def rfxlsx(filterdict):
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__max']),
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
                 str(fieldsize),
+                ]
 
         if num_groups_this_exam > num_groups_max:
             num_groups_max = num_groups_this_exam
@@ -434,9 +436,10 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Angle min',
             'G' + str(h+1) + ' Angle max',
             'G' + str(h+1) + ' Angle mean',
+            'G' + str(h+1) + ' Field size',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (16 * num_groups_max + 14 - 1
+    numcolumns = (17 * num_groups_max + 14 - 1)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
