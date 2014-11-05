@@ -34,6 +34,7 @@
     <th>Acquisition protocol</th>
     <th>View</th>
     <th>kVp</th>
+    <th>&micro;As</th>
     <th>mA</th>
     <th>Exposure time (ms)</th>
     <th>Exposure index</th>
@@ -46,6 +47,7 @@
         <td>{{ event.acquisition_protocol }}</td>
         <td>{{ event.image_view }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
+        <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_set.get.exposure }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.average_xray_tube_current|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_time|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:0 }}</td>
