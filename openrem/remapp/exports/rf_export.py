@@ -357,18 +357,21 @@ def rfxlsx(filterdict):
             angle0 = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
             protocol = inst[0].acquisition_protocol
             pulse_rate = inst[0].irradiation_event_xray_source_data_set.get().pulse_rate
+            event_type = inst[0].irradiation_event_type.code_meaning
             #TODO need to make field size an optional filter as it isn't a DICOM field.
             fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
             similarexposures = inst.filter(
                 irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle0) - angle_range, float(angle0) + angle_range),
                 acquisition_protocol__exact = protocol,
                 irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
-                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate)
+                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate,
+                irradiation_event_type__code_meaning__exact = event_type)
             inst = inst.exclude(
                 irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle0) - angle_range, float(angle0) + angle_range),
                 acquisition_protocol__exact = protocol,
                 irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
-                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate)
+                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate,
+                irradiation_event_type__code_meaning__exact = event_type)
 
             angle = similarexposures.all().aggregate(
                 Min('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
@@ -396,6 +399,7 @@ def rfxlsx(filterdict):
                 Avg('irradiation_event_xray_source_data__pulse_width__pulse_width'))
 
             examdata += [
+                event_type,
                 protocol,
                 str(pulse_rate),
                 str(fieldsize),
@@ -431,6 +435,7 @@ def rfxlsx(filterdict):
 
     for h in xrange(num_groups_max):
         alldataheaders += [
+            'G' + str(h+1) + ' Type',
             'G' + str(h+1) + ' Protocol',
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
@@ -454,7 +459,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (17 * num_groups_max + 14 - 1)
+    numcolumns = (22 * num_groups_max + 14)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
