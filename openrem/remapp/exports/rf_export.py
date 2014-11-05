@@ -381,6 +381,10 @@ def rfxlsx(filterdict):
                 Min('dose_area_product'),
                 Max('dose_area_product'),
                 Avg('dose_area_product'))
+            dose_rp = similarexposures.all().aggregate(
+                Min('irradiation_event_xray_source_data__dose_rp'),
+                Max('irradiation_event_xray_source_data__dose_rp'),
+                Avg('irradiation_event_xray_source_data__dose_rp'))
             kvp = similarexposures.all().aggregate(
                 Min('irradiation_event_xray_source_data__kvp__kvp'),
                 Max('irradiation_event_xray_source_data__kvp__kvp'),
@@ -419,6 +423,9 @@ def rfxlsx(filterdict):
                 str(dap['dose_area_product__min']),
                 str(dap['dose_area_product__max']),
                 str(dap['dose_area_product__avg']),
+                str(dose_rp['irradiation_event_xray_source_data__dose_rp__min']),
+                str(dose_rp['irradiation_event_xray_source_data__dose_rp__max']),
+                str(dose_rp['irradiation_event_xray_source_data__dose_rp__avg']),
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__min']),
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__max']),
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
@@ -456,12 +463,15 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' DAP min (Gy.m^2)',
             'G' + str(h+1) + ' DAP max (Gy.m^2)',
             'G' + str(h+1) + ' DAP mean (Gy.m^2)',
+            'G' + str(h+1) + ' Ref point dose min (Gy)',
+            'G' + str(h+1) + ' Ref point dose max (Gy)',
+            'G' + str(h+1) + ' Ref point dose mean (Gy)',
             'G' + str(h+1) + ' Angle min',
             'G' + str(h+1) + ' Angle max',
             'G' + str(h+1) + ' Angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (23 * num_groups_max + 14)
+    numcolumns = (26 * num_groups_max + 14)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
