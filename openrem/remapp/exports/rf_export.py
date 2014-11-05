@@ -356,16 +356,19 @@ def rfxlsx(filterdict):
             num_groups_this_exam += 1
             angle0 = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
             protocol = inst[0].acquisition_protocol
+            pulse_rate = inst[0].irradiation_event_xray_source_data_set.get().pulse_rate
             #TODO need to make field size an optional filter as it isn't a DICOM field.
             fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
             similarexposures = inst.filter(
                 irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle0) - angle_range, float(angle0) + angle_range),
                 acquisition_protocol__exact = protocol,
-                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize)
+                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
+                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate)
             inst = inst.exclude(
                 irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle0) - angle_range, float(angle0) + angle_range),
                 acquisition_protocol__exact = protocol,
-                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize)
+                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
+                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate)
 
             angle = similarexposures.all().aggregate(
                 Min('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
@@ -387,15 +390,24 @@ def rfxlsx(filterdict):
                 Min('irradiation_event_xray_source_data__exposure_time'),
                 Max('irradiation_event_xray_source_data__exposure_time'),
                 Avg('irradiation_event_xray_source_data__exposure_time'))
+            puse_width = similarexposures.all().aggregate(
+                Min('irradiation_event_xray_source_data__pulse_width__pulse_width'),
+                Max('irradiation_event_xray_source_data__pulse_width__pulse_width'),
+                Avg('irradiation_event_xray_source_data__pulse_width__pulse_width'))
 
             examdata += [
                 protocol,
+                str(pulse_rate),
+                str(fieldsize),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__min']),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__max']),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__avg']),
                 str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__min']),
                 str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__max']),
                 str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__avg']),
+                str(pulse_width['irradiation_event_xray_source_data__pulse_width__pulse_width__min']),
+                str(pulse_width['irradiation_event_xray_source_data__pulse_width__pulse_width__max']),
+                str(pulse_width['irradiation_event_xray_source_data__pulse_width__pulse_width__avg']),
                 str(exp_time['irradiation_event_xray_source_data__exposure_time__min']),
                 str(exp_time['irradiation_event_xray_source_data__exposure_time__max']),
                 str(exp_time['irradiation_event_xray_source_data__exposure_time__avg']),
@@ -405,7 +417,6 @@ def rfxlsx(filterdict):
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__min']),
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__max']),
                 str(angle['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
-                str(fieldsize),
                 ]
 
         if num_groups_this_exam > num_groups_max:
@@ -421,12 +432,17 @@ def rfxlsx(filterdict):
     for h in xrange(num_groups_max):
         alldataheaders += [
             'G' + str(h+1) + ' Protocol',
+            'G' + str(h+1) + ' Pulse rate',
+            'G' + str(h+1) + ' Field size',
             'G' + str(h+1) + ' kVp min',
             'G' + str(h+1) + ' kVp max',
             'G' + str(h+1) + ' kVp mean',
             'G' + str(h+1) + ' mA min',
             'G' + str(h+1) + ' mA max',
             'G' + str(h+1) + ' mA mean',
+            'G' + str(h+1) + ' pulse width min',
+            'G' + str(h+1) + ' pulse width max',
+            'G' + str(h+1) + ' pulse width mean',
             'G' + str(h+1) + ' Exp time min (ms)',
             'G' + str(h+1) + ' Exp time max (ms)',
             'G' + str(h+1) + ' Exp time mean (ms)',
@@ -436,7 +452,6 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Angle min',
             'G' + str(h+1) + ' Angle max',
             'G' + str(h+1) + ' Angle mean',
-            'G' + str(h+1) + ' Field size',
             ]
     wsalldata.write_row('A1', alldataheaders)
     numcolumns = (17 * num_groups_max + 14 - 1)
