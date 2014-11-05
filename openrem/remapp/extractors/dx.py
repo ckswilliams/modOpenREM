@@ -76,6 +76,7 @@ def _exposure(dataset,source):
     exp = Exposure.objects.create(irradiation_event_xray_source_data=source)
     from remapp.tools.get_values import get_value_kw
     exp.exposure = get_value_kw('ExposureInuAs',dataset) # uAs
+    if not exp.exposure: exp.exposure = get_value_num(0x00181152,dataset) * 1000
     exp.save()
 
 
