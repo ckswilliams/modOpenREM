@@ -222,6 +222,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.date_time_started = make_date_time('{0}{1}'.format(event_date,event_time))
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_value_num(0x0008103e,dataset)
     event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
@@ -347,7 +348,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 
 
 def _generalstudymoduleattributes(dataset,g):
-    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
+    from remapp.tools.get_values import get_value_kw, get_value_num, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
@@ -363,6 +364,7 @@ def _generalstudymoduleattributes(dataset,g):
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
     g.operator_name = get_value_kw('OperatorName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_num(0x0008103e,dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
     g.save()
