@@ -363,24 +363,34 @@ def rfxlsx(filterdict):
             filter_thick = inst[0].irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum
             #TODO need to make field size an optional filter as it isn't a DICOM field.
             fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
+
             similarexposures = inst.filter(
-                irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle1) - angle_range, float(angle1) + angle_range),
-                irradiation_event_xray_mechanical_data__positioner_secondary_angle__range=(float(angle2) - angle_range, float(angle2) + angle_range),
-                acquisition_protocol__exact = protocol,
-                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
-                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate,
-                irradiation_event_xray_source_data__xray_filters__xray_filter_material__code_meaning__exact = filter_material,
-                irradiation_event_xray_source_data__xray_filters__xray_filter_thickness_maximum__exact = filter_thick,
-                irradiation_event_type__code_meaning__exact = event_type)
-            inst = inst.exclude(
-                irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle1) - angle_range, float(angle1) + angle_range),
-                irradiation_event_xray_mechanical_data__positioner_secondary_angle__range=(float(angle2) - angle_range, float(angle2) + angle_range),
-                acquisition_protocol__exact = protocol,
-                irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
-                irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate,
-                irradiation_event_xray_source_data__xray_filters__xray_filter_material__code_meaning__exact = filter_material,
-                irradiation_event_xray_source_data__xray_filters__xray_filter_thickness_maximum__exact = filter_thick,
-                irradiation_event_type__code_meaning__exact = event_type)
+                irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle1) - angle_range, float(angle1) + angle_range))
+            if angle2:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_xray_mechanical_data__positioner_secondary_angle__range=(float(angle2) - angle_range, float(angle2) + angle_range))
+            if protocol:
+                similarexposures = similarexposures.filter(
+                    acquisition_protocol__exact = protocol)
+            if fieldsize:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_xray_source_data__ii_field_size__exact = fieldsize)
+            if pulse_rate:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate)
+            if filter_material:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_xray_source_data__xray_filters__xray_filter_material__code_meaning__exact = filter_material)
+            if filter_thick:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_xray_source_data__xray_filters__xray_filter_thickness_maximum__exact = filter_thick)
+            if event_type:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_type__code_meaning__exact = event_type)
+
+            # Remove exposures included in this group from inst
+            exposures_to_exclude = [o.irradiation_event_uid for o in similarexposures]
+            inst = inst.exclude(irradiation_event_uid__in = exposures_to_exclude)
 
             angle1 = similarexposures.all().aggregate(
                 Min('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
