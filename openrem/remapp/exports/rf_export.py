@@ -359,6 +359,8 @@ def rfxlsx(filterdict):
             protocol = inst[0].acquisition_protocol
             pulse_rate = inst[0].irradiation_event_xray_source_data_set.get().pulse_rate
             event_type = inst[0].irradiation_event_type.code_meaning
+            filter_material = inst[0].irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material.code_meaning
+            filter_thick = inst[0].irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum
             #TODO need to make field size an optional filter as it isn't a DICOM field.
             fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
             similarexposures = inst.filter(
@@ -367,6 +369,8 @@ def rfxlsx(filterdict):
                 acquisition_protocol__exact = protocol,
                 irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
                 irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate,
+                irradiation_event_xray_source_data__xray_filters__xray_filter_material__code_meaning__exact = filter_material,
+                irradiation_event_xray_source_data__xray_filters__xray_filter_thickness_maximum__exact = filter_thick,
                 irradiation_event_type__code_meaning__exact = event_type)
             inst = inst.exclude(
                 irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle1) - angle_range, float(angle1) + angle_range),
@@ -374,6 +378,8 @@ def rfxlsx(filterdict):
                 acquisition_protocol__exact = protocol,
                 irradiation_event_xray_source_data__ii_field_size__exact = fieldsize,
                 irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate,
+                irradiation_event_xray_source_data__xray_filters__xray_filter_material__code_meaning__exact = filter_material,
+                irradiation_event_xray_source_data__xray_filters__xray_filter_thickness_maximum__exact = filter_thick,
                 irradiation_event_type__code_meaning__exact = event_type)
 
             angle1 = similarexposures.all().aggregate(
@@ -415,6 +421,8 @@ def rfxlsx(filterdict):
                 str(similarexposures.count()),
                 str(pulse_rate),
                 str(fieldsize),
+                filter_material,
+                str(filter_thick),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__min']),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__max']),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__avg']),
@@ -458,6 +466,8 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' No. exposures',
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
+            'G' + str(h+1) + ' Filter material',
+            'G' + str(h+1) + ' Filter thickness',
             'G' + str(h+1) + ' kVp min',
             'G' + str(h+1) + ' kVp max',
             'G' + str(h+1) + ' kVp mean',
@@ -484,7 +494,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (26 * num_groups_max + 14)
+    numcolumns = (28 * num_groups_max + 14)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
