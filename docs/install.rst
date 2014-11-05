@@ -78,12 +78,12 @@ For either install, just follow the defaults – no special configurations requi
 Install and configure OpenREM
 =============================
 
-Install
---------
+Install latest beta version
+---------------------------
 
 .. sourcecode:: bash
 
-    pip install openrem
+    pip install --pre openrem==0.5.0b1
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -164,7 +164,9 @@ will be used in the URL in the web browser. For example::
     ]
 
 A dot before a hostname allows for subdomains (eg www.doseserver), a dot
-after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk)
+after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
+Alternatively, a single ``'*'`` allows any host, but removes the security
+the feature gives you.
 
 Create the database
 -------------------
