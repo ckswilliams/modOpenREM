@@ -390,7 +390,7 @@ def rfxlsx(filterdict):
                 Min('irradiation_event_xray_source_data__exposure_time'),
                 Max('irradiation_event_xray_source_data__exposure_time'),
                 Avg('irradiation_event_xray_source_data__exposure_time'))
-            puse_width = similarexposures.all().aggregate(
+            pulse_width = similarexposures.all().aggregate(
                 Min('irradiation_event_xray_source_data__pulse_width__pulse_width'),
                 Max('irradiation_event_xray_source_data__pulse_width__pulse_width'),
                 Avg('irradiation_event_xray_source_data__pulse_width__pulse_width'))
