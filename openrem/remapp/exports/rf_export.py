@@ -211,7 +211,7 @@ def rfxlsx(filterdict):
     tsk = Exports.objects.create()
 
     tsk.task_id = rfxlsx.request.id
-    tsk.modality = "DX"
+    tsk.modality = "RF"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
@@ -401,6 +401,7 @@ def rfxlsx(filterdict):
             examdata += [
                 event_type,
                 protocol,
+                str(similarexposures.count()),
                 str(pulse_rate),
                 str(fieldsize),
                 str(kvp['irradiation_event_xray_source_data__kvp__kvp__min']),
@@ -437,6 +438,7 @@ def rfxlsx(filterdict):
         alldataheaders += [
             'G' + str(h+1) + ' Type',
             'G' + str(h+1) + ' Protocol',
+            'G' + str(h+1) + ' No. exposures',
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
             'G' + str(h+1) + ' kVp min',
@@ -459,7 +461,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * num_groups_max + 14)
+    numcolumns = (23 * num_groups_max + 14)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
