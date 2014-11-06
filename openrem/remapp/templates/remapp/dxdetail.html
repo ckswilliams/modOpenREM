@@ -47,13 +47,13 @@
         <td>{{ event.acquisition_protocol }}</td>
         <td>{{ event.image_view }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
-        <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_set.get.convert_uAs_to_mAs }}</td>
+        <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.average_xray_tube_current|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_time|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_detector_data_set.get.relative_xray_exposure|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_control_mode }}</td>
-        <td>{{ event.convert_gym2_to_cgycm2 | floatformat:3 }}</td>
+        <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
     </tr>
     {% endfor %}
 </table>
