@@ -278,8 +278,15 @@ def rfxlsx(filterdict):
         'Test patient?',
         'Study description',
         'Requested procedure',
-        'Number of events',
         'DAP total (Gy.m^2)',
+        'Dose RP total',
+        'Fluoro DAP total',
+        'Fluoro dose RP total',
+        'Fluoro time total',
+        'Acquisition DAP total',
+        'Acquisition dose RP total',
+        'Acquisition time total',
+        'Number of events',
         ]
     protocolheaders = commonheaders + [
         'Protocol',
@@ -353,8 +360,16 @@ def rfxlsx(filterdict):
             exams.patient_module_attributes_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_rp_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_area_product_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_rp_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_fluoro_time),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_area_product_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_rp_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_acquisition_time),
+            str(exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
             ]
 
         angle_range = 5.0 #plus or minus range considered to be the same position
@@ -515,7 +530,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (28 * num_groups_max + 14)
+    numcolumns = (28 * num_groups_max + 21)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
