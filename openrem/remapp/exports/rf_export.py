@@ -189,6 +189,16 @@ def rfcsv(filterdict):
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
+def get_db_value(qs, location):
+    """Get value from database, testing to see if it exists
+    
+    """
+    try:
+        v = getattr(qs, location)
+        return v
+    except:
+        pass
+
 @shared_task
 def rfxlsx(filterdict):
     """Export filtered RF database data to multi-sheet Microsoft XSLX files.
@@ -354,21 +364,22 @@ def rfxlsx(filterdict):
         num_groups_this_exam = 0
         while inst:
             num_groups_this_exam += 1
-            angle1 = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle
-            angle2 = inst[0].irradiation_event_xray_mechanical_data_set.get().positioner_secondary_angle
-            protocol = inst[0].acquisition_protocol
-            pulse_rate = inst[0].irradiation_event_xray_source_data_set.get().pulse_rate
-            event_type = inst[0].irradiation_event_type.code_meaning
-            filter_material = inst[0].irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material.code_meaning
-            filter_thick = inst[0].irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum
-            #TODO need to make field size an optional filter as it isn't a DICOM field.
-            fieldsize = inst[0].irradiation_event_xray_source_data_set.get().ii_field_size
+            anglei = get_db_value(get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
+            angleii = get_db_value(get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
+            protocol = get_db_value(inst[0], "acquisition_protocol")
+            pulse_rate = get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "pulse_rate")
+            event_type = get_db_value(get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
+            filter_material = get_db_value(get_db_value(get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
+            filter_thick = get_db_value(get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
+            fieldsize = get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "ii_field_size")
 
-            similarexposures = inst.filter(
-                irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(angle1) - angle_range, float(angle1) + angle_range))
-            if angle2:
+            similarexposures = inst
+            if anglei:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_mechanical_data__positioner_secondary_angle__range=(float(angle2) - angle_range, float(angle2) + angle_range))
+                    irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
+            if angleii:
+                similarexposures = similarexposures.filter(
+                    irradiation_event_xray_mechanical_data__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
             if protocol:
                 similarexposures = similarexposures.filter(
                     acquisition_protocol__exact = protocol)
