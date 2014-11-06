@@ -359,6 +359,7 @@ def _generalstudymoduleattributes(dataset,g):
     g.study_id = get_value_kw('StudyID',dataset)
     g.accession_number = get_value_kw('AccessionNumber',dataset)
     g.study_description = get_value_kw('StudyDescription',dataset)
+    if not g.study_description: g.study_description = get_value_kw('SeriesDescription',dataset)
     g.modality_type = get_value_kw('Modality',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
