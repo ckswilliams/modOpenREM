@@ -281,6 +281,11 @@ class Exposure(models.Model): # EV 113736
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
     exposure = models.DecimalField(max_digits=16,decimal_places=2,blank=True,null=True)
 
+    def convert_uAs_to_mAs(self):
+        """Converts uAs to mAs for display in web interface    
+        """
+        return self.exposure / 1000
+
 class Xray_filters(models.Model): # EV 113771
     """Container in TID 10003b. Code value 113771
     """
