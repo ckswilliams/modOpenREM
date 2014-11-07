@@ -112,7 +112,7 @@ def rfcsv(filterdict):
         'Requested procedure',
         'Number of events',
         'DAP total (Gy.m^2)',
-        ]
+    ]
 
     from django.db.models import Max
     max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
@@ -127,7 +127,7 @@ def rfcsv(filterdict):
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (Gy.m^2)',
-            ]
+        ]
     writer.writerow(headers)
 
     tsk.progress = 'CSV header row written.'
@@ -192,6 +192,7 @@ def rfcsv(filterdict):
 def get_db_value(qs, location):
     """Get value from database, testing to see if it exists
     
+    :rtype : attribute or queryset
     """
     try:
         v = getattr(qs, location)
@@ -483,7 +484,7 @@ def rfxlsx(filterdict):
                 str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__min']),
                 str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__max']),
                 str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__avg']),
-                ]
+            ]
 
         if num_groups_this_exam > num_groups_max:
             num_groups_max = num_groups_this_exam
@@ -530,7 +531,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (28 * num_groups_max + 21)
+    numcolumns = (31 * num_groups_max + 23)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
