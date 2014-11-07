@@ -231,7 +231,18 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
             event.laterality = get_or_create_cid('G-A100','Right')
         if laterality.strip() == 'L':
             event.laterality = get_or_create_cid('G-A101','Left')
+
     event.image_view = get_or_create_cid(get_seq_code_value('ViewCodeSequence',dataset),get_seq_code_meaning('ViewCodeSequence',dataset))
+    if not event.image_view:
+        projection = get_value_kw('ViewPosition',dataset)
+        if   projection == 'AP': event.image_view = get_or_create_cid('R-10206','antero-posterior')
+        elif projection == 'PA': event.image_view = get_or_create_cid('R-10214','postero-anterior')
+        elif projection == 'LL': event.image_view = get_or_create_cid('R-10236','left lateral')
+        elif projection == 'RL': event.image_view = get_or_create_cid('R-10232','right lateral')
+        # http://dicomlookup.com/lookup.asp?sw=Tnumber&q=(0018,5101) lists four other views: RLD (Right Lateral Decubitus),
+        # LLD (Left Lateral Decubitus), RLO (Right Lateral Oblique) and LLO (Left Lateral Oblique). There isn't an exact
+        # match for these views in the CID 4010 DX View (http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4010.html)
+
     # image view modifier?
     if event.anatomical_structure:
         event.target_region = event.anatomical_structure
