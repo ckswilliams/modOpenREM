@@ -74,9 +74,9 @@ def _kvp(dataset,source):
 def _exposure(dataset,source):
     from remapp.models import Exposure
     exp = Exposure.objects.create(irradiation_event_xray_source_data=source)
-    from remapp.tools.get_values import get_value_kw, get_value_num
+    from remapp.tools.get_values import get_value_kw
     exp.exposure = get_value_kw('ExposureInuAs',dataset) # uAs
-    if not exp.exposure: exp.exposure = get_value_num(0x00181152,dataset) * 1000
+    if not exp.exposure: exp.exposure = get_value_kw('Exposure',dataset) * 1000
     exp.save()
 
 
@@ -209,7 +209,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     from remapp.models import Irradiation_event_xray_data
-    from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
+    from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
     event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
@@ -223,7 +223,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.date_time_started = make_date_time('{0}{1}'.format(event_date,event_time))
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
-    if not event.acquisition_protocol: event.acquisition_protocol = get_value_num(0x0008103e,dataset)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
     event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
@@ -254,7 +254,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
     event.comment = get_value_kw('ExposureControlModeDescription',dataset)
 
-    dap = get_value_num(0x0018115e,dataset)
+    dap = get_value_kw('ImageAndFluoroscopyAreaDoseProduct',dataset)
     if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
     
@@ -360,7 +360,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 
 
 def _generalstudymoduleattributes(dataset,g):
-    from remapp.tools.get_values import get_value_kw, get_value_num, get_seq_code_meaning, get_seq_code_value
+    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
@@ -370,13 +370,14 @@ def _generalstudymoduleattributes(dataset,g):
     g.study_id = get_value_kw('StudyID',dataset)
     g.accession_number = get_value_kw('AccessionNumber',dataset)
     g.study_description = get_value_kw('StudyDescription',dataset)
+    if not g.study_description: g.study_description = get_value_kw('SeriesDescription',dataset)
     g.modality_type = get_value_kw('Modality',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
     g.operator_name = get_value_kw('OperatorName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
-    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_num(0x0008103e,dataset)
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
     g.save()
