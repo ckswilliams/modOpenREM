@@ -1,4 +1,4 @@
-OpenREM Release Notes version 0.5.0b1
+OpenREM Release Notes version 0.5.0b2
 *************************************
 
 Headline changes
@@ -39,7 +39,7 @@ Upgrading from version 0.4.3
 ````````````````````````````
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.5.0b1
+    pip install --pre openrem==0.5.0b2
 
 (Will need ``sudo`` or equivalent if using linux without a virtualenv)
 
@@ -67,7 +67,7 @@ If you are using the built-in test web server (`not for production use`)::
 Otherwise restart using the command for your web server
 
 Restart the Celery task queue
-```````````````````````````
+`````````````````````````````
 
 For testing, in a new shell: *(assuming no virtualenv)*
 
