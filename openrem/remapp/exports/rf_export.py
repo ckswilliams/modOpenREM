@@ -370,8 +370,7 @@ def rfxlsx(filterdict):
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_rp_total),
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_acquisition_time),
             str(exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-            ]
+        ]
 
         angle_range = 5.0 #plus or minus range considered to be the same position
         studyiuid = exams.study_instance_uid
@@ -531,7 +530,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (31 * num_groups_max + 23)
+    numcolumns = (31 * num_groups_max + 22 - 1)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
