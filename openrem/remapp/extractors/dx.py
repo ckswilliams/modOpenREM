@@ -76,6 +76,7 @@ def _exposure(dataset,source):
     exp = Exposure.objects.create(irradiation_event_xray_source_data=source)
     from remapp.tools.get_values import get_value_kw
     exp.exposure = get_value_kw('ExposureInuAs',dataset) # uAs
+    if not exp.exposure: exp.exposure = get_value_kw('Exposure',dataset) * 1000
     exp.save()
 
 
@@ -208,7 +209,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     from remapp.models import Irradiation_event_xray_data
-    from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
+    from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
     event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
@@ -222,6 +223,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.date_time_started = make_date_time('{0}{1}'.format(event_date,event_time))
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
     event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
@@ -229,7 +231,18 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
             event.laterality = get_or_create_cid('G-A100','Right')
         if laterality.strip() == 'L':
             event.laterality = get_or_create_cid('G-A101','Left')
+
     event.image_view = get_or_create_cid(get_seq_code_value('ViewCodeSequence',dataset),get_seq_code_meaning('ViewCodeSequence',dataset))
+    if not event.image_view:
+        projection = get_value_kw('ViewPosition',dataset)
+        if   projection == 'AP': event.image_view = get_or_create_cid('R-10206','antero-posterior')
+        elif projection == 'PA': event.image_view = get_or_create_cid('R-10214','postero-anterior')
+        elif projection == 'LL': event.image_view = get_or_create_cid('R-10236','left lateral')
+        elif projection == 'RL': event.image_view = get_or_create_cid('R-10232','right lateral')
+        # http://dicomlookup.com/lookup.asp?sw=Tnumber&q=(0018,5101) lists four other views: RLD (Right Lateral Decubitus),
+        # LLD (Left Lateral Decubitus), RLO (Right Lateral Oblique) and LLO (Left Lateral Oblique). There isn't an exact
+        # match for these views in the CID 4010 DX View (http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4010.html)
+
     # image view modifier?
     if event.anatomical_structure:
         event.target_region = event.anatomical_structure
@@ -241,7 +254,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
     event.comment = get_value_kw('ExposureControlModeDescription',dataset)
 
-    dap = get_value_num(0x0018115e,dataset)
+    dap = get_value_kw('ImageAndFluoroscopyAreaDoseProduct',dataset)
     if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
     
@@ -357,12 +370,14 @@ def _generalstudymoduleattributes(dataset,g):
     g.study_id = get_value_kw('StudyID',dataset)
     g.accession_number = get_value_kw('AccessionNumber',dataset)
     g.study_description = get_value_kw('StudyDescription',dataset)
+    if not g.study_description: g.study_description = get_value_kw('SeriesDescription',dataset)
     g.modality_type = get_value_kw('Modality',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
     g.operator_name = get_value_kw('OperatorName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
     g.save()

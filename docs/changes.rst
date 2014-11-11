@@ -2,9 +2,11 @@
 OpenREM version history
 =======================
 
-0.5.0b1 (2014-10-24)
-----------------
+0.5.0b2 (2014-11-11)
+--------------------
 
+* Pull request from DJ Platten: Improved display of DX data and improved export of DX data
+* `#127`_  DX IOD studies with image view populated failed to export due to lack of conversion to string
 * `#126`_  Documentation created for the radiographic functionality
 * `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
 * `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs

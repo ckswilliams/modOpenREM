@@ -191,8 +191,7 @@ class Irradiation_event_xray_data(models.Model): # TID 10003
     def __unicode__(self):
         return self.irradiation_event_uid
     def convert_gym2_to_cgycm2(self): # not used anywhere?
-        return 1000000*self.dose_area_product
-
+        if self.dose_area_product: return 1000000*self.dose_area_product
     
 class Image_view_modifier(models.Model): # EV 111032
     """Table to hold image view modifiers for the irradiation event xray data table
@@ -281,6 +280,11 @@ class Exposure(models.Model): # EV 113736
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
     exposure = models.DecimalField(max_digits=16,decimal_places=2,blank=True,null=True)
 
+    def convert_uAs_to_mAs(self):
+        """Converts uAs to mAs for display in web interface    
+        """
+        if self.exposure: return self.exposure / 1000
+
 class Xray_filters(models.Model): # EV 113771
     """Container in TID 10003b. Code value 113771
     """
@@ -357,7 +361,8 @@ class Accumulated_projection_xray_dose(models.Model): # TID 10004
     def convert_gym2_to_cgycm2(self):
         """Converts Gy.m2 to cGy.cm2 for display in web interface    
         """
-        return 1000000*self.dose_area_product_total
+        if self.dose_area_product_total:
+            return 1000000*self.dose_area_product_total
     
 #    def _convert_to_cgycm2(self,dap):
 #        dap = dap*1000000 # Gym2 to uGym2 = cGycm2
