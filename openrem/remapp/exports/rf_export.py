@@ -189,7 +189,33 @@ def rfcsv(filterdict):
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
-def get_db_value(qs, location):
+def _create_sheets(protocolslist):
+    """
+    Creates sheets from sanitised versions of the protocol names
+
+    :param protocolslist: List of protocols
+    :return:sheetlist - Dictionary of sheet names and a list of the protocol names that they correspond to
+    """
+    sheetlist = {}
+    for protocol in protocolslist:
+        tabtext = protocol.lower().replace(" ","_")
+        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
+        tabtext = tabtext.translate(translation_table) # remove illegal characters
+        tabtext = tabtext[:31]
+        if tabtext not in sheetlist:
+            sheetlist[tabtext] = {
+                'sheet': book.add_worksheet(tabtext),
+                'count':0,
+                'protocolname':[protocol]}
+            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
+            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
+        else:
+            if protocol not in sheetlist[tabtext]['protocolname']:
+                sheetlist[tabtext]['protocolname'].append(protocol)
+    return sheetlist
+
+
+def _get_db_value(qs, location):
     """Get value from database, testing to see if it exists
     
     :rtype : attribute or queryset
@@ -305,7 +331,6 @@ def rfxlsx(filterdict):
     tsk.progress = 'Generating list of protocols in the dataset...'
     tsk.save()
 
-    sheetlist = {}
     protocolslist = []
     for exams in e:
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
@@ -320,23 +345,7 @@ def rfxlsx(filterdict):
     tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
-    for protocol in protocolslist:
-        tabtext = protocol.lower().replace(" ","_")
-        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
-        tabtext = tabtext.translate(translation_table) # remove illegal characters
-        tabtext = tabtext[:31]
-        if tabtext not in sheetlist:
-            sheetlist[tabtext] = {
-                'sheet': book.add_worksheet(tabtext),
-                'count':0,
-                'protocolname':[protocol]}
-            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
-        else:
-            if protocol not in sheetlist[tabtext]['protocolname']:
-                sheetlist[tabtext]['protocolname'].append(protocol)
-
-
+    sheetlist = _create_sheets(protocolslist)
 
     ##################
     # All data sheet
@@ -379,14 +388,14 @@ def rfxlsx(filterdict):
         num_groups_this_exam = 0
         while inst:
             num_groups_this_exam += 1
-            anglei = get_db_value(get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
-            angleii = get_db_value(get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
-            protocol = get_db_value(inst[0], "acquisition_protocol")
-            pulse_rate = get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "pulse_rate")
-            event_type = get_db_value(get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
-            filter_material = get_db_value(get_db_value(get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
-            filter_thick = get_db_value(get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
-            fieldsize = get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "ii_field_size")
+            anglei = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
+            angleii = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
+            protocol = _get_db_value(inst[0], "acquisition_protocol")
+            pulse_rate = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "pulse_rate")
+            event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
+            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
+            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
+            fieldsize = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "ii_field_size")
 
             similarexposures = inst
             if anglei:
