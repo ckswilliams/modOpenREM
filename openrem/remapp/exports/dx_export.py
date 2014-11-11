@@ -112,7 +112,7 @@ def exportDX2excel(filterdict):
         'Study description',
         'Requested procedure',
         'Number of events',
-        'DAP total (Gy.m^2)',
+        'DAP total (cGy.cm^2)',
         ]
 
     from django.db.models import Max
@@ -123,11 +123,12 @@ def exportDX2excel(filterdict):
             'E' + str(h+1) + ' Image view',
             'E' + str(h+1) + ' Exposure control mode',
             'E' + str(h+1) + ' kVp',
+            'E' + str(h+1) + ' mAs',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
-            'E' + str(h+1) + ' DAP (Gy.m^2)',
+            'E' + str(h+1) + ' DAP (cGy.cm^2)',
             ]
     writer.writerow(headers)
 
@@ -149,7 +150,7 @@ def exportDX2excel(filterdict):
             exams.study_description,
             exams.requested_procedure_code_meaning,
             exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total,
+            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().convert_gym2_to_cgycm2(),
             ]
 
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
@@ -158,11 +159,12 @@ def exportDX2excel(filterdict):
                 s.image_view,
                 s.irradiation_event_xray_source_data_set.get().exposure_control_mode,
                 s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
+                s.irradiation_event_xray_source_data_set.get().exposure_set.get().convert_uAs_to_mAs(),
                 s.irradiation_event_xray_source_data_set.get().average_xray_tube_current,
                 s.irradiation_event_xray_source_data_set.get().exposure_time,
                 s.irradiation_event_xray_detector_data_set.get().exposure_index,
                 s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure,
-                s.dose_area_product,
+                s.convert_gym2_to_cgycm2(),
                 ]
 
         writer.writerow(examdata)
@@ -270,18 +272,19 @@ def dxxlsx(filterdict):
         'Study description',
         'Requested procedure',
         'Number of events',
-        'DAP total (Gy.m^2)',
+        'DAP total (cGy.cm^2)',
         ]
     protocolheaders = commonheaders + [
         'Protocol',
         'Image view',
         'Exposure control mode',
         'kVp',
+        'mAs',
         'mA',
         'Exposure time (ms)',
         'Exposure index',
         'Relative x-ray exposure',
-        'DAP (Gy.m^2)',
+        'DAP (cGy.cm^2)',
         ]
         
     # Generate list of protocols in queryset and create worksheets for each
@@ -338,11 +341,12 @@ def dxxlsx(filterdict):
             'E' + str(h+1) + ' Image view',
             'E' + str(h+1) + ' Exposure control mode',
             'E' + str(h+1) + ' kVp',
+            'E' + str(h+1) + ' mAs',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
-            'E' + str(h+1) + ' DAP (Gy.m^2)',
+            'E' + str(h+1) + ' DAP (cGy.cm^2)',
             ]
     wsalldata.write_row('A1', alldataheaders)
     numcolumns = (22 * max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']) + 14 - 1
@@ -369,7 +373,7 @@ def dxxlsx(filterdict):
             exams.study_description,
             exams.requested_procedure_code_meaning,
             str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().convert_gym2_to_cgycm2()),
 			]
         for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
@@ -377,11 +381,12 @@ def dxxlsx(filterdict):
                 str(s.image_view),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
                 str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
+                str(s.irradiation_event_xray_source_data_set.get().exposure_set.get().convert_uAs_to_mAs()),
                 str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_time),
                 str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
                 str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
-                str(s.dose_area_product),
+                str(s.convert_gym2_to_cgycm2()),
                 ]
 
         wsalldata.write_row(row+1,0, examdata)
@@ -413,18 +418,19 @@ def dxxlsx(filterdict):
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
                 str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().convert_gym2_to_cgycm2()),
                 ]
             examdata += [
                 s.acquisition_protocol,
                 str(s.image_view),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
                 str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
+                str(s.irradiation_event_xray_source_data_set.get().exposure_set.get().convert_uAs_to_mAs()),
                 str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
                 str(s.irradiation_event_xray_source_data_set.get().exposure_time),
                 str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
                 str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
-                str(s.dose_area_product),
+                str(s.convert_gym2_to_cgycm2()),
                 ]
 
             sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
