@@ -79,7 +79,7 @@ $(function () {
 {% endblock %}
 
 {% block toprow %}
-      {% load pagination_tags %}    
+      {% load pagination_tags %}
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
@@ -178,4 +178,57 @@ $('.datepicker').datepicker({
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
 
 <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+$(function () {
+    $('#container').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Total DAP'
+        },
+        subtitle: {
+            text: 'Not really a very useful plot'
+        },
+        xAxis: {
+            categories: [
+                   {% for exam in filter.qs %}
+                       '{{exam.procedure_code_meaning}}',
+                   {% endfor %}
+            ]
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Total DAP (cGy.cm<sup>2</sup>)'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Total DAP per procedure',
+            data: [
+                   {% for exam in filter.qs %}
+                       {{exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.convert_gym2_to_cgycm2}},
+                   {% endfor %}
+                  ]
+        }]
+    });
+});
+		</script>
+
+
 {% endblock %}
