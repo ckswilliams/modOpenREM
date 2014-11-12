@@ -547,11 +547,8 @@ def rfxlsx(filterdict):
     sheetlist = _create_sheets(book, protocolslist, protocolheaders)
 
     for tab in sheetlist:
-        print tab
         for protocol in sheetlist[tab]['protocolname']:
-            print protocol
             p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
-            print 'p has {0} events'.format(p.count())
             for event in p:
                 sheetlist[tab]['count'] += 1
                 examdata = [
