@@ -189,10 +189,11 @@ def rfcsv(filterdict):
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
-def _create_sheets(protocolslist):
+def _create_sheets(book, protocolslist, protocolheaders):
     """
     Creates sheets from sanitised versions of the protocol names
 
+    :rtype : dict
     :param protocolslist: List of protocols
     :return:sheetlist - Dictionary of sheet names and a list of the protocol names that they correspond to
     """
@@ -327,25 +328,6 @@ def rfxlsx(filterdict):
         'DAP (Gy.m^2)',
         ]
         
-    # Generate list of protocols in queryset and create worksheets for each
-    tsk.progress = 'Generating list of protocols in the dataset...'
-    tsk.save()
-
-    protocolslist = []
-    for exams in e:
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
-            if s.acquisition_protocol:
-                safeprotocol = s.acquisition_protocol
-            else:
-                safeprotocol = u'Unknown'
-            if safeprotocol not in protocolslist:
-                protocolslist.append(safeprotocol)
-    protocolslist.sort()
-
-    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
-    tsk.save()
-
-    sheetlist = _create_sheets(protocolslist)
 
     ##################
     # All data sheet
@@ -353,7 +335,7 @@ def rfxlsx(filterdict):
     num_groups_max = 0
     for row,exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, e.count())
+        tsk.progress = 'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
         tsk.save()
 
         examdata = [
@@ -544,6 +526,43 @@ def rfxlsx(filterdict):
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
         
+    # Generate list of protocols in queryset and create worksheets for each
+    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.save()
+
+    protocolslist = []
+    for exams in e:
+        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+            if s.acquisition_protocol:
+                safeprotocol = s.acquisition_protocol
+            else:
+                safeprotocol = u'Unknown'
+            if safeprotocol not in protocolslist:
+                protocolslist.append(safeprotocol)
+    protocolslist.sort()
+
+    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.save()
+
+    sheetlist = _create_sheets(book, protocolslist, protocolheaders)
+
+    for tab in sheetlist:
+        print tab
+        for protocol in sheetlist[tab]['protocolname']:
+            print protocol
+            p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
+            print 'p has {0} events'.format(p.count())
+            for event in p:
+                sheetlist[tab]['count'] += 1
+                examdata = [
+                    event.study_date,
+                    event.study_time,
+                    event.accession_number,
+                    event.study_description,
+                ]
+                sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
+
+
         # Now we need to write a sheet per series protocol for each 'exams'.
         
         #~ for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
