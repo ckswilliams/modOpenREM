@@ -227,6 +227,37 @@ def _get_db_value(qs, location):
     except:
         pass
 
+
+def _rf_common_get_data(source):
+    examdata = [
+        source.general_equipment_module_attributes_set.get().institution_name,
+        source.general_equipment_module_attributes_set.get().manufacturer,
+        source.general_equipment_module_attributes_set.get().manufacturer_model_name,
+        source.general_equipment_module_attributes_set.get().station_name,
+        source.accession_number,
+        source.operator_name,
+        source.performing_physician_name,
+        source.study_date,  # Is a date - cell needs formatting
+        str(source.patient_study_module_attributes_set.get().patient_age_decimal),
+        str(source.patient_study_module_attributes_set.get().patient_size),
+        str(source.patient_study_module_attributes_set.get().patient_weight),
+        source.patient_module_attributes_set.get().not_patient_indicator,
+        source.study_description,
+        source.requested_procedure_code_meaning,
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_rp_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_area_product_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_rp_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_fluoro_time),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_area_product_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_rp_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_acquisition_time),
+        str(source.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
+    ]
+    return examdata
+
+
+
 @shared_task
 def rfxlsx(filterdict):
     """Export filtered RF database data to multi-sheet Microsoft XSLX files.
@@ -299,6 +330,7 @@ def rfxlsx(filterdict):
         'Station name',
         'Accession number',
         'Operator',
+        'Physician',
         'Study date',
         'Patient age', 
         'Patient height', 
@@ -338,30 +370,7 @@ def rfxlsx(filterdict):
         tsk.progress = 'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
         tsk.save()
 
-        examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
-            exams.accession_number,
-            exams.operator_name,
-            exams.study_date,  # Is a date - cell needs formatting
-            str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-            str(exams.patient_study_module_attributes_set.get().patient_size),
-            str(exams.patient_study_module_attributes_set.get().patient_weight),
-            exams.patient_module_attributes_set.get().not_patient_indicator,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_rp_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_area_product_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_rp_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_fluoro_time),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_area_product_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_rp_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_acquisition_time),
-            str(exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
-        ]
+        examdata = _rf_common_get_data(exams)
 
         angle_range = 5.0 #plus or minus range considered to be the same position
         studyiuid = exams.study_instance_uid
@@ -521,7 +530,7 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (31 * num_groups_max + 22 - 1)
+    numcolumns = (31 * num_groups_max + 23 - 1)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -548,15 +557,12 @@ def rfxlsx(filterdict):
 
     for tab in sheetlist:
         for protocol in sheetlist[tab]['protocolname']:
+            tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
+            tsk.save()
             p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
             for event in p:
                 sheetlist[tab]['count'] += 1
-                examdata = [
-                    event.study_date,
-                    event.study_time,
-                    event.accession_number,
-                    event.study_description,
-                ]
+                examdata = _rf_common_get_data(event)
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
 
 
