@@ -224,7 +224,10 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
-    event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
+    try:
+        event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
+    except:
+        print "Error creating AnatomicRegionSequence. Continuing."
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
         if laterality.strip() == 'R':
