@@ -106,7 +106,7 @@ $('.datepicker').datepicker({
 <script src="{{ STATIC_URL }}js/highcharts.js"></script>
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
 
-<div id="container" style="min-width: 310px; height: 800px; margin: 0 auto"></div>
+<div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
 
 		<script type="text/javascript">
 $(function () {
@@ -130,13 +130,13 @@ $(function () {
         yAxis: {
             min: 0,
             title: {
+                useHTML: true,
                 text: 'Mean DAP (cGy.cm<sup>2</sup>)'
             }
         },
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.1f} cGy.cm^2</b></td></tr>',
+            pointFormat: '<tr><td style="padding:0"><b>{point.y:.1f} cGy.cm<sup>2</sup></b></td></tr>',
             footerFormat: '</table>',
             shared: true,
             useHTML: true
