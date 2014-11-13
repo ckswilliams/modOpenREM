@@ -77,10 +77,10 @@ def dx_summary_list_filter(request):
     #print f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='G4').aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
 
     # The following line acquires all unique acquisition protocol names
-    #print f.qs.values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct()
+    #print f.qs.values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
 
     # The following line acquires all unique acquisition protocol names, excluding any null or blank values
-    uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct()
+    uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
 
     protocolMeanDAP = [None] * len(uniqueProtocols)
     protocolNames   = [None] * len(uniqueProtocols)
