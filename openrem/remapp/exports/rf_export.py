@@ -352,19 +352,6 @@ def rfxlsx(filterdict):
     # Some prep
     commonheaders = _rf_common_headers()
 
-    protocolheaders = commonheaders + [
-        'Protocol',
-        'Image view',
-        'Exposure control mode',
-        'kVp',
-        'mA',
-        'Exposure time (ms)',
-        'Exposure index',
-        'Relative x-ray exposure',
-        'DAP (Gy.m^2)',
-        ]
-        
-
     ##################
     # All data sheet
 
@@ -557,6 +544,23 @@ def rfxlsx(filterdict):
     tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
+    protocolheaders = commonheaders + [
+        'Type',
+        'Protocol',
+        'Pulse rate',
+        'Field size',
+        'Filter material',
+        'Filter thickness',
+        'kVp',
+        'mA',
+        'Pulse width',
+        'Exposure time',
+        'DAP (cGy.cm^2)',
+        'Ref point dose (Gy)',
+        'Primary angle',
+        'Secondary angle',
+    ]
+
     sheetlist = _create_sheets(book, protocolslist, protocolheaders)
 
     for tab in sheetlist:
@@ -564,9 +568,29 @@ def rfxlsx(filterdict):
             tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
             tsk.save()
             p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
-            for event in p:
+            for event in p.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
                 sheetlist[tab]['count'] += 1
-                examdata = _rf_common_get_data(event)
+                examdata = _rf_common_get_data(event.projection_xray_radiation_dose_set.get())
+                examdata += [
+                    event.irradiation_event_type,
+                    event.acquisition_protocol,
+                    event.irradiation_event_source_data_set.get().pulserate,
+
+                    # _get_db_value(_get_db_value(event, "irradiation_event_type"), "code_meaning"),
+                    # _get_db_value(event, "acquisition_protocol"),
+                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "pulse_rate")),
+                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "ii_field_size")),
+                    # _get_db_value(_get_db_value(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning"),
+                    # str(_get_db_value(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")),
+                    # str(_get_db_value(_get_db_value((_get_db_value(event,"irradiation_event_xray_source_data_set").get(), "kvp_set").get(),"kvp"))),
+                    # str(_get_db_value(_get_db_value((_get_db_value(event,"irradiation_event_xray_source_data_set").get(), "xray_tube_current_set").get(),"xray_tube_current"))),
+                    # str(_get_db_value(_get_db_value((_get_db_value(event,"irradiation_event_xray_source_data_set").get(), "pulse_width_set").get(),"pulse_width"))),
+                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "exposure_time")),
+                    # str(_get_db_value(event, "convert_gym2_to_cgycm2()")),
+                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "dose_rp")),
+                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")),
+                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")),
+                ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
 
 
