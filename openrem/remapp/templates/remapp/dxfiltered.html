@@ -115,28 +115,28 @@ $(function () {
             type: 'column'
         },
         title: {
-            text: 'Total DAP'
+            text: 'Mean DAP per acquisition protocol'
         },
         subtitle: {
-            text: 'Not really a very useful plot'
+            text: 'A slightly useful plot'
         },
         xAxis: {
             categories: [
-                   {% for exam in filter.qs %}
-                       '{{exam.procedure_code_meaning}}',
+                   {% for testName in plotNames %}
+                       '{{testName}}',
                    {% endfor %}
             ]
         },
         yAxis: {
             min: 0,
             title: {
-                text: 'Total DAP (cGy.cm^2)'
+                text: 'Mean DAP (cGy.cm<sup>2</sup>)'
             }
         },
         tooltip: {
             headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
             pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                '<td style="padding:0"><b>{point.y:.1f} cGy.cm<sup>2</sup></b></td></tr>',
+                '<td style="padding:0"><b>{point.y:.1f} cGy.cm^2</b></td></tr>',
             footerFormat: '</table>',
             shared: true,
             useHTML: true
@@ -148,10 +148,10 @@ $(function () {
             }
         },
         series: [{
-            name: 'Total DAP per procedure',
+            name: 'Mean DAP per acquisition protocol',
             data: [
-                   {% for exam in filter.qs %}
-                       {{exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_projection_xray_dose_set.get.convert_gym2_to_cgycm2}},
+                   {% for testData in plotData %}
+                       {{testData}},
                    {% endfor %}
                   ]
         }]

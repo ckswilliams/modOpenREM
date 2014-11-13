@@ -61,11 +61,36 @@ def logout_page(request):
 @login_required
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import DXSummaryListFilter
-    from django.db.models import Q # For the Q "OR" query used for DX and CR
+    from django.db.models import Q, Avg # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     # 10/10/2014, DJP: altered the line below so that DX or CR is included
     #f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'CR'))
     f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
+
+    #The following line calculates the mean total DAP for all data in the dataset
+    #print f.qs.all().aggregate(Avg('projection_xray_radiation_dose__accumulated_djandjango djadfadsfxray_dose__accumulated_projection_xray_dose__dose_area_product_total'))
+
+    # The following line calculates the mean total DAP of all Chest PA studies
+    #print f.qs.filter(study_description='Chest PA').aggregate(Avg('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total'))
+
+    # The following line calculates the mean DAP of all individual exposures with the name "G4"
+    #print f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='G4').aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+
+    # The following line acquires all unique acquisition protocol names
+    #print f.qs.values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct()
+
+    # The following line acquires all unique acquisition protocol names, excluding any null or blank values
+    uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct()
+
+    protocolMeanDAP = [None] * len(uniqueProtocols)
+    protocolNames   = [None] * len(uniqueProtocols)
+
+    for idx, protocol in enumerate(protocolMeanDAP):
+        protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
+        protocolNames[idx]   = uniqueProtocols[idx].values()[0]
+
+    # The following line shows the mean DAP of all exposures made with the first element of the uniqueProtocol names array
+    #print f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[0].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -80,7 +105,8 @@ def dx_summary_list_filter(request):
 
     return render_to_response(
         'remapp/dxfiltered.html',
-        {'filter': f, 'admin':admin},
+        {'filter': f, 'admin':admin,
+         'plotNames': protocolNames, 'plotData': protocolMeanDAP},
         context_instance=RequestContext(request)
         )
 
