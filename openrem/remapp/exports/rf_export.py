@@ -256,6 +256,33 @@ def _rf_common_get_data(source):
     ]
     return examdata
 
+def _rf_common_headers():
+    commonheaders = [
+        'Institution',
+        'Manufacturer',
+        'Model name',
+        'Station name',
+        'Accession number',
+        'Operator',
+        'Physician',
+        'Study date',
+        'Patient age',
+        'Patient height',
+        'Patient mass (kg)',
+        'Test patient?',
+        'Study description',
+        'Requested procedure',
+        'DAP total (Gy.m^2)',
+        'Dose RP total',
+        'Fluoro DAP total',
+        'Fluoro dose RP total',
+        'Fluoro time total',
+        'Acquisition DAP total',
+        'Acquisition dose RP total',
+        'Acquisition time total',
+        'Number of events',
+        ]
+    return commonheaders
 
 
 @shared_task
@@ -323,31 +350,8 @@ def rfxlsx(filterdict):
     wsalldata.set_column('G:G', 10) # allow date to be displayed.
 
     # Some prep
-    commonheaders = [
-        'Institution', 
-        'Manufacturer', 
-        'Model name',
-        'Station name',
-        'Accession number',
-        'Operator',
-        'Physician',
-        'Study date',
-        'Patient age', 
-        'Patient height', 
-        'Patient mass (kg)', 
-        'Test patient?',
-        'Study description',
-        'Requested procedure',
-        'DAP total (Gy.m^2)',
-        'Dose RP total',
-        'Fluoro DAP total',
-        'Fluoro dose RP total',
-        'Fluoro time total',
-        'Acquisition DAP total',
-        'Acquisition dose RP total',
-        'Acquisition time total',
-        'Number of events',
-        ]
+    commonheaders = _rf_common_headers()
+
     protocolheaders = commonheaders + [
         'Protocol',
         'Image view',
