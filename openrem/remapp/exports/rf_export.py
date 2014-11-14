@@ -112,7 +112,7 @@ def rfcsv(filterdict):
         'Requested procedure',
         'Number of events',
         'DAP total (Gy.m^2)',
-        ]
+    ]
 
     from django.db.models import Max
     max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
@@ -127,7 +127,7 @@ def rfcsv(filterdict):
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (Gy.m^2)',
-            ]
+        ]
     writer.writerow(headers)
 
     tsk.progress = 'CSV header row written.'
@@ -189,15 +189,101 @@ def rfcsv(filterdict):
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
-def get_db_value(qs, location):
+def _create_sheets(book, protocolslist, protocolheaders):
+    """
+    Creates sheets from sanitised versions of the protocol names
+
+    :rtype : dict
+    :param protocolslist: List of protocols
+    :return:sheetlist - Dictionary of sheet names and a list of the protocol names that they correspond to
+    """
+    sheetlist = {}
+    for protocol in protocolslist:
+        tabtext = protocol.lower().replace(" ","_")
+        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
+        tabtext = tabtext.translate(translation_table) # remove illegal characters
+        tabtext = tabtext[:31]
+        if tabtext not in sheetlist:
+            sheetlist[tabtext] = {
+                'sheet': book.add_worksheet(tabtext),
+                'count':0,
+                'protocolname':[protocol]}
+            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
+            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
+        else:
+            if protocol not in sheetlist[tabtext]['protocolname']:
+                sheetlist[tabtext]['protocolname'].append(protocol)
+    return sheetlist
+
+
+def _get_db_value(qs, location):
     """Get value from database, testing to see if it exists
     
+    :rtype : attribute or queryset
     """
     try:
         v = getattr(qs, location)
         return v
     except:
         pass
+
+
+def _rf_common_get_data(source):
+    examdata = [
+        source.general_equipment_module_attributes_set.get().institution_name,
+        source.general_equipment_module_attributes_set.get().manufacturer,
+        source.general_equipment_module_attributes_set.get().manufacturer_model_name,
+        source.general_equipment_module_attributes_set.get().station_name,
+        source.accession_number,
+        source.operator_name,
+        source.performing_physician_name,
+        source.study_date,  # Is a date - cell needs formatting
+        str(source.patient_study_module_attributes_set.get().patient_age_decimal),
+        str(source.patient_study_module_attributes_set.get().patient_size),
+        str(source.patient_study_module_attributes_set.get().patient_weight),
+        source.patient_module_attributes_set.get().not_patient_indicator,
+        source.study_description,
+        source.requested_procedure_code_meaning,
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_rp_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_area_product_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_rp_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_fluoro_time),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_area_product_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_rp_total),
+        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_acquisition_time),
+        str(source.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
+    ]
+    return examdata
+
+def _rf_common_headers():
+    commonheaders = [
+        'Institution',
+        'Manufacturer',
+        'Model name',
+        'Station name',
+        'Accession number',
+        'Operator',
+        'Physician',
+        'Study date',
+        'Patient age',
+        'Patient height',
+        'Patient mass (kg)',
+        'Test patient?',
+        'Study description',
+        'Requested procedure',
+        'DAP total (Gy.m^2)',
+        'Dose RP total',
+        'Fluoro DAP total',
+        'Fluoro dose RP total',
+        'Fluoro time total',
+        'Acquisition DAP total',
+        'Acquisition dose RP total',
+        'Acquisition time total',
+        'Number of events',
+        ]
+    return commonheaders
+
 
 @shared_task
 def rfxlsx(filterdict):
@@ -263,114 +349,16 @@ def rfxlsx(filterdict):
     wsalldata = book.add_worksheet('All data')       
     wsalldata.set_column('G:G', 10) # allow date to be displayed.
 
-    # Some prep
-    commonheaders = [
-        'Institution', 
-        'Manufacturer', 
-        'Model name',
-        'Station name',
-        'Accession number',
-        'Operator',
-        'Study date',
-        'Patient age', 
-        'Patient height', 
-        'Patient mass (kg)', 
-        'Test patient?',
-        'Study description',
-        'Requested procedure',
-        'DAP total (Gy.m^2)',
-        'Dose RP total',
-        'Fluoro DAP total',
-        'Fluoro dose RP total',
-        'Fluoro time total',
-        'Acquisition DAP total',
-        'Acquisition dose RP total',
-        'Acquisition time total',
-        'Number of events',
-        ]
-    protocolheaders = commonheaders + [
-        'Protocol',
-        'Image view',
-        'Exposure control mode',
-        'kVp',
-        'mA',
-        'Exposure time (ms)',
-        'Exposure index',
-        'Relative x-ray exposure',
-        'DAP (Gy.m^2)',
-        ]
-        
-    # Generate list of protocols in queryset and create worksheets for each
-    tsk.progress = 'Generating list of protocols in the dataset...'
-    tsk.save()
-
-    sheetlist = {}
-    protocolslist = []
-    for exams in e:
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
-            if s.acquisition_protocol:
-                safeprotocol = s.acquisition_protocol
-            else:
-                safeprotocol = u'Unknown'
-            if safeprotocol not in protocolslist:
-                protocolslist.append(safeprotocol)
-    protocolslist.sort()
-
-    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
-    tsk.save()
-
-    for protocol in protocolslist:
-        tabtext = protocol.lower().replace(" ","_")
-        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
-        tabtext = tabtext.translate(translation_table) # remove illegal characters
-        tabtext = tabtext[:31]
-        if tabtext not in sheetlist:
-            sheetlist[tabtext] = {
-                'sheet': book.add_worksheet(tabtext),
-                'count':0,
-                'protocolname':[protocol]}
-            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
-        else:
-            if protocol not in sheetlist[tabtext]['protocolname']:
-                sheetlist[tabtext]['protocolname'].append(protocol)
-
-
-
     ##################
     # All data sheet
 
     num_groups_max = 0
     for row,exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, e.count())
+        tsk.progress = 'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
         tsk.save()
 
-        examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
-            exams.accession_number,
-            exams.operator_name,
-            exams.study_date,  # Is a date - cell needs formatting
-            str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-            str(exams.patient_study_module_attributes_set.get().patient_size),
-            str(exams.patient_study_module_attributes_set.get().patient_weight),
-            exams.patient_module_attributes_set.get().not_patient_indicator,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_rp_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_area_product_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().fluoro_dose_rp_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_fluoro_time),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_area_product_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().acquisition_dose_rp_total),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_acquisition_time),
-            str(exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-            ]
+        examdata = _rf_common_get_data(exams)
 
         angle_range = 5.0 #plus or minus range considered to be the same position
         studyiuid = exams.study_instance_uid
@@ -379,14 +367,14 @@ def rfxlsx(filterdict):
         num_groups_this_exam = 0
         while inst:
             num_groups_this_exam += 1
-            anglei = get_db_value(get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
-            angleii = get_db_value(get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
-            protocol = get_db_value(inst[0], "acquisition_protocol")
-            pulse_rate = get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "pulse_rate")
-            event_type = get_db_value(get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
-            filter_material = get_db_value(get_db_value(get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
-            filter_thick = get_db_value(get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
-            fieldsize = get_db_value(get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "ii_field_size")
+            anglei = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
+            angleii = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
+            protocol = _get_db_value(inst[0], "acquisition_protocol")
+            pulse_rate = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "pulse_rate")
+            event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
+            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
+            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
+            fieldsize = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "ii_field_size")
 
             similarexposures = inst
             if anglei:
@@ -483,7 +471,7 @@ def rfxlsx(filterdict):
                 str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__min']),
                 str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__max']),
                 str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__avg']),
-                ]
+            ]
 
         if num_groups_this_exam > num_groups_max:
             num_groups_max = num_groups_this_exam
@@ -493,7 +481,7 @@ def rfxlsx(filterdict):
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    alldataheaders = commonheaders
+    alldataheaders = _rf_common_headers()
 
     for h in xrange(num_groups_max):
         alldataheaders += [
@@ -530,11 +518,87 @@ def rfxlsx(filterdict):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (28 * num_groups_max + 21)
+    numcolumns = (31 * num_groups_max + 23 - 1)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
         
+    # Generate list of protocols in queryset and create worksheets for each
+    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.save()
+
+    protocolslist = []
+    for exams in e:
+        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+            if s.acquisition_protocol:
+                safeprotocol = s.acquisition_protocol
+            else:
+                safeprotocol = u'Unknown'
+            if safeprotocol not in protocolslist:
+                protocolslist.append(safeprotocol)
+    protocolslist.sort()
+
+    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.save()
+
+    protocolheaders = _rf_common_headers() + [
+        'Time',
+        'Type',
+        'Protocol',
+        'Pulse rate',
+        'Field size',
+        'Filter material',
+        'Filter thickness',
+        'kVp',
+        'mA',
+        'Pulse width',
+        'Exposure time',
+        'DAP (cGy.cm^2)',
+        'Ref point dose (Gy)',
+        'Primary angle',
+        'Secondary angle',
+    ]
+
+    sheetlist = _create_sheets(book, protocolslist, protocolheaders)
+
+    expInclude = [o.study_instance_uid for o in e]
+
+    for tab in sheetlist:
+        for protocol in sheetlist[tab]['protocolname']:
+            tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
+            tsk.save()
+            p_events = Irradiation_event_xray_data.objects.filter(
+                acquisition_protocol__exact = protocol
+            ).filter(
+                projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+            )
+#            p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
+            for event in p_events:
+                sheetlist[tab]['count'] += 1
+                examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
+                if event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material:
+                    filter_material = event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material.code_meaning
+                else: filter_material = None
+                examdata += [
+                    str(event.date_time_started),
+                    event.irradiation_event_type.code_meaning,
+                    event.acquisition_protocol,
+                    str(event.irradiation_event_xray_source_data_set.get().pulse_rate),
+                    str(event.irradiation_event_xray_source_data_set.get().ii_field_size),
+                    filter_material,
+                    str(event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
+                    str(event.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
+                    str(event.irradiation_event_xray_source_data_set.get().xray_tube_current_set.get().xray_tube_current),
+                    str(event.irradiation_event_xray_source_data_set.get().pulse_width_set.get().pulse_width),
+                    str(event.irradiation_event_xray_source_data_set.get().exposure_time),
+                    str(event.convert_gym2_to_cgycm2()),
+                    str(event.irradiation_event_xray_source_data_set.get().dose_rp),
+                    str(event.irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle),
+                    str(event.irradiation_event_xray_mechanical_data_set.get().positioner_secondary_angle),
+                ]
+                sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
+
+
         # Now we need to write a sheet per series protocol for each 'exams'.
         
         #~ for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
