@@ -39,7 +39,7 @@ Upgrading from version 0.4.3
 ````````````````````````````
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.5.0b2
+    pip install --pre openrem==0.5.0b3
 
 (Will need ``sudo`` or equivalent if using linux without a virtualenv)
 
