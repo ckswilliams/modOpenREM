@@ -349,9 +349,6 @@ def rfxlsx(filterdict):
     wsalldata = book.add_worksheet('All data')       
     wsalldata.set_column('G:G', 10) # allow date to be displayed.
 
-    # Some prep
-    commonheaders = _rf_common_headers()
-
     ##################
     # All data sheet
 
@@ -484,7 +481,7 @@ def rfxlsx(filterdict):
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    alldataheaders = commonheaders
+    alldataheaders = _rf_common_headers()
 
     for h in xrange(num_groups_max):
         alldataheaders += [
@@ -544,7 +541,7 @@ def rfxlsx(filterdict):
     tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
-    protocolheaders = commonheaders + [
+    protocolheaders = _rf_common_headers() + [
         'Type',
         'Protocol',
         'Pulse rate',
@@ -563,22 +560,27 @@ def rfxlsx(filterdict):
 
     sheetlist = _create_sheets(book, protocolslist, protocolheaders)
 
+    expInclude = [o.study_instance_uid for o in e]
+
     for tab in sheetlist:
         for protocol in sheetlist[tab]['protocolname']:
             tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
             tsk.save()
-            p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
-            for event in p.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+            p_events = Irradiation_event_xray_data.objects.filter(
+                acquisition_protocol__exact = protocol
+            ).filter(
+                projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+            )
+#            p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
+            for event in p_events:
                 sheetlist[tab]['count'] += 1
-                examdata = _rf_common_get_data(event.projection_xray_radiation_dose_set.get())
+                examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
                 examdata += [
-                    event.irradiation_event_type,
+                    event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
-                    event.irradiation_event_source_data_set.get().pulserate,
+                    str(event.irradiation_event_xray_source_data_set.get().pulse_rate),
+                    str(event.irradiation_event_xray_source_data_set.get().ii_field_size),
 
-                    # _get_db_value(_get_db_value(event, "irradiation_event_type"), "code_meaning"),
-                    # _get_db_value(event, "acquisition_protocol"),
-                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "pulse_rate")),
                     # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "ii_field_size")),
                     # _get_db_value(_get_db_value(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning"),
                     # str(_get_db_value(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")),
