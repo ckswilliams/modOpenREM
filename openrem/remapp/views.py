@@ -47,6 +47,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from remapp.models import General_study_module_attributes
+from numpy import *
 
 
 
@@ -60,12 +61,15 @@ def logout_page(request):
 
 @login_required
 def dx_summary_list_filter(request):
+    import numpy as np
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q, Avg # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
-    # 10/10/2014, DJP: altered the line below so that DX or CR is included
-    #f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'CR'))
+
     f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
+
+    # A test histogram
+    #histogramCounts, histogramBinEdges = np.histogram([1, 2, 1])
 
     #The following line calculates the mean total DAP for all data in the dataset
     #print f.qs.all().aggregate(Avg('projection_xray_radiation_dose__accumulated_djandjango djadfadsfxray_dose__accumulated_projection_xray_dose__dose_area_product_total'))
@@ -84,13 +88,18 @@ def dx_summary_list_filter(request):
 
     protocolMeanDAP = [None] * len(uniqueProtocols)
     protocolNames   = [None] * len(uniqueProtocols)
+    protocolHistogramCounts   = [None] * len(uniqueProtocols)
+    protocolHistogramBinEdges = [None] * len(uniqueProtocols)
 
     for idx, protocol in enumerate(protocolMeanDAP):
         protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
         protocolNames[idx]   = uniqueProtocols[idx].values()[0]
-
-    # The following line shows the mean DAP of all exposures made with the first element of the uniqueProtocol names array
-    #print f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[0].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram([1, 2, 1])
+        # I want the line below to return an array of DAP values for the given protocol. The result can then be plugged into the np.histogram line
+        # above so that the histogram is calculated on the actual data rather than dummy data.
+        test = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product').values()[0]
+        #The line below fails at the moment, probably because the test array isn't in the correct format - need to check in PyCharm.
+        #testHistogramCounts[idx], testHistogramBinEdges[idx] = np.histogram(test)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -106,7 +115,10 @@ def dx_summary_list_filter(request):
     return render_to_response(
         'remapp/dxfiltered.html',
         {'filter': f, 'admin':admin,
-         'plotNames': protocolNames, 'plotData': protocolMeanDAP},
+         'plotNames': protocolNames,
+         'plotData':  protocolMeanDAP,
+         'histogramCounts':   protocolHistogramCounts,
+         'histogramBinEdges': protocolHistogramBinEdges},
         context_instance=RequestContext(request)
         )
 
