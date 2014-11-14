@@ -94,12 +94,12 @@ def dx_summary_list_filter(request):
     for idx, protocol in enumerate(protocolMeanDAP):
         protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
         protocolNames[idx]   = uniqueProtocols[idx].values()[0]
-        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram([1, 2, 1])
-        # I want the line below to return an array of DAP values for the given protocol. The result can then be plugged into the np.histogram line
-        # above so that the histogram is calculated on the actual data rather than dummy data.
-        test = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product').values()[0]
-        #The line below fails at the moment, probably because the test array isn't in the correct format - need to check in PyCharm.
-        #testHistogramCounts[idx], testHistogramBinEdges[idx] = np.histogram(test)
+        test = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+        temp = []
+        for idx2, item in enumerate(test):
+            temp.append(float(item)*1000000)
+        
+        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(temp)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -119,6 +119,7 @@ def dx_summary_list_filter(request):
          'plotData':  protocolMeanDAP,
          'histogramCounts':   protocolHistogramCounts,
          'histogramBinEdges': protocolHistogramBinEdges},
+         #'test': test},
         context_instance=RequestContext(request)
         )
 

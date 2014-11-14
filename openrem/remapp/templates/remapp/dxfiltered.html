@@ -14,7 +14,7 @@
       </p>
 
 <p>This is a test to see how to write out the histogram data.</p>
-<p>This is the full histogramCounts variable:</p>
+<p>This is the full histogramCounts variable, containing an array per protocol:</p>
 <p>{{ histogramCounts }}</p>
 <p>This is each sub-array, written out enclosed in square brackets with each data value separated by a comma:</p>
 {% for protocol in histogramCounts %}
@@ -24,6 +24,18 @@
     {% endfor %}
     ]</p>
 {% endfor %}
+
+<p>This is the bin edge data associated with the above counts.</p>
+<p>{{ histogramBinEdges }}</p>
+<p>This is each sub-array, written out enclosed in square brackets with each data value separated by a comma:</p>
+{% for protocol in histogramBinEdges %}
+    <p>[
+    {% for dataPoint in protocol %}
+        {{ dataPoint }},
+    {% endfor %}
+    ]</p>
+{% endfor %}
+
 <p>The syntax used to create the above can be used to construct the multiple javascript arrays for the histogram plots that
 I'm going to plug in as drilldown data behind the initial column plot.</p>
 
