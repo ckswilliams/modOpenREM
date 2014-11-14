@@ -13,32 +13,6 @@
         There are {{ filter.count }} studies in this list.
       </p>
 
-<p>This is a test to see how to write out the histogram data.</p>
-<p>This is the full histogramCounts variable, containing an array per protocol:</p>
-<p>{{ histogramCounts }}</p>
-<p>This is each sub-array, written out enclosed in square brackets with each data value separated by a comma:</p>
-{% for protocol in histogramCounts %}
-    <p>[
-    {% for dataPoint in protocol %}
-        {{ dataPoint }},
-    {% endfor %}
-    ]</p>
-{% endfor %}
-
-<p>This is the bin edge data associated with the above counts.</p>
-<p>{{ histogramBinEdges }}</p>
-<p>This is each sub-array, written out enclosed in square brackets with each data value separated by a comma:</p>
-{% for protocol in histogramBinEdges %}
-    <p>[
-    {% for dataPoint in protocol %}
-        {{ dataPoint }},
-    {% endfor %}
-    ]</p>
-{% endfor %}
-
-<p>The syntax used to create the above can be used to construct the multiple javascript arrays for the histogram plots that
-I'm going to plug in as drilldown data behind the initial column plot.</p>
-
         {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><a href="/openrem/exportdxcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
@@ -132,8 +106,15 @@ $('.datepicker').datepicker({
 {% block plotdata %}
 <script src="{{ STATIC_URL }}js/highcharts.js"></script>
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
+<script src="{{ STATIC_URL }}js/drilldown.js"></script>
 
 <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+
+<script>
+var protocolNames  = [{% for name in plotNames %}"{{name}}",{% endfor %}];
+var protocolCounts = [{% for protocol in histogramCounts %}[{% for dataCounts in protocol %}{{dataCounts}},{% endfor %}],{% endfor %}]
+var protocolBins   = [{% for protocolEdges in histogramBinEdges %}[{% for edges in protocolEdges %}{{edges}},{% endfor %}],{% endfor %}]
+</script>
 
 		<script type="text/javascript">
 $(function () {
@@ -148,11 +129,7 @@ $(function () {
             text: 'A slightly useful plot'
         },
         xAxis: {
-            categories: [
-                   {% for testName in plotNames %}
-                       '{{testName}}',
-                   {% endfor %}
-            ]
+            type: 'category'
         },
         yAxis: {
             min: 0,
@@ -178,13 +155,49 @@ $(function () {
             name: 'Mean DAP per acquisition protocol',
             data: [
                    {% for testData in plotData %}
-                       {{testData}},
+                       {{'{'}}
+                       name:protocolNames[{{forloop.counter}}-1],
+                       y: {{testData}},
+                       drilldown:protocolNames[{{forloop.counter}}-1]
+                       {{'}'}},
                    {% endfor %}
                   ]
-        }]
+        }],
+        drilldown: {
+            series: [
+                {% for protocolCountsArray in histogramCounts %}
+                    {
+                        id: protocolNames[{{forloop.counter}}-1],
+                        name: protocolNames[{{forloop.counter}}-1],
+                        data: [
+                            {% for dataCounts in protocolCountsArray %}
+
+                                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toString(),{{dataCounts}}],
+
+                            {% endfor %}
+                        ]
+                    },
+                {% endfor %}
+            ],
+            xAxis: {
+                categories: [
+                       {% for testName in plotNames %}
+                           '{{testName}}',
+                       {% endfor %}
+                ]
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    useHTML: true,
+                    text: 'Number'
+                }
+            }
+
+
+        }
     });
 });
 		</script>
-
 
 {% endblock %}
