@@ -32,7 +32,7 @@ Get and Install MOD_WSGI
 	<Files wsgi.py>
 	Order deny,allow
 	Require all granted
-	</Files>cd c:\py	
+	</Files>
 	</Directory>
 
 
