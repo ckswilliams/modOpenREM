@@ -12,12 +12,13 @@
 """
 
 import sys
+from glob import glob
 from openrem.remapp.extractors import rdsr
 
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the radiation dose structured report')
 
-for sr in sys.argv[1:]:
+for sr in glob(sys.argv[1:]):
     rdsr(sr)
     
 sys.exit()
