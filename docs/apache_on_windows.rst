@@ -25,10 +25,10 @@ Get and Install MOD_WSGI
 	
 + At the end of ``C:\apache24\conf\httpd.conf`` add the following::
 
-	WSGIScriptAlias / "c:/Python27/Lib/site-packages/openrem/openrem/wsgi.py"
+	WSGIScriptAlias / "c:/Python27/Lib/site-packages/openrem/openremproject/wsgi.py"
 	WSGIPythonPath "c:/Python27/Lib/site-packages/openrem"
 
-	<Directory "c:/Python27/Lib/site-packages/openrem/openrem">
+	<Directory "c:/Python27/Lib/site-packages/openrem/openremproject">
 	<Files wsgi.py>
 	Order deny,allow
 	Require all granted
@@ -41,7 +41,7 @@ Get and Install wsgi.py and monitor.py
 
 Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki/ReloadingSourceCode
 
-+ Change wsgi.py in the openrem/openrem folder to the following
++ Change wsgi.py in the openrem/openremproject folder to the following
 
 .. code-block:: python
 
@@ -67,17 +67,17 @@ Detailed instructions are available here: https://code.google.com/p/modwsgi/wiki
 	if path not in sys.path:
         sys.path.append(path)
 
-	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openrem.settings")
+	os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openremproject.settings")
 
 	# Apply WSGI middleware here.
 
 	import django.core.handlers.wsgi
 	application = django.core.handlers.wsgi.WSGIHandler()
 
-	import openrem.monitor
-	openrem.monitor.start(interval=1.0)
+	import openremproject.monitor
+	openremproject.monitor.start(interval=1.0)
 	
-+ Create a file monitor.py in the openrem/openrem folder with the following contents
++ Create a file monitor.py in the openrem/openremproject folder with the following contents
 
 .. code-block:: python
 
