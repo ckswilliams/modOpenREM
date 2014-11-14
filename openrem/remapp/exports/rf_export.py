@@ -572,7 +572,6 @@ def rfxlsx(filterdict):
             ).filter(
                 projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
             )
-#            p = e.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__exact = protocol)
             for event in p_events:
                 sheetlist[tab]['count'] += 1
                 examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
@@ -597,53 +596,10 @@ def rfxlsx(filterdict):
                     str(event.irradiation_event_xray_mechanical_data_set.get().positioner_secondary_angle),
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
+        tabcolumns = (37)
+        tabrows = sheetlist[tab]['count']
+        sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
 
-
-        # Now we need to write a sheet per series protocol for each 'exams'.
-        
-        #~ for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
-            #~ protocol = s.acquisition_protocol
-            #~ if not protocol:
-                #~ protocol = u'Unknown'
-            #~ tabtext = protocol.lower().replace(" ","_")
-            #~ translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
-            #~ tabtext = tabtext.translate(translation_table) # remove illegal characters
-            #~ tabtext = tabtext[:31]
-            #~ sheetlist[tabtext]['count'] += 1
-            #~ 
-            #~ examdata = [
-                #~ exams.general_equipment_module_attributes_set.get().institution_name,
-                #~ exams.general_equipment_module_attributes_set.get().manufacturer,
-                #~ exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-                #~ exams.general_equipment_module_attributes_set.get().station_name,
-                #~ exams.accession_number,
-                #~ exams.operator_name,
-                #~ exams.study_date,  # Is a date - cell needs formatting
-                #~ str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-                #~ str(exams.patient_study_module_attributes_set.get().patient_size),
-                #~ str(exams.patient_study_module_attributes_set.get().patient_weight),
-                #~ exams.patient_module_attributes_set.get().not_patient_indicator,
-                #~ exams.study_description,
-                #~ exams.requested_procedure_code_meaning,
-                #~ str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-                #~ str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().dose_area_product_total),
-                #~ ]
-            #~ examdata += [
-                #~ s.acquisition_protocol,
-                #~ str(s.image_view),
-                #~ str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
-                #~ str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
-                #~ str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
-                #~ str(s.irradiation_event_xray_source_data_set.get().exposure_time),
-                #~ str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
-                #~ str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
-                #~ str(s.dose_area_product),
-                #~ ]
-#~ 
-            #~ sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
-
-    # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
-    
     # Populate summary sheet
     tsk.progress = 'Now populating the summary sheet...'
     tsk.save()
