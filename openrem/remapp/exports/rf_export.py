@@ -542,6 +542,7 @@ def rfxlsx(filterdict):
     tsk.save()
 
     protocolheaders = _rf_common_headers() + [
+        'Time',
         'Type',
         'Protocol',
         'Pulse rate',
@@ -575,23 +576,25 @@ def rfxlsx(filterdict):
             for event in p_events:
                 sheetlist[tab]['count'] += 1
                 examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
+                if event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material:
+                    filter_material = event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material.code_meaning
+                else: filter_material = None
                 examdata += [
+                    str(event.date_time_started),
                     event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
                     str(event.irradiation_event_xray_source_data_set.get().pulse_rate),
                     str(event.irradiation_event_xray_source_data_set.get().ii_field_size),
-
-                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "ii_field_size")),
-                    # _get_db_value(_get_db_value(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning"),
-                    # str(_get_db_value(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")),
-                    # str(_get_db_value(_get_db_value((_get_db_value(event,"irradiation_event_xray_source_data_set").get(), "kvp_set").get(),"kvp"))),
-                    # str(_get_db_value(_get_db_value((_get_db_value(event,"irradiation_event_xray_source_data_set").get(), "xray_tube_current_set").get(),"xray_tube_current"))),
-                    # str(_get_db_value(_get_db_value((_get_db_value(event,"irradiation_event_xray_source_data_set").get(), "pulse_width_set").get(),"pulse_width"))),
-                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "exposure_time")),
-                    # str(_get_db_value(event, "convert_gym2_to_cgycm2()")),
-                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_source_data_set").get(), "dose_rp")),
-                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")),
-                    # str(_get_db_value(_get_db_value(event, "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")),
+                    filter_material,
+                    str(event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
+                    str(event.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
+                    str(event.irradiation_event_xray_source_data_set.get().xray_tube_current_set.get().xray_tube_current),
+                    str(event.irradiation_event_xray_source_data_set.get().pulse_width_set.get().pulse_width),
+                    str(event.irradiation_event_xray_source_data_set.get().exposure_time),
+                    str(event.convert_gym2_to_cgycm2()),
+                    str(event.irradiation_event_xray_source_data_set.get().dose_rp),
+                    str(event.irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle),
+                    str(event.irradiation_event_xray_mechanical_data_set.get().positioner_secondary_angle),
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
 
