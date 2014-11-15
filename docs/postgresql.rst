@@ -67,7 +67,7 @@ Configure OpenREM to use the database
 =====================================
 
 Find and edit the settings file, eg
-    + ``nano local/lib/python2.7/site-packages/openrem/openrem/settings.py``
+    + ``nano local/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
 
 Set the following (changing name, user and password as appropriate):
     + ``'ENGINE': 'django.db.backends.postgresql_psycopg2',``

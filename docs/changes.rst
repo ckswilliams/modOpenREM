@@ -2,16 +2,19 @@
 OpenREM version history
 =======================
 
-0.5.0b2 (2014-11-11)
+0.5.0b3 (2014-11-14)
 --------------------
 
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
+* `#128`_  Updated some non-core documentation that didn't have the new local_settings.py reference or the new openremproject folder name
 * `#127`_  DX IOD studies with image view populated failed to export due to lack of conversion to string
 * `#126`_  Documentation created for the radiographic functionality
 * `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
 * `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs
+* `#122`_  Exports of RF data should now be more useful when exporting to xlsx. Will need refinement in the future
 * `#26`_   Extractors created for radiographic DICOM images. Contributed by DJ Platten
 * `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_. Contributed by DJ Platten
+* `#9`_    Import of *.dcm from Windows should now be available
 
 
 0.4.3 (2014-10-01)
