@@ -112,13 +112,14 @@ $('.datepicker').datepicker({
 
 <script>
 var protocolNames     = [{% for name in plotNames %}"{{name}}",{% endfor %}];
-var protocolCounts    = [{% for protocol in histogramCounts %}[{% for dataCounts in protocol %}{{dataCounts}},{% endfor %}],{% endfor %}]
-var protocolBins      = [{% for protocolEdges in histogramBinEdges %}[{% for edges in protocolEdges %}{{edges}},{% endfor %}],{% endfor %}]
-var protocolBinLabels = [{% for dataCounts in protocolCountsArray %}protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{% endfor %}]
-
+var protocolCounts    = [{% for protocol in histogramCounts %}[{% for dataCounts in protocol %}{{dataCounts}},{% endfor %}],{% endfor %}];
+var protocolBins      = [{% for protocolEdges in histogramBinEdges %}[{% for edges in protocolEdges %}{{edges}},{% endfor %}],{% endfor %}];
+var protocolBinLabels = [{% for dataCounts in protocolCountsArray %}protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{% endfor %}];
+var seriesData        = [{% for testData in plotData %}{{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}},{% endfor %}];
+var seriesDrilldown   = [{% for protocolCountsArray in histogramCounts %}{id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [{% for dataCounts in protocolCountsArray %}[protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}],{% endfor %}]},{% endfor %}];
 </script>
 
-		<script type="text/javascript">
+<script type="text/javascript">
 $(function () {
 
 var drilldownTitle = 'Histogram of ';
@@ -179,37 +180,12 @@ var chart = new Highcharts.Chart({
         },
         series: [{
             name: 'Mean DAP per acquisition protocol',
-            data: [
-                   {% for testData in plotData %}
-                       {{'{'}}
-                       name:protocolNames[{{forloop.counter}}-1],
-                       y: {{testData}},
-                       drilldown:protocolNames[{{forloop.counter}}-1]
-                       {{'}'}},
-                   {% endfor %}
-                  ]
+            data: seriesData
         }],
         drilldown: {
-            series: [
-                {% for protocolCountsArray in histogramCounts %}
-                    {
-                        id: protocolNames[{{forloop.counter}}-1],
-                        name: protocolNames[{{forloop.counter}}-1],
-                        useHTML: true,
-                        data: [
-                            {% for dataCounts in protocolCountsArray %}
-                                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}],
-                            {% endfor %}
-                        ]
-                    },
-                {% endfor %}
-            ],
+            series: seriesDrilldown,
             xAxis: {
-                categories: [
-                       {% for testName in plotNames %}
-                           '{{testName}}',
-                       {% endfor %}
-                ]
+                categories: protocolNames
             },
             yAxis: {
                 min: 0,
