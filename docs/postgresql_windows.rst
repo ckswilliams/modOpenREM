@@ -1,10 +1,10 @@
 Installing PostgreSQL for OpenREM on Windows
-*************************************************
+********************************************
 
 ..  Note:: Author JA Cole
 
 Get PostgreSQL and the python connector
-===========================================
+=======================================
     
 + Download the installer from http://www.enterprisedb.com/products-services-training/pgdownload#windows
 + Download psycopg2 from http://www.lfd.uci.edu/~gohlke/pythonlibs/. Make sure it matches your python and Windows version.
@@ -16,7 +16,7 @@ Run the the postgresql installer. It will ask for a location. Ensure the "data" 
 Enter a superuser password when prompted. Make sure you keep this safe as you will need it.
 
 Create a user and database
-==============================
+==========================
 
 Open pgAdmin III
 
@@ -39,7 +39,7 @@ Configure OpenREM to use the database
 =====================================
 
 Find and edit the settings file (notepad works fine). The path depends on your python install, but could be something like:
-    + ``C:\lib\python2.7\site-packages\openrem\openrem\settings.py``
+    + ``C:\lib\python2.7\site-packages\openrem\openremproject\local_settings.py``
 
 Set the following (changing name, user and password as appropriate):
     + ``'ENGINE': 'django.db.backends.postgresql_psycopg2',``

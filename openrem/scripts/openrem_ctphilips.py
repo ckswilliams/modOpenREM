@@ -12,12 +12,13 @@
 """
 
 import sys
+from glob import glob
 from openrem.remapp.extractors import ct_philips
 
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the Philips dose report image')
 
-for sr in sys.argv[1:]:
+for sr in glob(sys.argv[1:]):
     ct_philips(sr)
 
 sys.exit()
