@@ -118,15 +118,28 @@ var protocolBins   = [{% for protocolEdges in histogramBinEdges %}[{% for edges 
 
 		<script type="text/javascript">
 $(function () {
-    $('#container').highcharts({
+
+var drilldownTitle = 'Histogram of ';
+var defaultTitle   = 'Mean DAP per acquisition protocol';
+
+//    $('#container').highcharts({
+var chart = new Highcharts.Chart({
         chart: {
-            type: 'column'
+            type: 'column',
+            renderTo: 'container',
+            events: {
+                drilldown: function(e) {
+                    chart.setTitle({ text: drilldownTitle + e.point.name });
+                    chart.yAxis[0].setTitle({text:'Number'});
+                },
+                drillup: function(e) {
+                    chart.setTitle({ text: defaultTitle });
+                    chart.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
+                }
+            }
         },
         title: {
             text: 'Mean DAP per acquisition protocol'
-        },
-        subtitle: {
-            text: 'A slightly useful plot'
         },
         xAxis: {
             type: 'category'
