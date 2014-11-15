@@ -111,9 +111,11 @@ $('.datepicker').datepicker({
 <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
 
 <script>
-var protocolNames  = [{% for name in plotNames %}"{{name}}",{% endfor %}];
-var protocolCounts = [{% for protocol in histogramCounts %}[{% for dataCounts in protocol %}{{dataCounts}},{% endfor %}],{% endfor %}]
-var protocolBins   = [{% for protocolEdges in histogramBinEdges %}[{% for edges in protocolEdges %}{{edges}},{% endfor %}],{% endfor %}]
+var protocolNames     = [{% for name in plotNames %}"{{name}}",{% endfor %}];
+var protocolCounts    = [{% for protocol in histogramCounts %}[{% for dataCounts in protocol %}{{dataCounts}},{% endfor %}],{% endfor %}]
+var protocolBins      = [{% for protocolEdges in histogramBinEdges %}[{% for edges in protocolEdges %}{{edges}},{% endfor %}],{% endfor %}]
+var protocolBinLabels = [{% for dataCounts in protocolCountsArray %}protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{% endfor %}]
+
 </script>
 
 		<script type="text/javascript">
@@ -131,18 +133,29 @@ var chart = new Highcharts.Chart({
                 drilldown: function(e) {
                     chart.setTitle({ text: drilldownTitle + e.point.name });
                     chart.yAxis[0].setTitle({text:'Number'});
+                    chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
+                    chart.xAxis[0].setCategories(protocolBinLabels, true);
                 },
                 drillup: function(e) {
                     chart.setTitle({ text: defaultTitle });
                     chart.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
+                    chart.xAxis[0].setTitle({text:'Protocol name'});
+                    chart.xAxis[0].setCategories(protocolNames, true);
                 }
             }
         },
         title: {
             text: 'Mean DAP per acquisition protocol'
         },
+        legend: {
+            enabled: false
+        },
         xAxis: {
-            type: 'category'
+            type: 'category',
+            title: {
+                useHTML: true,
+                text: 'Protocol name'
+            }
         },
         yAxis: {
             min: 0,
