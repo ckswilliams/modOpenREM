@@ -98,7 +98,6 @@ $('.datepicker').datepicker({
     </table>
 
     {% paginate %}
-
  
 {% endblock %}
 
@@ -108,7 +107,23 @@ $('.datepicker').datepicker({
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
 <script src="{{ STATIC_URL }}js/drilldown.js"></script>
 
-<div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+          Plot of currently filtered data. Click this text to toggle between hidden and visible.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in">
+      <div class="panel-body">
+         <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+         <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 var protocolNames     = [{% for name in plotNames %}"{{name}}",{% endfor %}];
@@ -199,6 +214,6 @@ var chart = new Highcharts.Chart({
         }
     });
 });
-		</script>
+</script>
 
 {% endblock %}
