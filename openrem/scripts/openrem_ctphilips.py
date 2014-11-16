@@ -18,7 +18,8 @@ from openrem.remapp.extractors import ct_philips
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the Philips dose report image')
 
-for sr in glob(sys.argv[1:]):
-    ct_philips(sr)
+for arg in sys.argv[1:]:
+    for filename in glob(arg):
+        ct_philips(filename)
 
 sys.exit()
