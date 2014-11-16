@@ -15,13 +15,10 @@ Radiation Dose Structured Reports
 
     openrem_rdsr.py filename.dcm
 
-In linux, or using an advanced shell in Windows, you can use wildcards
-to process a number of files at once, ie::
+You can use wildcards to process a number of files at once, ie::
 
     openrem_rdsr.py *.dcm
 
-This feature will be added for Windows users with the standard cmd.exe shell in
-a future version, and is tracked as `issue #9`_
 
 For mammography DICOM images
 ----------------------------

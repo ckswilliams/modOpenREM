@@ -229,7 +229,7 @@ def _philips_ct2db(dataset):
         uid = dataset.StudyInstanceUID
         existing = General_study_module_attributes.objects.filter(study_instance_uid__exact = uid)
         if existing:
-            sys.exit()
+            return
 
     g = General_study_module_attributes.objects.create()
     _generalstudymoduleattributes(dataset,g)

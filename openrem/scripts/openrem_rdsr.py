@@ -18,7 +18,8 @@ from openrem.remapp.extractors import rdsr
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the radiation dose structured report')
 
-for sr in glob(sys.argv[1:]):
-    rdsr(sr)
-    
+for arg in sys.argv[1:]:
+    for filename in glob(arg):
+        rdsr(filename)
+
 sys.exit()

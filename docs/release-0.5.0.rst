@@ -1,4 +1,4 @@
-OpenREM Release Notes version 0.5.0b3
+OpenREM Release Notes version 0.5.0b4
 *************************************
 
 Headline changes
@@ -41,7 +41,7 @@ Upgrading from version 0.4.3
 ````````````````````````````
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.5.0b3
+    pip install --pre openrem==0.5.0b4
 
 (Will need ``sudo`` or equivalent if using linux without a virtualenv)
 
