@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.5.0b3 (2014-11-14)
+0.5.0b4 (2014-11-16)
 --------------------
 
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
@@ -14,7 +14,7 @@ OpenREM version history
 * `#122`_  Exports of RF data should now be more useful when exporting to xlsx. Will need refinement in the future
 * `#26`_   Extractors created for radiographic DICOM images. Contributed by DJ Platten
 * `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_. Contributed by DJ Platten
-* `#9`_    Import of *.dcm from Windows should now be available
+* `#9`_    Import of *.dcm should now be available from Windows and Linux alike
 
 
 0.4.3 (2014-10-01)
