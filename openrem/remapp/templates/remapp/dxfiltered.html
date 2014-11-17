@@ -140,7 +140,6 @@ $(function () {
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DAP per acquisition protocol';
 
-//    $('#container').highcharts({
 var chart = new Highcharts.Chart({
         chart: {
             type: 'column',
@@ -151,12 +150,26 @@ var chart = new Highcharts.Chart({
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
                     chart.xAxis[0].setCategories(protocolBinLabels, true);
+                    chart.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            xyArr.push(this.y.toFixed(0) + ' exposures');
+                        });
+                        return xyArr.join('<br/>');
+                    }
                 },
                 drillup: function(e) {
                     chart.setTitle({ text: defaultTitle });
                     chart.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
                     chart.xAxis[0].setTitle({text:'Protocol name'});
                     chart.xAxis[0].setCategories(protocolNames, true);
+                    chart.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>');
+                        });
+                        return xyArr.join('<br/>');
+                    }
                 }
             }
         },
@@ -181,9 +194,7 @@ var chart = new Highcharts.Chart({
             }
         },
         tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="padding:0"><b>{point.y:.1f} cGy.cm<sup>2</sup></b></td></tr>',
-            footerFormat: '</table>',
+            pointFormat:'{point.key} {point.y:.1f} cGy.cm<sup>2</sup>',
             shared: true,
             useHTML: true
         },
