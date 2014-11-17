@@ -102,7 +102,7 @@ def dx_summary_list_filter(request):
             except:
                 pass
         
-        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(temp)
+        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(temp, bins=20)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
