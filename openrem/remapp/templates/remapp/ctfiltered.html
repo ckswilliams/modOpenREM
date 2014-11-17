@@ -116,3 +116,101 @@ $('.datepicker').datepicker({
 
 {% block jsblock %}
 {% endblock %}
+
+        {% block plotdata %}
+<script src="{{ STATIC_URL }}js/highcharts.js"></script>
+<script src="{{ STATIC_URL }}js/exporting.js"></script>
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+		<script type="text/javascript">
+$(function () {
+    $('#container').highcharts({
+        chart: {
+            type: 'scatter',
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'Weight Verses Total DLP of filtered data'
+        },
+        subtitle: {
+            text: 'Source: Not the most useful chart in the world'
+        },
+        xAxis: {
+            title: {
+                enabled: true,
+                text: 'Mass (kg)'
+            },
+            startOnTick: true,
+            endOnTick: true,
+            showLastLabel: true
+        },
+        yAxis: {
+            title: {
+                text: 'Total DLP (mGy∙cm)'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            verticalAlign: 'top',
+            x: 100,
+            y: 70,
+            floating: true,
+            backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF',
+            borderWidth: 1
+        },
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            location.href = this.options.url;
+                        }
+                    }
+                }
+            },
+            scatter: {
+                marker: {
+                    radius: 5,
+                    states: {
+                        hover: {
+                            enabled: true,
+                            lineColor: 'rgb(100,100,100)'
+                        }
+                    }
+                },
+                states: {
+                    hover: {
+                        marker: {
+                            enabled: false
+                        }
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<b>{series.name}</b><br>',
+                    pointFormat: '{point.x} kg, {point.y} mGy∙cm<br> Click to go to study'
+                }
+            }
+        },
+        series: [{
+            name: 'All data',
+            color: 'rgba(223, 83, 83, .5)',
+            data: [
+                   {% for exam in filter.qs %}
+                    {% if exam.patient_study_module_attributes_set.get.patient_weight %}
+                       {
+                        "x": {{ exam.patient_study_module_attributes_set.get.patient_weight }},
+                        "y": {{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total }},
+                        "url": "/openrem/ct/{{ exam.id }}/"
+                       },
+                    {% endif %}
+                   {% endfor %}
+                  ]
+        }]
+    });
+});		</script>
+
+
+{% endblock %}

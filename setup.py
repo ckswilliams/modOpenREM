@@ -16,7 +16,8 @@ requires = [
     'xlsxwriter',
     'south',
     'celery >= 3.1',
-    'argparse >= 1.2.1'
+    'argparse >= 1.2.1',
+    'numpy'
     ]
 
 setup(
