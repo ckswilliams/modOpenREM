@@ -18,7 +18,8 @@ from openrem.remapp.extractors import mam
 if len(sys.argv) < 2:
     sys.exit('Error: Supply at least one argument - the DICOM mammography image file')
 
-for sr in glob(sys.argv[1:]):
-    mam(sr)
+for arg in sys.argv[1:]:
+    for filename in glob(arg):
+        mam(filename)
     
 sys.exit()
