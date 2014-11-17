@@ -68,22 +68,6 @@ def dx_summary_list_filter(request):
 
     f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
 
-    # A test histogram
-    #histogramCounts, histogramBinEdges = np.histogram([1, 2, 1])
-
-    #The following line calculates the mean total DAP for all data in the dataset
-    #print f.qs.all().aggregate(Avg('projection_xray_radiation_dose__accumulated_djandjango djadfadsfxray_dose__accumulated_projection_xray_dose__dose_area_product_total'))
-
-    # The following line calculates the mean total DAP of all Chest PA studies
-    #print f.qs.filter(study_description='Chest PA').aggregate(Avg('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total'))
-
-    # The following line calculates the mean DAP of all individual exposures with the name "G4"
-    #print f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='G4').aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-
-    # The following line acquires all unique acquisition protocol names
-    #print f.qs.values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
-
-    # The following line acquires all unique acquisition protocol names, excluding any null or blank values
     uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
 
     protocolMeanDAP = [None] * len(uniqueProtocols)
@@ -94,15 +78,15 @@ def dx_summary_list_filter(request):
     for idx, protocol in enumerate(protocolMeanDAP):
         protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
         protocolNames[idx]   = uniqueProtocols[idx].values()[0]
-        test = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
-        temp = []
-        for idx2, item in enumerate(test):
+        dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+        dapValuesFloatArray = []
+        for idx2, dapValue in enumerate(dapValues):
             try:
-                temp.append(float(item)*1000000)
+                dapValuesFloatArray.append(float(dapValue)*1000000)
             except:
                 pass
         
-        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(temp, bins=20)
+        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(dapValuesFloatArray, bins=20)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
