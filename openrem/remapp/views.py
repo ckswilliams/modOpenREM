@@ -97,7 +97,10 @@ def dx_summary_list_filter(request):
         test = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
         temp = []
         for idx2, item in enumerate(test):
-            temp.append(float(item)*1000000)
+            try:
+                temp.append(float(item)*1000000)
+            except:
+                pass
         
         protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(temp)
 
