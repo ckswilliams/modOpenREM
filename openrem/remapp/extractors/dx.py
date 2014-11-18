@@ -106,6 +106,7 @@ def _irradiationeventxraydetectordata(dataset,event):
     manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
     if   'fuji'       in manufacturer: detector.relative_exposure_unit = 'S ()'
     elif 'carestream' in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
+    elif 'kodak'      in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
     elif 'agfa'       in manufacturer: detector.relative_exposure_unit = 'lgM (Bels)'
     elif 'konica'     in manufacturer: detector.relative_exposure_unit = 'S ()'
     elif 'canon'      in manufacturer: detector.relative_exposure_unit = 'REX ()'
@@ -113,8 +114,8 @@ def _irradiationeventxraydetectordata(dataset,event):
     elif 'philips'    in manufacturer: detector.relative_exposure_unit = 'EI ()'
     elif 'siemens'    in manufacturer: detector.relative_exposure_unit = 'EXI (uGy)'
     detector.sensitivity = get_value_kw('Sensitivity',dataset)
-    detector.target_exposure_index = get_value_kw('TargetExposureIndex',dataset)
-    detector.deviation_index = get_value_kw('DeviationIndex',dataset)
+    detector.target_exposure_index = get_value_kw('TargetExposureIndex', dataset)
+    detector.deviation_index = get_value_kw('DeviationIndex', dataset)
     detector.save()
 
 
