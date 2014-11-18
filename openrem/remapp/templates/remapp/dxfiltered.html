@@ -8,10 +8,11 @@
 {% endblock %}
 
 {% block toprow %}
-      {% load pagination_tags %}    
+      {% load pagination_tags %}
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
+
         {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><a href="/openrem/exportdxcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
@@ -23,8 +24,6 @@
         </p>
         {% endif %}
 {% endblock %}
-
-
 
 {% block col2 %}
 
@@ -99,6 +98,197 @@ $('.datepicker').datepicker({
     </table>
 
     {% paginate %}
-
  
+{% endblock %}
+
+
+{% block plotdata %}
+<script src="{{ STATIC_URL }}js/highcharts.js"></script>
+<script src="{{ STATIC_URL }}js/exporting.js"></script>
+<script src="{{ STATIC_URL }}js/drilldown.js"></script>
+
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+          Plot of currently filtered data. Click this text to toggle between hidden and visible.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="container" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var protocolNames     = [
+                        {% for name in plotNames %}
+                            "{{name}}"
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var protocolCounts    = [
+                        {% for protocol in histogramCounts %}
+                            [
+                            {% for dataCounts in protocol %}
+                                {{dataCounts}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var protocolBins      = [
+                        {% for protocolEdges in histogramBinEdges %}
+                            [
+                            {% for edges in protocolEdges %}
+                                {{edges}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesData        = [
+                        {% for testData in plotData %}
+                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesDrilldown   = [
+                        {% for protocolCountsArray in histogramCounts %}
+                            {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
+                            {% for dataCounts in protocolCountsArray %}
+                                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}]}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+</script>
+
+<script type="text/javascript">
+$(function () {
+
+var drilldownTitle = 'Histogram of ';
+var defaultTitle   = 'Mean DAP per acquisition protocol';
+
+var chart = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo: 'container',
+            events: {
+                drilldown: function(e) {
+                    chart.setTitle({ text: drilldownTitle + e.point.name });
+                    chart.yAxis[0].setTitle({text:'Number'});
+                    chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
+                    chart.xAxis[0].setCategories([], true);
+                    chart.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            xyArr.push(this.y.toFixed(0) + ' exposures');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                },
+                drillup: function(e) {
+                    chart.setTitle({ text: defaultTitle });
+                    chart.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
+                    chart.xAxis[0].setTitle({text:'Protocol name'});
+                    chart.xAxis[0].setCategories(protocolNames, true);
+                    chart.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                }
+            }
+        },
+        title: {
+            text: 'Mean DAP per acquisition protocol'
+        },
+        legend: {
+            enabled: false
+        },
+        xAxis: {
+            categories: protocolNames,
+            title: {
+                useHTML: true,
+                text: 'Protocol name'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                useHTML: true,
+                text: 'Mean DAP (cGy.cm<sup>2</sup>)'
+            }
+        },
+        tooltip: {
+            pointFormat:'{point.key} {point.y:.1f} cGy.cm<sup>2</sup>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Mean DAP per acquisition protocol',
+            data: seriesData
+        }],
+        drilldown: {
+            series: seriesDrilldown
+        }
+    });
+});
+
+(function (H) {
+    H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
+        var point = proceed.call(this, series, options, x),
+            chart = series.chart,
+            tick = series.xAxis && series.xAxis.ticks[x],
+            tickLabel = tick && tick.label;
+
+        if (point.drilldown) {
+
+            // Add the click event to the point label
+            H.addEvent(point, 'click', function () {
+                point.doDrilldown();
+            });
+
+            // Make axis labels clickable
+            if (tickLabel) {
+                if (!tickLabel._basicStyle) {
+                    tickLabel._basicStyle = tickLabel.element.getAttribute('style');
+                }
+                tickLabel.addClass('highcharts-drilldown-axis-label')          .css({
+                    'text-decoration': 'none',
+                    'font-weight': 'normal',
+                    'cursor': 'auto'
+                    })
+                    .on('click', function () {
+                    if (point.doDrilldown) {
+                        return false;
+                    }
+                });
+
+            }
+        } else if (tickLabel && tickLabel._basicStyle) {
+        }
+
+        return point;
+    });
+})(Highcharts);
+</script>
+
 {% endblock %}
