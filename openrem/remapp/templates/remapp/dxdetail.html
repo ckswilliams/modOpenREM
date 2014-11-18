@@ -31,12 +31,13 @@
 
 <table class="table table-striped table-bordered">
     <th>Time</th>
-    <th>Acquisition protocol</th>
+    <th>Protocol</th>
     <th>View</th>
     <th>kVp</th>
     <th>mAs</th>
     <th>mA</th>
-    <th>Exposure time (ms)</th>
+    <th>Time (ms)</th>
+    <th>Filters</th>
     <th>SID (mm)</th>
     <th>IEC Exposure Index</th>
     <th>Exposure Index</th>
@@ -51,6 +52,12 @@
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.average_xray_tube_current|floatformat:0 }}</td>
         <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_time|floatformat:0 }}</td>
+        <td>
+            {% for xrayfilt in event.irradiation_event_xray_source_data_set.get.xray_filters_set.all %}
+                {{ xrayfilt.xray_filter_material }}
+                {{ xrayfilt.xray_filter_thickness_maximum }}
+            {% endfor %}
+        </td>
         <td>{{ event.irradiation_event_xray_mechanical_data_set.get.dose_related_distance_measurements_set.get.distance_source_to_detector }}</td>
         <td>
             EI: {{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:1 }} <br>

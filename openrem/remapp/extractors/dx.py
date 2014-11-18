@@ -151,9 +151,9 @@ def _irradiationeventxraysourcedata(dataset,event):
         source.exposure_control_mode = exp_ctrl_mode
     source.save()
     xray_filter_type = get_value_kw('FilterType', dataset)
-    xray_filter_material = get_value_kw('FilterMaterial',dataset)
-    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum')
-    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum')
+    xray_filter_material = get_value_kw('FilterMaterial', dataset)
+    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
     if xray_filter_type:
         if xray_filter_type == 'NONE':
             _xrayfiltersnone(source)
