@@ -29,7 +29,7 @@
 ..  module:: dx.
     :synopsis: Module to extract radiation dose related data from DX image objects.
 
-..  moduleauthor:: David Platten
+..  moduleauthor:: David Platten, Ed McDonagh
 
 """
 def _xrayfilters(filttype, material, thickmax, thickmin, source):
@@ -111,7 +111,6 @@ def _xraygrid(gridcode,source):
     grid.save()
 
 
-# 28/3/2014 Added by DJP to collect exposure index
 def _irradiationeventxraydetectordata(dataset,event):
     from remapp.models import Irradiation_event_xray_detector_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
@@ -213,7 +212,6 @@ def _doserelateddistancemeasurements(dataset,mech):
     dist.table_height_position = get_value_kw('TableHeightPosition',dataset)
     dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
     dist.radiological_thickness = get_value_num(0x00451049,dataset)
-	
     dist.save()        
 
 
@@ -231,35 +229,8 @@ def _irradiationeventxraymechanicaldata(dataset,event):
     mech.table_head_tilt_angle = get_value_kw('TableHeadTiltAngle',dataset)
     mech.table_horizontal_rotation_angle = get_value_kw('TableHorizontalRotationAngle',dataset)
     mech.table_cradle_tilt_angle = get_value_kw('TableCradleTiltAngle',dataset)
-    mech.compression_thickness = get_value_kw('CompressionThickness',dataset)
-    comp_force = get_value_kw('CompressionForce',dataset)
-    if comp_force:
-        mech.compression_force = float(comp_force)/10 # GE Conformance statement says in N, treating as dN
-    
     mech.save()
     _doserelateddistancemeasurements(dataset,mech)
-
-
-# 28/3/2014 DJP commented the below routine out as it's not relevant to DX images
-#def _accumulatedmammo_update(dataset,event): # TID 10005
-#    from remapp.tools.get_values import get_value_kw, get_or_create_cid
-#    accummam = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_mammography_xray_dose_set.get()
-#    if event.irradiation_event_xray_source_data_set.get().average_glandular_dose:
-#        accummam.accumulated_average_glandular_dose += event.irradiation_event_xray_source_data_set.get().average_glandular_dose
-#    if event.laterality:
-#        if accummam.laterality:
-#            if accummam.laterality.code_meaning == 'Left breast':
-#                if event.laterality.code_meaning == 'Right':
-#                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-#            if accummam.laterality.code_meaning == 'Right breast':
-#                if event.laterality.code_meaning == 'Left':
-#                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-#        else:
-#            if event.laterality.code_meaning == 'Right':
-#                accummam.laterality = get_or_create_cid('T-04020','Right breast')
-#            if event.laterality.code_meaning == 'Left':
-#                accummam.laterality = get_or_create_cid('T-04030','Left breast')
-#    accummam.save()
 
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
@@ -316,14 +287,12 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
     
-    # 28/3/2014 DJP put the line below in
     _irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
     _accumulatedxraydose_update(dataset,event)
 
 
-# 28/3/2014 DJP: removed the mammo bits from the routine below
 def _accumulatedxraydose(dataset,proj):
     from remapp.models import Accumulated_xray_dose, Accumulated_projection_xray_dose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
@@ -446,10 +415,8 @@ def _generalstudymoduleattributes(dataset,g):
     _patientmoduleattributes(dataset,g)
 
     
-# 28/3/2014 DJP renamed the routine below to "_test_if_dx" from "_test_if_mammo" and made code
-# changes to make it DX rather than mammography specific. The routine will accept three types
-# of image:
-# DX image storage                               (SOP UID = '1.2.840.10008.5.1.4.1.1.1')
+# The routine will accept three types of image:
+# CR image storage                               (SOP UID = '1.2.840.10008.5.1.4.1.1.1')
 # Digital x-ray image storage - for presentation (SOP UID = '1.2.840.10008.5.1.4.1.1.1.1')
 # Digital x-ray image storage - for processing   (SOP UID = '1.2.840.10008.5.1.4.1.1.1.1.1')
 # These SOP UIDs were taken from http://www.dicomlibrary.com/dicom/sop/
@@ -460,17 +427,14 @@ def _test_if_dx(dataset):
     return 1
 
 
-# 28/3/2014 DJP renamed this "_dx2db" from "_mammo2db" and made code changes
-# to make it DX rather than mammography specific.
 def _dx2db(dataset):
     import os, sys
     import openrem_settings
     
-    openrem_settings.add_project_to_path()
-#    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.openremproject())
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-
     from django.db import models
+
+    openrem_settings.add_project_to_path()
     from remapp.models import General_study_module_attributes
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
