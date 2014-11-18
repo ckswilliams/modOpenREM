@@ -32,36 +32,51 @@
 ..  moduleauthor:: David Platten
 
 """
-def _xrayfilters(dataset,source):
+def _xrayfilters(filttype, material, thickmax, thickmin, source):
+    from remapp.models import Xray_filters
+    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    if filttype:
+        filter_types = {'STRIP': {"code": '113650', "meaning": "Strip filter"},
+                        'WEDGE': {"code": '113651', "meaning": "Wedge filter"},
+                        'BUTTERFLY': {"code:": '113652', "meaning": "Butterfly filter"},
+                        'NONE': {"code": '111609', "meaning": "No filter"},
+                        'FLAT': {"code": '113653', "meaning": "Flat filter"},
+        }
+        if filttype in filter_types:
+            filters.xray_filter_type = get_or_create_cid(
+                filter_types[filttype]["code"], filter_types[filttype]["meaning"]
+            )
+    if material:
+        if material.strip().lower() == 'molybdenum':
+            filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
+        if material.strip().lower() == 'rhodium':
+            filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+        if material.strip().lower() == 'silver':
+            filters.xray_filter_material = get_or_create_cid('C-137F9','Silver or Silver compound')
+        if material.strip().lower() == 'aluminum':
+            filters.xray_filter_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
+        if material.strip().lower() == 'copper':
+            filters.xray_filter_material = get_or_create_cid('C-127F9','Copper or Copper compound')
+        if material.strip().lower() == 'niobium':
+            filters.xray_filter_material = get_or_create_cid('C-1190E','Niobium or Niobium compound')
+        if material.strip().lower() == 'europium':
+            filters.xray_filter_material = get_or_create_cid('C-1190F','Europium or Europium compound')
+        if material.strip().lower() == 'lead':
+            filters.xray_filter_material = get_or_create_cid('C-132F9','Lead or Lead compound')
+        if material.strip().lower() == 'tantalum':
+            filters.xray_filter_material = get_or_create_cid('C-156F9','Tantalum or Tantalum compound')
+    if thickmax:
+        filters.xray_filter_thickness_maximum = thickmax
+    if thickmin:
+        filters.xray_filter_thickness_minimum = thickmin
+    filters.save()
+
+def _xrayfiltersnone(source):
     from remapp.models import Xray_filters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
-    xray_filter_material = get_value_kw('FilterMaterial',dataset)
-    if xray_filter_material:
-        if xray_filter_material.strip().lower() == 'molybdenum':
-            filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-        if xray_filter_material.strip().lower() == 'rhodium':
-            filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
-        if xray_filter_material.strip().lower() == 'silver':
-            filters.xray_filter_material = get_or_create_cid('C-137F9','Silver or Silver compound')
-        if xray_filter_material.strip().lower() == 'aluminum' or xray_filter_material.strip().lower() == 'aluminium':
-            filters.xray_filter_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
-        # Added by DJP on 28/3/2014 to ensure that all possible filters are looked for. Data taken
-        # from https://www.dabsoft.ch/dicom/16/CID_10006/
-        if xray_filter_material.strip().lower() == 'copper':
-            filters.xray_filter_material = get_or_create_cid('C-127F9','Copper or Copper compound')
-        if xray_filter_material.strip().lower() == 'niobium':
-            filters.xray_filter_material = get_or_create_cid('C-1190E','Niobium or Niobium compound')
-        if xray_filter_material.strip().lower() == 'europium':
-            filters.xray_filter_material = get_or_create_cid('C-1190F','Europium or Europium compound')
-        if xray_filter_material.strip().lower() == 'lead':
-            filters.xray_filter_material = get_or_create_cid('C-132F9','Lead or Lead compound')
-        if xray_filter_material.strip().lower() == 'tantalum':
-            filters.xray_filter_material = get_or_create_cid('C-156F9','Tantalum or Tantalum compound')
-        # End of 28/3/2014 DJP additions
-        
-        filters.save()
-    
+    filters.xray_filter_type = get_or_create_cid('111609', "No filter")
+    filters.save()
 
 def _kvp(dataset,source):
     from remapp.models import Kvp
@@ -134,10 +149,43 @@ def _irradiationeventxraysourcedata(dataset,event):
     exp_ctrl_mode = get_value_kw('ExposureControlMode',dataset)
     if exp_ctrl_mode:
         source.exposure_control_mode = exp_ctrl_mode
-    
     source.save()
-    
-    _xrayfilters(dataset,source)
+    xray_filter_type = get_value_kw('FilterType', dataset)
+    xray_filter_material = get_value_kw('FilterMaterial',dataset)
+    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum')
+    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum')
+    if xray_filter_type:
+        if xray_filter_type == 'NONE':
+            _xrayfiltersnone(source)
+        elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
+            for i, material in enumerate(xray_filter_material.split(',')):
+                try:
+                    thickmax = None
+                    thickmin = None
+                    if xray_filter_thickness_maximum:
+                        thickmax = xray_filter_thickness_maximum.split(',')[i]
+                    if xray_filter_thickness_minimum:
+                        thickmin = xray_filter_thickness_minimum.split(',')[i]
+                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
+                except IndexError:
+                    pass
+        else:
+            siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
+            if xray_filter_type in siemens_filters:
+                if xray_filter_type == "CU_0.1_MM":
+                    thickmax = 0.1
+                    thickmin = 0.1
+                elif xray_filter_type == "CU_0.2_MM":
+                    thickmax = 0.2
+                    thickmin = 0.2
+                elif xray_filter_type == "CU_0.3_MM":
+                    thickmax = 0.3
+                    thickmin = 0.3
+                _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
+            else:
+                _xrayfilters(
+                    xray_filter_type, xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum
+                )
     _kvp(dataset,source)
     _exposure(dataset,source)
     xray_grid = get_value_kw('Grid',dataset)
