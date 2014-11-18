@@ -29,6 +29,15 @@
     <li>Study UID: {{ general_study_module_attributes.study_instance_uid }}</li>
     <li>Comment: {{ general_study_module_attributes.ct_radiation_dose_set.get.comment }} </li>
     <li>Test patient indicators? {{ general_study_module_attributes.patient_module_attributes_set.get.not_patient_indicator }}</li>
+    <li>
+        Total number of events:
+        {{ general_study_module_attributes.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}
+    </li>
+    <li>
+        Total DLP:
+        {{ general_study_module_attributes.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}
+        mGy.cm
+    </li>
 </ul>
 
 <table class="table table-striped table-bordered">
