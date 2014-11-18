@@ -154,11 +154,6 @@ var protocolBins      = [
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
-var protocolBinLabels = [
-                        {% for dataCounts in protocolCountsArray %}
-                            protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString()
-                            {% if not forloop.last %},{% endif %}
-                        {% endfor %}];
 var seriesData        = [
                         {% for testData in plotData %}
                             {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
@@ -192,7 +187,7 @@ var chart = new Highcharts.Chart({
                     chart.setTitle({ text: drilldownTitle + e.point.name });
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
-                    chart.xAxis[0].setCategories(protocolBinLabels, true);
+                    chart.xAxis[0].setCategories([], true);
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -223,7 +218,6 @@ var chart = new Highcharts.Chart({
             enabled: false
         },
         xAxis: {
-            //type: 'category',
             categories: protocolNames,
             title: {
                 useHTML: true,
