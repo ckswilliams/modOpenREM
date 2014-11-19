@@ -149,10 +149,34 @@ def rf_summary_list_filter(request):
 
 @login_required
 def ct_summary_list_filter(request):
+    if plotting: import numpy as np
     from remapp.interface.mod_filters import CTSummaryListFilter
+    from django.db.models import Q, Avg # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
 
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
+
+    if plotting:
+        #uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
+        uniqueProtocols = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct()
+        
+        protocolMeanDLP = [None] * len(uniqueProtocols)
+        protocolNames   = [None] * len(uniqueProtocols)
+        protocolHistogramCounts   = [None] * len(uniqueProtocols)
+        protocolHistogramBinEdges = [None] * len(uniqueProtocols)
+
+        for idx, protocol in enumerate(protocolMeanDLP):
+            protocolMeanDLP[idx] = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('ct_radiation_dose__ct_irradiation_event_data__dlp')).values()[0]
+            protocolNames[idx]   = uniqueProtocols[idx].values()[0]
+            dlpValues = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
+            dlpValuesFloatArray = []
+            for idx2, dlpValue in enumerate(dlpValues):
+                try:
+                    dlpValuesFloatArray.append(float(dlpValue))
+                except:
+                    pass
+        
+            protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(dlpValuesFloatArray, bins=20)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -164,12 +188,23 @@ def ct_summary_list_filter(request):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
-    
-    return render_to_response(
-        'remapp/ctfiltered.html',
-        {'filter': f, 'admin':admin},
-        context_instance=RequestContext(request)
-        )
+
+    if plotting:
+        return render_to_response(
+            'remapp/ctfiltered.html',
+            {'filter': f, 'admin':admin,
+             'plotNames': protocolNames,
+             'plotData':  protocolMeanDLP,
+             'histogramCounts':   protocolHistogramCounts,
+             'histogramBinEdges': protocolHistogramBinEdges},
+            context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+            'remapp/ctfiltered.html',
+            {'filter': f, 'admin':admin},
+            context_instance=RequestContext(request)
+            )
 
 @login_required
 def mg_summary_list_filter(request):
