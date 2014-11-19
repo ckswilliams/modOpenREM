@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -32,8 +33,11 @@
 ..  moduleauthor:: David Platten, Ed McDonagh
 
 """
+
+
 def _xrayfilters(filttype, material, thickmax, thickmin, source):
     from remapp.models import Xray_filters
+    from remapp.tools.get_values import get_or_create_cid
     filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
     if filttype:
         filter_types = {'STRIP': {"code": '113650', "meaning": "Strip filter"},
@@ -126,7 +130,7 @@ def _irradiationeventxraydetectordata(dataset,event):
     elif 'canon'      in manufacturer: detector.relative_exposure_unit = 'REX ()'
     elif 'swissray'   in manufacturer: detector.relative_exposure_unit = 'DI ()'
     elif 'philips'    in manufacturer: detector.relative_exposure_unit = 'EI ()'
-    elif 'siemens'    in manufacturer: detector.relative_exposure_unit = 'EXI (uGy)'
+    elif 'siemens'    in manufacturer: detector.relative_exposure_unit = u'EXI (μGy)'
     detector.sensitivity = get_value_kw('Sensitivity',dataset)
     detector.target_exposure_index = get_value_kw('TargetExposureIndex', dataset)
     detector.deviation_index = get_value_kw('DeviationIndex', dataset)
@@ -183,7 +187,7 @@ def _irradiationeventxraysourcedata(dataset,event):
                 _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
             else:
                 _xrayfilters(
-                    xray_filter_type, xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum
+                    xray_filter_type, xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source
                 )
     _kvp(dataset,source)
     _exposure(dataset,source)
