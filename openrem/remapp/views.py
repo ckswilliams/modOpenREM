@@ -47,7 +47,12 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from remapp.models import General_study_module_attributes
-from numpy import *
+
+try:
+    from numpy import *
+except ImportError:
+    plotting = 0
+    
 
 
 
@@ -61,32 +66,33 @@ def logout_page(request):
 
 @login_required
 def dx_summary_list_filter(request):
-    import numpy as np
+    if plotting: import numpy as np
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q, Avg # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
 
     f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
 
-    uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
+    if plotting:
+        uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
 
-    protocolMeanDAP = [None] * len(uniqueProtocols)
-    protocolNames   = [None] * len(uniqueProtocols)
-    protocolHistogramCounts   = [None] * len(uniqueProtocols)
-    protocolHistogramBinEdges = [None] * len(uniqueProtocols)
+        protocolMeanDAP = [None] * len(uniqueProtocols)
+        protocolNames   = [None] * len(uniqueProtocols)
+        protocolHistogramCounts   = [None] * len(uniqueProtocols)
+        protocolHistogramBinEdges = [None] * len(uniqueProtocols)
 
-    for idx, protocol in enumerate(protocolMeanDAP):
-        protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
-        protocolNames[idx]   = uniqueProtocols[idx].values()[0]
-        dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
-        dapValuesFloatArray = []
-        for idx2, dapValue in enumerate(dapValues):
-            try:
-                dapValuesFloatArray.append(float(dapValue)*1000000)
-            except:
-                pass
+        for idx, protocol in enumerate(protocolMeanDAP):
+            protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
+            protocolNames[idx]   = uniqueProtocols[idx].values()[0]
+            dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValuesFloatArray = []
+            for idx2, dapValue in enumerate(dapValues):
+                try:
+                    dapValuesFloatArray.append(float(dapValue)*1000000)
+                except:
+                    pass
         
-        protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(dapValuesFloatArray, bins=20)
+            protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(dapValuesFloatArray, bins=20)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -99,16 +105,23 @@ def dx_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    return render_to_response(
-        'remapp/dxfiltered.html',
-        {'filter': f, 'admin':admin,
-         'plotNames': protocolNames,
-         'plotData':  protocolMeanDAP,
-         'histogramCounts':   protocolHistogramCounts,
-         'histogramBinEdges': protocolHistogramBinEdges},
-         #'test': test},
-        context_instance=RequestContext(request)
-        )
+    if plotting:
+        return render_to_response(
+            'remapp/dxfiltered.html',
+            {'filter': f, 'admin':admin,
+             'plotNames': protocolNames,
+             'plotData':  protocolMeanDAP,
+             'histogramCounts':   protocolHistogramCounts,
+             'histogramBinEdges': protocolHistogramBinEdges},
+            context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+            'remapp/dxfiltered.html',
+            {'filter': f, 'admin':admin},
+            context_instance=RequestContext(request)
+            )
+
 
 @login_required
 def rf_summary_list_filter(request):
