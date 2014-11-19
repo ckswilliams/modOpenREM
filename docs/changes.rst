@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.5.0b4 (2014-11-16)
+0.5.0b5 (2014-11-19)
 --------------------
 
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
