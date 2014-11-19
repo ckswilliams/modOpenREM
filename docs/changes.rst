@@ -2,10 +2,12 @@
 OpenREM version history
 =======================
 
-0.5.0b4 (2014-11-16)
---------------------
+0.5.0 (2014-11-19)
+------------------
 
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
+* `#132`_  Fixed mammo export error that slipped in before the first beta
+* `#130`_  Only creates ExposureInuAs from Exposure if Exposure exists now
 * `#128`_  Updated some non-core documentation that didn't have the new local_settings.py reference or the new openremproject folder name
 * `#127`_  DX IOD studies with image view populated failed to export due to lack of conversion to string
 * `#126`_  Documentation created for the radiographic functionality
