@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -29,39 +30,57 @@
 ..  module:: dx.
     :synopsis: Module to extract radiation dose related data from DX image objects.
 
-..  moduleauthor:: David Platten
+..  moduleauthor:: David Platten, Ed McDonagh
 
 """
-def _xrayfilters(dataset,source):
+
+
+def _xrayfilters(filttype, material, thickmax, thickmin, source):
+    from remapp.models import Xray_filters
+    from remapp.tools.get_values import get_or_create_cid
+    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    if filttype:
+        filter_types = {'STRIP': {"code": '113650', "meaning": "Strip filter"},
+                        'WEDGE': {"code": '113651', "meaning": "Wedge filter"},
+                        'BUTTERFLY': {"code:": '113652', "meaning": "Butterfly filter"},
+                        'NONE': {"code": '111609', "meaning": "No filter"},
+                        'FLAT': {"code": '113653', "meaning": "Flat filter"},
+        }
+        if filttype in filter_types:
+            filters.xray_filter_type = get_or_create_cid(
+                filter_types[filttype]["code"], filter_types[filttype]["meaning"]
+            )
+    if material:
+        if material.strip().lower() == 'molybdenum':
+            filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
+        if material.strip().lower() == 'rhodium':
+            filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+        if material.strip().lower() == 'silver':
+            filters.xray_filter_material = get_or_create_cid('C-137F9','Silver or Silver compound')
+        if material.strip().lower() == 'aluminum':
+            filters.xray_filter_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
+        if material.strip().lower() == 'copper':
+            filters.xray_filter_material = get_or_create_cid('C-127F9','Copper or Copper compound')
+        if material.strip().lower() == 'niobium':
+            filters.xray_filter_material = get_or_create_cid('C-1190E','Niobium or Niobium compound')
+        if material.strip().lower() == 'europium':
+            filters.xray_filter_material = get_or_create_cid('C-1190F','Europium or Europium compound')
+        if material.strip().lower() == 'lead':
+            filters.xray_filter_material = get_or_create_cid('C-132F9','Lead or Lead compound')
+        if material.strip().lower() == 'tantalum':
+            filters.xray_filter_material = get_or_create_cid('C-156F9','Tantalum or Tantalum compound')
+    if thickmax:
+        filters.xray_filter_thickness_maximum = thickmax
+    if thickmin:
+        filters.xray_filter_thickness_minimum = thickmin
+    filters.save()
+
+def _xrayfiltersnone(source):
     from remapp.models import Xray_filters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
-    xray_filter_material = get_value_kw('FilterMaterial',dataset)
-    if xray_filter_material:
-        if xray_filter_material.strip().lower() == 'molybdenum':
-            filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
-        if xray_filter_material.strip().lower() == 'rhodium':
-            filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
-        if xray_filter_material.strip().lower() == 'silver':
-            filters.xray_filter_material = get_or_create_cid('C-137F9','Silver or Silver compound')
-        if xray_filter_material.strip().lower() == 'aluminum' or xray_filter_material.strip().lower() == 'aluminium':
-            filters.xray_filter_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
-        # Added by DJP on 28/3/2014 to ensure that all possible filters are looked for. Data taken
-        # from https://www.dabsoft.ch/dicom/16/CID_10006/
-        if xray_filter_material.strip().lower() == 'copper':
-            filters.xray_filter_material = get_or_create_cid('C-127F9','Copper or Copper compound')
-        if xray_filter_material.strip().lower() == 'niobium':
-            filters.xray_filter_material = get_or_create_cid('C-1190E','Niobium or Niobium compound')
-        if xray_filter_material.strip().lower() == 'europium':
-            filters.xray_filter_material = get_or_create_cid('C-1190F','Europium or Europium compound')
-        if xray_filter_material.strip().lower() == 'lead':
-            filters.xray_filter_material = get_or_create_cid('C-132F9','Lead or Lead compound')
-        if xray_filter_material.strip().lower() == 'tantalum':
-            filters.xray_filter_material = get_or_create_cid('C-156F9','Tantalum or Tantalum compound')
-        # End of 28/3/2014 DJP additions
-        
-        filters.save()
-    
+    filters.xray_filter_type = get_or_create_cid('111609', "No filter")
+    filters.save()
 
 def _kvp(dataset,source):
     from remapp.models import Kvp
@@ -75,8 +94,11 @@ def _exposure(dataset,source):
     from remapp.models import Exposure
     exp = Exposure.objects.create(irradiation_event_xray_source_data=source)
     from remapp.tools.get_values import get_value_kw
-    exp.exposure = get_value_kw('ExposureInuAs',dataset) # uAs
-    if not exp.exposure: exp.exposure = get_value_kw('Exposure',dataset) * 1000
+    exp.exposure = get_value_kw('ExposureInuAs', dataset) # uAs
+    if not exp.exposure:
+        exposure = get_value_kw('Exposure', dataset)
+        if exposure:
+            exp.exposure = exposure * 1000
     exp.save()
 
 
@@ -93,7 +115,6 @@ def _xraygrid(gridcode,source):
     grid.save()
 
 
-# 28/3/2014 Added by DJP to collect exposure index
 def _irradiationeventxraydetectordata(dataset,event):
     from remapp.models import Irradiation_event_xray_detector_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
@@ -103,15 +124,16 @@ def _irradiationeventxraydetectordata(dataset,event):
     manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
     if   'fuji'       in manufacturer: detector.relative_exposure_unit = 'S ()'
     elif 'carestream' in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
+    elif 'kodak'      in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
     elif 'agfa'       in manufacturer: detector.relative_exposure_unit = 'lgM (Bels)'
     elif 'konica'     in manufacturer: detector.relative_exposure_unit = 'S ()'
     elif 'canon'      in manufacturer: detector.relative_exposure_unit = 'REX ()'
     elif 'swissray'   in manufacturer: detector.relative_exposure_unit = 'DI ()'
     elif 'philips'    in manufacturer: detector.relative_exposure_unit = 'EI ()'
-    elif 'siemens'    in manufacturer: detector.relative_exposure_unit = 'EXI (uGy)'
+    elif 'siemens'    in manufacturer: detector.relative_exposure_unit = u'EXI (μGy)'
     detector.sensitivity = get_value_kw('Sensitivity',dataset)
-    detector.target_exposure_index = get_value_kw('TargetExposureIndex',dataset)
-    detector.deviation_index = get_value_kw('DeviationIndex',dataset)
+    detector.target_exposure_index = get_value_kw('TargetExposureIndex', dataset)
+    detector.deviation_index = get_value_kw('DeviationIndex', dataset)
     detector.save()
 
 
@@ -130,10 +152,43 @@ def _irradiationeventxraysourcedata(dataset,event):
     exp_ctrl_mode = get_value_kw('ExposureControlMode',dataset)
     if exp_ctrl_mode:
         source.exposure_control_mode = exp_ctrl_mode
-    
     source.save()
-    
-    _xrayfilters(dataset,source)
+    xray_filter_type = get_value_kw('FilterType', dataset)
+    xray_filter_material = get_value_kw('FilterMaterial', dataset)
+    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    if xray_filter_type:
+        if xray_filter_type == 'NONE':
+            _xrayfiltersnone(source)
+        elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
+            for i, material in enumerate(xray_filter_material.split(',')):
+                try:
+                    thickmax = None
+                    thickmin = None
+                    if xray_filter_thickness_maximum:
+                        thickmax = xray_filter_thickness_maximum.split(',')[i]
+                    if xray_filter_thickness_minimum:
+                        thickmin = xray_filter_thickness_minimum.split(',')[i]
+                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
+                except IndexError:
+                    pass
+        else:
+            siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
+            if xray_filter_type in siemens_filters:
+                if xray_filter_type == "CU_0.1_MM":
+                    thickmax = 0.1
+                    thickmin = 0.1
+                elif xray_filter_type == "CU_0.2_MM":
+                    thickmax = 0.2
+                    thickmin = 0.2
+                elif xray_filter_type == "CU_0.3_MM":
+                    thickmax = 0.3
+                    thickmin = 0.3
+                _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
+            else:
+                _xrayfilters(
+                    xray_filter_type, xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source
+                )
     _kvp(dataset,source)
     _exposure(dataset,source)
     xray_grid = get_value_kw('Grid',dataset)
@@ -149,7 +204,10 @@ def _doserelateddistancemeasurements(dataset,mech):
     from remapp.models import Dose_related_distance_measurements
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
+    if dist.distance_source_to_detector and "kodak" in manufacturer:
+        dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
     dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToEntrance',dataset)
     dist.distance_source_to_isocenter = get_value_kw('DistanceSourceToIsocenter',dataset)
     dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
@@ -158,7 +216,6 @@ def _doserelateddistancemeasurements(dataset,mech):
     dist.table_height_position = get_value_kw('TableHeightPosition',dataset)
     dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
     dist.radiological_thickness = get_value_num(0x00451049,dataset)
-	
     dist.save()        
 
 
@@ -176,35 +233,8 @@ def _irradiationeventxraymechanicaldata(dataset,event):
     mech.table_head_tilt_angle = get_value_kw('TableHeadTiltAngle',dataset)
     mech.table_horizontal_rotation_angle = get_value_kw('TableHorizontalRotationAngle',dataset)
     mech.table_cradle_tilt_angle = get_value_kw('TableCradleTiltAngle',dataset)
-    mech.compression_thickness = get_value_kw('CompressionThickness',dataset)
-    comp_force = get_value_kw('CompressionForce',dataset)
-    if comp_force:
-        mech.compression_force = float(comp_force)/10 # GE Conformance statement says in N, treating as dN
-    
     mech.save()
     _doserelateddistancemeasurements(dataset,mech)
-
-
-# 28/3/2014 DJP commented the below routine out as it's not relevant to DX images
-#def _accumulatedmammo_update(dataset,event): # TID 10005
-#    from remapp.tools.get_values import get_value_kw, get_or_create_cid
-#    accummam = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_mammography_xray_dose_set.get()
-#    if event.irradiation_event_xray_source_data_set.get().average_glandular_dose:
-#        accummam.accumulated_average_glandular_dose += event.irradiation_event_xray_source_data_set.get().average_glandular_dose
-#    if event.laterality:
-#        if accummam.laterality:
-#            if accummam.laterality.code_meaning == 'Left breast':
-#                if event.laterality.code_meaning == 'Right':
-#                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-#            if accummam.laterality.code_meaning == 'Right breast':
-#                if event.laterality.code_meaning == 'Left':
-#                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-#        else:
-#            if event.laterality.code_meaning == 'Right':
-#                accummam.laterality = get_or_create_cid('T-04020','Right breast')
-#            if event.laterality.code_meaning == 'Left':
-#                accummam.laterality = get_or_create_cid('T-04030','Left breast')
-#    accummam.save()
 
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
@@ -261,14 +291,12 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
     event.save()
     
-    # 28/3/2014 DJP put the line below in
     _irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
     _accumulatedxraydose_update(dataset,event)
 
 
-# 28/3/2014 DJP: removed the mammo bits from the routine below
 def _accumulatedxraydose(dataset,proj):
     from remapp.models import Accumulated_xray_dose, Accumulated_projection_xray_dose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
@@ -391,10 +419,8 @@ def _generalstudymoduleattributes(dataset,g):
     _patientmoduleattributes(dataset,g)
 
     
-# 28/3/2014 DJP renamed the routine below to "_test_if_dx" from "_test_if_mammo" and made code
-# changes to make it DX rather than mammography specific. The routine will accept three types
-# of image:
-# DX image storage                               (SOP UID = '1.2.840.10008.5.1.4.1.1.1')
+# The routine will accept three types of image:
+# CR image storage                               (SOP UID = '1.2.840.10008.5.1.4.1.1.1')
 # Digital x-ray image storage - for presentation (SOP UID = '1.2.840.10008.5.1.4.1.1.1.1')
 # Digital x-ray image storage - for processing   (SOP UID = '1.2.840.10008.5.1.4.1.1.1.1.1')
 # These SOP UIDs were taken from http://www.dicomlibrary.com/dicom/sop/
@@ -405,17 +431,14 @@ def _test_if_dx(dataset):
     return 1
 
 
-# 28/3/2014 DJP renamed this "_dx2db" from "_mammo2db" and made code changes
-# to make it DX rather than mammography specific.
 def _dx2db(dataset):
     import os, sys
     import openrem_settings
     
-    openrem_settings.add_project_to_path()
-#    os.environ['DJANGO_SETTINGS_MODULE'] = '{0}.settings'.format(openrem_settings.openremproject())
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
-
     from django.db import models
+
+    openrem_settings.add_project_to_path()
     from remapp.models import General_study_module_attributes
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
