@@ -65,7 +65,7 @@
                 {{ xrayfilt.xray_filter_thickness_maximum }} mm
             {% endfor %}
         </td>
-        <td>{{ event.irradiation_event_xray_mechanical_data_set.get.dose_related_distance_measurements_set.get.distance_source_to_detector }}</td>
+        <td>{{ event.irradiation_event_xray_mechanical_data_set.get.dose_related_distance_measurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
         <td>
             EI: {{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:1 }} <br>
             EI<sub>T</sub>: {{ event.irradiation_event_xray_detector_data_set.get.target_exposure_index|floatformat:1 }} <br>
