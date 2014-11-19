@@ -83,7 +83,7 @@ Install latest beta version
 
 .. sourcecode:: bash
 
-    pip install --pre openrem==0.5.0b4
+    pip install openrem
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
