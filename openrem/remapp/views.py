@@ -50,6 +50,7 @@ from remapp.models import General_study_module_attributes
 
 try:
     from numpy import *
+    plotting = 1
 except ImportError:
     plotting = 0
     
