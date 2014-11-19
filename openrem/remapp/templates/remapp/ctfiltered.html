@@ -121,6 +121,24 @@ $('.datepicker').datepicker({
 <script src="{{ STATIC_URL }}js/highcharts.js"></script>
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
 
+<!-- Plot of DLP vs. patient weight -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+          Plot of weight vs. total DLP for currently filtered data. Click this text to toggle between hidden and visible.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="DLPvsWeightPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 		<script type="text/javascript">
 $(function () {
     $('#DLPvsWeightPlotDIV').highcharts({
@@ -211,26 +229,10 @@ $(function () {
 });		</script>
 
 
-<div class="panel-group" id="accordion">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
-          Plot of weight vs. total DLP for currently filtered data. Click this text to toggle between hidden and visible.
-        </a>
-      </h4>
-    </div>
-    <div id="collapseOne" class="panel-collapse collapse">
-      <div class="panel-body">
-         <div id="DLPvsWeightPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 {% if plotNames %}
 <script src="{{ STATIC_URL }}js/drilldown.js"></script>
 
+<!-- Plot of mean DLP per acquisition protocol, with drilldown to histogram of DLP values for each protocol. -->
 <div class="panel-group" id="accordion">
   <div class="panel panel-default">
     <div class="panel-heading">
@@ -375,7 +377,157 @@ var chart = new Highcharts.Chart({
         }
     });
 });
+</script>
 
+<!-- Plot of mean DLP per study description, with drilldown to histogram of DLP values for each study description. -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+          Plot mean DLP for each study description in currently filtered data. Click this text to toggle between hidden and visible.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="histogramStudyPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on an individual column to show a histogram of data for that study description.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var studyNames     = [
+                        {% for name in studyPlotNames %}
+                            "{{name}}"
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studyCounts    = [
+                        {% for study in studyHistogramCounts %}
+                            [
+                            {% for dataCounts in study %}
+                                {{dataCounts}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studyBins      = [
+                        {% for studyEdges in studyHistogramBinEdges %}
+                            [
+                            {% for edges in studyEdges %}
+                                {{edges}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studySeriesData = [
+                        {% for testData in studyPlotData %}
+                            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studySeriesDrilldown   = [
+                        {% for studyCountsArray in studyHistogramCounts %}
+                            {id: studyNames[{{forloop.counter}}-1],name: studyNames[{{forloop.counter}}-1],useHTML: true,data: [
+                            {% for dataCounts in studyCountsArray %}
+                                [studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}]}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+</script>
+
+<script type="text/javascript">
+$(function () {
+
+var drilldownTitle = 'Histogram of ';
+var defaultTitle   = 'Mean DLP per study description';
+
+var chart = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo: 'histogramStudyPlotDIV',
+            events: {
+                drilldown: function(e) {
+                    chart.setTitle({ text: drilldownTitle + e.point.name });
+                    chart.yAxis[0].setTitle({text:'Number'});
+                    chart.xAxis[0].setTitle({text:'DLP range (cGy.cm)'});
+                    chart.xAxis[0].setCategories([], true);
+                    chart.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            xyArr.push(this.y.toFixed(0) + ' studies');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                },
+                drillup: function(e) {
+                    chart.setTitle({ text: defaultTitle });
+                    chart.yAxis[0].setTitle({text:'Mean DLP (cGy.cm)'});
+                    chart.xAxis[0].setTitle({text:'Study description'});
+                    chart.xAxis[0].setCategories(studyNames, true);
+                    chart.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                }
+            }
+        },
+        title: {
+            text: 'Mean DLP per study description'
+        },
+        legend: {
+            enabled: false
+        },
+        xAxis: {
+            categories: studyNames,
+            title: {
+                useHTML: true,
+                text: 'Study description'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                useHTML: true,
+                text: 'Mean DLP (cGy.cm)'
+            }
+        },
+        tooltip: {
+            pointFormat:'{point.key} {point.y:.1f} cGy.cm',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Mean DLP per study description',
+            data: studySeriesData
+        }],
+        drilldown: {
+            series: studySeriesDrilldown
+        }
+    });
+});
+</script>
+
+<!-- script to remove the hyper links from x-axis data labels in the plots -->
+<script>
 (function (H) {
     H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
         var point = proceed.call(this, series, options, x),

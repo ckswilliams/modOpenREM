@@ -157,7 +157,7 @@ def ct_summary_list_filter(request):
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
 
     if plotting:
-        #uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
+        # Data for plot of mean DLP per acquisition protocol and also drilldown histogram for each
         uniqueProtocols = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct()
         
         protocolMeanDLP = [None] * len(uniqueProtocols)
@@ -178,6 +178,27 @@ def ct_summary_list_filter(request):
         
             protocolHistogramCounts[idx], protocolHistogramBinEdges[idx] = np.histogram(dlpValuesFloatArray, bins=20)
 
+        # Data for plot of mean DLP per study description and also drilldown histogram for each
+        uniqueStudies = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct()
+        
+        studyMeanDLP = [None] * len(uniqueStudies)
+        studyNames   = [None] * len(uniqueStudies)
+        studyHistogramCounts   = [None] * len(uniqueStudies)
+        studyHistogramBinEdges = [None] * len(uniqueStudies)
+
+        for idx, study in enumerate(studyMeanDLP):
+            studyMeanDLP[idx] = f.qs.filter(study_description=(uniqueStudies[idx].values())[0]).aggregate(Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).values()[0]
+            studyNames[idx]   = uniqueStudies[idx].values()[0]
+            dlpValues = f.qs.filter(study_description=(uniqueStudies[idx].values())[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            dlpValuesFloatArray = []
+            for idx2, dlpValue in enumerate(dlpValues):
+                try:
+                    dlpValuesFloatArray.append(float(dlpValue))
+                except:
+                    pass
+        
+            studyHistogramCounts[idx], studyHistogramBinEdges[idx] = np.histogram(dlpValuesFloatArray, bins=20)
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -196,7 +217,11 @@ def ct_summary_list_filter(request):
              'plotNames': protocolNames,
              'plotData':  protocolMeanDLP,
              'histogramCounts':   protocolHistogramCounts,
-             'histogramBinEdges': protocolHistogramBinEdges},
+             'histogramBinEdges': protocolHistogramBinEdges,
+             'studyPlotNames': studyNames,
+             'studyPlotData':  studyMeanDLP,
+             'studyHistogramCounts':   studyHistogramCounts,
+             'studyHistogramBinEdges': studyHistogramBinEdges},
             context_instance=RequestContext(request)
             )
     else:
