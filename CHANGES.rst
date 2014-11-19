@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.5.0b5 (2014-11-19)
---------------------
+0.5.0 (2014-11-19)
+------------------
 
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
 * `#132`_  Fixed mammo export error that slipped in before the first beta
