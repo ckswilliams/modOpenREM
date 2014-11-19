@@ -62,7 +62,7 @@
         <td>
             {% for xrayfilt in event.irradiation_event_xray_source_data_set.get.xray_filters_set.all %}
                 {{ xrayfilt.xray_filter_material }}
-                {{ xrayfilt.xray_filter_thickness_maximum }}
+                {{ xrayfilt.xray_filter_thickness_maximum }} mm
             {% endfor %}
         </td>
         <td>{{ event.irradiation_event_xray_mechanical_data_set.get.dose_related_distance_measurements_set.get.distance_source_to_detector }}</td>
