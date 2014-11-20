@@ -191,6 +191,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    patient_dap_min = django_filters.NumberFilter(lookup_type='gt', label='Min DAP (Gy.m^2)', name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
+    patient_dap_max = django_filters.NumberFilter(lookup_type='lt', label='Max DAP (Gy.m^2)', name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
     class Meta:
         model = General_study_module_attributes
         fields = [
@@ -204,6 +206,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'model_name',
             'station_name',
             'accession_number',
+            'patient_dap_min',
+            'patient_dap_max',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
