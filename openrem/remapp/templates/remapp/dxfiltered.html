@@ -156,7 +156,13 @@ var protocolBins      = [
                         ];
 var seriesData        = [
                         {% for testData in plotData %}
-                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.0}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesDataN       = [
+                        {% for testData in plotData %}
+                            '{{testData.1}}'
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
@@ -232,7 +238,11 @@ var chart = new Highcharts.Chart({
             }
         },
         tooltip: {
-            pointFormat:'{point.key} {point.y:.1f} cGy.cm<sup>2</sup>',
+            formatter: function () {
+                var index = protocolNames.indexOf(this.x);
+                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>' + '<br/>(n=' + seriesDataN[index] + ')';
+                return comment;// + seriesDataN[index];
+            },
             shared: true,
             useHTML: true
         },

@@ -77,13 +77,15 @@ def dx_summary_list_filter(request):
     if plotting:
         uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
 
-        protocolMeanDAP = [None] * len(uniqueProtocols)
+        #protocolMeanDAP = [None] * len(uniqueProtocols)
+        protocolMeanDAP = [[None for i in xrange(2)] for i in xrange(len(uniqueProtocols))]
         protocolNames   = [None] * len(uniqueProtocols)
         protocolHistogramCounts   = [None] * len(uniqueProtocols)
         protocolHistogramBinEdges = [None] * len(uniqueProtocols)
 
         for idx, protocol in enumerate(protocolMeanDAP):
-            protocolMeanDAP[idx] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
+            protocolMeanDAP[idx][0] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).values()[0] * 1000000
+            protocolMeanDAP[idx][1] = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).count()
             protocolNames[idx]   = uniqueProtocols[idx].values()[0]
             dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             dapValuesFloatArray = []
