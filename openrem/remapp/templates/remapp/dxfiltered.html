@@ -197,7 +197,12 @@ var chart = new Highcharts.Chart({
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.y.toFixed(0) + ' exposures');
+                            console.log(this);
+                            // The line below needs adding to, so that the acquisition protocol can be included, together with the
+                            // first array index of protocolBins (currently forced to 0). I need to access the value e.point.x used
+                            // a few lines above to be able to do this.
+                            linkText =  'acquisition_dap_min=' + (protocolBins[0][this.x])/1000000 + '&acquisition_dap_max=' + (protocolBins[0][this.x+1])/1000000 + '&acquisition_protocol='; // 'date_after=&date_before=&institution_name=&study_description=&acquisition_protocol=Q_01W+Physics+Wall&patient_age_min=&patient_age_max=&manufacturer=&model_name=&station_name=&accession_number=&patient_dap_min=&patient_dap_max=&o=-study_date'
+                            xyArr.push('<a href="/openrem/dx/?' + linkText + '">' + this.y.toFixed(0) + ' exposures</a>');
                         });
                         return xyArr.join('<br/>');
                     }

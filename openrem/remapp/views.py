@@ -72,7 +72,7 @@ def dx_summary_list_filter(request):
     from django.db.models import Q, Avg # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
 
-    f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
+    f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
 
     if plotting:
         uniqueProtocols = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct()
