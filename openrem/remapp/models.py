@@ -228,6 +228,7 @@ class Irradiation_event_xray_source_data(models.Model): # TID 10003b
     Additional to the template:
         * ii_field_size
         * exposure_control_mode
+        * grid information over and above grid type
     """
     irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
     dose_rp = models.DecimalField(max_digits=16,decimal_places=12,blank=True,null=True)
@@ -247,6 +248,13 @@ class Irradiation_event_xray_source_data(models.Model): # TID 10003b
     # not in DICOM standard - 'image intensifier' field size and exposure control mode
     ii_field_size = models.IntegerField(blank=True,null=True)
     exposure_control_mode = models.CharField(max_length=16,blank=True,null=True)
+    grid_absorbing_material = models.Text(blank=True, null=True)
+    grid_spacing_material = models.Text(blank=True, null=True)
+    grid_thickness = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
+    grid_pitch = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
+    grid_aspect_ratio = models.TextField(blank=True, null=True)
+    grid_period = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
+    grid_focal_distance = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
 
 class Xray_grid(models.Model):
     """Content ID 10017 X-Ray Grid
@@ -254,7 +262,7 @@ class Xray_grid(models.Model):
     From DICOM Part 16
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
-    xray_grid = models.ForeignKey(Content_item_descriptions,blank=True,null=True)
+    xray_grid = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
 
 class Pulse_width(models.Model): # EV 113793
     """In TID 10003b. Code value 113793 (ms)
