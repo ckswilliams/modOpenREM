@@ -177,7 +177,13 @@ var protocolBins      = [
                         ];
 var seriesData        = [
                         {% for testData in plotData %}
-                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.0}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesDataN       = [
+                        {% for testData in plotData %}
+                            '{{testData.1}}'
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
@@ -205,9 +211,9 @@ var chart = new Highcharts.Chart({
             renderTo: 'histogramPlotDIV',
             events: {
                 drilldown: function(e) {
-                    chart.setTitle({ text: drilldownTitle + e.point.name });
+                    chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chart.yAxis[0].setTitle({text:'Number'});
-                    chart.xAxis[0].setTitle({text:'DLP range (cGy.cm)'});
+                    chart.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chart.xAxis[0].setCategories([], true);
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
@@ -218,14 +224,14 @@ var chart = new Highcharts.Chart({
                     }
                 },
                 drillup: function(e) {
-                    chart.setTitle({ text: defaultTitle });
-                    chart.yAxis[0].setTitle({text:'Mean DLP (cGy.cm)'});
+                    chart.setTitle({ text: defaultTitle }, { text: '' });
+                    chart.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
                     chart.xAxis[0].setTitle({text:'Protocol name'});
                     chart.xAxis[0].setCategories(protocolNames, true);
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm');
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm');
                         });
                         return xyArr.join('<br/>');
                     }
@@ -249,11 +255,15 @@ var chart = new Highcharts.Chart({
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean DLP (cGy.cm)'
+                text: 'Mean DLP (mGy.cm)'
             }
         },
         tooltip: {
-            pointFormat:'{point.key} {point.y:.1f} cGy.cm',
+            formatter: function () {
+                var index = protocolNames.indexOf(this.x);
+                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + seriesDataN[index] + ')';
+                return comment;
+            },
             shared: true,
             useHTML: true
         },
@@ -324,7 +334,13 @@ var studyBins      = [
                         ];
 var studySeriesData = [
                         {% for testData in studyPlotData %}
-                            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+                            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.0}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studySeriesDataN = [
+                        {% for testData in studyPlotData %}
+                            '{{testData.1}}'
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
@@ -352,9 +368,9 @@ var chart = new Highcharts.Chart({
             renderTo: 'histogramStudyPlotDIV',
             events: {
                 drilldown: function(e) {
-                    chart.setTitle({ text: drilldownTitle + e.point.name });
+                    chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + studySeriesDataN[e.point.x] +')' });
                     chart.yAxis[0].setTitle({text:'Number'});
-                    chart.xAxis[0].setTitle({text:'DLP range (cGy.cm)'});
+                    chart.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chart.xAxis[0].setCategories([], true);
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
@@ -365,14 +381,14 @@ var chart = new Highcharts.Chart({
                     }
                 },
                 drillup: function(e) {
-                    chart.setTitle({ text: defaultTitle });
-                    chart.yAxis[0].setTitle({text:'Mean DLP (cGy.cm)'});
+                    chart.setTitle({ text: defaultTitle }, { text: '' });
+                    chart.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
                     chart.xAxis[0].setTitle({text:'Study description'});
                     chart.xAxis[0].setCategories(studyNames, true);
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm');
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm');
                         });
                         return xyArr.join('<br/>');
                     }
@@ -396,11 +412,15 @@ var chart = new Highcharts.Chart({
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean DLP (cGy.cm)'
+                text: 'Mean DLP (mGy.cm)'
             }
         },
         tooltip: {
-            pointFormat:'{point.key} {point.y:.1f} cGy.cm',
+            formatter: function () {
+                var index = studyNames.indexOf(this.x);
+                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + studySeriesDataN[index] + ')';
+                return comment;
+            },
             shared: true,
             useHTML: true
         },

@@ -162,13 +162,15 @@ def ct_summary_list_filter(request):
         # Data for plot of mean DLP per acquisition protocol and also drilldown histogram for each
         uniqueProtocols = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct()
         
-        protocolMeanDLP = [None] * len(uniqueProtocols)
+        protocolMeanDLP = [[None for i in xrange(2)] for i in xrange(len(uniqueProtocols))]
         protocolNames   = [None] * len(uniqueProtocols)
         protocolHistogramCounts   = [None] * len(uniqueProtocols)
         protocolHistogramBinEdges = [None] * len(uniqueProtocols)
 
         for idx, protocol in enumerate(protocolMeanDLP):
-            protocolMeanDLP[idx] = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('ct_radiation_dose__ct_irradiation_event_data__dlp')).values()[0]
+            protocolMeanDLP[idx][0] = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).aggregate(Avg('ct_radiation_dose__ct_irradiation_event_data__dlp')).values()[0]
+            protocolMeanDLP[idx][1] = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).count()
+
             protocolNames[idx]   = uniqueProtocols[idx].values()[0]
             dlpValues = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=(uniqueProtocols[idx].values())[0]).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
             dlpValuesFloatArray = []
@@ -184,12 +186,14 @@ def ct_summary_list_filter(request):
         uniqueStudies = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct()
         
         studyMeanDLP = [None] * len(uniqueStudies)
+        studyMeanDLP = [[None for i in xrange(2)] for i in xrange(len(uniqueStudies))]
         studyNames   = [None] * len(uniqueStudies)
         studyHistogramCounts   = [None] * len(uniqueStudies)
         studyHistogramBinEdges = [None] * len(uniqueStudies)
 
         for idx, study in enumerate(studyMeanDLP):
-            studyMeanDLP[idx] = f.qs.filter(study_description=(uniqueStudies[idx].values())[0]).aggregate(Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).values()[0]
+            studyMeanDLP[idx][0] = f.qs.filter(study_description=(uniqueStudies[idx].values())[0]).aggregate(Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).values()[0]
+            studyMeanDLP[idx][1] = f.qs.filter(study_description=(uniqueStudies[idx].values())[0]).count()
             studyNames[idx]   = uniqueStudies[idx].values()[0]
             dlpValues = f.qs.filter(study_description=(uniqueStudies[idx].values())[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             dlpValuesFloatArray = []
