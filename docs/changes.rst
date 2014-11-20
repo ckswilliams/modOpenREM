@@ -2,6 +2,12 @@
 OpenREM version history
 =======================
 
+0.5.0b1 (2014-?)
+----------------
+
+* `#137`_  Carestream DX multiple filter thickness values in a DS VR now extracted correctly
+
+
 0.5.0 (2014-11-19)
 ------------------
 

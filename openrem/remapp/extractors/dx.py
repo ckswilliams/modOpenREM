@@ -157,28 +157,31 @@ def _irradiationeventxraysourcedata(dataset,event):
     xray_filter_material = get_value_kw('FilterMaterial', dataset)
     try:
         xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except ValueError:
-        xray_filter_thickness_maximum = None
+    except ValueError as e: # Assumes ValueError will be a comma separated pair of numbers, as per Kodak. If it isn't, this won't work, and won't give an error.
+        try:
+            xray_filter_thickness_maximum = e.message.split(':')[1].strip().split(',')
+        except:
+            xray_filter_thickness_maximum = None
     try:
         xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except ValueError:
-        xray_filter_thickness_minimum = None
+    except ValueError as e:
+        try:
+            xray_filter_thickness_minimum = e.message.split(':')[1].strip().split(',')
+        except:
+            xray_filter_thickness_minimum = None
     if xray_filter_type:
         if xray_filter_type == 'NONE':
             _xrayfiltersnone(source)
         elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
             for i, material in enumerate(xray_filter_material.split(',')):
                 try:
-# Section commented out due to ValueError attempting to get two values with a comma separator from a Decimal String!
-# Help request posted on pydicom forum. Logged as https://bitbucket.org/openrem/openrem/issue/137/
-#                    thickmax = None
-#                    thickmin = None
-#                    if xray_filter_thickness_maximum:
-#                        thickmax = xray_filter_thickness_maximum.split(',')[i]
-#                    if xray_filter_thickness_minimum:
-#                        thickmin = xray_filter_thickness_minimum.split(',')[i]
-#                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
-                    _xrayfilters('FLAT', material, None, None, source)
+                    thickmax = None
+                    thickmin = None
+                    if isinstance(xray_filter_thickness_maximum, list):
+                        thickmax = xray_filter_thickness_maximum[i]
+                    if isinstance(xray_filter_thickness_minimum, list):
+                        thickmin = xray_filter_thickness_minimum[i]
+                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
                 except IndexError:
                     pass
         else:
