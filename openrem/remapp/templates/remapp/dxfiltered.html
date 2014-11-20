@@ -183,6 +183,7 @@ $(function () {
 
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DAP per acquisition protocol';
+var tooltipData = [2];
 
 var chart = new Highcharts.Chart({
         chart: {
@@ -190,18 +191,16 @@ var chart = new Highcharts.Chart({
             renderTo: 'container',
             events: {
                 drilldown: function(e) {
+                    tooltipData[0] = protocolNames[e.point.x];
+                    tooltipData[1] = e.point.x;
                     chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
                     chart.xAxis[0].setCategories([], true);
-                    chart.tooltip.options.formatter = function() {
+                    chart.tooltip.options.formatter = function(e) {
                         var xyArr=[];
-                        $.each(this.points,function(){
-                            console.log(this);
-                            // The line below needs adding to, so that the acquisition protocol can be included, together with the
-                            // first array index of protocolBins (currently forced to 0). I need to access the value e.point.x used
-                            // a few lines above to be able to do this.
-                            linkText =  'acquisition_dap_min=' + (protocolBins[0][this.x])/1000000 + '&acquisition_dap_max=' + (protocolBins[0][this.x+1])/1000000 + '&acquisition_protocol='; // 'date_after=&date_before=&institution_name=&study_description=&acquisition_protocol=Q_01W+Physics+Wall&patient_age_min=&patient_age_max=&manufacturer=&model_name=&station_name=&accession_number=&patient_dap_min=&patient_dap_max=&o=-study_date'
+                        $.each(this.points,function(e){
+                            var linkText = 'acquisition_dap_min=' + (protocolBins[tooltipData[1]][this.x])/1000000 + '&acquisition_dap_max=' + (protocolBins[tooltipData[1]][this.x+1])/1000000 + '&acquisition_protocol=' + tooltipData[0]; // 'date_after=&date_before=&institution_name=&study_description=&patient_age_min=&patient_age_max=&manufacturer=&model_name=&station_name=&accession_number=&patient_dap_min=&patient_dap_max=&o=-study_date'
                             xyArr.push('<a href="/openrem/dx/?' + linkText + '">' + this.y.toFixed(0) + ' exposures</a>');
                         });
                         return xyArr.join('<br/>');
