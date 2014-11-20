@@ -190,7 +190,7 @@ var chart = new Highcharts.Chart({
             renderTo: 'container',
             events: {
                 drilldown: function(e) {
-                    chart.setTitle({ text: drilldownTitle + e.point.name });
+                    chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
                     chart.xAxis[0].setCategories([], true);
@@ -203,7 +203,7 @@ var chart = new Highcharts.Chart({
                     }
                 },
                 drillup: function(e) {
-                    chart.setTitle({ text: defaultTitle });
+                    chart.setTitle({ text: defaultTitle }, { text: '' });
                     chart.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
                     chart.xAxis[0].setTitle({text:'Protocol name'});
                     chart.xAxis[0].setCategories(protocolNames, true);
@@ -241,7 +241,7 @@ var chart = new Highcharts.Chart({
             formatter: function () {
                 var index = protocolNames.indexOf(this.x);
                 var comment = this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>' + '<br/>(n=' + seriesDataN[index] + ')';
-                return comment;// + seriesDataN[index];
+                return comment;
             },
             shared: true,
             useHTML: true
