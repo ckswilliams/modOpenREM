@@ -152,6 +152,20 @@ def _irradiationeventxraysourcedata(dataset,event):
     exp_ctrl_mode = get_value_kw('ExposureControlMode',dataset)
     if exp_ctrl_mode:
         source.exposure_control_mode = exp_ctrl_mode
+    xray_grid = get_value_kw('Grid',dataset)
+    if xray_grid:
+        if xray_grid == 'NONE':
+            _xraygrid('111646',source)
+        elif xray_grid == ['RECIPROCATING', 'FOCUSED']:
+            _xraygrid('111642',source)
+            _xraygrid('111643',source)
+    source.grid_absorbing_material = get_value_kw('GridAbsorbingMaterial', dataset)
+    source.grid_spacing_material = get_value_kw('GridSpacingMaterial', dataset)
+    source.grid_thickness = get_value_kw('GridThickness', dataset)
+    source.grid_pitch = get_value_kw('GridPitch', dataset)
+    source.grid_aspect_ratio = get_value_kw('GridAspectRatio', dataset)
+    source.grid_period = get_value_kw('GridPeriod', dataset)
+    source.grid_focal_distance = get_value_kw('GridFocal', dataset)
     source.save()
     xray_filter_type = get_value_kw('FilterType', dataset)
     xray_filter_material = get_value_kw('FilterMaterial', dataset)
@@ -203,13 +217,6 @@ def _irradiationeventxraysourcedata(dataset,event):
                 )
     _kvp(dataset,source)
     _exposure(dataset,source)
-    xray_grid = get_value_kw('Grid',dataset)
-    if xray_grid:
-        if xray_grid == 'NONE':
-            _xraygrid('111646',source)
-        elif xray_grid == ['RECIPROCATING', 'FOCUSED']:
-            _xraygrid('111642',source)
-            _xraygrid('111643',source)
 
 
 def _doserelateddistancemeasurements(dataset,mech):
