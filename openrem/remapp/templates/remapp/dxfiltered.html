@@ -102,7 +102,7 @@ $('.datepicker').datepicker({
 {% endblock %}
 
 {% block plotdata %}
-{% if plotNames %}
+{% if acquisitionSummary %}
 <script src="{{ STATIC_URL }}js/highcharts.js"></script>
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
 <script src="{{ STATIC_URL }}js/drilldown.js"></script>
@@ -127,15 +127,15 @@ $('.datepicker').datepicker({
 
 <script>
 var protocolNames     = [
-                        {% for name in plotNames %}
-                            "{{name}}"
+                        {% for name in acquisitionSummary %}
+                            "{{name.projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol}}"
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var protocolCounts    = [
-                        {% for protocol in histogramCounts %}
+                        {% for protocol in acquisitionHistogramData %}
                             [
-                            {% for dataCounts in protocol %}
+                            {% for dataCounts in protocol.0 %}
                                 {{dataCounts}}
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}
@@ -144,9 +144,9 @@ var protocolCounts    = [
                         {% endfor %}
                         ];
 var protocolBins      = [
-                        {% for protocolEdges in histogramBinEdges %}
+                        {% for protocolEdges in acquisitionHistogramData %}
                             [
-                            {% for edges in protocolEdges %}
+                            {% for edges in protocolEdges.1 %}
                                 {{edges}}
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}
@@ -155,21 +155,21 @@ var protocolBins      = [
                         {% endfor %}
                         ];
 var seriesData        = [
-                        {% for testData in plotData %}
-                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.0}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                        {% for testData in acquisitionSummary %}
+                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}}*1000000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var seriesDataN       = [
-                        {% for testData in plotData %}
-                            '{{testData.1}}'
+                        {% for testData in acquisitionSummary %}
+                            '{{testData.num_acq}}'
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var seriesDrilldown   = [
-                        {% for protocolCountsArray in histogramCounts %}
+                        {% for protocolCountsArray in acquisitionHistogramData %}
                             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
-                            {% for dataCounts in protocolCountsArray %}
+                            {% for dataCounts in protocolCountsArray.0 %}
                                 [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}]}
