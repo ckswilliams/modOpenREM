@@ -156,7 +156,7 @@ def ct_summary_list_filter(request):
     from django.db.models import Q, Avg # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
 
-    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
+    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT').order_by().distinct())
 
     if plotting:
         # Data for plot of mean DLP per acquisition protocol and also drilldown histogram for each
