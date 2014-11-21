@@ -105,8 +105,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')
-    acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ct_radiation_dose__ct_irradiation_event_data__dlp')
-    acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ct_radiation_dose__ct_irradiation_event_data__dlp')
+    acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min acquisition DLP', name='ct_radiation_dose__ct_irradiation_event_data__dlp')
+    acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max acquisition DLP', name='ct_radiation_dose__ct_irradiation_event_data__dlp')
     class Meta:
         model = General_study_module_attributes
         fields = [
