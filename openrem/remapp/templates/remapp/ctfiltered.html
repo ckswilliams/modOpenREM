@@ -204,6 +204,7 @@ $(function () {
 
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DLP per acquisition protocol';
+var tooltipData = [2];
 
 var chart = new Highcharts.Chart({
         chart: {
@@ -211,6 +212,8 @@ var chart = new Highcharts.Chart({
             renderTo: 'histogramPlotDIV',
             events: {
                 drilldown: function(e) {
+                    tooltipData[0] = protocolNames[e.point.x];
+                    tooltipData[1] = e.point.x;
                     chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
@@ -218,7 +221,8 @@ var chart = new Highcharts.Chart({
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.y.toFixed(0) + ' exposures');
+                            var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
+                            xyArr.push('<a href="/openrem/ct/?' + linkText + '">' + this.y.toFixed(0) + ' exposures.<br/>Click to see.</a>');
                         });
                         return xyArr.join('<br/>');
                     }
@@ -231,7 +235,8 @@ var chart = new Highcharts.Chart({
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm');
+                            var index = protocolNames.indexOf(this.x);
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + seriesDataN[index] + ')');
                         });
                         return xyArr.join('<br/>');
                     }
@@ -361,6 +366,7 @@ $(function () {
 
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DLP per study description';
+var tooltipData = [2];
 
 var chart = new Highcharts.Chart({
         chart: {
@@ -368,6 +374,8 @@ var chart = new Highcharts.Chart({
             renderTo: 'histogramStudyPlotDIV',
             events: {
                 drilldown: function(e) {
+                    tooltipData[0] = studyNames[e.point.x];
+                    tooltipData[1] = e.point.x;
                     chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + studySeriesDataN[e.point.x] +')' });
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
@@ -375,7 +383,8 @@ var chart = new Highcharts.Chart({
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.y.toFixed(0) + ' studies');
+                            var linkText = 'study_dlp_min=' + studyBins[tooltipData[1]][this.x] + '&study_dlp_max=' + studyBins[tooltipData[1]][this.x+1] + '&study_description=' + tooltipData[0];
+                            xyArr.push('<a href="/openrem/ct/?' + linkText + '">' + this.y.toFixed(0) + ' studies.<br/>Click to see.</a>');
                         });
                         return xyArr.join('<br/>');
                     }
@@ -388,7 +397,8 @@ var chart = new Highcharts.Chart({
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm');
+                            var index = studyNames.indexOf(this.x);
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + studySeriesDataN[index] + ')');
                         });
                         return xyArr.join('<br/>');
                     }

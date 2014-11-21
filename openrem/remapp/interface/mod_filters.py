@@ -95,6 +95,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label='Acquisition protocol', name='ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='general_equipment_module_attributes__institution_name')
@@ -102,6 +103,10 @@ class CTSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')
+    study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')
+    acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ct_radiation_dose__ct_irradiation_event_data__dlp')
+    acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ct_radiation_dose__ct_irradiation_event_data__dlp')
     class Meta:
         model = General_study_module_attributes
         fields = [
@@ -109,12 +114,17 @@ class CTSummaryListFilter(django_filters.FilterSet):
             'date_before', 
             'institution_name', 
             'study_description',
+            'acquisition_protocol',
             'patient_age_min',
             'patient_age_max',
             'manufacturer', 
             'model_name',
             'station_name',
             'accession_number',
+            'study_dlp_min',
+            'study_dlp_max',
+            'acquisition_dlp_min',
+            'acquisition_dlp_max',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
@@ -193,12 +203,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
-    #patient_dap_min = django_filters.NumberFilter(lookup_type='gt', label=mark_safe('Min DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
-    #patient_dap_max = django_filters.NumberFilter(lookup_type='lt', label=mark_safe('Max DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
-    study_dap_min = django_filters.NumberFilter(lookup_type='gt', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
-    study_dap_max = django_filters.NumberFilter(lookup_type='lt', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
-    acquisition_dap_max = django_filters.NumberFilter(lookup_type='lt', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')
-    acquisition_dap_min = django_filters.NumberFilter(lookup_type='gt', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')
+    study_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
+    study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total')
+    acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')
+    acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')
     class Meta:
         model = General_study_module_attributes
         fields = [
