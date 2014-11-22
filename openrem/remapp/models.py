@@ -248,8 +248,8 @@ class Irradiation_event_xray_source_data(models.Model): # TID 10003b
     # not in DICOM standard - 'image intensifier' field size and exposure control mode
     ii_field_size = models.IntegerField(blank=True,null=True)
     exposure_control_mode = models.CharField(max_length=16,blank=True,null=True)
-    grid_absorbing_material = models.Text(blank=True, null=True)
-    grid_spacing_material = models.Text(blank=True, null=True)
+    grid_absorbing_material = models.TextField(blank=True, null=True)
+    grid_spacing_material = models.TextField(blank=True, null=True)
     grid_thickness = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
     grid_pitch = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
     grid_aspect_ratio = models.TextField(blank=True, null=True)
