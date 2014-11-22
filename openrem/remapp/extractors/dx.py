@@ -165,7 +165,7 @@ def _irradiationeventxraysourcedata(dataset,event):
     source.grid_pitch = get_value_kw('GridPitch', dataset)
     source.grid_aspect_ratio = get_value_kw('GridAspectRatio', dataset)
     source.grid_period = get_value_kw('GridPeriod', dataset)
-    source.grid_focal_distance = get_value_kw('GridFocal', dataset)
+    source.grid_focal_distance = get_value_kw('GridFocalDistance', dataset)
     source.save()
     xray_filter_type = get_value_kw('FilterType', dataset)
     xray_filter_material = get_value_kw('FilterMaterial', dataset)
