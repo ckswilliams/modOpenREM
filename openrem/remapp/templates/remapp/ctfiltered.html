@@ -148,15 +148,15 @@ $('.datepicker').datepicker({
 
 <script>
 var protocolNames     = [
-                        {% for name in plotNames %}
-                            "{{name}}"
+                        {% for name in acquisitionSummary %}
+                            "{{name.ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol}}"
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var protocolCounts    = [
-                        {% for protocol in histogramCounts %}
+                        {% for protocol in acquisitionHistogramData %}
                             [
-                            {% for dataCounts in protocol %}
+                            {% for dataCounts in protocol.0 %}
                                 {{dataCounts}}
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}
@@ -165,9 +165,9 @@ var protocolCounts    = [
                         {% endfor %}
                         ];
 var protocolBins      = [
-                        {% for protocolEdges in histogramBinEdges %}
+                        {% for protocolEdges in acquisitionHistogramData %}
                             [
-                            {% for edges in protocolEdges %}
+                            {% for edges in protocolEdges.1 %}
                                 {{edges}}
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}
@@ -176,21 +176,21 @@ var protocolBins      = [
                         {% endfor %}
                         ];
 var seriesData        = [
-                        {% for testData in plotData %}
-                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.0}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                        {% for testData in acquisitionSummary %}
+                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var seriesDataN       = [
-                        {% for testData in plotData %}
-                            '{{testData.1}}'
+                        {% for testData in acquisitionSummary %}
+                            '{{testData.num_acq}}'
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var seriesDrilldown   = [
-                        {% for protocolCountsArray in histogramCounts %}
+                        {% for protocolCountsArray in acquisitionHistogramData %}
                             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
-                            {% for dataCounts in protocolCountsArray %}
+                            {% for dataCounts in protocolCountsArray.0 %}
                                 [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}]}
@@ -310,15 +310,15 @@ var chart = new Highcharts.Chart({
 
 <script>
 var studyNames     = [
-                        {% for name in studyPlotNames %}
-                            "{{name}}"
+                        {% for name in studySummary %}
+                            "{{name.study_description}}"
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var studyCounts    = [
-                        {% for study in studyHistogramCounts %}
+                        {% for study in studyHistogramData %}
                             [
-                            {% for dataCounts in study %}
+                            {% for dataCounts in study.0 %}
                                 {{dataCounts}}
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}
@@ -327,9 +327,9 @@ var studyCounts    = [
                         {% endfor %}
                         ];
 var studyBins      = [
-                        {% for studyEdges in studyHistogramBinEdges %}
+                        {% for studyEdges in studyHistogramData %}
                             [
-                            {% for edges in studyEdges %}
+                            {% for edges in studyEdges.1 %}
                                 {{edges}}
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}
@@ -338,21 +338,21 @@ var studyBins      = [
                         {% endfor %}
                         ];
 var studySeriesData = [
-                        {% for testData in studyPlotData %}
-                            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.0}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+                        {% for testData in studySummary %}
+                            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var studySeriesDataN = [
-                        {% for testData in studyPlotData %}
-                            '{{testData.1}}'
+                        {% for testData in studySummary %}
+                            '{{testData.num_acq}}'
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 var studySeriesDrilldown   = [
-                        {% for studyCountsArray in studyHistogramCounts %}
+                        {% for studyCountsArray in studyHistogramData %}
                             {id: studyNames[{{forloop.counter}}-1],name: studyNames[{{forloop.counter}}-1],useHTML: true,data: [
-                            {% for dataCounts in studyCountsArray %}
+                            {% for dataCounts in studyCountsArray.0 %}
                                 [studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}]}
