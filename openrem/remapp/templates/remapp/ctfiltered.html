@@ -124,7 +124,7 @@ $('.datepicker').datepicker({
 
 
 
-{% if plotNames %}
+{% if acquisitionSummary %}
 <script src="{{ STATIC_URL }}js/drilldown.js"></script>
 
 <!-- Plot of mean DLP per acquisition protocol, with drilldown to histogram of DLP values for each protocol. -->
@@ -288,7 +288,9 @@ var chart = new Highcharts.Chart({
     });
 });
 </script>
+{% endif %}
 
+{% if studySummary %}
 <!-- Plot of mean DLP per study description, with drilldown to histogram of DLP values for each study description. -->
 <div class="panel-group" id="accordion">
   <div class="panel panel-default">
@@ -450,6 +452,7 @@ var chart = new Highcharts.Chart({
     });
 });
 </script>
+{% endif %}
 
 <!-- script to remove the hyper links from x-axis data labels in the plots -->
 <script>
@@ -491,6 +494,5 @@ var chart = new Highcharts.Chart({
     });
 })(Highcharts);
 </script>
-{% endif %}
 
 {% endblock %}
