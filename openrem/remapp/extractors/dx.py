@@ -107,11 +107,17 @@ def _xraygrid(gridcode,source):
     from remapp.tools.get_values import get_or_create_cid
     grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
-        grid.xray_grid = get_or_create_cid('111646','No grid')
-    if gridcode == '111642':
-        grid.xray_grid = get_or_create_cid('111642','Focused grid')
-    if gridcode == '111643':
-        grid.xray_grid = get_or_create_cid('111643','Reciprocating grid')
+        grid.xray_grid = get_or_create_cid('111646', 'No grid')
+    elif gridcode == '111641':
+        grid.xray_grid = get_or_create_cid('111641', 'Fixed grid')
+    elif gridcode == '111642':
+        grid.xray_grid = get_or_create_cid('111642', 'Focused grid')
+    elif gridcode == '111643':
+        grid.xray_grid = get_or_create_cid('111643', 'Reciprocating grid')
+    elif gridcode == '111644':
+        grid.xray_grid = get_or_create_cid('111644', 'Parallel grid')
+    elif gridcode == '111645':
+        grid.xray_grid = get_or_create_cid('111645', 'Crossed grid')
     grid.save()
 
 
@@ -155,10 +161,19 @@ def _irradiationeventxraysourcedata(dataset,event):
     xray_grid = get_value_kw('Grid',dataset)
     if xray_grid:
         if xray_grid == 'NONE':
-            _xraygrid('111646',source)
-        elif xray_grid == ['RECIPROCATING', 'FOCUSED']:
-            _xraygrid('111642',source)
-            _xraygrid('111643',source)
+            _xraygrid('111646', source)
+        else:
+            for gtype in xray_grid:
+                if 'FI' in gtype:             # Fixed; abbreviated due to fitting two keywords in 16 characters
+                    _xraygrid('111641', source)
+                elif 'FO' in gtype:             # Focused
+                    _xraygrid('111642', source)
+                elif 'RE' in gtype:             # Reciprocating
+                    _xraygrid('111643', source)
+                elif 'PA' in gtype:             # Parallel
+                    _xraygrid('111644', source)
+                elif 'CR' in gtype:             # Crossed
+                    _xraygrid('111645', source)
     source.grid_absorbing_material = get_value_kw('GridAbsorbingMaterial', dataset)
     source.grid_spacing_material = get_value_kw('GridSpacingMaterial', dataset)
     source.grid_thickness = get_value_kw('GridThickness', dataset)
