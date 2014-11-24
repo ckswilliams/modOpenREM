@@ -230,7 +230,25 @@ def ct_histogram_list_filter(request):
     from django.db.models import Q, Avg, Count # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
 
-    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT', ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=request.GET.get('acquisition_protocol'), ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('acquisition_dlp_min'), ct_radiation_dose__ct_irradiation_event_data__dlp__lte=request.GET.get('acquisition_dlp_max')).order_by().distinct())
+    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        modality_type__exact = 'CT',
+        ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=request.GET.get('acquisition_protocol'),
+        ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('acquisition_dlp_min'),
+        ct_radiation_dose__ct_irradiation_event_data__dlp__lte=request.GET.get('acquisition_dlp_max')
+        ).order_by().distinct())
+
+    if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
+    if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
+    if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
+    if request.GET.get('institution_name')  : f.qs.filter(general_equipment_module_attributes__institution_name=request.GET.get('institution_name'))
+    if request.GET.get('manufacturer')      : f.qs.filter(general_equipment_module_attributes__manufacturer=request.GET.get('manufacturer'))
+    if request.GET.get('model_name')        : f.qs.filter(general_equipment_module_attributes__model_name=request.GET.get('model_name'))
+    if request.GET.get('patient_age_max')   : f.qs.filter(patient_study_module_attributes__patient_age_decimal__lte=request.GET.get('patient_age_max'))
+    if request.GET.get('patient_age_min')   : f.qs.filter(patient_study_module_attributes__patient_age_decimal__gte=request.GET.get('patient_age_min'))
+    if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
+    if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
+    if request.GET.get('study_dlp_max')     : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
+    if request.GET.get('study_dlp_min')     : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
 
     if plotting:
         acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp'))

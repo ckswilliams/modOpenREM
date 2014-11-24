@@ -147,6 +147,7 @@ $('.datepicker').datepicker({
 </div>
 
 <script>
+
 var protocolNames     = [
                         {% for name in acquisitionSummary %}
                             "{{name.ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol}}"
@@ -221,8 +222,9 @@ var chart = new Highcharts.Chart({
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
+                            var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                             var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<a href="/openrem/ct/hist/?' + linkText + '">' + this.y.toFixed(0) + ' exposures.<br/>Click to see.</a>');
+                            xyArr.push('<a href="/openrem/ct/hist/?' + linkText + tooltipFilters + '">' + this.y.toFixed(0) + ' exposures.<br/>Click to see.</a>');
                         });
                         return xyArr.join('<br/>');
                     }
