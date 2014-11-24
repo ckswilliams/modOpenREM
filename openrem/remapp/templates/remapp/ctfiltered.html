@@ -222,7 +222,7 @@ var chart = new Highcharts.Chart({
                         var xyArr=[];
                         $.each(this.points,function(){
                             var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<a href="/openrem/ct/?' + linkText + '">' + this.y.toFixed(0) + ' exposures.<br/>Click to see.</a>');
+                            xyArr.push('<a href="/openrem/ct/hist/?' + linkText + '">' + this.y.toFixed(0) + ' exposures.<br/>Click to see.</a>');
                         });
                         return xyArr.join('<br/>');
                     }

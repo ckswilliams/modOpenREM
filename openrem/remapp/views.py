@@ -107,6 +107,48 @@ def dx_summary_list_filter(request):
             context_instance=RequestContext(request)
             )
 
+@login_required
+def dx_histogram_list_filter(request):
+    if plotting: import numpy as np
+    from remapp.interface.mod_filters import DXSummaryListFilter
+    from django.db.models import Q, Avg, Count # For the Q "OR" query used for DX and CR
+    import pkg_resources # part of setuptools
+
+    f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'), projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('acquisition_protocol'), projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'), projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__lte=request.GET.get('acquisition_dap_max')).order_by().distinct())
+
+    if plotting:
+        acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+        for idx, protocol in enumerate(acquisitionSummary):
+            dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.values()[2]).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    if plotting:
+        return render_to_response(
+            'remapp/dxfiltered.html',
+            {'filter': f, 'admin':admin,
+             'acquisitionSummary': acquisitionSummary,
+             'acquisitionHistogramData': acquisitionHistogramData},
+            context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+            'remapp/dxfiltered.html',
+            {'filter': f, 'admin':admin},
+            context_instance=RequestContext(request)
+            )
+
 
 @login_required
 def rf_summary_list_filter(request):
@@ -139,6 +181,56 @@ def ct_summary_list_filter(request):
     import pkg_resources # part of setuptools
 
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT').order_by().distinct())
+
+    if plotting:
+        acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp'))
+        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+        for idx, protocol in enumerate(acquisitionSummary):
+            dlpValues = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=protocol.values()[2]).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
+            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+
+        studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+        studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
+        for idx, study in enumerate(studySummary):
+            dlpValues = f.qs.filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    if plotting:
+        return render_to_response(
+            'remapp/ctfiltered.html',
+            {'filter': f, 'admin':admin,
+             'studySummary': studySummary,
+             'studyHistogramData': studyHistogramData,
+             'acquisitionSummary': acquisitionSummary,
+             'acquisitionHistogramData': acquisitionHistogramData},
+            context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+            'remapp/ctfiltered.html',
+            {'filter': f, 'admin':admin},
+            context_instance=RequestContext(request)
+            )
+
+@login_required
+def ct_histogram_list_filter(request):
+    if plotting: import numpy as np
+    from remapp.interface.mod_filters import CTSummaryListFilter
+    from django.db.models import Q, Avg, Count # For the Q "OR" query used for DX and CR
+    import pkg_resources # part of setuptools
+
+    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT', ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=request.GET.get('acquisition_protocol'), ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('acquisition_dlp_min'), ct_radiation_dose__ct_irradiation_event_data__dlp__lte=request.GET.get('acquisition_dlp_max')).order_by().distinct())
 
     if plotting:
         acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp'))
