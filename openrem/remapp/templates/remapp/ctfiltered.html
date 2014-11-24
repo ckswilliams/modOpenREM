@@ -192,7 +192,7 @@ var seriesDrilldown   = [
                         {% for protocolCountsArray in acquisitionHistogramData %}
                             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
                             {% for dataCounts in protocolCountsArray.0 %}
-                                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}]}
                             {% if not forloop.last %},{% endif %}
@@ -357,7 +357,7 @@ var studySeriesDrilldown   = [
                         {% for studyCountsArray in studyHistogramData %}
                             {id: studyNames[{{forloop.counter}}-1],name: studyNames[{{forloop.counter}}-1],useHTML: true,data: [
                             {% for dataCounts in studyCountsArray.0 %}
-                                [studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' to < ' + studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                                [studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
                                 {% if not forloop.last %},{% endif %}
                             {% endfor %}]}
                             {% if not forloop.last %},{% endif %}
