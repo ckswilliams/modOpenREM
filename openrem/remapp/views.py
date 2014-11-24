@@ -78,7 +78,7 @@ def dx_summary_list_filter(request):
         acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
     try:
@@ -120,7 +120,7 @@ def dx_histogram_list_filter(request):
         acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
     try:
