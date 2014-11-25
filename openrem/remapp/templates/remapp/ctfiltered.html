@@ -141,6 +141,9 @@ $('.datepicker').datepicker({
       <div class="panel-body">
          <div id="histogramPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
          <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+         <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+         Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+         more data than shown in the histogram bin.</p>
       </div>
     </div>
   </div>
@@ -311,7 +314,10 @@ var chart = new Highcharts.Chart({
     <div id="collapseThree" class="panel-collapse collapse">
       <div class="panel-body">
          <div id="histogramStudyPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
-         <p>Click on an individual column to show a histogram of data for that study description.</p>
+         <p>Click on an individual column to show a histogram of data for that study.</p>
+         <p>Click on a histogram bin tooltip to see the studies in the bin. Note that this will
+         include studies at the upper bin boundary, so in some cases may display more data than
+         shown in the histogram bin.</p>
       </div>
     </div>
   </div>
