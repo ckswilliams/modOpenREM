@@ -219,6 +219,7 @@ var chart = new Highcharts.Chart({
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chart.xAxis[0].setCategories([], true);
+                    chart.xAxis[0].update({labels:{rotation:0}});
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -234,6 +235,7 @@ var chart = new Highcharts.Chart({
                     chart.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
                     chart.xAxis[0].setTitle({text:'Protocol name'});
                     chart.xAxis[0].setCategories(protocolNames, true);
+                    chart.xAxis[0].update({labels:{rotation:90}});
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -256,6 +258,9 @@ var chart = new Highcharts.Chart({
             title: {
                 useHTML: true,
                 text: 'Protocol name'
+            },
+            labels: {
+                rotation:90
             }
         },
         yAxis: {
@@ -384,6 +389,7 @@ var chart = new Highcharts.Chart({
                     chart.yAxis[0].setTitle({text:'Number'});
                     chart.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chart.xAxis[0].setCategories([], true);
+                    chart.xAxis[0].update({labels:{rotation:0}});
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -399,6 +405,7 @@ var chart = new Highcharts.Chart({
                     chart.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
                     chart.xAxis[0].setTitle({text:'Study description'});
                     chart.xAxis[0].setCategories(studyNames, true);
+                    chart.xAxis[0].update({labels:{rotation:90}});
                     chart.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -421,6 +428,9 @@ var chart = new Highcharts.Chart({
             title: {
                 useHTML: true,
                 text: 'Study description'
+            },
+            labels: {
+                rotation:90
             }
         },
         yAxis: {
