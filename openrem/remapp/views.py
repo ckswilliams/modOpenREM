@@ -75,7 +75,7 @@ def dx_summary_list_filter(request):
     f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
 
     if plotting:
-        acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+        acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
             dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
@@ -147,7 +147,7 @@ def dx_histogram_list_filter(request):
     if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
 
     if plotting:
-        acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+        acquisitionSummary = f.qs.exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol__isnull=True)|Q(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol='')).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
             dapValues = f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
@@ -213,13 +213,13 @@ def ct_summary_list_filter(request):
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT').order_by().distinct())
 
     if plotting:
-        acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp'))
+        acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp')).order_by('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=protocol.get('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
-        studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+        studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
         for idx, study in enumerate(studySummary):
             dlpValues = f.qs.filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
@@ -293,13 +293,13 @@ def ct_histogram_list_filter(request):
     if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
 
     if plotting:
-        acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp'))
+        acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp')).order_by('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=protocol.get('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
-        studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+        studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
         for idx, study in enumerate(studySummary):
             dlpValues = f.qs.filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
