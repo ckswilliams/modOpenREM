@@ -395,7 +395,7 @@ var chart = new Highcharts.Chart({
                         $.each(this.points,function(){
                             var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                             var linkText = 'study_dlp_min=' + studyBins[tooltipData[1]][this.x] + '&study_dlp_max=' + studyBins[tooltipData[1]][this.x+1] + '&study_description=' + tooltipData[0];
-                            xyArr.push('<a href="/openrem/ct/hist/?&' + linkText + tooltipFilters + '">' + this.y.toFixed(0) + ' studies.<br/>Click to see.</a>');
+                            xyArr.push('<a href="/openrem/ct/hist/?studyhist=1&' + linkText + tooltipFilters + '">' + this.y.toFixed(0) + ' studies.<br/>Click to see.</a>');
                         });
                         return xyArr.join('<br/>');
                     }

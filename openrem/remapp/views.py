@@ -125,13 +125,23 @@ def dx_histogram_list_filter(request):
         if request.GET.get('study_dap_max')     : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
         if request.GET.get('study_dap_min')     : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
 
-    else:
+    elif request.GET.get('studyhist'):
         f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
             projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('study_description'),
             projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
             projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__lte=request.GET.get('study_dap_max')
             ).order_by().distinct())
+        if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
+        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
+        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+
+    else:
+        f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
+        if request.GET.get('study_description')    : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('study_description'))
+        if request.GET.get('study_dap_min')        : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
+        if request.GET.get('study_dap_max')        : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
         if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
         if request.GET.get('acquisition_dap_max')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
         if request.GET.get('acquisition_dap_min')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
@@ -271,7 +281,7 @@ def ct_histogram_list_filter(request):
         if request.GET.get('study_dlp_max')     : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
         if request.GET.get('study_dlp_min')     : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
 
-    else:
+    elif request.GET.get('studyhist'):
         f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
             modality_type__exact = 'CT',
             study_description=request.GET.get('study_description'),
@@ -281,6 +291,16 @@ def ct_histogram_list_filter(request):
         if request.GET.get('acquisition_protocol') : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=request.GET.get('acquisition_protocol'))
         if request.GET.get('acquisition_dlp_max')  : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__dlp__lte=request.GET.get('study_dlp_max'))
         if request.GET.get('acquisition_dlp_min')  : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('study_dlp_min'))
+
+    else:
+        f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+            modality_type__exact = 'CT').order_by().distinct())
+        if request.GET.get('study_description')    : f.qs.filter(study_description=request.GET.get('study_description'))
+        if request.GET.get('study_dlp_min')        : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
+        if request.GET.get('study_dlp_max')        : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
+        if request.GET.get('acquisition_protocol') : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=request.GET.get('acquisition_protocol'))
+        if request.GET.get('study_dlp_max')        : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__dlp__lte=request.GET.get('study_dlp_max'))
+        if request.GET.get('study_dlp_min')        : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('study_dlp_min'))
 
     if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
     if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
