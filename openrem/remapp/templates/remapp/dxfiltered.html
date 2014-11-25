@@ -203,7 +203,7 @@ var chart = new Highcharts.Chart({
                         $.each(this.points,function(){
                             var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                             var linkText = 'acquisition_dap_min=' + (protocolBins[tooltipData[1]][this.x])/1000000 + '&acquisition_dap_max=' + (protocolBins[tooltipData[1]][this.x+1])/1000000 + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFilters + '">' + this.y.toFixed(0) + ' exposures.<br/>Click to see.</a>');
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }
