@@ -80,7 +80,7 @@ $('.datepicker').datepicker({
       {% autopaginate filter.qs 25 as filter_list %}
       {% paginate %}
     <table class="table table-striped">
-        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
+        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
         {% if admin.adminperm %}
         <th>Delete?</th>
         {% endif %}
@@ -95,9 +95,8 @@ $('.datepicker').datepicker({
             <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
             <td>
                 <a href="/openrem/ct/{{ exam.id }}/">{{ exam.study_description }}</a> |
-                {{ exam.accession_number }} |
-                {{ exam.patient_study_module_attributes_set.get.patient_size|floatformat:0 }} cm |
-                {{ exam.patient_study_module_attributes_set.get.patient_weight|floatformat:0 }} kg
+                {{ exam.requested_procedure_code_meaning }} |
+                {{ exam.accession_number }}
             </td>
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
             <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>

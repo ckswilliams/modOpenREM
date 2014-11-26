@@ -96,6 +96,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label='Acquisition protocol', name='ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label='Requested procedure', name='requested_procedure_code_meaning')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patient_study_module_attributes__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='general_equipment_module_attributes__institution_name')
@@ -115,6 +116,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
             'institution_name', 
             'study_description',
             'acquisition_protocol',
+            'requested_procedure',
             'patient_age_min',
             'patient_age_max',
             'manufacturer', 
