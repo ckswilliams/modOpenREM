@@ -184,20 +184,33 @@ def _irradiationeventxraysourcedata(dataset,event):
     source.save()
     xray_filter_type = get_value_kw('FilterType', dataset)
     xray_filter_material = get_value_kw('FilterMaterial', dataset)
+
+    try: # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except ValueError: # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052) # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value = thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+        else:
+            xray_filter_thickness_minimum = None
+
     try:
         xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except ValueError as e: # Assumes ValueError will be a comma separated pair of numbers, as per Kodak. If it isn't, this won't work, and won't give an error.
-        try:
-            xray_filter_thickness_maximum = e.message.split(':')[1].strip().split(',')
-        except:
+    except ValueError: # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054) # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value = thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+        else:
             xray_filter_thickness_maximum = None
-    try:
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except ValueError as e:
-        try:
-            xray_filter_thickness_minimum = e.message.split(':')[1].strip().split(',')
-        except:
-            xray_filter_thickness_minimum = None
+
     if xray_filter_type:
         if xray_filter_type == 'NONE':
             _xrayfiltersnone(source)
