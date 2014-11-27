@@ -1,7 +1,8 @@
 Configuring Conquest DICOM server to accept x-ray radiation dose structured reports
 ***********************************************************************************
 
-The Conquest DICOM server only accepts incoming DICOM objects if they have a service-object pair (SOP) unique identifier that appears in the ``dgatesop.lst`` file, located in the root of the Conquest installation folder.
+The Conquest DICOM server only accepts incoming DICOM objects if they have a service-object pair (SOP) unique identifier that appears in the ``dgatesop.lst`` file, located in the root of the Conquest installation folder. This file is created by the Conquest DICOM server
+ automatically when it is first run.
 
 By default this file does not contain the SOP information for x-ray radiation dose structured reports (RDSRs). It is easy to add this: open the ``dgatesop.lst`` file in a text editor and add the following line::
 
