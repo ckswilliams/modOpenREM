@@ -171,6 +171,7 @@ class Accumulated_xray_dose(models.Model):  # TID 10002
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
     acquisition_plane = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
 
+
 class Calibration(models.Model):
     """Table to hold the calibration information
     
@@ -178,13 +179,14 @@ class Calibration(models.Model):
     
     """
     accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
-    dose_measurement_device = models.ForeignKey(Content_item_descriptions,blank=True,null=True)
+    dose_measurement_device = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
     calibration_date = models.DateTimeField(blank=True, null=True)
-    calibration_factor = models.DecimalField(max_digits=8,decimal_places=5,blank=True,null=True)
-    calibration_uncertainty = models.DecimalField(max_digits=8,decimal_places=5,blank=True,null=True)
+    calibration_factor = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    calibration_uncertainty = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
     calibration_responsible_party = models.TextField(blank=True, null=True)
 
-class Irradiation_event_xray_data(models.Model): # TID 10003
+
+class Irradiation_event_xray_data(models.Model):  # TID 10003
     """Irradiation Event X-Ray Data TID 10003
     
     From DICOM part 16:
@@ -192,33 +194,41 @@ class Irradiation_event_xray_data(models.Model): # TID 10003
     
     """
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
-    acquisition_plane = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_plane')
+    acquisition_plane = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003_plane')
     irradiation_event_uid = models.TextField(blank=True, null=True)
     irradiation_event_label = models.TextField(blank=True, null=True)
-    label_type = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_labeltype')
+    label_type = models.ForeignKey(Content_item_descriptions, blank=True, null=True, related_name='tid10003_labeltype')
     date_time_started = models.DateTimeField(blank=True, null=True)
-    irradiation_event_type = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_eventtype')
+    irradiation_event_type = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003_eventtype')
     acquisition_protocol = models.TextField(blank=True, null=True)
-    anatomical_structure = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_anatomy')
-    laterality = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_laterality')
-    image_view = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_view')
-    projection_eponymous_name = models.CharField(max_length=16,blank=True)
-    patient_table_relationship = models.CharField(max_length=16,blank=True)
-    patient_orientation = models.CharField(max_length=16,blank=True)
-    patient_orientation_modifier = models.CharField(max_length=16,blank=True)
-    target_region = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_region')
-    dose_area_product = models.DecimalField(max_digits=16,decimal_places=12,blank=True,null=True)
-    half_value_layer = models.DecimalField(max_digits=8,decimal_places=5,blank=True,null=True)
-    entrance_exposure_at_rp = models.DecimalField(max_digits=8,decimal_places=4,blank=True,null=True)
-    reference_point_definition = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10003_rpdefinition')
-    breast_composition = models.CharField(max_length=16,blank=True) # TID 4007, CID 6000
-    percent_fibroglandular_tissue = models.DecimalField(max_digits=6,decimal_places=3,blank=True,null=True) # TID 4007
+    anatomical_structure = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003_anatomy')
+    laterality = models.ForeignKey(Content_item_descriptions, blank=True, null=True, related_name='tid10003_laterality')
+    image_view = models.ForeignKey(Content_item_descriptions, blank=True, null=True, related_name='tid10003_view')
+    projection_eponymous_name = models.CharField(max_length=16, blank=True)
+    patient_table_relationship = models.CharField(max_length=16, blank=True)
+    patient_orientation = models.CharField(max_length=16, blank=True)
+    patient_orientation_modifier = models.CharField(max_length=16, blank=True)
+    target_region = models.ForeignKey(Content_item_descriptions, blank=True, null=True, related_name="tid10003_region")
+    dose_area_product = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
+    half_value_layer = models.DecimalField(max_digits=8, decimal_places=5, blank=True, null=True)
+    entrance_exposure_at_rp = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+    reference_point_definition = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003_rpdefinition')
+    breast_composition = models.CharField(max_length=16, blank=True)  # TID 4007, CID 6000
+    percent_fibroglandular_tissue = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)  # TID 4007
     comment = models.TextField(blank=True, null=True)
+
     def __unicode__(self):
         return self.irradiation_event_uid
-    def convert_gym2_to_cgycm2(self): # not used anywhere?
-        if self.dose_area_product: return 1000000*self.dose_area_product
+
+    def convert_gym2_to_cgycm2(self):
+        if self.dose_area_product:
+            return 1000000*self.dose_area_product
     
+
 class Image_view_modifier(models.Model): # EV 111032
     """Table to hold image view modifiers for the irradiation event xray data table
     
