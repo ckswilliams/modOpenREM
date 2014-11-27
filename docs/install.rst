@@ -358,6 +358,7 @@ Related guides
         conquestAsWindowsService
         backupMySQLWindows
         conquestImportConfig
+        conquestAddRDSR
 
 Advanced guides for developers
 ------------------------------
