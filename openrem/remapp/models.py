@@ -135,29 +135,22 @@ class Projection_xray_radiation_dose(models.Model):  # TID 10001
     """
     general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
     procedure_reported = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_procedure'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_procedure')
     has_intent = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_intent'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_intent')
     acquisition_device_type = models.CharField(max_length=16, blank=True)
     scope_of_accumulation = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_scope'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_scope')
     xray_detector_data_available = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_detector'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_detector')
     xray_source_data_available = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_source'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_source')
     xray_mechanical_data_available = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_mech'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_mech')
     comment = models.TextField(blank=True, null=True)
     # might need to be a table on its own as is 1-n, even though it should only list the primary source...
     source_of_dose_information = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_infosource'
-    )
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_infosource')
 
 
 class Accumulated_xray_dose(models.Model):  # TID 10002
