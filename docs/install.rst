@@ -357,6 +357,7 @@ Related guides
         
         conquestAsWindowsService
         backupMySQLWindows
+        conquestImportConfig
 
 Advanced guides for developers
 ------------------------------
