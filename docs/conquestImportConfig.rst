@@ -7,7 +7,7 @@ These actions are set up in the ``dicom.ini`` file, located in the root of the C
 
 For example::
     ImportModality1   = MG
-    ImportConverter1  = save to C:\conquest\dosedata\mammo\%o.dcm; system C:\conquest\openrem-mam-launch.bat C:\conquest\dosedata\mammo\%o.dcm; destroy
+    ImportConverter1  = save to C:\\conquest\\dosedata\\mammo\\%o.dcm; system C:\\conquest\\openrem-mam-launch.bat C:\\conquest\\dosedata\\mammo\\%o.dcm; destroy
 
 ``ImportModality1 = MG`` tells Conquest that modality 1 is MG. The commands listed in the ``ImportConverter1`` line are then run on all incoming MG images.
 
