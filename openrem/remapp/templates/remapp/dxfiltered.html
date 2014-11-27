@@ -301,7 +301,7 @@ function sort_by_y(a,b) {
     return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0)); // a[1] for col. 2 etc...
 }
 
-var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 var protocolPiechartData = new Array(protocolNames.length);
 for(var i=0; i<protocolNames.length; i++) {
     protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
