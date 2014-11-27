@@ -275,7 +275,80 @@ var chart = new Highcharts.Chart({
         }
     });
 });
+</script>
 
+
+<!-- Pie chart of frequency of acquisitions. -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart">
+          Pie chart showing a breakdown of acquisition protocol frequency.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="piechartProtocolDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+var protocolPiechartData = new Array(protocolNames.length);
+for(var i=0; i<protocolNames.length; i++) {
+    protocolPiechartData[i] = new Array(protocolNames[i], parseInt(seriesDataN[i]));
+}
+
+function sort_by_column(a,b)
+{
+    return ((a[1] < b[1]) ? -1 : ((a[1] > b[1]) ? 1 : 0)); // a[1] for col. 2 etc...
+}
+
+protocolPiechartData.sort(sort_by_column);
+
+$(function () {
+
+var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'piechartProtocolDIV',
+            plotBackgroundColor: null,
+            plotBorderWidth: 1,//null,
+            plotShadow: false
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Study frequency',
+            data: protocolPiechartData
+        }]
+    });
+});
+</script>
+
+
+<script>
 (function (H) {
     H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
         var point = proceed.call(this, series, options, x),
