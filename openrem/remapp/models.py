@@ -33,6 +33,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
+
 class Size_upload(models.Model):
     sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)
@@ -45,7 +46,8 @@ class Size_upload(models.Model):
     num_records = models.IntegerField(blank=True, null=True)
     logfile = models.FileField(upload_to='sizelogs/%Y/%m/%d', null=True)
     import_date = models.DateTimeField(blank=True, null=True)
-    processtime = models.FloatField(blank=True,null=True)
+    processtime = models.FloatField(blank=True, null=True)
+
 
 class Exports(models.Model):
     """Table to hold the export status and filenames
@@ -54,26 +56,30 @@ class Exports(models.Model):
     filename = models.FileField(upload_to='exports/%Y/%m/%d', null=True)
     status = models.TextField(blank=True, null=True)
     progress = models.TextField(blank=True, null=True)
-    modality = models.CharField(max_length=8, blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
     num_records = models.IntegerField(blank=True, null=True)
     export_type = models.TextField(blank=True, null=True)
     export_date = models.DateTimeField(blank=True, null=True)
-    processtime = models.DecimalField(max_digits=30,decimal_places=10,blank=True,null=True)
+    processtime = models.DecimalField(max_digits=30, decimal_places=10, blank=True,null=True)
+
 
 class Content_item_descriptions(models.Model):
     """Table to hold all the context ID code values and code meanings.
     
-    + Should be renamed Context_identifiers. If it does, I think it would only need to be edited in tools.get_values.get_or_set_cid and admin, then a South migration.
-    + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. This assumes they are used correctly.
+    + Should be renamed Context_identifiers. If it does, I think it would only need to be edited in \
+    tools.get_values.get_or_set_cid and admin, then a South migration.
+    + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. \
+    This assumes they are used correctly.
     
     """    
     code_value = models.CharField(max_length=16)
     code_meaning = models.TextField(blank=True, null=True)
-    cid_table = models.CharField(max_length=16,blank=True)
+    cid_table = models.CharField(max_length=16, blank=True)
     def __unicode__(self):
         return self.code_meaning
     class Meta:
         ordering = ['code_value']
+
 
 class General_study_module_attributes(models.Model): # C.7.2.1
     """General Study Module C.7.2.1
@@ -95,22 +101,23 @@ class General_study_module_attributes(models.Model): # C.7.2.1
     study_time = models.TimeField(blank=True, null=True)
     referring_physician_name = models.TextField(blank=True, null=True)
     referring_physician_identification = models.TextField(blank=True, null=True)
-    study_id = models.CharField(max_length=16,blank=True,null=True)
-    accession_number = models.CharField(max_length=16,blank=True,null=True)
-    study_description = models.TextField(blank=True,null=True)
-    physician_of_record = models.TextField(blank=True,null=True)
-    name_of_physician_reading_study = models.TextField(blank=True,null=True)
+    study_id = models.CharField(max_length=16, blank=True, null=True)
+    accession_number = models.CharField(max_length=16, blank=True, null=True)
+    study_description = models.TextField(blank=True, null=True)
+    physician_of_record = models.TextField(blank=True, null=True)
+    name_of_physician_reading_study = models.TextField(blank=True, null=True)
     # Possibly need a few sequences linked to this table...
     # Next three don't belong in this table, but they don't belong anywhere in a RDSR!
-    performing_physician_name = models.TextField(blank=True,null=True)
-    operator_name = models.TextField(blank=True,null=True)
-    modality_type = models.CharField(max_length=8,blank=True,null=True)
-    procedure_code_value = models.CharField(max_length=16,blank=True,null=True)
-    procedure_code_meaning = models.TextField(blank=True,null=True)
-    requested_procedure_code_value = models.CharField(max_length=16,blank=True,null=True)
-    requested_procedure_code_meaning = models.TextField(blank=True,null=True)
+    performing_physician_name = models.TextField(blank=True, null=True)
+    operator_name = models.TextField(blank=True, null=True)
+    modality_type = models.CharField(max_length=16, blank=True, null=True)
+    procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    procedure_code_meaning = models.TextField(blank=True, null=True)
+    requested_procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    requested_procedure_code_meaning = models.TextField(blank=True, null=True)
     def __unicode__(self):
         return self.study_instance_uid
+
 
 class Projection_xray_radiation_dose(models.Model): # TID 10001
     """Projection X-Ray Radiation Dose template TID 10001
@@ -124,15 +131,31 @@ class Projection_xray_radiation_dose(models.Model): # TID 10001
     
     """
     general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
-    procedure_reported = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_procedure')
-    has_intent = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_intent')
-    acquisition_device_type = models.CharField(max_length=16,blank=True)
-    scope_of_accumulation = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_scope')
-    xray_detector_data_available = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_detector')
-    xray_source_data_available = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_source')
-    xray_mechanical_data_available = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_mech')
+    procedure_reported = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_procedure'
+    )
+    has_intent = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_intent'
+    )
+    acquisition_device_type = models.CharField(max_length=16, blank=True)
+    scope_of_accumulation = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_scope'
+    )
+    xray_detector_data_available = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_detector'
+    )
+    xray_source_data_available = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_source'
+    )
+    xray_mechanical_data_available = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_mech'
+    )
     comment = models.TextField(blank=True, null=True)
-    source_of_dose_information = models.ForeignKey(Content_item_descriptions,blank=True,null=True, related_name='tid10001_infosource') # might need to be a table on its own as is 1-n, even though it should only list the primary source...
+    # might need to be a table on its own as is 1-n, even though it should only list the primary source...
+    source_of_dose_information = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10001_infosource'
+    )
+
 
 class Accumulated_xray_dose(models.Model): # TID 10002
     """Accumulated X-Ray Dose TID 10002
@@ -143,7 +166,7 @@ class Accumulated_xray_dose(models.Model): # TID 10002
     
     """
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
-    acquisition_plane = models.ForeignKey(Content_item_descriptions,blank=True,null=True)
+    acquisition_plane = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
 
 class Calibration(models.Model):
     """Table to hold the calibration information
