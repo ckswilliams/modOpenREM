@@ -60,7 +60,7 @@ class Exports(models.Model):
     num_records = models.IntegerField(blank=True, null=True)
     export_type = models.TextField(blank=True, null=True)
     export_date = models.DateTimeField(blank=True, null=True)
-    processtime = models.DecimalField(max_digits=30, decimal_places=10, blank=True,null=True)
+    processtime = models.DecimalField(max_digits=30, decimal_places=10, blank=True, null=True)
 
 
 class Content_item_descriptions(models.Model):
@@ -75,13 +75,15 @@ class Content_item_descriptions(models.Model):
     code_value = models.CharField(max_length=16)
     code_meaning = models.TextField(blank=True, null=True)
     cid_table = models.CharField(max_length=16, blank=True)
+
     def __unicode__(self):
         return self.code_meaning
+
     class Meta:
         ordering = ['code_value']
 
 
-class General_study_module_attributes(models.Model): # C.7.2.1
+class General_study_module_attributes(models.Model):  # C.7.2.1
     """General Study Module C.7.2.1
     
     Specifies the Attributes that describe and identify the Study 
@@ -115,11 +117,12 @@ class General_study_module_attributes(models.Model): # C.7.2.1
     procedure_code_meaning = models.TextField(blank=True, null=True)
     requested_procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
+
     def __unicode__(self):
         return self.study_instance_uid
 
 
-class Projection_xray_radiation_dose(models.Model): # TID 10001
+class Projection_xray_radiation_dose(models.Model):  # TID 10001
     """Projection X-Ray Radiation Dose template TID 10001
     
     From DICOM Part 16:
@@ -157,7 +160,7 @@ class Projection_xray_radiation_dose(models.Model): # TID 10001
     )
 
 
-class Accumulated_xray_dose(models.Model): # TID 10002
+class Accumulated_xray_dose(models.Model):  # TID 10002
     """Accumulated X-Ray Dose TID 10002
     
     From DICOM Part 16:
