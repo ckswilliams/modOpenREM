@@ -297,18 +297,19 @@ var chart = new Highcharts.Chart({
 </div>
 
 <script type="text/javascript">
-
-var protocolPiechartData = new Array(protocolNames.length);
-for(var i=0; i<protocolNames.length; i++) {
-    protocolPiechartData[i] = new Array(protocolNames[i], parseInt(seriesDataN[i]));
-}
-
-function sort_by_column(a,b)
-{
+function sort_by_column(a,b) {
     return ((a[1] < b[1]) ? -1 : ((a[1] > b[1]) ? 1 : 0)); // a[1] for col. 2 etc...
 }
 
+var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+var protocolPiechartData = new Array(protocolNames.length);
+for(var i=0; i<protocolNames.length; i++) {
+    protocolPiechartData[i] = new Array(protocolNames[i], parseInt(seriesDataN[i]), urlStart+protocolNames[i]);
+}
 protocolPiechartData.sort(sort_by_column);
+for(var i=0; i<protocolNames.length; i++) {
+        protocolPiechartData[i] = {name:protocolPiechartData[i][0], y:protocolPiechartData[i][1],url:protocolPiechartData[i][2]};
+}
 
 $(function () {
 
@@ -327,7 +328,7 @@ var chart = new Highcharts.Chart({
         },
         plotOptions: {
             pie: {
-                allowPointSelect: true,
+                allowPointSelect: false,
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
@@ -341,6 +342,14 @@ var chart = new Highcharts.Chart({
         series: [{
             type: 'pie',
             name: 'Study frequency',
+            point: {
+                events: {
+                    click: function(e) {
+                        location.href = e.point.url;
+                        e.preventDefault();
+                    }
+                }
+            },
             data: protocolPiechartData
         }]
     });
