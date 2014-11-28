@@ -262,13 +262,13 @@ class Irradiation_event_xray_detector_data(models.Model):  # TID 10003a
         the equipment.
     """
     irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
-    exposure_index = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    target_exposure_index = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    deviation_index = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    exposure_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    target_exposure_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    deviation_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # New fields added to record the non-IEC exposure index from CR/DX image headers
-    relative_xray_exposure = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True)
+    relative_xray_exposure = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     relative_exposure_unit = models.CharField(max_length=16, blank=True, null=True)
-    sensitivity = models.DecimalField(max_digits=12, decimal_places=6, blank=True, null=True)
+    sensitivity = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Irradiation_event_xray_source_data(models.Model):  # TID 10003b
