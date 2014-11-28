@@ -103,10 +103,7 @@ $('.datepicker').datepicker({
 
 {% block plotdata %}
 {% if acquisitionSummary %}
-<script src="{{ STATIC_URL }}js/highcharts.js"></script>
-<script src="{{ STATIC_URL }}js/exporting.js"></script>
-<script src="{{ STATIC_URL }}js/drilldown.js"></script>
-
+<!-- HTML to include div container for acquisition plot -->
 <div class="panel-group" id="accordion">
   <div class="panel panel-default">
     <div class="panel-heading">
@@ -127,7 +124,47 @@ $('.datepicker').datepicker({
     </div>
   </div>
 </div>
+<!-- End of HTML to include div for acquisition plot -->
 
+
+<!-- HTML to include div container for acquisition pie chart -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart">
+          Pie chart showing a breakdown of acquisition protocol frequency.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="piechartProtocolDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for acquisition pie chart -->
+
+
+<!-- Include JavaScript to enable highcharts plots -->
+<script src="{{ STATIC_URL }}js/highcharts.js"></script>
+<script src="{{ STATIC_URL }}js/exporting.js"></script>
+<script src="{{ STATIC_URL }}js/drilldown.js"></script>
+<!-- End of include JavaScript for the plots -->
+
+
+<!-- JavaScript function to sort a list of objects by the 'y' object.
+     This must be positioned above the functions first use. -->
+<script>
+function sort_by_y(a,b) {
+    return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0)); // a[1] for col. 2 etc...
+}
+</script>
+<!-- End of JavaScript function to sort a list of objects by the 'y' object -->
+
+
+<!-- JavaScript for acquisition plot -->
 <script>
 var protocolNames     = [
                         {% for name in acquisitionSummary %}
@@ -276,31 +313,11 @@ var chart = new Highcharts.Chart({
     });
 });
 </script>
+<!-- End of JavaScript for acquisition plot -->
 
 
-<!-- Pie chart of frequency of acquisitions. -->
-<div class="panel-group" id="accordion">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart">
-          Pie chart showing a breakdown of acquisition protocol frequency.
-        </a>
-      </h4>
-    </div>
-    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
-      <div class="panel-body">
-         <div id="piechartProtocolDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script type="text/javascript">
-function sort_by_y(a,b) {
-    return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0)); // a[1] for col. 2 etc...
-}
-
+<!-- JavaScript for acquisition pie chart -->
+<script>
 var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 var protocolPiechartData = new Array(protocolNames.length);
 for(var i=0; i<protocolNames.length; i++) {
@@ -321,7 +338,7 @@ var chart = new Highcharts.Chart({
             text: ''
         },
         tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
         },
         plotOptions: {
             pie: {
@@ -329,7 +346,7 @@ var chart = new Highcharts.Chart({
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
@@ -352,8 +369,10 @@ var chart = new Highcharts.Chart({
     });
 });
 </script>
+<!-- End of JavaScript for acquisition pie chart -->
 
 
+<!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
 <script>
 (function (H) {
     H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
@@ -369,7 +388,7 @@ var chart = new Highcharts.Chart({
                 point.doDrilldown();
             });
 
-            // Make axis labels clickable
+            // Make axis labels click-able
             if (tickLabel) {
                 if (!tickLabel._basicStyle) {
                     tickLabel._basicStyle = tickLabel.element.getAttribute('style');
@@ -393,5 +412,6 @@ var chart = new Highcharts.Chart({
     });
 })(Highcharts);
 </script>
+<!-- End of JavaScript to remove the hyper links from x-axis data labels in the plots -->
 {% endif %}
 {% endblock %}
