@@ -368,8 +368,8 @@ class Xray_filters(models.Model):  # EV 113771
         Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_type')  # CID 10007
     xray_filter_material = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_material')  # CID 10006
-    xray_filter_thickness_minimum = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    xray_filter_thickness_maximum = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    xray_filter_thickness_minimum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    xray_filter_thickness_maximum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
         
 
 class Irradiation_event_xray_mechanical_data(models.Model):  # TID 10003c
@@ -385,18 +385,18 @@ class Irradiation_event_xray_mechanical_data(models.Model):  # TID 10003c
     """
     irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
     crdr_mechanical_configuration = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
-    positioner_primary_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    positioner_secondary_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    positioner_primary_end_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    positioner_secondary_end_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    column_angulation = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    table_head_tilt_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    table_horizontal_rotation_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    table_cradle_tilt_angle = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    compression_thickness = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    positioner_primary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    positioner_secondary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    positioner_primary_end_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    positioner_secondary_end_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    column_angulation = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_head_tilt_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_horizontal_rotation_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_cradle_tilt_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    compression_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # not in DICOM standard - compression force in N
-    compression_force = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
-    magnification_factor = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    compression_force = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    magnification_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     
 
 class Dose_related_distance_measurements(models.Model):  # CID 10008
@@ -405,16 +405,19 @@ class Dose_related_distance_measurements(models.Model):  # CID 10008
     Called from TID 10003c
     """
     irradiation_event_xray_mechanical_data = models.ForeignKey(Irradiation_event_xray_mechanical_data)
-    distance_source_to_isocenter = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    distance_source_to_reference_point = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    distance_source_to_detector = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    table_longitudinal_position = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    table_lateral_position = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    table_height_position = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    distance_source_to_table_plane = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    distance_source_to_isocenter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    distance_source_to_reference_point = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    distance_source_to_detector = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_longitudinal_position = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_lateral_position = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_height_position = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    distance_source_to_table_plane = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_longitudinal_end_position = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_lateral_end_position = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    table_height_end_position = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # not in DICOM standard - distance source to entrance surface distance in mm
-    distance_source_to_entrance_surface = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    radiological_thickness = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    distance_source_to_entrance_surface = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    radiological_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     
 
 class Accumulated_projection_xray_dose(models.Model):  # TID 10004
