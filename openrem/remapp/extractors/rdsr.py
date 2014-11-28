@@ -245,7 +245,8 @@ def _imageviewmodifier(dataset,event):
     modifier.save()
 
 
-def _irradiationeventxraydata(dataset,proj): # TID 10003
+def _irradiationeventxraydata(dataset,proj):  # TID 10003
+    # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import Irradiation_event_xray_data
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time

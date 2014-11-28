@@ -285,6 +285,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
+    # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import Irradiation_event_xray_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
