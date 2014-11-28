@@ -75,6 +75,7 @@ def _xraygrid(gridcode,source):
 
 
 def _irradiationeventxraysourcedata(dataset,event):
+    # TODO: review model to convert to cid where appropriate, and add additional fields, such as height and width
     from remapp.models import Irradiation_event_xray_source_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)

@@ -177,6 +177,7 @@ def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
     mech.save()
 
 def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
+    # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import Irradiation_event_xray_source_data
     from remapp.tools.get_values import get_or_create_cid
     from xml.etree import ElementTree as ET
