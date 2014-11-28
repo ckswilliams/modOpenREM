@@ -286,20 +286,25 @@ class Irradiation_event_xray_source_data(models.Model):  # TID 10003b
     dose_rp = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_rpdefinition')
-    average_glandular_dose = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_rpdefinition')  # CID 10025
+    average_glandular_dose = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     fluoro_mode = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_fluoromode')
-    pulse_rate = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
-    number_of_pulses = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
-    derivation = models.CharField(max_length=16, blank=True)
-    irradiation_duration = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    average_xray_tube_current = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_fluoromode')  # CID 10004
+    pulse_rate = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    number_of_pulses = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
+    # derivation should be a cid - has never been used in extractor, but was non null=True so will exist in database :-(
+    derivation = models.CharField(max_length=16, blank=True, null=True)
+    derivation_cid = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_derivation')  # R-10260, "Estimated"
+    irradiation_duration = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    average_xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     exposure_time = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
-    focal_spot_size = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    focal_spot_size = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     anode_target_material = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_anodetarget')
-    collimated_field_area = models.DecimalField(max_digits=8, decimal_places=6, blank=True, null=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_anodetarget')  # CID 10016
+    collimated_field_area = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    collimated_field_height = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    collimated_field_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # not in DICOM standard - 'image intensifier' field size and exposure control mode
     ii_field_size = models.IntegerField(blank=True, null=True)
     exposure_control_mode = models.CharField(max_length=16, blank=True, null=True)
@@ -318,28 +323,28 @@ class Xray_grid(models.Model):
     From DICOM Part 16
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
-    xray_grid = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    xray_grid = models.ForeignKey(Content_item_descriptions, blank=True, null=True)  # CID 10017
 
 
 class Pulse_width(models.Model):  # EV 113793
     """In TID 10003b. Code value 113793 (ms)
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
-    pulse_width = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
+    pulse_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Kvp(models.Model):  # EV 113733
     """In TID 10003b. Code value 113733 (kV)
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
-    kvp = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    kvp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Xray_tube_current(models.Model):  # EV 113734
     """In TID 10003b. Code value 113734 (mA)
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
-    xray_tube_current = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Exposure(models.Model):  # EV 113736
@@ -360,9 +365,9 @@ class Xray_filters(models.Model):  # EV 113771
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
     xray_filter_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_type')
+        Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_type')  # CID 10007
     xray_filter_material = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_material')
+        Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_material')  # CID 10006
     xray_filter_thickness_minimum = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
     xray_filter_thickness_maximum = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
         
