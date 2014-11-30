@@ -81,6 +81,16 @@ def dx_summary_list_filter(request):
             dapValues = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
+        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+        for day in range(7):
+            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+            if studyTimesOnThisWeekday:
+                for hour in range(24):
+                    try:
+                        studiesPerHourInWeekdays[day][hour] = (studyTimesOnThisWeekday.filter(Q(study_time__gte = str(hour)+':00') & Q(study_time__lte = str(hour)+':59')).values('study_time').annotate(num_acq_this_hour = Count('study_instance_uid')))[0].values()[0]
+                    except:
+                        studiesPerHourInWeekdays[day][hour] = 0
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -97,7 +107,8 @@ def dx_summary_list_filter(request):
             'remapp/dxfiltered.html',
             {'filter': f, 'admin':admin,
              'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData},
+             'acquisitionHistogramData': acquisitionHistogramData,
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
             context_instance=RequestContext(request)
             )
     else:
