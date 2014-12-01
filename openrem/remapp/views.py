@@ -81,15 +81,15 @@ def dx_summary_list_filter(request):
             dapValues = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
-        acquisitionsPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
         for day in range(7):
-            acquisitionTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
-            if acquisitionTimesOnThisWeekday:
+            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+            if studyTimesOnThisWeekday:
                 for hour in range(24):
                     try:
-                        acquisitionsPerHourInWeekdays[day][hour] = acquisitionTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
                     except:
-                        acquisitionsPerHourInWeekdays[day][hour] = 0
+                        studiesPerHourInWeekdays[day][hour] = 0
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -108,7 +108,7 @@ def dx_summary_list_filter(request):
             {'filter': f, 'admin':admin,
              'acquisitionSummary': acquisitionSummary,
              'acquisitionHistogramData': acquisitionHistogramData,
-             'acquisitionsPerHourInWeekdays': acquisitionsPerHourInWeekdays},
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
             context_instance=RequestContext(request)
             )
     else:
@@ -174,15 +174,15 @@ def dx_histogram_list_filter(request):
             dapValues = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
-        acquisitionsPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
         for day in range(7):
-            acquisitionTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
-            if acquisitionTimesOnThisWeekday:
+            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+            if studyTimesOnThisWeekday:
                 for hour in range(24):
                     try:
-                        acquisitionsPerHourInWeekdays[day][hour] = acquisitionTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
                     except:
-                        acquisitionsPerHourInWeekdays[day][hour] = 0
+                        studiesPerHourInWeekdays[day][hour] = 0
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -201,7 +201,7 @@ def dx_histogram_list_filter(request):
             {'filter': f, 'admin':admin,
              'acquisitionSummary': acquisitionSummary,
              'acquisitionHistogramData': acquisitionHistogramData,
-             'acquisitionsPerHourInWeekdays': acquisitionsPerHourInWeekdays},
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
             context_instance=RequestContext(request)
             )
     else:
@@ -257,6 +257,16 @@ def ct_summary_list_filter(request):
             dlpValues = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
+        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+        for day in range(7):
+            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+            if studyTimesOnThisWeekday:
+                for hour in range(24):
+                    try:
+                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                    except:
+                        studiesPerHourInWeekdays[day][hour] = 0
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -275,7 +285,8 @@ def ct_summary_list_filter(request):
              'studySummary': studySummary,
              'studyHistogramData': studyHistogramData,
              'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData},
+             'acquisitionHistogramData': acquisitionHistogramData,
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
             context_instance=RequestContext(request)
             )
     else:
@@ -347,6 +358,16 @@ def ct_histogram_list_filter(request):
             dlpValues = f.qs.filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
+        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+        for day in range(7):
+            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+            if studyTimesOnThisWeekday:
+                for hour in range(24):
+                    try:
+                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                    except:
+                        studiesPerHourInWeekdays[day][hour] = 0
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -365,7 +386,8 @@ def ct_histogram_list_filter(request):
              'studySummary': studySummary,
              'studyHistogramData': studyHistogramData,
              'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData},
+             'acquisitionHistogramData': acquisitionHistogramData,
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
             context_instance=RequestContext(request)
             )
     else:
