@@ -436,7 +436,7 @@ class Accumulated_projection_xray_dose(models.Model):  # TID 10004
     total_fluoro_time = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     acquisition_dose_area_product_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     acquisition_dose_rp_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
-    total_acquisition_time = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    total_acquisition_time = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     total_number_of_radiographic_frames  = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
