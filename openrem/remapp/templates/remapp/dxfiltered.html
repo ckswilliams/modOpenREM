@@ -352,7 +352,7 @@ var chart = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartProtocolDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,//null,
+            plotBorderWidth: 1,
             plotShadow: false
         },
         title: {
@@ -439,10 +439,21 @@ var chart = new Highcharts.Chart({
             renderTo: 'piechartProtocolWorkloadDIV',
             plotBackgroundColor: null,
             plotBorderWidth: 1,//null,
-            plotShadow: false
+            plotShadow: false,
+            events: {
+                drilldown: function(e) {
+                    chart.setTitle({ text: 'Acquisitions per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
+                },
+                drillup: function(e) {
+                    chart.setTitle({ text: 'Acquisitions per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
+                }
+            }
         },
         title: {
-            text: ''
+            text: 'Acquisitions per<br>day of the week',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 70
         },
         tooltip: {
             pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
@@ -462,7 +473,10 @@ var chart = new Highcharts.Chart({
         },
         series: [{
             type: 'pie',
-            name: 'Acquisitions per day of the week',
+            startAngle:-90,
+            endAngle:90,
+            center: ['50%','75%'],
+            innerSize: '50%',
             data: protocolWorkloadPieChartData
         }],
         drilldown: {
