@@ -160,6 +160,7 @@ $('.datepicker').datepicker({
     <div id="collapseProtocolWorkloadPieChart" class="panel-collapse collapse">
       <div class="panel-body">
          <div id="piechartProtocolWorkloadDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
       </div>
     </div>
   </div>
@@ -420,7 +421,7 @@ var seriesDrillDownPieChart   = [
                         {% for dayCounts in acquisitionsPerHourInWeekdays %}
                             {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
                             {% for hourCounts in dayCounts %}
-                                ['{{forloop.counter}}', acquisitionsPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1]]{% if not forloop.last %},{% endif %}
+                                ['{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', acquisitionsPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1]]{% if not forloop.last %},{% endif %}
                             {% endfor %}]}
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
