@@ -87,7 +87,7 @@ def dx_summary_list_filter(request):
             if acquisitionTimesOnThisWeekday:
                 for hour in range(24):
                     try:
-                        acquisitionsPerHourInWeekdays[day][hour] = (acquisitionTimesOnThisWeekday.filter(Q(study_time__gte = str(hour)+':00') & Q(study_time__lte = str(hour)+':59')).values('study_time').annotate(num_acq_this_hour = Count('study_instance_uid')))[0].values()[0]
+                        acquisitionsPerHourInWeekdays[day][hour] = acquisitionTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
                     except:
                         acquisitionsPerHourInWeekdays[day][hour] = 0
 
@@ -180,7 +180,7 @@ def dx_histogram_list_filter(request):
             if acquisitionTimesOnThisWeekday:
                 for hour in range(24):
                     try:
-                        acquisitionsPerHourInWeekdays[day][hour] = (acquisitionTimesOnThisWeekday.filter(Q(study_time__gte = str(hour)+':00') & Q(study_time__lte = str(hour)+':59')).values('study_time').annotate(num_acq_this_hour = Count('study_instance_uid')))[0].values()[0]
+                        acquisitionsPerHourInWeekdays[day][hour] = acquisitionTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
                     except:
                         acquisitionsPerHourInWeekdays[day][hour] = 0
 
