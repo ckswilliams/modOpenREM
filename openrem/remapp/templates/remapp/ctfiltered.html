@@ -436,6 +436,27 @@ var chart = new Highcharts.Chart({
 <!-- End of HTML to include div container for study pie chart -->
 
 
+<!-- HTML to include div container for pie chart of studies per week day pie chart -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyWorkloadPieChart">
+          Pie chart showing a breakdown of number of studies per weekday.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="piechartStudyWorkloadDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for studies per week day pie chart -->
+
+
 <!-- JavaScript for study plot -->
 <script>
 var studyNames     = [
@@ -642,6 +663,101 @@ var chart = new Highcharts.Chart({
 });
 </script>
 <!-- End of JavaScript for study pie chart -->
+
+
+<!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
+<script>
+var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+var studiesPerHourEachWeekday = [
+                      {% for dayCounts in studiesPerHourInWeekdays %}
+                          [
+                          {% for hourCounts in dayCounts %}
+                              {{hourCounts}}
+                              {% if not forloop.last %},{% endif %}
+                          {% endfor %}
+                          ]
+                          {% if not forloop.last %},{% endif %}
+                      {% endfor %}
+                      ];
+var studiesPerWeekday = new Array(7);
+for(var i=0; i<7; i++) {
+    var tempTotal = 0;
+    for(var j=0; j<24; j++) {
+        tempTotal = tempTotal + studiesPerHourEachWeekday[i][j];
+    }
+    studiesPerWeekday[i] = tempTotal;
+}
+
+var seriesDrillDownPieChart   = [
+                        {% for dayCounts in studiesPerHourInWeekdays %}
+                            {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
+                            {% for hourCounts in dayCounts %}
+                                ['{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1]]{% if not forloop.last %},{% endif %}
+                            {% endfor %}]}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+
+var studyWorkloadPieChartData= new Array(7);
+for(var i=0; i<7; i++) {
+    studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], drilldown:dayNames[i]};
+}
+
+$(function () {
+
+var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'piechartStudyWorkloadDIV',
+            plotBackgroundColor: null,
+            plotBorderWidth: 1,//null,
+            plotShadow: false,
+            events: {
+                drilldown: function(e) {
+                    chart.setTitle({ text: 'Studies per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
+                },
+                drillup: function(e) {
+                    chart.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
+                }
+            }
+        },
+        title: {
+            text: 'Studies per<br>day of the week',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 70
+        },
+        tooltip: {
+            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: false,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            startAngle:-90,
+            endAngle:90,
+            center: ['50%','75%'],
+            innerSize: '50%',
+            data: studyWorkloadPieChartData
+        }],
+        drilldown: {
+            series:seriesDrillDownPieChart
+        }
+    });
+});
+</script>
+<!-- End of JavaScript for studies per week day pie chart -->
 {% endif %}
 
 <!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
