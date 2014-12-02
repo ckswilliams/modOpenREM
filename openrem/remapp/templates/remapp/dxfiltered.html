@@ -246,7 +246,7 @@ var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DAP per acquisition protocol';
 var tooltipData = [2];
 
-var chart = new Highcharts.Chart({
+var chartDAPperAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'container',
@@ -254,12 +254,12 @@ var chart = new Highcharts.Chart({
                 drilldown: function(e) {
                     tooltipData[0] = protocolNames[e.point.x];
                     tooltipData[1] = e.point.x;
-                    chart.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
-                    chart.yAxis[0].setTitle({text:'Number'});
-                    chart.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
-                    chart.xAxis[0].setCategories([], true);
-                    chart.xAxis[0].update({labels:{rotation:0}});
-                    chart.tooltip.options.formatter = function() {
+                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
+                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Number'});
+                    chartDAPperAcquisition.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
+                    chartDAPperAcquisition.xAxis[0].setCategories([], true);
+                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:0}});
+                    chartDAPperAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
                             var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -270,12 +270,12 @@ var chart = new Highcharts.Chart({
                     }
                 },
                 drillup: function(e) {
-                    chart.setTitle({ text: defaultTitle }, { text: '' });
-                    chart.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
-                    chart.xAxis[0].setTitle({text:'Protocol name'});
-                    chart.xAxis[0].setCategories(protocolNames, true);
-                    chart.xAxis[0].update({labels:{rotation:90}});
-                    chart.tooltip.options.formatter = function() {
+                    chartDAPperAcquisition.setTitle({ text: defaultTitle }, { text: '' });
+                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
+                    chartDAPperAcquisition.xAxis[0].setTitle({text:'Protocol name'});
+                    chartDAPperAcquisition.xAxis[0].setCategories(protocolNames, true);
+                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartDAPperAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
                             var index = protocolNames.indexOf(this.x);
@@ -348,7 +348,7 @@ protocolPiechartData.sort(sort_by_y);
 
 $(function () {
 
-var chart = new Highcharts.Chart({
+var chartAcqFrequency = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartProtocolDIV',
             plotBackgroundColor: null,
@@ -434,7 +434,7 @@ for(var i=0; i<7; i++) {
 
 $(function () {
 
-var chart = new Highcharts.Chart({
+var chartWorkload = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartStudyWorkloadDIV',
             plotBackgroundColor: null,
@@ -442,10 +442,10 @@ var chart = new Highcharts.Chart({
             plotShadow: false,
             events: {
                 drilldown: function(e) {
-                    chart.setTitle({ text: 'Studies per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
+                    chartWorkload.setTitle({ text: 'Studies per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
                 },
                 drillup: function(e) {
-                    chart.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
+                    chartWorkload.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
                 }
             }
         },
