@@ -578,9 +578,17 @@ class Ct_radiation_dose(models.Model):  # TID 10011
     uid_type = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid1011_uid')  # CID 10001
     comment = models.TextField(blank=True, null=True)
-    # might need to be a table on its own as is 1-n
+    # does need to be a table on its own as is 1-n
     source_of_dose_information = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid10011_source')
+
+
+class SourceOfCTDoseInformation(models.Model):  # CID 10021
+    """Source of CT Dose Information
+    """
+    ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
+    source_of_dose_information = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True)  # CID 10021
 
 
 class Ct_accumulated_dose_data(models.Model):  # TID 10012
