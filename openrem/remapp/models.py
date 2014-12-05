@@ -569,11 +569,14 @@ class Ct_radiation_dose(models.Model):  # TID 10011
     general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
     procedure_reported = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid10011_procedure')
-    has_intent = models.ForeignKey(Content_item_descriptions, blank=True, null=True, related_name='tid10011_intent')
+    has_intent = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10011_intent')  # CID 3629
     start_of_xray_irradiation = models.DateTimeField(blank=True, null=True)
     end_of_xray_irradiation = models.DateTimeField(blank=True, null=True)
     scope_of_accumulation = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10011_scope')
+        Content_item_descriptions, blank=True, null=True, related_name='tid10011_scope')  # CID 10000
+    uid_type = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid1011_uid')  # CID 10001
     comment = models.TextField(blank=True, null=True)
     # might need to be a table on its own as is 1-n
     source_of_dose_information = models.ForeignKey(
