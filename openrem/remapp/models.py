@@ -604,13 +604,13 @@ class Ct_accumulated_dose_data(models.Model):  # TID 10012
     ct_dose_length_product_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     ct_effective_dose_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     reference_authority_code = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10012_authority')
-    reference_authority_text = models.CharField(max_length=256, blank=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10012_authority')  # CID 10015 (ICRP60/103)
+    reference_authority_text = models.TextField(blank=True, null=True)
     measurement_method = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10012_method')
-    patient_model = models.CharField(max_length=256, blank=True)
-    effective_dose_phantom_type = models.CharField(max_length=256, blank=True)
-    dosimeter_type = models.CharField(max_length=256, blank=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10012_method')  # CID 10011
+    patient_model = models.TextField(blank=True, null=True)
+    effective_dose_phantom_type = models.TextField(blank=True, null=True)
+    dosimeter_type = models.TextField(blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
 
 
