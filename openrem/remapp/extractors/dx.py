@@ -409,6 +409,8 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     from remapp.tools.get_values import get_value_kw
     patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
+    patientatt.patient_weight = get_value_kw("PatientWeight",dataset)
+    patientatt.patient_size = get_value_kw("PatientSize", dataset)
     patientatt.save()
 
 
