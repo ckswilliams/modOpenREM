@@ -601,7 +601,7 @@ class Ct_accumulated_dose_data(models.Model):  # TID 10012
         (typically a Study or a Performed Procedure Step).
     """
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
-    total_number_of_irradiation_events = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
+    total_number_of_irradiation_events = models.DecimalField(max_digits=16, decimal_places=0, blank=True, null=True)
     ct_dose_length_product_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     ct_effective_dose_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     reference_authority_code = models.ForeignKey(
