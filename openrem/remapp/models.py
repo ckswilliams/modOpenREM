@@ -632,23 +632,27 @@ class Ct_irradiation_event_data(models.Model):  # TID 10013
     ct_acquisition_type = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid10013_type')  # CID 10013
     procedure_context = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_context')
+        Content_item_descriptions, blank=True, null=True, related_name='tid10013_context')  # CID 10014
     irradiation_event_uid = models.TextField(blank=True, null=True)
-    exposure_time = models.DecimalField(max_digits=16, decimal_places=4, blank=True, null=True)
-    nominal_single_collimation_width = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    nominal_total_collimation_width = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
-    pitch_factor = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    number_of_xray_sources = models.DecimalField(max_digits=2, decimal_places=0, blank=True, null=True)
-    mean_ctdivol = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+    #  TODO: Add extraction of the label and label type (Series, acquisition, instance number) Issue #167
+    irradiation_event_label = models.TextField(blank=True, null=True)
+    label_type = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10013_labeltype')  # CID 10022
+    exposure_time = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    nominal_single_collimation_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    nominal_total_collimation_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    pitch_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    number_of_xray_sources = models.DecimalField(max_digits=8, decimal_places=0, blank=True, null=True)
+    mean_ctdivol = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     ctdiw_phantom_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_phantom')
-    ctdifreeair_calculation_factor = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    mean_ctdifreeair = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    dlp = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    effective_dose = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10013_phantom')  # CID 4052
+    ctdifreeair_calculation_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    mean_ctdifreeair = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    dlp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    effective_dose = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     measurement_method = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_method')
-    effective_dose_conversion_factor = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+        Content_item_descriptions, blank=True, null=True, related_name='tid10013_method')  # CID 10011
+    effective_dose_conversion_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     xray_modulation_type = models.TextField(blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
     # Not in DICOM standard:
@@ -693,6 +697,17 @@ class Scanning_length(models.Model):  # TID 10014
     top_z_location_of_scanning_length = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     bottom_z_location_of_scanning_length = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     frame_of_reference_uid = models.TextField(blank=True, null=True)
+
+
+class SizeSpecificDoseEstimation(models.Model):
+    """Container in TID 10013 to hold size specific dose estimation details
+    """
+    # TODO: Add this to the rdsr extraction routines. Issue #168
+    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    measurement_method = models.ForeignKey(Content_item_descriptions, blank=True, null=True)  # CID 10023
+    measured_lateral_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    measured_ap_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    derived_effective_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Ct_dose_check_details(models.Model):  # TID 10015
