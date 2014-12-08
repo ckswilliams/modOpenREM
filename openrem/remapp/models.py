@@ -627,9 +627,10 @@ class Ct_irradiation_event_data(models.Model):  # TID 10013
     """
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
     acquisition_protocol = models.TextField(blank=True, null=True)
-    target_region = models.ForeignKey(Content_item_descriptions, blank=True, null=True, related_name='tid10013_region')
+    target_region = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid10013_region')  # CID 4030
     ct_acquisition_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_type')
+        Content_item_descriptions, blank=True, null=True, related_name='tid10013_type')  # CID 10013
     procedure_context = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid10013_context')
     irradiation_event_uid = models.TextField(blank=True, null=True)
@@ -653,6 +654,14 @@ class Ct_irradiation_event_data(models.Model):  # TID 10013
     # Not in DICOM standard:
     date_time_started = models.DateTimeField(blank=True, null=True)
     series_description = models.TextField(blank=True, null=True)
+
+
+class CtReconstructionAlgorithm(models.Model):
+    """Container in TID 10013 to hold CT reconstruction methods
+    """
+    # TODO: Add this to the rdsr extraction routines. Issue #166
+    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    reconstruction_algorithm = models.ForeignKey(Content_item_descriptions, blank=True, null=True)  # CID 10033
 
 
 class Ct_xray_source_parameters(models.Model):
