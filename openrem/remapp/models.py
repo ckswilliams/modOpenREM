@@ -586,6 +586,7 @@ class Ct_radiation_dose(models.Model):  # TID 10011
 class SourceOfCTDoseInformation(models.Model):  # CID 10021
     """Source of CT Dose Information
     """
+    # TODO: populate this table when extracting and move existing data. Task #164
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
     source_of_dose_information = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True)  # CID 10021
