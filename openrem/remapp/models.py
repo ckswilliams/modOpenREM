@@ -687,15 +687,15 @@ class Scanning_length(models.Model):  # TID 10014
         No description
     """
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
-    scanning_length = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    length_of_reconstructable_volume = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    exposed_range = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+    scanning_length = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    length_of_reconstructable_volume = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    exposed_range = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     top_z_location_of_reconstructable_volume = models.DecimalField(
-        max_digits=8, decimal_places=4, blank=True, null=True)
+        max_digits=16, decimal_places=8, blank=True, null=True)
     bottom_z_location_of_reconstructable_volume = models.DecimalField(
-        max_digits=8, decimal_places=4, blank=True, null=True)
-    top_z_location_of_scanning_length = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    bottom_z_location_of_scanning_length = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+        max_digits=16, decimal_places=8, blank=True, null=True)
+    top_z_location_of_scanning_length = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    bottom_z_location_of_scanning_length = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     frame_of_reference_uid = models.TextField(blank=True, null=True)
 
 
