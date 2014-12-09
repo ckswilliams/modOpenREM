@@ -72,6 +72,30 @@ $('.datepicker').datepicker({
     });
 </script>
 
+<script>
+function getColours(noOfColours) {
+    var colours = [];
+    frequency = 5 / noOfColours; 
+    for (var i = 0; i < noOfColours;++i) {
+        if (noOfColours > 24) {
+            r = Math.sin(frequency * i * 2 + 0) * (127) + 128;
+            g = Math.sin(frequency * i * 2 + 1) * (127) + 128;
+            b = Math.sin(frequency * i * 2 + 3) * (127) + 128;
+        } else {
+            r = Math.sin(frequency * i  + 0) * (127) + 128;
+            g = Math.sin(frequency * i  + 1) * (127) + 128;
+            b = Math.sin(frequency * i  + 3) * (127) + 128;
+        }
+        colour = 'rgb({r},{g},{b})';
+        colour = colour.replace("{r}", Math.floor(r));
+        colour = colour.replace("{g}", Math.floor(g));
+        colour = colour.replace("{b}", Math.floor(b));
+        colours.push(colour);
+    }
+    return colours;
+}
+</script>
+
 {% endblock %}
 
 {% block col1 %}
@@ -343,6 +367,12 @@ for(var i=0; i<protocolNames.length; i++) {
     protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
 }
 protocolPiechartData.sort(sort_by_y);
+
+protocolColours = getColours(protocolNames.length);
+for(var i=0; i<protocolNames.length; i++) {
+    protocolPiechartData[i].color = protocolColours[i];
+}
+
 
 $(function () {
 
@@ -618,6 +648,11 @@ for(var i=0; i<studyNames.length; i++) {
 }
 studyPiechartData.sort(sort_by_y);
 
+studyColours = getColours(studyNames.length);
+for(var i=0; i<studyNames.length; i++) {
+    studyPiechartData[i].color = studyColours[i];
+}
+
 $(function () {
 
 var chartStudyFreq = new Highcharts.Chart({
@@ -689,19 +724,22 @@ for(var i=0; i<7; i++) {
     studiesPerWeekday[i] = tempTotal;
 }
 
+var hourColours = getColours(24);
 var seriesDrillDownPieChart   = [
                         {% for dayCounts in studiesPerHourInWeekdays %}
                             {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
                             {% for hourCounts in dayCounts %}
-                                ['{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1]]{% if not forloop.last %},{% endif %}
+                                <!--['{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1]]{% if not forloop.last %},{% endif %}-->
+                                {{'{'}}name:'{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', y:studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1],color:hourColours[{{forloop.counter}}]{{'}'}}{% if not forloop.last %},{% endif %}
                             {% endfor %}]}
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
 
+var dayColours = getColours(7);
 var studyWorkloadPieChartData= new Array(7);
 for(var i=0; i<7; i++) {
-    studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], drilldown:dayNames[i]};
+    studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
 }
 
 $(function () {
