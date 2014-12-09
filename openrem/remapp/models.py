@@ -673,11 +673,11 @@ class Ct_xray_source_parameters(models.Model):
     """
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
     identification_of_the_xray_source = models.TextField(blank=True, null=True)
-    kvp = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    maximum_xray_tube_current = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    xray_tube_current = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    exposure_time_per_rotation = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    xray_filter_aluminum_equivalent = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+    kvp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    maximum_xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    exposure_time_per_rotation = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    xray_filter_aluminum_equivalent = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Scanning_length(models.Model):  # TID 10014
