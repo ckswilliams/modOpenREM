@@ -719,12 +719,12 @@ class Ct_dose_check_details(models.Model):  # TID 10015
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
     dlp_alert_value_configured = models.NullBooleanField()
     ctdivol_alert_value_configured = models.NullBooleanField()
-    dlp_alert_value = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    ctdivol_alert_value = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    accumulated_dlp_forward_estimate = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    accumulated_ctdivol_forward_estimate = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
+    dlp_alert_value = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    ctdivol_alert_value = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    accumulated_dlp_forward_estimate = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    accumulated_ctdivol_forward_estimate = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # alert_ added to allow two fields that are in different containers in std
-    alert_reason_for_proceeding = models.CharField(max_length=512, blank=True)
+    alert_reason_for_proceeding = models.TextField(blank=True, null=True)
     dlp_notification_value_configured = models.NullBooleanField()
     ctdivol_notification_value_configured = models.NullBooleanField()
     dlp_notification_value = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
@@ -732,7 +732,7 @@ class Ct_dose_check_details(models.Model):  # TID 10015
     dlp_forward_estimate = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     ctdivol_forward_estimate = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     # notification_ added to allow two fields that are in different containers in std
-    notification_reason_for_proceeding = models.CharField(max_length=512, blank=True)
+    notification_reason_for_proceeding = models.TextField(blank=True, null=True)
 
 
 # Models common to both
