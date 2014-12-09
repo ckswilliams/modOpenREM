@@ -739,14 +739,20 @@ class Ct_dose_check_details(models.Model):  # TID 10015
     
 class Observer_context(models.Model):  # TID 1002
     """Observer Context TID 1002
-    
+
     From DICOM Part 16:
         The observer (person or device) that created the Content Items to which this context applies.
     """
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose, blank=True, null=True)
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
     observer_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1002_observertype')
+        Content_item_descriptions, blank=True, null=True, related_name='tid1002_observertype')  # CID 270
+    person_observer_name = models.TextField(blank=True, null=True)
+    person_observer_organization_name = models.TextField(blank=True, null=True)
+    person_observer_role_in_organization = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid1002_ptroleorg')  # CID 7452
+    person_observer_role_in_procedure = models.ForeignKey(
+        Content_item_descriptions, blank=True, null=True, related_name='tid1002_ptroleproc')  # CID 7453
     device_observer_uid = models.TextField(blank=True, null=True)
     device_observer_name = models.TextField(blank=True, null=True)
     device_observer_manufacturer = models.TextField(blank=True, null=True)
@@ -754,7 +760,7 @@ class Observer_context(models.Model):  # TID 1002
     device_observer_serial_number = models.TextField(blank=True, null=True)
     device_observer_physical_location_during_observation = models.TextField(blank=True, null=True)
     device_role_in_procedure = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1002_role')
+        Content_item_descriptions, blank=True, null=True, related_name='tid1002_role')  # CID 7445
 
     def __unicode__(self):
         return self.device_observer_name
