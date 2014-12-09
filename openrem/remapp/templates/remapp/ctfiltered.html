@@ -729,7 +729,6 @@ var seriesDrillDownPieChart   = [
                         {% for dayCounts in studiesPerHourInWeekdays %}
                             {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
                             {% for hourCounts in dayCounts %}
-                                <!--['{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1]]{% if not forloop.last %},{% endif %}-->
                                 {{'{'}}name:'{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', y:studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1],color:hourColours[{{forloop.counter}}]{{'}'}}{% if not forloop.last %},{% endif %}
                             {% endfor %}]}
                             {% if not forloop.last %},{% endif %}
