@@ -107,11 +107,17 @@ def _xraygrid(gridcode,source):
     from remapp.tools.get_values import get_or_create_cid
     grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
-        grid.xray_grid = get_or_create_cid('111646','No grid')
-    if gridcode == '111642':
-        grid.xray_grid = get_or_create_cid('111642','Focused grid')
-    if gridcode == '111643':
-        grid.xray_grid = get_or_create_cid('111643','Reciprocating grid')
+        grid.xray_grid = get_or_create_cid('111646', 'No grid')
+    elif gridcode == '111641':
+        grid.xray_grid = get_or_create_cid('111641', 'Fixed grid')
+    elif gridcode == '111642':
+        grid.xray_grid = get_or_create_cid('111642', 'Focused grid')
+    elif gridcode == '111643':
+        grid.xray_grid = get_or_create_cid('111643', 'Reciprocating grid')
+    elif gridcode == '111644':
+        grid.xray_grid = get_or_create_cid('111644', 'Parallel grid')
+    elif gridcode == '111645':
+        grid.xray_grid = get_or_create_cid('111645', 'Crossed grid')
     grid.save()
 
 
@@ -138,6 +144,7 @@ def _irradiationeventxraydetectordata(dataset,event):
 
 
 def _irradiationeventxraysourcedata(dataset,event):
+    # TODO: review model to convert to cid where appropriate, and add additional fields such as field height and width
     from remapp.models import Irradiation_event_xray_source_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
@@ -152,33 +159,72 @@ def _irradiationeventxraysourcedata(dataset,event):
     exp_ctrl_mode = get_value_kw('ExposureControlMode',dataset)
     if exp_ctrl_mode:
         source.exposure_control_mode = exp_ctrl_mode
+    xray_grid = get_value_kw('Grid',dataset)
+    if xray_grid:
+        if xray_grid == 'NONE':
+            _xraygrid('111646', source)
+        else:
+            for gtype in xray_grid:
+                if 'FI' in gtype:             # Fixed; abbreviated due to fitting two keywords in 16 characters
+                    _xraygrid('111641', source)
+                elif 'FO' in gtype:             # Focused
+                    _xraygrid('111642', source)
+                elif 'RE' in gtype:             # Reciprocating
+                    _xraygrid('111643', source)
+                elif 'PA' in gtype:             # Parallel
+                    _xraygrid('111644', source)
+                elif 'CR' in gtype:             # Crossed
+                    _xraygrid('111645', source)
+    source.grid_absorbing_material = get_value_kw('GridAbsorbingMaterial', dataset)
+    source.grid_spacing_material = get_value_kw('GridSpacingMaterial', dataset)
+    source.grid_thickness = get_value_kw('GridThickness', dataset)
+    source.grid_pitch = get_value_kw('GridPitch', dataset)
+    source.grid_aspect_ratio = get_value_kw('GridAspectRatio', dataset)
+    source.grid_period = get_value_kw('GridPeriod', dataset)
+    source.grid_focal_distance = get_value_kw('GridFocalDistance', dataset)
     source.save()
     xray_filter_type = get_value_kw('FilterType', dataset)
     xray_filter_material = get_value_kw('FilterMaterial', dataset)
+
+    try: # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except ValueError: # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052) # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value = thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+        else:
+            xray_filter_thickness_minimum = None
+
     try:
         xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except ValueError:
-        xray_filter_thickness_maximum = None
-    try:
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except ValueError:
-        xray_filter_thickness_minimum = None
+    except ValueError: # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054) # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value = thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+        else:
+            xray_filter_thickness_maximum = None
+
     if xray_filter_type:
         if xray_filter_type == 'NONE':
             _xrayfiltersnone(source)
         elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
             for i, material in enumerate(xray_filter_material.split(',')):
                 try:
-# Section commented out due to ValueError attempting to get two values with a comma separator from a Decimal String!
-# Help request posted on pydicom forum. Logged as https://bitbucket.org/openrem/openrem/issue/137/
-#                    thickmax = None
-#                    thickmin = None
-#                    if xray_filter_thickness_maximum:
-#                        thickmax = xray_filter_thickness_maximum.split(',')[i]
-#                    if xray_filter_thickness_minimum:
-#                        thickmin = xray_filter_thickness_minimum.split(',')[i]
-#                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
-                    _xrayfilters('FLAT', material, None, None, source)
+                    thickmax = None
+                    thickmin = None
+                    if isinstance(xray_filter_thickness_maximum, list):
+                        thickmax = xray_filter_thickness_maximum[i]
+                    if isinstance(xray_filter_thickness_minimum, list):
+                        thickmin = xray_filter_thickness_minimum[i]
+                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
                 except IndexError:
                     pass
         else:
@@ -200,13 +246,6 @@ def _irradiationeventxraysourcedata(dataset,event):
                 )
     _kvp(dataset,source)
     _exposure(dataset,source)
-    xray_grid = get_value_kw('Grid',dataset)
-    if xray_grid:
-        if xray_grid == 'NONE':
-            _xraygrid('111646',source)
-        elif xray_grid == ['RECIPROCATING', 'FOCUSED']:
-            _xraygrid('111642',source)
-            _xraygrid('111643',source)
 
 
 def _doserelateddistancemeasurements(dataset,mech):
@@ -247,6 +286,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
+    # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import Irradiation_event_xray_data
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
@@ -369,6 +409,8 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     from remapp.tools.get_values import get_value_kw
     patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
+    patientatt.patient_weight = get_value_kw("PatientWeight",dataset)
+    patientatt.patient_size = get_value_kw("PatientSize", dataset)
     patientatt.save()
 
 
