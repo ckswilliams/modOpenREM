@@ -203,7 +203,7 @@ class Irradiation_event_xray_data(models.Model):  # TID 10003
         Content_item_descriptions, blank=True, null=True, related_name='tid10003_laterality')  # CID 244
     image_view = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid10003_view'
-    )  # CID 4010 “DX View” or CID 4014 “View for Mammography”
+    )  # CID 4010 "DX View" or CID 4014 "View for Mammography"
     # Lines below are incorrect, but exist in current databases. Replace with lines below them:
     projection_eponymous_name = models.CharField(max_length=16, blank=True, null=True)  # Added null to originals
     patient_table_relationship = models.CharField(max_length=16, blank=True, null=True)
@@ -251,7 +251,7 @@ class Image_view_modifier(models.Model):  # EV 111032
     irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
     image_view_modifier = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True
-    )  # CID 4011 “DX View Modifier” or CID 4015 “View Modifier for Mammography”
+    )  # CID 4011 "DX View Modifier" or CID 4015 "View Modifier for Mammography"
 
 
 class Irradiation_event_xray_detector_data(models.Model):  # TID 10003a
