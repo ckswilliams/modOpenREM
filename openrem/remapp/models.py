@@ -804,12 +804,16 @@ class Person_participant(models.Model):  # TID 1020
     ct_dose_check_details_notification = models.ForeignKey(
         Ct_dose_check_details, blank=True, null=True, related_name='tid1020_notification')
     person_name = models.TextField(blank=True, null=True)
-    person_role_in_procedure = models.ForeignKey(
+    # CharField version is a mistake and shouldn't be used
+    person_role_in_procedure = models.CharField(max_length=16, blank=True)
+    person_role_in_procedure_cid = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid1020_roleproc')
     person_id = models.TextField(blank=True, null=True)
     person_id_issuer = models.TextField(blank=True, null=True)
     organization_name = models.TextField(blank=True, null=True)
-    person_role_in_organization = models.ForeignKey(
+    # TextField version is a mistake and shouldn't be used
+    person_role_in_organization = models.TextField(blank=True, null=True)
+    person_role_in_organization_cid = models.ForeignKey(
         Content_item_descriptions, blank=True, null=True, related_name='tid1020_roleorg')  # CID 7452
 
     def __unicode__(self):
