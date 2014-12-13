@@ -86,21 +86,21 @@ def get_seq_code_meaning(sequence,dataset):
             return seq[0].CodeMeaning
 
 def get_or_create_cid(codevalue, codemeaning):
-    """Create a code_value code_meaning pair entry in the Content_item_descriptions 
+    """Create a code_value code_meaning pair entry in the ContextID
     table if it doesn't already exist. 
 
     :param codevalue:   Code value as defined in the DICOM standard part 16
     :type codevalue:    int.
     :param codemeaning: Code meaning as defined in the DICOM standard part 16
     :type codevalue:    int.
-    :returns:           Content_item_descriptions entry for code value passed
+    :returns:           ContextID entry for code value passed
     """
-    from remapp.models import Content_item_descriptions
+    from remapp.models import ContextID
     if codevalue:
-        if not Content_item_descriptions.objects.all().filter(code_value=codevalue).exists():
-            cid = Content_item_descriptions(
+        if not ContextID.objects.all().filter(code_value=codevalue).exists():
+            cid = ContextID(
                 code_value = codevalue,
                 code_meaning = codemeaning,
                 )
             cid.save()
-        return Content_item_descriptions.objects.get(code_value=codevalue)
+        return ContextID.objects.get(code_value=codevalue)

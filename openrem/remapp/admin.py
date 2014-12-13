@@ -10,7 +10,7 @@ from remapp.models import (General_study_module_attributes,
     Accumulated_cassette_based_projection_radiography_dose, 
     Accumulated_integrated_projection_radiography_dose, 
     Patient_module_attributes, General_equipment_module_attributes, 
-    Patient_study_module_attributes, Content_item_descriptions,
+    Patient_study_module_attributes, ContextID,
     Ct_radiation_dose, Ct_accumulated_dose_data,
     Ct_irradiation_event_data, Scanning_length,
     Ct_dose_check_details, Ct_xray_source_parameters,
@@ -44,7 +44,7 @@ admin.site.register(Accumulated_integrated_projection_radiography_dose)
 admin.site.register(Patient_module_attributes)
 admin.site.register(General_equipment_module_attributes)
 admin.site.register(Patient_study_module_attributes)
-admin.site.register(Content_item_descriptions)
+admin.site.register(ContextID)
 admin.site.register(Ct_radiation_dose)
 admin.site.register(Ct_accumulated_dose_data)
 admin.site.register(Ct_irradiation_event_data)

@@ -63,11 +63,9 @@ class Exports(models.Model):
     processtime = models.DecimalField(max_digits=30, decimal_places=10, blank=True, null=True)
 
 
-class Content_item_descriptions(models.Model):
+class ContextID(models.Model):
     """Table to hold all the context ID code values and code meanings.
     
-    + Should be renamed Context_identifiers. If it does, I think it would only need to be edited in \
-    tools.get_values.get_or_set_cid and admin, then a South migration.
     + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. \
     This assumes they are used correctly.
     
@@ -135,22 +133,22 @@ class Projection_xray_radiation_dose(models.Model):  # TID 10001
     """
     general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
     procedure_reported = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_procedure')
+        ContextID, blank=True, null=True, related_name='tid10001_procedure')
     has_intent = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_intent')
+        ContextID, blank=True, null=True, related_name='tid10001_intent')
     acquisition_device_type = models.CharField(max_length=16, blank=True)
     scope_of_accumulation = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_scope')
+        ContextID, blank=True, null=True, related_name='tid10001_scope')
     xray_detector_data_available = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_detector')
+        ContextID, blank=True, null=True, related_name='tid10001_detector')
     xray_source_data_available = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_source')
+        ContextID, blank=True, null=True, related_name='tid10001_source')
     xray_mechanical_data_available = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_mech')
+        ContextID, blank=True, null=True, related_name='tid10001_mech')
     comment = models.TextField(blank=True, null=True)
     # might need to be a table on its own as is 1-n, even though it should only list the primary source...
     source_of_dose_information = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10001_infosource')
+        ContextID, blank=True, null=True, related_name='tid10001_infosource')
 
 
 class Accumulated_xray_dose(models.Model):  # TID 10002
@@ -162,7 +160,7 @@ class Accumulated_xray_dose(models.Model):  # TID 10002
     
     """
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
-    acquisition_plane = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    acquisition_plane = models.ForeignKey(ContextID, blank=True, null=True)
 
 
 class Calibration(models.Model):
@@ -172,7 +170,7 @@ class Calibration(models.Model):
     
     """
     accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
-    dose_measurement_device = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    dose_measurement_device = models.ForeignKey(ContextID, blank=True, null=True)
     calibration_date = models.DateTimeField(blank=True, null=True)
     calibration_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     calibration_uncertainty = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -188,21 +186,21 @@ class Irradiation_event_xray_data(models.Model):  # TID 10003
     """
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
     acquisition_plane = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_plane')  # CID 10003
+        ContextID, blank=True, null=True, related_name='tid10003_plane')  # CID 10003
     irradiation_event_uid = models.TextField(blank=True, null=True)
     irradiation_event_label = models.TextField(blank=True, null=True)
     label_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_labeltype')  # CID 10022
+        ContextID, blank=True, null=True, related_name='tid10003_labeltype')  # CID 10022
     date_time_started = models.DateTimeField(blank=True, null=True)
     irradiation_event_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_eventtype')  # CID 10002
+        ContextID, blank=True, null=True, related_name='tid10003_eventtype')  # CID 10002
     acquisition_protocol = models.TextField(blank=True, null=True)
     anatomical_structure = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_anatomy')  # CID 4009
+        ContextID, blank=True, null=True, related_name='tid10003_anatomy')  # CID 4009
     laterality = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_laterality')  # CID 244
+        ContextID, blank=True, null=True, related_name='tid10003_laterality')  # CID 244
     image_view = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_view'
+        ContextID, blank=True, null=True, related_name='tid10003_view'
     )  # CID 4010 "DX View" or CID 4014 "View for Mammography"
     # Lines below are incorrect, but exist in current databases. Replace with lines below them:
     projection_eponymous_name = models.CharField(max_length=16, blank=True, null=True)  # Added null to originals
@@ -210,25 +208,25 @@ class Irradiation_event_xray_data(models.Model):  # TID 10003
     patient_orientation = models.CharField(max_length=16, blank=True, null=True)
     patient_orientation_modifier = models.CharField(max_length=16, blank=True, null=True)
     projection_eponymous_name_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_pojectioneponymous')  # CID 4012
+        ContextID, blank=True, null=True, related_name='tid10003_pojectioneponymous')  # CID 4012
     patient_table_relationship_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_pttablerel')  # CID 21
+        ContextID, blank=True, null=True, related_name='tid10003_pttablerel')  # CID 21
     patient_orientation_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_ptorientation')  # CID 19
+        ContextID, blank=True, null=True, related_name='tid10003_ptorientation')  # CID 19
     patient_orientation_modifier_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_ptorientationmod')  # CID 20
+        ContextID, blank=True, null=True, related_name='tid10003_ptorientationmod')  # CID 20
     target_region = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name="tid10003_region")  # CID 4031
+        ContextID, blank=True, null=True, related_name="tid10003_region")  # CID 4031
     dose_area_product = models.DecimalField(max_digits=16, decimal_places=10, blank=True, null=True)
     half_value_layer = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     patient_equivalent_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     entrance_exposure_at_rp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     reference_point_definition = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_rpdefinition')  # CID 10025
+        ContextID, blank=True, null=True, related_name='tid10003_rpdefinition')  # CID 10025
     # Another char field that should be a cid
     breast_composition = models.CharField(max_length=16, blank=True, null=True)  # TID 4007, CID 6000
     breast_composition_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003_breastcomposition')  # CID 6000/6001
+        ContextID, blank=True, null=True, related_name='tid10003_breastcomposition')  # CID 6000/6001
     percent_fibroglandular_tissue = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)  # TID 4007
     comment = models.TextField(blank=True, null=True)
 
@@ -250,7 +248,7 @@ class Image_view_modifier(models.Model):  # EV 111032
     """
     irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
     image_view_modifier = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True
+        ContextID, blank=True, null=True
     )  # CID 4011 "DX View Modifier" or CID 4015 "View Modifier for Mammography"
 
 
@@ -286,22 +284,22 @@ class Irradiation_event_xray_source_data(models.Model):  # TID 10003b
     dose_rp = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_rpdefinition')  # CID 10025
+        ContextID, blank=True, null=True, related_name='tid10003b_rpdefinition')  # CID 10025
     average_glandular_dose = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     fluoro_mode = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_fluoromode')  # CID 10004
+        ContextID, blank=True, null=True, related_name='tid10003b_fluoromode')  # CID 10004
     pulse_rate = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     number_of_pulses = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
     # derivation should be a cid - has never been used in extractor, but was non null=True so will exist in database :-(
     derivation = models.CharField(max_length=16, blank=True, null=True)
     derivation_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_derivation')  # R-10260, "Estimated"
+        ContextID, blank=True, null=True, related_name='tid10003b_derivation')  # R-10260, "Estimated"
     irradiation_duration = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     average_xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     exposure_time = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
     focal_spot_size = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     anode_target_material = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10003b_anodetarget')  # CID 10016
+        ContextID, blank=True, null=True, related_name='tid10003b_anodetarget')  # CID 10016
     collimated_field_area = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     collimated_field_height = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     collimated_field_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -323,7 +321,7 @@ class Xray_grid(models.Model):
     From DICOM Part 16
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
-    xray_grid = models.ForeignKey(Content_item_descriptions, blank=True, null=True)  # CID 10017
+    xray_grid = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10017
 
 
 class Pulse_width(models.Model):  # EV 113793
@@ -365,9 +363,9 @@ class Xray_filters(models.Model):  # EV 113771
     """
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
     xray_filter_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_type')  # CID 10007
+        ContextID, blank=True, null=True, related_name='xrayfilters_type')  # CID 10007
     xray_filter_material = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='xrayfilters_material')  # CID 10006
+        ContextID, blank=True, null=True, related_name='xrayfilters_material')  # CID 10006
     xray_filter_thickness_minimum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     xray_filter_thickness_maximum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
         
@@ -384,7 +382,7 @@ class Irradiation_event_xray_mechanical_data(models.Model):  # TID 10003c
         * magnification_factor
     """
     irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
-    crdr_mechanical_configuration = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    crdr_mechanical_configuration = models.ForeignKey(ContextID, blank=True, null=True)
     positioner_primary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     positioner_secondary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     positioner_primary_end_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -443,7 +441,7 @@ class Accumulated_projection_xray_dose(models.Model):  # TID 10004
     dose_rp_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     total_number_of_radiographic_frames  = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
-    reference_point_definition_code = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
 
     def convert_gym2_to_cgycm2(self):
         """Converts Gy.m2 to cGy.cm2 for display in web interface    
@@ -462,7 +460,7 @@ class Accumulated_mammography_xray_dose(models.Model):  # TID 10005
     """
     accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
     accumulated_average_glandular_dose = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
-    laterality = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    laterality = models.ForeignKey(ContextID, blank=True, null=True)
 
 
 class Accumulated_cassette_based_projection_radiography_dose(models.Model):  # TID 10006
@@ -474,7 +472,7 @@ class Accumulated_cassette_based_projection_radiography_dose(models.Model):  # T
         the same equipment.
     """
     accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
-    detector_type = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    detector_type = models.ForeignKey(ContextID, blank=True, null=True)
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     
 
@@ -490,7 +488,7 @@ class Accumulated_integrated_projection_radiography_dose(models.Model):  # TID 1
     dose_area_product_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     dose_rp_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
-    reference_point_definition_code = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     
 
@@ -568,19 +566,19 @@ class Ct_radiation_dose(models.Model):  # TID 10011
     """
     general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
     procedure_reported = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10011_procedure')
+        ContextID, blank=True, null=True, related_name='tid10011_procedure')
     has_intent = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10011_intent')  # CID 3629
+        ContextID, blank=True, null=True, related_name='tid10011_intent')  # CID 3629
     start_of_xray_irradiation = models.DateTimeField(blank=True, null=True)
     end_of_xray_irradiation = models.DateTimeField(blank=True, null=True)
     scope_of_accumulation = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10011_scope')  # CID 10000
+        ContextID, blank=True, null=True, related_name='tid10011_scope')  # CID 10000
     uid_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1011_uid')  # CID 10001
+        ContextID, blank=True, null=True, related_name='tid1011_uid')  # CID 10001
     comment = models.TextField(blank=True, null=True)
     # does need to be a table on its own as is 1-n
     source_of_dose_information = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10011_source')
+        ContextID, blank=True, null=True, related_name='tid10011_source')
 
 
 class SourceOfCTDoseInformation(models.Model):  # CID 10021
@@ -589,7 +587,7 @@ class SourceOfCTDoseInformation(models.Model):  # CID 10021
     # TODO: populate this table when extracting and move existing data. Task #164
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
     source_of_dose_information = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True)  # CID 10021
+        ContextID, blank=True, null=True)  # CID 10021
 
 
 class Ct_accumulated_dose_data(models.Model):  # TID 10012
@@ -605,10 +603,10 @@ class Ct_accumulated_dose_data(models.Model):  # TID 10012
     ct_dose_length_product_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     ct_effective_dose_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     reference_authority_code = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10012_authority')  # CID 10015 (ICRP60/103)
+        ContextID, blank=True, null=True, related_name='tid10012_authority')  # CID 10015 (ICRP60/103)
     reference_authority_text = models.TextField(blank=True, null=True)
     measurement_method = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10012_method')  # CID 10011
+        ContextID, blank=True, null=True, related_name='tid10012_method')  # CID 10011
     patient_model = models.TextField(blank=True, null=True)
     effective_dose_phantom_type = models.TextField(blank=True, null=True)
     dosimeter_type = models.TextField(blank=True, null=True)
@@ -628,16 +626,16 @@ class Ct_irradiation_event_data(models.Model):  # TID 10013
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
     acquisition_protocol = models.TextField(blank=True, null=True)
     target_region = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_region')  # CID 4030
+        ContextID, blank=True, null=True, related_name='tid10013_region')  # CID 4030
     ct_acquisition_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_type')  # CID 10013
+        ContextID, blank=True, null=True, related_name='tid10013_type')  # CID 10013
     procedure_context = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_context')  # CID 10014
+        ContextID, blank=True, null=True, related_name='tid10013_context')  # CID 10014
     irradiation_event_uid = models.TextField(blank=True, null=True)
     #  TODO: Add extraction of the label and label type (Series, acquisition, instance number) Issue #167
     irradiation_event_label = models.TextField(blank=True, null=True)
     label_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_labeltype')  # CID 10022
+        ContextID, blank=True, null=True, related_name='tid10013_labeltype')  # CID 10022
     exposure_time = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     nominal_single_collimation_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     nominal_total_collimation_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -645,13 +643,13 @@ class Ct_irradiation_event_data(models.Model):  # TID 10013
     number_of_xray_sources = models.DecimalField(max_digits=8, decimal_places=0, blank=True, null=True)
     mean_ctdivol = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     ctdiw_phantom_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_phantom')  # CID 4052
+        ContextID, blank=True, null=True, related_name='tid10013_phantom')  # CID 4052
     ctdifreeair_calculation_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     mean_ctdifreeair = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     dlp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     effective_dose = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     measurement_method = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid10013_method')  # CID 10011
+        ContextID, blank=True, null=True, related_name='tid10013_method')  # CID 10011
     effective_dose_conversion_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     xray_modulation_type = models.TextField(blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
@@ -665,7 +663,7 @@ class CtReconstructionAlgorithm(models.Model):
     """
     # TODO: Add this to the rdsr extraction routines. Issue #166
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
-    reconstruction_algorithm = models.ForeignKey(Content_item_descriptions, blank=True, null=True)  # CID 10033
+    reconstruction_algorithm = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10033
 
 
 class Ct_xray_source_parameters(models.Model):
@@ -704,7 +702,7 @@ class SizeSpecificDoseEstimation(models.Model):
     """
     # TODO: Add this to the rdsr extraction routines. Issue #168
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
-    measurement_method = models.ForeignKey(Content_item_descriptions, blank=True, null=True)  # CID 10023
+    measurement_method = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10023
     measured_lateral_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     measured_ap_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     derived_effective_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -746,13 +744,13 @@ class Observer_context(models.Model):  # TID 1002
     projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose, blank=True, null=True)
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
     observer_type = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1002_observertype')  # CID 270
+        ContextID, blank=True, null=True, related_name='tid1002_observertype')  # CID 270
     person_observer_name = models.TextField(blank=True, null=True)
     person_observer_organization_name = models.TextField(blank=True, null=True)
     person_observer_role_in_organization = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1002_ptroleorg')  # CID 7452
+        ContextID, blank=True, null=True, related_name='tid1002_ptroleorg')  # CID 7452
     person_observer_role_in_procedure = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1002_ptroleproc')  # CID 7453
+        ContextID, blank=True, null=True, related_name='tid1002_ptroleproc')  # CID 7453
     device_observer_uid = models.TextField(blank=True, null=True)
     device_observer_name = models.TextField(blank=True, null=True)
     device_observer_manufacturer = models.TextField(blank=True, null=True)
@@ -760,7 +758,7 @@ class Observer_context(models.Model):  # TID 1002
     device_observer_serial_number = models.TextField(blank=True, null=True)
     device_observer_physical_location_during_observation = models.TextField(blank=True, null=True)
     device_role_in_procedure = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1002_role')  # CID 7445
+        ContextID, blank=True, null=True, related_name='tid1002_role')  # CID 7445
 
     def __unicode__(self):
         return self.device_observer_name
@@ -778,7 +776,7 @@ class Device_participant(models.Model):  # TID 1021
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data, blank=True, null=True)
     ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data, blank=True, null=True)
-    device_role_in_procedure = models.ForeignKey(Content_item_descriptions, blank=True, null=True)
+    device_role_in_procedure = models.ForeignKey(ContextID, blank=True, null=True)
     device_name = models.TextField(blank=True, null=True)
     device_manufacturer = models.TextField(blank=True, null=True)
     device_model_name = models.TextField(blank=True, null=True)
@@ -807,14 +805,14 @@ class Person_participant(models.Model):  # TID 1020
     # CharField version is a mistake and shouldn't be used
     person_role_in_procedure = models.CharField(max_length=16, blank=True)
     person_role_in_procedure_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1020_roleproc')
+        ContextID, blank=True, null=True, related_name='tid1020_roleproc')
     person_id = models.TextField(blank=True, null=True)
     person_id_issuer = models.TextField(blank=True, null=True)
     organization_name = models.TextField(blank=True, null=True)
     # TextField version is a mistake and shouldn't be used
     person_role_in_organization = models.TextField(blank=True, null=True)
     person_role_in_organization_cid = models.ForeignKey(
-        Content_item_descriptions, blank=True, null=True, related_name='tid1020_roleorg')  # CID 7452
+        ContextID, blank=True, null=True, related_name='tid1020_roleorg')  # CID 7452
 
     def __unicode__(self):
         return self.person_name

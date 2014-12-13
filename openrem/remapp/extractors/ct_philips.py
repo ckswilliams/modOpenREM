@@ -93,7 +93,7 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
                         
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
-    from remapp.models import Ct_accumulated_dose_data, Content_item_descriptions
+    from remapp.models import Ct_accumulated_dose_data, ContextID
     from remapp.tools.get_values import get_value_kw, get_value_num
     ctacc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
     ctacc.total_number_of_irradiation_events = get_value_kw('TotalNumberOfExposures',dataset)

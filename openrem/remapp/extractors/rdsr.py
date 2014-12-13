@@ -342,7 +342,7 @@ def _accumulatedmammoxraydose(dataset,accum): # TID 10005
 
 def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
     from remapp.tools.get_values import get_or_create_cid
-    from remapp.models import Accumulated_projection_xray_dose, Content_item_descriptions
+    from remapp.models import Accumulated_projection_xray_dose, ContextID
     
     accumproj = Accumulated_projection_xray_dose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
@@ -404,7 +404,7 @@ def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
     accumint.save()
 
 def _accumulatedxraydose(dataset,proj): # TID 10002
-    from remapp.models import Accumulated_xray_dose, Content_item_descriptions
+    from remapp.models import Accumulated_xray_dose, ContextID
     from remapp.tools.get_values import get_or_create_cid
     accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
@@ -526,7 +526,7 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
                         
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
-    from remapp.models import Ct_accumulated_dose_data, Content_item_descriptions
+    from remapp.models import Ct_accumulated_dose_data, ContextID
     ctacc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
