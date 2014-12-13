@@ -132,8 +132,8 @@ def _xrayfilters(dataset,source):
 
 
 def _doserelateddistancemeasurements(dataset,mech): #CID 10008
-    from remapp.models import Dose_related_distance_measurements
-    distance = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    from remapp.models import DoseRelatedDistanceMeasurements
+    distance = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     codes = {   'Distance Source to Isocenter'      :'distance_source_to_isocenter',
                 'Distance Source to Reference Point':'distance_source_to_reference_point',
                 'Distance Source to Detector'       :'distance_source_to_detector',
@@ -593,10 +593,10 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
                 _ctirradiationeventdata(cont,proj)
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import General_equipment_module_attributes
+    from remapp.models import GeneralEquipmentModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)

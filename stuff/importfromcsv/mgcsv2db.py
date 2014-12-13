@@ -84,8 +84,8 @@ def _irradiationeventxraysourcedata(dataset,event):
         _xraygrid('111643',source)
 
 def _doserelateddistancemeasurements(dataset,mech):
-    from remapp.models import Dose_related_distance_measurements
-    dist = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    from remapp.models import DoseRelatedDistanceMeasurements
+    dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     dist.distance_source_to_detector = dataset[14]
     dist.distance_source_to_entrance_surface = dataset[17]
     dist.save()
@@ -178,8 +178,8 @@ def _projectionxrayradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,g):
-    from remapp.models import General_equipment_module_attributes
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import GeneralEquipmentModuleAttr
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=g)
     equip.manufacturer = 'GE'
     equip.station_name = dataset[3]
     if equip.station_name[3] == 'C':

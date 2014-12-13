@@ -397,7 +397,7 @@ class IrradEventXRayMechanicalData(models.Model):  # TID 10003c
     magnification_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     
 
-class Dose_related_distance_measurements(models.Model):  # CID 10008
+class DoseRelatedDistanceMeasurements(models.Model):  # CID 10008
     """Dose Related Distance Measurements Context ID 10008
     
     Called from TID 10003c
@@ -527,7 +527,7 @@ class Patient_study_module_attributes(models.Model):  # C.7.2.2
     # TODO: Add patient size code sequence
     
 
-class General_equipment_module_attributes(models.Model):  # C.7.5.1
+class GeneralEquipmentModuleAttr(models.Model):  # C.7.5.1
     """General Equipment Module C.7.5.1
     
     From DICOM Part 3: Information Object Definitions Table C.7-8:

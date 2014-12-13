@@ -5,11 +5,11 @@ from remapp.models import (GeneralStudyModuleAttr,
     IrradEventXRayDetectorData, IrradEventXRaySourceData,
     Pulse_width, Kvp, Xray_tube_current, Exposure, Xray_filters, Xray_grid,
     DeviceParticipant, IrradEventXRayMechanicalData,
-    Dose_related_distance_measurements, AccumProjectionXRayDose,
+    DoseRelatedDistanceMeasurements, AccumProjectionXRayDose,
     AccumMammographyXRayDose,
     AccumCassetteBsdProjRadiogDose,
     AccumIntegratedProjRadiogDose,
-    Patient_module_attributes, General_equipment_module_attributes, 
+    Patient_module_attributes, GeneralEquipmentModuleAttr,
     Patient_study_module_attributes, ContextID,
     CtRadiationDose, CtAccumulatedDoseData,
     CtIrradiationEventData, Scanning_length,
@@ -36,13 +36,13 @@ admin.site.register(Xray_filters)
 admin.site.register(Xray_grid)
 admin.site.register(DeviceParticipant)
 admin.site.register(IrradEventXRayMechanicalData)
-admin.site.register(Dose_related_distance_measurements)
+admin.site.register(DoseRelatedDistanceMeasurements)
 admin.site.register(AccumProjectionXRayDose)
 admin.site.register(AccumMammographyXRayDose)
 admin.site.register(AccumCassetteBsdProjRadiogDose)
 admin.site.register(AccumIntegratedProjRadiogDose)
 admin.site.register(Patient_module_attributes)
-admin.site.register(General_equipment_module_attributes)
+admin.site.register(GeneralEquipmentModuleAttr)
 admin.site.register(Patient_study_module_attributes)
 admin.site.register(ContextID)
 admin.site.register(CtRadiationDose)

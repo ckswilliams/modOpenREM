@@ -140,10 +140,10 @@ def _ctradiationdose(dataset,g):
     proj.save()
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import General_equipment_module_attributes
+    from remapp.models import GeneralEquipmentModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)

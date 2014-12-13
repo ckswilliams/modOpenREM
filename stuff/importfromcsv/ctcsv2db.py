@@ -79,8 +79,8 @@ def _ctradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,g, sitecode):
-    from remapp.models import General_equipment_module_attributes
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import GeneralEquipmentModuleAttr
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=g)
     if sitecode is "C":
         equip.manufacturer = "GE"
         equip.institution_name = "Royal Marsden Hospital"
