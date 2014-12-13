@@ -237,9 +237,9 @@ def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
     detector.save()
         
 def _imageviewmodifier(dataset,event):
-    from remapp.models import Image_view_modifier
+    from remapp.models import ImageViewModifier
     from remapp.tools.get_values import get_or_create_cid
-    modifier = Image_view_modifier.objects.create(irradiation_event_xray_data=event)
+    modifier = ImageViewModifier.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View Modifier':
             modifier.image_view_modifier = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)

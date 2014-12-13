@@ -238,7 +238,7 @@ class IrradiationEventXRayData(models.Model):  # TID 10003
             return 1000000*self.dose_area_product
     
 
-class Image_view_modifier(models.Model):  # EV 111032
+class ImageViewModifier(models.Model):  # EV 111032
     """Table to hold image view modifiers for the irradiation event x-ray data table
     
     From DICOM Part 16 Annex D DICOM controlled Terminology Definitions
