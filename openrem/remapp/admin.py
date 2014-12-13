@@ -1,12 +1,12 @@
 from remapp.models import (GeneralStudyModuleAttr,
     ProjectionXRayRadiationDose, Observer_context,
-    AccumulatedXRayDose, Calibration, IrradEventXRayData,
+    AccumXRayDose, Calibration, IrradEventXRayData,
     ImageViewModifier, Person_participant,
     IrradEventXRayDetectorData, IrradEventXRaySourceData,
     Pulse_width, Kvp, Xray_tube_current, Exposure, Xray_filters, Xray_grid,
     Device_participant, IrradEventXRayMechanicalData,
-    Dose_related_distance_measurements, Accumulated_projection_xray_dose, 
-    Accumulated_mammography_xray_dose, 
+    Dose_related_distance_measurements, AccumProjectionXRayDose,
+    AccumMammographyXRayDose,
     AccumCassetteBsdProjRadiogDose,
     AccumIntegratedProjRadiogDose,
     Patient_module_attributes, General_equipment_module_attributes, 
@@ -21,7 +21,7 @@ from django.contrib import admin
 admin.site.register(GeneralStudyModuleAttr)
 admin.site.register(ProjectionXRayRadiationDose)
 admin.site.register(Observer_context)
-admin.site.register(AccumulatedXRayDose)
+admin.site.register(AccumXRayDose)
 admin.site.register(Calibration)
 admin.site.register(IrradEventXRayData)
 admin.site.register(ImageViewModifier)
@@ -37,8 +37,8 @@ admin.site.register(Xray_grid)
 admin.site.register(Device_participant)
 admin.site.register(IrradEventXRayMechanicalData)
 admin.site.register(Dose_related_distance_measurements)
-admin.site.register(Accumulated_projection_xray_dose)
-admin.site.register(Accumulated_mammography_xray_dose)
+admin.site.register(AccumProjectionXRayDose)
+admin.site.register(AccumMammographyXRayDose)
 admin.site.register(AccumCassetteBsdProjRadiogDose)
 admin.site.register(AccumIntegratedProjRadiogDose)
 admin.site.register(Patient_module_attributes)

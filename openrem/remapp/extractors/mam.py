@@ -193,12 +193,12 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
 
 
 def _accumulatedxraydose(dataset,proj):
-    from remapp.models import AccumulatedXRayDose, Accumulated_mammography_xray_dose
+    from remapp.models import AccumXRayDose, AccumMammographyXRayDose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accum = AccumulatedXRayDose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
     accum.save()
-    accummam = Accumulated_mammography_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     accummam.accumulated_average_glandular_dose = 0.0
     accummam.save()
 

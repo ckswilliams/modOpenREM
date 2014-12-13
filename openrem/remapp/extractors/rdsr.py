@@ -330,9 +330,9 @@ def _calibration(dataset,accum):
     cal.save()
 
 def _accumulatedmammoxraydose(dataset,accum): # TID 10005
-    from remapp.models import Accumulated_mammography_xray_dose
+    from remapp.models import AccumMammographyXRayDose
     from remapp.tools.get_values import get_or_create_cid
-    accummammo = Accumulated_mammography_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accummammo = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated Average Glandular Dose':
             accummammo.accumulated_average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
@@ -342,9 +342,9 @@ def _accumulatedmammoxraydose(dataset,accum): # TID 10005
 
 def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
     from remapp.tools.get_values import get_or_create_cid
-    from remapp.models import Accumulated_projection_xray_dose, ContextID
+    from remapp.models import AccumProjectionXRayDose, ContextID
     
-    accumproj = Accumulated_projection_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accumproj = AccumProjectionXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
             accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
@@ -404,9 +404,9 @@ def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
     accumint.save()
 
 def _accumulatedxraydose(dataset,proj): # TID 10002
-    from remapp.models import AccumulatedXRayDose, ContextID
+    from remapp.models import AccumXRayDose, ContextID
     from remapp.tools.get_values import get_or_create_cid
-    accum = AccumulatedXRayDose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             accum.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
