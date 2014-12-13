@@ -263,7 +263,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 from openremproject.settings import MEDIA_ROOT
-from remapp.models import Size_upload
+from remapp.models import SizeUpload
 from remapp.forms import SizeUploadForm
 
 @login_required
@@ -276,7 +276,7 @@ def size_upload(request):
     if request.method == 'POST':
         form = SizeUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            newcsv = Size_upload(sizefile = request.FILES['sizefile'])
+            newcsv = SizeUpload(sizefile = request.FILES['sizefile'])
             newcsv.save()
 
             # Redirect to the document list after POST
@@ -321,7 +321,7 @@ def size_process(request, *args, **kwargs):
         uniqueItemsInPost = len(set(request.POST.values()))
         
         if itemsInPost == uniqueItemsInPost:
-            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+            csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])[0]
             
             if not csvrecord.sizefile:
                 messages.error(request, "File to be processed doesn't exist. Do you wish to try again?")
@@ -344,7 +344,7 @@ def size_process(request, *args, **kwargs):
 
     else:
     
-        csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
+        csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])
         with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
             try:
                 dialect = csv.Sniffer().sniff(csvfile.read(1024))
@@ -395,9 +395,9 @@ def size_imports(request, *args, **kwargs):
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
-    imports = Size_upload.objects.all().order_by('-import_date')
+    imports = SizeUpload.objects.all().order_by('-import_date')
     
     current = imports.filter(status__contains = 'CURRENT')
     complete = imports.filter(status__contains = 'COMPLETE')
@@ -433,10 +433,10 @@ def size_delete(request):
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
     for task in request.POST:
-        uploads = Size_upload.objects.filter(task_id__exact = request.POST[task])
+        uploads = SizeUpload.objects.filter(task_id__exact = request.POST[task])
         for upload in uploads:
             try:
                 upload.logfile.delete()
@@ -459,9 +459,9 @@ def size_abort(request, pk):
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
     from django.shortcuts import render, redirect, get_object_or_404
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
-    size = get_object_or_404(Size_upload, pk=pk)
+    size = get_object_or_404(SizeUpload, pk=pk)
 
     if request.user.groups.filter(name="admingroup"):
         revoke(size.task_id, terminate=True)

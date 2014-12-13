@@ -114,10 +114,10 @@ def websizeimport(csv_pk = None, *args, **kwargs):
 
     import os, sys, csv, datetime
     from django.core.files.base import ContentFile
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
     if csv_pk:
-        csvrecord = Size_upload.objects.all().filter(id__exact = csv_pk)[0]
+        csvrecord = SizeUpload.objects.all().filter(id__exact = csv_pk)[0]
         csvrecord.task_id = websizeimport.request.id
         datestamp = datetime.datetime.now()
         csvrecord.import_date = datestamp

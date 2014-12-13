@@ -14,7 +14,7 @@ from remapp.models import (General_study_module_attributes,
     Ct_radiation_dose, Ct_accumulated_dose_data,
     Ct_irradiation_event_data, Scanning_length,
     Ct_dose_check_details, Ct_xray_source_parameters,
-    Exports, Size_upload)
+    Exports, SizeUpload)
 
 from django.contrib import admin
 
@@ -52,4 +52,4 @@ admin.site.register(Scanning_length)
 admin.site.register(Ct_dose_check_details)
 admin.site.register(Ct_xray_source_parameters)
 admin.site.register(Exports)
-admin.site.register(Size_upload)
+admin.site.register(SizeUpload)
