@@ -36,9 +36,9 @@ def _scanninglength(dataset,event): # TID 10014
     scanlen.save()
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import CtXraySourceParameters
+    from remapp.models import CtXRaySourceParameters
     from remapp.tools.get_values import get_value_kw
-    param = CtXraySourceParameters.objects.create(ct_irradiation_event_data=event)
+    param = CtXRaySourceParameters.objects.create(ct_irradiation_event_data=event)
     param.identification_of_the_xray_source = 'A'
     param.kvp = get_value_kw('KVP',dataset)
     mA = get_value_kw('XRayTubeCurrentInuA',dataset)

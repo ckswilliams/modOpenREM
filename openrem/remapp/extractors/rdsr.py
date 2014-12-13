@@ -443,8 +443,8 @@ def _scanninglength(dataset,event): # TID 10014
     scanlen.save()
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import CtXraySourceParameters
-    param = CtXraySourceParameters.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import CtXRaySourceParameters
+    param = CtXRaySourceParameters.objects.create(ct_irradiation_event_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification of the x-ray source' or cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification number of the x-ray source':
             param.identification_of_the_xray_source = cont.TextValue

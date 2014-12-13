@@ -13,7 +13,7 @@ from remapp.models import (GeneralStudyModuleAttr,
     Patient_study_module_attributes, ContextID,
     CtRadiationDose, CtAccumulatedDoseData,
     CtIrradiationEventData, Scanning_length,
-    CtDoseCheckDetails, CtXraySourceParameters,
+    CtDoseCheckDetails, CtXRaySourceParameters,
     Exports, SizeUpload)
 
 from django.contrib import admin
@@ -50,6 +50,6 @@ admin.site.register(CtAccumulatedDoseData)
 admin.site.register(CtIrradiationEventData)
 admin.site.register(Scanning_length)
 admin.site.register(CtDoseCheckDetails)
-admin.site.register(CtXraySourceParameters)
+admin.site.register(CtXRaySourceParameters)
 admin.site.register(Exports)
 admin.site.register(SizeUpload)

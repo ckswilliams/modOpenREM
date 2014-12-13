@@ -22,8 +22,8 @@ def _scanninglength(dataset,event,col): # TID 10014
 
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import CtXraySourceParameters
-    param = CtXraySourceParameters.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import CtXRaySourceParameters
+    param = CtXRaySourceParameters.objects.create(ct_irradiation_event_data=event)
     # Nothing in here from GE, will need to populate for Siemens
     param.save()
 

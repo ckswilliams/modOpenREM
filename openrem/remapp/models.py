@@ -666,7 +666,7 @@ class CtReconstructionAlgorithm(models.Model):
     reconstruction_algorithm = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10033
 
 
-class CtXraySourceParameters(models.Model):
+class CtXRaySourceParameters(models.Model):
     """Container in TID 10013 to hold CT x-ray source parameters
     """
     ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
