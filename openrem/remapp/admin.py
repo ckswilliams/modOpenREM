@@ -7,8 +7,8 @@ from remapp.models import (GeneralStudyModuleAttr,
     Device_participant, IrradEventXRayMechanicalData,
     Dose_related_distance_measurements, Accumulated_projection_xray_dose, 
     Accumulated_mammography_xray_dose, 
-    Accumulated_cassette_based_projection_radiography_dose, 
-    Accumulated_integrated_projection_radiography_dose, 
+    AccumCassetteBsdProjRadiogDose,
+    AccumIntegratedProjRadiogDose,
     Patient_module_attributes, General_equipment_module_attributes, 
     Patient_study_module_attributes, ContextID,
     Ct_radiation_dose, Ct_accumulated_dose_data,
@@ -39,8 +39,8 @@ admin.site.register(IrradEventXRayMechanicalData)
 admin.site.register(Dose_related_distance_measurements)
 admin.site.register(Accumulated_projection_xray_dose)
 admin.site.register(Accumulated_mammography_xray_dose)
-admin.site.register(Accumulated_cassette_based_projection_radiography_dose)
-admin.site.register(Accumulated_integrated_projection_radiography_dose)
+admin.site.register(AccumCassetteBsdProjRadiogDose)
+admin.site.register(AccumIntegratedProjRadiogDose)
 admin.site.register(Patient_module_attributes)
 admin.site.register(General_equipment_module_attributes)
 admin.site.register(Patient_study_module_attributes)

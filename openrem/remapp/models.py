@@ -434,7 +434,7 @@ class Accumulated_projection_xray_dose(models.Model):  # TID 10004
     acquisition_dose_rp_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     total_acquisition_time = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # The following fields should not be in this table, and are duplicated in the
-    # Accumulated_cassette_based_projection_radiography_dose and Accumulated_integrated_projection_radiography_dose
+    # AccumCassetteBsdProjRadiogDose and AccumIntegratedProjRadiogDose
     # tables below.
     # TODO: Ensure rdsr.py and dx.py use the other table and do not populate this one any further.
     dose_area_product_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
@@ -463,7 +463,7 @@ class Accumulated_mammography_xray_dose(models.Model):  # TID 10005
     laterality = models.ForeignKey(ContextID, blank=True, null=True)
 
 
-class Accumulated_cassette_based_projection_radiography_dose(models.Model):  # TID 10006
+class AccumCassetteBsdProjRadiogDose(models.Model):  # TID 10006
     """Accumulated Cassette-based Projection Radiography Dose TID 10006
     
     From DICOM Part 16 Correction Proposal CP-1077:
@@ -476,7 +476,7 @@ class Accumulated_cassette_based_projection_radiography_dose(models.Model):  # T
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     
 
-class Accumulated_integrated_projection_radiography_dose(models.Model):  # TID 10007
+class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
     """Accumulated Integrated Projection Radiography Dose TID 10007
     
     From DICOM Part 16 Correction Proposal CP-1077:

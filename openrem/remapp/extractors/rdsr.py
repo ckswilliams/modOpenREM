@@ -378,9 +378,9 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
 
 
 def _accumulatedcassettebasedprojectionradiographydose(dataset,accum): # TID 10006
-    from remapp.models import Accumulated_cassette_based_projection_radiography_dose
+    from remapp.models import AccumCassetteBsdProjRadiogDose
     from remapp.tools.get_values import get_or_create_cid
-    accumcass = Accumulated_cassette_based_projection_radiography_dose.objects.create(accumulated_xray_dose=accum)
+    accumcass = AccumCassetteBsdProjRadiogDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Detector Type':
             accumcass.detector_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -389,9 +389,9 @@ def _accumulatedcassettebasedprojectionradiographydose(dataset,accum): # TID 100
     accumcass.save()
 
 def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
-    from remapp.models import Accumulated_integrated_projection_radiography_dose
+    from remapp.models import AccumIntegratedProjRadiogDose
     from remapp.tools.get_values import get_or_create_cid
-    accumint = Accumulated_integrated_projection_radiography_dose.objects.create(accumulated_xray_dose=accum)
+    accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
             accumint.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
