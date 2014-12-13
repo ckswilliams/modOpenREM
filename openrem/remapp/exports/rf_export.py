@@ -300,7 +300,7 @@ def rfxlsx(filterdict):
     from django.core.files import File
     from django.shortcuts import redirect
     from django.db.models import Max, Min, Avg
-    from remapp.models import GeneralStudyModuleAttr, Irradiation_event_xray_data
+    from remapp.models import GeneralStudyModuleAttr, IrradiationEventXRayData
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
 
@@ -362,7 +362,7 @@ def rfxlsx(filterdict):
 
         angle_range = 5.0 #plus or minus range considered to be the same position
         studyiuid = exams.study_instance_uid
-        inst = Irradiation_event_xray_data.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
+        inst = IrradiationEventXRayData.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
 
         num_groups_this_exam = 0
         while inst:
@@ -567,7 +567,7 @@ def rfxlsx(filterdict):
         for protocol in sheetlist[tab]['protocolname']:
             tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
             tsk.save()
-            p_events = Irradiation_event_xray_data.objects.filter(
+            p_events = IrradiationEventXRayData.objects.filter(
                 acquisition_protocol__exact = protocol
             ).filter(
                 projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude

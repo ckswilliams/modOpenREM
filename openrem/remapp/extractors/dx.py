@@ -287,10 +287,10 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import Irradiation_event_xray_data
+    from remapp.models import IrradiationEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     event.irradiation_event_uid = get_value_kw('SOPInstanceUID',dataset)
     event_time = get_value_kw('AcquisitionTime',dataset)
@@ -347,9 +347,9 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
 
 
 def _accumulatedxraydose(dataset,proj):
-    from remapp.models import Accumulated_xray_dose, Accumulated_projection_xray_dose
+    from remapp.models import AccumulatedXRayDose, Accumulated_projection_xray_dose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumulatedXRayDose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
     accum.save()
     accumdx = Accumulated_projection_xray_dose.objects.create(accumulated_xray_dose=accum)
@@ -369,9 +369,9 @@ def _accumulatedxraydose_update(dataset,event):
 
 
 def _projectionxrayradiationdose(dataset,g):
-    from remapp.models import Projection_xray_radiation_dose
+    from remapp.models import ProjectionXRayRadiationDose
     from remapp.tools.get_values import get_or_create_cid
-    proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+    proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('113704','Projection X-Ray')
     proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014','Study')

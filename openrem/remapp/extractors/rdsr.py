@@ -248,10 +248,10 @@ def _imageviewmodifier(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import Irradiation_event_xray_data
+    from remapp.models import IrradiationEventXRayData
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             event.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -404,9 +404,9 @@ def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
     accumint.save()
 
 def _accumulatedxraydose(dataset,proj): # TID 10002
-    from remapp.models import Accumulated_xray_dose, ContextID
+    from remapp.models import AccumulatedXRayDose, ContextID
     from remapp.tools.get_values import get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumulatedXRayDose.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             accum.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -546,11 +546,11 @@ def _ctaccumulateddosedata(dataset,ct): # TID 10012
 
 
 def _projectionxrayradiationdose(dataset,g,reporttype):
-    from remapp.models import Projection_xray_radiation_dose, Ct_radiation_dose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, Ct_radiation_dose, Observer_context
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     if reporttype == 'projection':
-        proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+        proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     elif reporttype == 'ct':
         proj = Ct_radiation_dose.objects.create(general_study_module_attributes=g)
     else: pass

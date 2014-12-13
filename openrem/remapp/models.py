@@ -120,7 +120,7 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
         return self.study_instance_uid
 
 
-class Projection_xray_radiation_dose(models.Model):  # TID 10001
+class ProjectionXRayRadiationDose(models.Model):  # TID 10001
     """Projection X-Ray Radiation Dose template TID 10001
     
     From DICOM Part 16:
@@ -151,7 +151,7 @@ class Projection_xray_radiation_dose(models.Model):  # TID 10001
         ContextID, blank=True, null=True, related_name='tid10001_infosource')
 
 
-class Accumulated_xray_dose(models.Model):  # TID 10002
+class AccumulatedXRayDose(models.Model):  # TID 10002
     """Accumulated X-Ray Dose TID 10002
     
     From DICOM Part 16:
@@ -159,7 +159,7 @@ class Accumulated_xray_dose(models.Model):  # TID 10002
         several irradiation events from the same equipment (typically a study or a performed procedure step).
     
     """
-    projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
+    projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose)
     acquisition_plane = models.ForeignKey(ContextID, blank=True, null=True)
 
 
@@ -169,7 +169,7 @@ class Calibration(models.Model):
     + Container in TID 10002 Accumulated X-ray dose
     
     """
-    accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
+    accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose)
     dose_measurement_device = models.ForeignKey(ContextID, blank=True, null=True)
     calibration_date = models.DateTimeField(blank=True, null=True)
     calibration_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -177,14 +177,14 @@ class Calibration(models.Model):
     calibration_responsible_party = models.TextField(blank=True, null=True)
 
 
-class Irradiation_event_xray_data(models.Model):  # TID 10003
+class IrradiationEventXRayData(models.Model):  # TID 10003
     """Irradiation Event X-Ray Data TID 10003
     
     From DICOM part 16:
         This template conveys the dose and equipment parameters of a single irradiation event.
     
     """
-    projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose)
+    projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose)
     acquisition_plane = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10003_plane')  # CID 10003
     irradiation_event_uid = models.TextField(blank=True, null=True)
@@ -246,7 +246,7 @@ class Image_view_modifier(models.Model):  # EV 111032
         + Code Meaning Image View Modifier 
         + Code Definition Modifier for image view
     """
-    irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
+    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
     image_view_modifier = models.ForeignKey(
         ContextID, blank=True, null=True
     )  # CID 4011 "DX View Modifier" or CID 4015 "View Modifier for Mammography"
@@ -259,7 +259,7 @@ class Irradiation_event_xray_detector_data(models.Model):  # TID 10003a
         This template contains data which is expected to be available to the X-ray detector or plate reader component of
         the equipment.
     """
-    irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
+    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
     exposure_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     target_exposure_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     deviation_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -280,7 +280,7 @@ class Irradiation_event_xray_source_data(models.Model):  # TID 10003b
         * exposure_control_mode
         * grid information over and above grid type
     """
-    irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
+    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
     dose_rp = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(
@@ -381,7 +381,7 @@ class Irradiation_event_xray_mechanical_data(models.Model):  # TID 10003c
         * compression_force
         * magnification_factor
     """
-    irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data)
+    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
     crdr_mechanical_configuration = models.ForeignKey(ContextID, blank=True, null=True)
     positioner_primary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     positioner_secondary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -426,7 +426,7 @@ class Accumulated_projection_xray_dose(models.Model):  # TID 10004
         several irradiation events from the same equipment (typically a study or a performed procedure step).
     
     """
-    accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
+    accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose)
     fluoro_dose_area_product_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     fluoro_dose_rp_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     total_fluoro_time = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
@@ -458,7 +458,7 @@ class Accumulated_mammography_xray_dose(models.Model):  # TID 10005
         accumulations over several irradiation events from the same equipment (typically a study or a performed
         procedure step).
     """
-    accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
+    accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose)
     accumulated_average_glandular_dose = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     laterality = models.ForeignKey(ContextID, blank=True, null=True)
 
@@ -471,7 +471,7 @@ class Accumulated_cassette_based_projection_radiography_dose(models.Model):  # T
         based systems over one or more irradiation events (typically a study or a performed procedure step) from
         the same equipment.
     """
-    accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
+    accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose)
     detector_type = models.ForeignKey(ContextID, blank=True, null=True)
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     
@@ -484,7 +484,7 @@ class Accumulated_integrated_projection_radiography_dose(models.Model):  # TID 1
         systems over one or more irradiation events (typically a study or a performed procedure step) from the
         same equipment.
     """
-    accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose)
+    accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose)
     dose_area_product_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     dose_rp_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
@@ -741,7 +741,7 @@ class Observer_context(models.Model):  # TID 1002
     From DICOM Part 16:
         The observer (person or device) that created the Content Items to which this context applies.
     """
-    projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose, blank=True, null=True)
+    projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose, blank=True, null=True)
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
     observer_type = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid1002_observertype')  # CID 270
@@ -771,7 +771,7 @@ class Device_participant(models.Model):  # TID 1021
         This template describes a device participating in an activity as other than an observer or subject. E.g. for
         a dose report documenting an irradiating procedure, participants include the irradiating device.
     """
-    accumulated_xray_dose = models.ForeignKey(Accumulated_xray_dose, blank=True, null=True)
+    accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose, blank=True, null=True)
     irradiation_event_xray_detector_data = models.ForeignKey(Irradiation_event_xray_detector_data, blank=True, null=True)
     irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data, blank=True, null=True)
     ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
@@ -792,9 +792,9 @@ class Person_participant(models.Model):  # TID 1020
         a dose report documenting an irradiating procedure, participants include the person administering the
         irradiation and the person authorizing the irradiation.
     """
-    projection_xray_radiation_dose = models.ForeignKey(Projection_xray_radiation_dose, blank=True, null=True)
+    projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose, blank=True, null=True)
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
-    irradiation_event_xray_data = models.ForeignKey(Irradiation_event_xray_data, blank=True, null=True)
+    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData, blank=True, null=True)
     ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data, blank=True, null=True)
     ct_dose_check_details_alert = models.ForeignKey(

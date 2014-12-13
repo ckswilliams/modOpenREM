@@ -107,11 +107,11 @@ def _accumulatedmammo_update(dataset,event): # TID 10005
     accummam.save()
 
 def _irradiationeventxraydata(dataset,proj):
-    from remapp.models import Irradiation_event_xray_data
+    from remapp.models import IrradiationEventXRayData
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     import dicom
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.irradiation_event_uid = dicom.UID.generate_uid()
     event.date_time_started = make_date_time(str(dataset[5]) + str(dataset[6]))
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')
@@ -155,9 +155,9 @@ def _irradiationeventxraydata(dataset,proj):
     _accumulatedmammo_update(dataset,event)
     
 def _accumulatedxraydose(dataset,proj):
-    from remapp.models import Accumulated_xray_dose, Accumulated_mammography_xray_dose
+    from remapp.models import AccumulatedXRayDose, Accumulated_mammography_xray_dose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumulatedXRayDose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
     accum.save()
     accummam = Accumulated_mammography_xray_dose.objects.create(accumulated_xray_dose=accum)
@@ -166,9 +166,9 @@ def _accumulatedxraydose(dataset,proj):
     
     
 def _projectionxrayradiationdose(dataset,g):
-    from remapp.models import Projection_xray_radiation_dose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, Observer_context
     from remapp.tools.get_values import get_or_create_cid
-    proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+    proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('P5-40010','Mammography')
     proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014','Study')
