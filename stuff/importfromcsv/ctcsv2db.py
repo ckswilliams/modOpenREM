@@ -1,6 +1,6 @@
 def _scanninglength(dataset,event,col): # TID 10014
-    from remapp.models import Scanning_length
-    scanlen = Scanning_length.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import ScanningLength
+    scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
     scanlen.scanning_length = "" # declare it so export works, even if it is not populated.
     r_ge = dataset[col+3]
     r_arr = r_ge.split("-")
@@ -133,8 +133,8 @@ def _generalstudymoduleattributes(dataset,g):
 
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientStudyModuleAttr
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = dataset[1]
     if dataset[2] != "#N/A" and not dataset[2]:
         patientatt.patient_age_decimal = dataset[2]
@@ -155,8 +155,8 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 
 
 def _patientmoduleattributes(dataset,g):
-    from remapp.models import Patient_module_attributes
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientModuleAttr
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = dataset[0]
     pat.save()
 

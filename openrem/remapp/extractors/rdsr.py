@@ -82,8 +82,8 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
     device.save()
 
 def _pulsewidth(dataset,source):
-    from remapp.models import Pulse_width
-    pulse = Pulse_width.objects.create(irradiation_event_xray_source_data=source)
+    from remapp.models import PulseWidth
+    pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Width':
             pulse.pulse_width = cont.MeasuredValueSequence[0].NumericValue
@@ -98,8 +98,8 @@ def _kvptable(dataset,source):
     kvpdata.save()
 
 def _xraytubecurrent(dataset,source):
-    from remapp.models import Xray_tube_current
-    tubecurrent = Xray_tube_current.objects.create(irradiation_event_xray_source_data=source)
+    from remapp.models import XrayTubeCurrent
+    tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
             tubecurrent.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
@@ -114,9 +114,9 @@ def _exposure(dataset,source):
     exposure.save()
 
 def _xrayfilters(dataset,source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
             for cont2 in cont.ContentSequence:
@@ -421,8 +421,8 @@ def _accumulatedxraydose(dataset,proj): # TID 10002
     accum.save()
 
 def _scanninglength(dataset,event): # TID 10014
-    from remapp.models import Scanning_length
-    scanlen = Scanning_length.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import ScanningLength
+    scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'scanning length':
             scanlen.scanning_length = cont.MeasuredValueSequence[0].NumericValue
@@ -546,7 +546,7 @@ def _ctaccumulateddosedata(dataset,ct): # TID 10012
 
 
 def _projectionxrayradiationdose(dataset,g,reporttype):
-    from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, ObserverContext
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     if reporttype == 'projection':
@@ -575,9 +575,9 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
         
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
             if reporttype == 'projection':
-                obs = Observer_context.objects.create(projection_xray_radiation_dose=proj)
+                obs = ObserverContext.objects.create(projection_xray_radiation_dose=proj)
             elif reporttype == 'ct':
-                obs = Observer_context.objects.create(ct_radiation_dose=proj)
+                obs = ObserverContext.objects.create(ct_radiation_dose=proj)
             _observercontext(dataset,obs)
 
         if cont.ValueType == 'CONTAINER':
@@ -613,26 +613,26 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.save()
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
+    from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw("PatientAge",dataset)
     patientatt.patient_weight = get_value_kw("PatientWeight",dataset)
     patientatt.patient_size = get_value_kw("PatientSize", dataset)
     patientatt.save()
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
-    from remapp.models import Patient_module_attributes, Patient_study_module_attributes
+    from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
     from decimal import Decimal
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:

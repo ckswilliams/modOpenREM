@@ -28,9 +28,9 @@
 
 """
 def _xrayfilters(dataset,source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     xray_filter_material = get_value_kw('FilterMaterial',dataset)
     if xray_filter_material:
         if xray_filter_material.strip().lower() == 'molybdenum':
@@ -62,9 +62,9 @@ def _exposure(dataset,source):
 
 
 def _xraygrid(gridcode,source):
-    from remapp.models import Xray_grid
+    from remapp.models import XrayGrid
     from remapp.tools.get_values import get_or_create_cid
-    grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
+    grid = XrayGrid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
         grid.xray_grid = get_or_create_cid('111646','No grid')
     if gridcode == '111642':
@@ -240,25 +240,25 @@ def _generalequipmentmoduleattributes(dataset,study):
 
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
+    from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
     patientatt.save()
 
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
-    from remapp.models import Patient_module_attributes, Patient_study_module_attributes
+    from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
     from decimal import Decimal
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex',dataset)
     patient_birth_date = get_date('PatientBirthDate',dataset) # Not saved to database
     pat.not_patient_indicator = get_not_pt(dataset)
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:

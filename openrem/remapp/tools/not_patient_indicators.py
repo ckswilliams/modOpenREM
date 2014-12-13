@@ -40,7 +40,7 @@ def get_not_pt(dataset):
     :type dataset:      dataset
     :returns:           str. -- xml style string if any trigger values are found.
     """
-    from remapp.models import Patient_module_attributes
+    from remapp.models import PatientModuleAttr
     from remapp.tools.get_values import get_value_kw
     patient_id = get_value_kw('PatientID',dataset)
     patient_name = get_value_kw('PatientName',dataset)

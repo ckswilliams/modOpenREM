@@ -315,7 +315,7 @@ class IrradEventXRaySourceData(models.Model):  # TID 10003b
     grid_focal_distance = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
 
 
-class Xray_grid(models.Model):
+class XrayGrid(models.Model):
     """Content ID 10017 X-Ray Grid
     
     From DICOM Part 16
@@ -324,7 +324,7 @@ class Xray_grid(models.Model):
     xray_grid = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10017
 
 
-class Pulse_width(models.Model):  # EV 113793
+class PulseWidth(models.Model):  # EV 113793
     """In TID 10003b. Code value 113793 (ms)
     """
     irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
@@ -338,7 +338,7 @@ class Kvp(models.Model):  # EV 113733
     kvp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
-class Xray_tube_current(models.Model):  # EV 113734
+class XrayTubeCurrent(models.Model):  # EV 113734
     """In TID 10003b. Code value 113734 (mA)
     """
     irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
@@ -358,7 +358,7 @@ class Exposure(models.Model):  # EV 113736
             return self.exposure / 1000
 
 
-class Xray_filters(models.Model):  # EV 113771
+class XrayFilters(models.Model):  # EV 113771
     """Container in TID 10003b. Code value 113771
     """
     irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
@@ -492,7 +492,7 @@ class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
     reference_point_definition = models.TextField(blank=True, null=True)
     
 
-class Patient_module_attributes(models.Model):  # C.7.1.1
+class PatientModuleAttr(models.Model):  # C.7.1.1
     """Patient Module C.7.1.1
     
     From DICOM Part 3: Information Object Definitions Table C.7-1:
@@ -510,7 +510,7 @@ class Patient_module_attributes(models.Model):  # C.7.1.1
     not_patient_indicator = models.TextField(blank=True, null=True)
 
 
-class Patient_study_module_attributes(models.Model):  # C.7.2.2
+class PatientStudyModuleAttr(models.Model):  # C.7.2.2
     """Patient Study Module C.7.2.2
     
     From DICOM Part 3: Information Object Definitions Table C.7-4a:
@@ -678,7 +678,7 @@ class CtXRaySourceParameters(models.Model):
     xray_filter_aluminum_equivalent = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
-class Scanning_length(models.Model):  # TID 10014
+class ScanningLength(models.Model):  # TID 10014
     """Scanning Length TID 10014
     
     From DICOM Part 16:
@@ -735,7 +735,7 @@ class CtDoseCheckDetails(models.Model):  # TID 10015
 
 # Models common to both
     
-class Observer_context(models.Model):  # TID 1002
+class ObserverContext(models.Model):  # TID 1002
     """Observer Context TID 1002
 
     From DICOM Part 16:

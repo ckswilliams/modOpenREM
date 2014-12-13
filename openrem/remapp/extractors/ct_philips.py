@@ -29,9 +29,9 @@
 """
 
 def _scanninglength(dataset,event): # TID 10014
-    from remapp.models import Scanning_length
+    from remapp.models import ScanningLength
     from remapp.tools.get_values import get_value_kw
-    scanlen = Scanning_length.objects.create(ct_irradiation_event_data=event)
+    scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
     scanlen.scanning_length = get_value_kw('ScanLength',dataset)
     scanlen.save()
 
@@ -102,7 +102,7 @@ def _ctaccumulateddosedata(dataset,ct): # TID 10012
     ctacc.save()
 
 def _ctradiationdose(dataset,g):
-    from remapp.models import CtRadiationDose, Observer_context
+    from remapp.models import CtRadiationDose, ObserverContext
     from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid
     from datetime import timedelta
     from django.db.models import Min, Max
@@ -160,26 +160,26 @@ def _generalequipmentmoduleattributes(dataset,study):
 
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
+    from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw("PatientAge",dataset)
     patientatt.patient_weight = get_value_kw("PatientWeight",dataset)
     patientatt.save()
 
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
-    from remapp.models import Patient_module_attributes, Patient_study_module_attributes
+    from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
     from decimal import Decimal
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate",dataset)
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:

@@ -7,9 +7,9 @@ def _irradiationeventxraydetectordata(dataset,event):
     _deviceparticipant(dataset,'detector',detector)
 
 def _xrayfilters(dataset,source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     xray_filter_material = dataset[23]
     if xray_filter_material == 'MOLYBDENUM':
         filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
@@ -18,9 +18,9 @@ def _xrayfilters(dataset,source):
     filters.save()
 
 def _xraygrid(gridcode,source):
-    from remapp.models import Xray_grid
+    from remapp.models import XrayGrid
     from remapp.tools.get_values import get_or_create_cid
-    grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
+    grid = XrayGrid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
         grid.xray_grid = get_or_create_cid('111646','No grid')
     if gridcode == '111642':
@@ -166,7 +166,7 @@ def _accumulatedxraydose(dataset,proj):
     
     
 def _projectionxrayradiationdose(dataset,g):
-    from remapp.models import ProjectionXRayRadiationDose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, ObserverContext
     from remapp.tools.get_values import get_or_create_cid
     proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('P5-40010','Mammography')
@@ -192,8 +192,8 @@ def _generalequipmentmoduleattributes(dataset,g):
     equip.save()
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientStudyModuleAttr
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = dataset[9]
     if 'Y' in patientatt.patient_age:
         patientatt.patient_age_decimal = patientatt.patient_age[:patientatt.patient_age.find('Y')]
@@ -206,8 +206,8 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     patientatt.save()
 
 def _patientmoduleattributes(dataset,g):
-    from remapp.models import Patient_module_attributes
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientModuleAttr
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = dataset[8]
     pat.save()
 

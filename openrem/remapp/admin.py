@@ -1,18 +1,18 @@
 from remapp.models import (GeneralStudyModuleAttr,
-    ProjectionXRayRadiationDose, Observer_context,
+    ProjectionXRayRadiationDose, ObserverContext,
     AccumXRayDose, Calibration, IrradEventXRayData,
     ImageViewModifier, PersonParticipant,
     IrradEventXRayDetectorData, IrradEventXRaySourceData,
-    Pulse_width, Kvp, Xray_tube_current, Exposure, Xray_filters, Xray_grid,
+    PulseWidth, Kvp, XrayTubeCurrent, Exposure, XrayFilters, XrayGrid,
     DeviceParticipant, IrradEventXRayMechanicalData,
     DoseRelatedDistanceMeasurements, AccumProjectionXRayDose,
     AccumMammographyXRayDose,
     AccumCassetteBsdProjRadiogDose,
     AccumIntegratedProjRadiogDose,
-    Patient_module_attributes, GeneralEquipmentModuleAttr,
-    Patient_study_module_attributes, ContextID,
+    PatientModuleAttr, GeneralEquipmentModuleAttr,
+    PatientStudyModuleAttr, ContextID,
     CtRadiationDose, CtAccumulatedDoseData,
-    CtIrradiationEventData, Scanning_length,
+    CtIrradiationEventData, ScanningLength,
     CtDoseCheckDetails, CtXRaySourceParameters,
     Exports, SizeUpload)
 
@@ -20,7 +20,7 @@ from django.contrib import admin
 
 admin.site.register(GeneralStudyModuleAttr)
 admin.site.register(ProjectionXRayRadiationDose)
-admin.site.register(Observer_context)
+admin.site.register(ObserverContext)
 admin.site.register(AccumXRayDose)
 admin.site.register(Calibration)
 admin.site.register(IrradEventXRayData)
@@ -28,12 +28,12 @@ admin.site.register(ImageViewModifier)
 admin.site.register(PersonParticipant)
 admin.site.register(IrradEventXRayDetectorData)
 admin.site.register(IrradEventXRaySourceData)
-admin.site.register(Pulse_width)
+admin.site.register(PulseWidth)
 admin.site.register(Kvp)
-admin.site.register(Xray_tube_current)
+admin.site.register(XrayTubeCurrent)
 admin.site.register(Exposure)
-admin.site.register(Xray_filters)
-admin.site.register(Xray_grid)
+admin.site.register(XrayFilters)
+admin.site.register(XrayGrid)
 admin.site.register(DeviceParticipant)
 admin.site.register(IrradEventXRayMechanicalData)
 admin.site.register(DoseRelatedDistanceMeasurements)
@@ -41,14 +41,14 @@ admin.site.register(AccumProjectionXRayDose)
 admin.site.register(AccumMammographyXRayDose)
 admin.site.register(AccumCassetteBsdProjRadiogDose)
 admin.site.register(AccumIntegratedProjRadiogDose)
-admin.site.register(Patient_module_attributes)
+admin.site.register(PatientModuleAttr)
 admin.site.register(GeneralEquipmentModuleAttr)
-admin.site.register(Patient_study_module_attributes)
+admin.site.register(PatientStudyModuleAttr)
 admin.site.register(ContextID)
 admin.site.register(CtRadiationDose)
 admin.site.register(CtAccumulatedDoseData)
 admin.site.register(CtIrradiationEventData)
-admin.site.register(Scanning_length)
+admin.site.register(ScanningLength)
 admin.site.register(CtDoseCheckDetails)
 admin.site.register(CtXRaySourceParameters)
 admin.site.register(Exports)
