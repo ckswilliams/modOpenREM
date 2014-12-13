@@ -163,14 +163,14 @@ def _patientmoduleattributes(dataset,g):
 
 def _ctcsv2db(dataset, sitecode):
     from django.db import models
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from django import db
     
     # If there isn't an accession number, ignore. If there is, check to see if it has been entered into the database already.
     if dataset[3] != '':
-        e = General_study_module_attributes.objects.filter(accession_number__exact = dataset[3])
+        e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = dataset[3])
         if not e:
-            g = General_study_module_attributes.objects.create()
+            g = GeneralStudyModuleAttr.objects.create()
             _generalstudymoduleattributes(dataset,g)
             _generalequipmentmoduleattributes(dataset, g, sitecode)
             _patientstudymoduleattributes(dataset,g)

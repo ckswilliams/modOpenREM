@@ -1,4 +1,4 @@
-from remapp.models import (General_study_module_attributes, 
+from remapp.models import (GeneralStudyModuleAttr,
     Projection_xray_radiation_dose, Observer_context, 
     Accumulated_xray_dose, Calibration, Irradiation_event_xray_data, 
     Image_view_modifier, Person_participant, 
@@ -18,7 +18,7 @@ from remapp.models import (General_study_module_attributes,
 
 from django.contrib import admin
 
-admin.site.register(General_study_module_attributes) 
+admin.site.register(GeneralStudyModuleAttr)
 admin.site.register(Projection_xray_radiation_dose)
 admin.site.register(Observer_context)
 admin.site.register(Accumulated_xray_dose)

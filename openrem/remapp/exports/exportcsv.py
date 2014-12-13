@@ -47,7 +47,7 @@ def exportFL2excel(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
 
@@ -74,7 +74,7 @@ def exportFL2excel(filterdict):
         
     # Get the data!
     
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
+    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF')
     f = RFSummaryListFilter.base_filters
 
     for filt in f:
@@ -183,7 +183,7 @@ def exportCT2excel(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
 
     tsk = Exports.objects.create()
@@ -208,10 +208,10 @@ def exportCT2excel(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.interface.mod_filters import CTSummaryListFilter
     
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT')
     f = CTSummaryListFilter.base_filters
 
     for filt in f:
@@ -378,7 +378,7 @@ def exportMG2excel(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
 
@@ -405,7 +405,7 @@ def exportMG2excel(filterdict):
         
     # Get the data!
     
-    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
+    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
     f = MGSummaryListFilter.base_filters
 
     for filt in f:

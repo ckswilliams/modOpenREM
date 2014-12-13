@@ -230,26 +230,26 @@ def _generalstudymoduleattributes(dataset,g):
 
 def _mgcsv2db(line):
     from django.db import models
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.tools.dcmdatetime import make_date_time, make_date, make_time
     from django import db
     from datetime import timedelta
 
     # First off, some logic to see if exposure is part of an exam already registered
     if line[7] != '': # Is there an accession number?
-        e = General_study_module_attributes.objects.filter(accession_number__exact = line[7])
+        e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = line[7])
         if e: # ie the acccession number has been found, so only an irradiation event needs to be created
             itime = e.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.filter(
                 date_time_started__exact = make_date_time(str(line[5]) + str(line[6])))
             if not itime: # ie there aren't any existing events with the same date/time stamp
                 _irradiationeventxraydata(line,e.get().projection_xray_radiation_dose_set.get())
         else:
-            g = General_study_module_attributes.objects.create()
+            g = GeneralStudyModuleAttr.objects.create()
             _generalstudymoduleattributes(line,g)
     else:
         if not (line[8] == 'O' and line[9] == '001D'):
             window = timedelta(seconds=(30*60)) # half an hour either side of any previous exposures 
-            e = General_study_module_attributes.objects.filter(
+            e = GeneralStudyModuleAttr.objects.filter(
                     accession_number__exact = ''
                 ).filter(
                     study_date__exact = make_date(line[5])
@@ -271,7 +271,7 @@ def _mgcsv2db(line):
                     if not itime:
                         _irradiationeventxraydata(line,e.get().projection_xray_radiation_dose_set.get())
             else:
-                g = General_study_module_attributes.objects.create()
+                g = GeneralStudyModuleAttr.objects.create()
                 _generalstudymoduleattributes(line,g)
     db.reset_queries()
 

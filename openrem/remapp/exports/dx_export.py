@@ -48,7 +48,7 @@ def exportDX2excel(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q # For the Q "OR" query used for DX and CR
@@ -75,7 +75,7 @@ def exportDX2excel(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+    e = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
     f = DXSummaryListFilter.base_filters
 
@@ -206,7 +206,7 @@ def dxxlsx(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q # For the Q "OR" query used for DX and CR
@@ -233,7 +233,7 @@ def dxxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    e = General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+    e = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
     f = DXSummaryListFilter.base_filters
 

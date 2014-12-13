@@ -50,7 +50,7 @@ def ctxlsx(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import CTSummaryListFilter
 
@@ -76,7 +76,7 @@ def ctxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'CT')
+    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT')
     f = CTSummaryListFilter.base_filters
 
     for filt in f:

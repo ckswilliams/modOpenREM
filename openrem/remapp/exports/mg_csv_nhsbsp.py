@@ -49,7 +49,7 @@ def mg_csv_nhsbsp(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
 
@@ -76,7 +76,7 @@ def mg_csv_nhsbsp(filterdict):
         
     # Get the data!
     
-    s = General_study_module_attributes.objects.filter(modality_type__exact = 'MG')
+    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
     f = MGSummaryListFilter.base_filters
 
     for filt in f:

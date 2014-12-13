@@ -37,12 +37,12 @@ def check_uid(uid, level='Study'):
     :returns:           1 if it does exist, 0 otherwise
     """
     import sys
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     
     if level == 'Study':
-        existing = General_study_module_attributes.objects.filter(study_instance_uid__exact = uid)
+        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = uid)
     elif level == 'Event':
-        existing = General_study_module_attributes.objects.filter(projection_xray_radiation_dose__irradiation_event_xray_data__irradiation_event_uid__exact = uid)
+        existing = GeneralStudyModuleAttr.objects.filter(projection_xray_radiation_dose__irradiation_event_xray_data__irradiation_event_uid__exact = uid)
     if existing:
         return 1
 

@@ -81,7 +81,7 @@ class ContextID(models.Model):
         ordering = ['code_value']
 
 
-class General_study_module_attributes(models.Model):  # C.7.2.1
+class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     """General Study Module C.7.2.1
     
     Specifies the Attributes that describe and identify the Study 
@@ -131,7 +131,7 @@ class Projection_xray_radiation_dose(models.Model):  # TID 10001
         values will be kept separate for each plane.
     
     """
-    general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     procedure_reported = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_procedure')
     has_intent = models.ForeignKey(
@@ -501,7 +501,7 @@ class Patient_module_attributes(models.Model):  # C.7.1.1
         for diagnostic interpretation of the Image and are common for all studies performed on the
         patient. It contains Attributes that are also included in the Patient Modules in Section C.2.
     """
-    general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     patient_name = models.TextField(blank=True, null=True)
     patient_id = models.TextField(blank=True, null=True)
     patient_birth_date = models.DateField(blank=True, null=True)
@@ -517,7 +517,7 @@ class Patient_study_module_attributes(models.Model):  # C.7.2.2
         Defines Attributes that provide information about the Patient at the time the Study
         started.        
     """
-    general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     admitting_diagnosis_description = models.TextField(blank=True, null=True)
     admitting_diagnosis_code_sequence = models.TextField(blank=True, null=True)
     patient_age = models.CharField(max_length=4, blank=True, null=True)
@@ -534,7 +534,7 @@ class General_equipment_module_attributes(models.Model):  # C.7.5.1
         Specifies the Attributes that identify and describe the piece of equipment that
         produced a Series of Composite Instances.
     """
-    general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     manufacturer = models.TextField(blank=True, null=True)
     institution_name = models.TextField(blank=True, null=True)
     institution_address = models.TextField(blank=True, null=True)
@@ -564,7 +564,7 @@ class Ct_radiation_dose(models.Model):  # TID 10011
         Study or at least a part of a Study, if the Study is divided in the workflow of the examination, or a
         performed procedure step. Multiple CT Radiation Dose objects may be created for one Study.
     """
-    general_study_module_attributes = models.ForeignKey(General_study_module_attributes)
+    general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     procedure_reported = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10011_procedure')
     has_intent = models.ForeignKey(

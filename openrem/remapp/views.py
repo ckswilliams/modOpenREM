@@ -46,7 +46,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
-from remapp.models import General_study_module_attributes
+from remapp.models import GeneralStudyModuleAttr
 
 
 
@@ -64,8 +64,8 @@ def dx_summary_list_filter(request):
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     # 10/10/2014, DJP: altered the line below so that DX or CR is included
-    #f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'CR'))
-    f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
+    #f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__contains = 'CR'))
+    f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -88,7 +88,7 @@ def dx_summary_list_filter(request):
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter
     import pkg_resources # part of setuptools
-    f = RFSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'RF'))
+    f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__contains = 'RF'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -112,7 +112,7 @@ def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
     import pkg_resources # part of setuptools
 
-    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT'))
+    f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -138,7 +138,7 @@ def mg_summary_list_filter(request):
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
-    f = MGSummaryListFilter(filter_data, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'MG'))
+    f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -159,7 +159,7 @@ def mg_summary_list_filter(request):
 
 
 def openrem_home(request):
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -177,7 +177,7 @@ def openrem_home(request):
         ag = Group(name="admingroup")
         ag.save()
     
-    allstudies = General_study_module_attributes.objects.all()
+    allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = { 
         'total' : allstudies.count(),
         'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
@@ -243,7 +243,7 @@ def openrem_home(request):
 
 @login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
-    study = get_object_or_404(General_study_module_attributes, pk=pk)    
+    study = get_object_or_404(GeneralStudyModuleAttr, pk=pk)
 
     if request.method=='POST':
         if request.user.groups.filter(name="admingroup"):

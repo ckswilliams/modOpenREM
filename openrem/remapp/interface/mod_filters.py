@@ -35,7 +35,7 @@ from django.db import models
 
 import django_filters
 from django import forms
-from remapp.models import General_study_module_attributes
+from remapp.models import GeneralStudyModuleAttr
 
 
 class RFSummaryListFilter(django_filters.FilterSet):
@@ -54,7 +54,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
     performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
-        model = General_study_module_attributes
+        model = GeneralStudyModuleAttr
         fields = [
             'date_after', 
             'date_before', 
@@ -102,7 +102,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
-        model = General_study_module_attributes
+        model = GeneralStudyModuleAttr
         fields = [
             'date_after', 
             'date_before', 
@@ -148,7 +148,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
-        model = General_study_module_attributes
+        model = GeneralStudyModuleAttr
         fields = [
             'date_after', 
             'date_before', 
@@ -192,7 +192,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
-        model = General_study_module_attributes
+        model = GeneralStudyModuleAttr
         fields = [
             'date_after', 
             'date_before', 

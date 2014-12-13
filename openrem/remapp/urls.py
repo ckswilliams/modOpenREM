@@ -32,7 +32,7 @@ from django.conf.urls import patterns, include, url
 from django_filters.views import FilterView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
-from remapp.models import Accumulated_projection_xray_dose, General_study_module_attributes
+from remapp.models import Accumulated_projection_xray_dose, GeneralStudyModuleAttr
 
 
 urlpatterns = patterns('remapp.views',
@@ -44,28 +44,28 @@ urlpatterns = patterns('remapp.views',
         'rf_summary_list_filter'),
     url(r'^rf/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
-            model=General_study_module_attributes,
+            model=GeneralStudyModuleAttr,
             template_name='remapp/rfdetail.html'))),
 
     url(r'^ct/$',
         'ct_summary_list_filter'),
     url(r'^ct/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
-            model=General_study_module_attributes,
+            model=GeneralStudyModuleAttr,
             template_name='remapp/ctdetail.html'))),
 
     url(r'^dx/$',
         'dx_summary_list_filter'),
     url(r'^dx/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
-            model=General_study_module_attributes,
+            model=GeneralStudyModuleAttr,
             template_name='remapp/dxdetail.html'))),
 
     url(r'^mg/$',
         'mg_summary_list_filter'),
     url(r'^mg/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
-            model=General_study_module_attributes,
+            model=GeneralStudyModuleAttr,
             template_name='remapp/mgdetail.html'))),
 
     url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),

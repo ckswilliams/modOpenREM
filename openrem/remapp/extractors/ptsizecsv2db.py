@@ -75,7 +75,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
 
 def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwargs):
     from django.db import models
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from django import db
     
     imp_log = None
@@ -84,9 +84,9 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
     
     if (height or weight) and accno:
         if not siuid:
-            e = General_study_module_attributes.objects.filter(accession_number__exact = accno)
+            e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = accno)
         else:
-            e = General_study_module_attributes.objects.filter(study_instance_uid__exact = accno)
+            e = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = accno)
         if e:
             for exam in e:
                 if verbose:

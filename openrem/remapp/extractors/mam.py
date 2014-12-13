@@ -319,7 +319,7 @@ def _mammo2db(dataset):
     from django.db import models
 
     openrem_settings.add_project_to_path()
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import make_date_time
@@ -333,7 +333,7 @@ def _mammo2db(dataset):
         inst_in_db = check_uid.check_uid(event_uid,'Event')
         if inst_in_db:
             return 0
-        same_study_uid = General_study_module_attributes.objects.filter(study_instance_uid__exact = study_uid)
+        same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
         if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7':
             # further check required to ensure 'for processing' and 'for presentation' 
             # versions of the same irradiation event don't get imported twice
@@ -350,7 +350,7 @@ def _mammo2db(dataset):
         return 0
 
     # study doesn't exist, start from scratch
-    g = General_study_module_attributes.objects.create()
+    g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
     
     

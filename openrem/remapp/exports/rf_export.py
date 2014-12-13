@@ -48,7 +48,7 @@ def rfcsv(filterdict):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
 
@@ -74,7 +74,7 @@ def rfcsv(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
+    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF')
 
     f = RFSummaryListFilter.base_filters
 
@@ -300,7 +300,7 @@ def rfxlsx(filterdict):
     from django.core.files import File
     from django.shortcuts import redirect
     from django.db.models import Max, Min, Avg
-    from remapp.models import General_study_module_attributes, Irradiation_event_xray_data
+    from remapp.models import GeneralStudyModuleAttr, Irradiation_event_xray_data
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
 
@@ -326,7 +326,7 @@ def rfxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    e = General_study_module_attributes.objects.filter(modality_type__exact = 'RF')
+    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF')
 
     f = RFSummaryListFilter.base_filters
 

@@ -490,7 +490,7 @@ def _dx2db(dataset):
     from django.db import models
 
     openrem_settings.add_project_to_path()
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import make_date_time
@@ -506,7 +506,7 @@ def _dx2db(dataset):
             return 0
         # further check required to ensure 'for processing' and 'for presentation' 
         # versions of the same irradiation event don't get imported twice
-        same_study_uid = General_study_module_attributes.objects.filter(study_instance_uid__exact = study_uid)
+        same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
         event_time = get_value_kw('AcquisitionTime',dataset)
         if not event_time: event_time = get_value_kw('StudyTime',dataset)
         event_date = get_value_kw('AcquisitionDate',dataset)
@@ -521,7 +521,7 @@ def _dx2db(dataset):
         return 0
     
     # study doesn't exist, start from scratch
-    g = General_study_module_attributes.objects.create()
+    g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
 
 

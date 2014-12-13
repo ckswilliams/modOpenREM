@@ -691,15 +691,15 @@ def _rsdr2db(dataset):
     from django.db import models
 
     openrem_settings.add_project_to_path()
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
-        existing = General_study_module_attributes.objects.filter(study_instance_uid__exact = uid)
+        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = uid)
         if existing:
             return
 
-    g = General_study_module_attributes.objects.create()
+    g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
     _generalequipmentmoduleattributes(dataset,g)
     _patientstudymoduleattributes(dataset,g)
