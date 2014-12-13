@@ -122,9 +122,9 @@ def _xraygrid(gridcode,source):
 
 
 def _irradiationeventxraydetectordata(dataset,event):
-    from remapp.models import Irradiation_event_xray_detector_data
+    from remapp.models import IrradEventXRayDetectorData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
+    detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     detector.exposure_index = get_value_kw('ExposureIndex',dataset)
     detector.relative_xray_exposure = get_value_kw('RelativeXRayExposure',dataset)
     manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
@@ -145,9 +145,9 @@ def _irradiationeventxraydetectordata(dataset,event):
 
 def _irradiationeventxraysourcedata(dataset,event):
     # TODO: review model to convert to cid where appropriate, and add additional fields such as field height and width
-    from remapp.models import Irradiation_event_xray_source_data
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
     if not source.average_xray_tube_current: source.average_xray_tube_current = get_value_kw('AverageXRayTubeCurrent',dataset)
     source.exposure_time = get_value_kw('ExposureTime',dataset)
@@ -268,9 +268,9 @@ def _doserelateddistancemeasurements(dataset,mech):
 
 
 def _irradiationeventxraymechanicaldata(dataset,event):
-    from remapp.models import Irradiation_event_xray_mechanical_data
+    from remapp.models import IrradEventXRayMechanicalData
     from remapp.tools.get_values import get_value_kw
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.magnification_factor = get_value_kw('EstimatedRadiographicMagnificationFactor',dataset)
     mech.dxdr_mechanical_configuration = get_value_kw('DX/DRMechanicalConfiguration',dataset)
     mech.primary_angle = get_value_kw('PositionerPrimaryAngle',dataset)
@@ -287,10 +287,10 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import IrradiationEventXRayData
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
-    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     event.irradiation_event_uid = get_value_kw('SOPInstanceUID',dataset)
     event_time = get_value_kw('AcquisitionTime',dataset)

@@ -1,7 +1,7 @@
 
 def _irradiationeventxraydetectordata(dataset,event):
-    from remapp.models import Irradiation_event_xray_detector_data
-    detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
+    from remapp.models import IrradEventXRayDetectorData
+    detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     # This table is just relating to exposure index, so nothing to report. 
     # We do know the 'sensitivity' though, and probably the detector dose...
     _deviceparticipant(dataset,'detector',detector)
@@ -56,9 +56,9 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
 
 
 def _irradiationeventxraysourcedata(dataset,event):
-    from remapp.models import Irradiation_event_xray_source_data
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     # AGD/MGD is dGy in Mammo headers, and was dGy in Radiation Dose SR - CP1194 changes this to mGy!
     source.average_glandular_dose = 100.0 * float(dataset[32]) #MGD in dGy * 100 = mGy 
     source.average_xray_tube_current = dataset[28] # mA
@@ -91,8 +91,8 @@ def _doserelateddistancemeasurements(dataset,mech):
     dist.save()
 
 def _irradiationeventxraymechanicaldata(dataset,event):
-    from remapp.models import Irradiation_event_xray_mechanical_data
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    from remapp.models import IrradEventXRayMechanicalData
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = dataset[20]
     mech.compression_force = float(dataset[21])/10
     mech.magnification_factor = dataset[16]
@@ -107,11 +107,11 @@ def _accumulatedmammo_update(dataset,event): # TID 10005
     accummam.save()
 
 def _irradiationeventxraydata(dataset,proj):
-    from remapp.models import IrradiationEventXRayData
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     import dicom
-    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.irradiation_event_uid = dicom.UID.generate_uid()
     event.date_time_started = make_date_time(str(dataset[5]) + str(dataset[6]))
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')

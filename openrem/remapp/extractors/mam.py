@@ -76,9 +76,9 @@ def _xraygrid(gridcode,source):
 
 def _irradiationeventxraysourcedata(dataset,event):
     # TODO: review model to convert to cid where appropriate, and add additional fields, such as height and width
-    from remapp.models import Irradiation_event_xray_source_data
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     # AGD/MGD is dGy in Mammo headers, and was dGy in Radiation Dose SR - CP1194 changes this to mGy!
     agd_dgy = get_value_kw('OrganDose',dataset) #AGD in dGy 
     if agd_dgy:
@@ -121,9 +121,9 @@ def _doserelateddistancemeasurements(dataset,mech):
 
 
 def _irradiationeventxraymechanicaldata(dataset,event):
-    from remapp.models import Irradiation_event_xray_mechanical_data
+    from remapp.models import IrradEventXRayMechanicalData
     from remapp.tools.get_values import get_value_kw
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = get_value_kw('BodyPartThickness',dataset)
     mech.compression_force = float(get_value_kw('CompressionForce',dataset))/10 # GE Conformance statement says in N, treating as dN
     mech.magnification_factor = get_value_kw('EstimatedRadiographicMagnificationFactor',dataset)
@@ -155,10 +155,10 @@ def _accumulatedmammo_update(dataset,event): # TID 10005
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import IrradiationEventXRayData
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
-    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     event.irradiation_event_uid = get_value_kw('SOPInstanceUID',dataset)
     event_time = get_value_kw('AcquisitionTime',dataset)

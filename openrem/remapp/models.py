@@ -177,7 +177,7 @@ class Calibration(models.Model):
     calibration_responsible_party = models.TextField(blank=True, null=True)
 
 
-class IrradiationEventXRayData(models.Model):  # TID 10003
+class IrradEventXRayData(models.Model):  # TID 10003
     """Irradiation Event X-Ray Data TID 10003
     
     From DICOM part 16:
@@ -246,20 +246,20 @@ class ImageViewModifier(models.Model):  # EV 111032
         + Code Meaning Image View Modifier 
         + Code Definition Modifier for image view
     """
-    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
+    irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData)
     image_view_modifier = models.ForeignKey(
         ContextID, blank=True, null=True
     )  # CID 4011 "DX View Modifier" or CID 4015 "View Modifier for Mammography"
 
 
-class Irradiation_event_xray_detector_data(models.Model):  # TID 10003a
+class IrradEventXRayDetectorData(models.Model):  # TID 10003a
     """Irradiation Event X-Ray Detector Data TID 10003a
     
     From DICOM Part 16 Correction Proposal CP-1077:
         This template contains data which is expected to be available to the X-ray detector or plate reader component of
         the equipment.
     """
-    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
+    irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData)
     exposure_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     target_exposure_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     deviation_index = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -269,7 +269,7 @@ class Irradiation_event_xray_detector_data(models.Model):  # TID 10003a
     sensitivity = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
-class Irradiation_event_xray_source_data(models.Model):  # TID 10003b
+class IrradEventXRaySourceData(models.Model):  # TID 10003b
     """Irradiation Event X-Ray Source Data TID 10003b
     
     From DICOM Part 16 Correction Proposal CP-1077:
@@ -280,7 +280,7 @@ class Irradiation_event_xray_source_data(models.Model):  # TID 10003b
         * exposure_control_mode
         * grid information over and above grid type
     """
-    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
+    irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData)
     dose_rp = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(
@@ -320,35 +320,35 @@ class Xray_grid(models.Model):
     
     From DICOM Part 16
     """
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
     xray_grid = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10017
 
 
 class Pulse_width(models.Model):  # EV 113793
     """In TID 10003b. Code value 113793 (ms)
     """
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
     pulse_width = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Kvp(models.Model):  # EV 113733
     """In TID 10003b. Code value 113733 (kV)
     """
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
     kvp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Xray_tube_current(models.Model):  # EV 113734
     """In TID 10003b. Code value 113734 (mA)
     """
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
     xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
 class Exposure(models.Model):  # EV 113736
     """In TID 10003b. Code value 113736 (uAs)
     """
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
     exposure = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
 
     def convert_uAs_to_mAs(self):
@@ -361,7 +361,7 @@ class Exposure(models.Model):  # EV 113736
 class Xray_filters(models.Model):  # EV 113771
     """Container in TID 10003b. Code value 113771
     """
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
     xray_filter_type = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='xrayfilters_type')  # CID 10007
     xray_filter_material = models.ForeignKey(
@@ -370,7 +370,7 @@ class Xray_filters(models.Model):  # EV 113771
     xray_filter_thickness_maximum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
         
 
-class Irradiation_event_xray_mechanical_data(models.Model):  # TID 10003c
+class IrradEventXRayMechanicalData(models.Model):  # TID 10003c
     """Irradiation Event X-Ray Mechanical Data TID 10003c
 
     From DICOM Part 16 Correction Proposal CP-1077:
@@ -381,7 +381,7 @@ class Irradiation_event_xray_mechanical_data(models.Model):  # TID 10003c
         * compression_force
         * magnification_factor
     """
-    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData)
+    irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData)
     crdr_mechanical_configuration = models.ForeignKey(ContextID, blank=True, null=True)
     positioner_primary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     positioner_secondary_angle = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -402,7 +402,7 @@ class Dose_related_distance_measurements(models.Model):  # CID 10008
     
     Called from TID 10003c
     """
-    irradiation_event_xray_mechanical_data = models.ForeignKey(Irradiation_event_xray_mechanical_data)
+    irradiation_event_xray_mechanical_data = models.ForeignKey(IrradEventXRayMechanicalData)
     distance_source_to_isocenter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     distance_source_to_reference_point = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     distance_source_to_detector = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -772,8 +772,8 @@ class Device_participant(models.Model):  # TID 1021
         a dose report documenting an irradiating procedure, participants include the irradiating device.
     """
     accumulated_xray_dose = models.ForeignKey(AccumulatedXRayDose, blank=True, null=True)
-    irradiation_event_xray_detector_data = models.ForeignKey(Irradiation_event_xray_detector_data, blank=True, null=True)
-    irradiation_event_xray_source_data = models.ForeignKey(Irradiation_event_xray_source_data, blank=True, null=True)
+    irradiation_event_xray_detector_data = models.ForeignKey(IrradEventXRayDetectorData, blank=True, null=True)
+    irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData, blank=True, null=True)
     ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data, blank=True, null=True)
     device_role_in_procedure = models.ForeignKey(ContextID, blank=True, null=True)
@@ -794,7 +794,7 @@ class Person_participant(models.Model):  # TID 1020
     """
     projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose, blank=True, null=True)
     ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
-    irradiation_event_xray_data = models.ForeignKey(IrradiationEventXRayData, blank=True, null=True)
+    irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData, blank=True, null=True)
     ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
     ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data, blank=True, null=True)
     ct_dose_check_details_alert = models.ForeignKey(

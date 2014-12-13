@@ -149,9 +149,9 @@ def _doserelateddistancemeasurements(dataset,mech): #CID 10008
     distance.save()
 
 def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
-    from remapp.models import Irradiation_event_xray_mechanical_data
+    from remapp.models import IrradEventXRayMechanicalData
     from remapp.tools.get_values import get_or_create_cid
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CR/DR Mechanical Configuration':
             mech.crdr_mechanical_configuration = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -178,10 +178,10 @@ def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
 
 def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import Irradiation_event_xray_source_data
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid
     from xml.etree import ElementTree as ET
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
             source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
@@ -224,8 +224,8 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     source.save()
 
 def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
-    from remapp.models import Irradiation_event_xray_detector_data
-    detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
+    from remapp.models import IrradEventXRayDetectorData
+    detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Index':
             detector.exposure_index = cont.MeasuredValueSequence[0].NumericValue
@@ -248,10 +248,10 @@ def _imageviewmodifier(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import IrradiationEventXRayData
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
-    event = IrradiationEventXRayData.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             event.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
