@@ -36,9 +36,9 @@ def _scanninglength(dataset,event): # TID 10014
     scanlen.save()
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import Ct_xray_source_parameters
+    from remapp.models import CtXraySourceParameters
     from remapp.tools.get_values import get_value_kw
-    param = Ct_xray_source_parameters.objects.create(ct_irradiation_event_data=event)
+    param = CtXraySourceParameters.objects.create(ct_irradiation_event_data=event)
     param.identification_of_the_xray_source = 'A'
     param.kvp = get_value_kw('KVP',dataset)
     mA = get_value_kw('XRayTubeCurrentInuA',dataset)
@@ -49,11 +49,11 @@ def _ctxraysourceparameters(dataset,event):
 
 
 def _ctirradiationeventdata(dataset,ct): # TID 10013
-    from remapp.models import Ct_irradiation_event_data
+    from remapp.models import CtIrradiationEventData
     from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid
     from remapp.tools.dcmdatetime import get_date_time
     from dicom import UID
-    event = Ct_irradiation_event_data.objects.create(ct_radiation_dose=ct)
+    event = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
     event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
     # target region is mandatory, but I don't have it
     acqtype = get_value_kw('AcquisitionType',dataset)
@@ -93,20 +93,20 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
                         
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
-    from remapp.models import Ct_accumulated_dose_data, ContextID
+    from remapp.models import CtAccumulatedDoseData, ContextID
     from remapp.tools.get_values import get_value_kw, get_value_num
-    ctacc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
+    ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     ctacc.total_number_of_irradiation_events = get_value_kw('TotalNumberOfExposures',dataset)
     ctacc.ct_dose_length_product_total = get_value_num(0x00e11021,dataset) # Philips private tag
     ctacc.comment = get_value_kw('CommentsOnRadiationDose',dataset)
     ctacc.save()
 
 def _ctradiationdose(dataset,g):
-    from remapp.models import Ct_radiation_dose, Observer_context
+    from remapp.models import CtRadiationDose, Observer_context
     from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid
     from datetime import timedelta
     from django.db.models import Min, Max
-    proj = Ct_radiation_dose.objects.create(general_study_module_attributes=g)
+    proj = CtRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('P5-08000','Computed Tomography X-Ray')
     proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014','Study')

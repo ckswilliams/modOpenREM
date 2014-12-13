@@ -443,8 +443,8 @@ def _scanninglength(dataset,event): # TID 10014
     scanlen.save()
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import Ct_xray_source_parameters
-    param = Ct_xray_source_parameters.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import CtXraySourceParameters
+    param = CtXraySourceParameters.objects.create(ct_irradiation_event_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification of the x-ray source' or cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification number of the x-ray source':
             param.identification_of_the_xray_source = cont.TextValue
@@ -462,9 +462,9 @@ def _ctxraysourceparameters(dataset,event):
 
 
 def _ctirradiationeventdata(dataset,ct): # TID 10013
-    from remapp.models import Ct_irradiation_event_data
+    from remapp.models import CtIrradiationEventData
     from remapp.tools.get_values import get_or_create_cid
-    event = Ct_irradiation_event_data.objects.create(ct_radiation_dose=ct)
+    event = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = cont.TextValue
@@ -526,8 +526,8 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
                         
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
-    from remapp.models import Ct_accumulated_dose_data, ContextID
-    ctacc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
+    from remapp.models import CtAccumulatedDoseData, ContextID
+    ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
             ctacc.total_number_of_irradiation_events = cont.MeasuredValueSequence[0].NumericValue
@@ -546,13 +546,13 @@ def _ctaccumulateddosedata(dataset,ct): # TID 10012
 
 
 def _projectionxrayradiationdose(dataset,g,reporttype):
-    from remapp.models import ProjectionXRayRadiationDose, Ct_radiation_dose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, Observer_context
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     if reporttype == 'projection':
         proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     elif reporttype == 'ct':
-        proj = Ct_radiation_dose.objects.create(general_study_module_attributes=g)
+        proj = CtRadiationDose.objects.create(general_study_module_attributes=g)
     else: pass
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure reported':

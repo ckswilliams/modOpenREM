@@ -11,9 +11,9 @@ from remapp.models import (GeneralStudyModuleAttr,
     AccumIntegratedProjRadiogDose,
     Patient_module_attributes, General_equipment_module_attributes, 
     Patient_study_module_attributes, ContextID,
-    Ct_radiation_dose, Ct_accumulated_dose_data,
-    Ct_irradiation_event_data, Scanning_length,
-    Ct_dose_check_details, Ct_xray_source_parameters,
+    CtRadiationDose, CtAccumulatedDoseData,
+    CtIrradiationEventData, Scanning_length,
+    CtDoseCheckDetails, CtXraySourceParameters,
     Exports, SizeUpload)
 
 from django.contrib import admin
@@ -45,11 +45,11 @@ admin.site.register(Patient_module_attributes)
 admin.site.register(General_equipment_module_attributes)
 admin.site.register(Patient_study_module_attributes)
 admin.site.register(ContextID)
-admin.site.register(Ct_radiation_dose)
-admin.site.register(Ct_accumulated_dose_data)
-admin.site.register(Ct_irradiation_event_data)
+admin.site.register(CtRadiationDose)
+admin.site.register(CtAccumulatedDoseData)
+admin.site.register(CtIrradiationEventData)
 admin.site.register(Scanning_length)
-admin.site.register(Ct_dose_check_details)
-admin.site.register(Ct_xray_source_parameters)
+admin.site.register(CtDoseCheckDetails)
+admin.site.register(CtXraySourceParameters)
 admin.site.register(Exports)
 admin.site.register(SizeUpload)

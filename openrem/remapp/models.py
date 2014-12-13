@@ -554,7 +554,7 @@ class General_equipment_module_attributes(models.Model):  # C.7.5.1
 
 # CT
 
-class Ct_radiation_dose(models.Model):  # TID 10011
+class CtRadiationDose(models.Model):  # TID 10011
     """CT Radiation Dose TID 10011
     
     From DICOM Part 16:
@@ -585,12 +585,12 @@ class SourceOfCTDoseInformation(models.Model):  # CID 10021
     """Source of CT Dose Information
     """
     # TODO: populate this table when extracting and move existing data. Task #164
-    ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
+    ct_radiation_dose = models.ForeignKey(CtRadiationDose)
     source_of_dose_information = models.ForeignKey(
         ContextID, blank=True, null=True)  # CID 10021
 
 
-class Ct_accumulated_dose_data(models.Model):  # TID 10012
+class CtAccumulatedDoseData(models.Model):  # TID 10012
     """CT Accumulated Dose Data
     
     From DICOM Part 16:
@@ -598,7 +598,7 @@ class Ct_accumulated_dose_data(models.Model):  # TID 10012
         irradiation events from the same equipment and over the scope of accumulation specified for the report
         (typically a Study or a Performed Procedure Step).
     """
-    ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
+    ct_radiation_dose = models.ForeignKey(CtRadiationDose)
     total_number_of_irradiation_events = models.DecimalField(max_digits=16, decimal_places=0, blank=True, null=True)
     ct_dose_length_product_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     ct_effective_dose_total = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -613,7 +613,7 @@ class Ct_accumulated_dose_data(models.Model):  # TID 10012
     comment = models.TextField(blank=True, null=True)
 
 
-class Ct_irradiation_event_data(models.Model):  # TID 10013
+class CtIrradiationEventData(models.Model):  # TID 10013
     """CT Irradiation Event Data TID 10013
     
     From DICOM Part 16:
@@ -623,7 +623,7 @@ class Ct_irradiation_event_data(models.Model):  # TID 10013
         + date_time_started
         + series_description
     """
-    ct_radiation_dose = models.ForeignKey(Ct_radiation_dose)
+    ct_radiation_dose = models.ForeignKey(CtRadiationDose)
     acquisition_protocol = models.TextField(blank=True, null=True)
     target_region = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10013_region')  # CID 4030
@@ -662,14 +662,14 @@ class CtReconstructionAlgorithm(models.Model):
     """Container in TID 10013 to hold CT reconstruction methods
     """
     # TODO: Add this to the rdsr extraction routines. Issue #166
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
     reconstruction_algorithm = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10033
 
 
-class Ct_xray_source_parameters(models.Model):
+class CtXraySourceParameters(models.Model):
     """Container in TID 10013 to hold CT x-ray source parameters
     """
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
     identification_of_the_xray_source = models.TextField(blank=True, null=True)
     kvp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     maximum_xray_tube_current = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -684,7 +684,7 @@ class Scanning_length(models.Model):  # TID 10014
     From DICOM Part 16:
         No description
     """
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
     scanning_length = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     length_of_reconstructable_volume = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     exposed_range = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -701,20 +701,20 @@ class SizeSpecificDoseEstimation(models.Model):
     """Container in TID 10013 to hold size specific dose estimation details
     """
     # TODO: Add this to the rdsr extraction routines. Issue #168
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
     measurement_method = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10023
     measured_lateral_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     measured_ap_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     derived_effective_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
 
 
-class Ct_dose_check_details(models.Model):  # TID 10015
+class CtDoseCheckDetails(models.Model):  # TID 10015
     """CT Dose Check Details TID 10015
     
     From DICOM Part 16:
         This template records details related to the use of the NEMA Dose Check Standard (NEMA XR-25-2010).
     """
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
     dlp_alert_value_configured = models.NullBooleanField()
     ctdivol_alert_value_configured = models.NullBooleanField()
     dlp_alert_value = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
@@ -742,7 +742,7 @@ class Observer_context(models.Model):  # TID 1002
         The observer (person or device) that created the Content Items to which this context applies.
     """
     projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose, blank=True, null=True)
-    ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
+    ct_radiation_dose = models.ForeignKey(CtRadiationDose, blank=True, null=True)
     observer_type = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid1002_observertype')  # CID 270
     person_observer_name = models.TextField(blank=True, null=True)
@@ -774,8 +774,8 @@ class Device_participant(models.Model):  # TID 1021
     accumulated_xray_dose = models.ForeignKey(AccumXRayDose, blank=True, null=True)
     irradiation_event_xray_detector_data = models.ForeignKey(IrradEventXRayDetectorData, blank=True, null=True)
     irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData, blank=True, null=True)
-    ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data, blank=True, null=True)
+    ct_accumulated_dose_data = models.ForeignKey(CtAccumulatedDoseData, blank=True, null=True)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData, blank=True, null=True)
     device_role_in_procedure = models.ForeignKey(ContextID, blank=True, null=True)
     device_name = models.TextField(blank=True, null=True)
     device_manufacturer = models.TextField(blank=True, null=True)
@@ -793,14 +793,14 @@ class Person_participant(models.Model):  # TID 1020
         irradiation and the person authorizing the irradiation.
     """
     projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose, blank=True, null=True)
-    ct_radiation_dose = models.ForeignKey(Ct_radiation_dose, blank=True, null=True)
+    ct_radiation_dose = models.ForeignKey(CtRadiationDose, blank=True, null=True)
     irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData, blank=True, null=True)
-    ct_accumulated_dose_data = models.ForeignKey(Ct_accumulated_dose_data, blank=True, null=True)
-    ct_irradiation_event_data = models.ForeignKey(Ct_irradiation_event_data, blank=True, null=True)
+    ct_accumulated_dose_data = models.ForeignKey(CtAccumulatedDoseData, blank=True, null=True)
+    ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData, blank=True, null=True)
     ct_dose_check_details_alert = models.ForeignKey(
-        Ct_dose_check_details, blank=True, null=True, related_name='tid1020_alert')
+        CtDoseCheckDetails, blank=True, null=True, related_name='tid1020_alert')
     ct_dose_check_details_notification = models.ForeignKey(
-        Ct_dose_check_details, blank=True, null=True, related_name='tid1020_notification')
+        CtDoseCheckDetails, blank=True, null=True, related_name='tid1020_notification')
     person_name = models.TextField(blank=True, null=True)
     # CharField version is a mistake and shouldn't be used
     person_role_in_procedure = models.CharField(max_length=16, blank=True)

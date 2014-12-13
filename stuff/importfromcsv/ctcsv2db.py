@@ -22,17 +22,17 @@ def _scanninglength(dataset,event,col): # TID 10014
 
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import Ct_xray_source_parameters
-    param = Ct_xray_source_parameters.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import CtXraySourceParameters
+    param = CtXraySourceParameters.objects.create(ct_irradiation_event_data=event)
     # Nothing in here from GE, will need to populate for Siemens
     param.save()
 
 
 def _ctirradiationeventdata(dataset,ct,col):
     import dicom
-    from remapp.models import Ct_irradiation_event_data
+    from remapp.models import CtIrradiationEventData
     from remapp.tools.get_values import get_or_create_cid
-    irr = Ct_irradiation_event_data.objects.create(ct_radiation_dose=ct)
+    irr = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
     irr.acquisition_protocol = dataset[8]
     if dataset[col+2] == "Helical":
         irr.ct_acquisition_type = get_or_create_cid("P5-08001","Spiral Acquisition")
@@ -52,17 +52,17 @@ def _ctirradiationeventdata(dataset,ct,col):
 
 
 def _ctaccumulateddosedata(dataset,ct):
-    from remapp.models import Ct_accumulated_dose_data
-    acc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
+    from remapp.models import CtAccumulatedDoseData
+    acc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     acc.total_number_of_irradiation_events = dataset[10]
     acc.ct_dose_length_product_total = dataset[11]
     acc.save()
 
 
 def _ctradiationdose(dataset,g):
-    from remapp.models import Ct_radiation_dose
+    from remapp.models import CtRadiationDose
     from remapp.tools.get_values import get_or_create_cid
-    ct = Ct_radiation_dose.objects.create(general_study_module_attributes=g)
+    ct = CtRadiationDose.objects.create(general_study_module_attributes=g)
     ct.procedure_reported = get_or_create_cid('P5-08000','Computed Tomography X-Ray')
     ct.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     ct.scope_of_accumulation = get_or_create_cid('113014','Study')
