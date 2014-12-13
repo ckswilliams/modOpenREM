@@ -764,7 +764,7 @@ class Observer_context(models.Model):  # TID 1002
         return self.device_observer_name
 
 
-class Device_participant(models.Model):  # TID 1021
+class DeviceParticipant(models.Model):  # TID 1021
     """Device Participant TID 1021
     
     From DICOM Part 16:
@@ -784,7 +784,7 @@ class Device_participant(models.Model):  # TID 1021
     device_observer_uid = models.TextField(blank=True, null=True)
 
 
-class Person_participant(models.Model):  # TID 1020
+class PersonParticipant(models.Model):  # TID 1020
     """Person Participant TID 1020
     
     From DICOM Part 16:

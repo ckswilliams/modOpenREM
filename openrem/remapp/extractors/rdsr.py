@@ -51,18 +51,18 @@ def _observercontext(dataset,obs): # TID 1002
     obs.save()
     
 def _deviceparticipant(dataset,eventdatatype,foreignkey):
-    from remapp.models import Device_participant
+    from remapp.models import DeviceParticipant
     from remapp.tools.get_values import get_or_create_cid
     if eventdatatype == 'detector':
-        device = Device_participant.objects.create(irradiation_event_xray_detector_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_detector_data=foreignkey)
     elif eventdatatype == 'source':
-        device = Device_participant.objects.create(irradiation_event_xray_source_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_source_data=foreignkey)
     elif eventdatatype == 'accumulated':
-        device = Device_participant.objects.create(accumulated_xray_dose=foreignkey)
+        device = DeviceParticipant.objects.create(accumulated_xray_dose=foreignkey)
     elif eventdatatype == 'ct_accumulated':
-        device = Device_participant.objects.create(ct_accumulated_dose_data=foreignkey)
+        device = DeviceParticipant.objects.create(ct_accumulated_dose_data=foreignkey)
     elif eventdatatype == 'ct_event':
-        device = Device_participant.objects.create(ct_irradiation_event_data=foreignkey)
+        device = DeviceParticipant.objects.create(ct_irradiation_event_data=foreignkey)
     else:
         print "Doh"
     for cont in dataset.ContentSequence:

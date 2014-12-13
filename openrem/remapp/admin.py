@@ -1,10 +1,10 @@
 from remapp.models import (GeneralStudyModuleAttr,
     ProjectionXRayRadiationDose, Observer_context,
     AccumXRayDose, Calibration, IrradEventXRayData,
-    ImageViewModifier, Person_participant,
+    ImageViewModifier, PersonParticipant,
     IrradEventXRayDetectorData, IrradEventXRaySourceData,
     Pulse_width, Kvp, Xray_tube_current, Exposure, Xray_filters, Xray_grid,
-    Device_participant, IrradEventXRayMechanicalData,
+    DeviceParticipant, IrradEventXRayMechanicalData,
     Dose_related_distance_measurements, AccumProjectionXRayDose,
     AccumMammographyXRayDose,
     AccumCassetteBsdProjRadiogDose,
@@ -25,7 +25,7 @@ admin.site.register(AccumXRayDose)
 admin.site.register(Calibration)
 admin.site.register(IrradEventXRayData)
 admin.site.register(ImageViewModifier)
-admin.site.register(Person_participant)
+admin.site.register(PersonParticipant)
 admin.site.register(IrradEventXRayDetectorData)
 admin.site.register(IrradEventXRaySourceData)
 admin.site.register(Pulse_width)
@@ -34,7 +34,7 @@ admin.site.register(Xray_tube_current)
 admin.site.register(Exposure)
 admin.site.register(Xray_filters)
 admin.site.register(Xray_grid)
-admin.site.register(Device_participant)
+admin.site.register(DeviceParticipant)
 admin.site.register(IrradEventXRayMechanicalData)
 admin.site.register(Dose_related_distance_measurements)
 admin.site.register(AccumProjectionXRayDose)

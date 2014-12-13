@@ -42,13 +42,13 @@ def _exposure(dataset,source):
     exp.save()
 
 def _deviceparticipant(dataset,eventdatatype,foreignkey):
-    from remapp.models import Device_participant
+    from remapp.models import DeviceParticipant
     if eventdatatype == 'detector':
-        device = Device_participant.objects.create(irradiation_event_xray_detector_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_detector_data=foreignkey)
     elif eventdatatype == 'source':
-        device = Device_participant.objects.create(irradiation_event_xray_source_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_source_data=foreignkey)
     elif eventdatatype == 'accumulated':
-        device = Device_participant.objects.create(accumulated_xray_dose=foreignkey)
+        device = DeviceParticipant.objects.create(accumulated_xray_dose=foreignkey)
     device.device_model_name = 'Senograph DS'
     device.device_manufacturer = 'GE'
     device.device_serial_number = dataset[2]
