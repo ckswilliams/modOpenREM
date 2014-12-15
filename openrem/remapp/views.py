@@ -241,6 +241,7 @@ def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
     from django.db.models import Q, Avg, Count # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
+    import datetime, qsstats
 
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT').order_by().distinct())
 
@@ -254,7 +255,17 @@ def ct_summary_list_filter(request):
         studySummary = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
         for idx, study in enumerate(studySummary):
-            dlpValues = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).filter(study_description=study.values()[0])
+
+            # Work out the mean total DAP per month for this study description
+            qss = qsstats.QuerySetStats(qs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+            today = datetime.date.today()
+            two_years_ago = today - datetime.timedelta(days=730)
+            time_series = qss.time_series(two_years_ago, today,interval='weeks')
+            # End of working out the mean total DAP per month for this study description
+
+            #dlpValues = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            dlpValues = qs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
