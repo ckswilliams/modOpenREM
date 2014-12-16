@@ -487,6 +487,26 @@ var chartAcqFreq = new Highcharts.Chart({
 <!-- End of HTML to include div container for studies per week day pie chart -->
 
 
+<!-- HTML to include div container for mean study DLP per week -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyStudyMeanChart">
+          Line plot showing mean of each study type over time.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="linechartWeeklyStudyMeanDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for mean study DLP per week -->
+
+
 <!-- JavaScript for study plot -->
 <script>
 var studyNames     = [
@@ -796,13 +816,66 @@ var chartStudyWorkload = new Highcharts.Chart({
 </script>
 <!-- End of JavaScript for studies per week day pie chart -->
 
-<!-- Start of mean per week data testing section -->
-{% for studyData in studyDLPoverTime %}
-    {% for weekEntries in studyData %}
-        {{ weekEntries.0 }}, {{ weekEntries.1 }}
-    {% endfor %}
+
+<!-- JavaScript for mean DLP per study description -->
+<script>
+dateAxis = [
+{% for dateEntries in studyDLPoverTime.0 %}
+    "{{ dateEntries.0 }}".replace(", midnight", "")
+    {% if not forloop.last %},{% endif %}
 {% endfor %}
-<!-- End of mean per week data testing section -->
+];
+
+meanDLPperWeek = [
+{% for studyData in studyDLPoverTime %}
+    {{'{'}}name:studyNames[{{forloop.counter}}-1],data:[
+    {% for weekEntries in studyData %}
+        {% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %}
+        {% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ]{{'}'}}
+    {% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+
+$(function () {
+var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
+        chart: {
+            renderTo: 'linechartWeeklyStudyMeanDIV',
+            zoomType: 'x'
+        },
+        title: {
+            text: '',
+        },
+        xAxis: {
+            categories: dateAxis,
+            minTickInterval: 4,
+            labels: {
+                rotation:90
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Mean DLP (mGy.cm)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: meanDLPperWeek
+    });
+});
+
+</script>
+<!-- End of JavaScript for mean DLP per study description -->
 {% endif %}
 
 <!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
