@@ -153,6 +153,9 @@ function getColours(noOfColours) {
 function sort_by_y(a,b) {
     return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0)); // a[1] for col. 2 etc...
 }
+function sort_by_name(a,b) {
+    return ((a.name < b.name) ? -1 : ((a.name > b.name) ? 1 : 0)); // a[1] for col. 2 etc...
+}
 </script>
 <!-- End of JavaScript function to sort a list of objects by the 'y' object -->
 
@@ -493,13 +496,14 @@ var chartAcqFreq = new Highcharts.Chart({
     <div class="panel-heading">
       <h4 class="panel-title">
         <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyStudyMeanChart">
-          Line plot showing mean of each study type over time.
+          Line plot showing weekly mean DLP of each study type over time.
         </a>
       </h4>
     </div>
     <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
       <div class="panel-body">
          <div id="linechartWeeklyStudyMeanDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
       </div>
     </div>
   </div>
@@ -826,9 +830,18 @@ dateAxis = [
 {% endfor %}
 ];
 
+// Create the same colours as for the study pie chart, so that the colours
+// are the same for the studies in the pie chart and this plot.
+var studyLineColours =  new Array(studyNames.length);
+studyPiechartData.sort(sort_by_name);
+for(var i=0; i<studyNames.length; i++) {
+    studyLineColours[i] = studyPiechartData[i].color;
+}
+studyPiechartData.sort(sort_by_y);
+
 meanDLPperWeek = [
 {% for studyData in studyDLPoverTime %}
-    {{'{'}}name:studyNames[{{forloop.counter}}-1],data:[
+    {{'{'}}name:studyNames[{{forloop.counter}}-1],color:studyLineColours[{{forloop.counter}}-1],data:[
     {% for weekEntries in studyData %}
         {% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %}
         {% if not forloop.last %},{% endif %}
