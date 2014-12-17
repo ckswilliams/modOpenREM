@@ -860,6 +860,9 @@ var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
         title: {
             text: '',
         },
+        tooltip: {
+            pointFormat: '{series.name}<br/>{point.y:.0f} mGy.cm'
+        },
         xAxis: {
             categories: dateAxis,
             minTickInterval: 4,
