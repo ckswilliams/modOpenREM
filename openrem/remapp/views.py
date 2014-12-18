@@ -137,8 +137,9 @@ def dx_summary_list_filter(request):
 def dx_histogram_list_filter(request):
     if plotting: import numpy as np
     from remapp.interface.mod_filters import DXSummaryListFilter
-    from django.db.models import Q, Avg, Count # For the Q "OR" query used for DX and CR
+    from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
+    import datetime, qsstats
 
     if request.GET.get('acquisitionhist'):
         f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
@@ -185,8 +186,21 @@ def dx_histogram_list_filter(request):
     if plotting:
         acquisitionSummary = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').order_by().distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
+        acquisitionDAPoverTime = [None] * len(acquisitionSummary)
+
+        startDate = f.qs.aggregate(Min('study_date')).values()[0]
+
         for idx, protocol in enumerate(acquisitionSummary):
-            dapValues = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)).values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True))
+
+            # Work out the mean total DLP per week for this acquisition protocol
+            qss = qsstats.QuerySetStats(qs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+            today = datetime.date.today()
+            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+            # End of working out the mean total DLP per week for this acquisition protocol
+
+            dapValues = qs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -216,7 +230,8 @@ def dx_histogram_list_filter(request):
             {'filter': f, 'admin':admin,
              'acquisitionSummary': acquisitionSummary,
              'acquisitionHistogramData': acquisitionHistogramData,
-             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
+             'acquisitionDAPoverTime': acquisitionDAPoverTime},
             context_instance=RequestContext(request)
             )
     else:
