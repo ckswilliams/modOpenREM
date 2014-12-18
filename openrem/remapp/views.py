@@ -83,16 +83,18 @@ def dx_summary_list_filter(request):
 
         startDate = f.qs.aggregate(Min('study_date')).values()[0]
 
+        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
+        today = datetime.date.today()
+
         for idx, protocol in enumerate(acquisitionSummary):
-            qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True))
+            subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
 
             # Work out the mean total DLP per week for this acquisition protocol
-            qss = qsstats.QuerySetStats(qs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-            today = datetime.date.today()
+            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
             acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
             # End of working out the mean total DLP per week for this acquisition protocol
 
-            dapValues = qs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -191,16 +193,19 @@ def dx_histogram_list_filter(request):
 
         startDate = f.qs.aggregate(Min('study_date')).values()[0]
 
+        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
+        today = datetime.date.today()
+
         for idx, protocol in enumerate(acquisitionSummary):
-            qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')).exclude(Q(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True))
+
+            subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
 
             # Work out the mean total DLP per week for this acquisition protocol
-            qss = qsstats.QuerySetStats(qs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-            today = datetime.date.today()
+            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
             acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
             # End of working out the mean total DLP per week for this acquisition protocol
 
-            dapValues = qs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -289,16 +294,18 @@ def ct_summary_list_filter(request):
 
         startDate = f.qs.aggregate(Min('study_date')).values()[0]
 
+        qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True)
+        today = datetime.date.today()
+
         for idx, study in enumerate(studySummary):
-            qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).filter(study_description=study.values()[0])
+            subqs = qs.filter(study_description=study.values()[0])
 
             # Work out the mean total DAP per week for this study description
-            qss = qsstats.QuerySetStats(qs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
-            today = datetime.date.today()
+            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
             studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
             # End of working out the mean total DAP per week for this study description
 
-            dlpValues = qs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            dlpValues = subqs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -405,16 +412,17 @@ def ct_histogram_list_filter(request):
 
         startDate = f.qs.aggregate(Min('study_date')).values()[0]
 
+        today = datetime.date.today()
+
         for idx, study in enumerate(studySummary):
-            qs = f.qs.filter(study_description=study.values()[0])
+            subqs = f.qs.filter(study_description=study.values()[0])
 
             # Work out the mean total DAP per week for this study description
-            qss = qsstats.QuerySetStats(qs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
-            today = datetime.date.today()
+            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
             studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
             # End of working out the mean total DAP per week for this study description
 
-            dlpValues = qs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            dlpValues = subqs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
