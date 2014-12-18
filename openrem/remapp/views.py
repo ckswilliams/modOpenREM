@@ -262,11 +262,11 @@ def ct_summary_list_filter(request):
         for idx, study in enumerate(studySummary):
             qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).filter(study_description=study.values()[0])
 
-            # Work out the mean total DAP per month for this study description
+            # Work out the mean total DAP per week for this study description
             qss = qsstats.QuerySetStats(qs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
             today = datetime.date.today()
             studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
-            # End of working out the mean total DAP per month for this study description
+            # End of working out the mean total DAP per week for this study description
 
             dlpValues = qs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
@@ -315,8 +315,9 @@ def ct_summary_list_filter(request):
 def ct_histogram_list_filter(request):
     if plotting: import numpy as np
     from remapp.interface.mod_filters import CTSummaryListFilter
-    from django.db.models import Q, Avg, Count # For the Q "OR" query used for DX and CR
+    from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
+    import datetime, qsstats
 
     if request.GET.get('acquisitionhist'):
         f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
@@ -369,8 +370,21 @@ def ct_histogram_list_filter(request):
 
         studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').order_by().distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
+
+        studyDLPoverTime = [None] * len(studySummary)
+
+        startDate = f.qs.aggregate(Min('study_date')).values()[0]
+
         for idx, study in enumerate(studySummary):
-            dlpValues = f.qs.filter(study_description=study.values()[0]).values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            qs = f.qs.filter(study_description=study.values()[0])
+
+            # Work out the mean total DAP per week for this study description
+            qss = qsstats.QuerySetStats(qs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+            today = datetime.date.today()
+            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+            # End of working out the mean total DAP per week for this study description
+
+            dlpValues = qs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -402,7 +416,8 @@ def ct_histogram_list_filter(request):
              'studyHistogramData': studyHistogramData,
              'acquisitionSummary': acquisitionSummary,
              'acquisitionHistogramData': acquisitionHistogramData,
-             'studiesPerHourInWeekdays': studiesPerHourInWeekdays},
+             'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
+             'studyDLPoverTime': studyDLPoverTime},
             context_instance=RequestContext(request)
             )
     else:
