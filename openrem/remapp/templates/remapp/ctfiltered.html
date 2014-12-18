@@ -841,7 +841,7 @@ studyPiechartData.sort(sort_by_y);
 
 meanDLPperWeek = [
 {% for studyData in studyDLPoverTime %}
-    {{'{'}}name:studyNames[{{forloop.counter}}-1],color:studyLineColours[{{forloop.counter}}-1],data:[
+    {{'{'}}name:studyNames[{{forloop.counter}}-1],color:studyLineColours[{{forloop.counter}}-1],marker:{{'{'}}enabled:true{{'}'}},data:[
     {% for weekEntries in studyData %}
         {% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %}
         {% if not forloop.last %},{% endif %}
