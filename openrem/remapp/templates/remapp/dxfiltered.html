@@ -193,6 +193,27 @@ function getColours(noOfColours) {
 <!-- End of HTML to include div container for studies per week day pie chart -->
 
 
+<!-- HTML to include div container for mean acquisition protocol DAP per week -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyAcquisitionMeanChart">
+          Line plot showing weekly mean DAP of each acquisition protocol over time.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseWeeklyAcquisitionMeanChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="linechartWeeklyAcquisitionMeanDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for mean acquisition protocol DAP per week -->
+
+
 <!-- Include JavaScript to enable highcharts plots -->
 <script src="{{ STATIC_URL }}js/highcharts.js"></script>
 <script src="{{ STATIC_URL }}js/exporting.js"></script>
@@ -205,6 +226,9 @@ function getColours(noOfColours) {
 <script>
 function sort_by_y(a,b) {
     return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0)); // a[1] for col. 2 etc...
+}
+function sort_by_name(a,b) {
+    return ((a.name < b.name) ? -1 : ((a.name > b.name) ? 1 : 0)); // a[1] for col. 2 etc...
 }
 </script>
 <!-- End of JavaScript function to sort a list of objects by the 'y' object -->
@@ -519,6 +543,82 @@ var chartWorkload = new Highcharts.Chart({
 });
 </script>
 <!-- End of JavaScript for studies per week day pie chart -->
+
+
+<!-- JavaScript for mean DAP per acquisition protocol per week -->
+<script>
+dateAxis = [
+{% for dateEntries in acquisitionDAPoverTime.0 %}
+    "{{ dateEntries.0 }}".replace(", midnight", "")
+    {% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+
+// Create the same colours as for the study pie chart, so that the colours
+// are the same for the studies in the pie chart and this plot.
+var protocolLineColours =  new Array(protocolNames.length);
+protocolPiechartData.sort(sort_by_name);
+for(var i=0; i<protocolNames.length; i++) {
+    protocolLineColours[i] = protocolPiechartData[i].color;
+}
+protocolPiechartData.sort(sort_by_y);
+
+meanDAPperWeek = [
+{% for protocolData in acquisitionDAPoverTime %}
+    {{'{'}}name:protocolNames[{{forloop.counter}}-1],color:protocolLineColours[{{forloop.counter}}-1],data:[
+    {% for weekEntries in protocolData %}
+        {% if weekEntries.1 %}{{ weekEntries.1 }}*1000000{% else %}null{% endif %}
+        {% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ]{{'}'}}
+    {% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+
+$(function () {
+var chartWeeklyAcquisitionMeanDAP = new Highcharts.Chart({
+        chart: {
+            renderTo: 'linechartWeeklyAcquisitionMeanDIV',
+            zoomType: 'x'
+        },
+        title: {
+            text: '',
+        },
+        tooltip: {
+            pointFormat: '{series.name}<br/>{point.y:.1f} cGy.cm<sup>2</sup>',
+            useHTML: true
+        },
+        xAxis: {
+            categories: dateAxis,
+            minTickInterval: 4,
+            labels: {
+                rotation:90
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Mean DAP (cGy.cm<sup>2</sup>)',
+                useHTML: true
+            },
+            floor: 0,
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: meanDAPperWeek
+    });
+});
+
+</script>
+<!-- End of JavaScript for mean DAP per acquisition protocol per week -->
 
 
 <!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
