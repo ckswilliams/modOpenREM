@@ -89,10 +89,10 @@ def dx_summary_list_filter(request):
         for idx, protocol in enumerate(acquisitionSummary):
             subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
 
-            # Work out the mean total DLP per week for this acquisition protocol
+            # Work out the mean total DLP per month for this acquisition protocol
             qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
-            # End of working out the mean total DLP per week for this acquisition protocol
+            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
+            # End of working out the mean total DLP per month for this acquisition protocol
 
             dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
@@ -200,10 +200,10 @@ def dx_histogram_list_filter(request):
 
             subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
 
-            # Work out the mean total DLP per week for this acquisition protocol
+            # Work out the mean total DLP per month for this acquisition protocol
             qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
-            # End of working out the mean total DLP per week for this acquisition protocol
+            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
+            # End of working out the mean total DLP per month for this acquisition protocol
 
             dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
