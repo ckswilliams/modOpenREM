@@ -549,7 +549,7 @@ var chartWorkload = new Highcharts.Chart({
 <script>
 dateAxis = [
 {% for dateEntries in acquisitionDAPoverTime.0 %}
-    "{{ dateEntries.0.date }}"
+    "{{ dateEntries.0.date|date:"d/m/Y" }}"
     {% if not forloop.last %},{% endif %}
 {% endfor %}
 ];

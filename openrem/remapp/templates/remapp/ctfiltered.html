@@ -73,6 +73,17 @@ $('.datepicker').datepicker({
 </script>
 
 <script>
+function formatDate(d) {
+  var dd = d.getDate();
+  if ( dd < 10 ) dd = '0' + dd;
+  var mm = d.getMonth()+1;
+  if ( mm < 10 ) mm = '0' + mm;
+  var yyyy = d.getFullYear();
+  return yyyy+'-'+mm+'-'+dd;
+}
+</script>
+
+<script>
 function getColours(noOfColours) {
     var colours = [];
     frequency = 5 / noOfColours; 
@@ -825,7 +836,7 @@ var chartStudyWorkload = new Highcharts.Chart({
 <script>
 dateAxis = [
 {% for dateEntries in studyDLPoverTime.0 %}
-    "{{ dateEntries.0.date }}"
+    "{{ dateEntries.0.date|date:"d/m/Y" }}"
     {% if not forloop.last %},{% endif %}
 {% endfor %}
 ];
@@ -839,11 +850,24 @@ for(var i=0; i<studyNames.length; i++) {
 }
 studyPiechartData.sort(sort_by_y);
 
+var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+
 meanDLPperWeek = [
 {% for studyData in studyDLPoverTime %}
-    {{'{'}}name:studyNames[{{forloop.counter}}-1],color:studyLineColours[{{forloop.counter}}-1],marker:{{'{'}}enabled:true{{'}'}},data:[
+    {{'{'}}name:studyNames[{{forloop.counter}}-1],
+        color:studyLineColours[{{forloop.counter}}-1],
+        marker:{{'{'}}enabled:true{{'}'}},
+        point: {{'{'}}
+            events: {{'{'}}
+                    click: function(e) {{'{'}}
+                        location.href = e.point.url;
+                        e.preventDefault();
+                    {{'}'}}
+            {{'}'}}
+        {{'}'}},
+        data:[
     {% for weekEntries in studyData %}
-        {% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %}
+        {{'{'}}y:{% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}-1))+'&date_before='+ formatDate(new Date ((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}-1)).setDate((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}-1)).getDate()+6))){{'}'}}
         {% if not forloop.last %},{% endif %}
     {% endfor %}
     ]{{'}'}}
