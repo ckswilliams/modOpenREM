@@ -825,7 +825,7 @@ var chartStudyWorkload = new Highcharts.Chart({
 <script>
 dateAxis = [
 {% for dateEntries in studyDLPoverTime.0 %}
-    "{{ dateEntries.0 }}".replace(", midnight", "")
+    "{{ dateEntries.0.date }}"
     {% if not forloop.last %},{% endif %}
 {% endfor %}
 ];

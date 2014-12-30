@@ -549,7 +549,7 @@ var chartWorkload = new Highcharts.Chart({
 <script>
 dateAxis = [
 {% for dateEntries in acquisitionDAPoverTime.0 %}
-    "{{ dateEntries.0 }}".replace(", midnight", "")
+    "{{ dateEntries.0.date }}"
     {% if not forloop.last %},{% endif %}
 {% endfor %}
 ];
