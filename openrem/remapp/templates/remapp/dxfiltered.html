@@ -63,6 +63,17 @@ $('.datepicker').datepicker({
 </script>
 
 <script>
+function formatDate(d) {
+  var dd = d.getDate();
+  if ( dd < 10 ) dd = '0' + dd;
+  var mm = d.getMonth()+1;
+  if ( mm < 10 ) mm = '0' + mm;
+  var yyyy = d.getFullYear();
+  return yyyy+'-'+mm+'-'+dd;
+}
+</script>
+
+<script>
 function getColours(noOfColours) {
     var colours = [];
     frequency = 5 / noOfColours; 
@@ -563,11 +574,24 @@ for(var i=0; i<protocolNames.length; i++) {
 }
 protocolPiechartData.sort(sort_by_y);
 
+var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+
 meanDAPperMonth = [
 {% for protocolData in acquisitionDAPoverTime %}
-    {{'{'}}name:protocolNames[{{forloop.counter}}-1],color:protocolLineColours[{{forloop.counter}}-1],marker:{{'{'}}enabled:true{{'}'}},data:[
+    {{'{'}}name:protocolNames[{{forloop.counter}}-1],
+        color:protocolLineColours[{{forloop.counter}}-1],
+        marker:{{'{'}}enabled:true{{'}'}},
+        point: {{'{'}}
+            events: {{'{'}}
+                    click: function(e) {{'{'}}
+                        location.href = e.point.url;
+                        e.preventDefault();
+                    {{'}'}}
+            {{'}'}}
+        {{'}'}},
+        data:[
     {% for monthEntries in protocolData %}
-        {% if monthEntries.1 %}{{ monthEntries.1 }}*1000000{% else %}null{% endif %}
+        {{'{'}}y:{% if monthEntries.1 %}{{ monthEntries.1 }}*1000000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}})).setMonth((new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}})).getMonth()+1))){{'}'}}
         {% if not forloop.last %},{% endif %}
     {% endfor %}
     ]{{'}'}}
@@ -582,7 +606,7 @@ var chartMonthlyAcquisitionMeanDAP = new Highcharts.Chart({
             zoomType: 'x'
         },
         title: {
-            text: '',
+            text: ''
         },
         tooltip: {
             pointFormat: '{series.name}<br/>{point.y:.1f} cGy.cm<sup>2</sup>',
