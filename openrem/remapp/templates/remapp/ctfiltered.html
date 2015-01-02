@@ -867,7 +867,7 @@ meanDLPperWeek = [
         {{'}'}},
         data:[
     {% for weekEntries in studyData %}
-        {{'{'}}y:{% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}-1))+'&date_before='+ formatDate(new Date ((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}-1)).setDate((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}-1)).getDate()+6))){{'}'}}
+        {{'{'}}y:{% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}})).setDate((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}})).getDate()+6))){{'}'}}
         {% if not forloop.last %},{% endif %}
     {% endfor %}
     ]{{'}'}}
