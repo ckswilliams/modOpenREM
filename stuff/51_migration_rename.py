@@ -141,6 +141,18 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='content_item_descriptions').update(model='contextid')
 
+        # Renaming model from 'Accumulated_mammography_xray_dose' to 'AccumMammographyXRayDose'
+        db.rename_table(u'remapp_accumulated_mammography_xray_dose', u'remapp_accummammographyxraydose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='accumulated_mammography_xray_dose').update(model='accummammographyxraydose')
+
+        # Renaming model from 'Observer_context' to 'ObserverContext'
+        db.rename_table(u'remapp_observer_context', u'remapp_observercontext')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='observer_context').update(model='observercontext')
+
 
     def backwards(self, orm):
         # Renaming model from 'CtDoseCheckDetails' to 'Ct_dose_check_details'
@@ -273,3 +285,16 @@ class Migration(SchemaMigration):
         if not db.dry_run:
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='contextid').update(model='content_item_descriptions')
+
+        # Renaming model from 'AccumMammographyXRayDose' to 'Accumulated_mammography_xray_dose'
+        db.rename_table(u'remapp_accummammographyxraydose', u'remapp_accumulated_mammography_xray_dose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='accummammographyxraydose').update(model='accumulated_mammography_xray_dose')
+
+        # Renaming model from 'ObserverContext' to 'Observer_context'
+        db.rename_table(u'remapp_observercontext', u'remapp_observer_context')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='observercontext').update(model='observer_context')
+
