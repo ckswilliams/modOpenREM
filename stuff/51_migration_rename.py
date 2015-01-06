@@ -98,6 +98,49 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='image_view_modifier').update(model='imageviewmodifier')
 
+        # Renaming model from 'Scanning_length' to 'ScanningLength'
+        db.rename_table(u'remapp_scanning_length', u'remapp_scanninglength')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='scanning_length').update(model='scanninglength')
+
+        # Renaming model from 'Accumulated_xray_dose' to 'AccumXRayDose'
+        db.rename_table(u'remapp_accumulated_xray_dose', u'remapp_accumxraydose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='accumulated_xray_dose').update(model='accumxraydose')
+
+        # Renaming model from 'Irradiation_event_xray_mechanical_data' to 'IrradEventXRayMechanicalData'
+        db.rename_table(u'remapp_irradiation_event_xray_mechanical_data', u'remapp_irradeventxraymechanicaldata')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradiation_event_xray_mechanical_data'
+            ).update(model='irradeventxraymechanicaldata')
+
+        # Renaming model from 'Xray_tube_current' to 'XrayTubeCurrent'
+        db.rename_table(u'remapp_xray_tube_current', u'remapp_xraytubecurrent')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='xray_tube_current').update(model='xraytubecurrent')
+
+        # Renaming model from 'Xray_filters' to 'XrayFilters'
+        db.rename_table(u'remapp_xray_filters', u'remapp_xrayfilters')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='xray_filters').update(model='xrayfilters')
+
+        # Renaming model from 'Xray_grid' to 'XrayGrid'
+        db.rename_table(u'remapp_xray_grid', u'remapp_xraygrid')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='xray_grid').update(model='xraygrid')
+
+        # Renaming model from 'Content_item_descriptions' to 'ContextID'
+        db.rename_table(u'remapp_content_item_descriptions', u'remapp_contextid')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='content_item_descriptions').update(model='contextid')
+
 
     def backwards(self, orm):
         # Renaming model from 'CtDoseCheckDetails' to 'Ct_dose_check_details'
@@ -187,3 +230,46 @@ class Migration(SchemaMigration):
         if not db.dry_run:
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='imageviewmodifier').update(model='image_view_modifier')
+
+        # Renaming model from 'ScanningLength' to 'Scanning_length'
+        db.rename_table(u'remapp_scanninglength', u'remapp_scanning_length')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='scanninglength').update(model='scanning_length')
+
+        # Renaming model from 'AccumXRayDose' to 'Accumulated_xray_dose'
+        db.rename_table(u'remapp_accumxraydose', u'remapp_accumulated_xray_dose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='accumxraydose').update(model='accumulated_xray_dose')
+
+        # Renaming model from 'IrradEventXRayMechanicalData' to 'Irradiation_event_xray_mechanical_data'
+        db.rename_table(u'remapp_irradeventxraymechanicaldata', u'remapp_irradiation_event_xray_mechanical_data')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradeventxraymechanicaldata'
+            ).update(model='irradiation_event_xray_mechanical_data')
+
+        # Renaming model from 'XrayTubeCurrent' to 'Xray_tube_current'
+        db.rename_table(u'remapp_xraytubecurrent', u'remapp_xray_tube_current')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='xraytubecurrent').update(model='xray_tube_current')
+
+        # Renaming model from 'XrayFilters' to 'Xray_filters'
+        db.rename_table(u'remapp_xrayfilters', u'remapp_xray_filters')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='xrayfilters').update(model='xray_filters')
+
+        # Renaming model from 'XrayGrid' to 'Xray_grid'
+        db.rename_table(u'remapp_xraygrid', u'remapp_xray_grid')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='xraygrid').update(model='xray_grid')
+
+        # Renaming model from 'ContextID' to 'Content_item_descriptions'
+        db.rename_table(u'remapp_contextid', u'remapp_content_item_descriptions')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='contextid').update(model='content_item_descriptions')
