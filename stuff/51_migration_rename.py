@@ -68,6 +68,36 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='person_participant').update(model='personparticipant')
 
+        # Renaming model from 'Projection_xray_radiation_dose' to 'ProjectionXRayRadiationDose'
+        db.rename_table(u'remapp_projection_xray_radiation_dose', u'remapp_projectionxrayradiationdose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='projection_xray_radiation_dose').update(model='projectionxrayradiationdose')
+
+        # Renaming model from 'Irradiation_event_xray_source_data' to 'IrradEventXRaySourceData'
+        db.rename_table(u'remapp_irradiation_event_xray_source_data', u'remapp_irradeventxraysourcedata')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradiation_event_xray_source_data').update(model='irradeventxraysourcedata')
+
+        # Renaming model from 'Ct_accumulated_dose_data' to 'CtAccumulatedDoseData'
+        db.rename_table(u'remapp_ct_accumulated_dose_data', u'remapp_ctaccumulateddosedata')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='ct_accumulated_dose_data').update(model='ctaccumulateddosedata')
+
+        # Renaming model from 'Device_participant' to 'DeviceParticipant'
+        db.rename_table(u'remapp_device_participant', u'remapp_deviceparticipant')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='device_participant').update(model='deviceparticipant')
+
+        # Renaming model from 'Image_view_modifier' to 'ImageViewModifier'
+        db.rename_table(u'remapp_image_view_modifier', u'remapp_imageviewmodifier')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='image_view_modifier').update(model='imageviewmodifier')
+
 
     def backwards(self, orm):
         # Renaming model from 'CtDoseCheckDetails' to 'Ct_dose_check_details'
@@ -127,3 +157,33 @@ class Migration(SchemaMigration):
         if not db.dry_run:
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='personparticipant').update(model='person_participant')
+
+        # Renaming model from 'ProjectionXRayRadiationDose' to 'Projection_xray_radiation_dose'
+        db.rename_table(u'remapp_projectionxrayradiationdose', u'remapp_projection_xray_radiation_dose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='projectionxrayradiationdose').update(model='projection_xray_radiation_dose')
+
+        # Renaming model from 'IrradEventXRaySourceData' to 'Irradiation_event_xray_source_data'
+        db.rename_table(u'remapp_irradeventxraysourcedata', u'remapp_irradiation_event_xray_source_data')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradeventxraysourcedata').update(model='irradiation_event_xray_source_data')
+
+        # Renaming model from 'CtAccumulatedDoseData' to 'Ct_accumulated_dose_data'
+        db.rename_table(u'remapp_ctaccumulateddosedata', u'remapp_ct_accumulated_dose_data')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='ctaccumulateddosedata').update(model='ct_accumulated_dose_data')
+
+        # Renaming model from 'DeviceParticipant' to 'Device_participant'
+        db.rename_table(u'remapp_deviceparticipant', u'remapp_device_participant')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='deviceparticipant').update(model='device_participant')
+
+        # Renaming model from 'ImageViewModifier' to 'Image_view_modifier'
+        db.rename_table(u'remapp_imageviewmodifier', u'remapp_image_view_modifier')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='imageviewmodifier').update(model='image_view_modifier')
