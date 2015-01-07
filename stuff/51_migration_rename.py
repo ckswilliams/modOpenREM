@@ -153,6 +153,39 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='observer_context').update(model='observercontext')
 
+        # Renaming model from 'Accumulated_integrated_projection_radiography_dose' to 'AccumIntegratedProjRadiogDose'
+        db.rename_table(
+            u'remapp_accumulated_integrated_projection_radiography_dose', u'remapp_accumintegratedprojradiogdose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='accumulated_integrated_projection_radiography_dose'
+            ).update(model='accumintegratedprojradiogdose')
+
+        # Renaming model from 'Ct_xray_source_parameters' to 'CtXRaySourceParameters'
+        db.rename_table(u'remapp_ct_xray_source_parameters', u'remapp_ctxraysourceparameters')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='ct_xray_source_parameters').update(model='ctxraysourceparameters')
+
+        # Renaming model from 'General_study_module_attributes' to 'GeneralStudyModuleAttr'
+        db.rename_table(u'remapp_general_study_module_attributes', u'remapp_generalstudymoduleattr')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='general_study_module_attributes').update(model='generalstudymoduleattr')
+
+        # Renaming model from 'Dose_related_distance_measurements' to 'DoseRelatedDistanceMeasurements'
+        db.rename_table(u'remapp_dose_related_distance_measurements', u'remapp_doserelateddistancemeasurements')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='dose_related_distance_measurements'
+            ).update(model='doserelateddistancemeasurements')
+
+
+################################################################################
+#
+#              gap for my benefit, remove!
+#
+################################################################################
 
     def backwards(self, orm):
         # Renaming model from 'CtDoseCheckDetails' to 'Ct_dose_check_details'
@@ -298,3 +331,29 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='observercontext').update(model='observer_context')
 
+        # Renaming model from 'AccumIntegratedProjRadiogDose' to 'Accumulated_integrated_projection_radiography_dose'
+        db.rename_table(
+            u'remapp_accumintegratedprojradiogdose', u'remapp_accumulated_integrated_projection_radiography_dose')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='accumintegratedprojradiogdose'
+            ).update(model='accumulated_integrated_projection_radiography_dose')
+
+        # Renaming model from 'CtXRaySourceParameters' to 'Ct_xray_source_parameters'
+        db.rename_table(u'remapp_ctxraysourceparameters', u'remapp_ct_xray_source_parameters')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='ctxraysourceparameters').update(model='ct_xray_source_parameters')
+
+        # Renaming model from 'GeneralStudyModuleAttr' to 'General_study_module_attributes'
+        db.rename_table(u'remapp_generalstudymoduleattr', u'remapp_general_study_module_attributes')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='generalstudymoduleattr').update(model='general_study_module_attributes')
+
+        # Renaming model from 'DoseRelatedDistanceMeasurements' to 'Dose_related_distance_measurements'
+        db.rename_table(u'remapp_doserelateddistancemeasurements', u'remapp_dose_related_distance_measurements')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='doserelateddistancemeasurements'
+            ).update(model='dose_related_distance_measurements')
