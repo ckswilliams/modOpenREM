@@ -180,12 +180,31 @@ class Migration(SchemaMigration):
                 app_label='remapp', model='dose_related_distance_measurements'
             ).update(model='doserelateddistancemeasurements')
 
+        # Renaming model from 'Irradiation_event_xray_detector_data' to 'IrradEventXRayDetectorData'
+        db.rename_table(u'remapp_irradiation_event_xray_detector_data', u'remapp_irradeventxraydetectordata')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradiation_event_xray_detector_data'
+            ).update(model='irradeventxraydetectordata')
 
-################################################################################
-#
-#              gap for my benefit, remove!
-#
-################################################################################
+        # Renaming model from 'Ct_irradiation_event_data' to 'CtIrradiationEventData'
+        db.rename_table(u'remapp_ct_irradiation_event_data', u'remapp_ctirradiationeventdata')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='ct_irradiation_event_data').update(model='ctirradiationeventdata')
+
+        # Renaming model from 'Irradiation_event_xray_data' to 'IrradEventXRayData'
+        db.rename_table(u'remapp_irradiation_event_xray_data', u'remapp_irradeventxraydata')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradiation_event_xray_data').update(model='irradeventxraydata')
+
+        # Renaming model from 'Patient_module_attributes' to 'PatientModuleAttr'
+        db.rename_table(u'remapp_patient_module_attributes', u'remapp_patientmoduleattr')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='patient_module_attributes').update(model='patientmoduleattr')
+
 
     def backwards(self, orm):
         # Renaming model from 'CtDoseCheckDetails' to 'Ct_dose_check_details'
@@ -357,3 +376,28 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='doserelateddistancemeasurements'
             ).update(model='dose_related_distance_measurements')
+
+        # Renaming model from 'IrradEventXRayDetectorData' to 'Irradiation_event_xray_detector_data'
+        db.rename_table(u'remapp_irradeventxraydetectordata', u'remapp_irradiation_event_xray_detector_data')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradeventxraydetectordata'
+            ).update(model='irradiation_event_xray_detector_data')
+
+        # Renaming model from 'CtIrradiationEventData' to 'Ct_irradiation_event_data'
+        db.rename_table(u'remapp_ctirradiationeventdata', u'remapp_ct_irradiation_event_data')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='ctirradiationeventdata').update(model='ct_irradiation_event_data')
+
+        # Renaming model from 'IrradEventXRayData' to 'Irradiation_event_xray_data'
+        db.rename_table(u'remapp_irradeventxraydata', u'remapp_irradiation_event_xray_data')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='irradeventxraydata').update(model='irradiation_event_xray_data')
+
+        # Renaming model from 'PatientModuleAttr' to 'Patient_module_attributes'
+        db.rename_table(u'remapp_patientmoduleattr', u'remapp_patient_module_attributes')
+        if not db.dry_run:
+            orm['contenttypes.contenttype'].objects.filter(
+                app_label='remapp', model='patientmoduleattr').update(model='patient_module_attributes')
