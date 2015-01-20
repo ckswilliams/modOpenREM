@@ -1,5 +1,5 @@
-Backing up a PostgreSQL database
-================================
+Backing up and restoring a PostgreSQL database
+==============================================
 
 ..  Note::  Content contributed by DJ Platten
 
