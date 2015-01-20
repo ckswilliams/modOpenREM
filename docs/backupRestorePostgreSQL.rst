@@ -22,18 +22,18 @@ To backup the contents of ``openrempostgresql`` to a file called ``backup.sql`` 
 
     pg_dump -i -U backup -F c -b -v -f backup.sql openrempostgresql
 
-Note that the pg_dump command needs to be in your path for this to work exactly as written. The ``-U backup`` indicates that the ``backup`` user is to carry out the task. The ``-F c`` option archives in a suitable format for input into the ``pg_restore`` command. Further information on ``pg_dump`` and backing up a PostgreSQL database can be found here: http://www.postgresql.org/docs/9.3/static/app-pgdump.html and here: http://www.postgresql.org/docs/9.3/static/backup-dump.html.tells 
+Note that the ``pg_dump`` command needs to be in your path for this to work exactly as written. The ``-U backup`` indicates that the ``backup`` user is to carry out the task. The ``-F c`` option archives in a suitable format for input into the ``pg_restore`` command. Further information on ``pg_dump`` and backing up a PostgreSQL database can be found here: http://www.postgresql.org/docs/9.3/static/app-pgdump.html and here: http://www.postgresql.org/docs/9.3/static/backup-dump.html
 
 Restoring a backup
 ==================
 
 The ``pg_restore`` command can be used to restore the database using one of the backed-up SQL files that were produced using the ``pg_dump`` command.
 
-Use the ``pgAdminIII`` tool to ensure that there is a PostgreSQL user called ``openremuser`` and another called ``backup`` (password ``backup``).
+Use the ``pgAdminIII`` tool to ensure that there is a PostgreSQL user called ``openremuser``.
 
 Use ``pgAdminIII`` to create a database called ``openrempostgresql``; set the owner to ``openremuser`` and the encoding to ``UTF8``.
 
-Run the following command in a command prompt window (Windows) or terminal window (Ubuntu) to restore ``backupFile`` to the database, where ``backupFile`` is the file created by the ``pg_dump`` command:
+Run the following command in a command prompt window (Windows) or terminal window (Ubuntu) to restore the contents of ``backupFile`` to the ``openrempostgresql`` database, where ``backupFile`` is the file created by the ``pg_dump`` command:
 
 ..  code-block:: posh
 
@@ -45,6 +45,6 @@ Ensure that ``openremuser`` has an entry in PostgreSQL’s ``pg_hpa.conf`` file 
 
     local all openremuser md5
 
-You will need to restart the PostgreSQL server if ``pg_hpa.conf`` has been changed.
+The PostgreSQL server will need to be restarted if you have changed ``pg_hpa.conf``.
 
 See http://www.postgresql.org/docs/9.3/static/backup-dump.html#BACKUP-DUMP-RESTORE for further details.
