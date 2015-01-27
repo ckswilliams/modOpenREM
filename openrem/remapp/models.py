@@ -418,7 +418,7 @@ class DoseRelatedDistanceMeasurements(models.Model):  # CID 10008
     radiological_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     
 
-class AccumProjectionXRayDose(models.Model):  # TID 10004
+class AccumProjXRayDose(models.Model):  # TID 10004
     """Accumulated Fluoroscopy and Acquisition Projection X-Ray Dose TID 10004
     
     From DICOM Part 16:
