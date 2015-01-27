@@ -32,7 +32,7 @@ from django.conf.urls import patterns, include, url
 from django_filters.views import FilterView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
-from remapp.models import AccumProjectionXRayDose, GeneralStudyModuleAttr
+from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 
 
 urlpatterns = patterns('remapp.views',

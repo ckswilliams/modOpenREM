@@ -208,7 +208,7 @@ def openrem_home(request):
             studies = allstudies.filter(modality_type__contains = modality).all()
         # End of 10/10/2014 DJP code changes
 
-        stations = studies.values_list('general_equipment_module_attributes__station_name').distinct()
+        stations = studies.values_list('generalequipmentmoduleattr__station_name').distinct()
         modalitydata = {}
         for station in stations:
             latestdate = studies.filter(
