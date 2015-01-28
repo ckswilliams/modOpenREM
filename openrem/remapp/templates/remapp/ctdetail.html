@@ -31,11 +31,11 @@
     <li>Test patient indicators? {{ general_study_module_attributes.patient_module_attributes_set.get.not_patient_indicator }}</li>
     <li>
         Total number of events:
-        {{ general_study_module_attributes.ctradiationdose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}
+        {{ general_study_module_attributes.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
     </li>
     <li>
         Total DLP:
-        {{ general_study_module_attributes.ctradiationdose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}
+        {{ general_study_module_attributes.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
         mGy.cm
     </li>
 </ul>

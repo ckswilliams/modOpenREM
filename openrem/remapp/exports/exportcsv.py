@@ -251,9 +251,9 @@ def exportCT2excel(filterdict):
         ]
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('ctradiationdose__ct_accumulated_dose_data__total_number_of_irradiation_events'))
+    max_events = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
 
-    for h in xrange(max_events['ctradiationdose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']):
+    for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Type',
@@ -296,8 +296,8 @@ def exportCT2excel(filterdict):
             exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.ctradiationdose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events,
-            exams.ctradiationdose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total,
+            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events,
+            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total,
 			]
         for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
             examdata += [
