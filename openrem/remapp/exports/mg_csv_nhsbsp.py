@@ -126,14 +126,14 @@ def mg_csv_nhsbsp(filterdict):
                 viewCode = viewCode + 'OB'
             else:
                 viewCode = viewCode + str(exp.image_view)
-            target = str(exp.irradiation_event_xray_source_data_set.get().anode_target_material)
+            target = str(exp.irradeventxraysourcedata_set.get().anode_target_material)
             if "TUNGSTEN" in target.upper():
                 target = 'W'
             elif "MOLY" in target.upper():
 			    target = 'Mo'
             elif "RHOD" in target.upper():
                 target = 'Rh'
-            filterMat = str(exp.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material)
+            filterMat = str(exp.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material)
             if "ALUM" in filterMat.upper():
                 filterMat = 'Al'
             elif "MOLY" in filterMat.upper():
@@ -142,7 +142,7 @@ def mg_csv_nhsbsp(filterdict):
                 filterMat = 'Rh'
             elif "SILV" in filterMat.upper():
                 filterMat = 'Ag'
-            automan = str(exp.irradiation_event_xray_source_data_set.get().exposure_control_mode)
+            automan = str(exp.irradeventxraysourcedata_set.get().exposure_control_mode)
             if "AUTO" in automan.upper():
                 automan = 'AUTO'
             elif "MAN" in automan.upper():
@@ -152,14 +152,14 @@ def mg_csv_nhsbsp(filterdict):
                 '1',
                 i+1,
                 viewCode,
-                exp.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
+                exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
                 filterMat,
                 exp.irradiation_event_xray_mechanical_data_set.get().compression_thickness,
-                exp.irradiation_event_xray_source_data_set.get().exposure_set.get().exposure / 1000,
+                exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
                 '', # not applicable to FFDM
                 automan,				
-                exp.irradiation_event_xray_source_data_set.get().exposure_control_mode,
+                exp.irradeventxraysourcedata_set.get().exposure_control_mode,
                 '', # no consistent behaviour for recording density setting on FFDM units
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
                 '', # not in DICOM headers

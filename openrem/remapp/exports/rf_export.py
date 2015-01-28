@@ -155,10 +155,10 @@ def rfcsv(filterdict):
             examdata += [
                 s.acquisition_protocol,
                 s.image_view,
-                s.irradiation_event_xray_source_data_set.get().exposure_control_mode,
-                s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
-                s.irradiation_event_xray_source_data_set.get().average_xray_tube_current,
-                s.irradiation_event_xray_source_data_set.get().exposure_time,
+                s.irradeventxraysourcedata_set.get().exposure_control_mode,
+                s.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
+                s.irradeventxraysourcedata_set.get().average_xray_tube_current,
+                s.irradeventxraysourcedata_set.get().exposure_time,
                 s.irradiation_event_xray_detector_data_set.get().exposure_index,
                 s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure,
                 s.dose_area_product,
@@ -370,11 +370,11 @@ def rfxlsx(filterdict):
             anglei = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
             angleii = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
             protocol = _get_db_value(inst[0], "acquisition_protocol")
-            pulse_rate = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "pulse_rate")
+            pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
-            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
-            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
-            fieldsize = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_source_data_set").get(), "ii_field_size")
+            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
+            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
+            fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
 
             similarexposures = inst
             if anglei:
@@ -388,16 +388,16 @@ def rfxlsx(filterdict):
                     acquisition_protocol__exact = protocol)
             if fieldsize:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_source_data__ii_field_size__exact = fieldsize)
+                    irradeventxraysourcedata__ii_field_size__exact = fieldsize)
             if pulse_rate:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_source_data__pulse_rate__exact = pulse_rate)
+                    irradeventxraysourcedata__pulse_rate__exact = pulse_rate)
             if filter_material:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_source_data__xray_filters__xray_filter_material__code_meaning__exact = filter_material)
+                    irradeventxraysourcedata__xray_filters__xray_filter_material__code_meaning__exact = filter_material)
             if filter_thick:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_source_data__xray_filters__xray_filter_thickness_maximum__exact = filter_thick)
+                    irradeventxraysourcedata__xray_filters__xray_filter_thickness_maximum__exact = filter_thick)
             if event_type:
                 similarexposures = similarexposures.filter(
                     irradiation_event_type__code_meaning__exact = event_type)
@@ -419,25 +419,25 @@ def rfxlsx(filterdict):
                 Max('dose_area_product'),
                 Avg('dose_area_product'))
             dose_rp = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_source_data__dose_rp'),
-                Max('irradiation_event_xray_source_data__dose_rp'),
-                Avg('irradiation_event_xray_source_data__dose_rp'))
+                Min('irradeventxraysourcedata__dose_rp'),
+                Max('irradeventxraysourcedata__dose_rp'),
+                Avg('irradeventxraysourcedata__dose_rp'))
             kvp = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_source_data__kvp__kvp'),
-                Max('irradiation_event_xray_source_data__kvp__kvp'),
-                Avg('irradiation_event_xray_source_data__kvp__kvp'))
+                Min('irradeventxraysourcedata__kvp__kvp'),
+                Max('irradeventxraysourcedata__kvp__kvp'),
+                Avg('irradeventxraysourcedata__kvp__kvp'))
             tube_current = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
-                Max('irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'),
-                Avg('irradiation_event_xray_source_data__xray_tube_current__xray_tube_current'))
+                Min('irradeventxraysourcedata__xray_tube_current__xray_tube_current'),
+                Max('irradeventxraysourcedata__xray_tube_current__xray_tube_current'),
+                Avg('irradeventxraysourcedata__xray_tube_current__xray_tube_current'))
             exp_time = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_source_data__exposure_time'),
-                Max('irradiation_event_xray_source_data__exposure_time'),
-                Avg('irradiation_event_xray_source_data__exposure_time'))
+                Min('irradeventxraysourcedata__exposure_time'),
+                Max('irradeventxraysourcedata__exposure_time'),
+                Avg('irradeventxraysourcedata__exposure_time'))
             pulse_width = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_source_data__pulsewidth__pulse_width'),
-                Max('irradiation_event_xray_source_data__pulsewidth__pulse_width'),
-                Avg('irradiation_event_xray_source_data__pulsewidth__pulse_width'))
+                Min('irradeventxraysourcedata__pulsewidth__pulse_width'),
+                Max('irradeventxraysourcedata__pulsewidth__pulse_width'),
+                Avg('irradeventxraysourcedata__pulsewidth__pulse_width'))
 
             examdata += [
                 event_type,
@@ -447,24 +447,24 @@ def rfxlsx(filterdict):
                 str(fieldsize),
                 filter_material,
                 str(filter_thick),
-                str(kvp['irradiation_event_xray_source_data__kvp__kvp__min']),
-                str(kvp['irradiation_event_xray_source_data__kvp__kvp__max']),
-                str(kvp['irradiation_event_xray_source_data__kvp__kvp__avg']),
-                str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__min']),
-                str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__max']),
-                str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__avg']),
-                str(pulse_width['irradiation_event_xray_source_data__pulsewidth__pulse_width__min']),
-                str(pulse_width['irradiation_event_xray_source_data__pulsewidth__pulse_width__max']),
-                str(pulse_width['irradiation_event_xray_source_data__pulsewidth__pulse_width__avg']),
-                str(exp_time['irradiation_event_xray_source_data__exposure_time__min']),
-                str(exp_time['irradiation_event_xray_source_data__exposure_time__max']),
-                str(exp_time['irradiation_event_xray_source_data__exposure_time__avg']),
+                str(kvp['irradeventxraysourcedata__kvp__kvp__min']),
+                str(kvp['irradeventxraysourcedata__kvp__kvp__max']),
+                str(kvp['irradeventxraysourcedata__kvp__kvp__avg']),
+                str(tube_current['irradeventxraysourcedata__xray_tube_current__xray_tube_current__min']),
+                str(tube_current['irradeventxraysourcedata__xray_tube_current__xray_tube_current__max']),
+                str(tube_current['irradeventxraysourcedata__xray_tube_current__xray_tube_current__avg']),
+                str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__min']),
+                str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__max']),
+                str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__avg']),
+                str(exp_time['irradeventxraysourcedata__exposure_time__min']),
+                str(exp_time['irradeventxraysourcedata__exposure_time__max']),
+                str(exp_time['irradeventxraysourcedata__exposure_time__avg']),
                 str(dap['dose_area_product__min']),
                 str(dap['dose_area_product__max']),
                 str(dap['dose_area_product__avg']),
-                str(dose_rp['irradiation_event_xray_source_data__dose_rp__min']),
-                str(dose_rp['irradiation_event_xray_source_data__dose_rp__max']),
-                str(dose_rp['irradiation_event_xray_source_data__dose_rp__avg']),
+                str(dose_rp['irradeventxraysourcedata__dose_rp__min']),
+                str(dose_rp['irradeventxraysourcedata__dose_rp__max']),
+                str(dose_rp['irradeventxraysourcedata__dose_rp__avg']),
                 str(angle1['irradiation_event_xray_mechanical_data__positioner_primary_angle__min']),
                 str(angle1['irradiation_event_xray_mechanical_data__positioner_primary_angle__max']),
                 str(angle1['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
@@ -575,23 +575,23 @@ def rfxlsx(filterdict):
             for event in p_events:
                 sheetlist[tab]['count'] += 1
                 examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
-                if event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material:
-                    filter_material = event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_material.code_meaning
+                if event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material:
+                    filter_material = event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material.code_meaning
                 else: filter_material = None
                 examdata += [
                     str(event.date_time_started),
                     event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
-                    str(event.irradiation_event_xray_source_data_set.get().pulse_rate),
-                    str(event.irradiation_event_xray_source_data_set.get().ii_field_size),
+                    str(event.irradeventxraysourcedata_set.get().pulse_rate),
+                    str(event.irradeventxraysourcedata_set.get().ii_field_size),
                     filter_material,
-                    str(event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
-                    str(event.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
-                    str(event.irradiation_event_xray_source_data_set.get().xray_tube_current_set.get().xray_tube_current),
-                    str(event.irradiation_event_xray_source_data_set.get().pulsewidth_set.get().pulse_width),
-                    str(event.irradiation_event_xray_source_data_set.get().exposure_time),
+                    str(event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
+                    str(event.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
+                    str(event.irradeventxraysourcedata_set.get().xray_tube_current_set.get().xray_tube_current),
+                    str(event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width),
+                    str(event.irradeventxraysourcedata_set.get().exposure_time),
                     str(event.convert_gym2_to_cgycm2()),
-                    str(event.irradiation_event_xray_source_data_set.get().dose_rp),
+                    str(event.irradeventxraysourcedata_set.get().dose_rp),
                     str(event.irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle),
                     str(event.irradiation_event_xray_mechanical_data_set.get().positioner_secondary_angle),
                 ]

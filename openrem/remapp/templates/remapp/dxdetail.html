@@ -56,12 +56,12 @@
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
         <td>{{ event.image_view }}</td>
-        <td>{{ event.irradiation_event_xray_source_data_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
-        <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
-        <td>{{ event.irradiation_event_xray_source_data_set.get.average_xray_tube_current|floatformat:0 }}</td>
-        <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_time|floatformat:0 }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.average_xray_tube_current|floatformat:0 }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:0 }}</td>
         <td>
-            {% for xrayfilt in event.irradiation_event_xray_source_data_set.get.xray_filters_set.all %}
+            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xray_filters_set.all %}
                 {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
                     Al: {{ xrayfilt.xray_filter_thickness_minimum }} - {{ xrayfilt.xray_filter_thickness_maximum }} <br>
                 {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
@@ -73,7 +73,7 @@
         </td>
         <td>{{ event.irradiation_event_xray_mechanical_data_set.get.dose_related_distance_measurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
         <td>
-            {{ event.irradiation_event_xray_source_data_set.get.grid_focal_distance|floatformat:0 }}
+            {{ event.irradeventxraysourcedata_set.get.grid_focal_distance|floatformat:0 }}
         </td>
         <td>
             EI: {{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:1 }} <br>
@@ -85,7 +85,7 @@
             {{ event.irradiation_event_xray_detector_data_set.get.relative_exposure_unit }}
         </td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-        <td>{{ event.irradiation_event_xray_source_data_set.get.exposure_control_mode }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.exposure_control_mode }}</td>
     </tr>
     {% endfor %}
 </table>
