@@ -71,7 +71,7 @@
                 {% endif %}
             {% endfor %}
         </td>
-        <td>{{ event.irradeventxraymechanicaldata_set.get.dose_related_distance_measurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
+        <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
         <td>
             {{ event.irradeventxraysourcedata_set.get.grid_focal_distance|floatformat:0 }}
         </td>

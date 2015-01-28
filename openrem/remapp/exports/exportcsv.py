@@ -475,7 +475,7 @@ def exportMG2excel(filterdict):
                 exp.image_view,
                 exp.acquisition_protocol,
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
-                exp.irradeventxraymechanicaldata_set.get().dose_related_distance_measurements_set.get().radiological_thickness,
+                exp.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().radiological_thickness,
                 exp.irradeventxraymechanicaldata_set.get().compression_force,
                 exp.irradeventxraymechanicaldata_set.get().magnification_factor,
                 exp.irradeventxraysourcedata_set.get().collimated_field_area,
