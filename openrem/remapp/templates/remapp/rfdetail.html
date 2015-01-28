@@ -18,8 +18,8 @@
     <li>Requested procedure: {{ general_study_module_attributes.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
     <li>Patient weight: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>Total DAP: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumulated_xray_dose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm2</li>
-    <li>Total dose at RP: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumulated_xray_dose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
+    <li>Total DAP: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm2</li>
+    <li>Total dose at RP: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
     <li>Hospital: {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
         Scanner: 
