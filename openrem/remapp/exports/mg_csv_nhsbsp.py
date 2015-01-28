@@ -155,7 +155,7 @@ def mg_csv_nhsbsp(filterdict):
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
                 filterMat,
-                exp.irradiation_event_xray_mechanical_data_set.get().compression_thickness,
+                exp.irradeventxraymechanicaldata_set.get().compression_thickness,
                 exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
                 '', # not applicable to FFDM
                 automan,				

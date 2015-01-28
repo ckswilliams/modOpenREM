@@ -367,8 +367,8 @@ def rfxlsx(filterdict):
         num_groups_this_exam = 0
         while inst:
             num_groups_this_exam += 1
-            anglei = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_primary_angle")
-            angleii = _get_db_value(_get_db_value(inst[0], "irradiation_event_xray_mechanical_data_set").get(), "positioner_secondary_angle")
+            anglei = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_primary_angle")
+            angleii = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_secondary_angle")
             protocol = _get_db_value(inst[0], "acquisition_protocol")
             pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
@@ -379,10 +379,10 @@ def rfxlsx(filterdict):
             similarexposures = inst
             if anglei:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_mechanical_data__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
+                    irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
             if angleii:
                 similarexposures = similarexposures.filter(
-                    irradiation_event_xray_mechanical_data__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
+                    irradeventxraymechanicaldata__positioner_secondary_angle__range=(float(angleii) - angle_range, float(angleii) + angle_range))
             if protocol:
                 similarexposures = similarexposures.filter(
                     acquisition_protocol__exact = protocol)
@@ -407,13 +407,13 @@ def rfxlsx(filterdict):
             inst = inst.exclude(irradiation_event_uid__in = exposures_to_exclude)
 
             angle1 = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
-                Max('irradiation_event_xray_mechanical_data__positioner_primary_angle'),
-                Avg('irradiation_event_xray_mechanical_data__positioner_primary_angle'))
+                Min('irradeventxraymechanicaldata__positioner_primary_angle'),
+                Max('irradeventxraymechanicaldata__positioner_primary_angle'),
+                Avg('irradeventxraymechanicaldata__positioner_primary_angle'))
             angle2 = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_mechanical_data__positioner_secondary_angle'),
-                Max('irradiation_event_xray_mechanical_data__positioner_secondary_angle'),
-                Avg('irradiation_event_xray_mechanical_data__positioner_secondary_angle'))
+                Min('irradeventxraymechanicaldata__positioner_secondary_angle'),
+                Max('irradeventxraymechanicaldata__positioner_secondary_angle'),
+                Avg('irradeventxraymechanicaldata__positioner_secondary_angle'))
             dap = similarexposures.all().aggregate(
                 Min('dose_area_product'),
                 Max('dose_area_product'),
@@ -465,12 +465,12 @@ def rfxlsx(filterdict):
                 str(dose_rp['irradeventxraysourcedata__dose_rp__min']),
                 str(dose_rp['irradeventxraysourcedata__dose_rp__max']),
                 str(dose_rp['irradeventxraysourcedata__dose_rp__avg']),
-                str(angle1['irradiation_event_xray_mechanical_data__positioner_primary_angle__min']),
-                str(angle1['irradiation_event_xray_mechanical_data__positioner_primary_angle__max']),
-                str(angle1['irradiation_event_xray_mechanical_data__positioner_primary_angle__avg']),
-                str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__min']),
-                str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__max']),
-                str(angle2['irradiation_event_xray_mechanical_data__positioner_secondary_angle__avg']),
+                str(angle1['irradeventxraymechanicaldata__positioner_primary_angle__min']),
+                str(angle1['irradeventxraymechanicaldata__positioner_primary_angle__max']),
+                str(angle1['irradeventxraymechanicaldata__positioner_primary_angle__avg']),
+                str(angle2['irradeventxraymechanicaldata__positioner_secondary_angle__min']),
+                str(angle2['irradeventxraymechanicaldata__positioner_secondary_angle__max']),
+                str(angle2['irradeventxraymechanicaldata__positioner_secondary_angle__avg']),
             ]
 
         if num_groups_this_exam > num_groups_max:
@@ -592,8 +592,8 @@ def rfxlsx(filterdict):
                     str(event.irradeventxraysourcedata_set.get().exposure_time),
                     str(event.convert_gym2_to_cgycm2()),
                     str(event.irradeventxraysourcedata_set.get().dose_rp),
-                    str(event.irradiation_event_xray_mechanical_data_set.get().positioner_primary_angle),
-                    str(event.irradiation_event_xray_mechanical_data_set.get().positioner_secondary_angle),
+                    str(event.irradeventxraymechanicaldata_set.get().positioner_primary_angle),
+                    str(event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle),
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
         tabcolumns = (37)
