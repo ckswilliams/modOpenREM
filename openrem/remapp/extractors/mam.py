@@ -134,7 +134,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _accumulatedmammo_update(dataset,event): # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accumulated_mammography_xray_dose_set.get()
+    accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
     if event.irradeventxraysourcedata_set.get().average_glandular_dose:
         accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
     if event.laterality:

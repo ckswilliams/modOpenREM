@@ -89,8 +89,8 @@ $('.datepicker').datepicker({
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradiation_event_xray_data_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumulated_mammography_xray_dose_set.get.laterality }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumulated_mammography_xray_dose_set.get.accumulated_average_glandular_dose }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.laterality }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.accumulated_average_glandular_dose }}</td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>
