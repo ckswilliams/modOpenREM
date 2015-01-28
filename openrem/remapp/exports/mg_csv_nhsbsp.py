@@ -161,7 +161,7 @@ def mg_csv_nhsbsp(filterdict):
                 automan,				
                 exp.irradiation_event_xray_source_data_set.get().exposure_control_mode,
                 '', # no consistent behaviour for recording density setting on FFDM units
-                exp.projection_xray_radiation_dose.general_study_module_attributes.patient_study_module_attributes_set.get().patient_age_decimal,
+                exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
                 '', # not in DICOM headers
                 '', # no consistent behaviour for recording density mode on FFDM units
                 ])

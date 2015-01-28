@@ -96,8 +96,8 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/ct/{{ exam.id }}/">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }} |
-                {{ exam.patient_study_module_attributes_set.get.patient_size|floatformat:0 }} cm |
-                {{ exam.patient_study_module_attributes_set.get.patient_weight|floatformat:0 }} kg
+                {{ exam.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm |
+                {{ exam.patientstudymoduleattr_set.get.patient_weight|floatformat:0 }} kg
             </td>
             <td>{{ exam.ctradiationdose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
             <td>{{ exam.ctradiationdose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>

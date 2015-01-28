@@ -34,7 +34,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
     if 'imp_log' in kwargs:
         imp_log = kwargs['imp_log']
 
-    patientatt = exam.patient_study_module_attributes_set.get()
+    patientatt = exam.patientstudymoduleattr_set.get()
     if height:
         if not patientatt.patient_size:
             patientatt.patient_size = height

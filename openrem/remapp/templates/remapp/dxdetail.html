@@ -17,8 +17,8 @@
     <li>Study time: {{ general_study_module_attributes.study_time }}</li>
     <li>Study description: {{ general_study_module_attributes.study_description }}</li>
     <li>Requested procedure: {{ general_study_module_attributes.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ general_study_module_attributes.patient_study_module_attributes_set.get.patient_age_decimal|floatformat:1 }}</li>
-    <li>Patient height and weight: {{ general_study_module_attributes.patient_study_module_attributes_set.get.patient_size|floatformat:0 }} cm, {{ general_study_module_attributes.patient_study_module_attributes_set.get.patient_weight|floatformat:1 }} kg</li>
+    <li>Patient age: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
+    <li>Patient height and weight: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm, {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
     <li>Hospital: {{ general_study_module_attributes.general_equipment_module_attributes_set.get.institution_name }}</li>
     <li>
         X-ray system:
