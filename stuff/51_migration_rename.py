@@ -22,11 +22,11 @@ class Migration(SchemaMigration):
             orm['contenttypes.contenttype'].objects.filter(
                 app_label='remapp', model='ct_radiation_dose').update(model='ctradiationdose')
 
-        # Renaming model from 'Accumulated_projection_xray_dose' to 'AccumXRayDose'
-        db.rename_table(u'remapp_accumulated_projection_xray_dose', u'remapp_accumxraydose')
+        # Renaming model from 'Accumulated_projection_xray_dose' to 'AccumProjXRayDose'
+        db.rename_table(u'remapp_accumulated_projection_xray_dose', u'remapp_accumprojxraydose')
         if not db.dry_run:
             orm['contenttypes.contenttype'].objects.filter(
-                app_label='remapp', model='accumulated_projection_xray_dose').update(model='accumxraydose')
+                app_label='remapp', model='accumulated_projection_xray_dose').update(model='accumprojxraydose')
 
         # Renaming model from 'Patient_study_module_attributes' to 'PatientStudyModuleAttr'
         db.rename_table(u'remapp_patient_study_module_attributes', u'remapp_patientstudymoduleattr')
