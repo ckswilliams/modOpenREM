@@ -63,7 +63,7 @@
                     <td rowspan="2">{{ event.ct_acquisition_type }}</td>
                     <td rowspan="2">{{ event.mean_ctdivol|floatformat:2 }}</td>
                     <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>        
-                    <td rowspan="2">{{ event.scanning_length_set.get.scanning_length|floatformat:0 }}</td>
+                    <td rowspan="2">{{ event.scanninglength_set.get.scanning_length|floatformat:0 }}</td>
                     {% if event.number_of_xray_sources < 2 %}
                         <td rowspan="2">{{ source.kvp|floatformat:0 }}</td>
                         <td rowspan="2">{{ source.xray_tube_current|floatformat:0 }}</td>

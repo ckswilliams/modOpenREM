@@ -304,7 +304,7 @@ def exportCT2excel(filterdict):
                 s.acquisition_protocol,
                 s.ct_acquisition_type,
                 s.exposure_time,
-                s.scanning_length_set.get().scanning_length,
+                s.scanninglength_set.get().scanning_length,
                 s.nominal_single_collimation_width,
                 s.nominal_total_collimation_width,
                 s.pitch_factor,
