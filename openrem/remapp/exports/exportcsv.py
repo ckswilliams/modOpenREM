@@ -313,7 +313,7 @@ def exportCT2excel(filterdict):
                 s.dlp,
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.ctxraysourceparameters_set.all():
                     examdata += [
                         source.identification_of_the_xray_source,
                         source.kvp,
@@ -324,11 +324,11 @@ def exportCT2excel(filterdict):
             else:
                 try:
                     examdata += [
-                        s.ct_xray_source_parameters_set.get().identification_of_the_xray_source,
-                        s.ct_xray_source_parameters_set.get().kvp,
-                        s.ct_xray_source_parameters_set.get().maximum_xray_tube_current,
-                        s.ct_xray_source_parameters_set.get().xray_tube_current,
-                        s.ct_xray_source_parameters_set.get().exposure_time_per_rotation,
+                        s.ctxraysourceparameters_set.get().identification_of_the_xray_source,
+                        s.ctxraysourceparameters_set.get().kvp,
+                        s.ctxraysourceparameters_set.get().maximum_xray_tube_current,
+                        s.ctxraysourceparameters_set.get().xray_tube_current,
+                        s.ctxraysourceparameters_set.get().exposure_time_per_rotation,
                         'n/a',
                         'n/a',
                         'n/a',

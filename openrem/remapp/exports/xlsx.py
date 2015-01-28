@@ -255,7 +255,7 @@ def ctxlsx(filterdict):
                 str(s.dlp),
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.ctxraysourceparameters_set.all():
                     examdata += [
                         str(source.identification_of_the_xray_source),
                         str(source.kvp),
@@ -266,11 +266,11 @@ def ctxlsx(filterdict):
             else:
                 try:
                     examdata += [
-                        str(s.ct_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.ct_xray_source_parameters_set.get().kvp),
-                        str(s.ct_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().exposure_time_per_rotation),
+                        str(s.ctxraysourceparameters_set.get().identification_of_the_xray_source),
+                        str(s.ctxraysourceparameters_set.get().kvp),
+                        str(s.ctxraysourceparameters_set.get().maximum_xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().exposure_time_per_rotation),
                         'n/a',
                         'n/a',
                         'n/a',
@@ -328,7 +328,7 @@ def ctxlsx(filterdict):
                 str(s.dlp),
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.ctxraysourceparameters_set.all():
                     examdata += [
                         str(source.identification_of_the_xray_source),
                         str(source.kvp),
@@ -339,11 +339,11 @@ def ctxlsx(filterdict):
             else:
                 try:
                     examdata += [
-                        str(s.ct_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.ct_xray_source_parameters_set.get().kvp),
-                        str(s.ct_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().exposure_time_per_rotation),
+                        str(s.ctxraysourceparameters_set.get().identification_of_the_xray_source),
+                        str(s.ctxraysourceparameters_set.get().kvp),
+                        str(s.ctxraysourceparameters_set.get().maximum_xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().exposure_time_per_rotation),
                         'n/a',
                         'n/a',
                         'n/a',
