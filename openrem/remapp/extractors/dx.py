@@ -361,7 +361,7 @@ def _accumulatedxraydose(dataset,proj):
 def _accumulatedxraydose_update(dataset,event):
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     from decimal import Decimal
-    accumdx = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get()
+    accumdx = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumprojxraydose_set.get()
     accumdx.total_number_of_radiographic_frames = accumdx.total_number_of_radiographic_frames + 1
     if event.dose_area_product:
         accumdx.dose_area_product_total += Decimal(event.dose_area_product)
