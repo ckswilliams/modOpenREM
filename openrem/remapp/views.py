@@ -212,25 +212,25 @@ def openrem_home(request):
         modalitydata = {}
         for station in stations:
             latestdate = studies.filter(
-                general_equipment_module_attributes__station_name__exact = station[0]
+                generalequipmentmoduleattr__station_name__exact = station[0]
                 ).latest('study_date').study_date
-            latestuid = studies.filter(general_equipment_module_attributes__station_name__exact = station[0]
+            latestuid = studies.filter(generalequipmentmoduleattr__station_name__exact = station[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
             inst_name = studies.filter(
-                general_equipment_module_attributes__station_name__exact = station[0]
-                ).latest('study_date').general_equipment_module_attributes_set.get().institution_name
+                generalequipmentmoduleattr__station_name__exact = station[0]
+                ).latest('study_date').generalequipmentmoduleattr_set.get().institution_name
                 
             model_name = studies.filter(
-                general_equipment_module_attributes__station_name__exact = station[0]
-                ).latest('study_date').general_equipment_module_attributes_set.get().manufacturer_model_name
+                generalequipmentmoduleattr__station_name__exact = station[0]
+                ).latest('study_date').generalequipmentmoduleattr_set.get().manufacturer_model_name
             
             institution = '{0}, {1}'.format(inst_name,model_name)
                        
             modalitydata[station[0]] = {
                 'total' : studies.filter(
-                    general_equipment_module_attributes__station_name__exact = station[0]
+                    generalequipmentmoduleattr__station_name__exact = station[0]
                     ).count(),
                 'latest' : latestdatetime,
                 'institution' : institution

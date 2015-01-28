@@ -137,10 +137,10 @@ def exportDX2excel(filterdict):
 
     for i, exams in enumerate(e):
         examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().institution_name,
+            exams.generalequipmentmoduleattr_set.get().manufacturer,
+            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+            exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -359,10 +359,10 @@ def dxxlsx(filterdict):
         tsk.save()
 
         examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().institution_name,
+            exams.generalequipmentmoduleattr_set.get().manufacturer,
+            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+            exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
@@ -404,10 +404,10 @@ def dxxlsx(filterdict):
             sheetlist[tabtext]['count'] += 1
             
             examdata = [
-                exams.general_equipment_module_attributes_set.get().institution_name,
-                exams.general_equipment_module_attributes_set.get().manufacturer,
-                exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-                exams.general_equipment_module_attributes_set.get().station_name,
+                exams.generalequipmentmoduleattr_set.get().institution_name,
+                exams.generalequipmentmoduleattr_set.get().manufacturer,
+                exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+                exams.generalequipmentmoduleattr_set.get().station_name,
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting

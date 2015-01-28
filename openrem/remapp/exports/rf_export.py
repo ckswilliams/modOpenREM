@@ -135,10 +135,10 @@ def rfcsv(filterdict):
 
     for i, exams in enumerate(e):
         examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().institution_name,
+            exams.generalequipmentmoduleattr_set.get().manufacturer,
+            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+            exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -230,10 +230,10 @@ def _get_db_value(qs, location):
 
 def _rf_common_get_data(source):
     examdata = [
-        source.general_equipment_module_attributes_set.get().institution_name,
-        source.general_equipment_module_attributes_set.get().manufacturer,
-        source.general_equipment_module_attributes_set.get().manufacturer_model_name,
-        source.general_equipment_module_attributes_set.get().station_name,
+        source.generalequipmentmoduleattr_set.get().institution_name,
+        source.generalequipmentmoduleattr_set.get().manufacturer,
+        source.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+        source.generalequipmentmoduleattr_set.get().station_name,
         source.accession_number,
         source.operator_name,
         source.performing_physician_name,
@@ -435,9 +435,9 @@ def rfxlsx(filterdict):
                 Max('irradiation_event_xray_source_data__exposure_time'),
                 Avg('irradiation_event_xray_source_data__exposure_time'))
             pulse_width = similarexposures.all().aggregate(
-                Min('irradiation_event_xray_source_data__pulse_width__pulse_width'),
-                Max('irradiation_event_xray_source_data__pulse_width__pulse_width'),
-                Avg('irradiation_event_xray_source_data__pulse_width__pulse_width'))
+                Min('irradiation_event_xray_source_data__pulsewidth__pulse_width'),
+                Max('irradiation_event_xray_source_data__pulsewidth__pulse_width'),
+                Avg('irradiation_event_xray_source_data__pulsewidth__pulse_width'))
 
             examdata += [
                 event_type,
@@ -453,9 +453,9 @@ def rfxlsx(filterdict):
                 str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__min']),
                 str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__max']),
                 str(tube_current['irradiation_event_xray_source_data__xray_tube_current__xray_tube_current__avg']),
-                str(pulse_width['irradiation_event_xray_source_data__pulse_width__pulse_width__min']),
-                str(pulse_width['irradiation_event_xray_source_data__pulse_width__pulse_width__max']),
-                str(pulse_width['irradiation_event_xray_source_data__pulse_width__pulse_width__avg']),
+                str(pulse_width['irradiation_event_xray_source_data__pulsewidth__pulse_width__min']),
+                str(pulse_width['irradiation_event_xray_source_data__pulsewidth__pulse_width__max']),
+                str(pulse_width['irradiation_event_xray_source_data__pulsewidth__pulse_width__avg']),
                 str(exp_time['irradiation_event_xray_source_data__exposure_time__min']),
                 str(exp_time['irradiation_event_xray_source_data__exposure_time__max']),
                 str(exp_time['irradiation_event_xray_source_data__exposure_time__avg']),
@@ -588,7 +588,7 @@ def rfxlsx(filterdict):
                     str(event.irradiation_event_xray_source_data_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
                     str(event.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
                     str(event.irradiation_event_xray_source_data_set.get().xray_tube_current_set.get().xray_tube_current),
-                    str(event.irradiation_event_xray_source_data_set.get().pulse_width_set.get().pulse_width),
+                    str(event.irradiation_event_xray_source_data_set.get().pulsewidth_set.get().pulse_width),
                     str(event.irradiation_event_xray_source_data_set.get().exposure_time),
                     str(event.convert_gym2_to_cgycm2()),
                     str(event.irradiation_event_xray_source_data_set.get().dose_rp),

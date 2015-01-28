@@ -119,9 +119,9 @@ def exportFL2excel(filterdict):
         'Operator'])
     for i, exams in enumerate(e):
         writer.writerow([
-            exams.general_equipment_module_attributes_set.get().manufacturer, 
+            exams.generalequipmentmoduleattr_set.get().manufacturer,
             exams.projection_xray_radiation_dose_set.get().observer_context_set.get().device_observer_name,
-            exams.general_equipment_module_attributes_set.get().institution_name,
+            exams.generalequipmentmoduleattr_set.get().institution_name,
             exams.study_date,
             exams.accession_number, 
             exams.patientstudymoduleattr_set.get().patient_age_decimal,
@@ -284,10 +284,10 @@ def exportCT2excel(filterdict):
 
     for i, exams in enumerate(e):
         examdata = [
-			exams.general_equipment_module_attributes_set.get().institution_name,
-			exams.general_equipment_module_attributes_set.get().manufacturer,
-			exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-			exams.general_equipment_module_attributes_set.get().station_name,
+			exams.generalequipmentmoduleattr_set.get().institution_name,
+			exams.generalequipmentmoduleattr_set.get().manufacturer,
+			exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+			exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -462,9 +462,9 @@ def exportMG2excel(filterdict):
         e = study.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()
         for exp in e:
             writer.writerow([
-                exp.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.get().institution_name,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.get().manufacturer, 
-                exp.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.get().station_name,
+                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().institution_name,
+                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().manufacturer,
+                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number, 
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,

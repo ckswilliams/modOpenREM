@@ -19,12 +19,12 @@
     <li>Requested procedure: {{ general_study_module_attributes.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
     <li>Patient height and weight: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm, {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>Hospital: {{ general_study_module_attributes.general_equipment_module_attributes_set.get.institution_name }}</li>
+    <li>Hospital: {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
         X-ray system:
-        {{ general_study_module_attributes.general_equipment_module_attributes_set.get.manufacturer }} |
-        {{ general_study_module_attributes.general_equipment_module_attributes_set.get.manufacturer_model_name }} |
-        {{ general_study_module_attributes.general_equipment_module_attributes_set.get.station_name }}        
+        {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.manufacturer }} |
+        {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+        {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.station_name }}
     </li>
     <li>Study UID: {{ general_study_module_attributes.study_instance_uid }}</li>
     <li>Test patient indicators? {{ general_study_module_attributes.patient_module_attributes_set.get.not_patient_indicator }}</li>

@@ -47,10 +47,10 @@ class RFSummaryListFilter(django_filters.FilterSet):
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='general_equipment_module_attributes__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='general_equipment_module_attributes__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
@@ -71,10 +71,10 @@ class RFSummaryListFilter(django_filters.FilterSet):
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
-            ('general_equipment_module_attributes__institution_name', 'Hospital'),
-            ('general_equipment_module_attributes__manufacturer', 'Make'),
-            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
-            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('generalequipmentmoduleattr__institution_name', 'Hospital'),
+            ('generalequipmentmoduleattr__manufacturer', 'Make'),
+            ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
+            ('generalequipmentmoduleattr__station_name', 'Station name'),
             ('study_description', 'Study description'),
             ('-projection_xray_radiation_dose__accumulated_xray_dose__accumprojxraydose__dose_area_product_total','Total DAP'),
             ('-projection_xray_radiation_dose__accumulated_xray_dose__accumprojxraydose__dose_rp_total','Total RP Dose'),
@@ -96,10 +96,10 @@ class CTSummaryListFilter(django_filters.FilterSet):
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='general_equipment_module_attributes__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='general_equipment_module_attributes__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
         model = GeneralStudyModuleAttr
@@ -118,10 +118,10 @@ class CTSummaryListFilter(django_filters.FilterSet):
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
-            ('general_equipment_module_attributes__institution_name', 'Hospital'),
-            ('general_equipment_module_attributes__manufacturer', 'Make'),
-            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
-            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('generalequipmentmoduleattr__institution_name', 'Hospital'),
+            ('generalequipmentmoduleattr__manufacturer', 'Make'),
+            ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
+            ('generalequipmentmoduleattr__station_name', 'Station name'),
             ('study_description', 'Study description'),
             ('-ctradiationdose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
             )
@@ -142,10 +142,10 @@ class MGSummaryListFilter(django_filters.FilterSet):
     procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label='Procedure')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='general_equipment_module_attributes__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='general_equipment_module_attributes__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
         model = GeneralStudyModuleAttr
@@ -164,10 +164,10 @@ class MGSummaryListFilter(django_filters.FilterSet):
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
-            ('general_equipment_module_attributes__institution_name', 'Hospital'),
-            ('general_equipment_module_attributes__manufacturer', 'Make'),
-            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
-            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('generalequipmentmoduleattr__institution_name', 'Hospital'),
+            ('generalequipmentmoduleattr__manufacturer', 'Make'),
+            ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
+            ('generalequipmentmoduleattr__station_name', 'Station name'),
             ('procedure_code_meaning', 'Procedure'),
             )
     def get_order_by(self, order_value):
@@ -186,10 +186,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
-    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='general_equipment_module_attributes__institution_name')
-    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='general_equipment_module_attributes__manufacturer')
-    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='general_equipment_module_attributes__manufacturer_model_name')
-    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='general_equipment_module_attributes__station_name')
+    institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
+    manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='generalequipmentmoduleattr__manufacturer')
+    model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
+    station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     class Meta:
         model = GeneralStudyModuleAttr
@@ -208,10 +208,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
-            ('general_equipment_module_attributes__institution_name', 'Hospital'),
-            ('general_equipment_module_attributes__manufacturer', 'Make'),
-            ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
-            ('general_equipment_module_attributes__station_name', 'Station name'),
+            ('generalequipmentmoduleattr__institution_name', 'Hospital'),
+            ('generalequipmentmoduleattr__manufacturer', 'Make'),
+            ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
+            ('generalequipmentmoduleattr__station_name', 'Station name'),
             ('study_description', 'Study description'),
             ('-projection_xray_radiation_dose__accumulated_xray_dose__accumprojxraydose__dose_area_product_total','Total DAP'),
             )
