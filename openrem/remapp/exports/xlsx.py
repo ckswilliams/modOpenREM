@@ -148,7 +148,7 @@ def ctxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -241,7 +241,7 @@ def ctxlsx(filterdict):
             str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events),
             str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total),
 			]
-        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 str(s.ct_acquisition_type),
@@ -288,7 +288,7 @@ def ctxlsx(filterdict):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'

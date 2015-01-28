@@ -299,7 +299,7 @@ def exportCT2excel(filterdict):
             exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events,
             exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total,
 			]
-        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 s.ct_acquisition_type,

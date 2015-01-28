@@ -55,7 +55,7 @@
     <th>Slice thickness (mm)</th>
     <th>Collimation (mm)</th>
     <th>X-ray modulation type</th>
-    {% for event in general_study_module_attributes.ctradiationdose_set.get.ct_irradiation_event_data_set.all %}
+    {% for event in general_study_module_attributes.ctradiationdose_set.get.ctirradiationeventdata_set.all %}
         {% for source in event.ctxraysourceparameters_set.all %}
             {% if source.identification_of_the_xray_source != "B" %}
                 <tr>
