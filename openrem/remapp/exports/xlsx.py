@@ -148,7 +148,7 @@ def ctxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -182,14 +182,14 @@ def ctxlsx(filterdict):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events'))
+    max_events = e.aggregate(Max('ctradiationdose__ct_accumulated_dose_data__total_number_of_irradiation_events'))
 
     alldataheaders = commonheaders
 
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']):
+    for h in xrange(max_events['ctradiationdose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Type',
@@ -215,7 +215,7 @@ def ctxlsx(filterdict):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']) + 14 - 1
+    numcolumns = (22 * max_events['ctradiationdose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -238,10 +238,10 @@ def ctxlsx(filterdict):
             exams.patient_module_attributes_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-            str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
+            str(exams.ctradiationdose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
+            str(exams.ctradiationdose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
 			]
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
             examdata += [
                 s.acquisition_protocol,
                 str(s.ct_acquisition_type),
@@ -288,7 +288,7 @@ def ctxlsx(filterdict):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ct_irradiation_event_data_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
@@ -312,8 +312,8 @@ def ctxlsx(filterdict):
                 exams.patient_module_attributes_set.get().not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-                str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
+                str(exams.ctradiationdose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
+                str(exams.ctradiationdose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
                 ]
             examdata += [
                 s.acquisition_protocol,

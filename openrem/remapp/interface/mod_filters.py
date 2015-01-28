@@ -123,7 +123,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
             ('general_equipment_module_attributes__manufacturer_model_name', 'Model name'),
             ('general_equipment_module_attributes__station_name', 'Station name'),
             ('study_description', 'Study description'),
-            ('-ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
+            ('-ctradiationdose__ct_accumulated_dose_data__ct_dose_length_product_total', 'Total DLP'),
             )
 
     def get_order_by(self, order_value):

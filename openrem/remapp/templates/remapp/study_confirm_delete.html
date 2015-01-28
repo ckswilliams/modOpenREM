@@ -31,8 +31,8 @@
                 {{ exam.patient_study_module_attributes_set.get.patient_size|floatformat:0 }} cm |
                 {{ exam.patient_study_module_attributes_set.get.patient_weight|floatformat:0 }} kg
             </td>
-            <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
-            <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
+            <td>{{ exam.ctradiationdose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
+            <td>{{ exam.ctradiationdose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
 {% elif exam.modality_type = "RF" %}
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">{{ exam.study_description }}</a> |
