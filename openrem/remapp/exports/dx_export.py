@@ -162,8 +162,8 @@ def exportDX2excel(filterdict):
                 s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs(),
                 s.irradeventxraysourcedata_set.get().average_xray_tube_current,
                 s.irradeventxraysourcedata_set.get().exposure_time,
-                s.irradiation_event_xray_detector_data_set.get().exposure_index,
-                s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure,
+                s.irradeventxraydetectordata_set.get().exposure_index,
+                s.irradeventxraydetectordata_set.get().relative_xray_exposure,
                 s.convert_gym2_to_cgycm2(),
                 ]
 
@@ -384,8 +384,8 @@ def dxxlsx(filterdict):
                 str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()),
                 str(s.irradeventxraysourcedata_set.get().average_xray_tube_current),
                 str(s.irradeventxraysourcedata_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
+                str(s.irradeventxraydetectordata_set.get().exposure_index),
+                str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
                 ]
 
@@ -428,8 +428,8 @@ def dxxlsx(filterdict):
                 str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()),
                 str(s.irradeventxraysourcedata_set.get().average_xray_tube_current),
                 str(s.irradeventxraysourcedata_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
+                str(s.irradeventxraydetectordata_set.get().exposure_index),
+                str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
                 ]
 

@@ -159,8 +159,8 @@ def rfcsv(filterdict):
                 s.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 s.irradeventxraysourcedata_set.get().average_xray_tube_current,
                 s.irradeventxraysourcedata_set.get().exposure_time,
-                s.irradiation_event_xray_detector_data_set.get().exposure_index,
-                s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure,
+                s.irradeventxraydetectordata_set.get().exposure_index,
+                s.irradeventxraydetectordata_set.get().relative_xray_exposure,
                 s.dose_area_product,
                 ]
 

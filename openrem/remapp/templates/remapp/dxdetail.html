@@ -76,13 +76,13 @@
             {{ event.irradeventxraysourcedata_set.get.grid_focal_distance|floatformat:0 }}
         </td>
         <td>
-            EI: {{ event.irradiation_event_xray_detector_data_set.get.exposure_index|floatformat:1 }} <br>
-            EI<sub>T</sub>: {{ event.irradiation_event_xray_detector_data_set.get.target_exposure_index|floatformat:1 }} <br>
-            DI: {{ event.irradiation_event_xray_detector_data_set.get.deviation_index|floatformat:1 }}
+            EI: {{ event.irradeventxraydetectordata_set.get.exposure_index|floatformat:1 }} <br>
+            EI<sub>T</sub>: {{ event.irradeventxraydetectordata_set.get.target_exposure_index|floatformat:1 }} <br>
+            DI: {{ event.irradeventxraydetectordata_set.get.deviation_index|floatformat:1 }}
         </td>
         <td>
-            {{ event.irradiation_event_xray_detector_data_set.get.relative_xray_exposure|floatformat:0 }}
-            {{ event.irradiation_event_xray_detector_data_set.get.relative_exposure_unit }}
+            {{ event.irradeventxraydetectordata_set.get.relative_xray_exposure|floatformat:0 }}
+            {{ event.irradeventxraydetectordata_set.get.relative_exposure_unit }}
         </td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_control_mode }}</td>
