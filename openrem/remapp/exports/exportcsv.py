@@ -120,7 +120,7 @@ def exportFL2excel(filterdict):
     for i, exams in enumerate(e):
         writer.writerow([
             exams.generalequipmentmoduleattr_set.get().manufacturer,
-            exams.projectionxrayradiationdose_set.get().observer_context_set.get().device_observer_name,
+            exams.projectionxrayradiationdose_set.get().observercontext_set.get().device_observer_name,
             exams.generalequipmentmoduleattr_set.get().institution_name,
             exams.study_date,
             exams.accession_number, 
