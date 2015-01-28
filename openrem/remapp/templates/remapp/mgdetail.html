@@ -41,7 +41,7 @@
     <th>Exposure time</th>
     <th>ESD</th>
     <th>AGD (mGy)</th>
-    {% for event in general_study_module_attributes.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.all %}
+    {% for event in general_study_module_attributes.projectionxrayradiationdose_set.get.irradiation_event_xray_data_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>

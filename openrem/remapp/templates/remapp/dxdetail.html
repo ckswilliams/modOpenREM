@@ -28,10 +28,10 @@
     </li>
     <li>Study UID: {{ general_study_module_attributes.study_instance_uid }}</li>
     <li>Test patient indicators? {{ general_study_module_attributes.patient_module_attributes_set.get.not_patient_indicator }}</li>
-    <li>Number of events: {{ general_study_module_attributes.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</li>
+    <li>Number of events: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.irradiation_event_xray_data_set.count }}</li>
     <li>
         Total DAP:
-        {{ general_study_module_attributes.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+        {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumulated_xray_dose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
         cGy.cm<sup>2</sup>
     </li>
 </ul>
@@ -51,7 +51,7 @@
     <th>Exposure Index<br>vendor</th>
     <th>DAP<br>(cGy.cm<sup>2</sup>)</th>
     <th>Control mode</th>
-    {% for event in general_study_module_attributes.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.all %}
+    {% for event in general_study_module_attributes.projectionxrayradiationdose_set.get.irradiation_event_xray_data_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>

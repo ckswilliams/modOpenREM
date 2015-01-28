@@ -120,7 +120,7 @@ def exportFL2excel(filterdict):
     for i, exams in enumerate(e):
         writer.writerow([
             exams.generalequipmentmoduleattr_set.get().manufacturer,
-            exams.projection_xray_radiation_dose_set.get().observer_context_set.get().device_observer_name,
+            exams.projectionxrayradiationdose_set.get().observer_context_set.get().device_observer_name,
             exams.generalequipmentmoduleattr_set.get().institution_name,
             exams.study_date,
             exams.accession_number, 
@@ -128,16 +128,16 @@ def exportFL2excel(filterdict):
             exams.patientstudymoduleattr_set.get().patient_size,
             exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
-            exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.count(),
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_area_product_total,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_rp_total,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_fluoro_time,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_acquisition_time,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().reference_point_definition_code,
+            exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.count(),
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_area_product_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_rp_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_fluoro_time,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_acquisition_time,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().reference_point_definition_code,
             exams.performing_physician_name,
             exams.operator_name,
             ])
@@ -459,7 +459,7 @@ def exportMG2excel(filterdict):
         ])
     
     for i, study in enumerate(s):
-        e = study.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all()
+        e = study.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all()
         for exp in e:
             writer.writerow([
                 exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().institution_name,

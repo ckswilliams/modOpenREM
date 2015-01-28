@@ -87,8 +87,8 @@ $('.datepicker').datepicker({
                 <a href="/openrem/dx/{{ exam.id }}/">{{ exam.procedure_code_meaning }}</a> |
                 {{ exam.accession_number }}
             </td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.irradiation_event_xray_data_set.count }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumulated_xray_dose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}</td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>

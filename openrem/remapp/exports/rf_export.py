@@ -115,8 +115,8 @@ def rfcsv(filterdict):
     ]
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumprojxraydose__total_number_of_radiographic_frames'))
-    for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumprojxraydose__total_number_of_radiographic_frames__max']):
+    max_events = e.aggregate(Max('projectionxrayradiationdose__accumulated_xray_dose__accumprojxraydose__total_number_of_radiographic_frames'))
+    for h in xrange(max_events['projectionxrayradiationdose__accumulated_xray_dose__accumprojxraydose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Image view',
@@ -147,11 +147,11 @@ def rfcsv(filterdict):
             exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_area_product_total,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames,
+            exams.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_area_product_total,
             ]
 
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
             examdata += [
                 s.acquisition_protocol,
                 s.image_view,
@@ -244,15 +244,15 @@ def _rf_common_get_data(source):
         source.patient_module_attributes_set.get().not_patient_indicator,
         source.study_description,
         source.requested_procedure_code_meaning,
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_area_product_total),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_rp_total),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_fluoro_time),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total),
-        str(source.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_acquisition_time),
-        str(source.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all().count()),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_area_product_total),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().dose_rp_total),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_fluoro_time),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total),
+        str(source.projectionxrayradiationdose_set.get().accumulated_xray_dose_set.get().accumprojxraydose_set.get().total_acquisition_time),
+        str(source.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all().count()),
     ]
     return examdata
 
@@ -529,7 +529,7 @@ def rfxlsx(filterdict):
 
     protocolslist = []
     for exams in e:
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:

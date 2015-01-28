@@ -512,11 +512,11 @@ def _dx2db(dataset):
         event_date = get_value_kw('AcquisitionDate',dataset)
         if not event_date: event_date = get_value_kw('StudyDate',dataset)
         event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-        for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
             if event_date_time == events.date_time_started:
                 return 0
         # study exists, but event doesn't
-        _irradiationeventxraydata(dataset,same_study_uid.get().projection_xray_radiation_dose_set.get())
+        _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
         # update the accumulated tables
         return 0
     
