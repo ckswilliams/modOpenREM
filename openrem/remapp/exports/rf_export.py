@@ -427,9 +427,9 @@ def rfxlsx(filterdict):
                 Max('irradeventxraysourcedata__kvp__kvp'),
                 Avg('irradeventxraysourcedata__kvp__kvp'))
             tube_current = similarexposures.all().aggregate(
-                Min('irradeventxraysourcedata__xray_tube_current__xray_tube_current'),
-                Max('irradeventxraysourcedata__xray_tube_current__xray_tube_current'),
-                Avg('irradeventxraysourcedata__xray_tube_current__xray_tube_current'))
+                Min('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'),
+                Max('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'),
+                Avg('irradeventxraysourcedata__xraytubecurrent__xray_tube_current'))
             exp_time = similarexposures.all().aggregate(
                 Min('irradeventxraysourcedata__exposure_time'),
                 Max('irradeventxraysourcedata__exposure_time'),
@@ -450,9 +450,9 @@ def rfxlsx(filterdict):
                 str(kvp['irradeventxraysourcedata__kvp__kvp__min']),
                 str(kvp['irradeventxraysourcedata__kvp__kvp__max']),
                 str(kvp['irradeventxraysourcedata__kvp__kvp__avg']),
-                str(tube_current['irradeventxraysourcedata__xray_tube_current__xray_tube_current__min']),
-                str(tube_current['irradeventxraysourcedata__xray_tube_current__xray_tube_current__max']),
-                str(tube_current['irradeventxraysourcedata__xray_tube_current__xray_tube_current__avg']),
+                str(tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__min']),
+                str(tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__max']),
+                str(tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__avg']),
                 str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__min']),
                 str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__max']),
                 str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__avg']),
@@ -587,7 +587,7 @@ def rfxlsx(filterdict):
                     filter_material,
                     str(event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
                     str(event.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
-                    str(event.irradeventxraysourcedata_set.get().xray_tube_current_set.get().xray_tube_current),
+                    str(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current),
                     str(event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width),
                     str(event.irradeventxraysourcedata_set.get().exposure_time),
                     str(event.convert_gym2_to_cgycm2()),
