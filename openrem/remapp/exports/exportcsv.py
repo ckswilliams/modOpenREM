@@ -481,7 +481,7 @@ def exportMG2excel(filterdict):
                 exp.irradeventxraysourcedata_set.get().collimated_field_area,
                 exp.irradeventxraysourcedata_set.get().exposure_control_mode,
                 exp.irradeventxraysourcedata_set.get().anode_target_material,
-                exp.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material,
+                exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material,
                 exp.irradeventxraysourcedata_set.get().focal_spot_size,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 exp.irradeventxraysourcedata_set.get().average_xray_tube_current,

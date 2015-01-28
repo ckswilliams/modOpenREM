@@ -372,8 +372,8 @@ def rfxlsx(filterdict):
             protocol = _get_db_value(inst[0], "acquisition_protocol")
             pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
-            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xray_filters_set").get(), "xray_filter_material"), "code_meaning")
-            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xray_filters_set").get(), "xray_filter_thickness_maximum")
+            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_material"), "code_meaning")
+            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_thickness_maximum")
             fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
 
             similarexposures = inst
@@ -394,10 +394,10 @@ def rfxlsx(filterdict):
                     irradeventxraysourcedata__pulse_rate__exact = pulse_rate)
             if filter_material:
                 similarexposures = similarexposures.filter(
-                    irradeventxraysourcedata__xray_filters__xray_filter_material__code_meaning__exact = filter_material)
+                    irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = filter_material)
             if filter_thick:
                 similarexposures = similarexposures.filter(
-                    irradeventxraysourcedata__xray_filters__xray_filter_thickness_maximum__exact = filter_thick)
+                    irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = filter_thick)
             if event_type:
                 similarexposures = similarexposures.filter(
                     irradiation_event_type__code_meaning__exact = event_type)
@@ -575,8 +575,8 @@ def rfxlsx(filterdict):
             for event in p_events:
                 sheetlist[tab]['count'] += 1
                 examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
-                if event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material:
-                    filter_material = event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material.code_meaning
+                if event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material:
+                    filter_material = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
                 else: filter_material = None
                 examdata += [
                     str(event.date_time_started),
@@ -585,7 +585,7 @@ def rfxlsx(filterdict):
                     str(event.irradeventxraysourcedata_set.get().pulse_rate),
                     str(event.irradeventxraysourcedata_set.get().ii_field_size),
                     filter_material,
-                    str(event.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_thickness_maximum),
+                    str(event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum),
                     str(event.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
                     str(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current),
                     str(event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width),

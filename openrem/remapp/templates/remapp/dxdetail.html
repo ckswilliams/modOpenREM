@@ -61,7 +61,7 @@
         <td>{{ event.irradeventxraysourcedata_set.get.average_xray_tube_current|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:0 }}</td>
         <td>
-            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xray_filters_set.all %}
+            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xrayfilters_set.all %}
                 {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
                     Al: {{ xrayfilt.xray_filter_thickness_minimum }} - {{ xrayfilt.xray_filter_thickness_maximum }} <br>
                 {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}

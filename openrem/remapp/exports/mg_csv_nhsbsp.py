@@ -133,7 +133,7 @@ def mg_csv_nhsbsp(filterdict):
 			    target = 'Mo'
             elif "RHOD" in target.upper():
                 target = 'Rh'
-            filterMat = str(exp.irradeventxraysourcedata_set.get().xray_filters_set.get().xray_filter_material)
+            filterMat = str(exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material)
             if "ALUM" in filterMat.upper():
                 filterMat = 'Al'
             elif "MOLY" in filterMat.upper():
