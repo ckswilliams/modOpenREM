@@ -341,7 +341,7 @@ def _mammo2db(dataset):
             event_time = get_value_kw('AcquisitionTime',dataset)
             event_date = get_value_kw('AcquisitionDate',dataset)
             event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-            for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+            for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
                 if event_date_time == events.date_time_started:
                     return 0
         # study exists, but event doesn't

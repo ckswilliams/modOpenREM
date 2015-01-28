@@ -151,7 +151,7 @@ def rfcsv(filterdict):
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_area_product_total,
             ]
 
-        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 s.image_view,
@@ -252,7 +252,7 @@ def _rf_common_get_data(source):
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total),
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total),
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_acquisition_time),
-        str(source.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all().count()),
+        str(source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()),
     ]
     return examdata
 
@@ -529,7 +529,7 @@ def rfxlsx(filterdict):
 
     protocolslist = []
     for exams in e:
-        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:

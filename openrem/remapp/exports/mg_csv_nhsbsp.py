@@ -116,7 +116,7 @@ def mg_csv_nhsbsp(filterdict):
         ])
 
     for i, study in enumerate(s):
-        e = study.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all()
+        e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
         for exp in e:
             viewCode = str(exp.laterality)
             viewCode = viewCode[:1]

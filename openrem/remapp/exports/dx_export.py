@@ -153,7 +153,7 @@ def exportDX2excel(filterdict):
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().convert_gym2_to_cgycm2(),
             ]
 
-        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 s.image_view,
@@ -294,7 +294,7 @@ def dxxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -375,7 +375,7 @@ def dxxlsx(filterdict):
             str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames),
             str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().convert_gym2_to_cgycm2()),
 			]
-        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 str(s.image_view),
@@ -393,7 +393,7 @@ def dxxlsx(filterdict):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'

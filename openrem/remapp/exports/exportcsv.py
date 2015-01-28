@@ -128,7 +128,7 @@ def exportFL2excel(filterdict):
             exams.patientstudymoduleattr_set.get().patient_size,
             exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
-            exams.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.count(),
+            exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count(),
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_area_product_total,
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_rp_total,
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total,
@@ -459,7 +459,7 @@ def exportMG2excel(filterdict):
         ])
     
     for i, study in enumerate(s):
-        e = study.projectionxrayradiationdose_set.get().irradiation_event_xray_data_set.all()
+        e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
         for exp in e:
             writer.writerow([
                 exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().institution_name,
@@ -471,7 +471,7 @@ def exportMG2excel(filterdict):
                 exp.date_time_started,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patient_module_attributes_set.get().patient_sex,
-                exp.projection_xray_radiation_dose.irradiation_event_xray_data_set.count(),
+                exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
                 exp.image_view,
                 exp.acquisition_protocol,
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
