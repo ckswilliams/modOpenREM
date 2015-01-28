@@ -241,7 +241,7 @@ def _rf_common_get_data(source):
         str(source.patientstudymoduleattr_set.get().patient_age_decimal),
         str(source.patientstudymoduleattr_set.get().patient_size),
         str(source.patientstudymoduleattr_set.get().patient_weight),
-        source.patient_module_attributes_set.get().not_patient_indicator,
+        source.patientmoduleattr_set.get().not_patient_indicator,
         source.study_description,
         source.requested_procedure_code_meaning,
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_area_product_total),

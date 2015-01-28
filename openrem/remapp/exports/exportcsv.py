@@ -470,7 +470,7 @@ def exportMG2excel(filterdict):
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
                 exp.date_time_started,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.patient_module_attributes_set.get().patient_sex,
+                exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get().patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
                 exp.image_view,
                 exp.acquisition_protocol,

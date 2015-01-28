@@ -28,7 +28,7 @@
     </li>
     <li>Study UID: {{ general_study_module_attributes.study_instance_uid }}</li>
     <li>Comment: {{ general_study_module_attributes.ctradiationdose_set.get.comment }} </li>
-    <li>Test patient indicators? {{ general_study_module_attributes.patient_module_attributes_set.get.not_patient_indicator }}</li>
+    <li>Test patient indicators? {{ general_study_module_attributes.patientmoduleattr_set.get.not_patient_indicator }}</li>
     <li>
         Total number of events:
         {{ general_study_module_attributes.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
