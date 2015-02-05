@@ -75,7 +75,7 @@
                         <td>{{ source.maximum_xray_tube_current|floatformat:0 }}</td>
                         <td>{{ source.exposure_time_per_rotation|floatformat:3 }}</td>
                     {% endif %}
-                    <td rowspan="2">{{ event.pitch_factor }}</td>
+                    <td rowspan="2">{{ event.pitch_factor|floatformat:3 }}</td>
                     <td rowspan="2">{{ event.exposure_time|floatformat:3 }}</td>
                     <td rowspan="2">{{ event.nominal_single_collimation_width|floatformat:3 }}</td>
                     <td rowspan="2">{{ event.nominal_total_collimation_width|floatformat:2 }}</td>
