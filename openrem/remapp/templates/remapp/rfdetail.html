@@ -11,30 +11,30 @@
 <h1>Detail list of events</h1>
 
 <ul>
-    <li>Accession number: {{ general_study_module_attributes.accession_number }}</li>
-    <li>Study date: {{ general_study_module_attributes.study_date }}</li>
-    <li>Study time: {{ general_study_module_attributes.study_time }}</li>
-    <li>Study description: {{ general_study_module_attributes.study_description }}</li>
-    <li>Requested procedure: {{ general_study_module_attributes.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
-    <li>Patient weight: {{ general_study_module_attributes.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>Total DAP: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm2</li>
-    <li>Total dose at RP: {{ general_study_module_attributes.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
-    <li>Hospital: {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.institution_name }}</li>
+    <li>Accession number: {{ generalstudymoduleattr.accession_number }}</li>
+    <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
+    <li>Study time: {{ generalstudymoduleattr.study_time }}</li>
+    <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
+    <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
+    <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
+    <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
+    <li>Total DAP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm2</li>
+    <li>Total dose at RP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
+    <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
         Scanner: 
-        {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.manufacturer }} |
-        {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-        {{ general_study_module_attributes.generalequipmentmoduleattr_set.get.station_name }}
+        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
+        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
     </li>
-    <li>Study UID: {{ general_study_module_attributes.study_instance_uid }}</li>
-    <li>Test patient indicators? {{ general_study_module_attributes.patientmoduleattr_set.get.not_patient_indicator }}</li>
+    <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
+    <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
 </ul>
 
 
 <table class="table table-striped table-bordered">
     <th>Time</th><th>Acquisition protocol</th><th>DAP cGy.cm2</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
-    {% for event in general_study_module_attributes.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
+    {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
