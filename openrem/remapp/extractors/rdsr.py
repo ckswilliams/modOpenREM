@@ -209,6 +209,7 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
             source.anode_target_material = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
             source.collimated_field_area = cont.MeasuredValueSequence[0].NumericValue
+        # TODO: xray_grid no longer exists in this table - it is a model on its own... See https://bitbucket.org/openrem/openrem/issue/181
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
             source.xray_grid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
     _pulsewidth(dataset,source)

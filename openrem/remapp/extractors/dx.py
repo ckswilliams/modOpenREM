@@ -127,7 +127,7 @@ def _irradiationeventxraydetectordata(dataset,event):
     detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     detector.exposure_index = get_value_kw('ExposureIndex',dataset)
     detector.relative_xray_exposure = get_value_kw('RelativeXRayExposure',dataset)
-    manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
+    manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
     if   'fuji'       in manufacturer: detector.relative_exposure_unit = 'S ()'
     elif 'carestream' in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
     elif 'kodak'      in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
@@ -252,7 +252,7 @@ def _doserelateddistancemeasurements(dataset,mech):
     from remapp.models import DoseRelatedDistanceMeasurements
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
-    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
+    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
     if dist.distance_source_to_detector and "kodak" in manufacturer:
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
@@ -361,7 +361,7 @@ def _accumulatedxraydose(dataset,proj):
 def _accumulatedxraydose_update(dataset,event):
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     from decimal import Decimal
-    accumdx = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get()
+    accumdx = event.projection_xray_radiation_dose.accumxraydose_set.get().accumprojxraydose_set.get()
     accumdx.total_number_of_radiographic_frames = accumdx.total_number_of_radiographic_frames + 1
     if event.dose_area_product:
         accumdx.dose_area_product_total += Decimal(event.dose_area_product)
@@ -512,11 +512,11 @@ def _dx2db(dataset):
         event_date = get_value_kw('AcquisitionDate',dataset)
         if not event_date: event_date = get_value_kw('StudyDate',dataset)
         event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-        for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if event_date_time == events.date_time_started:
                 return 0
         # study exists, but event doesn't
-        _irradiationeventxraydata(dataset,same_study_uid.get().projection_xray_radiation_dose_set.get())
+        _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
         # update the accumulated tables
         return 0
     

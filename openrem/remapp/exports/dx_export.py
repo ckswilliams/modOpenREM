@@ -116,8 +116,8 @@ def exportDX2excel(filterdict):
         ]
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
-    for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
+    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames'))
+    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Image view',
@@ -137,33 +137,33 @@ def exportDX2excel(filterdict):
 
     for i, exams in enumerate(e):
         examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().institution_name,
+            exams.generalequipmentmoduleattr_set.get().manufacturer,
+            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+            exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
-            exams.patient_study_module_attributes_set.get().patient_age_decimal,
-            exams.patient_study_module_attributes_set.get().patient_size,
-            exams.patient_study_module_attributes_set.get().patient_weight,
+            exams.patientstudymoduleattr_set.get().patient_age_decimal,
+            exams.patientstudymoduleattr_set.get().patient_size,
+            exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames,
-            exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().convert_gym2_to_cgycm2(),
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames,
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().convert_gym2_to_cgycm2(),
             ]
 
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 s.image_view,
-                s.irradiation_event_xray_source_data_set.get().exposure_control_mode,
-                s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp,
-                s.irradiation_event_xray_source_data_set.get().exposure_set.get().convert_uAs_to_mAs(),
-                s.irradiation_event_xray_source_data_set.get().average_xray_tube_current,
-                s.irradiation_event_xray_source_data_set.get().exposure_time,
-                s.irradiation_event_xray_detector_data_set.get().exposure_index,
-                s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure,
+                s.irradeventxraysourcedata_set.get().exposure_control_mode,
+                s.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
+                s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs(),
+                s.irradeventxraysourcedata_set.get().average_xray_tube_current,
+                s.irradeventxraysourcedata_set.get().exposure_time,
+                s.irradeventxraydetectordata_set.get().exposure_index,
+                s.irradeventxraydetectordata_set.get().relative_xray_exposure,
                 s.convert_gym2_to_cgycm2(),
                 ]
 
@@ -294,7 +294,7 @@ def dxxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -328,14 +328,14 @@ def dxxlsx(filterdict):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames'))
+    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames'))
 
     alldataheaders = commonheaders
 
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']):
+    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Image view',
@@ -349,7 +349,7 @@ def dxxlsx(filterdict):
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__total_number_of_radiographic_frames__max']) + 14 - 1
+    numcolumns = (22 * max_events['projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -359,33 +359,33 @@ def dxxlsx(filterdict):
         tsk.save()
 
         examdata = [
-            exams.general_equipment_module_attributes_set.get().institution_name,
-            exams.general_equipment_module_attributes_set.get().manufacturer,
-            exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-            exams.general_equipment_module_attributes_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().institution_name,
+            exams.generalequipmentmoduleattr_set.get().manufacturer,
+            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+            exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
-            str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-            str(exams.patient_study_module_attributes_set.get().patient_size),
-            str(exams.patient_study_module_attributes_set.get().patient_weight),
-            exams.patient_module_attributes_set.get().not_patient_indicator,
+            str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
+            str(exams.patientstudymoduleattr_set.get().patient_size),
+            str(exams.patientstudymoduleattr_set.get().patient_weight),
+            exams.patientmoduleattr_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-            str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().convert_gym2_to_cgycm2()),
+            str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames),
+            str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().convert_gym2_to_cgycm2()),
 			]
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 str(s.image_view),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
-                str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_set.get().convert_uAs_to_mAs()),
-                str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
+                str(s.irradeventxraysourcedata_set.get().exposure_control_mode),
+                str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
+                str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()),
+                str(s.irradeventxraysourcedata_set.get().average_xray_tube_current),
+                str(s.irradeventxraysourcedata_set.get().exposure_time),
+                str(s.irradeventxraydetectordata_set.get().exposure_index),
+                str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
                 ]
 
@@ -393,7 +393,7 @@ def dxxlsx(filterdict):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
@@ -404,32 +404,32 @@ def dxxlsx(filterdict):
             sheetlist[tabtext]['count'] += 1
             
             examdata = [
-                exams.general_equipment_module_attributes_set.get().institution_name,
-                exams.general_equipment_module_attributes_set.get().manufacturer,
-                exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-                exams.general_equipment_module_attributes_set.get().station_name,
+                exams.generalequipmentmoduleattr_set.get().institution_name,
+                exams.generalequipmentmoduleattr_set.get().manufacturer,
+                exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+                exams.generalequipmentmoduleattr_set.get().station_name,
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
-                str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-                str(exams.patient_study_module_attributes_set.get().patient_size),
-                str(exams.patient_study_module_attributes_set.get().patient_weight),
-                exams.patient_module_attributes_set.get().not_patient_indicator,
+                str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
+                str(exams.patientstudymoduleattr_set.get().patient_size),
+                str(exams.patientstudymoduleattr_set.get().patient_weight),
+                exams.patientmoduleattr_set.get().not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().total_number_of_radiographic_frames),
-                str(exams.projection_xray_radiation_dose_set.get().accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get().convert_gym2_to_cgycm2()),
+                str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames),
+                str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().convert_gym2_to_cgycm2()),
                 ]
             examdata += [
                 s.acquisition_protocol,
                 str(s.image_view),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_control_mode),
-                str(s.irradiation_event_xray_source_data_set.get().kvp_set.get().kvp),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_set.get().convert_uAs_to_mAs()),
-                str(s.irradiation_event_xray_source_data_set.get().average_xray_tube_current),
-                str(s.irradiation_event_xray_source_data_set.get().exposure_time),
-                str(s.irradiation_event_xray_detector_data_set.get().exposure_index),
-                str(s.irradiation_event_xray_detector_data_set.get().relative_xray_exposure),
+                str(s.irradeventxraysourcedata_set.get().exposure_control_mode),
+                str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
+                str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()),
+                str(s.irradeventxraysourcedata_set.get().average_xray_tube_current),
+                str(s.irradeventxraysourcedata_set.get().exposure_time),
+                str(s.irradeventxraydetectordata_set.get().exposure_index),
+                str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
                 ]
 

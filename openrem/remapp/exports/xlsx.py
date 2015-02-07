@@ -148,7 +148,7 @@ def ctxlsx(filterdict):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -182,14 +182,14 @@ def ctxlsx(filterdict):
     # All data sheet
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events'))
+    max_events = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
 
     alldataheaders = commonheaders
 
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    for h in xrange(max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']):
+    for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Type',
@@ -215,7 +215,7 @@ def ctxlsx(filterdict):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['ct_radiation_dose__ct_accumulated_dose_data__total_number_of_irradiation_events__max']) + 14 - 1
+    numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -225,28 +225,28 @@ def ctxlsx(filterdict):
         tsk.save()
 
         examdata = [
-			exams.general_equipment_module_attributes_set.get().institution_name,
-			exams.general_equipment_module_attributes_set.get().manufacturer,
-			exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-			exams.general_equipment_module_attributes_set.get().station_name,
+			exams.generalequipmentmoduleattr_set.get().institution_name,
+			exams.generalequipmentmoduleattr_set.get().manufacturer,
+			exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+			exams.generalequipmentmoduleattr_set.get().station_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
-            str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-            str(exams.patient_study_module_attributes_set.get().patient_size),
-            str(exams.patient_study_module_attributes_set.get().patient_weight),
-            exams.patient_module_attributes_set.get().not_patient_indicator,
+            str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
+            str(exams.patientstudymoduleattr_set.get().patient_size),
+            str(exams.patientstudymoduleattr_set.get().patient_weight),
+            exams.patientmoduleattr_set.get().not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-            str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
+            str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events),
+            str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total),
 			]
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             examdata += [
                 s.acquisition_protocol,
                 str(s.ct_acquisition_type),
                 str(s.exposure_time),
-                str(s.scanning_length_set.get().scanning_length),
+                str(s.scanninglength_set.get().scanning_length),
                 str(s.nominal_single_collimation_width),
                 str(s.nominal_total_collimation_width),
                 str(s.pitch_factor),
@@ -255,7 +255,7 @@ def ctxlsx(filterdict):
                 str(s.dlp),
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.ctxraysourceparameters_set.all():
                     examdata += [
                         str(source.identification_of_the_xray_source),
                         str(source.kvp),
@@ -266,11 +266,11 @@ def ctxlsx(filterdict):
             else:
                 try:
                     examdata += [
-                        str(s.ct_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.ct_xray_source_parameters_set.get().kvp),
-                        str(s.ct_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().exposure_time_per_rotation),
+                        str(s.ctxraysourceparameters_set.get().identification_of_the_xray_source),
+                        str(s.ctxraysourceparameters_set.get().kvp),
+                        str(s.ctxraysourceparameters_set.get().maximum_xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().exposure_time_per_rotation),
                         'n/a',
                         'n/a',
                         'n/a',
@@ -288,7 +288,7 @@ def ctxlsx(filterdict):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.ct_radiation_dose_set.get().ct_irradiation_event_data_set.all():
+        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
@@ -299,27 +299,27 @@ def ctxlsx(filterdict):
             sheetlist[tabtext]['count'] += 1
             
             examdata = [
-                exams.general_equipment_module_attributes_set.get().institution_name,
-                exams.general_equipment_module_attributes_set.get().manufacturer,
-                exams.general_equipment_module_attributes_set.get().manufacturer_model_name,
-                exams.general_equipment_module_attributes_set.get().station_name,
+                exams.generalequipmentmoduleattr_set.get().institution_name,
+                exams.generalequipmentmoduleattr_set.get().manufacturer,
+                exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
+                exams.generalequipmentmoduleattr_set.get().station_name,
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
-                str(exams.patient_study_module_attributes_set.get().patient_age_decimal),
-                str(exams.patient_study_module_attributes_set.get().patient_size),
-                str(exams.patient_study_module_attributes_set.get().patient_weight),
-                exams.patient_module_attributes_set.get().not_patient_indicator,
+                str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
+                str(exams.patientstudymoduleattr_set.get().patient_size),
+                str(exams.patientstudymoduleattr_set.get().patient_weight),
+                exams.patientmoduleattr_set.get().not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().total_number_of_irradiation_events),
-                str(exams.ct_radiation_dose_set.get().ct_accumulated_dose_data_set.get().ct_dose_length_product_total),
+                str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events),
+                str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total),
                 ]
             examdata += [
                 s.acquisition_protocol,
                 str(s.ct_acquisition_type),
                 str(s.exposure_time),
-                str(s.scanning_length_set.get().scanning_length),
+                str(s.scanninglength_set.get().scanning_length),
                 str(s.nominal_single_collimation_width),
                 str(s.nominal_total_collimation_width),
                 str(s.pitch_factor),
@@ -328,7 +328,7 @@ def ctxlsx(filterdict):
                 str(s.dlp),
                 ]
             if s.number_of_xray_sources > 1:
-                for source in s.ct_xray_source_parameters_set.all():
+                for source in s.ctxraysourceparameters_set.all():
                     examdata += [
                         str(source.identification_of_the_xray_source),
                         str(source.kvp),
@@ -339,11 +339,11 @@ def ctxlsx(filterdict):
             else:
                 try:
                     examdata += [
-                        str(s.ct_xray_source_parameters_set.get().identification_of_the_xray_source),
-                        str(s.ct_xray_source_parameters_set.get().kvp),
-                        str(s.ct_xray_source_parameters_set.get().maximum_xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().xray_tube_current),
-                        str(s.ct_xray_source_parameters_set.get().exposure_time_per_rotation),
+                        str(s.ctxraysourceparameters_set.get().identification_of_the_xray_source),
+                        str(s.ctxraysourceparameters_set.get().kvp),
+                        str(s.ctxraysourceparameters_set.get().maximum_xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().xray_tube_current),
+                        str(s.ctxraysourceparameters_set.get().exposure_time_per_rotation),
                         'n/a',
                         'n/a',
                         'n/a',

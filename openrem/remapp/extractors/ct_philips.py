@@ -130,7 +130,7 @@ def _ctradiationdose(dataset,g):
     # Come back and set start and end of irradiation after creating the x-ray events
     #
     # Won't work with SQLite
-    events = proj.ct_irradiation_event_data_set.all()
+    events = proj.ctirradiationeventdata_set.all()
     proj.start_of_xray_irradiation = events.aggregate(Min('date_time_started'))['date_time_started__min']
     latestlength = int(events.latest('date_time_started').exposure_time * 1000) # in microseconds
     lastevent = events.aggregate(Max('date_time_started'))['date_time_started__max'] 

@@ -134,9 +134,9 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _accumulatedmammo_update(dataset,event): # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accummam = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_mammography_xray_dose_set.get()
-    if event.irradiation_event_xray_source_data_set.get().average_glandular_dose:
-        accummam.accumulated_average_glandular_dose += event.irradiation_event_xray_source_data_set.get().average_glandular_dose
+    accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
+    if event.irradeventxraysourcedata_set.get().average_glandular_dose:
+        accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
     if event.laterality:
         if accummam.laterality:
             if accummam.laterality.code_meaning == 'Left breast':
@@ -341,11 +341,11 @@ def _mammo2db(dataset):
             event_time = get_value_kw('AcquisitionTime',dataset)
             event_date = get_value_kw('AcquisitionDate',dataset)
             event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-            for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+            for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
                 if event_date_time == events.date_time_started:
                     return 0
         # study exists, but event doesn't
-        _irradiationeventxraydata(dataset,same_study_uid.get().projection_xray_radiation_dose_set.get())
+        _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
         # update the accumulated tables
         return 0
 
