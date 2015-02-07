@@ -366,7 +366,437 @@ class Migration(SchemaMigration):
         db.alter_column(u'remapp_deviceparticipant', 'ct_irradiation_event_data_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.CtIrradiationEventData'], null=True, blank=True))
         db.alter_column(u'remapp_deviceparticipant', 'device_role_in_procedure_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.ContextID'], null=True, blank=True))
 
+        #######################################
+        #
+        #  Remaining database changes for 0.5.1
+        #
+        #######################################
 
+        # Adding model 'CtReconstructionAlgorithm'
+        db.create_table(u'remapp_ctreconstructionalgorithm', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('ct_irradiation_event_data', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.CtIrradiationEventData'])),
+            ('reconstruction_algorithm', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.ContextID'], null=True, blank=True)),
+        ))
+        db.send_create_signal(u'remapp', ['CtReconstructionAlgorithm'])
+
+        # Adding model 'SizeSpecificDoseEstimation'
+        db.create_table(u'remapp_sizespecificdoseestimation', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('ct_irradiation_event_data', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.CtIrradiationEventData'])),
+            ('measurement_method', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.ContextID'], null=True, blank=True)),
+            ('measured_lateral_dimension', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True)),
+            ('measured_ap_dimension', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True)),
+            ('derived_effective_diameter', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True)),
+        ))
+        db.send_create_signal(u'remapp', ['SizeSpecificDoseEstimation'])
+
+        # Adding model 'SourceOfCTDoseInformation'
+        db.create_table(u'remapp_sourceofctdoseinformation', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('ct_radiation_dose', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.CtRadiationDose'])),
+            ('source_of_dose_information', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['remapp.ContextID'], null=True, blank=True)),
+        ))
+        db.send_create_signal(u'remapp', ['SourceOfCTDoseInformation'])
+
+        # Adding field 'CtIrradiationEventData.irradiation_event_label'
+        db.add_column(u'remapp_ctirradiationeventdata', 'irradiation_event_label',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'CtIrradiationEventData.label_type'
+        db.add_column(u'remapp_ctirradiationeventdata', 'label_type',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10013_labeltype', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+
+        # Changing field 'CtIrradiationEventData.exposure_time'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'exposure_time', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.ctdifreeair_calculation_factor'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'ctdifreeair_calculation_factor', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.mean_ctdivol'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'mean_ctdivol', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.effective_dose'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'effective_dose', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.number_of_xray_sources'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'number_of_xray_sources', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=8, decimal_places=0))
+
+        # Changing field 'CtIrradiationEventData.mean_ctdifreeair'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'mean_ctdifreeair', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.dlp'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'dlp', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.effective_dose_conversion_factor'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'effective_dose_conversion_factor', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.nominal_single_collimation_width'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'nominal_single_collimation_width', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.pitch_factor'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'pitch_factor', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtIrradiationEventData.nominal_total_collimation_width'
+        db.alter_column(u'remapp_ctirradiationeventdata', 'nominal_total_collimation_width', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayDetectorData.deviation_index'
+        db.alter_column(u'remapp_irradeventxraydetectordata', 'deviation_index', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayDetectorData.sensitivity'
+        db.alter_column(u'remapp_irradeventxraydetectordata', 'sensitivity', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayDetectorData.relative_xray_exposure'
+        db.alter_column(u'remapp_irradeventxraydetectordata', 'relative_xray_exposure', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayDetectorData.exposure_index'
+        db.alter_column(u'remapp_irradeventxraydetectordata', 'exposure_index', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayDetectorData.target_exposure_index'
+        db.alter_column(u'remapp_irradeventxraydetectordata', 'target_exposure_index', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+        # Adding field 'IrradEventXRayData.projection_eponymous_name_cid'
+        db.add_column(u'remapp_irradeventxraydata', 'projection_eponymous_name_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10003_pojectioneponymous', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRayData.patient_table_relationship_cid'
+        db.add_column(u'remapp_irradeventxraydata', 'patient_table_relationship_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10003_pttablerel', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRayData.patient_orientation_cid'
+        db.add_column(u'remapp_irradeventxraydata', 'patient_orientation_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10003_ptorientation', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRayData.patient_orientation_modifier_cid'
+        db.add_column(u'remapp_irradeventxraydata', 'patient_orientation_modifier_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10003_ptorientationmod', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRayData.patient_equivalent_thickness'
+        db.add_column(u'remapp_irradeventxraydata', 'patient_equivalent_thickness',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRayData.breast_composition_cid'
+        db.add_column(u'remapp_irradeventxraydata', 'breast_composition_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10003_breastcomposition', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+
+        # Changing field 'IrradEventXRayData.entrance_exposure_at_rp'
+        db.alter_column(u'remapp_irradeventxraydata', 'entrance_exposure_at_rp', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayData.patient_table_relationship'
+        db.alter_column(u'remapp_irradeventxraydata', 'patient_table_relationship', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'IrradEventXRayData.percent_fibroglandular_tissue'
+        db.alter_column(u'remapp_irradeventxraydata', 'percent_fibroglandular_tissue', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayData.patient_orientation_modifier'
+        db.alter_column(u'remapp_irradeventxraydata', 'patient_orientation_modifier', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'IrradEventXRayData.half_value_layer'
+        db.alter_column(u'remapp_irradeventxraydata', 'half_value_layer', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayData.patient_orientation'
+        db.alter_column(u'remapp_irradeventxraydata', 'patient_orientation', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'IrradEventXRayData.projection_eponymous_name'
+        db.alter_column(u'remapp_irradeventxraydata', 'projection_eponymous_name', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'IrradEventXRayData.dose_area_product'
+        db.alter_column(u'remapp_irradeventxraydata', 'dose_area_product', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=10))
+
+        # Changing field 'IrradEventXRayData.breast_composition'
+        db.alter_column(u'remapp_irradeventxraydata', 'breast_composition', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'CtDoseCheckDetails.accumulated_dlp_forward_estimate'
+        db.alter_column(u'remapp_ctdosecheckdetails', 'accumulated_dlp_forward_estimate', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtDoseCheckDetails.accumulated_ctdivol_forward_estimate'
+        db.alter_column(u'remapp_ctdosecheckdetails', 'accumulated_ctdivol_forward_estimate', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtDoseCheckDetails.ctdivol_alert_value'
+        db.alter_column(u'remapp_ctdosecheckdetails', 'ctdivol_alert_value', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtDoseCheckDetails.dlp_alert_value'
+        db.alter_column(u'remapp_ctdosecheckdetails', 'dlp_alert_value', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtDoseCheckDetails.notification_reason_for_proceeding'
+        db.alter_column(u'remapp_ctdosecheckdetails', 'notification_reason_for_proceeding', self.gf('django.db.models.fields.TextField')(null=True))
+
+        # Changing field 'CtDoseCheckDetails.alert_reason_for_proceeding'
+        db.alter_column(u'remapp_ctdosecheckdetails', 'alert_reason_for_proceeding', self.gf('django.db.models.fields.TextField')(null=True))
+
+        # Changing field 'Kvp.kvp'
+        db.alter_column(u'remapp_kvp', 'kvp', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'Exports.modality'
+        db.alter_column(u'remapp_exports', 'modality', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'CtXRaySourceParameters.maximum_xray_tube_current'
+        db.alter_column(u'remapp_ctxraysourceparameters', 'maximum_xray_tube_current', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtXRaySourceParameters.exposure_time_per_rotation'
+        db.alter_column(u'remapp_ctxraysourceparameters', 'exposure_time_per_rotation', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtXRaySourceParameters.xray_filter_aluminum_equivalent'
+        db.alter_column(u'remapp_ctxraysourceparameters', 'xray_filter_aluminum_equivalent', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtXRaySourceParameters.xray_tube_current'
+        db.alter_column(u'remapp_ctxraysourceparameters', 'xray_tube_current', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtXRaySourceParameters.kvp'
+        db.alter_column(u'remapp_ctxraysourceparameters', 'kvp', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'CtAccumulatedDoseData.patient_model'
+        db.alter_column(u'remapp_ctaccumulateddosedata', 'patient_model', self.gf('django.db.models.fields.TextField')(null=True))
+
+        # Changing field 'CtAccumulatedDoseData.reference_authority_text'
+        db.alter_column(u'remapp_ctaccumulateddosedata', 'reference_authority_text', self.gf('django.db.models.fields.TextField')(null=True))
+
+        # Changing field 'CtAccumulatedDoseData.effective_dose_phantom_type'
+        db.alter_column(u'remapp_ctaccumulateddosedata', 'effective_dose_phantom_type', self.gf('django.db.models.fields.TextField')(null=True))
+
+        # Changing field 'CtAccumulatedDoseData.dosimeter_type'
+        db.alter_column(u'remapp_ctaccumulateddosedata', 'dosimeter_type', self.gf('django.db.models.fields.TextField')(null=True))
+
+        # Changing field 'CtAccumulatedDoseData.total_number_of_irradiation_events'
+        db.alter_column(u'remapp_ctaccumulateddosedata', 'total_number_of_irradiation_events', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=0))
+        # Adding field 'DoseRelatedDistanceMeasurements.table_longitudinal_end_position'
+        db.add_column(u'remapp_doserelateddistancemeasurements', 'table_longitudinal_end_position',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True),
+                      keep_default=False)
+
+        # Adding field 'DoseRelatedDistanceMeasurements.table_lateral_end_position'
+        db.add_column(u'remapp_doserelateddistancemeasurements', 'table_lateral_end_position',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True),
+                      keep_default=False)
+
+        # Adding field 'DoseRelatedDistanceMeasurements.table_height_end_position'
+        db.add_column(u'remapp_doserelateddistancemeasurements', 'table_height_end_position',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True),
+                      keep_default=False)
+
+
+        # Changing field 'DoseRelatedDistanceMeasurements.table_longitudinal_position'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'table_longitudinal_position', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.table_lateral_position'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'table_lateral_position', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.distance_source_to_detector'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'distance_source_to_detector', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.radiological_thickness'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'radiological_thickness', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.distance_source_to_table_plane'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'distance_source_to_table_plane', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.distance_source_to_entrance_surface'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'distance_source_to_entrance_surface', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.distance_source_to_reference_point'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'distance_source_to_reference_point', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.distance_source_to_isocenter'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'distance_source_to_isocenter', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'DoseRelatedDistanceMeasurements.table_height_position'
+        db.alter_column(u'remapp_doserelateddistancemeasurements', 'table_height_position', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+        # Adding field 'PersonParticipant.person_role_in_procedure_cid'
+        db.add_column(u'remapp_personparticipant', 'person_role_in_procedure_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid1020_roleproc', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'PersonParticipant.person_role_in_organization_cid'
+        db.add_column(u'remapp_personparticipant', 'person_role_in_organization_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid1020_roleorg', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+
+        # Changing field 'XrayFilters.xray_filter_thickness_minimum'
+        db.alter_column(u'remapp_xrayfilters', 'xray_filter_thickness_minimum', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'XrayFilters.xray_filter_thickness_maximum'
+        db.alter_column(u'remapp_xrayfilters', 'xray_filter_thickness_maximum', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.positioner_primary_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'positioner_primary_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.positioner_primary_end_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'positioner_primary_end_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.compression_thickness'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'compression_thickness', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.table_horizontal_rotation_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'table_horizontal_rotation_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.positioner_secondary_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'positioner_secondary_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.table_cradle_tilt_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'table_cradle_tilt_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.positioner_secondary_end_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'positioner_secondary_end_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.compression_force'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'compression_force', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.table_head_tilt_angle'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'table_head_tilt_angle', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.column_angulation'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'column_angulation', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRayMechanicalData.magnification_factor'
+        db.alter_column(u'remapp_irradeventxraymechanicaldata', 'magnification_factor', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+        # Adding field 'ObserverContext.person_observer_name'
+        db.add_column(u'remapp_observercontext', 'person_observer_name',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'ObserverContext.person_observer_organization_name'
+        db.add_column(u'remapp_observercontext', 'person_observer_organization_name',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'ObserverContext.person_observer_role_in_organization'
+        db.add_column(u'remapp_observercontext', 'person_observer_role_in_organization',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid1002_ptroleorg', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'ObserverContext.person_observer_role_in_procedure'
+        db.add_column(u'remapp_observercontext', 'person_observer_role_in_procedure',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid1002_ptroleproc', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+
+        # Changing field 'GeneralStudyModuleAttr.modality_type'
+        db.alter_column(u'remapp_generalstudymoduleattr', 'modality_type', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'XrayTubeCurrent.xray_tube_current'
+        db.alter_column(u'remapp_xraytubecurrent', 'xray_tube_current', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'Calibration.calibration_factor'
+        db.alter_column(u'remapp_calibration', 'calibration_factor', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'Calibration.calibration_uncertainty'
+        db.alter_column(u'remapp_calibration', 'calibration_uncertainty', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+        # Adding field 'CtRadiationDose.uid_type'
+        db.add_column(u'remapp_ctradiationdose', 'uid_type',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid1011_uid', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+
+        # Changing field 'AccumProjXRayDose.total_acquisition_time'
+        db.alter_column(u'remapp_accumprojxraydose', 'total_acquisition_time', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'PulseWidth.pulse_width'
+        db.alter_column(u'remapp_pulsewidth', 'pulse_width', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+        # Adding field 'IrradEventXRaySourceData.derivation_cid'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'derivation_cid',
+                      self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tid10003b_derivation', null=True, to=orm['remapp.ContextID']),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.collimated_field_height'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'collimated_field_height',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.collimated_field_width'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'collimated_field_width',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_absorbing_material'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_absorbing_material',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_spacing_material'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_spacing_material',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_thickness'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_thickness',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=6, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_pitch'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_pitch',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=6, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_aspect_ratio'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_aspect_ratio',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_period'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_period',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=6, blank=True),
+                      keep_default=False)
+
+        # Adding field 'IrradEventXRaySourceData.grid_focal_distance'
+        db.add_column(u'remapp_irradeventxraysourcedata', 'grid_focal_distance',
+                      self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=6, blank=True),
+                      keep_default=False)
+
+
+        # Changing field 'IrradEventXRaySourceData.average_glandular_dose'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'average_glandular_dose', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRaySourceData.average_xray_tube_current'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'average_xray_tube_current', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRaySourceData.derivation'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'derivation', self.gf('django.db.models.fields.CharField')(max_length=16, null=True))
+
+        # Changing field 'IrradEventXRaySourceData.collimated_field_area'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'collimated_field_area', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRaySourceData.pulse_rate'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'pulse_rate', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRaySourceData.number_of_pulses'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'number_of_pulses', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=2))
+
+        # Changing field 'IrradEventXRaySourceData.irradiation_duration'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'irradiation_duration', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'IrradEventXRaySourceData.focal_spot_size'
+        db.alter_column(u'remapp_irradeventxraysourcedata', 'focal_spot_size', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.top_z_location_of_reconstructable_volume'
+        db.alter_column(u'remapp_scanninglength', 'top_z_location_of_reconstructable_volume', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.exposed_range'
+        db.alter_column(u'remapp_scanninglength', 'exposed_range', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.scanning_length'
+        db.alter_column(u'remapp_scanninglength', 'scanning_length', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.top_z_location_of_scanning_length'
+        db.alter_column(u'remapp_scanninglength', 'top_z_location_of_scanning_length', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.length_of_reconstructable_volume'
+        db.alter_column(u'remapp_scanninglength', 'length_of_reconstructable_volume', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.bottom_z_location_of_reconstructable_volume'
+        db.alter_column(u'remapp_scanninglength', 'bottom_z_location_of_reconstructable_volume', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
+
+        # Changing field 'ScanningLength.bottom_z_location_of_scanning_length'
+        db.alter_column(u'remapp_scanninglength', 'bottom_z_location_of_scanning_length', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=16, decimal_places=8))
 
 
 
