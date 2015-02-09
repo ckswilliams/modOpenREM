@@ -76,27 +76,31 @@ def dx_summary_list_filter(request):
     f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
     if plotting:
+        # Required for mean DAP per acquisition plot
         acquisitionSummary = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
+        # Required for mean DAP per month plot
         acquisitionDAPoverTime = [None] * len(acquisitionSummary)
-
         startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-
-        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
         today = datetime.date.today()
 
+        # Required for all plots
+        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
+
         for idx, protocol in enumerate(acquisitionSummary):
+            # Required for mean DAP per acquisition plot AND mean DAP per month plot
             subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
 
-            # Work out the mean total DLP per month for this acquisition protocol
-            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
-            # End of working out the mean total DLP per month for this acquisition protocol
-
+            # Required for mean DAP per acquisition plot
             dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
+            # Required for mean DAP per month plot
+            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval='months')
+
+        # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
         for day in range(7):
             studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
@@ -186,28 +190,31 @@ def dx_histogram_list_filter(request):
     if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
 
     if plotting:
+        # Required for mean DAP per acquisition plot
         acquisitionSummary = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
+        # Required for mean DAP per month plot
         acquisitionDAPoverTime = [None] * len(acquisitionSummary)
-
         startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-
-        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
         today = datetime.date.today()
 
-        for idx, protocol in enumerate(acquisitionSummary):
+        # Required for all plots
+        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
 
+        for idx, protocol in enumerate(acquisitionSummary):
+            # Required for mean DAP per acquisition plot AND mean DAP per month plot
             subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
 
-            # Work out the mean total DLP per month for this acquisition protocol
-            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
-            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
-            # End of working out the mean total DLP per month for this acquisition protocol
-
+            # Required for mean DAP per acquisition plot
             dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
+            # Required for mean DAP per month plot
+            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
+
+        # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
         for day in range(7):
             studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
@@ -281,33 +288,38 @@ def ct_summary_list_filter(request):
     f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT').distinct())
 
     if plotting:
+        # Required for mean DLP per acquisition plot
         acquisitionSummary = f.qs.exclude(ct_radiation_dose__ct_irradiation_event_data__dlp__isnull=True).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp')).order_by('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = f.qs.exclude(ct_radiation_dose__ct_irradiation_event_data__dlp__isnull=True).filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=protocol.get('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
+        # Required for mean DLP per study type plot
         studySummary = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
+        # Required for mean DLP per study type per week plot
         studyDLPoverTime = [None] * len(studySummary)
-
         startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-
-        qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True)
         today = datetime.date.today()
 
+        # Required for all plots
+        qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True)
+
         for idx, study in enumerate(studySummary):
+            # Required for mean DLP per study type plot AND mean DLP per study type per week plot
             subqs = qs.filter(study_description=study.get('study_description'))
 
-            # Work out the mean total DAP per week for this study description
-            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
-            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
-            # End of working out the mean total DAP per week for this study description
-
+            # Required for mean DLP per study type plot
             dlpValues = subqs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
+            # Required for mean DLP per study type per week plot
+            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+
+        # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
         for day in range(7):
             studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
@@ -399,32 +411,35 @@ def ct_histogram_list_filter(request):
     if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
 
     if plotting:
+        # Required for mean DLP per acquisition plot
         acquisitionSummary = f.qs.exclude(Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol__isnull=True)|Q(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol='')).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp')).order_by('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=protocol.get('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
+        # Required for mean DLP per study type plot
         studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
+        # Required for mean DLP per study type per week plot
         studyDLPoverTime = [None] * len(studySummary)
-
         startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-
         today = datetime.date.today()
 
         for idx, study in enumerate(studySummary):
+            # Required for Mean DLP per study type plot AND mean DLP per study type per week plot
             subqs = f.qs.filter(study_description=study.get('study_description'))
 
-            # Work out the mean total DAP per week for this study description
-            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
-            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
-            # End of working out the mean total DAP per week for this study description
-
+            # Required for mean DLP per study type plot
             dlpValues = subqs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
+            # Required for mean DLP per study type per week plot
+            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+
+        # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
         for day in range(7):
             studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
