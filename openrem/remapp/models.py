@@ -490,7 +490,13 @@ class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
-    
+
+    def convert_gym2_to_cgycm2(self):
+        """Converts Gy.m2 to cGy.cm2 for display in web interface
+        """
+        if self.dose_area_product_total:
+            return 1000000*self.dose_area_product_total
+
 
 class PatientModuleAttr(models.Model):  # C.7.1.1
     """Patient Module C.7.1.1

@@ -115,8 +115,8 @@ def rfcsv(filterdict):
     ]
 
     from django.db.models import Max
-    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames'))
-    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumprojxraydose__total_number_of_radiographic_frames__max']):
+    max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
+    for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Image view',
@@ -147,8 +147,8 @@ def rfcsv(filterdict):
             exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_number_of_radiographic_frames,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_area_product_total,
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames,
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total,
             ]
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
@@ -244,8 +244,8 @@ def _rf_common_get_data(source):
         source.patientmoduleattr_set.get().not_patient_indicator,
         source.study_description,
         source.requested_procedure_code_meaning,
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_area_product_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().dose_rp_total),
+        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total),
+        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_rp_total),
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total),
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total),
         str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_fluoro_time),

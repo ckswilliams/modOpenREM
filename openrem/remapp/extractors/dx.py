@@ -343,29 +343,28 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     _irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
-    _accumulatedxraydose_update(dataset,event)
+    _accumulatedxraydose_update(event)
 
 
-def _accumulatedxraydose(dataset,proj):
-    from remapp.models import AccumXRayDose, AccumProjectionXRayDose
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid
+def _accumulatedxraydose(proj):
+    from remapp.models import AccumXRayDose, AccumIntegratedProjRadiogDose
+    from remapp.tools.get_values import get_or_create_cid
     accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
-    accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
+    accum.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     accum.save()
-    accumdx = AccumProjectionXRayDose.objects.create(accumulated_xray_dose=accum)
-    accumdx.dose_area_product_total = 0.0
-    accumdx.total_number_of_radiographic_frames = 0
-    accumdx.save()
+    accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
+    accumint.dose_area_product_total = 0.0
+    accumint.total_number_of_radiographic_frames = 0
+    accumint.save()
 
 
-def _accumulatedxraydose_update(dataset,event):
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid
+def _accumulatedxraydose_update(event):
     from decimal import Decimal
-    accumdx = event.projection_xray_radiation_dose.accumxraydose_set.get().accumprojxraydose_set.get()
-    accumdx.total_number_of_radiographic_frames = accumdx.total_number_of_radiographic_frames + 1
+    accumint = event.projection_xray_radiation_dose.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+    accumint.total_number_of_radiographic_frames = accumint.total_number_of_radiographic_frames + 1
     if event.dose_area_product:
-        accumdx.dose_area_product_total += Decimal(event.dose_area_product)
-    accumdx.save()
+        accumint.dose_area_product_total += Decimal(event.dose_area_product)
+    accumint.save()
 
 
 def _projectionxrayradiationdose(dataset,g):
@@ -380,7 +379,7 @@ def _projectionxrayradiationdose(dataset,g):
     proj.xray_source_data_available = get_or_create_cid('R-0038D','Yes')
     proj.xray_mechanical_data_available = get_or_create_cid('R-0038D','Yes')
     proj.save()
-    _accumulatedxraydose(dataset,proj)
+    _accumulatedxraydose(proj)
     _irradiationeventxraydata(dataset,proj)
 
 
