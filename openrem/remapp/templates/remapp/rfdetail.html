@@ -18,7 +18,11 @@
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
     <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>Total DAP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm2</li>
+    <li>
+        Total DAP:
+        {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+        cGy.cm2
+    </li>
     <li>Total dose at RP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
     <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>

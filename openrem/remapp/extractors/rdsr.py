@@ -343,14 +343,9 @@ def _accumulatedmammoxraydose(dataset,accum): # TID 10005
 
 def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
     from remapp.tools.get_values import get_or_create_cid
-    from remapp.models import AccumProjectionXRayDose, ContextID
-    
-    accumproj = AccumProjectionXRayDose.objects.create(accumulated_xray_dose=accum)
+    from remapp.models import AccumProjXRayDose
+    accumproj = AccumProjXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-            accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
-            accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
             accumproj.fluoro_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
@@ -363,6 +358,11 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
             accumproj.acquisition_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
             accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
+        # TODO: Remove the following four items, as they are also imported (correctly) into _accumulatedintegratedprojectionradiographydose
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
+            accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
+            accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
