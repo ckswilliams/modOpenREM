@@ -28,7 +28,7 @@
     </li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
-    <li>Number of events: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</li>
+    <li>Number of events: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames }}</li>
     <li>
         Total DAP:
         {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
