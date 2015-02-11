@@ -12,6 +12,46 @@ class Migration(DataMigration):
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
 
+        # For every AccumProjXRayDose table, the total DAP, Total RP dose, Total no. frames and any reference point
+        # definitions (code or text) should be copied to the AccumIntegratedProjRadiogDose table.
+        # For fluoro rdsr imports, the value will always already exist in both tables, and will be the same.
+        # For dx image header imports, the value will only be in the AccumProjXRayDose table.
+        # Obviously we can't assume either - what to do if both are filled and the values are different?
+        # The AccumIntegratedProjRadiogDose object won't exist for dx studies already in the database.
+
+        from remapp.models import AccumIntegratedProjRadiogDose
+        for accumprojx in orm.AccumProjXRayDose.objects.all():
+            dap = accumprojx.dose_area_product_total
+            rp = accumprojx.dose_rp_total
+            frames = accumprojx.total_number_of_radiographic_frames
+            ref_def = accumprojx.reference_point_definition
+            ref_def_code = accumprojx.reference_point_definition_code
+            try:
+                accuminteg = accumprojx.accumulated_xray_dose.accumintegratedprojradiogdose_set.get()
+            except:  # dx imports won't have an AccumIntegratedProjRadiogDose object
+                accum = accumprojx.accumulated_xray_dose
+                accuminteg = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
+            if dap:
+                if accuminteg.dose_area_product_total:
+                    # not sure what to do here...
+                    pass
+                else:
+                    accuminteg.dose_area_product_total = dap
+            if rp:
+                if accuminteg.dose_rp_total:
+                    pass
+                else:
+                    accuminteg.dose_rp_total = rp
+            if frames:
+                if accuminteg.total_number_of_radiographic_frames:
+                    pass
+                else:
+                    accuminteg.total_number_of_radiographic_frames = frames
+            if ref_def:
+                if accuminteg.reference_point_definition:
+                    pass
+                else:
+                    accuminteg.reference_point_definition = ref_def
 
 
     def backwards(self, orm):
