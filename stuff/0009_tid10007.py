@@ -32,7 +32,7 @@ class Migration(DataMigration):
                 accuminteg = orm.AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
             if dap:
                 if accuminteg.dose_area_product_total:
-                    # not sure what to do here...
+                    # Assume that existing value is true?
                     pass
                 else:
                     accuminteg.dose_area_product_total = dap
@@ -51,6 +51,12 @@ class Migration(DataMigration):
                     pass
                 else:
                     accuminteg.reference_point_definition = ref_def
+            if ref_def:
+                if accuminteg.reference_point_definition_code:
+                    pass
+                else:
+                    accuminteg.reference_point_definition_code = ref_def_code
+            accuminteg.save()
 
 
     def backwards(self, orm):
