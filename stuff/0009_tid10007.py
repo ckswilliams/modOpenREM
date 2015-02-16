@@ -32,7 +32,8 @@ class Migration(DataMigration):
                 accuminteg = orm.AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
             if dap:
                 if accuminteg.dose_area_product_total:
-                    # Assume that existing value is true?
+                    # RDSR fluoro studies will have the same data in both fields, DX image studies will just have
+                    # AccumProjXRayDose
                     pass
                 else:
                     accuminteg.dose_area_product_total = dap
