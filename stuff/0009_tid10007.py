@@ -19,7 +19,6 @@ class Migration(DataMigration):
         # Obviously we can't assume either - what to do if both are filled and the values are different?
         # The AccumIntegratedProjRadiogDose object won't exist for dx studies already in the database.
 
-        from remapp.models import AccumIntegratedProjRadiogDose
         for accumprojx in orm.AccumProjXRayDose.objects.all():
             dap = accumprojx.dose_area_product_total
             rp = accumprojx.dose_rp_total
@@ -30,7 +29,7 @@ class Migration(DataMigration):
                 accuminteg = accumprojx.accumulated_xray_dose.accumintegratedprojradiogdose_set.get()
             except:  # dx imports won't have an AccumIntegratedProjRadiogDose object
                 accum = accumprojx.accumulated_xray_dose
-                accuminteg = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
+                accuminteg = orm.AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
             if dap:
                 if accuminteg.dose_area_product_total:
                     # not sure what to do here...
