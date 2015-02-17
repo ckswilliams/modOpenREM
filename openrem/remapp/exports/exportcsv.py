@@ -128,7 +128,7 @@ def exportFL2excel(filterdict):
             exams.patientstudymoduleattr_set.get().patient_size,
             exams.patientstudymoduleattr_set.get().patient_weight,
             exams.study_description,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames,
+            exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count(),
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total,
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_rp_total,
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total,
