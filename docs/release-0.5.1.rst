@@ -18,6 +18,7 @@ Specific upgrade instructions
 **Always make sure you have converted your database to South before attempting an upgrade**
 
 Quick reminder of how, if you haven't done it already
+
 .. code-block:: bash
 
     # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
