@@ -1,14 +1,16 @@
-OpenREM Release Notes version 0.5.0
+OpenREM Release Notes version 0.5.1
 ***********************************
+
+*Document is being created - please do not attempt to follow!*
 
 Headline changes
 ================
 
+* Major database modification to remove table name length errors
+* Extended the field value lengths to better incorporate all possible values and decimal places
+* Improved import of grid and filter information from DX images
+* Improved DX summary and detail web pages
 
-* Import, display and export of CR/DX data from image headers
-* Export of study data from fluoroscopy to xlsx files
-* Importing data from Windows using *.dcm style wildcards
-* Hologic tomography projection images are no longer excluded if part of a Combo exposure
 
 Specific upgrade instructions
 =============================
@@ -26,15 +28,21 @@ Quick reminder of how, if you haven't done it already:
         python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
 
-Upgrading from versions before 0.4.3
-````````````````````````````````````
+Upgrading from version 0.3.9 or earlier
+```````````````````````````````````````
+Upgrade to 0.4.2, then install RabbitMQ, then upgrade to  0.5.1
+
+Upgrading from 0.4.2, install RabbitMQ, then upgrade 0.5.1
+
+Upgrading from 0.4.3 or 0.5.0, go straight to 0.5.1
+
 
 If you are upgrading from 0.3.9 or earlier, you will need to upgrade to
 version 0.4.2 first. See the :doc:`release-0.4.3`.
 
 If you are upgrading from 0.4.0 or later, the instructions in :doc:`release-0.4.3`
 still need to be followed to install/setup RabbitMQ and Celery and to update
-the configuration files, but you can go straight to 0.5.0b1 rather than 
+the configuration files, but you can go straight to 0.5.0 rather than
 installing 0.4.3.
 
 Upgrading from version 0.4.3
