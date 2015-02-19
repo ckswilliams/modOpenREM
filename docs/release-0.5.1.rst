@@ -17,24 +17,87 @@ Specific upgrade instructions
 
 **Always make sure you have converted your database to South before attempting an upgrade**
 
-Quick reminder of how, if you haven't done it already:
+Quick reminder of how, if you haven't done it already::
 
-    Linux::
-
+        # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
         python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
 
-    Windows::
-
+        # Windows
         python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
 
 Upgrading from version 0.3.9 or earlier
 ```````````````````````````````````````
-Upgrade to 0.4.2, then install RabbitMQ, then upgrade to  0.5.1
+Upgrade to 0.4.2 - add local_settings, transfer db settings
 
-Upgrading from 0.4.2, install RabbitMQ, then upgrade 0.5.1
+Upgrading from versions 0.4.0 - 0.4.3
+`````````````````````````````````````
+*Versions 0.4.0 - 0.4.2*
 
-Upgrading from 0.4.3 or 0.5.0, go straight to 0.5.1
+Install RabbitMQ, move settings from ``openrem`` to ``openremproject``
+
+*Versions 0.4.0 - 0.4.3*
+
+Upgrade to 0.5.0, database migration
+
+Upgrading from version 0.5.0
+````````````````````````````
+Find out how many migration files you have
+
+Method 1:
+
+    Use a file browser or terminal to list the contents of the ``migrations`` folder, eg::
+
+        # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+        ls /usr/local/lib/python2.7/dist-packages/openrem/remapp/migrations/
+
+Method 2:
+
+    Use the Django ``manage.py`` program to list the existing migrations::
+
+        # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate --list remapp
+
+        # Windows
+        python C:\Python27\Lib\site-packages\openrem\manage.py migrate --list remapp
+
+    The output should look something like this::
+
+        remapp
+        (*) 0001_initial
+        (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
+        (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
+        (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
+        (*) 0005_auto__add_exports__add_size_upload
+        (*) 0006_auto__chg_field_exports_filename
+        (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
+
+
+Rename the two 050 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``
+and ``0009_051datamigration.py``. The ``051schemamigration`` **must** come before the ``051datamigration``
+If you now re-run ``migrate --list remapp`` you should get a listing similar to this::
+
+     remapp
+      (*) 0001_initial
+      (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
+      (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
+      (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
+      (*) 0005_auto__add_exports__add_size_upload
+      (*) 0006_auto__chg_field_exports_filename
+      (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
+      ( ) 0008_051schemamigration
+      ( ) 0009_051datamigration
+
+The star indicates that a migration has already been completed. If you have any that are not completed apart from the
+``051schemamigration`` and the ``051datamigration`` then please resolve these first.
+
+Now execute the migrations::
+
+    # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+
+    # Windows
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 
 If you are upgrading from 0.3.9 or earlier, you will need to upgrade to
