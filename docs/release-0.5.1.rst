@@ -21,10 +21,12 @@ Quick reminder of how, if you haven't done it already
 
 .. sourcecode:: bash
 
-    # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+    # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+    python /usr/local/lib/python2.7/site-packages/openrem/manage.py convert_to_south remapp
 
-    # Windows
+    # Windows, assuming no virtualenv
     python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
 
@@ -33,12 +35,17 @@ Upgrading from version 0.3.9 or earlier
 
 *Back up your database*
 
-Upgrade to 0.4.2 - add local_settings, transfer db settings, irreversible database migration
-
 *  ``pip install openrem==0.4.2``
 *  Migrate the schema
-    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
-    * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
+
+    .. sourcecode:: bash
+
+        # Linux: Debian/Ubuntu and derivatives
+        python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        python /usr/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+        # Windows:
+        C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
 
     When South has considered the changes to the schema, you will see the following message::
 
