@@ -19,7 +19,7 @@ Specific upgrade instructions
 
 Quick reminder of how, if you haven't done it already
 
-.. sourcecode:: bat
+.. sourcecode:: bash
 
     # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
@@ -30,7 +30,31 @@ Quick reminder of how, if you haven't done it already
 
 Upgrading from version 0.3.9 or earlier
 ```````````````````````````````````````
-Upgrade to 0.4.2 - add local_settings, transfer db settings
+
+*Back up your database*
+
+Upgrade to 0.4.2 - add local_settings, transfer db settings, irreversible database migration
+
+*  ``pip install openrem==0.4.2``
+*  Migrate the schema
+    * Linux: ``python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp``
+    * Windows: ``C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp``
+
+    When South has considered the changes to the schema, you will see the following message::
+
+     ? The field 'Observer_context.device_observer_name' does not have a default specified, yet is NOT NULL.
+     ? Since you are making this field nullable, you MUST specify a default
+     ? value to use for existing rows. Would you like to:
+     ?  1. Quit now.
+     ?  2. Specify a one-off value to use for existing columns now
+     ?  3. Disable the backwards migration by raising an exception; you can edit the migration to fix it later
+     ? Please select a choice: 3
+
+    * As per the final line above, please select option 3.
+
+*  Update the settings files
+
+
 
 Upgrading from versions 0.4.0 - 0.4.3
 `````````````````````````````````````
