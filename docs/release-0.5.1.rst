@@ -59,7 +59,25 @@ Upgrading from version 0.3.9 or earlier
 
     * As per the final line above, please select option 3.
 
-*  Update the settings files
+*  Create and populate the new local_settings.py file
+
+    In the ``openrem/openrem`` folder, either rename ``local_settings.py.example`` to ``local_settings.py``, or better,
+    create a  new file by copying the contents of `this link
+    <https://bitbucket.org/openrem/openrem/src/d906e25cd793833bed9e55356b72ac57c12733a1/openrem/openremproject/local_settings.py.example?at=develop>`_
+    into a file called ``local_settings.py`` in that folder.
+
+    Copy the database details from ``settings.py`` into ``local_settings.py``
+
+    The ``openrem/openrem`` folder can be found at:
+
+    .. sourcecode:: bash
+
+        # Linux: Debian/Ubuntu and derivatives
+        /usr/lib/python2.7/dist-packages/openrem/openrem
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        /usr/lib/python2.7/site-packages/openrem/openrem
+        # Windows:
+        C:\Python27\Lib\site-packages\openrem\openrem
 
 
 
