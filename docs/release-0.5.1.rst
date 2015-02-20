@@ -19,7 +19,7 @@ Specific upgrade instructions
 
 Quick reminder of how, if you haven't done it already
 
-.. sourcecode:: bash
+.. sourcecode:: bat
 
     # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
