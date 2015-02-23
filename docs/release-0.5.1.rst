@@ -61,10 +61,10 @@ Upgrading from version 0.3.9 or earlier
 
 *  Create and populate the new local_settings.py file
 
-    In the ``openrem/openrem`` folder, either rename ``local_settings.py.example`` to ``local_settings.py``, or better
-    still, create a  new file by copying the contents of `this link
+    In the ``openrem/openrem`` folder, create a new file called ``local_settings.py`` and copy the `contents of this link
     <https://bitbucket.org/openrem/openrem/raw/a37540ba88a5e9b383cf0ea03a3e77fb35638f43/openrem/openremproject/local_settings.py.example>`_
-    into a file called ``local_settings.py`` in that folder.
+    into a the file and save it. Alternatively, rename ``local_settings.py.example`` to ``local_settings.py`` - this is
+    an older version of the file.
 
     Copy the database details from ``settings.py`` into ``local_settings.py``
 
