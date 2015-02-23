@@ -68,6 +68,15 @@ Upgrading from version 0.3.9 or earlier
 
     Copy the database details from ``settings.py`` into ``local_settings.py``
 
+    * Change the secret key from the default
+
+        *   Generate a new secret key - http://www.miniwebtool.com/django-secret-key-generator/ is a
+            suitable method of creating a new key.
+        *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
+
+*   Move the existing ``settings.py`` out of the python directories (delete or move somewher as a backup)
+*   Rename the ``settings.py.new`` to ``settings.py``
+
     The ``openrem/openrem`` folder can be found at:
 
     .. sourcecode:: bash
@@ -79,6 +88,18 @@ Upgrading from version 0.3.9 or earlier
         # Windows:
         C:\Python27\Lib\site-packages\openrem\openrem
 
+* Restart your webserver to check everything looks ok
+
+* Add some users
+
+    * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally
+    created the database (``manage.py syncdb``)
+    * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and
+    they should be created).
+
+        + ``viewgroup`` can browse the data only
+        + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/openrem/openrem/issue/21/>`_)
+        + ``admingroup`` can delete studies in addition to anything the export group can do
 
 
 Upgrading from versions 0.4.0 - 0.4.3
