@@ -59,7 +59,7 @@ Upgrading from version 0.3.9 or earlier
 
     * As per the final line above, please select option 3.
 
-*  Create and populate the new local_settings.py file
+*  Create and populate the database settings in the new local_settings.py file
 
     In the ``openrem/openrem`` folder, create a new file called ``local_settings.py`` and copy the `contents of this link
     <https://bitbucket.org/openrem/openrem/raw/a37540ba88a5e9b383cf0ea03a3e77fb35638f43/openrem/openremproject/local_settings.py.example>`_
@@ -68,13 +68,13 @@ Upgrading from version 0.3.9 or earlier
 
     Copy the database details from ``settings.py`` into ``local_settings.py``
 
-    * Change the secret key from the default
+* Change the secret key from the default
 
-        *   Generate a new secret key - http://www.miniwebtool.com/django-secret-key-generator/ is a
-            suitable method of creating a new key.
-        *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
+    *   Generate a new secret key - http://www.miniwebtool.com/django-secret-key-generator/ is a
+        suitable method of creating a new key.
+    *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
 
-*   Move the existing ``settings.py`` out of the python directories (delete or move somewher as a backup)
+*   Move the existing ``settings.py`` out of the python directories (delete or move somewhere as a backup)
 *   Rename the ``settings.py.new`` to ``settings.py``
 
     The ``openrem/openrem`` folder can be found at:
@@ -107,6 +107,18 @@ Upgrading from versions 0.4.0 - 0.4.3
 *Versions 0.4.0 - 0.4.2*
 
 Install RabbitMQ, move settings from ``openrem`` to ``openremproject``
+
+*Back up your database*
+
+* Install version 0.4.3
+
+    * ``pip install openrem==0.4.3``
+
+* Install RabbitMQ
+
+    * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
+    * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
+
 
 *Versions 0.4.0 - 0.4.3*
 
