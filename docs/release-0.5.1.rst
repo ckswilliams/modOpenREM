@@ -97,6 +97,7 @@ Upgrading from version 0.3.9 or earlier
 
     * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally
     created the database (the ``manage.py syncdb`` command - `Do you want to superuser`)
+
     * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and
     they should be there when you go back to admin).
 
