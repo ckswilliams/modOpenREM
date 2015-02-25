@@ -16,7 +16,7 @@
         {% if admin.exportperm or admin.adminperm %}
         <ul>
           <li><a href="/openrem/exportdxcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
-          <!--<li><a href="/openrem/exportdxxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>-->
+          <li><a href="/openrem/exportdxxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
         </ul>
         {% else %}
         <p>
