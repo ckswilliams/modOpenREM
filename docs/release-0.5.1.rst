@@ -57,25 +57,19 @@ Upgrading from version 0.3.9 or earlier
      ?  3. Disable the backwards migration by raising an exception; you can edit the migration to fix it later
      ? Please select a choice: 3
 
-    * As per the final line above, please select option 3.
+    * As per the final line above, please select option 3, and then execute the migration:
+
+    .. sourcecode:: bash
+
+        # Linux: Debian/Ubuntu and derivatives
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
+
+        # Windows, assuming no virtualenv
+        python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 *  Create and populate the database settings in the new local_settings.py file
-
-    In the ``openrem/openrem`` folder, create a new file called ``local_settings.py`` and copy the `contents of this link
-    <https://bitbucket.org/openrem/openrem/raw/a37540ba88a5e9b383cf0ea03a3e77fb35638f43/openrem/openremproject/local_settings.py.example>`_
-    into a the file and save it. Alternatively, rename ``local_settings.py.example`` to ``local_settings.py`` - this is
-    an older version of the file.
-
-    Copy the database details from ``settings.py`` into ``local_settings.py``
-
-* Change the secret key from the default
-
-    *   Generate a new secret key - http://www.miniwebtool.com/django-secret-key-generator/ is a
-        suitable method of creating a new key.
-    *   Copy the new key and use it to replace the default key in the ``local_settings.py`` file
-
-*   Move the existing ``settings.py`` out of the python directories (delete or move somewhere as a backup)
-*   Rename the ``settings.py.new`` to ``settings.py``
 
     The ``openrem/openrem`` folder can be found at:
 
@@ -88,14 +82,23 @@ Upgrading from version 0.3.9 or earlier
         # Windows:
         C:\Python27\Lib\site-packages\openrem\openrem
 
-* Restart your webserver to check everything looks ok
+    In the ``openrem/openrem`` folder, create a new file called ``local_settings.py`` and copy the `contents of this link
+    <https://bitbucket.org/openrem/openrem/raw/a37540ba88a5e9b383cf0ea03a3e77fb35638f43/openrem/openremproject/local_settings.py.example>`_
+    into a the file and save it. Alternatively, rename ``local_settings.py.example`` to ``local_settings.py`` - this is
+    an older version of the file.
 
+    Copy the database details from ``settings.py`` into ``local_settings.py``
+
+* Change the secret key - you can use http://www.miniwebtool.com/django-secret-key-generator/ to generate a new one
+* Move the existing ``settings.py`` out of the python directories (delete or move somewhere as a backup)
+* Rename the ``settings.py.new`` to ``settings.py``
+* Restart your webserver to check everything looks ok
 * Add some users
 
     * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally
-    created the database (``manage.py syncdb``)
+    created the database (the ``manage.py syncdb`` command - `Do you want to superuser`)
     * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and
-    they should be created).
+    they should be there when you go back to admin).
 
         + ``viewgroup`` can browse the data only
         + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/openrem/openrem/issue/21/>`_)
