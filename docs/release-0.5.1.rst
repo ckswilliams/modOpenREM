@@ -96,10 +96,10 @@ Upgrading from version 0.3.9 or earlier
 * Add some users
 
     * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally
-    created the database (the ``manage.py syncdb`` command - `Do you want to superuser`)
+      created the database (the ``manage.py syncdb`` command - `Do you want to create a superuser`)
 
     * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and
-    they should be there when you go back to admin).
+      they should be there when you go back to admin).
 
         + ``viewgroup`` can browse the data only
         + ``exportgroup`` can do as view group plus export data to a spreadsheet, and will be able to import height and weight data in due course (See `Issue #21 <https://bitbucket.org/openrem/openrem/issue/21/>`_)
