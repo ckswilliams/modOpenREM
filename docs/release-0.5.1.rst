@@ -123,6 +123,38 @@ Install RabbitMQ, move settings from ``openrem`` to ``openremproject``
     * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
     * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
+* Move local_settings.py details from openrem to openremproject
+
+    The inner ``openrem`` Django project folder has now been renamed ``openremproject``
+    The customised ``local_settings.py`` file and the ``wsgi.py`` file have
+    remain in the old ``openrem`` folder. The ``openrem/openrem`` folder can be found as detailed in the upgrade from
+    '0.3.9 or earlier' instructions above, and the new ``openrem/openremproject`` folder is in the same place.
+
+    * Move ``local_settings.py`` to ``openremproject``. If you have kept the older local_settings file, you may like to
+      instead rename the ``local_settings.py.example`` file instead, then transfer the database settings and change the
+      secret key.
+
+    * Set the path for ``MEDIA_ROOT``. The webserver needs to be able to write to this location - it is where OpenREM
+      will store export files etc so that they can be downloaded. For suggestions, see the main _install instructions.
+
+    * Set ``ALLOWED_HOSTS``. For details see the `Django docs <https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts>`_
+      A ``'*'`` allows any host - see the Django docs for the risk of this.
+
+* Move wsgi.py from openrem to openremproject or rename wsgi.py.example in openremproject
+
+    If you haven't edited it, simply rename the new version in ``openremproject``. Otherwise, move the old version and
+    edit the following line as follows:
+
+    .. sourcecode:: bash
+
+    # Old:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openrem.settings")
+    # New:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openremproject.settings")
+
+
+* Tidying up - you should delete the old ``openrem`` folder - you might like to take a backup first!
+
 
 *Versions 0.4.0 - 0.4.3*
 
