@@ -69,7 +69,7 @@ Upgrading from version 0.3.9 or earlier
         # Windows, assuming no virtualenv
         python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
-*  Create and populate the database settings in the new local_settings.py file
+*  Create and populate the database settings in the new ``local_settings.py`` file
 
     The ``openrem/openrem`` folder can be found at:
 
@@ -119,7 +119,7 @@ Upgrading from versions 0.4.0 - 0.4.2
     * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
     * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
 
-* Move local_settings.py details from openrem to openremproject
+* Move ``local_settings.py`` details from ``openrem`` to ``openremproject``
 
     The inner ``openrem`` Django project folder has now been renamed ``openremproject``
     The customised ``local_settings.py`` file and the ``wsgi.py`` file have
@@ -136,7 +136,7 @@ Upgrading from versions 0.4.0 - 0.4.2
     * Set ``ALLOWED_HOSTS``. For details see the `Django docs <https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts>`_
       A ``'*'`` allows any host - see the Django docs for the risk of this.
 
-* Move wsgi.py from openrem to openremproject or rename wsgi.py.example in openremproject
+* Move ``wsgi.py`` from ``openrem`` to ``openremproject`` or rename ``wsgi.py.example`` in ``openremproject``
 
     If you haven't edited it, simply rename the new version in ``openremproject``. Otherwise, move the old version and
     edit the following line as follows:
@@ -178,7 +178,7 @@ Upgrading from versions 0.4.0 - 0.4.2
         python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 After restarting the webserver, you should now have OpenREM 0.5.0 up and running. If you wish to test export
-functionality at this stage, start the Celery task queue - instructions in the _`install` docs or at the end of this
+functionality at this stage, start the Celery task queue - instructions in the :doc:`install` docs or at the end of this
 guide.
 
 Now move to `Upgrading from version 0.5.0`.
@@ -262,37 +262,6 @@ Now execute the migrations::
     # Windows
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
-
-If you are upgrading from 0.3.9 or earlier, you will need to upgrade to
-version 0.4.2 first. See the :doc:`release-0.4.3`.
-
-If you are upgrading from 0.4.0 or later, the instructions in :doc:`release-0.4.3`
-still need to be followed to install/setup RabbitMQ and Celery and to update
-the configuration files, but you can go straight to 0.5.0 rather than
-installing 0.4.3.
-
-Upgrading from version 0.4.3
-````````````````````````````
-.. sourcecode:: bash
-
-    pip install openrem==0.5.0
-
-(Will need ``sudo`` or equivalent if using linux without a virtualenv)
-
-
-Database migration
-``````````````````
-*Assuming no virtualenv*
-
-Linux::
-
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
-
-Windows::
-
-    C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
-    C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 Restart the web server
 ``````````````````````
