@@ -41,11 +41,11 @@ Upgrading from version 0.3.9 or earlier
     .. sourcecode:: bash
 
         # Linux: Debian/Ubuntu and derivatives
-        python /usr/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
         # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-        python /usr/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
         # Windows:
-        C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+        python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
 
     When South has considered the changes to the schema, you will see the following message::
 
@@ -106,17 +106,13 @@ Upgrading from version 0.3.9 or earlier
         + ``admingroup`` can delete studies in addition to anything the export group can do
 
 
-Upgrading from versions 0.4.0 - 0.4.3
+Upgrading from versions 0.4.0 - 0.4.2
 `````````````````````````````````````
-*Versions 0.4.0 - 0.4.2*
-
-Install RabbitMQ, move settings from ``openrem`` to ``openremproject``
-
 *Back up your database*
 
-* Install version 0.4.3
+* Install version 0.5.0
 
-    * ``pip install openrem==0.4.3``
+    * ``pip install openrem==0.5.0``
 
 * Install RabbitMQ
 
@@ -147,18 +143,65 @@ Install RabbitMQ, move settings from ``openrem`` to ``openremproject``
 
     .. sourcecode:: bash
 
-    # Old:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openrem.settings")
-    # New:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openremproject.settings")
+        # Old:
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openrem.settings")
+        # New:
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openremproject.settings")
 
 
 * Tidying up - you should delete the old ``openrem`` folder - you might like to take a backup first!
 
+* Update web server configuration
 
-*Versions 0.4.0 - 0.4.3*
+    The configuration of the webserver will need to be updated to reflect the new location for the ``settings.py`` file
+    and the ``wsgi.py`` file.
 
-Upgrade to 0.5.0, database migration
+    If you are using the built-in test webserver, static files will no-longer be served unless you use the ``insecure``
+    option:
+
+    .. sourcecode:: bash
+
+        python manage.py runserver x.x.x.x:8000 --insecure
+
+*  Migrate the schema
+
+    .. sourcecode:: bash
+
+        # Linux: Debian/Ubuntu and derivatives
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
+        # Windows:
+        python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+        python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+
+After restarting the webserver, you should now have OpenREM 0.5.0 up and running. If you wish to test export
+functionality at this stage, start the Celery task queue - instructions in the _`install` docs or at the end of this
+guide.
+
+Now move to `Upgrading from version 0.5.0`.
+
+Upgrading from version 0.4.3
+````````````````````````````
+
+The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is required:
+
+.. sourcecode:: bash
+
+    pip install openrem==0.5.0
+
+        # Linux: Debian/Ubuntu and derivatives
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
+        # Windows:
+        python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+        python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+
 
 Upgrading from version 0.5.0
 ````````````````````````````
