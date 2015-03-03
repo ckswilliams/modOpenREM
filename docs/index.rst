@@ -1,5 +1,6 @@
+###################################
 Welcome to OpenREM's documentation!
-===================================
+###################################
 
 .. image:: openrem0105.png
     :width: 105px
@@ -38,9 +39,9 @@ Contents:
     note though that you will need to include the RSRD SOP in the dgatesop.lst
     file.
 
-
+******************
 Indices and tables
-==================
+******************
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -1,22 +1,25 @@
+#####################################
 Previous Release Notes and Change Log
-*************************************
+#####################################
 
+**************************
 Version history change log
-==========================
+**************************
 
     ..  toctree::
         :maxdepth: 1
         
         changes
 
+**************************************
 Release notes and upgrade instructions
-======================================
+**************************************
 
 Each release comes with specific upgrade instructions, so please follow
 the links below for the appropriate version.
     
 Version specific information
-----------------------------
+============================
 
     ..  toctree::
         :maxdepth: 1
@@ -29,9 +32,9 @@ Version specific information
         release-0.4.0
 
 
-
+********************
 Contributing authors
-====================
+********************
 
 The following people have contributed to OpenREM - either with code, documentation or ideas.
 
