@@ -209,18 +209,27 @@ Find out how many migration files you have
 
 Method 1:
 
-    Use a file browser or terminal to list the contents of the ``migrations`` folder, eg::
+    Use a file browser or terminal to list the contents of the ``migrations`` folder, eg:
 
-        # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+    .. sourcecode:: bash
+
+        # Linux: Debian/Ubuntu and derivatives
         ls /usr/local/lib/python2.7/dist-packages/openrem/remapp/migrations/
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        ls /usr/local/lib/python2.7/site-packages/openrem/remapp/migrations/
+        # Windows (alternatively use the file browser):
+        dir C:\Python27\Lib\site-packages\openrem\remapp\migrations\
 
 Method 2:
 
-    Use the Django ``manage.py`` program to list the existing migrations::
+    Use the Django ``manage.py`` program to list the existing migrations:
 
-        # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+    .. sourcecode:: bash
+
+        # Linux: Debian/Ubuntu and derivatives
         python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate --list remapp
-
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate --list remapp
         # Windows
         python C:\Python27\Lib\site-packages\openrem\manage.py migrate --list remapp
 
@@ -254,11 +263,14 @@ If you now re-run ``migrate --list remapp`` you should get a listing similar to 
 The star indicates that a migration has already been completed. If you have any that are not completed apart from the
 ``051schemamigration`` and the ``051datamigration`` then please resolve these first.
 
-Now execute the migrations::
+Now execute the migrations:
 
-    # Linux Debian/Ubuntu - for others/virtualenv substitute 'site-packages' for 'dist-packages'
+.. sourcecode:: bash
+
+    # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
-
+    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+    python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
     # Windows
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
@@ -276,14 +288,16 @@ Restart the Celery task queue
 
 For testing, in a new shell: *(assuming no virtualenv)*
 
-Linux::
+.. sourcecode:: bash
 
+    # Linux: Debian/Ubuntu and derivatives
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openremproject worker -l info
-
-Windows::
-
+    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+    cd /usr/local/lib/python2.7/site-packages/openrem/
+    # Windows
     cd C:\Python27\Lib\site-packages\openrem\
+
+    # All
     celery -A openremproject worker -l info
 
 For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
