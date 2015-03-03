@@ -1,5 +1,5 @@
-OpenREM Release Notes
-************************
+Previous Release Notes and Change Log
+*************************************
 
 Version history change log
 ==========================
@@ -21,6 +21,7 @@ Version specific information
     ..  toctree::
         :maxdepth: 1
         
+        release-0.5.1
         release-0.5.0
         release-0.4.3
         release-0.4.2

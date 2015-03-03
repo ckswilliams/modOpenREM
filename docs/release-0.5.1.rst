@@ -238,16 +238,16 @@ Upgrading from version 0.5.0
             # Windows
             python C:\Python27\Lib\site-packages\openrem\manage.py migrate --list remapp
 
-        The output should look something like this::
+    The output should look something like this::
 
-            remapp
-            (*) 0001_initial
-            (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
-            (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
-            (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
-            (*) 0005_auto__add_exports__add_size_upload
-            (*) 0006_auto__chg_field_exports_filename
-            (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
+        remapp
+        (*) 0001_initial
+        (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
+        (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
+        (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
+        (*) 0005_auto__add_exports__add_size_upload
+        (*) 0006_auto__chg_field_exports_filename
+        (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
 
 
 *   Rename the two 050 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``

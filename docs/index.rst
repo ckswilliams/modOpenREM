@@ -22,6 +22,7 @@ Contents:
     :maxdepth: 2
 
     install
+    release-0.5.1
     releasenotes
     import
     interface
