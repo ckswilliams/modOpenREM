@@ -29,14 +29,17 @@ Quick reminder of how, if you haven't done it already
     # Windows, assuming no virtualenv
     python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
-**************************
-Upgrades from before 0.5.0
-**************************
+***************************
+Upgrading from before 0.5.0
+***************************
 
 Upgrading from version 0.3.9 or earlier
 =======================================
 
-*Back up your database*
+* Back up your database
+
+    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
+    * For a non-production SQLite3 database, simply make a copy of the database file
 
 *  ``pip install openrem==0.4.2``
 *  Migrate the schema
@@ -112,11 +115,10 @@ Upgrading from version 0.3.9 or earlier
 Upgrading from versions 0.4.0 - 0.4.2
 =====================================
 
-* Back up your database at each stage
+* Back up your database
 
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
-
 
 * Install version 0.5.0
 
@@ -194,21 +196,26 @@ Now move to `Upgrading from version 0.5.0`_.
 Upgrading from version 0.4.3
 ============================
 
-The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is required:
+* Back up your database
 
-.. sourcecode:: bash
+    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
+    * For a non-production SQLite3 database, simply make a copy of the database file
 
-    pip install openrem==0.5.0
+* The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is required:
 
-        # Linux: Debian/Ubuntu and derivatives
-        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
-        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
-        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-        python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
-        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
-        # Windows:
-        python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
-        python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+    .. sourcecode:: bash
+
+        pip install openrem==0.5.0
+
+            # Linux: Debian/Ubuntu and derivatives
+            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+            # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+            python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+            python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
+            # Windows:
+            python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+            python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 
 ****************************
