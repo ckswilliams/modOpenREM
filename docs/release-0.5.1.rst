@@ -1,17 +1,19 @@
-OpenREM Release Notes version 0.5.1b1
-*************************************
+######################
+Release Notes v0.5.1b1
+######################
 
+****************
 Headline changes
-================
+****************
 
 * Major database modification to remove table name length errors
 * Extended the field value lengths to better incorporate all possible values and decimal places
 * Improved import of grid and filter information from DX images
 * Improved DX summary and detail web pages
 
-
-Specific upgrade instructions
-=============================
+**************************
+Upgrades: Convert to South
+**************************
 
 **Always make sure you have converted your database to South before attempting an upgrade**
 
@@ -27,9 +29,12 @@ Quick reminder of how, if you haven't done it already
     # Windows, assuming no virtualenv
     python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
 
+**************************
+Upgrades from before 0.5.0
+**************************
 
 Upgrading from version 0.3.9 or earlier
-```````````````````````````````````````
+=======================================
 
 *Back up your database*
 
@@ -105,7 +110,8 @@ Upgrading from version 0.3.9 or earlier
 
 
 Upgrading from versions 0.4.0 - 0.4.2
-`````````````````````````````````````
+=====================================
+
 *Back up your database*
 
 * Install version 0.5.0
@@ -182,7 +188,7 @@ guide.
 Now move to `Upgrading from version 0.5.0`.
 
 Upgrading from version 0.4.3
-````````````````````````````
+============================
 
 The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is required:
 
@@ -201,8 +207,9 @@ The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is
         python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 
+****************************
 Upgrading from version 0.5.0
-````````````````````````````
+****************************
 
 * Install 0.5.1b1:
 
@@ -282,7 +289,8 @@ Upgrading from version 0.5.0
 
 
 Restart the web server
-``````````````````````
+======================
+
 If you are using the built-in test web server (`not for production use`)::
 
     python manage.py runserver x.x.x.x:8000 --insecure
@@ -290,7 +298,7 @@ If you are using the built-in test web server (`not for production use`)::
 Otherwise restart using the command for your web server
 
 Restart the Celery task queue
-`````````````````````````````
+=============================
 
 For testing, in a new shell:
 
