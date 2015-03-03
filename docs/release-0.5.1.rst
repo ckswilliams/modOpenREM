@@ -1,7 +1,5 @@
-OpenREM Release Notes version 0.5.1
-***********************************
-
-*Document is being created - please do not attempt to follow!*
+OpenREM Release Notes version 0.5.1b1
+*************************************
 
 Headline changes
 ================
@@ -205,74 +203,82 @@ The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is
 
 Upgrading from version 0.5.0
 ````````````````````````````
-Find out how many migration files you have
 
-Method 1:
+* Install 0.5.1b1:
 
-    Use a file browser or terminal to list the contents of the ``migrations`` folder, eg:
+    .. sourcecode:: bash
+
+        pip install openrem==0.5.1b1
+
+* Find out how many migration files you have
+
+    Method 1:
+
+        Use a file browser or terminal to list the contents of the ``migrations`` folder, eg:
+
+        .. sourcecode:: bash
+
+            # Linux: Debian/Ubuntu and derivatives
+            ls /usr/local/lib/python2.7/dist-packages/openrem/remapp/migrations/
+            # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+            ls /usr/local/lib/python2.7/site-packages/openrem/remapp/migrations/
+            # Windows (alternatively use the file browser):
+            dir C:\Python27\Lib\site-packages\openrem\remapp\migrations\
+
+    Method 2:
+
+        Use the Django ``manage.py`` program to list the existing migrations:
+
+        .. sourcecode:: bash
+
+            # Linux: Debian/Ubuntu and derivatives
+            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate --list remapp
+            # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+            python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate --list remapp
+            # Windows
+            python C:\Python27\Lib\site-packages\openrem\manage.py migrate --list remapp
+
+        The output should look something like this::
+
+            remapp
+            (*) 0001_initial
+            (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
+            (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
+            (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
+            (*) 0005_auto__add_exports__add_size_upload
+            (*) 0006_auto__chg_field_exports_filename
+            (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
+
+
+*   Rename the two 050 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``
+    and ``0009_051datamigration.py``. The ``051schemamigration`` **must** come before the ``051datamigration``
+
+    If you now re-run ``migrate --list remapp`` you should get a listing similar to this::
+
+         remapp
+          (*) 0001_initial
+          (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
+          (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
+          (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
+          (*) 0005_auto__add_exports__add_size_upload
+          (*) 0006_auto__chg_field_exports_filename
+          (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
+          ( ) 0008_051schemamigration
+          ( ) 0009_051datamigration
+
+    The star indicates that a migration has already been completed. If you have any that are not completed apart from the
+    ``051schemamigration`` and the ``051datamigration`` then please resolve these first.
+
+*   Now execute the migrations:
 
     .. sourcecode:: bash
 
         # Linux: Debian/Ubuntu and derivatives
-        ls /usr/local/lib/python2.7/dist-packages/openrem/remapp/migrations/
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
         # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-        ls /usr/local/lib/python2.7/site-packages/openrem/remapp/migrations/
-        # Windows (alternatively use the file browser):
-        dir C:\Python27\Lib\site-packages\openrem\remapp\migrations\
-
-Method 2:
-
-    Use the Django ``manage.py`` program to list the existing migrations:
-
-    .. sourcecode:: bash
-
-        # Linux: Debian/Ubuntu and derivatives
-        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate --list remapp
-        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate --list remapp
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
         # Windows
-        python C:\Python27\Lib\site-packages\openrem\manage.py migrate --list remapp
-
-    The output should look something like this::
-
-        remapp
-        (*) 0001_initial
-        (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
-        (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
-        (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
-        (*) 0005_auto__add_exports__add_size_upload
-        (*) 0006_auto__chg_field_exports_filename
-        (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
-
-
-Rename the two 050 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``
-and ``0009_051datamigration.py``. The ``051schemamigration`` **must** come before the ``051datamigration``
-If you now re-run ``migrate --list remapp`` you should get a listing similar to this::
-
-     remapp
-      (*) 0001_initial
-      (*) 0002_auto__chg_field_ct_accumulated_dose_data_ct_dose_length_product_total_
-      (*) 0003_auto__chg_field_general_equipment_module_attributes_station_name
-      (*) 0004_auto__chg_field_ct_radiation_dose_comment__chg_field_accumulated_proje
-      (*) 0005_auto__add_exports__add_size_upload
-      (*) 0006_auto__chg_field_exports_filename
-      (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
-      ( ) 0008_051schemamigration
-      ( ) 0009_051datamigration
-
-The star indicates that a migration has already been completed. If you have any that are not completed apart from the
-``051schemamigration`` and the ``051datamigration`` then please resolve these first.
-
-Now execute the migrations:
-
-.. sourcecode:: bash
-
-    # Linux: Debian/Ubuntu and derivatives
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
-    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-    python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
-    # Windows
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+        python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 
 Restart the web server
@@ -286,7 +292,7 @@ Otherwise restart using the command for your web server
 Restart the Celery task queue
 `````````````````````````````
 
-For testing, in a new shell: *(assuming no virtualenv)*
+For testing, in a new shell:
 
 .. sourcecode:: bash
 
