@@ -3,3 +3,4 @@ docs/_build/*
 docs/_static/*
 openrem/remapp/migrations
 .idea
+openrem/openremproject/local_settings.py

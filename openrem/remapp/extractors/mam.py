@@ -28,9 +28,9 @@
 
 """
 def _xrayfilters(dataset,source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     xray_filter_material = get_value_kw('FilterMaterial',dataset)
     if xray_filter_material:
         if xray_filter_material.strip().lower() == 'molybdenum':
@@ -62,9 +62,9 @@ def _exposure(dataset,source):
 
 
 def _xraygrid(gridcode,source):
-    from remapp.models import Xray_grid
+    from remapp.models import XrayGrid
     from remapp.tools.get_values import get_or_create_cid
-    grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
+    grid = XrayGrid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
         grid.xray_grid = get_or_create_cid('111646','No grid')
     if gridcode == '111642':
@@ -75,9 +75,10 @@ def _xraygrid(gridcode,source):
 
 
 def _irradiationeventxraysourcedata(dataset,event):
-    from remapp.models import Irradiation_event_xray_source_data
+    # TODO: review model to convert to cid where appropriate, and add additional fields, such as height and width
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     # AGD/MGD is dGy in Mammo headers, and was dGy in Radiation Dose SR - CP1194 changes this to mGy!
     agd_dgy = get_value_kw('OrganDose',dataset) #AGD in dGy 
     if agd_dgy:
@@ -110,9 +111,9 @@ def _irradiationeventxraysourcedata(dataset,event):
 
 
 def _doserelateddistancemeasurements(dataset,mech):
-    from remapp.models import Dose_related_distance_measurements
+    from remapp.models import DoseRelatedDistanceMeasurements
     from remapp.tools.get_values import get_value_kw, get_value_num
-    dist = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
     dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToEntrance',dataset)
     dist.radiological_thickness = get_value_num(0x00451049,dataset)
@@ -120,9 +121,9 @@ def _doserelateddistancemeasurements(dataset,mech):
 
 
 def _irradiationeventxraymechanicaldata(dataset,event):
-    from remapp.models import Irradiation_event_xray_mechanical_data
+    from remapp.models import IrradEventXRayMechanicalData
     from remapp.tools.get_values import get_value_kw
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = get_value_kw('BodyPartThickness',dataset)
     mech.compression_force = float(get_value_kw('CompressionForce',dataset))/10 # GE Conformance statement says in N, treating as dN
     mech.magnification_factor = get_value_kw('EstimatedRadiographicMagnificationFactor',dataset)
@@ -133,9 +134,9 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _accumulatedmammo_update(dataset,event): # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accummam = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_mammography_xray_dose_set.get()
-    if event.irradiation_event_xray_source_data_set.get().average_glandular_dose:
-        accummam.accumulated_average_glandular_dose += event.irradiation_event_xray_source_data_set.get().average_glandular_dose
+    accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
+    if event.irradeventxraysourcedata_set.get().average_glandular_dose:
+        accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
     if event.laterality:
         if accummam.laterality:
             if accummam.laterality.code_meaning == 'Left breast':
@@ -153,10 +154,11 @@ def _accumulatedmammo_update(dataset,event): # TID 10005
 
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
-    from remapp.models import Irradiation_event_xray_data
+    # TODO: review model to convert to cid where appropriate, and add additional fields
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     event.irradiation_event_uid = get_value_kw('SOPInstanceUID',dataset)
     event_time = get_value_kw('AcquisitionTime',dataset)
@@ -191,20 +193,20 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
 
 
 def _accumulatedxraydose(dataset,proj):
-    from remapp.models import Accumulated_xray_dose, Accumulated_mammography_xray_dose
+    from remapp.models import AccumXRayDose, AccumMammographyXRayDose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
     accum.save()
-    accummam = Accumulated_mammography_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     accummam.accumulated_average_glandular_dose = 0.0
     accummam.save()
 
 
 def _projectionxrayradiationdose(dataset,g):
-    from remapp.models import Projection_xray_radiation_dose
+    from remapp.models import ProjectionXRayRadiationDose
     from remapp.tools.get_values import get_or_create_cid
-    proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+    proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('P5-40010','Mammography')
     proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014','Study')
@@ -218,10 +220,10 @@ def _projectionxrayradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import General_equipment_module_attributes
+    from remapp.models import GeneralEquipmentModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
@@ -238,25 +240,25 @@ def _generalequipmentmoduleattributes(dataset,study):
 
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
+    from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
     patientatt.save()
 
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
-    from remapp.models import Patient_module_attributes, Patient_study_module_attributes
+    from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
     from decimal import Decimal
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex',dataset)
     patient_birth_date = get_date('PatientBirthDate',dataset) # Not saved to database
     pat.not_patient_indicator = get_not_pt(dataset)
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:
@@ -317,7 +319,7 @@ def _mammo2db(dataset):
     from django.db import models
 
     openrem_settings.add_project_to_path()
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import make_date_time
@@ -331,7 +333,7 @@ def _mammo2db(dataset):
         inst_in_db = check_uid.check_uid(event_uid,'Event')
         if inst_in_db:
             return 0
-        same_study_uid = General_study_module_attributes.objects.filter(study_instance_uid__exact = study_uid)
+        same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
         if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7':
             # further check required to ensure 'for processing' and 'for presentation' 
             # versions of the same irradiation event don't get imported twice
@@ -339,16 +341,16 @@ def _mammo2db(dataset):
             event_time = get_value_kw('AcquisitionTime',dataset)
             event_date = get_value_kw('AcquisitionDate',dataset)
             event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-            for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+            for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
                 if event_date_time == events.date_time_started:
                     return 0
         # study exists, but event doesn't
-        _irradiationeventxraydata(dataset,same_study_uid.get().projection_xray_radiation_dose_set.get())
+        _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
         # update the accumulated tables
         return 0
 
     # study doesn't exist, start from scratch
-    g = General_study_module_attributes.objects.create()
+    g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
     
     

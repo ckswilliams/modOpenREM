@@ -1,15 +1,15 @@
 
 def _irradiationeventxraydetectordata(dataset,event):
-    from remapp.models import Irradiation_event_xray_detector_data
-    detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
+    from remapp.models import IrradEventXRayDetectorData
+    detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     # This table is just relating to exposure index, so nothing to report. 
     # We do know the 'sensitivity' though, and probably the detector dose...
     _deviceparticipant(dataset,'detector',detector)
 
 def _xrayfilters(dataset,source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     xray_filter_material = dataset[23]
     if xray_filter_material == 'MOLYBDENUM':
         filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
@@ -18,9 +18,9 @@ def _xrayfilters(dataset,source):
     filters.save()
 
 def _xraygrid(gridcode,source):
-    from remapp.models import Xray_grid
+    from remapp.models import XrayGrid
     from remapp.tools.get_values import get_or_create_cid
-    grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
+    grid = XrayGrid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
         grid.xray_grid = get_or_create_cid('111646','No grid')
     if gridcode == '111642':
@@ -42,13 +42,13 @@ def _exposure(dataset,source):
     exp.save()
 
 def _deviceparticipant(dataset,eventdatatype,foreignkey):
-    from remapp.models import Device_participant
+    from remapp.models import DeviceParticipant
     if eventdatatype == 'detector':
-        device = Device_participant.objects.create(irradiation_event_xray_detector_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_detector_data=foreignkey)
     elif eventdatatype == 'source':
-        device = Device_participant.objects.create(irradiation_event_xray_source_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_source_data=foreignkey)
     elif eventdatatype == 'accumulated':
-        device = Device_participant.objects.create(accumulated_xray_dose=foreignkey)
+        device = DeviceParticipant.objects.create(accumulated_xray_dose=foreignkey)
     device.device_model_name = 'Senograph DS'
     device.device_manufacturer = 'GE'
     device.device_serial_number = dataset[2]
@@ -56,9 +56,9 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
 
 
 def _irradiationeventxraysourcedata(dataset,event):
-    from remapp.models import Irradiation_event_xray_source_data
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     # AGD/MGD is dGy in Mammo headers, and was dGy in Radiation Dose SR - CP1194 changes this to mGy!
     source.average_glandular_dose = 100.0 * float(dataset[32]) #MGD in dGy * 100 = mGy 
     source.average_xray_tube_current = dataset[28] # mA
@@ -84,15 +84,15 @@ def _irradiationeventxraysourcedata(dataset,event):
         _xraygrid('111643',source)
 
 def _doserelateddistancemeasurements(dataset,mech):
-    from remapp.models import Dose_related_distance_measurements
-    dist = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    from remapp.models import DoseRelatedDistanceMeasurements
+    dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     dist.distance_source_to_detector = dataset[14]
     dist.distance_source_to_entrance_surface = dataset[17]
     dist.save()
 
 def _irradiationeventxraymechanicaldata(dataset,event):
-    from remapp.models import Irradiation_event_xray_mechanical_data
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    from remapp.models import IrradEventXRayMechanicalData
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = dataset[20]
     mech.compression_force = float(dataset[21])/10
     mech.magnification_factor = dataset[16]
@@ -107,11 +107,11 @@ def _accumulatedmammo_update(dataset,event): # TID 10005
     accummam.save()
 
 def _irradiationeventxraydata(dataset,proj):
-    from remapp.models import Irradiation_event_xray_data
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     import dicom
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.irradiation_event_uid = dicom.UID.generate_uid()
     event.date_time_started = make_date_time(str(dataset[5]) + str(dataset[6]))
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')
@@ -155,20 +155,20 @@ def _irradiationeventxraydata(dataset,proj):
     _accumulatedmammo_update(dataset,event)
     
 def _accumulatedxraydose(dataset,proj):
-    from remapp.models import Accumulated_xray_dose, Accumulated_mammography_xray_dose
+    from remapp.models import AccumXRayDose, AccumMammographyXRayDose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
     accum.save()
-    accummam = Accumulated_mammography_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     accummam.accumulated_average_glandular_dose = 0.0
     accummam.save()
     
     
 def _projectionxrayradiationdose(dataset,g):
-    from remapp.models import Projection_xray_radiation_dose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, ObserverContext
     from remapp.tools.get_values import get_or_create_cid
-    proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+    proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('P5-40010','Mammography')
     proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014','Study')
@@ -178,8 +178,8 @@ def _projectionxrayradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,g):
-    from remapp.models import General_equipment_module_attributes
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import GeneralEquipmentModuleAttr
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=g)
     equip.manufacturer = 'GE'
     equip.station_name = dataset[3]
     if equip.station_name[3] == 'C':
@@ -192,8 +192,8 @@ def _generalequipmentmoduleattributes(dataset,g):
     equip.save()
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientStudyModuleAttr
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = dataset[9]
     if 'Y' in patientatt.patient_age:
         patientatt.patient_age_decimal = patientatt.patient_age[:patientatt.patient_age.find('Y')]
@@ -206,8 +206,8 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     patientatt.save()
 
 def _patientmoduleattributes(dataset,g):
-    from remapp.models import Patient_module_attributes
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientModuleAttr
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = dataset[8]
     pat.save()
 
@@ -230,26 +230,26 @@ def _generalstudymoduleattributes(dataset,g):
 
 def _mgcsv2db(line):
     from django.db import models
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.tools.dcmdatetime import make_date_time, make_date, make_time
     from django import db
     from datetime import timedelta
 
     # First off, some logic to see if exposure is part of an exam already registered
     if line[7] != '': # Is there an accession number?
-        e = General_study_module_attributes.objects.filter(accession_number__exact = line[7])
+        e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = line[7])
         if e: # ie the acccession number has been found, so only an irradiation event needs to be created
             itime = e.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.filter(
                 date_time_started__exact = make_date_time(str(line[5]) + str(line[6])))
             if not itime: # ie there aren't any existing events with the same date/time stamp
                 _irradiationeventxraydata(line,e.get().projection_xray_radiation_dose_set.get())
         else:
-            g = General_study_module_attributes.objects.create()
+            g = GeneralStudyModuleAttr.objects.create()
             _generalstudymoduleattributes(line,g)
     else:
         if not (line[8] == 'O' and line[9] == '001D'):
             window = timedelta(seconds=(30*60)) # half an hour either side of any previous exposures 
-            e = General_study_module_attributes.objects.filter(
+            e = GeneralStudyModuleAttr.objects.filter(
                     accession_number__exact = ''
                 ).filter(
                     study_date__exact = make_date(line[5])
@@ -271,7 +271,7 @@ def _mgcsv2db(line):
                     if not itime:
                         _irradiationeventxraydata(line,e.get().projection_xray_radiation_dose_set.get())
             else:
-                g = General_study_module_attributes.objects.create()
+                g = GeneralStudyModuleAttr.objects.create()
                 _generalstudymoduleattributes(line,g)
     db.reset_queries()
 

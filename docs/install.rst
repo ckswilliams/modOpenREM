@@ -357,6 +357,9 @@ Related guides
         
         conquestAsWindowsService
         backupMySQLWindows
+        backupRestorePostgreSQL
+        conquestImportConfig
+        conquestAddRDSR
 
 Advanced guides for developers
 ------------------------------

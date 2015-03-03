@@ -2,6 +2,12 @@
 OpenREM version history
 =======================
 
+0.5.0b1 (2014-?)
+----------------
+
+* `#137`_  Carestream DX multiple filter thickness values in a DS VR now extracted correctly
+
+
 0.5.0 (2014-11-19)
 ------------------
 
@@ -16,7 +22,7 @@ OpenREM version history
 * `#122`_  Exports of RF data should now be more useful when exporting to xlsx. Will need refinement in the future
 * `#26`_   Extractors created for radiographic DICOM images. Contributed by DJ Platten
 * `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_. Contributed by DJ Platten
-* `#9`_    Import of *.dcm should now be available from Windows and Linux alike
+* `#9`_    Import of \*.dcm should now be available from Windows and Linux alike
 
 
 0.4.3 (2014-10-01)

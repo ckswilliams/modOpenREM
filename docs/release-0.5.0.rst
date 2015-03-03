@@ -34,7 +34,7 @@ version 0.4.2 first. See the :doc:`release-0.4.3`.
 
 If you are upgrading from 0.4.0 or later, the instructions in :doc:`release-0.4.3`
 still need to be followed to install/setup RabbitMQ and Celery and to update
-the configuration files, but you can go straight to 0.5.0b1 rather than 
+the configuration files, but you can go straight to 0.5.0 rather than
 installing 0.4.3.
 
 Upgrading from version 0.4.3
