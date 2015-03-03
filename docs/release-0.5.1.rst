@@ -99,7 +99,7 @@ Upgrading from version 0.3.9 or earlier
 * Add some users
 
     * Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you originally
-      created the database (the ``manage.py syncdb`` command - `Do you want to create a superuser`)
+      created the database (the ``manage.py syncdb`` command - *Do you want to create a superuser*)
 
     * Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and
       they should be there when you go back to admin).
@@ -112,7 +112,11 @@ Upgrading from version 0.3.9 or earlier
 Upgrading from versions 0.4.0 - 0.4.2
 =====================================
 
-*Back up your database*
+* Back up your database at each stage
+
+    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
+    * For a non-production SQLite3 database, simply make a copy of the database file
+
 
 * Install version 0.5.0
 
@@ -185,7 +189,7 @@ After restarting the webserver, you should now have OpenREM 0.5.0 up and running
 functionality at this stage, start the Celery task queue - instructions in the :doc:`install` docs or at the end of this
 guide.
 
-Now move to `Upgrading from version 0.5.0`.
+Now move to `Upgrading from version 0.5.0`_.
 
 Upgrading from version 0.4.3
 ============================
@@ -210,6 +214,11 @@ The 0.5.1 upgrade `must` be made from a 0.5.0 database, so a schema migration is
 ****************************
 Upgrading from version 0.5.0
 ****************************
+
+* Back up your database
+
+    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
+    * For a non-production SQLite3 database, simply make a copy of the database file
 
 * Install 0.5.1b1:
 
