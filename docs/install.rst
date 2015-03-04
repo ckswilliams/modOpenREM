@@ -124,7 +124,7 @@ For testing you can use the SQLite3 database
 For production use, see `Database options`_ below
 
 Location setting for imports and exports
-`````````````````````````````````````````
+````````````````````````````````````````
 
 Csv and xlsx study information exports and patient size csv imports are
 written to disk at a location defined by ``MEDIA_ROOT``.
@@ -183,9 +183,6 @@ Answer each question as it is asked, do setup a superuser. This username and
 password wil be used to log into the admin interface to create the usernames
 for using the web interface. See the `Start using it!`_ section below.
 
-Help! I get a ``value too long for type character varying(50)`` error!
-    This error with part of the Django auth_permissions system that we are not using, and can safely be ignored.
-    This is being tracked as `Issue 62 <https://bitbucket.org/openrem/openrem/issue/62>`_
 
 For production installs, convert to South
 `````````````````````````````````````````

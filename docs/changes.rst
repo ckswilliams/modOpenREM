@@ -10,7 +10,15 @@ OpenREM version history
 * `#172`_  Revert all changes made to database so `#62`_ could take place first
 * `#165`_  Extract height and weight from DX, height from RDSR, all if available
 * `#161`_  Views and exports now look for accumulated data in the right table after changes in `#159`_ and `#160`_
+* `#160`_  Created the data migration to move all the DX accumulated data from TID 10004 to TID 10007
+* `#159`_  Modified the DX import to populate TID 10007 rather than TID 10004. RDSR RF already populates both
+* `#158`_  Demo website created by DJ Platten: http://demo.openrem.org/openrem
+* `#154`_  Various decimal fields are defined with too few decimal places - all have now been extended.
+* `#150`_  DJ Platten has added Conquest configuration information
 * `#137`_  Carestream DX multiple filter thickness values in a DS VR now extracted correctly
+* `#113`_  Fixed and improved recording of grid information for mammo and DX and RDSR import routines
+* `#62`_   Refactored all model names to be less than 39 characters and be in CamelCase to allow database migrations and
+  to come into line with PEP 8 naming conventions for classes.
 
 
 0.5.0 (2014-11-19)
@@ -19,14 +27,16 @@ OpenREM version history
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
 * `#132`_  Fixed mammo export error that slipped in before the first beta
 * `#130`_  Only creates ExposureInuAs from Exposure if Exposure exists now
-* `#128`_  Updated some non-core documentation that didn't have the new local_settings.py reference or the new openremproject folder name
+* `#128`_  Updated some non-core documentation that didn't have the new local_settings.py reference or the new
+  openremproject folder name
 * `#127`_  DX IOD studies with image view populated failed to export due to lack of conversion to string
 * `#126`_  Documentation created for the radiographic functionality
 * `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
 * `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs
 * `#122`_  Exports of RF data should now be more useful when exporting to xlsx. Will need refinement in the future
 * `#26`_   Extractors created for radiographic DICOM images. Contributed by DJ Platten
-* `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_. Contributed by DJ Platten
+* `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_.
+  Contributed by DJ Platten
 * `#9`_    Import of \*.dcm should now be available from Windows and Linux alike
 
 
