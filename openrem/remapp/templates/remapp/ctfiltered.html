@@ -121,11 +121,11 @@ function getColours(noOfColours) {
         {% endif %}
         {% for exam in filter_list %}
         <tr>
-            <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
+            <td>{{ exam.generalequipmentmoduleattr_set.get.institution_name }}</td>
             <td>
-                {{ exam.general_equipment_module_attributes_set.get.manufacturer }} |
-                {{ exam.general_equipment_module_attributes_set.get.manufacturer_model_name }} |
-                {{ exam.general_equipment_module_attributes_set.get.station_name }}        
+                {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
+                {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                {{ exam.generalequipmentmoduleattr_set.get.station_name }}
             </td>
             <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
             <td>
@@ -133,8 +133,8 @@ function getColours(noOfColours) {
                 {{ exam.requested_procedure_code_meaning }} |
                 {{ exam.accession_number }}
             </td>
-            <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.total_number_of_irradiation_events }}</td>
-            <td>{{ exam.ct_radiation_dose_set.get.ct_accumulated_dose_data_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
+            <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}</td>
+            <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>

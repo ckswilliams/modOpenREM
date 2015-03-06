@@ -1,6 +1,6 @@
 def _scanninglength(dataset,event,col): # TID 10014
-    from remapp.models import Scanning_length
-    scanlen = Scanning_length.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import ScanningLength
+    scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
     scanlen.scanning_length = "" # declare it so export works, even if it is not populated.
     r_ge = dataset[col+3]
     r_arr = r_ge.split("-")
@@ -22,17 +22,17 @@ def _scanninglength(dataset,event,col): # TID 10014
 
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import Ct_xray_source_parameters
-    param = Ct_xray_source_parameters.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import CtXRaySourceParameters
+    param = CtXRaySourceParameters.objects.create(ct_irradiation_event_data=event)
     # Nothing in here from GE, will need to populate for Siemens
     param.save()
 
 
 def _ctirradiationeventdata(dataset,ct,col):
     import dicom
-    from remapp.models import Ct_irradiation_event_data
+    from remapp.models import CtIrradiationEventData
     from remapp.tools.get_values import get_or_create_cid
-    irr = Ct_irradiation_event_data.objects.create(ct_radiation_dose=ct)
+    irr = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
     irr.acquisition_protocol = dataset[8]
     if dataset[col+2] == "Helical":
         irr.ct_acquisition_type = get_or_create_cid("P5-08001","Spiral Acquisition")
@@ -52,17 +52,17 @@ def _ctirradiationeventdata(dataset,ct,col):
 
 
 def _ctaccumulateddosedata(dataset,ct):
-    from remapp.models import Ct_accumulated_dose_data
-    acc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
+    from remapp.models import CtAccumulatedDoseData
+    acc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     acc.total_number_of_irradiation_events = dataset[10]
     acc.ct_dose_length_product_total = dataset[11]
     acc.save()
 
 
 def _ctradiationdose(dataset,g):
-    from remapp.models import Ct_radiation_dose
+    from remapp.models import CtRadiationDose
     from remapp.tools.get_values import get_or_create_cid
-    ct = Ct_radiation_dose.objects.create(general_study_module_attributes=g)
+    ct = CtRadiationDose.objects.create(general_study_module_attributes=g)
     ct.procedure_reported = get_or_create_cid('P5-08000','Computed Tomography X-Ray')
     ct.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     ct.scope_of_accumulation = get_or_create_cid('113014','Study')
@@ -79,8 +79,8 @@ def _ctradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,g, sitecode):
-    from remapp.models import General_equipment_module_attributes
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import GeneralEquipmentModuleAttr
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=g)
     if sitecode is "C":
         equip.manufacturer = "GE"
         equip.institution_name = "Royal Marsden Hospital"
@@ -133,8 +133,8 @@ def _generalstudymoduleattributes(dataset,g):
 
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientStudyModuleAttr
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = dataset[1]
     if dataset[2] != "#N/A" and not dataset[2]:
         patientatt.patient_age_decimal = dataset[2]
@@ -155,22 +155,22 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 
 
 def _patientmoduleattributes(dataset,g):
-    from remapp.models import Patient_module_attributes
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    from remapp.models import PatientModuleAttr
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = dataset[0]
     pat.save()
 
 
 def _ctcsv2db(dataset, sitecode):
     from django.db import models
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from django import db
     
     # If there isn't an accession number, ignore. If there is, check to see if it has been entered into the database already.
     if dataset[3] != '':
-        e = General_study_module_attributes.objects.filter(accession_number__exact = dataset[3])
+        e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = dataset[3])
         if not e:
-            g = General_study_module_attributes.objects.create()
+            g = GeneralStudyModuleAttr.objects.create()
             _generalstudymoduleattributes(dataset,g)
             _generalequipmentmoduleattributes(dataset, g, sitecode)
             _patientstudymoduleattributes(dataset,g)

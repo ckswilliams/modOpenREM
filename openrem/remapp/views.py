@@ -46,7 +46,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
-from remapp.models import General_study_module_attributes
+from remapp.models import GeneralStudyModuleAttr
 
 try:
     from numpy import *
@@ -73,7 +73,7 @@ def dx_summary_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
 
-    f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
+    f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
     if plotting:
         # Required for mean DAP per acquisition plot
@@ -258,7 +258,7 @@ def dx_histogram_list_filter(request):
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter
     import pkg_resources # part of setuptools
-    f = RFSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__contains = 'RF'))
+    f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__contains = 'RF'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -391,7 +391,7 @@ def ct_histogram_list_filter(request):
         if request.GET.get('acquisition_dlp_min')  : f.qs.filter(ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('study_dlp_min'))
 
     else:
-        f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             modality_type__exact = 'CT').order_by().distinct())
         if request.GET.get('study_description')    : f.qs.filter(study_description=request.GET.get('study_description'))
         if request.GET.get('study_dlp_min')        : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
@@ -487,7 +487,7 @@ def mg_summary_list_filter(request):
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
-    f = MGSummaryListFilter(filter_data, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'MG'))
+    f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -508,7 +508,7 @@ def mg_summary_list_filter(request):
 
 
 def openrem_home(request):
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -526,7 +526,7 @@ def openrem_home(request):
         ag = Group(name="admingroup")
         ag.save()
     
-    allstudies = General_study_module_attributes.objects.all()
+    allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = { 
         'total' : allstudies.count(),
         'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
@@ -557,29 +557,29 @@ def openrem_home(request):
             studies = allstudies.filter(modality_type__contains = modality).all()
         # End of 10/10/2014 DJP code changes
 
-        stations = studies.values_list('general_equipment_module_attributes__station_name').distinct()
+        stations = studies.values_list('generalequipmentmoduleattr__station_name').distinct()
         modalitydata = {}
         for station in stations:
             latestdate = studies.filter(
-                general_equipment_module_attributes__station_name__exact = station[0]
+                generalequipmentmoduleattr__station_name__exact = station[0]
                 ).latest('study_date').study_date
-            latestuid = studies.filter(general_equipment_module_attributes__station_name__exact = station[0]
+            latestuid = studies.filter(generalequipmentmoduleattr__station_name__exact = station[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
             inst_name = studies.filter(
-                general_equipment_module_attributes__station_name__exact = station[0]
-                ).latest('study_date').general_equipment_module_attributes_set.get().institution_name
+                generalequipmentmoduleattr__station_name__exact = station[0]
+                ).latest('study_date').generalequipmentmoduleattr_set.get().institution_name
                 
             model_name = studies.filter(
-                general_equipment_module_attributes__station_name__exact = station[0]
-                ).latest('study_date').general_equipment_module_attributes_set.get().manufacturer_model_name
+                generalequipmentmoduleattr__station_name__exact = station[0]
+                ).latest('study_date').generalequipmentmoduleattr_set.get().manufacturer_model_name
             
             institution = '{0}, {1}'.format(inst_name,model_name)
                        
             modalitydata[station[0]] = {
                 'total' : studies.filter(
-                    general_equipment_module_attributes__station_name__exact = station[0]
+                    generalequipmentmoduleattr__station_name__exact = station[0]
                     ).count(),
                 'latest' : latestdatetime,
                 'institution' : institution
@@ -592,7 +592,7 @@ def openrem_home(request):
 
 @login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
-    study = get_object_or_404(General_study_module_attributes, pk=pk)    
+    study = get_object_or_404(GeneralStudyModuleAttr, pk=pk)
 
     if request.method=='POST':
         if request.user.groups.filter(name="admingroup"):
@@ -612,7 +612,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 from openremproject.settings import MEDIA_ROOT
-from remapp.models import Size_upload
+from remapp.models import SizeUpload
 from remapp.forms import SizeUploadForm
 
 @login_required
@@ -625,7 +625,7 @@ def size_upload(request):
     if request.method == 'POST':
         form = SizeUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            newcsv = Size_upload(sizefile = request.FILES['sizefile'])
+            newcsv = SizeUpload(sizefile = request.FILES['sizefile'])
             newcsv.save()
 
             # Redirect to the document list after POST
@@ -670,7 +670,7 @@ def size_process(request, *args, **kwargs):
         uniqueItemsInPost = len(set(request.POST.values()))
         
         if itemsInPost == uniqueItemsInPost:
-            csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])[0]
+            csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])[0]
             
             if not csvrecord.sizefile:
                 messages.error(request, "File to be processed doesn't exist. Do you wish to try again?")
@@ -693,7 +693,7 @@ def size_process(request, *args, **kwargs):
 
     else:
     
-        csvrecord = Size_upload.objects.all().filter(id__exact = kwargs['pk'])
+        csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])
         with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
             try:
                 dialect = csv.Sniffer().sniff(csvfile.read(1024))
@@ -744,9 +744,9 @@ def size_imports(request, *args, **kwargs):
     import pkg_resources # part of setuptools
     from django.template import RequestContext  
     from django.shortcuts import render_to_response
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
-    imports = Size_upload.objects.all().order_by('-import_date')
+    imports = SizeUpload.objects.all().order_by('-import_date')
     
     current = imports.filter(status__contains = 'CURRENT')
     complete = imports.filter(status__contains = 'COMPLETE')
@@ -782,10 +782,10 @@ def size_delete(request):
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
     for task in request.POST:
-        uploads = Size_upload.objects.filter(task_id__exact = request.POST[task])
+        uploads = SizeUpload.objects.filter(task_id__exact = request.POST[task])
         for upload in uploads:
             try:
                 upload.logfile.delete()
@@ -808,9 +808,9 @@ def size_abort(request, pk):
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
     from django.shortcuts import render, redirect, get_object_or_404
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
-    size = get_object_or_404(Size_upload, pk=pk)
+    size = get_object_or_404(SizeUpload, pk=pk)
 
     if request.user.groups.filter(name="admingroup"):
         revoke(size.task_id, terminate=True)

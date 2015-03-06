@@ -34,7 +34,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
     if 'imp_log' in kwargs:
         imp_log = kwargs['imp_log']
 
-    patientatt = exam.patient_study_module_attributes_set.get()
+    patientatt = exam.patientstudymoduleattr_set.get()
     if height:
         if not patientatt.patient_size:
             patientatt.patient_size = height
@@ -75,7 +75,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
 
 def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwargs):
     from django.db import models
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from django import db
     
     imp_log = None
@@ -84,9 +84,9 @@ def _ptsizeinsert(accno, height, weight, siuid, verbose, csvrecord, *args, **kwa
     
     if (height or weight) and accno:
         if not siuid:
-            e = General_study_module_attributes.objects.filter(accession_number__exact = accno)
+            e = GeneralStudyModuleAttr.objects.filter(accession_number__exact = accno)
         else:
-            e = General_study_module_attributes.objects.filter(study_instance_uid__exact = accno)
+            e = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = accno)
         if e:
             for exam in e:
                 if verbose:
@@ -114,10 +114,10 @@ def websizeimport(csv_pk = None, *args, **kwargs):
 
     import os, sys, csv, datetime
     from django.core.files.base import ContentFile
-    from remapp.models import Size_upload
+    from remapp.models import SizeUpload
 
     if csv_pk:
-        csvrecord = Size_upload.objects.all().filter(id__exact = csv_pk)[0]
+        csvrecord = SizeUpload.objects.all().filter(id__exact = csv_pk)[0]
         csvrecord.task_id = websizeimport.request.id
         datestamp = datetime.datetime.now()
         csvrecord.import_date = datestamp

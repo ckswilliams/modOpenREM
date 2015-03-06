@@ -51,18 +51,18 @@ def _observercontext(dataset,obs): # TID 1002
     obs.save()
     
 def _deviceparticipant(dataset,eventdatatype,foreignkey):
-    from remapp.models import Device_participant
+    from remapp.models import DeviceParticipant
     from remapp.tools.get_values import get_or_create_cid
     if eventdatatype == 'detector':
-        device = Device_participant.objects.create(irradiation_event_xray_detector_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_detector_data=foreignkey)
     elif eventdatatype == 'source':
-        device = Device_participant.objects.create(irradiation_event_xray_source_data=foreignkey)
+        device = DeviceParticipant.objects.create(irradiation_event_xray_source_data=foreignkey)
     elif eventdatatype == 'accumulated':
-        device = Device_participant.objects.create(accumulated_xray_dose=foreignkey)
+        device = DeviceParticipant.objects.create(accumulated_xray_dose=foreignkey)
     elif eventdatatype == 'ct_accumulated':
-        device = Device_participant.objects.create(ct_accumulated_dose_data=foreignkey)
+        device = DeviceParticipant.objects.create(ct_accumulated_dose_data=foreignkey)
     elif eventdatatype == 'ct_event':
-        device = Device_participant.objects.create(ct_irradiation_event_data=foreignkey)
+        device = DeviceParticipant.objects.create(ct_irradiation_event_data=foreignkey)
     else:
         print "Doh"
     for cont in dataset.ContentSequence:
@@ -82,8 +82,8 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
     device.save()
 
 def _pulsewidth(dataset,source):
-    from remapp.models import Pulse_width
-    pulse = Pulse_width.objects.create(irradiation_event_xray_source_data=source)
+    from remapp.models import PulseWidth
+    pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Width':
             pulse.pulse_width = cont.MeasuredValueSequence[0].NumericValue
@@ -98,8 +98,8 @@ def _kvptable(dataset,source):
     kvpdata.save()
 
 def _xraytubecurrent(dataset,source):
-    from remapp.models import Xray_tube_current
-    tubecurrent = Xray_tube_current.objects.create(irradiation_event_xray_source_data=source)
+    from remapp.models import XrayTubeCurrent
+    tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
             tubecurrent.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
@@ -114,9 +114,9 @@ def _exposure(dataset,source):
     exposure.save()
 
 def _xrayfilters(dataset,source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
             for cont2 in cont.ContentSequence:
@@ -132,8 +132,8 @@ def _xrayfilters(dataset,source):
 
 
 def _doserelateddistancemeasurements(dataset,mech): #CID 10008
-    from remapp.models import Dose_related_distance_measurements
-    distance = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    from remapp.models import DoseRelatedDistanceMeasurements
+    distance = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     codes = {   'Distance Source to Isocenter'      :'distance_source_to_isocenter',
                 'Distance Source to Reference Point':'distance_source_to_reference_point',
                 'Distance Source to Detector'       :'distance_source_to_detector',
@@ -149,9 +149,9 @@ def _doserelateddistancemeasurements(dataset,mech): #CID 10008
     distance.save()
 
 def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
-    from remapp.models import Irradiation_event_xray_mechanical_data
+    from remapp.models import IrradEventXRayMechanicalData
     from remapp.tools.get_values import get_or_create_cid
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CR/DR Mechanical Configuration':
             mech.crdr_mechanical_configuration = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -177,10 +177,11 @@ def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
     mech.save()
 
 def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
-    from remapp.models import Irradiation_event_xray_source_data
+    # TODO: review model to convert to cid where appropriate, and add additional fields
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid
     from xml.etree import ElementTree as ET
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
             source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
@@ -208,6 +209,7 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
             source.anode_target_material = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
             source.collimated_field_area = cont.MeasuredValueSequence[0].NumericValue
+        # TODO: xray_grid no longer exists in this table - it is a model on its own... See https://bitbucket.org/openrem/openrem/issue/181
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
             source.xray_grid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
     _pulsewidth(dataset,source)
@@ -223,8 +225,8 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     source.save()
 
 def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
-    from remapp.models import Irradiation_event_xray_detector_data
-    detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
+    from remapp.models import IrradEventXRayDetectorData
+    detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Index':
             detector.exposure_index = cont.MeasuredValueSequence[0].NumericValue
@@ -236,20 +238,21 @@ def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
     detector.save()
         
 def _imageviewmodifier(dataset,event):
-    from remapp.models import Image_view_modifier
+    from remapp.models import ImageViewModifier
     from remapp.tools.get_values import get_or_create_cid
-    modifier = Image_view_modifier.objects.create(irradiation_event_xray_data=event)
+    modifier = ImageViewModifier.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View Modifier':
             modifier.image_view_modifier = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
     modifier.save()
 
 
-def _irradiationeventxraydata(dataset,proj): # TID 10003
-    from remapp.models import Irradiation_event_xray_data
+def _irradiationeventxraydata(dataset,proj):  # TID 10003
+    # TODO: review model to convert to cid where appropriate, and add additional fields
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             event.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -328,9 +331,9 @@ def _calibration(dataset,accum):
     cal.save()
 
 def _accumulatedmammoxraydose(dataset,accum): # TID 10005
-    from remapp.models import Accumulated_mammography_xray_dose
+    from remapp.models import AccumMammographyXRayDose
     from remapp.tools.get_values import get_or_create_cid
-    accummammo = Accumulated_mammography_xray_dose.objects.create(accumulated_xray_dose=accum)
+    accummammo = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated Average Glandular Dose':
             accummammo.accumulated_average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
@@ -340,14 +343,9 @@ def _accumulatedmammoxraydose(dataset,accum): # TID 10005
 
 def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
     from remapp.tools.get_values import get_or_create_cid
-    from remapp.models import Accumulated_projection_xray_dose, Content_item_descriptions
-    
-    accumproj = Accumulated_projection_xray_dose.objects.create(accumulated_xray_dose=accum)
+    from remapp.models import AccumProjXRayDose
+    accumproj = AccumProjXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-            accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
-            accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
             accumproj.fluoro_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
@@ -360,6 +358,11 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
             accumproj.acquisition_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
             accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
+        # TODO: Remove the following four items, as they are also imported (correctly) into _accumulatedintegratedprojectionradiographydose
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
+            accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
+            accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
@@ -376,9 +379,9 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
 
 
 def _accumulatedcassettebasedprojectionradiographydose(dataset,accum): # TID 10006
-    from remapp.models import Accumulated_cassette_based_projection_radiography_dose
+    from remapp.models import AccumCassetteBsdProjRadiogDose
     from remapp.tools.get_values import get_or_create_cid
-    accumcass = Accumulated_cassette_based_projection_radiography_dose.objects.create(accumulated_xray_dose=accum)
+    accumcass = AccumCassetteBsdProjRadiogDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Detector Type':
             accumcass.detector_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -387,9 +390,9 @@ def _accumulatedcassettebasedprojectionradiographydose(dataset,accum): # TID 100
     accumcass.save()
 
 def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
-    from remapp.models import Accumulated_integrated_projection_radiography_dose
+    from remapp.models import AccumIntegratedProjRadiogDose
     from remapp.tools.get_values import get_or_create_cid
-    accumint = Accumulated_integrated_projection_radiography_dose.objects.create(accumulated_xray_dose=accum)
+    accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
             accumint.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
@@ -402,9 +405,9 @@ def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
     accumint.save()
 
 def _accumulatedxraydose(dataset,proj): # TID 10002
-    from remapp.models import Accumulated_xray_dose, Content_item_descriptions
+    from remapp.models import AccumXRayDose, ContextID
     from remapp.tools.get_values import get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             accum.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -419,8 +422,8 @@ def _accumulatedxraydose(dataset,proj): # TID 10002
     accum.save()
 
 def _scanninglength(dataset,event): # TID 10014
-    from remapp.models import Scanning_length
-    scanlen = Scanning_length.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import ScanningLength
+    scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'scanning length':
             scanlen.scanning_length = cont.MeasuredValueSequence[0].NumericValue
@@ -441,8 +444,8 @@ def _scanninglength(dataset,event): # TID 10014
     scanlen.save()
 
 def _ctxraysourceparameters(dataset,event):
-    from remapp.models import Ct_xray_source_parameters
-    param = Ct_xray_source_parameters.objects.create(ct_irradiation_event_data=event)
+    from remapp.models import CtXRaySourceParameters
+    param = CtXRaySourceParameters.objects.create(ct_irradiation_event_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification of the x-ray source' or cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification number of the x-ray source':
             param.identification_of_the_xray_source = cont.TextValue
@@ -460,9 +463,9 @@ def _ctxraysourceparameters(dataset,event):
 
 
 def _ctirradiationeventdata(dataset,ct): # TID 10013
-    from remapp.models import Ct_irradiation_event_data
+    from remapp.models import CtIrradiationEventData
     from remapp.tools.get_values import get_or_create_cid
-    event = Ct_irradiation_event_data.objects.create(ct_radiation_dose=ct)
+    event = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = cont.TextValue
@@ -524,8 +527,8 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
                         
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
-    from remapp.models import Ct_accumulated_dose_data, Content_item_descriptions
-    ctacc = Ct_accumulated_dose_data.objects.create(ct_radiation_dose=ct)
+    from remapp.models import CtAccumulatedDoseData, ContextID
+    ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
             ctacc.total_number_of_irradiation_events = cont.MeasuredValueSequence[0].NumericValue
@@ -544,13 +547,13 @@ def _ctaccumulateddosedata(dataset,ct): # TID 10012
 
 
 def _projectionxrayradiationdose(dataset,g,reporttype):
-    from remapp.models import Projection_xray_radiation_dose, Ct_radiation_dose, Observer_context
+    from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, ObserverContext
     from remapp.tools.get_values import get_or_create_cid
     from remapp.tools.dcmdatetime import make_date_time
     if reporttype == 'projection':
-        proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+        proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     elif reporttype == 'ct':
-        proj = Ct_radiation_dose.objects.create(general_study_module_attributes=g)
+        proj = CtRadiationDose.objects.create(general_study_module_attributes=g)
     else: pass
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure reported':
@@ -573,9 +576,9 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
         
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
             if reporttype == 'projection':
-                obs = Observer_context.objects.create(projection_xray_radiation_dose=proj)
+                obs = ObserverContext.objects.create(projection_xray_radiation_dose=proj)
             elif reporttype == 'ct':
-                obs = Observer_context.objects.create(ct_radiation_dose=proj)
+                obs = ObserverContext.objects.create(ct_radiation_dose=proj)
             _observercontext(dataset,obs)
 
         if cont.ValueType == 'CONTAINER':
@@ -591,10 +594,10 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
                 _ctirradiationeventdata(cont,proj)
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import General_equipment_module_attributes
+    from remapp.models import GeneralEquipmentModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
@@ -611,25 +614,26 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.save()
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
+    from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw("PatientAge",dataset)
     patientatt.patient_weight = get_value_kw("PatientWeight",dataset)
+    patientatt.patient_size = get_value_kw("PatientSize", dataset)
     patientatt.save()
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
-    from remapp.models import Patient_module_attributes, Patient_study_module_attributes
+    from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
     from decimal import Decimal
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:
@@ -688,15 +692,15 @@ def _rsdr2db(dataset):
     from django.db import models
 
     openrem_settings.add_project_to_path()
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
-        existing = General_study_module_attributes.objects.filter(study_instance_uid__exact = uid)
+        existing = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = uid)
         if existing:
             return
 
-    g = General_study_module_attributes.objects.create()
+    g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
     _generalequipmentmoduleattributes(dataset,g)
     _patientstudymoduleattributes(dataset,g)

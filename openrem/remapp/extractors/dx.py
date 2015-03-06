@@ -36,9 +36,9 @@
 
 
 def _xrayfilters(filttype, material, thickmax, thickmin, source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     if filttype:
         filter_types = {'STRIP': {"code": '113650', "meaning": "Strip filter"},
                         'WEDGE': {"code": '113651', "meaning": "Wedge filter"},
@@ -76,9 +76,9 @@ def _xrayfilters(filttype, material, thickmax, thickmin, source):
     filters.save()
 
 def _xrayfiltersnone(source):
-    from remapp.models import Xray_filters
+    from remapp.models import XrayFilters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    filters = Xray_filters.objects.create(irradiation_event_xray_source_data=source)
+    filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
     filters.xray_filter_type = get_or_create_cid('111609', "No filter")
     filters.save()
 
@@ -103,9 +103,9 @@ def _exposure(dataset,source):
 
 
 def _xraygrid(gridcode,source):
-    from remapp.models import Xray_grid
+    from remapp.models import XrayGrid
     from remapp.tools.get_values import get_or_create_cid
-    grid = Xray_grid.objects.create(irradiation_event_xray_source_data=source)
+    grid = XrayGrid.objects.create(irradiation_event_xray_source_data=source)
     if gridcode == '111646':
         grid.xray_grid = get_or_create_cid('111646', 'No grid')
     elif gridcode == '111641':
@@ -122,12 +122,12 @@ def _xraygrid(gridcode,source):
 
 
 def _irradiationeventxraydetectordata(dataset,event):
-    from remapp.models import Irradiation_event_xray_detector_data
+    from remapp.models import IrradEventXRayDetectorData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    detector = Irradiation_event_xray_detector_data.objects.create(irradiation_event_xray_data=event)
+    detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     detector.exposure_index = get_value_kw('ExposureIndex',dataset)
     detector.relative_xray_exposure = get_value_kw('RelativeXRayExposure',dataset)
-    manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
+    manufacturer = detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
     if   'fuji'       in manufacturer: detector.relative_exposure_unit = 'S ()'
     elif 'carestream' in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
     elif 'kodak'      in manufacturer: detector.relative_exposure_unit = 'EI (Mbels)'
@@ -145,9 +145,9 @@ def _irradiationeventxraydetectordata(dataset,event):
 
 def _irradiationeventxraysourcedata(dataset,event):
     # TODO: review model to convert to cid where appropriate, and add additional fields such as field height and width
-    from remapp.models import Irradiation_event_xray_source_data
+    from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    source = Irradiation_event_xray_source_data.objects.create(irradiation_event_xray_data=event)
+    source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
     if not source.average_xray_tube_current: source.average_xray_tube_current = get_value_kw('AverageXRayTubeCurrent',dataset)
     source.exposure_time = get_value_kw('ExposureTime',dataset)
@@ -249,10 +249,10 @@ def _irradiationeventxraysourcedata(dataset,event):
 
 
 def _doserelateddistancemeasurements(dataset,mech):
-    from remapp.models import Dose_related_distance_measurements
+    from remapp.models import DoseRelatedDistanceMeasurements
     from remapp.tools.get_values import get_value_kw, get_value_num
-    dist = Dose_related_distance_measurements.objects.create(irradiation_event_xray_mechanical_data=mech)
-    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.general_equipment_module_attributes_set.all()[0].manufacturer.lower()
+    dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
+    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
     if dist.distance_source_to_detector and "kodak" in manufacturer:
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
@@ -268,9 +268,9 @@ def _doserelateddistancemeasurements(dataset,mech):
 
 
 def _irradiationeventxraymechanicaldata(dataset,event):
-    from remapp.models import Irradiation_event_xray_mechanical_data
+    from remapp.models import IrradEventXRayMechanicalData
     from remapp.tools.get_values import get_value_kw
-    mech = Irradiation_event_xray_mechanical_data.objects.create(irradiation_event_xray_data=event)
+    mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.magnification_factor = get_value_kw('EstimatedRadiographicMagnificationFactor',dataset)
     mech.dxdr_mechanical_configuration = get_value_kw('DX/DRMechanicalConfiguration',dataset)
     mech.primary_angle = get_value_kw('PositionerPrimaryAngle',dataset)
@@ -287,10 +287,10 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _irradiationeventxraydata(dataset,proj): # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
-    from remapp.models import Irradiation_event_xray_data
+    from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import make_date_time
-    event = Irradiation_event_xray_data.objects.create(projection_xray_radiation_dose=proj)
+    event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     event.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     event.irradiation_event_uid = get_value_kw('SOPInstanceUID',dataset)
     event_time = get_value_kw('AcquisitionTime',dataset)
@@ -343,35 +343,34 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     _irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
-    _accumulatedxraydose_update(dataset,event)
+    _accumulatedxraydose_update(event)
 
 
-def _accumulatedxraydose(dataset,proj):
-    from remapp.models import Accumulated_xray_dose, Accumulated_projection_xray_dose
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accum = Accumulated_xray_dose.objects.create(projection_xray_radiation_dose=proj)
-    accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
+def _accumulatedxraydose(proj):
+    from remapp.models import AccumXRayDose, AccumIntegratedProjRadiogDose
+    from remapp.tools.get_values import get_or_create_cid
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
+    accum.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     accum.save()
-    accumdx = Accumulated_projection_xray_dose.objects.create(accumulated_xray_dose=accum)
-    accumdx.dose_area_product_total = 0.0
-    accumdx.total_number_of_radiographic_frames = 0
-    accumdx.save()
+    accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
+    accumint.dose_area_product_total = 0.0
+    accumint.total_number_of_radiographic_frames = 0
+    accumint.save()
 
 
-def _accumulatedxraydose_update(dataset,event):
-    from remapp.tools.get_values import get_value_kw, get_or_create_cid
+def _accumulatedxraydose_update(event):
     from decimal import Decimal
-    accumdx = event.projection_xray_radiation_dose.accumulated_xray_dose_set.get().accumulated_projection_xray_dose_set.get()
-    accumdx.total_number_of_radiographic_frames = accumdx.total_number_of_radiographic_frames + 1
+    accumint = event.projection_xray_radiation_dose.accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+    accumint.total_number_of_radiographic_frames = accumint.total_number_of_radiographic_frames + 1
     if event.dose_area_product:
-        accumdx.dose_area_product_total += Decimal(event.dose_area_product)
-    accumdx.save()
+        accumint.dose_area_product_total += Decimal(event.dose_area_product)
+    accumint.save()
 
 
 def _projectionxrayradiationdose(dataset,g):
-    from remapp.models import Projection_xray_radiation_dose
+    from remapp.models import ProjectionXRayRadiationDose
     from remapp.tools.get_values import get_or_create_cid
-    proj = Projection_xray_radiation_dose.objects.create(general_study_module_attributes=g)
+    proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
     proj.procedure_reported = get_or_create_cid('113704','Projection X-Ray')
     proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014','Study')
@@ -380,15 +379,15 @@ def _projectionxrayradiationdose(dataset,g):
     proj.xray_source_data_available = get_or_create_cid('R-0038D','Yes')
     proj.xray_mechanical_data_available = get_or_create_cid('R-0038D','Yes')
     proj.save()
-    _accumulatedxraydose(dataset,proj)
+    _accumulatedxraydose(proj)
     _irradiationeventxraydata(dataset,proj)
 
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import General_equipment_module_attributes
+    from remapp.models import GeneralEquipmentModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
-    equip = General_equipment_module_attributes.objects.create(general_study_module_attributes=study)
+    equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
     equip.institution_address = get_value_kw("InstitutionAddress",dataset)
@@ -405,9 +404,9 @@ def _generalequipmentmoduleattributes(dataset,study):
 
 
 def _patientstudymoduleattributes(dataset,g): # C.7.2.2
-    from remapp.models import Patient_study_module_attributes
+    from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patientatt = Patient_study_module_attributes.objects.create(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
     patientatt.patient_age = get_value_kw('PatientAge',dataset)
     patientatt.patient_weight = get_value_kw("PatientWeight",dataset)
     patientatt.patient_size = get_value_kw("PatientSize", dataset)
@@ -415,17 +414,17 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
-    from remapp.models import Patient_module_attributes, Patient_study_module_attributes
+    from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
     from datetime import timedelta
     from decimal import Decimal
-    pat = Patient_module_attributes.objects.create(general_study_module_attributes=g)
+    pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex',dataset)
     patient_birth_date = get_date('PatientBirthDate',dataset) # Not saved to database
     pat.not_patient_indicator = get_not_pt(dataset)
-    patientatt = Patient_study_module_attributes.objects.get(general_study_module_attributes=g)
+    patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:
@@ -490,7 +489,7 @@ def _dx2db(dataset):
     from django.db import models
 
     openrem_settings.add_project_to_path()
-    from remapp.models import General_study_module_attributes
+    from remapp.models import GeneralStudyModuleAttr
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import make_date_time
@@ -506,22 +505,22 @@ def _dx2db(dataset):
             return 0
         # further check required to ensure 'for processing' and 'for presentation' 
         # versions of the same irradiation event don't get imported twice
-        same_study_uid = General_study_module_attributes.objects.filter(study_instance_uid__exact = study_uid)
+        same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
         event_time = get_value_kw('AcquisitionTime',dataset)
         if not event_time: event_time = get_value_kw('StudyTime',dataset)
         event_date = get_value_kw('AcquisitionDate',dataset)
         if not event_date: event_date = get_value_kw('StudyDate',dataset)
         event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-        for events in same_study_uid.get().projection_xray_radiation_dose_set.get().irradiation_event_xray_data_set.all():
+        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if event_date_time == events.date_time_started:
                 return 0
         # study exists, but event doesn't
-        _irradiationeventxraydata(dataset,same_study_uid.get().projection_xray_radiation_dose_set.get())
+        _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
         # update the accumulated tables
         return 0
     
     # study doesn't exist, start from scratch
-    g = General_study_module_attributes.objects.create()
+    g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
 
 

@@ -77,20 +77,20 @@ $('.datepicker').datepicker({
         {% endif %}
         {% for exam in filter_list %}
         <tr>
-            <td>{{ exam.general_equipment_module_attributes_set.get.institution_name }}</td>
+            <td>{{ exam.generalequipmentmoduleattr_set.get.institution_name }}</td>
             <td>
-                {{ exam.general_equipment_module_attributes_set.get.manufacturer }} | 
-                {{ exam.general_equipment_module_attributes_set.get.manufacturer_model_name }} |
-                {{ exam.general_equipment_module_attributes_set.get.station_name }}
+                {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
+                {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                {{ exam.generalequipmentmoduleattr_set.get.station_name }}
             </td>
             <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">{{ exam.procedure_code_meaning }}</a> |
                 {{ exam.accession_number }}
             </td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.irradiation_event_xray_data_set.count }}</td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.laterality }}</td>
-            <td>{{ exam.projection_xray_radiation_dose_set.get.accumulated_xray_dose_set.get.accumulated_mammography_xray_dose_set.get.accumulated_average_glandular_dose }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.laterality }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.accumulated_average_glandular_dose }}</td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>
