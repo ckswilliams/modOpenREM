@@ -289,14 +289,14 @@ def ct_summary_list_filter(request):
 
     if plotting:
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(ct_radiation_dose__ct_irradiation_event_data__dlp__isnull=True).values('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_irradiation_event_data__dlp'), num_acq = Count('ct_radiation_dose__ct_irradiation_event_data__dlp')).order_by('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')
+        acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = f.qs.exclude(ct_radiation_dose__ct_irradiation_event_data__dlp__isnull=True).filter(ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=protocol.get('ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol')).values_list('ct_radiation_dose__ct_irradiation_event_data__dlp', flat=True)
+            dlpValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         # Required for mean DLP per study type plot
-        studySummary = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'), num_acq = Count('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total')).order_by('study_description')
+        studySummary = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
         # Required for mean DLP per study type per week plot
@@ -305,18 +305,18 @@ def ct_summary_list_filter(request):
         today = datetime.date.today()
 
         # Required for all plots
-        qs = f.qs.exclude(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__isnull=True)
+        qs = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True)
 
         for idx, study in enumerate(studySummary):
             # Required for mean DLP per study type plot AND mean DLP per study type per week plot
             subqs = qs.filter(study_description=study.get('study_description'))
 
             # Required for mean DLP per study type plot
-            dlpValues = subqs.values_list('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total', flat=True)
+            dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
             # Required for mean DLP per study type per week plot
-            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total'))
+            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
             studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
 
         # Required for studies per weekday and studies per hour in each weekday plot
