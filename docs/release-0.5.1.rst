@@ -277,9 +277,9 @@ Upgrading from version 0.5.0
 *   Rename the two 050 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``
     and ``0009_051datamigration.py`` for the existing migrations above, or ``0002_051schemamigration.py`` and
     ``0003_051datamigration.py`` if the only migration is the initial migration. The ``051schemamigration`` **must**
-    come before the ``051datamigration``
+    come before the ``051datamigration``.
 
-    If you now re-run ``migrate --list remapp`` you should get a listing with the ``051schemamigration`` and the
+*   If you now re-run ``migrate --list remapp`` you should get a listing with the ``051schemamigration`` and the
     ``051datamigration`` listed at the end::
 
          remapp
