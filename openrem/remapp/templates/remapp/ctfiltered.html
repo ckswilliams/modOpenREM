@@ -225,7 +225,7 @@ function sort_by_name(a,b) {
 <script>
 var protocolNames     = [
                         {% for name in acquisitionSummary %}
-                            "{{name.ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol}}"
+                            "{{name.ctradiationdose__ctirradiationeventdata__acquisition_protocol}}"
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
