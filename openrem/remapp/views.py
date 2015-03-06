@@ -148,7 +148,7 @@ def dx_histogram_list_filter(request):
     import datetime, qsstats
 
     if request.GET.get('acquisitionhist'):
-        f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
             projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('acquisition_protocol'),
             projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'),
@@ -159,7 +159,7 @@ def dx_histogram_list_filter(request):
         if request.GET.get('study_dap_min')     : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
 
     elif request.GET.get('studyhist'):
-        f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
             projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('study_description'),
             projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
@@ -170,7 +170,7 @@ def dx_histogram_list_filter(request):
         if request.GET.get('acquisition_dap_min')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
 
     else:
-        f = DXSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
         if request.GET.get('study_description')    : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('study_description'))
         if request.GET.get('study_dap_min')        : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
@@ -285,7 +285,7 @@ def ct_summary_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
 
-    f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(modality_type__exact = 'CT').distinct())
+    f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
     if plotting:
         # Required for mean DLP per acquisition plot
@@ -369,7 +369,7 @@ def ct_histogram_list_filter(request):
     import datetime, qsstats
 
     if request.GET.get('acquisitionhist'):
-        f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             modality_type__exact = 'CT',
             ct_radiation_dose__ct_irradiation_event_data__acquisition_protocol=request.GET.get('acquisition_protocol'),
             ct_radiation_dose__ct_irradiation_event_data__dlp__gte=request.GET.get('acquisition_dlp_min'),
@@ -380,7 +380,7 @@ def ct_histogram_list_filter(request):
         if request.GET.get('study_dlp_min')     : f.qs.filter(ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
 
     elif request.GET.get('studyhist'):
-        f = CTSummaryListFilter(request.GET, queryset=General_study_module_attributes.objects.filter(
+        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             modality_type__exact = 'CT',
             study_description=request.GET.get('study_description'),
             ct_radiation_dose__ct_accumulated_dose_data__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'),
