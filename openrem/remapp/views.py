@@ -77,7 +77,7 @@ def dx_summary_list_filter(request):
 
     if plotting:
         # Required for mean DAP per acquisition plot
-        acquisitionSummary = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
+        acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
         # Required for mean DAP per month plot
@@ -86,18 +86,18 @@ def dx_summary_list_filter(request):
         today = datetime.date.today()
 
         # Required for all plots
-        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
+        qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
 
         for idx, protocol in enumerate(acquisitionSummary):
             # Required for mean DAP per acquisition plot AND mean DAP per month plot
-            subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
+            subqs = qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
 
             # Required for mean DAP per acquisition plot
-            dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
             # Required for mean DAP per month plot
-            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+            qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
             acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval='months')
 
         # Required for studies per weekday and studies per hour in each weekday plot
@@ -150,48 +150,48 @@ def dx_histogram_list_filter(request):
     if request.GET.get('acquisitionhist'):
         f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-            projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('acquisition_protocol'),
-            projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'),
-            projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__lte=request.GET.get('acquisition_dap_max')
+            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('acquisition_protocol'),
+            projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'),
+            projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max')
             ).order_by().distinct())
         if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
-        if request.GET.get('study_dap_max')     : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
-        if request.GET.get('study_dap_min')     : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
+        if request.GET.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
+        if request.GET.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
 
     elif request.GET.get('studyhist'):
         f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-            projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('study_description'),
-            projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
-            projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__lte=request.GET.get('study_dap_max')
+            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'),
+            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
+            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max')
             ).order_by().distinct())
         if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
-        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
-        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
+        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
 
     else:
         f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
-        if request.GET.get('study_description')    : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=request.GET.get('study_description'))
-        if request.GET.get('study_dap_min')        : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
-        if request.GET.get('study_dap_max')        : f.qs.filter(projection_xray_radiation_dose__accumulated_xray_dose__accumulated_projection_xray_dose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
+        if request.GET.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'))
+        if request.GET.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
+        if request.GET.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
         if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
-        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
-        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
+        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
 
     if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
     if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
     if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
-    if request.GET.get('institution_name')  : f.qs.filter(general_equipment_module_attributes__institution_name=request.GET.get('institution_name'))
-    if request.GET.get('manufacturer')      : f.qs.filter(general_equipment_module_attributes__manufacturer=request.GET.get('manufacturer'))
-    if request.GET.get('model_name')        : f.qs.filter(general_equipment_module_attributes__model_name=request.GET.get('model_name'))
-    if request.GET.get('patient_age_max')   : f.qs.filter(patient_study_module_attributes__patient_age_decimal__lte=request.GET.get('patient_age_max'))
-    if request.GET.get('patient_age_min')   : f.qs.filter(patient_study_module_attributes__patient_age_decimal__gte=request.GET.get('patient_age_min'))
-    if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
+    if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
+    if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
+    if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
+    if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
+    if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
+    if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
     if plotting:
         # Required for mean DAP per acquisition plot
-        acquisitionSummary = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True).values('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol').distinct().annotate(mean_dap = Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'), num_acq = Count('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product')).order_by('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol')
+        acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
         # Required for mean DAP per month plot
@@ -200,18 +200,18 @@ def dx_histogram_list_filter(request):
         today = datetime.date.today()
 
         # Required for all plots
-        qs = f.qs.exclude(projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product__isnull=True)
+        qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
 
         for idx, protocol in enumerate(acquisitionSummary):
             # Required for mean DAP per acquisition plot AND mean DAP per month plot
-            subqs = qs.filter(projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol=protocol.get('projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol'))
+            subqs = qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
 
             # Required for mean DAP per acquisition plot
-            dapValues = subqs.values_list('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product', flat=True)
+            dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
             # Required for mean DAP per month plot
-            qss = qsstats.QuerySetStats(subqs, 'projection_xray_radiation_dose__irradiation_event_xray_data__date_time_started', aggregate=Avg('projection_xray_radiation_dose__irradiation_event_xray_data__dose_area_product'))
+            qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
             acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
 
         # Required for studies per weekday and studies per hour in each weekday plot
@@ -403,12 +403,12 @@ def ct_histogram_list_filter(request):
     if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
     if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
     if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
-    if request.GET.get('institution_name')  : f.qs.filter(general_equipment_module_attributes__institution_name=request.GET.get('institution_name'))
-    if request.GET.get('manufacturer')      : f.qs.filter(general_equipment_module_attributes__manufacturer=request.GET.get('manufacturer'))
-    if request.GET.get('model_name')        : f.qs.filter(general_equipment_module_attributes__model_name=request.GET.get('model_name'))
-    if request.GET.get('patient_age_max')   : f.qs.filter(patient_study_module_attributes__patient_age_decimal__lte=request.GET.get('patient_age_max'))
-    if request.GET.get('patient_age_min')   : f.qs.filter(patient_study_module_attributes__patient_age_decimal__gte=request.GET.get('patient_age_min'))
-    if request.GET.get('station_name')      : f.qs.filter(general_equipment_module_attributes__station_name=request.GET.get('station_name'))
+    if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
+    if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
+    if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
+    if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
+    if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
+    if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
     if plotting:
         # Required for mean DLP per acquisition plot

@@ -249,7 +249,7 @@ function sort_by_name(a,b) {
 <script>
 var protocolNames     = [
                         {% for name in acquisitionSummary %}
-                            "{{name.projection_xray_radiation_dose__irradiation_event_xray_data__acquisition_protocol}}"
+                            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
