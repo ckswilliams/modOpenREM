@@ -69,7 +69,7 @@ $('.datepicker').datepicker({
     {% autopaginate filter.qs 50 as filter_list %}
     {% paginate %}
 
-<table class="table table-bordered table-hover row-clickable">
+    <table class="table table-bordered table-hover row-clickable">
         <row>
             <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
             {% if admin.adminperm %}
