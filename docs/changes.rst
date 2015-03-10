@@ -157,7 +157,7 @@ Reopened issue
 
 * `#40`_   Restyled the filter section in the web interface and added a title to that section
 * `#38`_   Column titles tidied up in Excel exports
-* `#36`_	openrem_ptsizecsv output of log now depends on verbose flag
+* `#36`_   openrem_ptsizecsv output of log now depends on verbose flag
 * `#35`_   Numbers no longer stored as text in Excel exports
 
 0.3.6 (2014-02-24)
