@@ -1,5 +1,5 @@
 ######################
-Release Notes v0.5.1b1
+Release Notes v0.5.1b2
 ######################
 
 ****************
@@ -10,6 +10,7 @@ Headline changes
 * Extended the field value lengths to better incorporate all possible values and decimal places
 * Improved import of grid and filter information from DX images
 * Improved DX summary and detail web pages
+* Any item in a row can now be clicked to move between the home and filtered pages
 
 **************************
 Upgrades: Convert to South
@@ -227,11 +228,11 @@ Upgrading from version 0.5.0
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* Install 0.5.1b1:
+* Install 0.5.1b2:
 
     .. sourcecode:: bash
 
-        pip install openrem==0.5.1b1
+        pip install openrem==0.5.1b2
 
 * Find out how many migration files you have
 
