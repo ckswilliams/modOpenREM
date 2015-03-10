@@ -14,6 +14,7 @@ OpenREM version history
 * `#159`_  Modified the DX import to populate TID 10007 rather than TID 10004. RDSR RF already populates both
 * `#158`_  Demo website created by DJ Platten: http://demo.openrem.org/openrem
 * `#154`_  Various decimal fields are defined with too few decimal places - all have now been extended.
+* `#153`_  Changed home page and modality pages to have whole row clickable and highlighted
 * `#150`_  DJ Platten has added Conquest configuration information
 * `#137`_  Carestream DX multiple filter thickness values in a DS VR now extracted correctly
 * `#113`_  Fixed and improved recording of grid information for mammo and DX and RDSR import routines
