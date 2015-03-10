@@ -2,21 +2,43 @@
 OpenREM version history
 =======================
 
+0.5.1b1 (2015-03-03)
+--------------------
+
+* `#184`_  Documentation for 0.5.1
+* `#180`_  Rename all reverse lookups as a result of `#62`_
+* `#172`_  Revert all changes made to database so `#62`_ could take place first
+* `#165`_  Extract height and weight from DX, height from RDSR, all if available
+* `#161`_  Views and exports now look for accumulated data in the right table after changes in `#159`_ and `#160`_
+* `#160`_  Created the data migration to move all the DX accumulated data from TID 10004 to TID 10007
+* `#159`_  Modified the DX import to populate TID 10007 rather than TID 10004. RDSR RF already populates both
+* `#158`_  Demo website created by DJ Platten: http://demo.openrem.org/openrem
+* `#154`_  Various decimal fields are defined with too few decimal places - all have now been extended.
+* `#153`_  Changed home page and modality pages to have whole row clickable and highlighted
+* `#150`_  DJ Platten has added Conquest configuration information
+* `#137`_  Carestream DX multiple filter thickness values in a DS VR now extracted correctly
+* `#113`_  Fixed and improved recording of grid information for mammo and DX and RDSR import routines
+* `#62`_   Refactored all model names to be less than 39 characters and be in CamelCase to allow database migrations and
+  to come into line with PEP 8 naming conventions for classes.
+
+
 0.5.0 (2014-11-19)
 ------------------
 
 * Pull request from DJ Platten: Improved display of DX data and improved export of DX data
 * `#132`_  Fixed mammo export error that slipped in before the first beta
 * `#130`_  Only creates ExposureInuAs from Exposure if Exposure exists now
-* `#128`_  Updated some non-core documentation that didn't have the new local_settings.py reference or the new openremproject folder name
+* `#128`_  Updated some non-core documentation that didn't have the new local_settings.py reference or the new
+  openremproject folder name
 * `#127`_  DX IOD studies with image view populated failed to export due to lack of conversion to string
 * `#126`_  Documentation created for the radiographic functionality
 * `#125`_  Fixes issue where Hologic tomo projection objects were dropped as they have the same event time as the 2D element
 * `#123`_  Fixed issue where filters came through on export as lists rather than strings on some installs
 * `#122`_  Exports of RF data should now be more useful when exporting to xlsx. Will need refinement in the future
 * `#26`_   Extractors created for radiographic DICOM images. Contributed by DJ Platten
-* `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_. Contributed by DJ Platten
-* `#9`_    Import of *.dcm should now be available from Windows and Linux alike
+* `#25`_   Views and templates added for radiographic exposures - either from RDSRs or from images - see `#26`_.
+  Contributed by DJ Platten
+* `#9`_    Import of \*.dcm should now be available from Windows and Linux alike
 
 
 0.4.3 (2014-10-01)
@@ -135,7 +157,7 @@ Reopened issue
 
 * `#40`_   Restyled the filter section in the web interface and added a title to that section
 * `#38`_   Column titles tidied up in Excel exports
-* `#36`_	openrem_ptsizecsv output of log now depends on verbose flag
+* `#36`_   openrem_ptsizecsv output of log now depends on verbose flag
 * `#35`_   Numbers no longer stored as text in Excel exports
 
 0.3.6 (2014-02-24)
@@ -188,7 +210,7 @@ Reopened issue
 ------------------
 
 ..      Note::
-        
+
         Installs of OpenREM earlier than 0.3.3 will break on upgrade if the scripts are called from other programs.
         For example openrem_rdsr is now called openrem_rdsr.py
 
@@ -196,7 +218,7 @@ Reopened issue
 * `#10`_   Added .py suffix to the scripts to allow them to be executed on Windows (thanks to DJ Platten)
 * `#8`_    Removed superfluous '/' in base html file, harmless on linux, prevented Windows loading stylesheets (thanks to DJ Platten)
 * `#7`_    Added windows and linux path examples for test SQLite database creation
-* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten) 
+* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten)
 * `#4`_    Added some text to the documentation relating to importing files to OpenREM
 * `#3`_    Corrected copyright notice in documentation
 
@@ -206,6 +228,65 @@ Reopened issue
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#199`: https://bitbucket.org/openrem/openrem/issue/199/
+..  _`#198`: https://bitbucket.org/openrem/openrem/issue/198/
+..  _`#197`: https://bitbucket.org/openrem/openrem/issue/197/
+..  _`#196`: https://bitbucket.org/openrem/openrem/issue/196/
+..  _`#195`: https://bitbucket.org/openrem/openrem/issue/195/
+..  _`#194`: https://bitbucket.org/openrem/openrem/issue/194/
+..  _`#193`: https://bitbucket.org/openrem/openrem/issue/193/
+..  _`#192`: https://bitbucket.org/openrem/openrem/issue/192/
+..  _`#191`: https://bitbucket.org/openrem/openrem/issue/191/
+..  _`#190`: https://bitbucket.org/openrem/openrem/issue/190/
+..  _`#189`: https://bitbucket.org/openrem/openrem/issue/189/
+..  _`#188`: https://bitbucket.org/openrem/openrem/issue/188/
+..  _`#187`: https://bitbucket.org/openrem/openrem/issue/187/
+..  _`#186`: https://bitbucket.org/openrem/openrem/issue/186/
+..  _`#185`: https://bitbucket.org/openrem/openrem/issue/185/
+..  _`#184`: https://bitbucket.org/openrem/openrem/issue/184/
+..  _`#183`: https://bitbucket.org/openrem/openrem/issue/183/
+..  _`#182`: https://bitbucket.org/openrem/openrem/issue/182/
+..  _`#181`: https://bitbucket.org/openrem/openrem/issue/181/
+..  _`#180`: https://bitbucket.org/openrem/openrem/issue/180/
+..  _`#179`: https://bitbucket.org/openrem/openrem/issue/179/
+..  _`#178`: https://bitbucket.org/openrem/openrem/issue/178/
+..  _`#177`: https://bitbucket.org/openrem/openrem/issue/177/
+..  _`#176`: https://bitbucket.org/openrem/openrem/issue/176/
+..  _`#175`: https://bitbucket.org/openrem/openrem/issue/175/
+..  _`#174`: https://bitbucket.org/openrem/openrem/issue/174/
+..  _`#173`: https://bitbucket.org/openrem/openrem/issue/173/
+..  _`#172`: https://bitbucket.org/openrem/openrem/issue/172/
+..  _`#171`: https://bitbucket.org/openrem/openrem/issue/171/
+..  _`#170`: https://bitbucket.org/openrem/openrem/issue/170/
+..  _`#169`: https://bitbucket.org/openrem/openrem/issue/169/
+..  _`#168`: https://bitbucket.org/openrem/openrem/issue/168/
+..  _`#167`: https://bitbucket.org/openrem/openrem/issue/167/
+..  _`#166`: https://bitbucket.org/openrem/openrem/issue/166/
+..  _`#165`: https://bitbucket.org/openrem/openrem/issue/165/
+..  _`#164`: https://bitbucket.org/openrem/openrem/issue/164/
+..  _`#163`: https://bitbucket.org/openrem/openrem/issue/163/
+..  _`#162`: https://bitbucket.org/openrem/openrem/issue/162/
+..  _`#161`: https://bitbucket.org/openrem/openrem/issue/161/
+..  _`#160`: https://bitbucket.org/openrem/openrem/issue/160/
+..  _`#159`: https://bitbucket.org/openrem/openrem/issue/159/
+..  _`#158`: https://bitbucket.org/openrem/openrem/issue/158/
+..  _`#157`: https://bitbucket.org/openrem/openrem/issue/157/
+..  _`#156`: https://bitbucket.org/openrem/openrem/issue/156/
+..  _`#155`: https://bitbucket.org/openrem/openrem/issue/155/
+..  _`#154`: https://bitbucket.org/openrem/openrem/issue/154/
+..  _`#153`: https://bitbucket.org/openrem/openrem/issue/153/
+..  _`#152`: https://bitbucket.org/openrem/openrem/issue/152/
+..  _`#151`: https://bitbucket.org/openrem/openrem/issue/151/
+..  _`#150`: https://bitbucket.org/openrem/openrem/issue/150/
+..  _`#149`: https://bitbucket.org/openrem/openrem/issue/149/
+..  _`#148`: https://bitbucket.org/openrem/openrem/issue/148/
+..  _`#147`: https://bitbucket.org/openrem/openrem/issue/147/
+..  _`#146`: https://bitbucket.org/openrem/openrem/issue/146/
+..  _`#145`: https://bitbucket.org/openrem/openrem/issue/145/
+..  _`#144`: https://bitbucket.org/openrem/openrem/issue/144/
+..  _`#143`: https://bitbucket.org/openrem/openrem/issue/143/
+..  _`#142`: https://bitbucket.org/openrem/openrem/issue/142/
+..  _`#141`: https://bitbucket.org/openrem/openrem/issue/141/
 ..  _`#140`: https://bitbucket.org/openrem/openrem/issue/140/
 ..  _`#139`: https://bitbucket.org/openrem/openrem/issue/139/
 ..  _`#138`: https://bitbucket.org/openrem/openrem/issue/138/
