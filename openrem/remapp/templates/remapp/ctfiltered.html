@@ -141,10 +141,9 @@ function getColours(noOfColours) {
                 </a>
             <td>
                 <a href="/openrem/ct/{{ exam.id }}/">
-                    {{ exam.study_description }} |
-                    {{ exam.accession_number }} |
-                    {{ exam.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm |
-                    {{ exam.patientstudymoduleattr_set.get.patient_weight|floatformat:0 }} kg
+                    {{ exam.study_description }}</a> |
+                    {{ exam.requested_procedure_code_meaning }} |
+                    {{ exam.accession_number }}
                 </a>
             </td>
             <td>
