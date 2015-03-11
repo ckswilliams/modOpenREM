@@ -71,32 +71,57 @@ $('.datepicker').datepicker({
     {% autopaginate filter.qs 20 as filter_list %}
     {% paginate %}
 
-    <table class="table table-striped">
+    <table class="table table-bordered table-hover row-clickable">
         <th>Institution</th><th>Unit</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>DAP total (cGy.cm<sup>2</sup>)</th><th>Dose at RP total (Gy)</th><th>Physician</th>
         {% if admin.adminperm %}
         <th>Delete?</th>
         {% endif %}
+
         {% for exam in filter_list %}
         <tr>
-            <td>{{ exam.generalequipmentmoduleattr_set.get.institution_name }}</td>
             <td>
-                {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                {{ exam.generalequipmentmoduleattr_set.get.station_name }}
-            </td>
-            <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
-            <td>
-                <a href="/openrem/rf/{{ exam.id }}/">{{ exam.study_description }}</a> |
-                {{ exam.accession_number }}
-            </td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>
-                {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+                </a>
             </td>
             <td>
-                {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
+                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                    {{ exam.generalequipmentmoduleattr_set.get.station_name }}
+                </a>
             </td>
-            <td>{{ exam.performing_physician_name }}</td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.study_description }} |
+                    {{ exam.accession_number }}
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/rf/{{ exam.id }}/">
+                    {{ exam.performing_physician_name }}
+                </a>
+            </td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>

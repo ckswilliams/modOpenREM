@@ -114,27 +114,49 @@ function getColours(noOfColours) {
 
       {% autopaginate filter.qs 25 as filter_list %}
       {% paginate %}
-    <table class="table table-striped">
-        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
+
+    <table class="table table-bordered table-hover row-clickable">
+        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
         {% if admin.adminperm %}
         <th>Delete?</th>
         {% endif %}
+
         {% for exam in filter_list %}
         <tr>
-            <td>{{ exam.generalequipmentmoduleattr_set.get.institution_name }}</td>
             <td>
-                {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                {{ exam.generalequipmentmoduleattr_set.get.station_name }}
+                <a href="/openrem/ct/{{ exam.id }}/">
+                    {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+                </a>
             </td>
-            <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
             <td>
-                <a href="/openrem/ct/{{ exam.id }}/">{{ exam.study_description }}</a> |
-                {{ exam.requested_procedure_code_meaning }} |
-                {{ exam.accession_number }}
+                <a href="/openrem/ct/{{ exam.id }}/">
+                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
+                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                    {{ exam.generalequipmentmoduleattr_set.get.station_name }}
+                </a>
             </td>
-            <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}</td>
-            <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
+            <td>
+                <a href="/openrem/ct/{{ exam.id }}/">
+                    {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
+                </a>
+            <td>
+                <a href="/openrem/ct/{{ exam.id }}/">
+                    {{ exam.study_description }} |
+                    {{ exam.accession_number }} |
+                    {{ exam.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm |
+                    {{ exam.patientstudymoduleattr_set.get.patient_weight|floatformat:0 }} kg
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/ct/{{ exam.id }}/">
+                    {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
+                </a>
+            </td>
+            <td>
+                <a href="/openrem/ct/{{ exam.id }}/">
+                    {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
+                </a>
+            </td>
             {% if admin.adminperm %}
             <td>
               <a href="{% url 'study_delete' exam.id %}">Delete</a>
