@@ -203,7 +203,7 @@ function getColours(noOfColours) {
 </div>
 <!-- End of HTML to include div container for acquisition pie chart -->
 
-
+{% if studiesPerHourInWeekdays %}
 <!-- HTML to include div container for pie chart of studies per week day pie chart -->
 <div class="panel-group" id="accordion">
   <div class="panel panel-default">
@@ -223,6 +223,7 @@ function getColours(noOfColours) {
   </div>
 </div>
 <!-- End of HTML to include div container for studies per week day pie chart -->
+{% endif %}
 
 {% if acquisitionDAPoverTime %}
 <!-- HTML to include div container for mean acquisition protocol DAP per week -->
@@ -479,6 +480,7 @@ var chartAcqFrequency = new Highcharts.Chart({
 <!-- End of JavaScript for acquisition pie chart -->
 
 
+{% if studiesPerHourInWeekdays %}
 <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
 <script>
 var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -575,6 +577,7 @@ var chartWorkload = new Highcharts.Chart({
 });
 </script>
 <!-- End of JavaScript for studies per week day pie chart -->
+{% endif %}
 
 {% if acquisitionDAPoverTime %}
 <!-- JavaScript for mean DAP per acquisition protocol per month -->

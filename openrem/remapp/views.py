@@ -57,7 +57,8 @@ except ImportError:
 # New plotting options. These are manually set at the moment.
 plotCharts = 1 # This is a variable that will contain the user's global choice of plots on or off.
 plotDXAcquisitionMeanDAPOverTime = 0 # This variable determines whether the data for the DX plot of mean DAP over time is calculated
-plotCTStudyMeanDLPOverTime = 0 # This variable determines whether the data for the CT plot of mean DLP over time is calculated
+plotCTStudyMeanDLPOverTime = 0       # This variable determines whether the data for the CT plot of mean DLP over time is calculated
+plotDXStudyPerDayAndHour = 0         # This variable determines whether the data for the DX plot of number of studies per day and hour is calculated
 
 
 def logout_page(request):
@@ -105,16 +106,17 @@ def dx_summary_list_filter(request):
                 qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
                 acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval='months')
 
-        # Required for studies per weekday and studies per hour in each weekday plot
-        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
-        for day in range(7):
-            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
-            if studyTimesOnThisWeekday:
-                for hour in range(24):
-                    try:
-                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                    except:
-                        studiesPerHourInWeekdays[day][hour] = 0
+        if plotDXStudyPerDayAndHour:
+            # Required for studies per weekday and studies per hour in each weekday plot
+            studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+            for day in range(7):
+                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                if studyTimesOnThisWeekday:
+                    for hour in range(24):
+                        try:
+                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                        except:
+                            studiesPerHourInWeekdays[day][hour] = 0
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -129,12 +131,14 @@ def dx_summary_list_filter(request):
 
     returnStructure = {'filter': f, 'admin':admin,
                        'acquisitionSummary': acquisitionSummary,
-                       'acquisitionHistogramData': acquisitionHistogramData,
-                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
+                       'acquisitionHistogramData': acquisitionHistogramData
                        }
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
+
+    if plotting and plotCharts and plotDXStudyPerDayAndHour:
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -219,16 +223,17 @@ def dx_histogram_list_filter(request):
                 qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
                 acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
 
-        # Required for studies per weekday and studies per hour in each weekday plot
-        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
-        for day in range(7):
-            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
-            if studyTimesOnThisWeekday:
-                for hour in range(24):
-                    try:
-                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                    except:
-                        studiesPerHourInWeekdays[day][hour] = 0
+        if plotDXStudyPerDayAndHour:
+            # Required for studies per weekday and studies per hour in each weekday plot
+            studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+            for day in range(7):
+                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                if studyTimesOnThisWeekday:
+                    for hour in range(24):
+                        try:
+                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                        except:
+                            studiesPerHourInWeekdays[day][hour] = 0
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -243,12 +248,14 @@ def dx_histogram_list_filter(request):
 
     returnStructure = {'filter': f, 'admin':admin,
                        'acquisitionSummary': acquisitionSummary,
-                       'acquisitionHistogramData': acquisitionHistogramData,
-                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
+                       'acquisitionHistogramData': acquisitionHistogramData
                        }
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
+
+    if plotting and plotCharts and plotDXStudyPerDayAndHour:
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     return render_to_response(
         'remapp/dxfiltered.html',
