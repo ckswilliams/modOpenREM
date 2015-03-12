@@ -53,9 +53,9 @@ try:
     plotting = 1
 except ImportError:
     plotting = 0
-    
 
-
+# New plotting options. These are manually set at the moment.
+plotCharts = 0 # This is a variable that will contain the user's global choice of plots on or off.
 
 def logout_page(request):
     """
@@ -75,7 +75,7 @@ def dx_summary_list_filter(request):
 
     f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
-    if plotting:
+    if plotting and plotCharts:
         # Required for mean DAP per acquisition plot
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
@@ -122,7 +122,7 @@ def dx_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting:
+    if plotting and plotCharts:
         return render_to_response(
             'remapp/dxfiltered.html',
             {'filter': f, 'admin':admin,
@@ -189,7 +189,7 @@ def dx_histogram_list_filter(request):
     if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
     if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
-    if plotting:
+    if plotting and plotCharts:
         # Required for mean DAP per acquisition plot
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
@@ -236,7 +236,7 @@ def dx_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting:
+    if plotting and plotCharts:
         return render_to_response(
             'remapp/dxfiltered.html',
             {'filter': f, 'admin':admin,
@@ -287,7 +287,7 @@ def ct_summary_list_filter(request):
 
     f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
-    if plotting:
+    if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
         acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
@@ -341,7 +341,7 @@ def ct_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting:
+    if plotting and plotCharts:
         return render_to_response(
             'remapp/ctfiltered.html',
             {'filter': f, 'admin':admin,
@@ -410,7 +410,7 @@ def ct_histogram_list_filter(request):
     if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
     if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
-    if plotting:
+    if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
         acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
