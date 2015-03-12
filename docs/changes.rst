@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.5.1b1 (2015-03-03)
---------------------
+0.5.1 (2015-03-??)
+------------------
 
 * `#184`_  Documentation for 0.5.1
 * `#180`_  Rename all reverse lookups as a result of `#62`_
