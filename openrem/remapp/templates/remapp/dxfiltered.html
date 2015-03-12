@@ -224,7 +224,7 @@ function getColours(noOfColours) {
 </div>
 <!-- End of HTML to include div container for studies per week day pie chart -->
 
-
+{% if acquisitionDAPoverTime %}
 <!-- HTML to include div container for mean acquisition protocol DAP per week -->
 <div class="panel-group" id="accordion">
   <div class="panel panel-default">
@@ -244,7 +244,7 @@ function getColours(noOfColours) {
   </div>
 </div>
 <!-- End of HTML to include div container for mean acquisition protocol DAP per week -->
-
+{% endif %}
 
 <!-- Include JavaScript to enable highcharts plots -->
 <script src="{{ STATIC_URL }}js/highcharts.js"></script>
@@ -576,7 +576,7 @@ var chartWorkload = new Highcharts.Chart({
 </script>
 <!-- End of JavaScript for studies per week day pie chart -->
 
-
+{% if acquisitionDAPoverTime %}
 <!-- JavaScript for mean DAP per acquisition protocol per month -->
 <script>
 dateAxis = [
@@ -664,7 +664,7 @@ var chartMonthlyAcquisitionMeanDAP = new Highcharts.Chart({
 
 </script>
 <!-- End of JavaScript for mean DAP per acquisition protocol per week -->
-
+{% endif %}
 
 <!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
 <script>

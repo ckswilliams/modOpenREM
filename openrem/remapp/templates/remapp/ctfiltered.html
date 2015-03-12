@@ -521,7 +521,7 @@ var chartAcqFreq = new Highcharts.Chart({
 </div>
 <!-- End of HTML to include div container for studies per week day pie chart -->
 
-
+{% if studyDLPoverTime %}
 <!-- HTML to include div container for mean study DLP per week -->
 <div class="panel-group" id="accordion">
   <div class="panel panel-default">
@@ -541,7 +541,7 @@ var chartAcqFreq = new Highcharts.Chart({
   </div>
 </div>
 <!-- End of HTML to include div container for mean study DLP per week -->
-
+{% endif %}
 
 <!-- JavaScript for study plot -->
 <script>
@@ -852,7 +852,7 @@ var chartStudyWorkload = new Highcharts.Chart({
 </script>
 <!-- End of JavaScript for studies per week day pie chart -->
 
-
+{% if studyDLPoverTime %}
 <!-- JavaScript for mean DLP per study description -->
 <script>
 dateAxis = [
@@ -938,6 +938,7 @@ var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
 
 </script>
 <!-- End of JavaScript for mean DLP per study description -->
+{% endif %}
 {% endif %}
 
 <!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
