@@ -1,6 +1,6 @@
-######################
-Release Notes v0.5.1b2
-######################
+####################
+Release Notes v0.5.1
+####################
 
 ****************
 Headline changes
@@ -228,11 +228,11 @@ Upgrading from version 0.5.0
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* Install 0.5.1b2:
+* Install 0.5.1:
 
     .. sourcecode:: bash
 
-        pip install openrem==0.5.1b2
+        pip install openrem==0.5.1
 
 * Find out how many migration files you have
 
