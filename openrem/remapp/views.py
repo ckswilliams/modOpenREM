@@ -57,6 +57,7 @@ except ImportError:
 # New plotting options. These are manually set at the moment.
 plotCharts = 1 # This is a variable that will contain the user's global choice of plots on or off.
 plotDXAcquisitionMeanDAPOverTime = 0 # This variable determines whether the data for the DX plot of mean DAP over time is calculated
+plotCTStudyMeanDLPOverTime = 0 # This variable determines whether the data for the CT plot of mean DLP over time is calculated
 
 
 def logout_page(request):
@@ -301,10 +302,11 @@ def ct_summary_list_filter(request):
         studySummary = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
-        # Required for mean DLP per study type per week plot
-        studyDLPoverTime = [None] * len(studySummary)
-        startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-        today = datetime.date.today()
+        if plotCTStudyMeanDLPOverTime:
+            # Required for mean DLP per study type per week plot
+            studyDLPoverTime = [None] * len(studySummary)
+            startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
+            today = datetime.date.today()
 
         # Required for all plots
         qs = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True)
@@ -317,9 +319,10 @@ def ct_summary_list_filter(request):
             dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
-            # Required for mean DLP per study type per week plot
-            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+            if plotCTStudyMeanDLPOverTime:
+                # Required for mean DLP per study type per week plot
+                qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
+                studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
 
         # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -343,24 +346,23 @@ def ct_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting and plotCharts:
-        return render_to_response(
-            'remapp/ctfiltered.html',
-            {'filter': f, 'admin':admin,
-             'studySummary': studySummary,
-             'studyHistogramData': studyHistogramData,
-             'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData,
-             'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
-             'studyDLPoverTime': studyDLPoverTime},
-            context_instance=RequestContext(request)
-            )
-    else:
-        return render_to_response(
-            'remapp/ctfiltered.html',
-            {'filter': f, 'admin':admin},
-            context_instance=RequestContext(request)
-            )
+    returnStructure = {'filter': f, 'admin':admin,
+                       'studySummary': studySummary,
+                       'studyHistogramData': studyHistogramData,
+                       'acquisitionSummary': acquisitionSummary,
+                       'acquisitionHistogramData': acquisitionHistogramData,
+                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays
+                       }
+
+    if plotting and plotCharts and plotCTStudyMeanDLPOverTime:
+        returnStructure['studyDLPoverTime'] = studyDLPoverTime
+
+    return render_to_response(
+        'remapp/ctfiltered.html',
+        returnStructure,
+        context_instance=RequestContext(request)
+        )
+
 
 @login_required
 def ct_histogram_list_filter(request):
@@ -424,10 +426,11 @@ def ct_histogram_list_filter(request):
         studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
         studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
-        # Required for mean DLP per study type per week plot
-        studyDLPoverTime = [None] * len(studySummary)
-        startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-        today = datetime.date.today()
+        if plotCTStudyMeanDLPOverTime:
+            # Required for mean DLP per study type per week plot
+            studyDLPoverTime = [None] * len(studySummary)
+            startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
+            today = datetime.date.today()
 
         for idx, study in enumerate(studySummary):
             # Required for Mean DLP per study type plot AND mean DLP per study type per week plot
@@ -437,9 +440,10 @@ def ct_histogram_list_filter(request):
             dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
-            # Required for mean DLP per study type per week plot
-            qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-            studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+            if plotCTStudyMeanDLPOverTime:
+                # Required for mean DLP per study type per week plot
+                qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
+                studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
 
         # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -463,24 +467,23 @@ def ct_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting:
-        return render_to_response(
-            'remapp/ctfiltered.html',
-            {'filter': f, 'admin':admin,
-             'studySummary': studySummary,
-             'studyHistogramData': studyHistogramData,
-             'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData,
-             'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
-             'studyDLPoverTime': studyDLPoverTime},
-            context_instance=RequestContext(request)
-            )
-    else:
-        return render_to_response(
-            'remapp/ctfiltered.html',
-            {'filter': f, 'admin':admin},
-            context_instance=RequestContext(request)
-            )
+    returnStructure = {'filter': f, 'admin':admin,
+                       'studySummary': studySummary,
+                       'studyHistogramData': studyHistogramData,
+                       'acquisitionSummary': acquisitionSummary,
+                       'acquisitionHistogramData': acquisitionHistogramData,
+                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays
+                       }
+
+    if plotting and plotCharts and plotCTStudyMeanDLPOverTime:
+        returnStructure['studyDLPoverTime'] = studyDLPoverTime
+
+    return render_to_response(
+        'remapp/ctfiltered.html',
+        returnStructure,
+        context_instance=RequestContext(request)
+        )
+
 
 @login_required
 def mg_summary_list_filter(request):
