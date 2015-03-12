@@ -273,12 +273,21 @@ Upgrading from version 0.5.0
         (*) 0005_auto__add_exports__add_size_upload
         (*) 0006_auto__chg_field_exports_filename
         (*) 0007_auto__add_field_irradiation_event_xray_detector_data_relative_xray_exp
+        ( ) 000x_051datamigration
+        ( ) 000x_051schemamigration
 
 
-*   Rename the two 050 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``
+*   Rename the two 051 migration files to follow on from the existing migrations, for example ``0008_051schemamigration.py``
     and ``0009_051datamigration.py`` for the existing migrations above, or ``0002_051schemamigration.py`` and
     ``0003_051datamigration.py`` if the only migration is the initial migration. The ``051schemamigration`` **must**
     come before the ``051datamigration``.
+
+    If you are using linux, you might like to do it like this (from within the ``openrem`` folder):
+
+    .. sourcecode:: bash
+
+        mv remapp/migrations/000{x,8}_051schemamigration.py
+        mv remapp/migrations/000{x,9}_051datamigration.py
 
 *   If you now re-run ``migrate --list remapp`` you should get a listing with the ``051schemamigration`` and the
     ``051datamigration`` listed at the end::
