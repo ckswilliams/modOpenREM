@@ -55,7 +55,9 @@ except ImportError:
     plotting = 0
 
 # New plotting options. These are manually set at the moment.
-plotCharts = 0 # This is a variable that will contain the user's global choice of plots on or off.
+plotCharts = 1 # This is a variable that will contain the user's global choice of plots on or off.
+plotDXAcquisitionMeanDAPOverTime = 0 # This variable determines whether the data for the DX plot of mean DAP over time is calculated
+
 
 def logout_page(request):
     """
@@ -80,10 +82,11 @@ def dx_summary_list_filter(request):
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
-        # Required for mean DAP per month plot
-        acquisitionDAPoverTime = [None] * len(acquisitionSummary)
-        startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-        today = datetime.date.today()
+        if plotDXAcquisitionMeanDAPOverTime:
+            # Required for mean DAP per month plot
+            acquisitionDAPoverTime = [None] * len(acquisitionSummary)
+            startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
+            today = datetime.date.today()
 
         # Required for all plots
         qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
@@ -96,9 +99,10 @@ def dx_summary_list_filter(request):
             dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
-            # Required for mean DAP per month plot
-            qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
-            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval='months')
+            if plotDXAcquisitionMeanDAPOverTime:
+                # Required for mean DAP per month plot
+                qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
+                acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval='months')
 
         # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -122,22 +126,20 @@ def dx_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting and plotCharts:
-        return render_to_response(
-            'remapp/dxfiltered.html',
-            {'filter': f, 'admin':admin,
-             'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData,
-             'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
-             'acquisitionDAPoverTime': acquisitionDAPoverTime},
-            context_instance=RequestContext(request)
-            )
-    else:
-        return render_to_response(
-            'remapp/dxfiltered.html',
-            {'filter': f, 'admin':admin},
-            context_instance=RequestContext(request)
-            )
+    returnStructure = {'filter': f, 'admin':admin,
+                       'acquisitionSummary': acquisitionSummary,
+                       'acquisitionHistogramData': acquisitionHistogramData,
+                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
+                       }
+
+    if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
+        returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
+
+    return render_to_response(
+        'remapp/dxfiltered.html',
+        returnStructure,
+        context_instance=RequestContext(request)
+        )
 
 @login_required
 def dx_histogram_list_filter(request):
@@ -194,10 +196,11 @@ def dx_histogram_list_filter(request):
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
-        # Required for mean DAP per month plot
-        acquisitionDAPoverTime = [None] * len(acquisitionSummary)
-        startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
-        today = datetime.date.today()
+        if plotDXAcquisitionMeanDAPOverTime:
+            # Required for mean DAP per month plot
+            acquisitionDAPoverTime = [None] * len(acquisitionSummary)
+            startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
+            today = datetime.date.today()
 
         # Required for all plots
         qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
@@ -210,9 +213,10 @@ def dx_histogram_list_filter(request):
             dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
-            # Required for mean DAP per month plot
-            qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
-            acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
+            if plotDXAcquisitionMeanDAPOverTime:
+                # Required for mean DAP per month plot
+                qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
+                acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
 
         # Required for studies per weekday and studies per hour in each weekday plot
         studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
@@ -236,22 +240,20 @@ def dx_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    if plotting and plotCharts:
-        return render_to_response(
-            'remapp/dxfiltered.html',
-            {'filter': f, 'admin':admin,
-             'acquisitionSummary': acquisitionSummary,
-             'acquisitionHistogramData': acquisitionHistogramData,
-             'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
-             'acquisitionDAPoverTime': acquisitionDAPoverTime},
-            context_instance=RequestContext(request)
-            )
-    else:
-        return render_to_response(
-            'remapp/dxfiltered.html',
-            {'filter': f, 'admin':admin},
-            context_instance=RequestContext(request)
-            )
+    returnStructure = {'filter': f, 'admin':admin,
+                       'acquisitionSummary': acquisitionSummary,
+                       'acquisitionHistogramData': acquisitionHistogramData,
+                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays,
+                       }
+
+    if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
+        returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
+
+    return render_to_response(
+        'remapp/dxfiltered.html',
+        returnStructure,
+        context_instance=RequestContext(request)
+        )
 
 
 @login_required
