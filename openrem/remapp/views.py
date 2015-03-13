@@ -54,11 +54,12 @@ try:
 except ImportError:
     plotting = 0
 
-# New plotting options. These are manually set at the moment.
-plotCharts = 1 # This is a variable that will contain the user's global choice of plots on or off.
-plotDXAcquisitionMeanDAPOverTime = 0 # This variable determines whether the data for the DX plot of mean DAP over time is calculated
-plotCTStudyMeanDLPOverTime = 0       # This variable determines whether the data for the CT plot of mean DLP over time is calculated
-plotDXStudyPerDayAndHour = 0         # This variable determines whether the data for the DX plot of number of studies per day and hour is calculated
+# New plotting options
+userProfile = request.user.get_profile() # Get the user profile information
+plotCharts = userProfile.plotCharts
+plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
+plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
+plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
 
 
 def logout_page(request):

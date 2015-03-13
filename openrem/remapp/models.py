@@ -34,6 +34,26 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
 
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+class UserProfile(models.Model):
+    # This field is required.
+    user = models.OneToOneField(User)
+
+    # Plotting controls
+    plotCharts = models.BooleanField()                       # Switch for user's global choice of plots on or off
+    plotDXAcquisitionMeanDAPOverTime = models.BooleanField() # Switch for DX plot of mean DAP over time
+    plotCTStudyMeanDLPOverTime = models.BooleanField()       # Switch for CT plot of mean DLP over time
+    plotDXStudyPerDayAndHour = models.BooleanField()         # Switch for DX plot of number of studies per day and hour
+
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
+
+
 class SizeUpload(models.Model):
     sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)
