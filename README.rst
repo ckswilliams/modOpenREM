@@ -7,7 +7,7 @@ Monitoring related information, primarily from DICOM files.
 
 Full documentation can be found on Read the Docs: http://docs.openrem.org
 
-**For upgrades**, please look at the `version 0.5.0 release notes <http://docs.openrem.org/en/latest/release-0.5.0.html>`_
+**For upgrades**, please look at the `version 0.5.1 release notes <http://docs.openrem.org/en/latest/release-0.5.1.html>`_
 
 For fresh installs, please look at the `install docs <http://docs.openrem.org/page/install.html>`_
 
