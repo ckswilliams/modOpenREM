@@ -3,6 +3,7 @@ Change the version number in
 	setup.py
 	install instructions in the release notes where applicable
 	date and other details in changes and CHANGES
+    Edit README.rst
 
 Clean the existing distribute folder:
 	rm -r *
