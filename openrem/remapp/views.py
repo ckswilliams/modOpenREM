@@ -54,13 +54,6 @@ try:
 except ImportError:
     plotting = 0
 
-# New plotting options
-userProfile = request.user.get_profile() # Get the user profile information
-plotCharts = userProfile.plotCharts
-plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
-plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
-plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
-
 
 def logout_page(request):
     """
@@ -77,6 +70,12 @@ def dx_summary_list_filter(request):
     from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     import datetime, qsstats
+
+    # New plotting options
+    plotCharts = request.user.UserProfile.plotCharts
+    plotDXAcquisitionMeanDAPOverTime = request.user.UserProfile.plotDXAcquisitionMeanDAPOverTime
+    plotCTStudyMeanDLPOverTime = request.user.UserProfile.plotCTStudyMeanDLPOverTime
+    plotDXStudyPerDayAndHour = request.user.UserProfile.plotDXStudyPerDayAndHour
 
     f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 

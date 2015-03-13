@@ -10,9 +10,6 @@ from __future__ import absolute_import
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-# User profile setting
-AUTH_PROFILE_MODULE = 'openremproject.UserProfile'
-
 # Celery settings
 
 BROKER_URL = 'amqp://guest:guest@localhost//'
