@@ -46,7 +46,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
-from remapp.models import GeneralStudyModuleAttr
+from remapp.models import GeneralStudyModuleAttr, create_user_profile
 
 try:
     from numpy import *
@@ -71,11 +71,18 @@ def dx_summary_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
 
-    # New plotting options
-    plotCharts = request.user.UserProfile.plotCharts
-    plotDXAcquisitionMeanDAPOverTime = request.user.UserProfile.plotDXAcquisitionMeanDAPOverTime
-    plotCTStudyMeanDLPOverTime = request.user.UserProfile.plotCTStudyMeanDLPOverTime
-    plotDXStudyPerDayAndHour = request.user.UserProfile.plotDXStudyPerDayAndHour
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+
+    plotCharts = userProfile.plotCharts
+    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
+    plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
+
 
     f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
@@ -129,10 +136,11 @@ def dx_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin,
-                       'acquisitionSummary': acquisitionSummary,
-                       'acquisitionHistogramData': acquisitionHistogramData
-                       }
+    returnStructure = {'filter': f, 'admin':admin}
+
+    if plotting and plotCharts:
+        returnStructure['acquisitionSummary'] = acquisitionSummary
+        returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
@@ -196,6 +204,19 @@ def dx_histogram_list_filter(request):
     if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
     if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+
+    plotCharts = userProfile.plotCharts
+    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
+    plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
+
+
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
@@ -246,10 +267,11 @@ def dx_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin,
-                       'acquisitionSummary': acquisitionSummary,
-                       'acquisitionHistogramData': acquisitionHistogramData
-                       }
+    returnStructure = {'filter': f, 'admin':admin}
+
+    if plotting and plotCharts:
+        returnStructure['acquisitionSummary'] = acquisitionSummary
+        returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
@@ -294,6 +316,18 @@ def ct_summary_list_filter(request):
     from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     import datetime, qsstats
+
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+
+    plotCharts = userProfile.plotCharts
+    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
+
 
     f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
@@ -353,13 +387,14 @@ def ct_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin,
-                       'studySummary': studySummary,
-                       'studyHistogramData': studyHistogramData,
-                       'acquisitionSummary': acquisitionSummary,
-                       'acquisitionHistogramData': acquisitionHistogramData,
-                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays
-                       }
+    returnStructure = {'filter': f, 'admin':admin}
+
+    if plotting and plotCharts:
+        returnStructure['studySummary'] = studySummary
+        returnStructure['studyHistogramData'] = studyHistogramData
+        returnStructure['acquisitionSummary'] = acquisitionSummary
+        returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotting and plotCharts and plotCTStudyMeanDLPOverTime:
         returnStructure['studyDLPoverTime'] = studyDLPoverTime
@@ -421,6 +456,18 @@ def ct_histogram_list_filter(request):
     if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
     if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+
+    plotCharts = userProfile.plotCharts
+    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
+
+
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
         acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
@@ -474,13 +521,15 @@ def ct_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin,
-                       'studySummary': studySummary,
-                       'studyHistogramData': studyHistogramData,
-                       'acquisitionSummary': acquisitionSummary,
-                       'acquisitionHistogramData': acquisitionHistogramData,
-                       'studiesPerHourInWeekdays': studiesPerHourInWeekdays
-                       }
+
+    returnStructure = {'filter': f, 'admin':admin}
+
+    if plotting and plotCharts:
+        returnStructure['studySummary'] = studySummary
+        returnStructure['studyHistogramData'] = studyHistogramData
+        returnStructure['acquisitionSummary'] = acquisitionSummary
+        returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotting and plotCharts and plotCTStudyMeanDLPOverTime:
         returnStructure['studyDLPoverTime'] = studyDLPoverTime
