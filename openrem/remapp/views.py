@@ -78,6 +78,7 @@ def dx_summary_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
@@ -211,6 +212,7 @@ def dx_histogram_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
@@ -324,6 +326,7 @@ def ct_summary_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
@@ -463,6 +466,7 @@ def ct_histogram_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
