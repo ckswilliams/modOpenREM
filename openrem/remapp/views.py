@@ -78,7 +78,6 @@ def dx_summary_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
-        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
@@ -88,7 +87,7 @@ def dx_summary_list_filter(request):
     f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
     if plotting and plotCharts:
-        # Required for mean DAP per acquisition plot
+        # Required for mean DAP per acquisition plot and mean DAP over time
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
@@ -212,7 +211,6 @@ def dx_histogram_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
-        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
@@ -220,7 +218,7 @@ def dx_histogram_list_filter(request):
 
 
     if plotting and plotCharts:
-        # Required for mean DAP per acquisition plot
+        # Required for mean DAP per acquisition plot and mean DAP over time
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
@@ -326,7 +324,6 @@ def ct_summary_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
-        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
@@ -466,7 +463,6 @@ def ct_histogram_list_filter(request):
     except:
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
-        userProfile = request.user.userprofile
 
     plotCharts = userProfile.plotCharts
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime

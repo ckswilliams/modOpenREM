@@ -43,9 +43,17 @@ class UserProfile(models.Model):
 
     # Plotting controls
     plotCharts = models.BooleanField(default=False)
+    plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
+    plotDXAcquisitionFreq = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAPOverTime = models.BooleanField(default=False)
-    plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
     plotDXStudyPerDayAndHour = models.BooleanField(default=False)
+
+    plotCTAcquisitionMeanDLP = models.BooleanField(default=True)
+    plotCTAcquisitionFreq = models.BooleanField(default=False)
+    plotCTStudyMeanDLP = models.BooleanField(default=True)
+    plotCTStudyFreq = models.BooleanField(default=False)
+    plotCTStudyPerDayAndHour = models.BooleanField(default=False)
+    plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
