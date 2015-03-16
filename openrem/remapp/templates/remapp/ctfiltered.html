@@ -34,18 +34,13 @@
 
     {{ studyfilter }}
 
-
-
-
-
-
           <div class="panel panel-info">
             <div class="panel-heading">
               <h3 class="panel-title">Exam filter</h3>
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal" role="form">
+                <form action="" method="post" class="form-horizontal" role="form">
                         {% for field in filter.form %}
                             <div class="form-group">
                                 <div class="col-xs-4">
@@ -57,12 +52,20 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    </table>
                     <input type="submit" />
-                </form> 
+            </div>
+            <div class="panel-heading">
+              <h3 class="panel-title">Chart options</h3>
+            </div>
+            <div class="panel-body">
+              <table>
+                {% csrf_token %}
+                {{ chartOptionsForm }}
+              </table>
+              <input type="submit" />
+                </form>
             </div>
           </div>
-
 
 <script>
 $('.datepicker').datepicker({

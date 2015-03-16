@@ -414,7 +414,7 @@ def ct_summary_list_filter(request):
     from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     import datetime, qsstats
-
+    from remapp.forms import CTChartOptionsForm
 
     try:
         # See if the user has plot settings in userprofile
@@ -424,11 +424,44 @@ def ct_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        chartOptionsForm = CTChartOptionsForm(request.POST)
+        # check whether it's valid:
+        if chartOptionsForm.is_valid():
+            # process the data in form.cleaned_data as required
+            userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
+            userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
+            userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
+            userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
+            userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
+            userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
+            userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
+            userProfile.save()
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        formData = {'plotCharts': userProfile.plotCharts,
+                    'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
+                    'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
+                    'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                    'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
+                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime}
+        chartOptionsForm = CTChartOptionsForm(formData)
+
     plotCharts = userProfile.plotCharts
+    plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
+    plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
+    plotCTStudyFreq = userProfile.plotCTStudyFreq
+    plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
 
 
-    f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
+    f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
@@ -464,16 +497,17 @@ def ct_summary_list_filter(request):
                 qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
                 studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
 
-        # Required for studies per weekday and studies per hour in each weekday plot
-        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
-        for day in range(7):
-            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
-            if studyTimesOnThisWeekday:
-                for hour in range(24):
-                    try:
-                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                    except:
-                        studiesPerHourInWeekdays[day][hour] = 0
+        if plotCTStudyPerDayAndHour:
+            # Required for studies per weekday and studies per hour in each weekday plot
+            studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+            for day in range(7):
+                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                if studyTimesOnThisWeekday:
+                    for hour in range(24):
+                        try:
+                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                        except:
+                            studiesPerHourInWeekdays[day][hour] = 0
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -486,13 +520,17 @@ def ct_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin}
+    returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
+
+    returnStructure.update(csrf(request))
 
     if plotting and plotCharts:
         returnStructure['studySummary'] = studySummary
         returnStructure['studyHistogramData'] = studyHistogramData
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCharts and plotCTStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotting and plotCharts and plotCTStudyMeanDLPOverTime:
@@ -512,49 +550,93 @@ def ct_histogram_list_filter(request):
     from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     import datetime, qsstats
+    from remapp.forms import CTChartOptionsForm
 
-    if request.GET.get('acquisitionhist'):
-        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT',
-            ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'),
-            ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('acquisition_dlp_min'),
-            ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('acquisition_dlp_max')
-            ).order_by().distinct())
-        if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
-        if request.GET.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
-        if request.GET.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
+    if request.method == 'POST':
+        if request.POST.get('acquisitionhist'):
+            f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT',
+                ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.POST.get('acquisition_protocol'),
+                ctradiationdose__ctirradiationeventdata__dlp__gte=request.POST.get('acquisition_dlp_min'),
+                ctradiationdose__ctirradiationeventdata__dlp__lte=request.POST.get('acquisition_dlp_max')
+                ).order_by().distinct())
+            if request.POST.get('study_description') : f.qs.filter(study_description=request.POST.get('study_description'))
+            if request.POST.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.POST.get('study_dlp_max'))
+            if request.POST.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.POST.get('study_dlp_min'))
 
-    elif request.GET.get('studyhist'):
-        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT',
-            study_description=request.GET.get('study_description'),
-            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'),
-            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max')
-            ).order_by().distinct())
-        if request.GET.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'))
-        if request.GET.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('study_dlp_max'))
-        if request.GET.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('study_dlp_min'))
+        elif request.POST.get('studyhist'):
+            f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT',
+                study_description=request.POST.get('study_description'),
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.POST.get('study_dlp_min'),
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.POST.get('study_dlp_max')
+                ).order_by().distinct())
+            if request.POST.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.POST.get('acquisition_protocol'))
+            if request.POST.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.POST.get('study_dlp_max'))
+            if request.POST.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.POST.get('study_dlp_min'))
 
-    else:
-        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT').order_by().distinct())
-        if request.GET.get('study_description')    : f.qs.filter(study_description=request.GET.get('study_description'))
-        if request.GET.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
-        if request.GET.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
-        if request.GET.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'))
-        if request.GET.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('study_dlp_max'))
-        if request.GET.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('study_dlp_min'))
+        else:
+            f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT').order_by().distinct())
+            if request.POST.get('study_description')    : f.qs.filter(study_description=request.POST.get('study_description'))
+            if request.POST.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.POST.get('study_dlp_min'))
+            if request.POST.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.POST.get('study_dlp_max'))
+            if request.POST.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.POST.get('acquisition_protocol'))
+            if request.POST.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.POST.get('study_dlp_max'))
+            if request.POST.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.POST.get('study_dlp_min'))
 
-    if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
-    if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
-    if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
-    if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
-    if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
-    if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
-    if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
-    if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
-    if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
+        if request.POST.get('accession_number')  : f.qs.filter(accession_number=request.POST.get('accession_number'))
+        if request.POST.get('date_after')        : f.qs.filter(study_date__gt=request.POST.get('date_after'))
+        if request.POST.get('date_before')       : f.qs.filter(study_date__lt=request.POST.get('date_before'))
+        if request.POST.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.POST.get('institution_name'))
+        if request.POST.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.POST.get('manufacturer'))
+        if request.POST.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.POST.get('model_name'))
+        if request.POST.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.POST.get('patient_age_max'))
+        if request.POST.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.POST.get('patient_age_min'))
+        if request.POST.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.POST.get('station_name'))
 
+    elif request.method == 'GET':
+        if request.GET.get('acquisitionhist'):
+            f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT',
+                ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'),
+                ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('acquisition_dlp_min'),
+                ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('acquisition_dlp_max')
+                ).order_by().distinct())
+            if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
+            if request.GET.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
+            if request.GET.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
+
+        elif request.GET.get('studyhist'):
+            f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT',
+                study_description=request.GET.get('study_description'),
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'),
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max')
+                ).order_by().distinct())
+            if request.GET.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'))
+            if request.GET.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('study_dlp_max'))
+            if request.GET.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('study_dlp_min'))
+
+        else:
+            f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT').order_by().distinct())
+            if request.GET.get('study_description')    : f.qs.filter(study_description=request.GET.get('study_description'))
+            if request.GET.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
+            if request.GET.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
+            if request.GET.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'))
+            if request.GET.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('study_dlp_max'))
+            if request.GET.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('study_dlp_min'))
+
+        if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
+        if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
+        if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
+        if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
+        if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
+        if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
+        if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
+        if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
+        if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
     try:
         # See if the user has plot settings in userprofile
@@ -567,6 +649,39 @@ def ct_histogram_list_filter(request):
     plotCharts = userProfile.plotCharts
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
 
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        chartOptionsForm = CTChartOptionsForm(request.POST)
+        # check whether it's valid:
+        if chartOptionsForm.is_valid():
+            # process the data in form.cleaned_data as required
+            userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
+            userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
+            userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
+            userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
+            userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
+            userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
+            userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
+            userProfile.save()
+    else:
+        formData = {'plotCharts': userProfile.plotCharts,
+                    'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
+                    'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
+                    'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                    'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
+                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime}
+        chartOptionsForm = CTChartOptionsForm(formData)
+
+    plotCharts = userProfile.plotCharts
+    plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
+    plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
+    plotCTStudyFreq = userProfile.plotCTStudyFreq
+    plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
+    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
 
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
@@ -599,16 +714,17 @@ def ct_histogram_list_filter(request):
                 qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
                 studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
 
-        # Required for studies per weekday and studies per hour in each weekday plot
-        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
-        for day in range(7):
-            studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
-            if studyTimesOnThisWeekday:
-                for hour in range(24):
-                    try:
-                        studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                    except:
-                        studiesPerHourInWeekdays[day][hour] = 0
+        if plotCTStudyPerDayAndHour:
+            # Required for studies per weekday and studies per hour in each weekday plot
+            studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+            for day in range(7):
+                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                if studyTimesOnThisWeekday:
+                    for hour in range(24):
+                        try:
+                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                        except:
+                            studiesPerHourInWeekdays[day][hour] = 0
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -621,14 +737,15 @@ def ct_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-
-    returnStructure = {'filter': f, 'admin':admin}
+    returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
     if plotting and plotCharts:
         returnStructure['studySummary'] = studySummary
         returnStructure['studyHistogramData'] = studyHistogramData
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCharts and plotCTStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotting and plotCharts and plotCTStudyMeanDLPOverTime:
