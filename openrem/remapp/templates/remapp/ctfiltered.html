@@ -34,18 +34,13 @@
 
     {{ studyfilter }}
 
-
-
-
-
-
           <div class="panel panel-info">
             <div class="panel-heading">
               <h3 class="panel-title">Exam filter</h3>
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal" role="form">
+                <form action="" method="post" class="form-horizontal" role="form">
                         {% for field in filter.form %}
                             <div class="form-group">
                                 <div class="col-xs-4">
@@ -57,12 +52,20 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    </table>
                     <input type="submit" />
-                </form> 
+            </div>
+            <div class="panel-heading">
+              <h3 class="panel-title">Chart options</h3>
+            </div>
+            <div class="panel-body">
+              <table>
+                {% csrf_token %}
+                {{ chartOptionsForm }}
+              </table>
+              <input type="submit" />
+                </form>
             </div>
           </div>
-
 
 <script>
 $('.datepicker').datepicker({
@@ -72,6 +75,41 @@ $('.datepicker').datepicker({
     });
 </script>
 
+<script>
+function formatDate(d) {
+  var dd = d.getDate();
+  if ( dd < 10 ) dd = '0' + dd;
+  var mm = d.getMonth()+1;
+  if ( mm < 10 ) mm = '0' + mm;
+  var yyyy = d.getFullYear();
+  return yyyy+'-'+mm+'-'+dd;
+}
+</script>
+
+<script>
+function getColours(noOfColours) {
+    var colours = [];
+    frequency = 5 / noOfColours; 
+    for (var i = 0; i < noOfColours;++i) {
+        if (noOfColours > 24) {
+            r = Math.sin(frequency * i * 2 + 0) * (127) + 128;
+            g = Math.sin(frequency * i * 2 + 1) * (127) + 128;
+            b = Math.sin(frequency * i * 2 + 3) * (127) + 128;
+        } else {
+            r = Math.sin(frequency * i  + 0) * (127) + 128;
+            g = Math.sin(frequency * i  + 1) * (127) + 128;
+            b = Math.sin(frequency * i  + 3) * (127) + 128;
+        }
+        colour = 'rgb({r},{g},{b})';
+        colour = colour.replace("{r}", Math.floor(r));
+        colour = colour.replace("{g}", Math.floor(g));
+        colour = colour.replace("{b}", Math.floor(b));
+        colours.push(colour);
+    }
+    return colours;
+}
+</script>
+
 {% endblock %}
 
 {% block col1 %}
@@ -79,9 +117,10 @@ $('.datepicker').datepicker({
 
       {% autopaginate filter.qs 25 as filter_list %}
       {% paginate %}
+
     <table class="table table-bordered table-hover row-clickable">
         <tr>
-            <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
+            <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
             {% if admin.adminperm %}
             <th>Delete?</th>
             {% endif %}
@@ -106,10 +145,9 @@ $('.datepicker').datepicker({
                 </a>
             <td>
                 <a href="/openrem/ct/{{ exam.id }}/">
-                    {{ exam.study_description }} |
-                    {{ exam.accession_number }} |
-                    {{ exam.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm |
-                    {{ exam.patientstudymoduleattr_set.get.patient_weight|floatformat:0 }} kg
+                    {{ exam.study_description }}</a> |
+                    {{ exam.requested_procedure_code_meaning }} |
+                    {{ exam.accession_number }}
                 </a>
             </td>
             <td>
@@ -136,4 +174,841 @@ $('.datepicker').datepicker({
 {% endblock %}
 
 {% block jsblock %}
+{% endblock %}
+
+        {% block plotdata %}
+
+{% if request.user.userprofile.plotCharts %}
+<!-- Include JavaScript to enable highcharts plots -->
+<script src="{{ STATIC_URL }}js/highcharts.js"></script>
+<script src="{{ STATIC_URL }}js/exporting.js"></script>
+<!-- End of include JavaScript to enable highcharts plots -->
+
+
+<!-- JavaScript function to sort a list of objects by the 'y' object.
+     This must be positioned above the functions first use. -->
+<script>
+function sort_by_y(a,b) {
+    return ((a.y < b.y) ? -1 : ((a.y > b.y) ? 1 : 0)); // a[1] for col. 2 etc...
+}
+function sort_by_name(a,b) {
+    return ((a.name < b.name) ? -1 : ((a.name > b.name) ? 1 : 0)); // a[1] for col. 2 etc...
+}
+</script>
+<!-- End of JavaScript function to sort a list of objects by the 'y' object -->
+
+
+{% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+<!-- HTML to include div container for acquisition plot -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+          Plot mean DLP for each acquisition protocol in currently filtered data. Click this text to toggle between hidden and visible.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="histogramPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+         <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+         Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+         more data than shown in the histogram bin.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for acquisition plot -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTAcquisitionFreq %}
+<!-- HTML to include div container for acquisition pie chart -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart">
+          Pie chart showing a breakdown of acquisition protocol frequency.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="piechartProtocolDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- HTML to include div container for acquisition pie chart -->
+{% endif %}
+
+<!-- Include JavaScript to enable highcharts drilldown plots -->
+<script src="{{ STATIC_URL }}js/drilldown.js"></script>
+<!-- End of include JavaScript to enable highcharts drilldown plots -->
+
+
+<!-- JavaScript for acquisition plot -->
+<script>
+var protocolNames     = [
+                        {% for name in acquisitionSummary %}
+                            "{{name.ctradiationdose__ctirradiationeventdata__acquisition_protocol}}"
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var protocolCounts    = [
+                        {% for protocol in acquisitionHistogramData %}
+                            [
+                            {% for dataCounts in protocol.0 %}
+                                {{dataCounts}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var protocolBins      = [
+                        {% for protocolEdges in acquisitionHistogramData %}
+                            [
+                            {% for edges in protocolEdges.1 %}
+                                {{edges}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesData        = [
+                        {% for testData in acquisitionSummary %}
+                            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesDataN       = [
+                        {% for testData in acquisitionSummary %}
+                            '{{testData.num_acq}}'
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var seriesDrilldown   = [
+                        {% for protocolCountsArray in acquisitionHistogramData %}
+                            {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
+                            {% for dataCounts in protocolCountsArray.0 %}
+                                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}]}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+</script>
+
+
+{% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+<script type="text/javascript">
+$(function () {
+
+var drilldownTitle = 'Histogram of ';
+var defaultTitle   = 'Mean DLP per acquisition protocol';
+var tooltipData = [2];
+
+var chartAcqDLP = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo: 'histogramPlotDIV',
+            events: {
+                drilldown: function(e) {
+                    tooltipData[0] = protocolNames[e.point.x];
+                    tooltipData[1] = e.point.x;
+                    chartAcqDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
+                    chartAcqDLP.yAxis[0].setTitle({text:'Number'});
+                    chartAcqDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
+                    chartAcqDLP.xAxis[0].setCategories([], true);
+                    chartAcqDLP.xAxis[0].update({labels:{rotation:0}});
+                    chartAcqDLP.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                            var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                },
+                drillup: function(e) {
+                    chartAcqDLP.setTitle({ text: defaultTitle }, { text: '' });
+                    chartAcqDLP.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
+                    chartAcqDLP.xAxis[0].setTitle({text:'Protocol name'});
+                    chartAcqDLP.xAxis[0].setCategories(protocolNames, true);
+                    chartAcqDLP.xAxis[0].update({labels:{rotation:90}});
+                    chartAcqDLP.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            var index = protocolNames.indexOf(this.x);
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + seriesDataN[index] + ')');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                }
+            }
+        },
+        title: {
+            text: 'Mean DLP per acquisition protocol'
+        },
+        legend: {
+            enabled: false
+        },
+        xAxis: {
+            categories: protocolNames,
+            title: {
+                useHTML: true,
+                text: 'Protocol name'
+            },
+            labels: {
+                rotation:90
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                useHTML: true,
+                text: 'Mean DLP (mGy.cm)'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                var index = protocolNames.indexOf(this.x);
+                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + seriesDataN[index] + ')';
+                return comment;
+            },
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Mean DLP per acquisition protocol',
+            data: seriesData
+        }],
+        drilldown: {
+            series: seriesDrilldown
+        }
+    });
+});
+</script>
+<!-- End of JavaScript for acquisition plot -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTAcquisitionFreq %}
+<!-- JavaScript for acquisition pie chart -->
+<script>
+var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+var protocolPiechartData = new Array(protocolNames.length);
+for(var i=0; i<protocolNames.length; i++) {
+    protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
+}
+protocolPiechartData.sort(sort_by_y);
+
+protocolColours = getColours(protocolNames.length);
+for(var i=0; i<protocolNames.length; i++) {
+    protocolPiechartData[i].color = protocolColours[i];
+}
+
+
+$(function () {
+
+var chartAcqFreq = new Highcharts.Chart({
+        chart: {
+            renderTo: 'piechartProtocolDIV',
+            plotBackgroundColor: null,
+            plotBorderWidth: 1,
+            plotShadow: false
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: false,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Study frequency',
+            point: {
+                events: {
+                    click: function(e) {
+                        location.href = e.point.url;
+                        e.preventDefault();
+                    }
+                }
+            },
+            data: protocolPiechartData
+        }]
+    });
+});
+</script>
+<!-- End of JavaScript for acquisition pie chart -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyMeanDLP %}
+<!-- HTML to include div container for study plot -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+          Plot mean DLP for each study description in currently filtered data.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="histogramStudyPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on an individual column to show a histogram of data for that study.</p>
+         <p>Click on a histogram bin tooltip to see the studies in the bin. Note that this will
+         include studies at the upper bin boundary, so in some cases may display more data than
+         shown in the histogram bin.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for study plot -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyFreq %}
+<!-- HTML to include div container for study pie chart -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyPieChart">
+          Pie chart showing a breakdown of study frequency.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseStudyPieChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="piechartStudyDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for study pie chart -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyPerDayAndHour %}
+<!-- HTML to include div container for pie chart of studies per week day pie chart -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyWorkloadPieChart">
+          Pie chart showing a breakdown of number of studies per weekday.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="piechartStudyWorkloadDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for studies per week day pie chart -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+<!-- HTML to include div container for mean study DLP per week -->
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyStudyMeanChart">
+          Line plot showing weekly mean DLP of each study type over time.
+        </a>
+      </h4>
+    </div>
+    <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
+      <div class="panel-body">
+         <div id="linechartWeeklyStudyMeanDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of HTML to include div container for mean study DLP per week -->
+{% endif %}
+
+
+<!-- JavaScript for study plot -->
+<script>
+var studyNames     = [
+                        {% for name in studySummary %}
+                            "{{name.study_description}}"
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studyCounts    = [
+                        {% for study in studyHistogramData %}
+                            [
+                            {% for dataCounts in study.0 %}
+                                {{dataCounts}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studyBins      = [
+                        {% for studyEdges in studyHistogramData %}
+                            [
+                            {% for edges in studyEdges.1 %}
+                                {{edges}}
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                            ]
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studySeriesData = [
+                        {% for testData in studySummary %}
+                            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studySeriesDataN = [
+                        {% for testData in studySummary %}
+                            '{{testData.num_acq}}'
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+var studySeriesDrilldown   = [
+                        {% for studyCountsArray in studyHistogramData %}
+                            {id: studyNames[{{forloop.counter}}-1],name: studyNames[{{forloop.counter}}-1],useHTML: true,data: [
+                            {% for dataCounts in studyCountsArray.0 %}
+                                [studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}]}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+</script>
+
+
+{% if request.user.userprofile.plotCTStudyMeanDLP %}
+<script type="text/javascript">
+$(function () {
+
+var drilldownTitle = 'Histogram of ';
+var defaultTitle   = 'Mean DLP per study description';
+var tooltipData = [2];
+
+var chartStudyDLP = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo: 'histogramStudyPlotDIV',
+            events: {
+                drilldown: function(e) {
+                    tooltipData[0] = studyNames[e.point.x];
+                    tooltipData[1] = e.point.x;
+                    chartStudyDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + studySeriesDataN[e.point.x] +')' });
+                    chartStudyDLP.yAxis[0].setTitle({text:'Number'});
+                    chartStudyDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
+                    chartStudyDLP.xAxis[0].setCategories([], true);
+                    chartStudyDLP.xAxis[0].update({labels:{rotation:0}});
+                    chartStudyDLP.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                            var linkText = 'study_dlp_min=' + studyBins[tooltipData[1]][this.x] + '&study_dlp_max=' + studyBins[tooltipData[1]][this.x+1] + '&study_description=' + tooltipData[0];
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/hist/?studyhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                },
+                drillup: function(e) {
+                    chartStudyDLP.setTitle({ text: defaultTitle }, { text: '' });
+                    chartStudyDLP.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
+                    chartStudyDLP.xAxis[0].setTitle({text:'Study description'});
+                    chartStudyDLP.xAxis[0].setCategories(studyNames, true);
+                    chartStudyDLP.xAxis[0].update({labels:{rotation:90}});
+                    chartStudyDLP.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            var index = studyNames.indexOf(this.x);
+                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + studySeriesDataN[index] + ')');
+                        });
+                        return xyArr.join('<br/>');
+                    }
+                }
+            }
+        },
+        title: {
+            text: 'Mean DLP per study description'
+        },
+        legend: {
+            enabled: false
+        },
+        xAxis: {
+            categories: studyNames,
+            title: {
+                useHTML: true,
+                text: 'Study description'
+            },
+            labels: {
+                rotation:90
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                useHTML: true,
+                text: 'Mean DLP (mGy.cm)'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                var index = studyNames.indexOf(this.x);
+                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + studySeriesDataN[index] + ')';
+                return comment;
+            },
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [{
+            name: 'Mean DLP per study description',
+            data: studySeriesData
+        }],
+        drilldown: {
+            series: studySeriesDrilldown
+        }
+    });
+});
+</script>
+<!-- End of JavaScript for study plot -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyFreq %}
+<!-- JavaScript for study pie chart -->
+<script>
+var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+var studyPiechartData = new Array(studyNames.length);
+for(var i=0; i<studyNames.length; i++) {
+    studyPiechartData[i] = {name:studyNames[i], y:parseInt(studySeriesDataN[i]), url:urlStart+studyNames[i]};
+}
+studyPiechartData.sort(sort_by_y);
+
+studyColours = getColours(studyNames.length);
+for(var i=0; i<studyNames.length; i++) {
+    studyPiechartData[i].color = studyColours[i];
+}
+
+$(function () {
+
+var chartStudyFreq = new Highcharts.Chart({
+        chart: {
+            renderTo: 'piechartStudyDIV',
+            plotBackgroundColor: null,
+            plotBorderWidth: 1,//null,
+            plotShadow: false
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Study frequency',
+            point: {
+                events: {
+                    click: function(e) {
+                        location.href = e.point.url;
+                        e.preventDefault();
+                    }
+                }
+            },
+            data: studyPiechartData
+        }]
+    });
+});
+</script>
+<!-- End of JavaScript for study pie chart -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyPerDayAndHour %}
+<!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
+<script>
+var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+var studiesPerHourEachWeekday = [
+                      {% for dayCounts in studiesPerHourInWeekdays %}
+                          [
+                          {% for hourCounts in dayCounts %}
+                              {{hourCounts}}
+                              {% if not forloop.last %},{% endif %}
+                          {% endfor %}
+                          ]
+                          {% if not forloop.last %},{% endif %}
+                      {% endfor %}
+                      ];
+var studiesPerWeekday = new Array(7);
+for(var i=0; i<7; i++) {
+    var tempTotal = 0;
+    for(var j=0; j<24; j++) {
+        tempTotal = tempTotal + studiesPerHourEachWeekday[i][j];
+    }
+    studiesPerWeekday[i] = tempTotal;
+}
+
+var hourColours = getColours(24);
+var seriesDrillDownPieChart   = [
+                        {% for dayCounts in studiesPerHourInWeekdays %}
+                            {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
+                            {% for hourCounts in dayCounts %}
+                                {{'{'}}name:'{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', y:studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1],color:hourColours[{{forloop.counter}}]{{'}'}}{% if not forloop.last %},{% endif %}
+                            {% endfor %}]}
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+
+var dayColours = getColours(7);
+var studyWorkloadPieChartData= new Array(7);
+for(var i=0; i<7; i++) {
+    studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
+}
+
+$(function () {
+
+var chartStudyWorkload = new Highcharts.Chart({
+        chart: {
+            renderTo: 'piechartStudyWorkloadDIV',
+            plotBackgroundColor: null,
+            plotBorderWidth: 1,//null,
+            plotShadow: false,
+            events: {
+                drilldown: function(e) {
+                    chartStudyWorkload.setTitle({ text: 'Studies per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
+                },
+                drillup: function(e) {
+                    chartStudyWorkload.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
+                }
+            }
+        },
+        title: {
+            text: 'Studies per<br>day of the week',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 70
+        },
+        tooltip: {
+            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: false,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
+                    style: {
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            startAngle:-90,
+            endAngle:90,
+            center: ['50%','75%'],
+            innerSize: '50%',
+            data: studyWorkloadPieChartData
+        }],
+        drilldown: {
+            series:seriesDrillDownPieChart
+        }
+    });
+});
+</script>
+<!-- End of JavaScript for studies per week day pie chart -->
+{% endif %}
+
+
+{% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+<!-- JavaScript for mean DLP per study description -->
+<script>
+dateAxis = [
+{% for dateEntries in studyDLPoverTime.0 %}
+    "{{ dateEntries.0.date|date:"d/m/Y" }}"
+    {% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+
+// Create the same colours as for the study pie chart, so that the colours
+// are the same for the studies in the pie chart and this plot.
+var studyLineColours =  new Array(studyNames.length);
+studyPiechartData.sort(sort_by_name);
+for(var i=0; i<studyNames.length; i++) {
+    studyLineColours[i] = studyPiechartData[i].color;
+}
+studyPiechartData.sort(sort_by_y);
+
+var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+
+meanDLPperWeek = [
+{% for studyData in studyDLPoverTime %}
+    {{'{'}}name:studyNames[{{forloop.counter}}-1],
+        color:studyLineColours[{{forloop.counter}}-1],
+        marker:{{'{'}}enabled:true{{'}'}},
+        point: {{'{'}}
+            events: {{'{'}}
+                    click: function(e) {{'{'}}
+                        location.href = e.point.url;
+                        e.preventDefault();
+                    {{'}'}}
+            {{'}'}}
+        {{'}'}},
+        data:[
+    {% for weekEntries in studyData %}
+        {{'{'}}y:{% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}})).setDate((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}})).getDate()+6))){{'}'}}
+        {% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ]{{'}'}}
+    {% if not forloop.last %},{% endif %}
+{% endfor %}
+];
+
+$(function () {
+var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
+        chart: {
+            renderTo: 'linechartWeeklyStudyMeanDIV',
+            zoomType: 'x'
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{series.name}<br/>{point.y:.0f} mGy.cm'
+        },
+        xAxis: {
+            categories: dateAxis,
+            minTickInterval: 4,
+            labels: {
+                rotation:90
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Mean DLP over the week (mGy.cm)'
+            },
+            floor: 0,
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: meanDLPperWeek
+    });
+});
+
+</script>
+<!-- End of JavaScript for mean DLP per study description -->
+{% endif %}
+
+
+<!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
+<script>
+(function (H) {
+    H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
+        var point = proceed.call(this, series, options, x),
+            chart = series.chart,
+            tick = series.xAxis && series.xAxis.ticks[x],
+            tickLabel = tick && tick.label;
+
+        if (point.drilldown) {
+
+            // Add the click event to the point label
+            H.addEvent(point, 'click', function () {
+                point.doDrilldown();
+            });
+
+            // Make axis labels click-able
+            if (tickLabel) {
+                if (!tickLabel._basicStyle) {
+                    tickLabel._basicStyle = tickLabel.element.getAttribute('style');
+                }
+                tickLabel.addClass('highcharts-drilldown-axis-label')          .css({
+                    'text-decoration': 'none',
+                    'font-weight': 'normal',
+                    'cursor': 'auto'
+                    })
+                    .on('click', function () {
+                    if (point.doDrilldown) {
+                        return false;
+                    }
+                });
+
+            }
+        } else if (tickLabel && tickLabel._basicStyle) {
+        }
+
+        return point;
+    });
+})(Highcharts);
+</script>
+<!-- End of JavaScript to remove the hyper links from x-axis data labels in the plots -->
+{% endif %}
 {% endblock %}

@@ -54,8 +54,22 @@ urlpatterns = patterns('remapp.views',
             model=GeneralStudyModuleAttr,
             template_name='remapp/ctdetail.html'))),
 
+    url(r'^ct/hist/$',
+        'ct_histogram_list_filter'),
+    url(r'^ct/(?P<pk>\d+)/$',
+        login_required(DetailView.as_view(
+            model=GeneralStudyModuleAttr,
+            template_name='remapp/ctdetail.html'))),
+
     url(r'^dx/$',
         'dx_summary_list_filter'),
+    url(r'^dx/(?P<pk>\d+)/$',
+        login_required(DetailView.as_view(
+            model=GeneralStudyModuleAttr,
+            template_name='remapp/dxdetail.html'))),
+
+    url(r'^dx/hist/$',
+        'dx_histogram_list_filter'),
     url(r'^dx/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
             model=GeneralStudyModuleAttr,

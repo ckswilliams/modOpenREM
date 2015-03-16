@@ -37,7 +37,7 @@
 
 
 <table class="table table-striped table-bordered">
-    <th>Time</th><th>Acquisition protocol</th><th>DAP cGy.cm2</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
+    <th>Time</th><th>Acquisition protocol</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>

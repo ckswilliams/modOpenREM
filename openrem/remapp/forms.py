@@ -26,3 +26,18 @@ class SizeHeadersForm(forms.Form):
             ID_TYPES = (("acc-no", "Accession Number"),("si-uid", "Study instance UID"))
             self.fields['id_type'] = forms.ChoiceField(choices=ID_TYPES, widget=forms.Select(attrs={"class":"form-control"}))
 
+class DXChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?',required=False)
+    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean DAP per acquisition',required=False)
+    plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
+    plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time',required=False)
+    plotDXStudyPerDayAndHour = forms.BooleanField(label='Acquisition workload',required=False)
+
+class CTChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?',required=False)
+    plotCTAcquisitionMeanDLP = forms.BooleanField(label='Mean DLP per acquisition',required=False)
+    plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
+    plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study',required=False)
+    plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)
+    plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
+    plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Mean study DLP over time',required=False)
