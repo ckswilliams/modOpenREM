@@ -47,6 +47,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
+from django.core.context_processors import csrf
 
 try:
     from numpy import *
@@ -70,7 +71,7 @@ def dx_summary_list_filter(request):
     from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     import datetime, qsstats
-
+    from remapp.forms import DXChartOptionsForm
 
     try:
         # See if the user has plot settings in userprofile
@@ -80,12 +81,38 @@ def dx_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        chartOptionsForm = DXChartOptionsForm(request.POST)
+        # check whether it's valid:
+        if chartOptionsForm.is_valid():
+            # process the data in form.cleaned_data as required
+            userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
+            userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
+            userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
+            userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
+            userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
+            userProfile.save()
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        formData = {'plotCharts': userProfile.plotCharts,
+                    'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
+                    'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
+                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour}
+        chartOptionsForm = DXChartOptionsForm(formData)
+
     plotCharts = userProfile.plotCharts
+    plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
+    plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
 
 
-    f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
+    f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot and mean DAP over time
@@ -137,7 +164,9 @@ def dx_summary_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin}
+    returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
+
+    returnStructure.update(csrf(request))
 
     if plotting and plotCharts:
         returnStructure['acquisitionSummary'] = acquisitionSummary
@@ -162,49 +191,93 @@ def dx_histogram_list_filter(request):
     from django.db.models import Q, Avg, Count, Min # For the Q "OR" query used for DX and CR
     import pkg_resources # part of setuptools
     import datetime, qsstats
+    from remapp.forms import DXChartOptionsForm
 
-    if request.GET.get('acquisitionhist'):
-        f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('acquisition_protocol'),
-            projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'),
-            projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max')
-            ).order_by().distinct())
-        if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
-        if request.GET.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
-        if request.GET.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
+    if request.method == 'POST':
+        if request.POST.get('acquisitionhist'):
+            f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.POST.get('acquisition_protocol'),
+                projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.POST.get('acquisition_dap_min'),
+                projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.POST.get('acquisition_dap_max')
+                ).order_by().distinct())
+            if request.POST.get('study_description') : f.qs.filter(study_description=request.POST.get('study_description'))
+            if request.POST.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.POST.get('study_dap_max'))
+            if request.POST.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.POST.get('study_dap_min'))
 
-    elif request.GET.get('studyhist'):
-        f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'),
-            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
-            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max')
-            ).order_by().distinct())
-        if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
-        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
-        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+        elif request.POST.get('studyhist'):
+            f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.POST.get('study_description'),
+                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.POST.get('study_dap_min'),
+                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.POST.get('study_dap_max')
+                ).order_by().distinct())
+            if request.POST.get('acquisition_protocol') : f.qs.filter(study_description=request.POST.get('acquisition_protocol'))
+            if request.POST.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.POST.get('acquisition_dap_max'))
+            if request.POST.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.POST.get('acquisition_dap_min'))
 
-    else:
-        f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
-        if request.GET.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'))
-        if request.GET.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
-        if request.GET.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
-        if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
-        if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
-        if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+        else:
+            f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
+            if request.POST.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.POST.get('study_description'))
+            if request.POST.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.POST.get('study_dap_min'))
+            if request.POST.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.POST.get('study_dap_max'))
+            if request.POST.get('acquisition_protocol') : f.qs.filter(study_description=request.POST.get('acquisition_protocol'))
+            if request.POST.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.POST.get('acquisition_dap_max'))
+            if request.POST.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.POST.get('acquisition_dap_min'))
 
-    if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
-    if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
-    if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
-    if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
-    if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
-    if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
-    if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
-    if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
-    if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
+        if request.POST.get('accession_number')  : f.qs.filter(accession_number=request.POST.get('accession_number'))
+        if request.POST.get('date_after')        : f.qs.filter(study_date__gt=request.POST.get('date_after'))
+        if request.POST.get('date_before')       : f.qs.filter(study_date__lt=request.POST.get('date_before'))
+        if request.POST.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.POST.get('institution_name'))
+        if request.POST.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.POST.get('manufacturer'))
+        if request.POST.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.POST.get('model_name'))
+        if request.POST.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.POST.get('patient_age_max'))
+        if request.POST.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.POST.get('patient_age_min'))
+        if request.POST.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.POST.get('station_name'))
 
+    elif request.method == 'GET':
+        if request.GET.get('acquisitionhist'):
+            f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('acquisition_protocol'),
+                projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'),
+                projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max')
+                ).order_by().distinct())
+            if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
+            if request.GET.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
+            if request.GET.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
+
+        elif request.GET.get('studyhist'):
+            f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'),
+                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
+                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max')
+                ).order_by().distinct())
+            if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
+            if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
+            if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+
+        else:
+            f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
+            if request.GET.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'))
+            if request.GET.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
+            if request.GET.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
+            if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
+            if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
+            if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
+
+        if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
+        if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
+        if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
+        if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
+        if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
+        if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
+        if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
+        if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
+        if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
 
     try:
         # See if the user has plot settings in userprofile
@@ -214,10 +287,33 @@ def dx_histogram_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        chartOptionsForm = DXChartOptionsForm(request.POST)
+        # check whether it's valid:
+        if chartOptionsForm.is_valid():
+            # process the data in form.cleaned_data as required
+            userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
+            userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
+            userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
+            userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
+            userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
+            userProfile.save()
+    else:
+        formData = {'plotCharts': userProfile.plotCharts,
+                    'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
+                    'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
+                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour}
+        chartOptionsForm = DXChartOptionsForm(formData)
+
     plotCharts = userProfile.plotCharts
+    plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
+    plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
-
 
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot and mean DAP over time
@@ -269,7 +365,7 @@ def dx_histogram_list_filter(request):
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
 
-    returnStructure = {'filter': f, 'admin':admin}
+    returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
     if plotting and plotCharts:
         returnStructure['acquisitionSummary'] = acquisitionSummary
