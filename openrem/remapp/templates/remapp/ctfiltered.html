@@ -119,11 +119,12 @@ function getColours(noOfColours) {
       {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable">
-        <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
-        {% if admin.adminperm %}
-        <th>Delete?</th>
-        {% endif %}
-
+        <tr>
+            <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
+            {% if admin.adminperm %}
+            <th>Delete?</th>
+            {% endif %}
+        </tr>
         {% for exam in filter_list %}
         <tr>
             <td>
