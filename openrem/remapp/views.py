@@ -194,90 +194,51 @@ def dx_histogram_list_filter(request):
     from remapp.forms import DXChartOptionsForm
 
     if request.method == 'POST':
-        if request.POST.get('acquisitionhist'):
-            f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
-                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.POST.get('acquisition_protocol'),
-                projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.POST.get('acquisition_dap_min'),
-                projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.POST.get('acquisition_dap_max')
-                ).order_by().distinct())
-            if request.POST.get('study_description') : f.qs.filter(study_description=request.POST.get('study_description'))
-            if request.POST.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.POST.get('study_dap_max'))
-            if request.POST.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.POST.get('study_dap_min'))
+        requestResults = request.POST
+    else:
+        requestResults = request.GET
 
-        elif request.POST.get('studyhist'):
-            f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
-                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.POST.get('study_description'),
-                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.POST.get('study_dap_min'),
-                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.POST.get('study_dap_max')
-                ).order_by().distinct())
-            if request.POST.get('acquisition_protocol') : f.qs.filter(study_description=request.POST.get('acquisition_protocol'))
-            if request.POST.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.POST.get('acquisition_dap_max'))
-            if request.POST.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.POST.get('acquisition_dap_min'))
+    if requestResults.get('acquisitionhist'):
+        f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=requestResults.get('acquisition_protocol'),
+            projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=requestResults.get('acquisition_dap_min'),
+            projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=requestResults.get('acquisition_dap_max')
+            ).order_by().distinct())
+        if requestResults.get('study_description') : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=requestResults.get('study_dap_max'))
+        if requestResults.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=requestResults.get('study_dap_min'))
 
-        else:
-            f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
-                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
-            if request.POST.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.POST.get('study_description'))
-            if request.POST.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.POST.get('study_dap_min'))
-            if request.POST.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.POST.get('study_dap_max'))
-            if request.POST.get('acquisition_protocol') : f.qs.filter(study_description=request.POST.get('acquisition_protocol'))
-            if request.POST.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.POST.get('acquisition_dap_max'))
-            if request.POST.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.POST.get('acquisition_dap_min'))
+    elif requestResults.get('studyhist'):
+        f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=requestResults.get('study_description'),
+            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=requestResults.get('study_dap_min'),
+            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=requestResults.get('study_dap_max')
+            ).order_by().distinct())
+        if requestResults.get('acquisition_protocol') : f.qs.filter(study_description=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=requestResults.get('acquisition_dap_max'))
+        if requestResults.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=requestResults.get('acquisition_dap_min'))
 
-        if request.POST.get('accession_number')  : f.qs.filter(accession_number=request.POST.get('accession_number'))
-        if request.POST.get('date_after')        : f.qs.filter(study_date__gt=request.POST.get('date_after'))
-        if request.POST.get('date_before')       : f.qs.filter(study_date__lt=request.POST.get('date_before'))
-        if request.POST.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.POST.get('institution_name'))
-        if request.POST.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.POST.get('manufacturer'))
-        if request.POST.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.POST.get('model_name'))
-        if request.POST.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.POST.get('patient_age_max'))
-        if request.POST.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.POST.get('patient_age_min'))
-        if request.POST.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.POST.get('station_name'))
+    else:
+        f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
+        if requestResults.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=requestResults.get('study_description'))
+        if requestResults.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=requestResults.get('study_dap_min'))
+        if requestResults.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=requestResults.get('study_dap_max'))
+        if requestResults.get('acquisition_protocol') : f.qs.filter(study_description=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=requestResults.get('acquisition_dap_max'))
+        if requestResults.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=requestResults.get('acquisition_dap_min'))
 
-    elif request.method == 'GET':
-        if request.GET.get('acquisitionhist'):
-            f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('acquisition_protocol'),
-                projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'),
-                projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max')
-                ).order_by().distinct())
-            if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
-            if request.GET.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
-            if request.GET.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
-
-        elif request.GET.get('studyhist'):
-            f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-                projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'),
-                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'),
-                projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max')
-                ).order_by().distinct())
-            if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
-            if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
-            if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
-
-        else:
-            f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-                Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
-            if request.GET.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=request.GET.get('study_description'))
-            if request.GET.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=request.GET.get('study_dap_min'))
-            if request.GET.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=request.GET.get('study_dap_max'))
-            if request.GET.get('acquisition_protocol') : f.qs.filter(study_description=request.GET.get('acquisition_protocol'))
-            if request.GET.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=request.GET.get('acquisition_dap_max'))
-            if request.GET.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=request.GET.get('acquisition_dap_min'))
-
-        if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
-        if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
-        if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
-        if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
-        if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
-        if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
-        if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
-        if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
-        if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
+    if requestResults.get('accession_number')  : f.qs.filter(accession_number=requestResults.get('accession_number'))
+    if requestResults.get('date_after')        : f.qs.filter(study_date__gt=requestResults.get('date_after'))
+    if requestResults.get('date_before')       : f.qs.filter(study_date__lt=requestResults.get('date_before'))
+    if requestResults.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=requestResults.get('institution_name'))
+    if requestResults.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=requestResults.get('manufacturer'))
+    if requestResults.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=requestResults.get('model_name'))
+    if requestResults.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
+    if requestResults.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
+    if requestResults.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
 
     try:
         # See if the user has plot settings in userprofile
@@ -553,90 +514,51 @@ def ct_histogram_list_filter(request):
     from remapp.forms import CTChartOptionsForm
 
     if request.method == 'POST':
-        if request.POST.get('acquisitionhist'):
-            f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
-                modality_type__exact = 'CT',
-                ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.POST.get('acquisition_protocol'),
-                ctradiationdose__ctirradiationeventdata__dlp__gte=request.POST.get('acquisition_dlp_min'),
-                ctradiationdose__ctirradiationeventdata__dlp__lte=request.POST.get('acquisition_dlp_max')
-                ).order_by().distinct())
-            if request.POST.get('study_description') : f.qs.filter(study_description=request.POST.get('study_description'))
-            if request.POST.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.POST.get('study_dlp_max'))
-            if request.POST.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.POST.get('study_dlp_min'))
+        requestResults = request.POST
+    else:
+        requestResults = request.GET
 
-        elif request.POST.get('studyhist'):
-            f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
-                modality_type__exact = 'CT',
-                study_description=request.POST.get('study_description'),
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.POST.get('study_dlp_min'),
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.POST.get('study_dlp_max')
-                ).order_by().distinct())
-            if request.POST.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.POST.get('acquisition_protocol'))
-            if request.POST.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.POST.get('study_dlp_max'))
-            if request.POST.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.POST.get('study_dlp_min'))
+    if requestResults.get('acquisitionhist'):
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact = 'CT',
+            ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'),
+            ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'),
+            ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max')
+            ).order_by().distinct())
+        if requestResults.get('study_description') : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
 
-        else:
-            f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(
-                modality_type__exact = 'CT').order_by().distinct())
-            if request.POST.get('study_description')    : f.qs.filter(study_description=request.POST.get('study_description'))
-            if request.POST.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.POST.get('study_dlp_min'))
-            if request.POST.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.POST.get('study_dlp_max'))
-            if request.POST.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.POST.get('acquisition_protocol'))
-            if request.POST.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.POST.get('study_dlp_max'))
-            if request.POST.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.POST.get('study_dlp_min'))
+    elif requestResults.get('studyhist'):
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact = 'CT',
+            study_description=requestResults.get('study_description'),
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'),
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max')
+            ).order_by().distinct())
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('study_dlp_min'))
 
-        if request.POST.get('accession_number')  : f.qs.filter(accession_number=request.POST.get('accession_number'))
-        if request.POST.get('date_after')        : f.qs.filter(study_date__gt=request.POST.get('date_after'))
-        if request.POST.get('date_before')       : f.qs.filter(study_date__lt=request.POST.get('date_before'))
-        if request.POST.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.POST.get('institution_name'))
-        if request.POST.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.POST.get('manufacturer'))
-        if request.POST.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.POST.get('model_name'))
-        if request.POST.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.POST.get('patient_age_max'))
-        if request.POST.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.POST.get('patient_age_min'))
-        if request.POST.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.POST.get('station_name'))
+    else:
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact = 'CT').order_by().distinct())
+        if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('study_dlp_min'))
 
-    elif request.method == 'GET':
-        if request.GET.get('acquisitionhist'):
-            f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-                modality_type__exact = 'CT',
-                ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'),
-                ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('acquisition_dlp_min'),
-                ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('acquisition_dlp_max')
-                ).order_by().distinct())
-            if request.GET.get('study_description') : f.qs.filter(study_description=request.GET.get('study_description'))
-            if request.GET.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
-            if request.GET.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
-
-        elif request.GET.get('studyhist'):
-            f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-                modality_type__exact = 'CT',
-                study_description=request.GET.get('study_description'),
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'),
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max')
-                ).order_by().distinct())
-            if request.GET.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'))
-            if request.GET.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('study_dlp_max'))
-            if request.GET.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('study_dlp_min'))
-
-        else:
-            f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-                modality_type__exact = 'CT').order_by().distinct())
-            if request.GET.get('study_description')    : f.qs.filter(study_description=request.GET.get('study_description'))
-            if request.GET.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=request.GET.get('study_dlp_min'))
-            if request.GET.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=request.GET.get('study_dlp_max'))
-            if request.GET.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=request.GET.get('acquisition_protocol'))
-            if request.GET.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=request.GET.get('study_dlp_max'))
-            if request.GET.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=request.GET.get('study_dlp_min'))
-
-        if request.GET.get('accession_number')  : f.qs.filter(accession_number=request.GET.get('accession_number'))
-        if request.GET.get('date_after')        : f.qs.filter(study_date__gt=request.GET.get('date_after'))
-        if request.GET.get('date_before')       : f.qs.filter(study_date__lt=request.GET.get('date_before'))
-        if request.GET.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=request.GET.get('institution_name'))
-        if request.GET.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=request.GET.get('manufacturer'))
-        if request.GET.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=request.GET.get('model_name'))
-        if request.GET.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=request.GET.get('patient_age_max'))
-        if request.GET.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=request.GET.get('patient_age_min'))
-        if request.GET.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=request.GET.get('station_name'))
+    if requestResults.get('accession_number')  : f.qs.filter(accession_number=requestResults.get('accession_number'))
+    if requestResults.get('date_after')        : f.qs.filter(study_date__gt=requestResults.get('date_after'))
+    if requestResults.get('date_before')       : f.qs.filter(study_date__lt=requestResults.get('date_before'))
+    if requestResults.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=requestResults.get('institution_name'))
+    if requestResults.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=requestResults.get('manufacturer'))
+    if requestResults.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=requestResults.get('model_name'))
+    if requestResults.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
+    if requestResults.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
+    if requestResults.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
 
     try:
         # See if the user has plot settings in userprofile
