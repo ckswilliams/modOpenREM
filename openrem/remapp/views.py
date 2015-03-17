@@ -94,6 +94,7 @@ def dx_summary_list_filter(request):
             userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
+            userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
             userProfile.save()
 
     # if a GET (or any other method) we'll create a blank form
@@ -101,15 +102,17 @@ def dx_summary_list_filter(request):
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
                     'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
                     'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
-                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour}
+                    'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
         chartOptionsForm = DXChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
-    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
+    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
+    plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
 
     f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
@@ -137,9 +140,9 @@ def dx_summary_list_filter(request):
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
-                # Required for mean DAP per month plot
+                # Required for mean DAP over time
                 qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
-                acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval='months')
+                acquisitionDAPoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
         if plotDXStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
@@ -261,20 +264,23 @@ def dx_histogram_list_filter(request):
             userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
+            userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
             userProfile.save()
     else:
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
                     'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
                     'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
-                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour}
+                    'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
         chartOptionsForm = DXChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
-    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
+    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
+    plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot and mean DAP over time
@@ -299,9 +305,9 @@ def dx_histogram_list_filter(request):
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
-                # Required for mean DAP per month plot
+                # Required for mean DAP per time period plot
                 qss = qsstats.QuerySetStats(subqs, 'projectionxrayradiationdose__irradeventxraydata__date_time_started', aggregate=Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'))
-                acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval='months')
+                acquisitionDAPoverTime[idx] = qss.time_series(startDate, today,interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
         if plotDXStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
@@ -400,6 +406,7 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
+            userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
 
     # if a GET (or any other method) we'll create a blank form
@@ -410,7 +417,8 @@ def ct_summary_list_filter(request):
                     'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
                     'plotCTStudyFreq': userProfile.plotCTStudyFreq,
                     'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
-                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime}
+                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
+                    'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
         chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
@@ -420,6 +428,7 @@ def ct_summary_list_filter(request):
     plotCTStudyFreq = userProfile.plotCTStudyFreq
     plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
+    plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
 
 
     f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
@@ -454,9 +463,9 @@ def ct_summary_list_filter(request):
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
             if plotCTStudyMeanDLPOverTime:
-                # Required for mean DLP per study type per week plot
+                # Required for mean DLP per study type per time period plot
                 qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+                studyDLPoverTime[idx] = qss.time_series(startDate, today,interval=plotCTStudyMeanDLPOverTimePeriod)
 
         if plotCTStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
@@ -568,9 +577,6 @@ def ct_histogram_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
-    plotCharts = userProfile.plotCharts
-    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
-
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -586,6 +592,7 @@ def ct_histogram_list_filter(request):
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
+            userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
     else:
         formData = {'plotCharts': userProfile.plotCharts,
@@ -594,7 +601,8 @@ def ct_histogram_list_filter(request):
                     'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
                     'plotCTStudyFreq': userProfile.plotCTStudyFreq,
                     'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
-                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime}
+                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
+                    'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
         chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
@@ -604,6 +612,7 @@ def ct_histogram_list_filter(request):
     plotCTStudyFreq = userProfile.plotCTStudyFreq
     plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
+    plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
 
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
@@ -632,9 +641,9 @@ def ct_histogram_list_filter(request):
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
             if plotCTStudyMeanDLPOverTime:
-                # Required for mean DLP per study type per week plot
+                # Required for mean DLP per study type per time period plot
                 qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                studyDLPoverTime[idx] = qss.time_series(startDate, today,interval='weeks')
+                studyDLPoverTime[idx] = qss.time_series(startDate, today,interval=plotCTStudyMeanDLPOverTimePeriod)
 
         if plotCTStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot

@@ -38,6 +38,17 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 class UserProfile(models.Model):
+    DAYS = 'days'
+    WEEKS = 'weeks'
+    MONTHS = 'months'
+    YEARS = 'years'
+    TIME_PERIOD = (
+        (DAYS, 'Days'),
+        (WEEKS, 'Weeks'),
+        (MONTHS, 'Months'),
+        (YEARS, 'Years'),
+    )
+
     # This field is required.
     user = models.OneToOneField(User)
 
@@ -45,8 +56,11 @@ class UserProfile(models.Model):
     plotCharts = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
     plotDXAcquisitionFreq = models.BooleanField(default=False)
-    plotDXAcquisitionMeanDAPOverTime = models.BooleanField(default=False)
     plotDXStudyPerDayAndHour = models.BooleanField(default=False)
+    plotDXAcquisitionMeanDAPOverTime = models.BooleanField(default=False)
+    plotDXAcquisitionMeanDAPOverTimePeriod = models.CharField(max_length=6,
+                                                              choices=TIME_PERIOD,
+                                                              default=MONTHS)
 
     plotCTAcquisitionMeanDLP = models.BooleanField(default=True)
     plotCTAcquisitionFreq = models.BooleanField(default=False)
@@ -54,6 +68,9 @@ class UserProfile(models.Model):
     plotCTStudyFreq = models.BooleanField(default=False)
     plotCTStudyPerDayAndHour = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
+    plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
+                                                        choices=TIME_PERIOD,
+                                                        default=MONTHS)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
