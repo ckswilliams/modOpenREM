@@ -718,8 +718,8 @@ var chartStudyDLP = new Highcharts.Chart({
 {% endif %}
 
 
-{% if request.user.userprofile.plotCTStudyFreq %}
-<!-- JavaScript for study pie chart -->
+{% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+<!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
 <script>
 var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
 var studyPiechartData = new Array(studyNames.length);
@@ -732,7 +732,12 @@ studyColours = getColours(studyNames.length);
 for(var i=0; i<studyNames.length; i++) {
     studyPiechartData[i].color = studyColours[i];
 }
+</script>
+{% endif %}
 
+{% if request.user.userprofile.plotCTStudyFreq %}
+<!-- JavaScript for study pie chart. -->
+<script>
 $(function () {
 
 var chartStudyFreq = new Highcharts.Chart({

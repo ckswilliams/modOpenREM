@@ -435,8 +435,8 @@ var chartDAPperAcquisition = new Highcharts.Chart({
 {% endif %}
 
 
-{% if request.user.userprofile.plotDXAcquisitionFreq %}
-<!-- JavaScript for acquisition pie chart -->
+{% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
+<!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
 <script>
 var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 var protocolPiechartData = new Array(protocolNames.length);
@@ -449,7 +449,11 @@ protocolColours = getColours(protocolNames.length);
 for(var i=0; i<protocolNames.length; i++) {
     protocolPiechartData[i].color = protocolColours[i];
 }
+</script>
+{% endif %}
 
+{% if request.user.userprofile.plotDXAcquisitionFreq %}
+<script>
 $(function () {
 
 var chartAcqFrequency = new Highcharts.Chart({
