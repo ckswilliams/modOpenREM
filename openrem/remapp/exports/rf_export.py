@@ -42,7 +42,7 @@ def rfcsv(filterdict):
     :type request: HTTP get
     
     """
-
+# Not in use
     import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
@@ -523,6 +523,268 @@ def rfxlsx(filterdict):
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
         
+    # Generate list of protocols in queryset and create worksheets for each
+    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.save()
+
+    protocolslist = []
+    for exams in e:
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+            if s.acquisition_protocol:
+                safeprotocol = s.acquisition_protocol
+            else:
+                safeprotocol = u'Unknown'
+            if safeprotocol not in protocolslist:
+                protocolslist.append(safeprotocol)
+    protocolslist.sort()
+
+    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.save()
+
+    protocolheaders = _rf_common_headers() + [
+        'Time',
+        'Type',
+        'Protocol',
+        'Pulse rate',
+        'Field size',
+        'Filter material',
+        'Filter thickness',
+        'kVp',
+        'mA',
+        'Pulse width',
+        'Exposure time',
+        'DAP (cGy.cm^2)',
+        'Ref point dose (Gy)',
+        'Primary angle',
+        'Secondary angle',
+    ]
+
+    sheetlist = _create_sheets(book, protocolslist, protocolheaders)
+
+    expInclude = [o.study_instance_uid for o in e]
+
+    for tab in sheetlist:
+        for protocol in sheetlist[tab]['protocolname']:
+            tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
+            tsk.save()
+            p_events = IrradEventXRayData.objects.filter(
+                acquisition_protocol__exact = protocol
+            ).filter(
+                projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+            )
+            for event in p_events:
+                sheetlist[tab]['count'] += 1
+                examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
+                if event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material:
+                    filter_material = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
+                else: filter_material = None
+                examdata += [
+                    str(event.date_time_started),
+                    event.irradiation_event_type.code_meaning,
+                    event.acquisition_protocol,
+                    str(event.irradeventxraysourcedata_set.get().pulse_rate),
+                    str(event.irradeventxraysourcedata_set.get().ii_field_size),
+                    filter_material,
+                    str(event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum),
+                    str(event.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
+                    str(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current),
+                    str(event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width),
+                    str(event.irradeventxraysourcedata_set.get().exposure_time),
+                    str(event.convert_gym2_to_cgycm2()),
+                    str(event.irradeventxraysourcedata_set.get().dose_rp),
+                    str(event.irradeventxraymechanicaldata_set.get().positioner_primary_angle),
+                    str(event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle),
+                ]
+                sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
+        tabcolumns = (37)
+        tabrows = sheetlist[tab]['count']
+        sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
+
+    # Populate summary sheet
+    tsk.progress = 'Now populating the summary sheet...'
+    tsk.save()
+
+    import pkg_resources  # part of setuptools
+    import datetime
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+
+    version = vers
+    titleformat = book.add_format()
+    titleformat.set_font_size=(22)
+    titleformat.set_font_color=('#FF0000')
+    titleformat.set_bold()
+    toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
+    linetwostring = 'OpenREM is copyright 2014 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    summarysheet.write(0,0, toplinestring, titleformat)
+    summarysheet.write(1,0, linetwostring)
+
+    # Number of exams
+    summarysheet.write(3,0,"Total number of exams")
+    summarysheet.write(3,1,e.count())
+
+    # Generate list of Study Descriptions
+    summarysheet.write(5,0,"Study Description")
+    summarysheet.write(5,1,"Frequency")
+    from django.db.models import Count
+    study_descriptions = e.values("study_description").annotate(n=Count("pk"))
+    for row, item in enumerate(study_descriptions.order_by('n').reverse()):
+        summarysheet.write(row+6,0,item['study_description'])
+        summarysheet.write(row+6,1,item['n'])
+    summarysheet.set_column('A:A', 25)
+
+    # Generate list of Requested Procedures
+    summarysheet.write(5,3,"Requested Procedure")
+    summarysheet.write(5,4,"Frequency")
+    from django.db.models import Count
+    requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
+    for row, item in enumerate(requested_procedure.order_by('n').reverse()):
+        summarysheet.write(row+6,3,item['requested_procedure_code_meaning'])
+        summarysheet.write(row+6,4,item['n'])
+    summarysheet.set_column('D:D', 25)
+
+    # Generate list of Series Protocols
+    summarysheet.write(5,6,"Series Protocol")
+    summarysheet.write(5,7,"Frequency")
+    sortedprotocols = sorted(sheetlist.iteritems(), key=lambda (k,v): v['count'], reverse=True)
+    for row, item in enumerate(sortedprotocols):
+        summarysheet.write(row+6,6,', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
+        summarysheet.write(row+6,7,item[1]['count'])
+    summarysheet.set_column('G:G', 15)
+
+
+    book.close()
+    tsk.progress = 'XLSX book written.'
+    tsk.save()
+
+    xlsxfilename = "dxexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(xlsxfilename,File(tmpxlsx))
+    except OSError as e:
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
+
+
+@shared_task
+def rfopenskin(studyid):
+    """Export filtered RF database data to multi-sheet Microsoft XSLX files.
+
+    :param filterdict: Query parameters from the RF filtered page URL.
+    :type filterdict: HTTP get
+
+    """
+
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
+    from django.db.models import Max, Min, Avg
+    from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import RFSummaryListFilter
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = rfopenskin.request.id
+    tsk.modality = "RF"
+    tsk.export_type = "OpenSkin RF csv export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+
+    # Get the data
+    study = GeneralStudyModuleAttr.objects.get(pk=studyid)
+
+    for event in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        data = [
+            'Anon',
+            study.patientmoduleattr_set.get().patient_sex,
+            study.study_instance_uid,
+            '',
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().acquisition_plane,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().date_time_started,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().irradiation_event_type,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().acquisition_protocol,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().irradeventxraysourcedata_set.get().reference_point_definition,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().irradiation_event_uid,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().dose_area_product,
+            study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get().entrance_exposure_at_rp,
+        ]
+
+
+    tsk.progress = 'Generating headers for the all data sheet...'
+    tsk.save()
+
+    alldataheaders = _rf_common_headers()
+
+    for h in xrange(num_groups_max):
+        alldataheaders += [
+            'G' + str(h+1) + ' Type',
+            'G' + str(h+1) + ' Protocol',
+            'G' + str(h+1) + ' No. exposures',
+            'G' + str(h+1) + ' Pulse rate',
+            'G' + str(h+1) + ' Field size',
+            'G' + str(h+1) + ' Filter material',
+            'G' + str(h+1) + ' Filter thickness',
+            'G' + str(h+1) + ' kVp min',
+            'G' + str(h+1) + ' kVp max',
+            'G' + str(h+1) + ' kVp mean',
+            'G' + str(h+1) + ' mA min',
+            'G' + str(h+1) + ' mA max',
+            'G' + str(h+1) + ' mA mean',
+            'G' + str(h+1) + ' pulse width min',
+            'G' + str(h+1) + ' pulse width max',
+            'G' + str(h+1) + ' pulse width mean',
+            'G' + str(h+1) + ' Exp time min (ms)',
+            'G' + str(h+1) + ' Exp time max (ms)',
+            'G' + str(h+1) + ' Exp time mean (ms)',
+            'G' + str(h+1) + ' DAP min (Gy.m^2)',
+            'G' + str(h+1) + ' DAP max (Gy.m^2)',
+            'G' + str(h+1) + ' DAP mean (Gy.m^2)',
+            'G' + str(h+1) + ' Ref point dose min (Gy)',
+            'G' + str(h+1) + ' Ref point dose max (Gy)',
+            'G' + str(h+1) + ' Ref point dose mean (Gy)',
+            'G' + str(h+1) + ' Primary angle min',
+            'G' + str(h+1) + ' Primary angle max',
+            'G' + str(h+1) + ' Primary angle mean',
+            'G' + str(h+1) + ' Secondary angle min',
+            'G' + str(h+1) + ' Secondary angle max',
+            'G' + str(h+1) + ' Secondary angle mean',
+            ]
+    wsalldata.write_row('A1', alldataheaders)
+    numcolumns = (31 * num_groups_max + 23 - 1)
+    numrows = e.count()
+    wsalldata.autofilter(0,0,numrows,numcolumns)
+
+
     # Generate list of protocols in queryset and create worksheets for each
     tsk.progress = 'Generating list of protocols in the dataset...'
     tsk.save()
