@@ -714,7 +714,7 @@ def rfopenskin(studyid):
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
 
-        tsk.progress = 'CSV file created'
+        tsk.progress = 'CSV file created, starting to populate with events'
         tsk.save()
     except:
         messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
