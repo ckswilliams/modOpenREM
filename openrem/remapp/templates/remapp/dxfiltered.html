@@ -205,14 +205,14 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapseMonthlyAcquisitionMeanChart">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime">
           Line plot showing monthly mean DAP of each acquisition protocol over time.
         </a>
       </h4>
     </div>
-    <div id="collapseMonthlyAcquisitionMeanChart" class="panel-collapse collapse">
+    <div id="collapseAcquisitionMeanDAPOverTime" class="panel-collapse collapse">
       <div class="panel-body">
-         <div id="linechartMonthlyAcquisitionMeanDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+         <div id="AcquisitionMeanDAPOverTimeDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
          <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
       </div>
     </div>
@@ -233,7 +233,8 @@
 <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
 
 
-<!-- JavaScript for acquisition plot -->
+{% if request.user.userprofile.plotDXAcquisitionMeanDAP or request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
+<!-- JavaScript for acquisition plot that is also required by some other plots -->
 <script>
 var protocolNames     = [
                         {% for name in acquisitionSummary %}
@@ -241,6 +242,18 @@ var protocolNames     = [
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
+var seriesDataN       = [
+                        {% for testData in acquisitionSummary %}
+                            '{{testData.num_acq}}'
+                            {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        ];
+</script>
+{% endif %}
+
+{% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
+<!-- JavaScript for acquisition plot -->
+<script>
 var protocolCounts    = [
                         {% for protocol in acquisitionHistogramData %}
                             [
@@ -269,12 +282,6 @@ var seriesData        = [
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
-var seriesDataN       = [
-                        {% for testData in acquisitionSummary %}
-                            '{{testData.num_acq}}'
-                            {% if not forloop.last %},{% endif %}
-                        {% endfor %}
-                        ];
 var seriesDrilldown   = [
                         {% for protocolCountsArray in acquisitionHistogramData %}
                             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -285,104 +292,11 @@ var seriesDrilldown   = [
                             {% if not forloop.last %},{% endif %}
                         {% endfor %}
                         ];
+
+var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
 </script>
 
-{% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
-<script type="text/javascript">
-$(function () {
-
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Mean DAP per acquisition protocol';
-var tooltipData = [2];
-
-var chartDAPperAcquisition = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo: 'container',
-            events: {
-                drilldown: function(e) {
-                    tooltipData[0] = protocolNames[e.point.x];
-                    tooltipData[1] = e.point.x;
-                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
-                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Number'});
-                    chartDAPperAcquisition.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
-                    chartDAPperAcquisition.xAxis[0].setCategories([], true);
-                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:0}});
-                    chartDAPperAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                            var linkText = 'acquisition_dap_min=' + (protocolBins[tooltipData[1]][this.x])/1000000 + '&acquisition_dap_max=' + (protocolBins[tooltipData[1]][this.x+1])/1000000 + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
-                    }
-                },
-                drillup: function(e) {
-                    chartDAPperAcquisition.setTitle({ text: defaultTitle }, { text: '' });
-                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
-                    chartDAPperAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartDAPperAcquisition.xAxis[0].setCategories(protocolNames, true);
-                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:90}});
-                    chartDAPperAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var index = protocolNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>' + '<br/>(n=' + seriesDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
-                    }
-                }
-            }
-        },
-        title: {
-            text: 'Mean DAP per acquisition protocol'
-        },
-        legend: {
-            enabled: false
-        },
-        xAxis: {
-            categories: protocolNames,
-            title: {
-                useHTML: true,
-                text: 'Protocol name'
-            },
-            labels: {
-                rotation:90
-            }
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                useHTML: true,
-                text: 'Mean DAP (cGy.cm<sup>2</sup>)'
-            }
-        },
-        tooltip: {
-            formatter: function () {
-                var index = protocolNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>' + '<br/>(n=' + seriesDataN[index] + ')';
-                return comment;
-            },
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [{
-            name: 'Mean DAP per acquisition protocol',
-            data: seriesData
-        }],
-        drilldown: {
-            series: seriesDrilldown
-        }
-    });
-});
-</script>
+<script src="{{ STATIC_URL }}js/dxChartDAPperAcquisition.js"></script>
 <!-- End of JavaScript for acquisition plot -->
 {% endif %}
 
@@ -405,53 +319,10 @@ for(var i=0; i<protocolNames.length; i++) {
 {% endif %}
 
 {% if request.user.userprofile.plotDXAcquisitionFreq %}
-<script>
-$(function () {
-
-var chartAcqFrequency = new Highcharts.Chart({
-        chart: {
-            renderTo: 'piechartProtocolDIV',
-            plotBackgroundColor: null,
-            plotBorderWidth: 1,
-            plotShadow: false
-        },
-        title: {
-            text: ''
-        },
-        tooltip: {
-            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: false,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
-                    style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                    }
-                }
-            }
-        },
-        series: [{
-            type: 'pie',
-            name: 'Study frequency',
-            point: {
-                events: {
-                    click: function(e) {
-                        location.href = e.point.url;
-                        e.preventDefault();
-                    }
-                }
-            },
-            data: protocolPiechartData
-        }]
-    });
-});
-</script>
+<script src="{{ STATIC_URL }}js/dxChartAcquisitionFrequency.js"></script>
 <!-- End of JavaScript for acquisition pie chart -->
 {% endif %}
+
 
 {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
 <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
@@ -495,65 +366,15 @@ var studyWorkloadPieChartData= new Array(7);
 for(var i=0; i<7; i++) {
     studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
 }
-
-$(function () {
-
-var chartWorkload = new Highcharts.Chart({
-        chart: {
-            renderTo: 'piechartStudyWorkloadDIV',
-            plotBackgroundColor: null,
-            plotBorderWidth: 1,//null,
-            plotShadow: false,
-            events: {
-                drilldown: function(e) {
-                    chartWorkload.setTitle({ text: 'Studies per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
-                },
-                drillup: function(e) {
-                    chartWorkload.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
-                }
-            }
-        },
-        title: {
-            text: 'Studies per<br>day of the week',
-            align: 'center',
-            verticalAlign: 'middle',
-            y: 70
-        },
-        tooltip: {
-            pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: false,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
-                    style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                    }
-                }
-            }
-        },
-        series: [{
-            type: 'pie',
-            startAngle:-90,
-            endAngle:90,
-            center: ['50%','75%'],
-            innerSize: '50%',
-            data: studyWorkloadPieChartData
-        }],
-        drilldown: {
-            series:seriesDrillDownPieChart
-        }
-    });
-});
 </script>
+
+<script src="{{ STATIC_URL }}js/dxChartStudyWorkload.js"></script>
 <!-- End of JavaScript for studies per week day pie chart -->
 {% endif %}
 
+
 {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
-<!-- JavaScript for mean DAP per acquisition protocol per month -->
+<!-- JavaScript for mean DAP per acquisition protocol per time period -->
 <script>
 dateAxis = [
 {% for dateEntries in acquisitionDAPoverTime.0 %}
@@ -573,7 +394,7 @@ protocolPiechartData.sort(sort_by_y);
 
 var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 
-meanDAPperMonth = [
+meanDAPOverTime = [
 {% for protocolData in acquisitionDAPoverTime %}
     {{'{'}}name:protocolNames[{{forloop.counter}}-1],
         color:protocolLineColours[{{forloop.counter}}-1],
@@ -587,60 +408,20 @@ meanDAPperMonth = [
             {{'}'}}
         {{'}'}},
         data:[
-    {% for monthEntries in protocolData %}
-        {{'{'}}y:{% if monthEntries.1 %}{{ monthEntries.1 }}*1000000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}})).setMonth((new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}})).setMonth((new Date({{monthEntries.0.year}},{{monthEntries.0.month}}-1,{{monthEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
+    {% for dateEntries in protocolData %}
+        {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}*1000000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
         {% if not forloop.last %},{% endif %}
     {% endfor %}
     ]{{'}'}}
     {% if not forloop.last %},{% endif %}
 {% endfor %}
 ];
-
-$(function () {
-var chartMonthlyAcquisitionMeanDAP = new Highcharts.Chart({
-        chart: {
-            renderTo: 'linechartMonthlyAcquisitionMeanDIV',
-            zoomType: 'x'
-        },
-        title: {
-            text: ''
-        },
-        tooltip: {
-            pointFormat: '{series.name}<br/>{point.y:.1f} cGy.cm<sup>2</sup>',
-            useHTML: true
-        },
-        xAxis: {
-            categories: dateAxis,
-            minTickInterval: 1,
-            labels: {
-                rotation:90
-            }
-        },
-        yAxis: {
-            title: {
-                text: 'Mean DAP over the month (cGy.cm<sup>2</sup>)',
-                useHTML: true
-            },
-            floor: 0,
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }]
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
-        series: meanDAPperMonth
-    });
-});
-
 </script>
-<!-- End of JavaScript for mean DAP per acquisition protocol per week -->
+
+<script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionOverTime.js"></script>
+<!-- End of JavaScript for mean DAP per acquisition protocol per time period -->
 {% endif %}
+
 
 <!-- JavaScript to remove the hyper links from x-axis data labels in the plots -->
 <script src="{{ STATIC_URL }}js/removeXChartLabelHyperlinks.js"></script>

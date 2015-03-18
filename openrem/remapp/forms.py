@@ -41,7 +41,7 @@ class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean DAP per acquisition',required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
-    plotDXStudyPerDayAndHour = forms.BooleanField(label='Acquisition workload',required=False)
+    plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
 
