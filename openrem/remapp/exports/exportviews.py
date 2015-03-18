@@ -136,6 +136,21 @@ def rfxlsx1(request):
 
 @csrf_exempt
 @login_required
+def rfopenskin(request, pk):
+    from django.shortcuts import redirect, get_object_or_404
+    from remapp.exports.rf_export import rfopenskin
+    from remapp.models import GeneralStudyModuleAttr
+
+    export = get_object_or_404(GeneralStudyModuleAttr, pk=pk)
+
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = rfopenskin.delay(export.pk)
+
+    return redirect('/openrem/export/')
+
+
+@csrf_exempt
+@login_required
 def mgcsv1(request):
     """View to launch celery task to export mammography studies to csv file
 
