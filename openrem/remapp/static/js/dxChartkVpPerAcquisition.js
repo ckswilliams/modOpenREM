@@ -11,7 +11,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
             events: {
                 drilldown: function(ee) {
                     tooltipkVpData[0] = ee.point.x;
-                    chartkVpPerAcquisition.setTitle({ text: drilldownkVpTitle + ee.point.name}, { text: '(n = ' + serieskVpDataN[ee.point.x] +')' });
+                    chartkVpPerAcquisition.setTitle({ text: drilldownkVpTitle + ee.point.name + ' kVp values' }, { text: '(n = ' + serieskVpDataN[ee.point.x] +')' });
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'kVp range'});
                     chartkVpPerAcquisition.xAxis[0].setCategories([], true);

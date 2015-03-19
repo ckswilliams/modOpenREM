@@ -12,7 +12,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
                 drilldown: function(e) {
                     tooltipData[0] = protocolNames[e.point.x];
                     tooltipData[1] = e.point.x;
-                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
+                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name + ' DAP values' }, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chartDAPperAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartDAPperAcquisition.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
                     chartDAPperAcquisition.xAxis[0].setCategories([], true);
