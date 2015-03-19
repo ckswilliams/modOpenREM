@@ -285,6 +285,7 @@ def dx_histogram_list_filter(request):
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
             userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
+            userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
@@ -293,6 +294,7 @@ def dx_histogram_list_filter(request):
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
                     'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
                     'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
                     'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
                     'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
@@ -301,6 +303,7 @@ def dx_histogram_list_filter(request):
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
+    plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
@@ -310,22 +313,29 @@ def dx_histogram_list_filter(request):
         acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
+        # may have to add a filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude) to the line below
+        acquisitionkVpSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_kVp = Avg('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
+
         if plotDXAcquisitionMeanDAPOverTime:
             # Required for mean DAP per month plot
             acquisitionDAPoverTime = [None] * len(acquisitionSummary)
             startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
 
-        # Required for all plots
-        qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
-
         for idx, protocol in enumerate(acquisitionSummary):
             # Required for mean DAP per acquisition plot AND mean DAP per month plot
-            subqs = qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
+            subqs = f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
 
-            # Required for mean DAP per acquisition plot
-            dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
-            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+            if plotDXAcquisitionMeanDAP:
+                # Required for mean DAP per acquisition plot
+                dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+
+            if plotDXAcquisitionMeankVp:
+                # Required for mean kVp per acquisition plot
+                kVpValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', flat=True)
+                acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram([float(x) for x in kVpValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP per time period plot
@@ -359,7 +369,13 @@ def dx_histogram_list_filter(request):
 
     if plotting and plotCharts:
         returnStructure['acquisitionSummary'] = acquisitionSummary
+
+    if plotting and plotCharts and plotDXAcquisitionMeanDAP:
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCharts and plotDXAcquisitionMeankVp:
+        returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
+        returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
