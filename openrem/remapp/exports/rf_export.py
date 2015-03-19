@@ -42,7 +42,7 @@ def rfcsv(filterdict):
     :type request: HTTP get
     
     """
-
+# Not in use
     import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
@@ -678,3 +678,116 @@ def rfxlsx(filterdict):
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
+
+
+@shared_task
+def rfopenskin(studyid):
+    """Export filtered RF database data to multi-sheet Microsoft XSLX files.
+
+    :param studyid: RF study database ID.
+    :type studyud: int
+
+    """
+
+    import sys, datetime
+    from tempfile import TemporaryFile
+    from django.core.files import File
+    from django.shortcuts import redirect
+    from remapp.models import GeneralStudyModuleAttr
+    from remapp.models import Exports
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = rfopenskin.request.id
+    tsk.modality = "RF"
+    tsk.export_type = "OpenSkin RF csv export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created, starting to populate with events'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+
+    # Get the data
+    study = GeneralStudyModuleAttr.objects.get(pk=studyid)
+    numevents = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
+    tsk.num_records = numevents
+    tsk.save()
+
+    for i, event in enumerate(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()):
+#    for event in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        data = [
+            'Anon',
+            study.patientmoduleattr_set.get().patient_sex,
+            study.study_instance_uid,
+            '',
+            event.acquisition_plane,
+            event.date_time_started,
+            event.irradiation_event_type,
+            event.acquisition_protocol,
+            event.irradeventxraysourcedata_set.get().reference_point_definition,
+            event.irradiation_event_uid,
+            event.dose_area_product,
+            event.irradeventxraysourcedata_set.get().dose_rp,
+            event.irradeventxraymechanicaldata_set.get().positioner_primary_angle,
+            event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle,
+            event.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle,
+            event.irradeventxraymechanicaldata_set.get().positioner_secondary_end_angle,
+            event.irradeventxraymechanicaldata_set.get().column_angulation,
+            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_type,
+            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material,
+            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum,
+            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum,
+            event.irradeventxraysourcedata_set.get().fluoro_mode,
+            event.irradeventxraysourcedata_set.get().pulse_rate,
+            event.irradeventxraysourcedata_set.get().number_of_pulses,
+            event.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
+            event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current,
+            event.irradeventxraysourcedata_set.get().exposure_time,
+            event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width,
+            event.irradeventxraysourcedata_set.get().exposure_set.get().exposure,
+            event.irradeventxraysourcedata_set.get().focal_spot_size,
+            event.irradeventxraysourcedata_set.get().irradiation_duration,
+            event.irradeventxraysourcedata_set.get().average_xray_tube_current,
+            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector,
+            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter,
+            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position,
+            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position,
+            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position,
+            event.target_region,
+            event.comment,
+        ]
+        writer.writerow(data)
+        tsk.progress = "{0} of {1}".format(i, numevents)
+        tsk.save()
+    tsk.progress = 'All study data written.'
+    tsk.save()
+
+    csvfilename = "OpenSkinExport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
+

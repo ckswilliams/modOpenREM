@@ -200,8 +200,9 @@
       <!-- End of HTML to include div container for mean kVp per acquisition chart -->
     {% endif %}
 
-    {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
-      <!-- HTML to include div container for pie chart of studies per week day pie chart -->
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
+      <!-- HTML to include div container for mean acquisition protocol DAP per week -->
       <div class="panel-group" id="accordion">
         <div class="panel panel-default">
           <div class="panel-heading">

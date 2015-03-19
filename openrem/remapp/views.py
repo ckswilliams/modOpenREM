@@ -123,7 +123,6 @@ def dx_summary_list_filter(request):
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
-    #f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
     f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')))
     expInclude = [o.study_instance_uid for o in f]
 
@@ -221,6 +220,7 @@ def dx_histogram_list_filter(request):
 
     if request.method == 'POST':
         requestResults = request.POST
+        request.GET = request.POST
     else:
         requestResults = request.GET
 
@@ -408,6 +408,7 @@ def ct_summary_list_filter(request):
 
     if request.method == 'POST':
         requestResults = request.POST
+        request.GET = request.POST
     else:
         requestResults = request.GET
 
@@ -552,6 +553,7 @@ def ct_histogram_list_filter(request):
 
     if request.method == 'POST':
         requestResults = request.POST
+        request.GET = request.POST
     else:
         requestResults = request.GET
 
