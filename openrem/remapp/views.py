@@ -73,6 +73,12 @@ def dx_summary_list_filter(request):
     import datetime, qsstats
     from remapp.forms import DXChartOptionsForm
 
+    if request.method == 'POST':
+        requestResults = request.POST
+        request.GET = request.POST
+    else:
+        requestResults = request.GET
+
     try:
         # See if the user has plot settings in userprofile
         userProfile = request.user.userprofile
@@ -115,7 +121,7 @@ def dx_summary_list_filter(request):
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
 
-    f = DXSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
+    f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
 
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot and mean DAP over time
@@ -198,6 +204,7 @@ def dx_histogram_list_filter(request):
 
     if request.method == 'POST':
         requestResults = request.POST
+        request.GET = request.POST
     else:
         requestResults = request.GET
 
@@ -383,6 +390,12 @@ def ct_summary_list_filter(request):
     import datetime, qsstats
     from remapp.forms import CTChartOptionsForm
 
+    if request.method == 'POST':
+        requestResults = request.POST
+        request.GET = request.POST
+    else:
+        requestResults = request.GET
+
     try:
         # See if the user has plot settings in userprofile
         userProfile = request.user.userprofile
@@ -431,7 +444,7 @@ def ct_summary_list_filter(request):
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
 
 
-    f = CTSummaryListFilter(request.POST, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
+    f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
@@ -524,6 +537,7 @@ def ct_histogram_list_filter(request):
 
     if request.method == 'POST':
         requestResults = request.POST
+        request.GET = request.POST
     else:
         requestResults = request.GET
 
