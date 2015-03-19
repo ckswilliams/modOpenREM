@@ -720,6 +720,8 @@ def rfopenskin(studyid):
     # Get the data
     study = GeneralStudyModuleAttr.objects.get(pk=studyid)
     numevents = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
+    tsk.num_records = numevents
+    tsk.save()
 
     for i, event in enumerate(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()):
 #    for event in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
