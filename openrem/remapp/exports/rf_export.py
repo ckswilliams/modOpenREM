@@ -735,7 +735,7 @@ def rfopenskin(studyid):
             event.irradeventxraysourcedata_set.get().reference_point_definition,
             event.irradiation_event_uid,
             event.dose_area_product,
-            event.entrance_exposure_at_rp,
+            event.irradeventxraysourcedata_set.get().dose_rp,
             event.irradeventxraymechanicaldata_set.get().positioner_primary_angle,
             event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle,
             event.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle,
