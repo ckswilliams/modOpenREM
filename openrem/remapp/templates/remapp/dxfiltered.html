@@ -200,6 +200,27 @@
       <!-- End of HTML to include div container for mean kVp per acquisition chart -->
     {% endif %}
 
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
+      <!-- HTML to include div container for mean mAs per acquisition chart -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsChart">
+                Plot of mean mAs for each acquisition protocol.
+              </a>
+            </h4>
+          </div>
+          <div id="collapseAcquisitionMeanmAsChart" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="chartAcquisitionMeanmAs" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for mean mAs per acquisition chart -->
+    {% endif %}
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
@@ -407,6 +428,68 @@
 
       <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisition.js"></script>
       <!-- End of JavaScript for acquisition mean kVp plot -->
+    {% endif %}
+
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
+      <!-- JavaScript for acquisition mean mAs plot -->
+      <script>
+        var protocolmAsNames     = [
+          {% for name in acquisitionuAsSummary %}
+            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var seriesmAsDataN       = [
+          {% for testData in acquisitionuAsSummary %}
+            '{{testData.num_acq}}'
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var protocolmAsCounts    = [
+          {% for protocol in acquisitionHistogramuAsData %}
+            [
+              {% for dataCounts in protocol.0 %}
+                {{dataCounts}}
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var protocolmAsBins      = [
+          {% for protocolEdges in acquisitionHistogramuAsData %}
+            [
+              {% for edges in protocolEdges.1 %}
+                {{edges}}/1000
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var seriesmAsData        = [
+          {% for testData in acquisitionuAsSummary %}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_uAs}}/1000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var seriesmAsDrilldown   = [
+          {% for protocolCountsArray in acquisitionHistogramuAsData %}
+            {id: protocolmAsNames[{{forloop.counter}}-1],name: protocolmAsNames[{{forloop.counter}}-1],useHTML: true,data: [
+              {% for dataCounts in protocolCountsArray.0 %}
+                [protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}]}
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+
+        var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+      </script>
+
+      <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisition.js"></script>
+      <!-- End of JavaScript for acquisition mean mAs plot -->
     {% endif %}
 
 
