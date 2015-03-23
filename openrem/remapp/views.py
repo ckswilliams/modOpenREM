@@ -760,6 +760,37 @@ def openrem_home(request):
         }
 
     try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
+
+    if homedata['mg']:
+        userProfile.displayMG = True
+    else:
+        userProfile.displayMG = False
+
+    if homedata['ct']:
+        userProfile.displayCT = True
+    else:
+        userProfile.displayCT = False
+
+    if homedata['rf']:
+        userProfile.displayRF = True
+    else:
+        userProfile.displayRF = False
+
+    if homedata['dx']:
+        userProfile.displayDX = True
+    else:
+        userProfile.displayDX.displayDX = False
+
+    userProfile.save()
+
+
+    try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
