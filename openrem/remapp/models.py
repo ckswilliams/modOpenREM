@@ -74,6 +74,11 @@ class UserProfile(models.Model):
                                                         choices=TIME_PERIOD,
                                                         default=MONTHS)
 
+    displayCT = models.BooleanField(default=True)
+    displayRF = models.BooleanField(default=True)
+    displayMG = models.BooleanField(default=True)
+    displayDX = models.BooleanField(default=True)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
