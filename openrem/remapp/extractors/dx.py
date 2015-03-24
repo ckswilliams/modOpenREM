@@ -303,6 +303,10 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
+    acquisition_protocol = get_value_kw('ProtocolName',dataset)
+    series_description = get_value_kw('SeriesDescription',dataset)
+    if acquisition_protocol and series_description:
+        event.comment = series_description
     try:
         event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     except:
@@ -334,7 +338,11 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     if pc_fibroglandular:
         if '%' in pc_fibroglandular:
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
-    event.comment = get_value_kw('ExposureControlModeDescription',dataset)
+    exposure_control = get_value_kw('ExposureControlModeDescription',dataset)
+    if event.comment and exposure_control:
+        event.comment = event.comment + ', ' + exposure_control
+    else:
+        event.comment = exposure_control
 
     dap = get_value_kw('ImageAndFluoroscopyAreaDoseProduct',dataset)
     if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
