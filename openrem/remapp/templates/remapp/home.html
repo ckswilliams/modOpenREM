@@ -133,4 +133,9 @@
 </table>
 {% endif %}
 
+{% if not request.user.userprofile.displayCT and not request.user.userprofile.displayRF and not request.user.userprofile.displayMG and not request.user.userprofile.displayDX %}
+<h4>No data to display in the system</h4>
+<p>There are currently no studies from any modality stored in the database. Add some to see a summary of each on this page.</p>
+{% endif %}
+
 {% endblock %}	
