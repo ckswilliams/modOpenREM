@@ -785,7 +785,7 @@ def openrem_home(request):
     if homedata['dx']:
         userProfile.displayDX = True
     else:
-        userProfile.displayDX.displayDX = False
+        userProfile.displayDX = False
 
     userProfile.save()
 
