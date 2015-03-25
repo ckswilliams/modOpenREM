@@ -20,6 +20,7 @@ requires = [
     'django-qsstats-magic',
     'python-dateutil',
     'numpy',
+    'https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz'
     ]
 
 setup(
