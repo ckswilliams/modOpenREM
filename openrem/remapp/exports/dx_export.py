@@ -291,6 +291,7 @@ def dxxlsx(filterdict):
         'Exposure index',
         'Relative x-ray exposure',
         'DAP (cGy.cm^2)',
+        'Entrance exposure at RP'
         ]
         
     # Generate list of protocols in queryset and create worksheets for each
@@ -353,9 +354,10 @@ def dxxlsx(filterdict):
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
+            'E' + str(h+1) + ' DAP (mGy)',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
+    numcolumns = (23 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -393,7 +395,8 @@ def dxxlsx(filterdict):
                 str(s.irradeventxraydetectordata_set.get().exposure_index),
                 str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
-                ]
+                str(s.entrance_exposure_at_rp),
+            ]
 
         wsalldata.write_row(row+1,0, examdata)
         
@@ -437,7 +440,8 @@ def dxxlsx(filterdict):
                 str(s.irradeventxraydetectordata_set.get().exposure_index),
                 str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
-                ]
+                str(s.entrance_exposure_at_rp),
+            ]
 
             sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
 
