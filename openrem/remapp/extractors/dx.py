@@ -305,7 +305,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
     acquisition_protocol = get_value_kw('ProtocolName',dataset)
     series_description = get_value_kw('SeriesDescription',dataset)
-    if acquisition_protocol and series_description:
+    if series_description:
         event.comment = series_description
     try:
         event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
