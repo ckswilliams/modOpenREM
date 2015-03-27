@@ -282,6 +282,7 @@ def dxxlsx(filterdict):
         ]
     protocolheaders = commonheaders + [
         'Protocol',
+        'Anatomy',
         'Image view',
         'Exposure control mode',
         'kVp',
@@ -346,6 +347,7 @@ def dxxlsx(filterdict):
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         alldataheaders += [
             'E' + str(h+1) + ' Protocol',
+            'E' + str(h+1) + ' Anatomy',
             'E' + str(h+1) + ' Image view',
             'E' + str(h+1) + ' Exposure control mode',
             'E' + str(h+1) + ' kVp',
@@ -359,7 +361,7 @@ def dxxlsx(filterdict):
             'E' + str(h+1) + ' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (24 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
+    numcolumns = (25 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -388,6 +390,7 @@ def dxxlsx(filterdict):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
+                str(s.anatomical_structure),
                 str(s.image_view),
                 str(s.irradeventxraysourcedata_set.get().exposure_control_mode),
                 str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
@@ -434,6 +437,7 @@ def dxxlsx(filterdict):
                 ]
             examdata += [
                 s.acquisition_protocol,
+                str(s.anatomical_structure),
                 str(s.image_view),
                 str(s.irradeventxraysourcedata_set.get().exposure_control_mode),
                 str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp),

@@ -51,6 +51,7 @@
     <th>Exposure Index<br>vendor</th>
     <th>DAP<br>(cGy.cm<sup>2</sup>)</th>
     <th>Control mode</th>
+    <th>Comment</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
@@ -86,6 +87,7 @@
         </td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_control_mode }}</td>
+        <td>{{ event.comment }}</td>
     </tr>
     {% endfor %}
 </table>
