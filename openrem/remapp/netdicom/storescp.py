@@ -37,13 +37,18 @@ def OnReceiveEcho(self):
 
 
 def OnReceiveStore(SOPClass, DS):
+    import os, sys
+    # temp path manipulation as dev location isn't on path
+    sys.path.extend(['/home/mcdonaghe/research/bbOpenREM'])
+    from openrem.remapp.extractors.dx import dx
+
+
     print "Received C-STORE"
     # do something with dataset. For instance, store it on disk.
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
-#    file_meta.MediaStorageSOPInstanceUID = "1.2.3"  # !! Need valid UID here
-    file_meta.ImplementationClassUID = "1.2.3.4"  # !!! Need valid UIDs here
+    file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.9.5224.1.0.6.0.1"  # Using Medical Connections allocated UID
     filename = '%s/%s.dcm' % (tempfile.gettempdir(), DS.SOPInstanceUID)
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
     ds.update(DS)
@@ -51,6 +56,14 @@ def OnReceiveStore(SOPClass, DS):
     ds.is_implicit_VR = True
     ds.save_as(filename)
     print "File %s written" % filename
+    print "Institution name is {0}".format(DS.InstitutionName)
+    if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'
+        or DS.SOPClassUID != '1.2.840.10008.5.1.4.1.1.1.1'
+        or DS.SOPClassUID != '1.2.840.10008.5.1.4.1.1.1.1.1'
+    ):
+        dx(filename)
+
+
     # must return appropriate status
     return SOPClass.Success
 
