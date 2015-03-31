@@ -41,6 +41,7 @@ def OnReceiveStore(SOPClass, DS):
     # temp path manipulation as dev location isn't on path
     sys.path.extend(['/home/mcdonaghe/research/bbOpenREM'])
     from openrem.remapp.extractors.dx import dx
+    from openrem.remapp.extractors.mam import mam
 
 
     print "Received C-STORE"
@@ -57,12 +58,22 @@ def OnReceiveStore(SOPClass, DS):
     ds.save_as(filename)
     print "File %s written" % filename
     print "Institution name is {0}".format(DS.InstitutionName)
-    if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'
-        or DS.SOPClassUID != '1.2.840.10008.5.1.4.1.1.1.1'
-        or DS.SOPClassUID != '1.2.840.10008.5.1.4.1.1.1.1.1'
+    print DS.SOPClassUID
+    if (   DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'     # CR Image Storage
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'   # Digital X-Ray Image Storage for Presentation
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1' # Digital X-Ray Image Storage for Processing
     ):
+        print "DX"
         dx(filename)
-
+    elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'   # Digital Mammography X-Ray Image Storage for Presentation
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1' # Digital Mammography X-Ray Image Storage for Processing
+        or (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'    # Secondary Capture Image Storage, for processing
+            and DS.Modality == 'MG'                          # Selenia proprietary DBT projection objects
+            and 'ORIGINAL' in DS.ImageType
+        )
+    ):
+        print "Mammo"
+        mam(filename)
 
     # must return appropriate status
     return SOPClass.Success
