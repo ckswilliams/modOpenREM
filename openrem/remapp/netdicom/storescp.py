@@ -62,7 +62,6 @@ def OnReceiveStore(SOPClass, DS):
     ds.is_implicit_VR = True
     ds.save_as(filename)
     print "File %s written" % filename
-    print "Institution name is {0}".format(DS.InstitutionName)
     print DS.SOPClassUID
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
