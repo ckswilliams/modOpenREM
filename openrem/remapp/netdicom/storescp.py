@@ -42,7 +42,8 @@ def OnReceiveStore(SOPClass, DS):
     sys.path.extend(['/home/mcdonaghe/research/bbOpenREM'])
     from openrem.remapp.extractors.dx import dx
     from openrem.remapp.extractors.mam import mam
-
+    from openrem.remapp.extractors.rdsr import rdsr
+    from openrem.remapp.extractors.ct_philips import ct_philips
 
     print "Received C-STORE"
     # do something with dataset. For instance, store it on disk.
@@ -59,7 +60,12 @@ def OnReceiveStore(SOPClass, DS):
     print "File %s written" % filename
     print "Institution name is {0}".format(DS.InstitutionName)
     print DS.SOPClassUID
-    if (   DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'      # CR Image Storage
+    if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
+    ):
+        print "RDSR"
+        rdsr(filename)
+    elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'      # CR Image Storage
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'    # Digital X-Ray Image Storage for Presentation
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
     ):
@@ -74,6 +80,12 @@ def OnReceiveStore(SOPClass, DS):
     ):
         print "Mammo"
         mam(filename)
+    elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'
+          and DS.Manufacturer == 'Philips'
+          and DS.SeriesDescription == 'Dose Info'
+    ):
+        print "Philips CT Dose Info image"
+        ct_philips(filename)
 
     # must return appropriate status
     return SOPClass.Success
