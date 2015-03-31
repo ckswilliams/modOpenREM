@@ -59,16 +59,16 @@ def OnReceiveStore(SOPClass, DS):
     print "File %s written" % filename
     print "Institution name is {0}".format(DS.InstitutionName)
     print DS.SOPClassUID
-    if (   DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'     # CR Image Storage
-        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'   # Digital X-Ray Image Storage for Presentation
-        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1' # Digital X-Ray Image Storage for Processing
+    if (   DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'      # CR Image Storage
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'    # Digital X-Ray Image Storage for Presentation
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
     ):
         print "DX"
         dx(filename)
-    elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'   # Digital Mammography X-Ray Image Storage for Presentation
-        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1' # Digital Mammography X-Ray Image Storage for Processing
-        or (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'    # Secondary Capture Image Storage, for processing
-            and DS.Modality == 'MG'                          # Selenia proprietary DBT projection objects
+    elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'    # Digital Mammography X-Ray Image Storage for Presentation
+        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1'  # Digital Mammography X-Ray Image Storage for Processing
+        or (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'     # Secondary Capture Image Storage, for processing
+            and DS.Modality == 'MG'                           # Selenia proprietary DBT projection objects
             and 'ORIGINAL' in DS.ImageType
         )
     ):
