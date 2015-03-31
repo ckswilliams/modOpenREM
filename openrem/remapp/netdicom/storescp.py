@@ -38,8 +38,12 @@ def OnReceiveEcho(self):
 
 def OnReceiveStore(SOPClass, DS):
     import os, sys
-    # temp path manipulation as dev location isn't on path
-    sys.path.extend(['/home/mcdonaghe/research/bbOpenREM'])
+
+    basepath = os.path.dirname(__file__)
+    projectpath = os.path.abspath(os.path.join(basepath, "..","..",".."))
+    if projectpath not in sys.path:
+        sys.path.insert(1,projectpath)
+
     from openrem.remapp.extractors.dx import dx
     from openrem.remapp.extractors.mam import mam
     from openrem.remapp.extractors.rdsr import rdsr
