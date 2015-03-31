@@ -14,13 +14,14 @@
 
 <table class="table table-bordered">
     <tr>
-        <th><a href="/openrem/ct/">CT</a></th><th><a href="/openrem/rf/">Fluoroscopy</a></th><th><a href="/openrem/mg/">Mammography</a></th><th><a href="/openrem/dx/">Radiography</a></th>
+        {% if homedata.CT %}<th><a href="/openrem/ct/">CT</a></th>{% endif %}{% if homedata.RF %}<th><a href="/openrem/rf/">Fluoroscopy</a></th>{% endif %}{% if homedata.MG %}<th><a href="/openrem/mg/">Mammography</a></th>{% endif %}{% if homedata.DX %}<th><a href="/openrem/dx/">Radiography</a></th>{% endif %}
     </tr>
     <tr>
-        <td>{{ homedata.ct }}</td><td>{{ homedata.rf }}</td><td>{{ homedata.mg }}</td><td>{{ homedata.dx }}</td>
+        {% if homedata.CT %}<td>{{ homedata.ct }}</td>{% endif %}{% if homedata.RF %}<td>{{ homedata.rf }}</td>{% endif %}{% if homedata.MG %}<td>{{ homedata.mg }}</td>{% endif %}{% if homedata.DX %}<td>{{ homedata.dx }}</td>{% endif %}
     </tr>
 </table>
 
+{% if homedata.CT %}
 <h4>CT summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
@@ -46,7 +47,9 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 
+{% if homedata.RF %}
 <h4>Fluoroscopy summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
@@ -72,7 +75,9 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 
+{% if homedata.MG %}
 <h4>Mammography summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
@@ -98,7 +103,9 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 
+{% if homedata.DX %}
 <h4>Radiography summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
@@ -124,6 +131,11 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 
+{% if not homedata.CT and not homedata.RF and not homedata.MG and not homedata.DX %}
+<h4>No data to display in the system</h4>
+<p>There are currently no studies from any modality stored in the database. Add some to see a summary of each on this page.</p>
+{% endif %}
 
 {% endblock %}	

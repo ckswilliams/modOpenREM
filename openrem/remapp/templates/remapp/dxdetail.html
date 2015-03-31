@@ -1,9 +1,9 @@
 {% extends "remapp/base.html" %}
 {% block navbar %}
-            <li><a href="/openrem/ct">CT</a></li>
-            <li><a href="/openrem/rf">Fluoroscopy</a></li>
-            <li><a href="/openrem/rf">Mammography</a></li>
-            <li class="active"><a href="/openrem/dx">Radiography</a></li>
+            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
+            {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
+            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
+            {% if request.user.userprofile.displayDX %}<li class="active"><a href="/openrem/dx">Radiography</a></li>{% endif %}
 {% endblock %}
 
 
@@ -51,6 +51,7 @@
     <th>Exposure Index<br>vendor</th>
     <th>DAP<br>(cGy.cm<sup>2</sup>)</th>
     <th>Control mode</th>
+    <th>Comment</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
@@ -86,6 +87,7 @@
         </td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_control_mode }}</td>
+        <td>{{ event.comment }}</td>
     </tr>
     {% endfor %}
 </table>
