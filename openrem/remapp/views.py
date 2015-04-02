@@ -439,6 +439,7 @@ def ct_summary_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
     from remapp.forms import CTChartOptionsForm
+    from remapp.models import CtIrradiationEventData
 
     if request.method == 'POST':
         requestResults = request.POST
@@ -497,11 +498,23 @@ def ct_summary_list_filter(request):
     f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
     if plotting and plotCharts:
+        # Need to exclude all Constant Angle Acquisitions when calculating data for acquisition plots, as Philips
+        # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
+        # with null DLP values.
+        expInclude = [o.study_instance_uid for o in f]
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
+        ).exclude(
+            dlp__isnull=True
+        ).filter(
+            ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+        )
+
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+        acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
+            dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         # Required for mean DLP per study type plot
@@ -519,7 +532,7 @@ def ct_summary_list_filter(request):
 
         for idx, study in enumerate(studySummary):
             # Required for mean DLP per study type plot AND mean DLP per study type per week plot
-            subqs = qs.filter(study_description=study.get('study_description'))
+            subqs = f.qs.filter(study_description=study.get('study_description'))
 
             # Required for mean DLP per study type plot
             dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
@@ -584,6 +597,7 @@ def ct_histogram_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
     from remapp.forms import CTChartOptionsForm
+    from remapp.models import CtIrradiationEventData
 
     if request.method == 'POST':
         requestResults = request.POST
@@ -679,11 +693,23 @@ def ct_histogram_list_filter(request):
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
 
     if plotting and plotCharts:
+        # Need to exclude all Constant Angle Acquisitions when calculating data for acquisition plots, as Philips
+        # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
+        # with null DLP values.
+        expInclude = [o.study_instance_uid for o in f]
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
+        ).exclude(
+            dlp__isnull=True
+        ).filter(
+            ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+        )
+
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+        acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
+            dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         # Required for mean DLP per study type plot
