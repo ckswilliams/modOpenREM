@@ -63,6 +63,7 @@ class UserProfile(models.Model):
                                                               default=MONTHS)
 
     plotCTAcquisitionMeanDLP = models.BooleanField(default=True)
+    plotCTAcquisitionMeanCTDI = models.BooleanField(default=True)
     plotCTAcquisitionFreq = models.BooleanField(default=False)
     plotCTStudyMeanDLP = models.BooleanField(default=True)
     plotCTStudyFreq = models.BooleanField(default=False)

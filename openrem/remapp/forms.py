@@ -48,6 +48,7 @@ class DXChartOptionsForm(forms.Form):
 class CTChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
     plotCTAcquisitionMeanDLP = forms.BooleanField(label='Mean DLP per acquisition',required=False)
+    plotCTAcquisitionMeanCTDI = forms.BooleanField(label='Mean CTDIvol per acquisition',required=False)
     plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
     plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study',required=False)
     plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)

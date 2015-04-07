@@ -414,6 +414,7 @@ def ct_summary_list_filter(request):
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
+            userProfile.plotCTAcquisitionMeanCTDI = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanCTDI']
             userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
             userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
@@ -426,6 +427,7 @@ def ct_summary_list_filter(request):
     else:
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
                     'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
                     'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
                     'plotCTStudyFreq': userProfile.plotCTStudyFreq,
@@ -436,6 +438,7 @@ def ct_summary_list_filter(request):
 
     plotCharts = userProfile.plotCharts
     plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
     plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
     plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
     plotCTStudyFreq = userProfile.plotCTStudyFreq
@@ -601,6 +604,7 @@ def ct_histogram_list_filter(request):
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
+            userProfile.plotCTAcquisitionMeanCTDI = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanCTDI']
             userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
             userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
@@ -611,6 +615,7 @@ def ct_histogram_list_filter(request):
     else:
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
                     'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
                     'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
                     'plotCTStudyFreq': userProfile.plotCTStudyFreq,
@@ -621,6 +626,7 @@ def ct_histogram_list_filter(request):
 
     plotCharts = userProfile.plotCharts
     plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
     plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
     plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
     plotCTStudyFreq = userProfile.plotCTStudyFreq
