@@ -23,6 +23,7 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
             //    text: 'Protocol name'
             //},
             labels: {
+                useHTML: true,
                 rotation:90
             }
         },
@@ -39,8 +40,18 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
             opposite: true
         }],
         tooltip: {
-            shared: true,
-            useHTML: true
+            useHTML: true,
+            formatter: function(args) {
+                var this_point_index = this.series.data.indexOf( this.point );
+                var this_series_index = this.series.index;
+                var that_series_index = this.series.index == 0 ? 1 : 0; // assuming 2 series
+                var that_series = args.chart.series[that_series_index];
+                var that_point = that_series.data[this_point_index];
+                return this.point.name +
+                    '<br/>' + this.y.toFixed(1) + ' mGy.cm DLP' +
+                    '<br/>' + that_point.y.toFixed(1) + ' mGy CTDI<sub>vol</sub>';
+            }
+
         },
         plotOptions: {
             column: {
