@@ -177,6 +177,32 @@
     {% endif %}
 
 
+    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+      <!-- HTML to include div container for acquisition CTDI plot -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseCTDI">
+                Plot mean CTDI<sub>vol</sub> for each acquisition protocol in currently filtered data.
+              </a>
+            </h4>
+          </div>
+          <div id="collapseCTDI" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="histogramPlotCTDIdiv" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+              <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+                Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+                more data than shown in the histogram bin.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for acquisition CTDI plot -->
+    {% endif %}
+
+
     {% if request.user.userprofile.plotCTAcquisitionFreq %}
       <!-- HTML to include div container for acquisition pie chart -->
       <div class="panel-group" id="accordion">
@@ -203,7 +229,7 @@
     <!-- End of include JavaScript to enable highcharts drilldown plots -->
 
 
-    {% if request.user.userprofile.plotCTAcquisitionMeanDLP or request.user.userprofile.plotCTAcquisitionFreq %}
+    {% if request.user.userprofile.plotCTAcquisitionMeanDLP or request.user.userprofile.plotCTAcquisitionFreq or request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <!-- JavaScript for acquisition mean DLP and acquisition frequency plot -->
       <script>
         var protocolNames     = [
@@ -268,6 +294,56 @@
 
       <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisition.js"></script>
       <!-- End of JavaScript for acquisition plot -->
+    {% endif %}
+
+
+    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+      <!-- JavaScript for acquisition mean CTDI plot -->
+      <script>
+        var protocolCountsCTDI = [
+          {% for protocol in acquisitionHistogramDataCTDI %}
+            [
+              {% for dataCounts in protocol.0 %}
+                {{dataCounts}}
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var protocolBinsCTDI = [
+          {% for protocolEdges in acquisitionHistogramDataCTDI %}
+            [
+              {% for edges in protocolEdges.1 %}
+                {{edges}}
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var seriesDataCTDI = [
+          {% for testData in acquisitionSummary %}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_ctdi}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        var seriesDrilldownCTDI = [
+          {% for protocolCountsArray in acquisitionHistogramDataCTDI %}
+            {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
+              {% for dataCounts in protocolCountsArray.0 %}
+                [protocolBinsCTDI[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolBinsCTDI[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
+                {% if not forloop.last %},{% endif %}
+              {% endfor %}]}
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+
+        var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+      </script>
+
+      <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisition.js"></script>
+      <!-- End of JavaScript for acquisition CTDI plot -->
     {% endif %}
 
 
