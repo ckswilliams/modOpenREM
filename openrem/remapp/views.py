@@ -451,11 +451,20 @@ def ct_summary_list_filter(request):
 
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+        if plotCTAcquisitionMeanCTDI:
+            acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_ctdi = Avg('ctradiationdose__ctirradiationeventdata__mean_ctdivol'), mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+        else:
+            acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+            if plotCTAcquisitionMeanCTDI:
+                ctdiValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__mean_ctdivol__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__mean_ctdivol', flat=True)
+                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         # Required for mean DLP per study type plot
         studySummary = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
@@ -515,6 +524,9 @@ def ct_summary_list_filter(request):
         returnStructure['studyHistogramData'] = studyHistogramData
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCTAcquisitionMeanCTDI:
+        returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotting and plotCharts and plotCTStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
@@ -636,11 +648,20 @@ def ct_histogram_list_filter(request):
 
     if plotting and plotCharts:
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+        if plotCTAcquisitionMeanCTDI:
+            acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_ctdi = Avg('ctradiationdose__ctirradiationeventdata__mean_ctdivol'), mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+        else:
+            acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+            if plotCTAcquisitionMeanCTDI:
+                ctdiValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__mean_ctdivol__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__mean_ctdivol', flat=True)
+                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         # Required for mean DLP per study type plot
         studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
@@ -695,6 +716,9 @@ def ct_histogram_list_filter(request):
         returnStructure['studyHistogramData'] = studyHistogramData
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCTAcquisitionMeanCTDI:
+        returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotting and plotCharts and plotCTStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
