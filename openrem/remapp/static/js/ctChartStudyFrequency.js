@@ -18,6 +18,7 @@ var chartStudyFreq = new Highcharts.Chart({
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
+                    useHTML: true,
                     enabled: true,
                     format: '<b>{point.name}</b>: {point.percentage:.1f} % (n={point.y})',
                     style: {

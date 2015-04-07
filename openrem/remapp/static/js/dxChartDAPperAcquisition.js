@@ -56,6 +56,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
                 text: 'Protocol name'
             },
             labels: {
+                useHTML: true,
                 rotation:90
             }
         },
