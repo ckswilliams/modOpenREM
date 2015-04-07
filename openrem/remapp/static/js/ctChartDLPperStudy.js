@@ -56,6 +56,7 @@ var chartStudyDLP = new Highcharts.Chart({
                 text: 'Study description'
             },
             labels: {
+                useHTML: true,
                 rotation:90
             }
         },
