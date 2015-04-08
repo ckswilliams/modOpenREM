@@ -56,6 +56,8 @@ class UserProfile(models.Model):
     plotCharts = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
     plotDXAcquisitionFreq = models.BooleanField(default=False)
+    plotDXAcquisitionMeankVp = models.BooleanField(default=False)
+    plotDXAcquisitionMeanmAs = models.BooleanField(default=False)
     plotDXStudyPerDayAndHour = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAPOverTime = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = models.CharField(max_length=6,

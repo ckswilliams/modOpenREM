@@ -98,16 +98,20 @@ def dx_summary_list_filter(request):
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
             userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
+            userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
+            userProfile.plotDXAcquisitionMeanmAs = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAs']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
             userProfile.save()
 
-    # if a GET (or any other method) we'll create a blank form
+    # if a GET (or any other method) we'll create a form populated with options from userProfile
     else:
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
                     'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
+                    'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
                     'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
                     'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
                     'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
@@ -116,17 +120,25 @@ def dx_summary_list_filter(request):
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
+    plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
+    plotDXAcquisitionMeanmAs = userProfile.plotDXAcquisitionMeanmAs
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
-
     f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).distinct())
+    expInclude = [o.study_instance_uid for o in f]
 
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot and mean DAP over time
-        acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
+        acquisitionkVpSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__isnull=True).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').annotate(mean_kVp = Avg('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
+
+        acquisitionuAsSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__isnull=True).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').annotate(mean_uAs = Avg('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionHistogramuAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionuAsSummary))]
 
         if plotDXAcquisitionMeanDAPOverTime:
             # Required for mean DAP per month plot
@@ -134,16 +146,24 @@ def dx_summary_list_filter(request):
             startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
 
-        # Required for all plots
-        qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
-
         for idx, protocol in enumerate(acquisitionSummary):
-            # Required for mean DAP per acquisition plot AND mean DAP per month plot
-            subqs = qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
+            # Required for mean DAP per acquisition plot and mean DAP per month plot
+            subqs = f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__exact = protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude)
 
-            # Required for mean DAP per acquisition plot
-            dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
-            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+            if plotDXAcquisitionMeanDAP:
+                # Required for mean DAP per acquisition plot
+                dapValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+
+            if plotDXAcquisitionMeankVp:
+                # Required for mean kVp per acquisition plot
+                kVpValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', flat=True)
+                acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram([float(x) for x in kVpValues], bins=20)
+
+            if plotDXAcquisitionMeanmAs:
+                # Required for mean mAs per acquisition plot
+                uAsValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', flat=True)
+                acquisitionHistogramuAsData[idx][0], acquisitionHistogramuAsData[idx][1] = np.histogram([float(x) for x in uAsValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP over time
@@ -179,7 +199,17 @@ def dx_summary_list_filter(request):
 
     if plotting and plotCharts:
         returnStructure['acquisitionSummary'] = acquisitionSummary
+
+    if plotting and plotCharts and plotDXAcquisitionMeanDAP:
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCharts and plotDXAcquisitionMeankVp:
+        returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
+        returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
+
+    if plotting and plotCharts and plotDXAcquisitionMeanmAs:
+        returnStructure['acquisitionuAsSummary'] = acquisitionuAsSummary
+        returnStructure['acquisitionHistogramuAsData'] = acquisitionHistogramuAsData
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
@@ -269,6 +299,8 @@ def dx_histogram_list_filter(request):
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
             userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
+            userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
+            userProfile.plotDXAcquisitionMeanmAs = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAs']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
@@ -277,6 +309,8 @@ def dx_histogram_list_filter(request):
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
                     'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                    'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
+                    'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
                     'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
                     'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
                     'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
@@ -285,14 +319,24 @@ def dx_histogram_list_filter(request):
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
+    plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
+    plotDXAcquisitionMeanmAs = userProfile.plotDXAcquisitionMeanmAs
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
+    expInclude = [o.study_instance_uid for o in f]
+
     if plotting and plotCharts:
         # Required for mean DAP per acquisition plot and mean DAP over time
-        acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').distinct().annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').annotate(mean_dap = Avg('projectionxrayradiationdose__irradeventxraydata__dose_area_product'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__dose_area_product')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
+        acquisitionkVpSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__isnull=True).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').annotate(mean_kVp = Avg('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
+
+        acquisitionuAsSummary = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__isnull=True).filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__in = expInclude).values('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol').annotate(mean_uAs = Avg('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure'), num_acq = Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure')).order_by('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
+        acquisitionHistogramuAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionuAsSummary))]
 
         if plotDXAcquisitionMeanDAPOverTime:
             # Required for mean DAP per month plot
@@ -300,16 +344,24 @@ def dx_histogram_list_filter(request):
             startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
 
-        # Required for all plots
-        qs = f.qs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True)
-
         for idx, protocol in enumerate(acquisitionSummary):
             # Required for mean DAP per acquisition plot AND mean DAP per month plot
-            subqs = qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
+            subqs = f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=protocol.get('projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'))
 
-            # Required for mean DAP per acquisition plot
-            dapValues = subqs.values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
-            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+            if plotDXAcquisitionMeanDAP:
+                # Required for mean DAP per acquisition plot
+                dapValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__dose_area_product__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__dose_area_product', flat=True)
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x)*1000000 for x in dapValues], bins=20)
+
+            if plotDXAcquisitionMeankVp:
+                # Required for mean kVp per acquisition plot
+                kVpValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', flat=True)
+                acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram([float(x) for x in kVpValues], bins=20)
+
+            if plotDXAcquisitionMeanmAs:
+                # Required for mean mAs per acquisition plot
+                uAsValues = subqs.exclude(projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__isnull=True).values_list('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', flat=True)
+                acquisitionHistogramuAsData[idx][0], acquisitionHistogramuAsData[idx][1] = np.histogram([float(x) for x in uAsValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP per time period plot
@@ -343,7 +395,17 @@ def dx_histogram_list_filter(request):
 
     if plotting and plotCharts:
         returnStructure['acquisitionSummary'] = acquisitionSummary
+
+    if plotting and plotCharts and plotDXAcquisitionMeanDAP:
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCharts and plotDXAcquisitionMeankVp:
+        returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
+        returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
+
+    if plotting and plotCharts and plotDXAcquisitionMeanmAs:
+        returnStructure['acquisitionuAsSummary'] = acquisitionuAsSummary
+        returnStructure['acquisitionHistogramuAsData'] = acquisitionHistogramuAsData
 
     if plotting and plotCharts and plotDXAcquisitionMeanDAPOverTime:
         returnStructure['acquisitionDAPoverTime'] = acquisitionDAPoverTime
@@ -389,6 +451,7 @@ def ct_summary_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
     from remapp.forms import CTChartOptionsForm
+    from remapp.models import CtIrradiationEventData
 
     if request.method == 'POST':
         requestResults = request.POST
@@ -447,11 +510,23 @@ def ct_summary_list_filter(request):
     f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
     if plotting and plotCharts:
+        # Need to exclude all Constant Angle Acquisitions when calculating data for acquisition plots, as Philips
+        # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
+        # with null DLP values.
+        expInclude = [o.study_instance_uid for o in f]
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
+        ).exclude(
+            dlp__isnull=True
+        ).filter(
+            ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+        )
+
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+        acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
+            dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         # Required for mean DLP per study type plot
@@ -469,7 +544,7 @@ def ct_summary_list_filter(request):
 
         for idx, study in enumerate(studySummary):
             # Required for mean DLP per study type plot AND mean DLP per study type per week plot
-            subqs = qs.filter(study_description=study.get('study_description'))
+            subqs = f.qs.filter(study_description=study.get('study_description'))
 
             # Required for mean DLP per study type plot
             dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
@@ -534,6 +609,7 @@ def ct_histogram_list_filter(request):
     import pkg_resources # part of setuptools
     import datetime, qsstats
     from remapp.forms import CTChartOptionsForm
+    from remapp.models import CtIrradiationEventData
 
     if request.method == 'POST':
         requestResults = request.POST
@@ -629,11 +705,23 @@ def ct_histogram_list_filter(request):
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
 
     if plotting and plotCharts:
+        # Need to exclude all Constant Angle Acquisitions when calculating data for acquisition plots, as Philips
+        # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
+        # with null DLP values.
+        expInclude = [o.study_instance_uid for o in f]
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
+        ).exclude(
+            dlp__isnull=True
+        ).filter(
+            ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+        )
+
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = f.qs.exclude(Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol__isnull=True)|Q(ctradiationdose__ctirradiationeventdata__acquisition_protocol='')).values('ctradiationdose__ctirradiationeventdata__acquisition_protocol').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctirradiationeventdata__dlp'), num_acq = Count('ctradiationdose__ctirradiationeventdata__dlp')).order_by('ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+        acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__dlp', flat=True)
+            dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
         # Required for mean DLP per study type plot
