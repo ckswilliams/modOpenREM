@@ -13,9 +13,6 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
             useHTML: true,
             text: 'Mean DLP and CTDI<sub>vol</sub> per acquisition protocol'
         },
-        legend: {
-            enabled: false
-        },
         xAxis: {
             categories: protocolNames,
             labels: {
@@ -31,7 +28,7 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
         }, {
             title: {
                 useHTML: true,
-                text: 'CTDIvol (mGy)'
+                text: 'CTDI<sub>vol</sub> (mGy)'
             },
             opposite: true
         }],
@@ -41,13 +38,16 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
                 var this_point_index = this.series.data.indexOf( this.point );
                 var this_series_index = this.series.index;
                 var that_series_index = this.series.index == 0 ? 1 : 0; // assuming 2 series
+                var this_series = args.chart.series[this_series_index];
                 var that_series = args.chart.series[that_series_index];
+                var this_point = this_series.data[this_point_index];
                 var that_point = that_series.data[this_point_index];
+                var this_series_label = this.series.index == 0 ? ' mGy.cm DLP' : ' mGy CTDI<sub>vol</sub>';
+                var that_series_label = this.series.index == 0 ? ' mGy CTDI<sub>vol</sub>' : ' mGy.cm DLP';
                 return this.point.name +
-                    '<br/>' + this.y.toFixed(1) + ' mGy.cm DLP' +
-                    '<br/>' + that_point.y.toFixed(1) + ' mGy CTDI<sub>vol</sub>';
+                    '<br/>' + this_point.y.toFixed(1) + this_series_label +
+                    '<br/>' + that_point.y.toFixed(1) + that_series_label;
             }
-
         },
         plotOptions: {
             column: {
@@ -66,6 +66,7 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
             series: (seriesDrilldown).concat(seriesDrilldownCTDI)
         },
         legend: {
+            useHTML: true,
             align: 'center',
             verticalAlign: 'top',
             floating: true,
