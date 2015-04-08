@@ -29,6 +29,8 @@
 
 """
 
+from celery import shared_task
+
 def _observercontext(dataset,obs): # TID 1002
     from remapp.tools.get_values import get_or_create_cid
     for cont in dataset.ContentSequence:
@@ -707,6 +709,7 @@ def _rsdr2db(dataset):
     _patientmoduleattributes(dataset,g)
 
 
+@shared_task
 def rdsr(rdsr_file):
     """Extract radiation dose related data from DICOM Radiation SR objects.
 

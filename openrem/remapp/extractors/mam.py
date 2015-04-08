@@ -27,6 +27,9 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+
+from celery import shared_task
+
 def _xrayfilters(dataset,source):
     from remapp.models import XrayFilters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
@@ -356,7 +359,7 @@ def _mammo2db(dataset):
     
     
 
-
+@shared_task
 def mam(mg_file):
     """Extract radiation dose structured report related data from mammography images
     

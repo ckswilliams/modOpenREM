@@ -28,6 +28,8 @@
 
 """
 
+from celery import shared_task
+
 def _scanninglength(dataset,event): # TID 10014
     from remapp.models import ScanningLength
     from remapp.tools.get_values import get_value_kw
@@ -237,7 +239,7 @@ def _philips_ct2db(dataset):
     _patientstudymoduleattributes(dataset,g)
     _patientmoduleattributes(dataset,g)
 
-
+@shared_task
 def ct_philips(philips_file):
     """Extract radiation dose structured report related data from Philips CT dose report images
     

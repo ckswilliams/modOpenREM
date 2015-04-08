@@ -72,7 +72,7 @@ def OnReceiveStore(SOPClass, DS):
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
     ):
         print "RDSR"
-        rdsr(filename)
+        rdsr.delay(filename)
     elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'      # CR Image Storage
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'    # Digital X-Ray Image Storage for Presentation
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
@@ -87,13 +87,13 @@ def OnReceiveStore(SOPClass, DS):
         )
     ):
         print "Mammo"
-        mam(filename)
+        mam.delay(filename)
     elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'
           and DS.Manufacturer == 'Philips'
           and DS.SeriesDescription == 'Dose Info'
     ):
         print "Philips CT Dose Info image"
-        ct_philips(filename)
+        ct_philips.delay(filename)
 
     # must return appropriate status
     return SOPClass.Success
