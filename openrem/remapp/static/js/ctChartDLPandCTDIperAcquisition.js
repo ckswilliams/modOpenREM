@@ -18,10 +18,6 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
         },
         xAxis: {
             categories: protocolNames,
-            //title: {
-            //    useHTML: true,
-            //    text: 'Protocol name'
-            //},
             labels: {
                 useHTML: true,
                 rotation:90
@@ -55,22 +51,20 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
         },
         plotOptions: {
             column: {
-                //pointPadding: 0.2,
                 borderWidth: 0
             }
         },
         series: [{
             name: 'Mean DLP per acquisition protocol',
-            data: seriesData,
-            //pointPadding: 0.2,
-            //pointPlacement: 0.1
+            data: seriesData
         }, {
             name: 'Mean CTDI<sub>vol</sub> per acquisition protocol',
             data: seriesDataCTDI,
-            //pointPadding: 0.2,
-            //pointPlacement: -0.1,
             yAxis: 1
         }],
+        drilldown: {
+            series: (seriesDrilldown).concat(seriesDrilldownCTDI)
+        },
         legend: {
             align: 'center',
             verticalAlign: 'top',

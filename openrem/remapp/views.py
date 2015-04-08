@@ -538,7 +538,7 @@ def ct_summary_list_filter(request):
             dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
             if plotCTAcquisitionMeanCTDI:
-                ctdiValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__mean_ctdivol', flat=True)
+                ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
                 acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         # Required for mean DLP per study type plot
@@ -748,7 +748,7 @@ def ct_histogram_list_filter(request):
             dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
             if plotCTAcquisitionMeanCTDI:
-                ctdiValues = f.qs.exclude(ctradiationdose__ctirradiationeventdata__dlp__isnull=True).filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=protocol.get('ctradiationdose__ctirradiationeventdata__acquisition_protocol')).values_list('ctradiationdose__ctirradiationeventdata__mean_ctdivol', flat=True)
+                ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
                 acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         # Required for mean DLP per study type plot

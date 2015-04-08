@@ -350,13 +350,13 @@
         ];
         var seriesDataCTDI = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_ctdi}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_ctdi}},drilldown:protocolNames[{{forloop.counter}}-1]+'CTDI'{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
         var seriesDrilldownCTDI = [
           {% for protocolCountsArray in acquisitionHistogramDataCTDI %}
-            {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
+            {id: protocolNames[{{forloop.counter}}-1]+'CTDI',name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
               {% for dataCounts in protocolCountsArray.0 %}
                 [protocolBinsCTDI[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolBinsCTDI[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
                 {% if not forloop.last %},{% endif %}
