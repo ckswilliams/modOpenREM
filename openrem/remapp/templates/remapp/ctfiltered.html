@@ -260,7 +260,7 @@
       <script>
         var protocolNames     = [
           {% for name in acquisitionSummary %}
-            "{{name.ctradiationdose__ctirradiationeventdata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
