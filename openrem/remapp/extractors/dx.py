@@ -34,6 +34,8 @@
 
 """
 
+from celery import shared_task
+
 
 def _xrayfilters(filttype, material, thickmax, thickmin, source):
     from remapp.models import XrayFilters
@@ -531,6 +533,7 @@ def _dx2db(dataset):
     _generalstudymoduleattributes(dataset,g)
 
 
+@shared_task
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
     

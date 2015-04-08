@@ -10,10 +10,13 @@ For help on usage,
 python storescp.py -h
 """
 import argparse
+import os
+import sys
 from netdicom import AE, StorageSOPClass, VerificationSOPClass, debug
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
 import tempfile
+from django.views.decorators.csrf import csrf_exempt
 
 # parse commandline
 parser = argparse.ArgumentParser(description='storage SCP example')
@@ -22,6 +25,14 @@ parser.add_argument('-aet', help='AE title of this server', default='PYNETDICOM'
 args = parser.parse_args()
 
 debug(True)
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
 
 # callbacks
 def OnAssociateRequest(association):
@@ -36,18 +47,12 @@ def OnReceiveEcho(self):
     print "Echo received"
 
 
+@csrf_exempt
 def OnReceiveStore(SOPClass, DS):
-    import os, sys
-
-    basepath = os.path.dirname(__file__)
-    projectpath = os.path.abspath(os.path.join(basepath, "..","..",".."))
-    if projectpath not in sys.path:
-        sys.path.insert(1,projectpath)
-
-    from openrem.remapp.extractors.dx import dx
-    from openrem.remapp.extractors.mam import mam
-    from openrem.remapp.extractors.rdsr import rdsr
-    from openrem.remapp.extractors.ct_philips import ct_philips
+    from remapp.extractors.dx import dx
+    from remapp.extractors.mam import mam
+    from remapp.extractors.rdsr import rdsr
+    from remapp.extractors.ct_philips import ct_philips
 
     print "Received C-STORE"
     # do something with dataset. For instance, store it on disk.
@@ -73,7 +78,7 @@ def OnReceiveStore(SOPClass, DS):
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
     ):
         print "DX"
-        dx(filename)
+        dx.delay(filename)
     elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'    # Digital Mammography X-Ray Image Storage for Presentation
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1'  # Digital Mammography X-Ray Image Storage for Processing
         or (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'     # Secondary Capture Image Storage, for processing
