@@ -17,9 +17,17 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
                     chartAcqDLPandCTDI.yAxis[0].setTitle({text:'Number'});
                     chartAcqDLPandCTDI.xAxis[0].setTitle({text:e.point.series.index == 0 ? 'DLP range (mGy.cm)' : 'CTDI<sub>vol</sub> range (mGy)'});
                     chartAcqDLPandCTDI.xAxis[0].setCategories([], true);
-                    chartAcqDLPandCTDI.tooltip.options.formatter = function(args) {
+                    chartAcqDLPandCTDI.tooltip.options.formatter = function (args) {
                         return 'n = ' + this.y.toFixed(0);
-                    }
+                    };
+                    chartAcqDLPandCTDI.yAxis[1].update({
+                        labels: {
+                            enabled: false
+                        },
+                        title: {
+                            text: null
+                        }
+                    });
                 },
                 drillup: function(e) {
                     chartAcqDLPandCTDI.setTitle({ text: defaultTitle }, { text: '' });
@@ -40,8 +48,18 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
                         var that_series_label = ' mGy CTDI<sub>vol</sub>';//this.series.index == 0 ? ' mGy CTDI<sub>vol</sub>' : ' mGy.cm DLP';
                         return this.point.name +
                             '<br/>' + this_point.y.toFixed(1) + this_series_label +
-                            '<br/>' + that_point.y.toFixed(1) + that_series_label;
-                    }
+                            '<br/>' + that_point.y.toFixed(1) + that_series_label +
+                            '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                    };
+                    chartAcqDLPandCTDI.yAxis[1].update({
+                        labels: {
+                            enabled: true
+                        },
+                        title: {
+                            text: 'CTDI<sub>vol</sub> (mGy)'
+                        }
+                    });
+
                 }
             }
         },
@@ -75,17 +93,18 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
             useHTML: true,
             formatter: function(args) {
                 var this_point_index = this.series.data.indexOf( this.point );
-                var this_series_index = this.series.index;
-                var that_series_index = this.series.index == 0 ? 1 : 0; // assuming 2 series
+                var this_series_index = 0;//this.series.index;
+                var that_series_index = 1;//this.series.index == 0 ? 1 : 0; // assuming 2 series
                 var this_series = args.chart.series[this_series_index];
                 var that_series = args.chart.series[that_series_index];
                 var this_point = this_series.data[this_point_index];
                 var that_point = that_series.data[this_point_index];
-                var this_series_label = this.series.index == 0 ? ' mGy.cm DLP' : ' mGy CTDI<sub>vol</sub>';
-                var that_series_label = this.series.index == 0 ? ' mGy CTDI<sub>vol</sub>' : ' mGy.cm DLP';
+                var this_series_label = ' mGy.cm DLP';//this.series.index == 0 ? ' mGy.cm DLP' : ' mGy CTDI<sub>vol</sub>';
+                var that_series_label = ' mGy CTDI<sub>vol</sub>';//this.series.index == 0 ? ' mGy CTDI<sub>vol</sub>' : ' mGy.cm DLP';
                 return this.point.name +
                     '<br/>' + this_point.y.toFixed(1) + this_series_label +
-                    '<br/>' + that_point.y.toFixed(1) + that_series_label;
+                    '<br/>' + that_point.y.toFixed(1) + that_series_label +
+                    '<br/>(n = ' + seriesDataN[this_point_index] + ')';
             }
         },
         plotOptions: {
