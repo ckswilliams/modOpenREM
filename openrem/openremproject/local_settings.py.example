@@ -45,3 +45,7 @@ SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
 ALLOWED_HOSTS = [
     '',
 ]
+
+# DICOM networking settings
+STORE_AET = "STOREOPENREM"
+STORE_PORT = 8104
