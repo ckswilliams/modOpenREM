@@ -34,7 +34,7 @@
 
   {{ studyfilter }}
 
-  <form action="" method="post" class="form-horizontal" role="form">
+  <form action="" method="get" class="form-horizontal" role="form">
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">Exam filter</h3>
@@ -52,7 +52,7 @@
             </div>
           </div>
         {% endfor %}
-        <input type="submit" />
+        <input name="submit" type="submit" />
       </div>
       <div class="panel-heading">
         <h3 class="panel-title">Chart options</h3>
@@ -62,7 +62,7 @@
           {% csrf_token %}
           {{ chartOptionsForm }}
         </table>
-        <input type="submit" />
+        <input name="submit" type="submit" />
       </div>
     </div>
   </form>
