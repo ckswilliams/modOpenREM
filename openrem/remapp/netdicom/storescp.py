@@ -19,27 +19,11 @@ if projectpath not in sys.path:
     sys.path.insert(1,projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import argparse
 from netdicom import AE, StorageSOPClass, VerificationSOPClass, debug
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
 import tempfile
 from django.views.decorators.csrf import csrf_exempt
-
-try:
-    from openremproject.settings import STORE_AET
-except ImportError:
-    STORE_AET = "OPENREM"
-try:
-    from openremproject.settings import STORE_PORT
-except ImportError:
-    STORE_PORT = 8104
-
-# parse commandline
-parser = argparse.ArgumentParser(description='OpenREM Store SCP')
-parser.add_argument('-port', help='Override local_settings port used by this server', type=int, default=STORE_PORT)
-parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
-args = parser.parse_args()
 
 debug(True)
 
@@ -108,15 +92,39 @@ def OnReceiveStore(SOPClass, DS):
     return SOPClass.Success
 
 
-# setup AE
-MyAE = AE(args.aet, args.port, [], [StorageSOPClass, VerificationSOPClass], [ExplicitVRLittleEndian])
-MyAE.OnAssociateRequest = OnAssociateRequest
-MyAE.OnAssociateResponse = OnAssociateResponse
-MyAE.OnReceiveStore = OnReceiveStore
-MyAE.OnReceiveEcho = OnReceiveEcho
+def store(*args, **kwargs):
 
-# start AE
-print "starting AE... AET:{0}, port:{1}".format(args.aet, args.port),
-MyAE.start()
-print "done"
-MyAE.QuitOnKeyboardInterrupt()
+    import argparse
+
+    try:
+        from openremproject.settings import STORE_AET
+    except ImportError:
+        STORE_AET = "OPENREM"
+    try:
+        from openremproject.settings import STORE_PORT
+    except ImportError:
+        STORE_PORT = 8104
+
+    # parse commandline
+    parser = argparse.ArgumentParser(description='OpenREM Store SCP')
+    parser.add_argument('-port', help='Override local_settings port used by this server', type=int, default=STORE_PORT)
+    parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
+    args = parser.parse_args()
+
+    # setup AE
+    MyAE = AE(args.aet, args.port, [], [StorageSOPClass, VerificationSOPClass], [ExplicitVRLittleEndian])
+    MyAE.OnAssociateRequest = OnAssociateRequest
+    MyAE.OnAssociateResponse = OnAssociateResponse
+    MyAE.OnReceiveStore = OnReceiveStore
+    MyAE.OnReceiveEcho = OnReceiveEcho
+
+    # start AE
+    print "starting AE... AET:{0}, port:{1}".format(args.aet, args.port),
+    MyAE.start()
+    print "done"
+    MyAE.QuitOnKeyboardInterrupt()
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(store())

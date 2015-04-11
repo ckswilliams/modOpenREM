@@ -12,10 +12,6 @@
 """
 
 import sys
-from openrem.remapp.netdicom import storescp
+from openrem.remapp.netdicom.storescp import store
 
-
-
-
-
-sys.exit(storescp(sys.argv))
+sys.exit(store(sys.argv))
