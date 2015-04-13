@@ -73,11 +73,7 @@ def dx_summary_list_filter(request):
     import datetime, qsstats
     from remapp.forms import DXChartOptionsForm
 
-    if request.method == 'POST':
-        requestResults = request.POST
-        request.GET = request.POST
-    else:
-        requestResults = request.GET
+    requestResults = request.GET
 
     try:
         # See if the user has plot settings in userprofile
@@ -87,13 +83,12 @@ def dx_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
-
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        chartOptionsForm = DXChartOptionsForm(request.POST)
-        # check whether it's valid:
-        if chartOptionsForm.is_valid():
+    # Obtain the chart options from the request
+    chartOptionsForm = DXChartOptionsForm(requestResults)
+    # Check whether the form data is valid
+    if chartOptionsForm.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in requestResults:
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
@@ -105,17 +100,17 @@ def dx_summary_list_filter(request):
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
             userProfile.save()
 
-    # if a GET (or any other method) we'll create a form populated with options from userProfile
-    else:
-        formData = {'plotCharts': userProfile.plotCharts,
-                    'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
-                    'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
-                    'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
-                    'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
-                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
-                    'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
-                    'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
-        chartOptionsForm = DXChartOptionsForm(formData)
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            formData = {'plotCharts': userProfile.plotCharts,
+                        'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
+                        'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                        'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
+                        'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
+                        'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
+                        'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
+                        'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
+            chartOptionsForm = DXChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
@@ -232,11 +227,7 @@ def dx_histogram_list_filter(request):
     import datetime, qsstats
     from remapp.forms import DXChartOptionsForm
 
-    if request.method == 'POST':
-        requestResults = request.POST
-        request.GET = request.POST
-    else:
-        requestResults = request.GET
+    requestResults = request.GET
 
     if requestResults.get('acquisitionhist'):
         f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
@@ -288,13 +279,12 @@ def dx_histogram_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
-
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        chartOptionsForm = DXChartOptionsForm(request.POST)
-        # check whether it's valid:
-        if chartOptionsForm.is_valid():
+    # Obtain the chart options from the request
+    chartOptionsForm = DXChartOptionsForm(requestResults)
+    # check whether the form data is valid
+    if chartOptionsForm.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in requestResults:
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
@@ -305,16 +295,18 @@ def dx_histogram_list_filter(request):
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
             userProfile.save()
-    else:
-        formData = {'plotCharts': userProfile.plotCharts,
-                    'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
-                    'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
-                    'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
-                    'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
-                    'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
-                    'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
-                    'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
-        chartOptionsForm = DXChartOptionsForm(formData)
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            formData = {'plotCharts': userProfile.plotCharts,
+                        'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
+                        'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                        'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
+                        'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
+                        'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
+                        'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
+                        'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
+            chartOptionsForm = DXChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
@@ -453,11 +445,7 @@ def ct_summary_list_filter(request):
     from remapp.forms import CTChartOptionsForm
     from remapp.models import CtIrradiationEventData
 
-    if request.method == 'POST':
-        requestResults = request.POST
-        request.GET = request.POST
-    else:
-        requestResults = request.GET
+    requestResults = request.GET
 
     try:
         # See if the user has plot settings in userprofile
@@ -467,13 +455,12 @@ def ct_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
-
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        chartOptionsForm = CTChartOptionsForm(request.POST)
-        # check whether it's valid:
-        if chartOptionsForm.is_valid():
+    # Obtain the chart options from the request
+    chartOptionsForm = CTChartOptionsForm(requestResults)
+    # Check whether the form data is valid
+    if chartOptionsForm.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in requestResults:
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
@@ -508,7 +495,6 @@ def ct_summary_list_filter(request):
     plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
-
 
     f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT').distinct())
 
@@ -626,11 +612,7 @@ def ct_histogram_list_filter(request):
     from remapp.forms import CTChartOptionsForm
     from remapp.models import CtIrradiationEventData
 
-    if request.method == 'POST':
-        requestResults = request.POST
-        request.GET = request.POST
-    else:
-        requestResults = request.GET
+    requestResults = request.GET
 
     if requestResults.get('acquisitionhist'):
         f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
@@ -682,13 +664,12 @@ def ct_histogram_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
-
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        chartOptionsForm = CTChartOptionsForm(request.POST)
-        # check whether it's valid:
-        if chartOptionsForm.is_valid():
+    # Obtain the chart options from the request
+    chartOptionsForm = CTChartOptionsForm(requestResults)
+    # Check whether the form data is valid
+    if chartOptionsForm.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in requestResults:
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
@@ -700,6 +681,7 @@ def ct_histogram_list_filter(request):
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
+
     else:
         formData = {'plotCharts': userProfile.plotCharts,
                     'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
