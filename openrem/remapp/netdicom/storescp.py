@@ -23,9 +23,9 @@ try:
     import netdicom
     from distutils.version import StrictVersion
     if StrictVersion(netdicom.__version__.__version__) <= StrictVersion('0.8.1'):
-        sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/latest/install.html')
+        sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
-    sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/latest/install.html')
+    sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 from netdicom import AE, StorageSOPClass, VerificationSOPClass, debug
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
