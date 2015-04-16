@@ -29,6 +29,16 @@
 
 """
 
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
 from celery import shared_task
 
 def _observercontext(dataset,obs): # TID 1002
@@ -721,7 +731,9 @@ def rdsr(rdsr_file):
         * Fluoro: Siemens Artis Zee RDSR
     """
 
-    import sys, dicom
+    import dicom
+    from openremproject.settings import DELETE_DICOM
+
     dataset = dicom.read_file(rdsr_file)
 
     if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22':
@@ -734,6 +746,10 @@ def rdsr(rdsr_file):
 
     _rsdr2db(dataset)
 
+    if DELETE_DICOM:
+        os.remove(rdsr_file)
+
+    return 0
 
 if __name__ == "__main__":
     import sys

@@ -74,7 +74,8 @@ def OnReceiveStore(SOPClass, DS):
     file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.9.5224.1.0.6.0.1"  # Using Medical Connections allocated UID
     datestamp = datetime.datetime.now()
     path = os.path.join(
-        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
+#        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
+        MEDIA_ROOT, "dicom_in"
     )
     mkdir_p(path)
     filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
@@ -111,6 +112,9 @@ def OnReceiveStore(SOPClass, DS):
     ):
         print "Philips CT Dose Info image"
         ct_philips.delay(filename)
+    else:
+        os.remove(filename)
+        print "DICOM not RDSR, DX, Mammo or Philips CT dose info; file deleted. Modality type was {0}".format(DS.Modality)
 
     # must return appropriate status
     return SOPClass.Success

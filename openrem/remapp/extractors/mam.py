@@ -28,6 +28,17 @@
 
 """
 
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
+
 from celery import shared_task
 
 def _xrayfilters(dataset,source):
@@ -356,8 +367,7 @@ def _mammo2db(dataset):
     g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
     
-    
-    
+
 
 @shared_task
 def mam(mg_file):
@@ -374,8 +384,9 @@ def mam(mg_file):
     
     """
 
-    import sys
+    import os
     import dicom
+    from openremproject.settings import DELETE_DICOM
 
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)
@@ -383,6 +394,9 @@ def mam(mg_file):
         return '{0} is not a mammography DICOM image'.format(mg_file)
 
     _mammo2db(dataset)
+
+    if DELETE_DICOM:
+        os.remove(mg_file)
 
     return 0
 
