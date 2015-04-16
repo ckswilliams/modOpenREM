@@ -151,7 +151,32 @@
     <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
 
 
-    {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI and request.user.userprofile.plotCTAcquisitionMeanDLP %}
+      <!-- HTML to include div container for acquisition DLP and CTDI plot -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseDLPandCTDI">
+                Plot of mean DLP and CTDI<sub>vol</sub> for each acquisition protocol in currently filtered data.
+              </a>
+            </h4>
+          </div>
+          <div id="collapseDLPandCTDI" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="histogramPlotDLPandCTDIdiv" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+              <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+                Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+                more data than shown in the histogram bin.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for acquisition DLP and CTDI plot -->
+
+
+    {% elif request.user.userprofile.plotCTAcquisitionMeanDLP %}
       <!-- HTML to include div container for acquisition plot -->
       <div class="panel-group" id="accordion">
         <div class="panel panel-default">
@@ -174,10 +199,9 @@
         </div>
       </div>
       <!-- End of HTML to include div container for acquisition plot -->
-    {% endif %}
 
 
-    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+    {% elif request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <!-- HTML to include div container for acquisition CTDI plot -->
       <div class="panel-group" id="accordion">
         <div class="panel panel-default">
@@ -200,34 +224,6 @@
         </div>
       </div>
       <!-- End of HTML to include div container for acquisition CTDI plot -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI and request.user.userprofile.plotCTAcquisitionMeanDLP %}
-      <!-- HTML to include div container for acquisition DLP and CTDI plot -->
-<!--
-      <div class="panel-group" id="accordion">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseDLPandCTDI">
-                Plot of mean DLP and CTDI<sub>vol</sub> for each acquisition protocol in currently filtered data.
-              </a>
-            </h4>
-          </div>
-          <div id="collapseDLPandCTDI" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="histogramPlotDLPandCTDIdiv" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
-              <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                more data than shown in the histogram bin.</p>
-            </div>
-          </div>
-        </div>
-      </div>
--->
-      <!-- End of HTML to include div container for acquisition DLP and CTDI plot -->
     {% endif %}
 
 
@@ -320,7 +316,9 @@
         var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
+        {% if not request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisition.js"></script>
+        {% endif %}
       <!-- End of JavaScript for acquisition plot -->
     {% endif %}
 
@@ -370,14 +368,16 @@
         var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
+        {% if not request.user.userprofile.plotCTAcquisitionMeanDLP %}
       <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisition.js"></script>
+        {% endif %}
       <!-- End of JavaScript for acquisition CTDI plot -->
     {% endif %}
 
 
     {% if request.user.userprofile.plotCTAcquisitionMeanDLP and request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <!-- JavaScript for acquisition mean DLP and CTDI plot -->
-      <!--  <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisition.js"></script>  -->
+      <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisition.js"></script>
       <!-- End of JavaScript for acquisition CTDI plot -->
     {% endif %}
 
