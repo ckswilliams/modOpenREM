@@ -17,8 +17,13 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
                     chartAcqDLPandCTDI.yAxis[0].setTitle({text:'Number'});
                     chartAcqDLPandCTDI.xAxis[0].setTitle({text:e.point.series.index == 0 ? 'DLP range (mGy.cm)' : 'CTDI<sub>vol</sub> range (mGy)'});
                     chartAcqDLPandCTDI.xAxis[0].setCategories([], true);
-                    chartAcqDLPandCTDI.tooltip.options.formatter = function (args) {
-                        return 'n = ' + this.y.toFixed(0);
+                    chartAcqDLPandCTDI.tooltip.options.formatter = function() {
+                        var xyArr=[];
+                        $.each(this.points,function(){
+                            var linkText = 'acquisition_dlp_min=' + protocolBinsCTDI[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBinsCTDI[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>');
+                        });
+                        return xyArr.join('<br/>');
                     };
                     chartAcqDLPandCTDI.yAxis[1].update({
                         labels: {

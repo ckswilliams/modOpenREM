@@ -1,7 +1,7 @@
 $(function () {
 
 var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Mean CTDIvol per acquisition protocol';
+var defaultTitle   = 'Mean CTDI<sub>vol</sub> per acquisition protocol';
 var tooltipData = [2];
 
 var chartAcqCTDI = new Highcharts.Chart({
@@ -14,7 +14,7 @@ var chartAcqCTDI = new Highcharts.Chart({
                     tooltipData[1] = e.point.x;
                     chartAcqCTDI.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chartAcqCTDI.yAxis[0].setTitle({text:'Number'});
-                    chartAcqCTDI.xAxis[0].setTitle({text:'CTDI range (mGy)'});
+                    chartAcqCTDI.xAxis[0].setTitle({text:'CTDI<sub>vol</sub> range (mGy)'});
                     chartAcqCTDI.xAxis[0].setCategories([], true);
                     chartAcqCTDI.xAxis[0].update({labels:{rotation:0}});
                     chartAcqCTDI.tooltip.options.formatter = function() {
@@ -29,7 +29,7 @@ var chartAcqCTDI = new Highcharts.Chart({
                 },
                 drillup: function(e) {
                     chartAcqCTDI.setTitle({ text: defaultTitle }, { text: '' });
-                    chartAcqCTDI.yAxis[0].setTitle({text:'Mean CTDI (mGy)'});
+                    chartAcqCTDI.yAxis[0].setTitle({text:'Mean CTDI<sub>vol</sub> (mGy)'});
                     chartAcqCTDI.xAxis[0].setTitle({text:'Protocol name'});
                     chartAcqCTDI.xAxis[0].setCategories(protocolNames, true);
                     chartAcqCTDI.xAxis[0].update({labels:{rotation:90}});
@@ -45,7 +45,8 @@ var chartAcqCTDI = new Highcharts.Chart({
             }
         },
         title: {
-            text: 'Mean CTDIvol per acquisition protocol'
+            useHTML: true,
+            text: 'Mean CTDI<sub>vol</sub> per acquisition protocol'
         },
         legend: {
             enabled: false
@@ -57,14 +58,15 @@ var chartAcqCTDI = new Highcharts.Chart({
                 text: 'Protocol name'
             },
             labels: {
-                rotation:90
+                useHTML: true,
+                rotation: 90
             }
         },
         yAxis: {
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean CTDIvol (mGy)'
+                text: 'Mean CTDI<sub>vol</sub> (mGy)'
             }
         },
         tooltip: {
@@ -83,7 +85,8 @@ var chartAcqCTDI = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Mean CTDIvol per acquisition protocol',
+            useHTML: true,
+            name: 'Mean CTDI<sub>vol</sub> per acquisition protocol',
             data: seriesDataCTDI
         }],
         drilldown: {

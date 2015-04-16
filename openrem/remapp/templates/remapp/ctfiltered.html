@@ -205,6 +205,7 @@
 
     {% if request.user.userprofile.plotCTAcquisitionMeanCTDI and request.user.userprofile.plotCTAcquisitionMeanDLP %}
       <!-- HTML to include div container for acquisition DLP and CTDI plot -->
+<!--
       <div class="panel-group" id="accordion">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -225,6 +226,7 @@
           </div>
         </div>
       </div>
+-->
       <!-- End of HTML to include div container for acquisition DLP and CTDI plot -->
     {% endif %}
 
@@ -375,7 +377,7 @@
 
     {% if request.user.userprofile.plotCTAcquisitionMeanDLP and request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <!-- JavaScript for acquisition mean DLP and CTDI plot -->
-        <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisition.js"></script>
+      <!--  <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisition.js"></script>  -->
       <!-- End of JavaScript for acquisition CTDI plot -->
     {% endif %}
 
