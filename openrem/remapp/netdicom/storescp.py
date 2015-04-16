@@ -11,6 +11,7 @@ python storescp.py -h
 """
 import os
 import sys
+import errno
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -47,20 +48,36 @@ def OnReceiveEcho(self):
     print "Echo received"
 
 
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+
 @csrf_exempt
 def OnReceiveStore(SOPClass, DS):
+    import datetime
     from remapp.extractors.dx import dx
     from remapp.extractors.mam import mam
     from remapp.extractors.rdsr import rdsr
     from remapp.extractors.ct_philips import ct_philips
+    from openremproject.settings import MEDIA_ROOT
 
     print "Received C-STORE"
-    # do something with dataset. For instance, store it on disk.
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
     file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.9.5224.1.0.6.0.1"  # Using Medical Connections allocated UID
-    filename = '%s/%s.dcm' % (tempfile.gettempdir(), DS.SOPInstanceUID)
+    datestamp = datetime.datetime.now()
+    path = os.path.join(
+        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
+    )
+    mkdir_p(path)
+    filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
     ds.update(DS)
     ds.is_little_endian = True
