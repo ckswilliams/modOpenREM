@@ -34,6 +34,18 @@
 
 """
 
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
+from celery import shared_task
+
 
 def _xrayfilters(filttype, material, thickmax, thickmin, source):
     from remapp.models import XrayFilters
@@ -531,6 +543,7 @@ def _dx2db(dataset):
     _generalstudymoduleattributes(dataset,g)
 
 
+@shared_task
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
     
@@ -542,8 +555,11 @@ def dx(dig_file):
     
     """
     
-    import sys
     import dicom
+    try:
+        from openremproject.settings import RM_DCM_DX
+    except ImportError:
+        RM_DCM_DX = False
     
     dataset = dicom.read_file(dig_file)
     isdx = _test_if_dx(dataset)
@@ -552,6 +568,9 @@ def dx(dig_file):
     
     _dx2db(dataset)
     
+    if RM_DCM_DX:
+        os.remove(dig_file)
+
     return 0
 
 

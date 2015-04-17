@@ -28,6 +28,18 @@
 
 """
 
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
+from celery import shared_task
+
 def _scanninglength(dataset,event): # TID 10014
     from remapp.models import ScanningLength
     from remapp.tools.get_values import get_value_kw
@@ -237,7 +249,7 @@ def _philips_ct2db(dataset):
     _patientstudymoduleattributes(dataset,g)
     _patientmoduleattributes(dataset,g)
 
-
+@shared_task
 def ct_philips(philips_file):
     """Extract radiation dose structured report related data from Philips CT dose report images
     
@@ -249,13 +261,22 @@ def ct_philips(philips_file):
         * Brilliance BigBore v3.5.4.17001.
     """
 
-    import sys, dicom
-    dataset = dicom.read_file(philips_file)
+    import dicom
+    try:
+        from openremproject.settings import RM_DCM_CTPHIL
+    except ImportError:
+        RM_DCM_CTPHIL = False
 
+    dataset = dicom.read_file(philips_file)
     if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' or dataset.SeriesDescription != 'Dose Info':
         return '{0} is not a Philips CT dose report image'.format(philips_file)
 
     _philips_ct2db(dataset)
+
+    if RM_DCM_CTPHIL:
+        os.remove(philips_file)
+
+    return 0
 
 
 if __name__ == "__main__":

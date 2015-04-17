@@ -27,6 +27,20 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
+
+from celery import shared_task
+
 def _xrayfilters(dataset,source):
     from remapp.models import XrayFilters
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
@@ -353,10 +367,9 @@ def _mammo2db(dataset):
     g = GeneralStudyModuleAttr.objects.create()
     _generalstudymoduleattributes(dataset,g)
     
-    
-    
 
 
+@shared_task
 def mam(mg_file):
     """Extract radiation dose structured report related data from mammography images
     
@@ -371,8 +384,12 @@ def mam(mg_file):
     
     """
 
-    import sys
+    import os
     import dicom
+    try:
+        from openremproject.settings import RM_DCM_MG
+    except ImportError:
+        RM_DCM_MG = False
 
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)
@@ -380,6 +397,9 @@ def mam(mg_file):
         return '{0} is not a mammography DICOM image'.format(mg_file)
 
     _mammo2db(dataset)
+
+    if RM_DCM_MG:
+        os.remove(mg_file)
 
     return 0
 
