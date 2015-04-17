@@ -26,6 +26,7 @@ Contents:
     release-0.6.0
     releasenotes
     import
+    netdicom
     interface
     code
 
