@@ -386,7 +386,7 @@ def mam(mg_file):
 
     import os
     import dicom
-    from openremproject.settings import DELETE_DICOM
+    from openremproject.settings import RM_DCM_MG
 
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)
@@ -395,7 +395,7 @@ def mam(mg_file):
 
     _mammo2db(dataset)
 
-    if DELETE_DICOM:
+    if RM_DCM_MG:
         os.remove(mg_file)
 
     return 0

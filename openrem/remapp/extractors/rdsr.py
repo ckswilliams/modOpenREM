@@ -732,7 +732,7 @@ def rdsr(rdsr_file):
     """
 
     import dicom
-    from openremproject.settings import DELETE_DICOM
+    from openremproject.settings import RM_DCM_RDSR
 
     dataset = dicom.read_file(rdsr_file)
 
@@ -746,7 +746,7 @@ def rdsr(rdsr_file):
 
     _rsdr2db(dataset)
 
-    if DELETE_DICOM:
+    if RM_DCM_RDSR:
         os.remove(rdsr_file)
 
     return 0

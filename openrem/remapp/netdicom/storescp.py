@@ -66,6 +66,7 @@ def OnReceiveStore(SOPClass, DS):
     from remapp.extractors.rdsr import rdsr
     from remapp.extractors.ct_philips import ct_philips
     from openremproject.settings import MEDIA_ROOT
+    from openremproject.settings import RM_DCM_NOMATCH
 
     print "Received C-STORE"
     file_meta = Dataset()
@@ -112,7 +113,7 @@ def OnReceiveStore(SOPClass, DS):
     ):
         print "Philips CT Dose Info image"
         ct_philips.delay(filename)
-    else:
+    elif RM_DCM_NOMATCH:
         os.remove(filename)
         print "DICOM not RDSR, DX, Mammo or Philips CT dose info; file deleted. Modality type was {0}".format(DS.Modality)
 

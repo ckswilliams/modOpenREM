@@ -262,15 +262,16 @@ def ct_philips(philips_file):
     """
 
     import dicom
-    from openremproject.settings import DELETE_DICOM
+    from openremproject.settings import RM_DCM_CTPHIL
 
+    dataset = dicom.read_file(philips_file)
     if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' or dataset.SeriesDescription != 'Dose Info':
         return '{0} is not a Philips CT dose report image'.format(philips_file)
 
     _philips_ct2db(dataset)
 
-    if DELETE_DICOM:
-        os.remove(rdsr_file)
+    if RM_DCM_CTPHIL:
+        os.remove(philips_file)
 
     return 0
 

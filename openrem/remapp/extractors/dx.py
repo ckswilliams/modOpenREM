@@ -556,7 +556,7 @@ def dx(dig_file):
     """
     
     import dicom
-    from openremproject.settings import DELETE_DICOM
+    from openremproject.settings import RM_DCM_DX
     
     dataset = dicom.read_file(dig_file)
     isdx = _test_if_dx(dataset)
@@ -565,8 +565,8 @@ def dx(dig_file):
     
     _dx2db(dataset)
     
-    if DELETE_DICOM:
-        os.remove(rdsr_file)
+    if RM_DCM_DX:
+        os.remove(dig_file)
 
     return 0
 
