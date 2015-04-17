@@ -10,9 +10,8 @@ This is an initial preview release in 0.6.0, with the following features:
 
 * DICOM Store service class provider
 * DICOM objects are fed directly into appropriate routine for data extraction
-* Configuration of AE Title and port in the ``local_settings.py`` file
-* Configuration of deleting or keeping processed objects in the ``local_settings.py`` file
-* Configuration of deleting or keeping unmatched objects in the ``local_settings.py`` file
+* Extraction jobs are handled by Celery
+* Configuration is via the ``local_settings.py`` file
 
 *************
 Configuration
@@ -57,16 +56,16 @@ RM_DCM_NOMATCH
 When DICOM objects are received they are checked for suitability to have dose related data extracted using any of the
 current extraction routines.
 
-If you want the DICOM object to be deleted in this circumstance  set ``RM_DCM_NOMATCH`` to ``True``. Otherwise set this
+If you want the DICOM object to be deleted if it can't be used set ``RM_DCM_NOMATCH`` to ``True``. Otherwise set this
 to ``False``.
 
 Setting this to ``True`` is advisable as otherwise your disk can fill up very quickly if enture CT studies get sent
-through.
+through for example.
 
 RM_DCM_RDSR, RM_DCM_MG, RM_DCM_DX and RM_DCM_CTPHIL
 ===================================================
 
-Set these to ``True`` to delete the DICOM objects once the dose related data had been extracted. Otherwise set these to
+Set these to ``True`` to delete the DICOM objects once the dose related data had been extracted. Otherwise set them to
 ``False``, and the DICOM objects will be stored in a folder called ``dicom_in`` in the ``MEDIA_ROOT`` folder.
 
 The ``RDSR`` setting is for Radiation Dose Structured Reports (usually from CT or fluoroscopy), ``MG`` is for
@@ -86,4 +85,4 @@ You should see the following output, depending on your configuration::
 
     starting AE... AET:STOREOPENREM, port:8104 done
 
-
+Make sure that the Celery task manager is running, as all extraction jobs are passed to Celery.
