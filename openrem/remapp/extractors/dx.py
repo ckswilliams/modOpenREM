@@ -556,7 +556,10 @@ def dx(dig_file):
     """
     
     import dicom
-    from openremproject.settings import RM_DCM_DX
+    try:
+        from openremproject.settings import RM_DCM_DX
+    except ImportError:
+        RM_DCM_DX = False
     
     dataset = dicom.read_file(dig_file)
     isdx = _test_if_dx(dataset)

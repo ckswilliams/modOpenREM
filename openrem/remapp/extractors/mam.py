@@ -386,7 +386,10 @@ def mam(mg_file):
 
     import os
     import dicom
-    from openremproject.settings import RM_DCM_MG
+    try:
+        from openremproject.settings import RM_DCM_MG
+    except ImportError:
+        RM_DCM_MG = False
 
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)

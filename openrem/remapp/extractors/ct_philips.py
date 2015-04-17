@@ -262,7 +262,10 @@ def ct_philips(philips_file):
     """
 
     import dicom
-    from openremproject.settings import RM_DCM_CTPHIL
+    try:
+        from openremproject.settings import RM_DCM_CTPHIL
+    except ImportError:
+        RM_DCM_CTPHIL = False
 
     dataset = dicom.read_file(philips_file)
     if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' or dataset.SeriesDescription != 'Dose Info':
