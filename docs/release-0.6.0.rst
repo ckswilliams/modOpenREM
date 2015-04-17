@@ -7,7 +7,8 @@ Headline changes
 ****************
 
 * Charts
-
+* Preview of DICOM Store SCP functionality
+* Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 
 ******
@@ -88,3 +89,5 @@ The available charts for radiographic data are as follows:
       calculation times. The user can zoom in to the plot by clicking and dragging
       the mouse to select a date range. The user can also click on items in the
       legend to show or hide individual lines.
+
+.. _`OpenSkin`: https://bitbucket.org/jacole/openskin
