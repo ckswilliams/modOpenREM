@@ -2,11 +2,48 @@
 OpenREM version history
 =======================
 
+0.6.0 (2015-04-xx)
+------------------
+
+* `#205`_  Fixed issue of histogram tooltip links to data not working
+* `#204`_  Fixed issue of not being able to export with the charts features added
+* `#203`_  Charts: Fixed display of HTML in plots issue
+* `#202`_  Charts: Added mean CTDIvol to charts
+* `#200`_  Charts: Now exclude Philips Ingenuity SPRs from plots
+* `#196`_  Added comments and entrance exposure data to DX export
+* `#195`_  Fixed error with no users on fresh install
+* `#194`_  Added more robust extraction of series description from DX
+* `#193`_  Charts: Fixed reset of filters when moving between pages
+* `#192`_  Created RF export for OpenSkin
+* `#191`_  Charts: Factored out the javascript from the filtered.html files
+* `#190`_  Charts: Added time period configuration to dose over time plots
+* `#189`_  Charts: Fixed plotting of mean doses over time when frequency not plotted
+* `#187`_  Charts: Merged the charts work into the main develop branch
+* `#186`_  Fixed duplicate data in DX exports
+* `#179`_  Charts: Added kVp and mAs plots for DX
+* `#177`_  Charts: Fixed issue with date ranges for DX mean dose over time charts
+* `#176`_  Charts: Added link to filtered dataset from mean dose over time charts
+* `#175`_  Charts: Allowed configuration of the time period for mean dose trend charts to improve performance
+* `#174`_  Charts: Fixed number of decimal places for mean DLP values
+* `#173`_  Charts: Fixed plot of mean DLP over time y-axis issue
+* `#170`_  Charts: Added plot of mean dose over time
+* `#169`_  Charts: Improved chart colours
+* `#157`_  Charts: Added chart showing number of studies per day of the week, then hour in the day
+* `#156`_  Charts: Fixed issue with some protocols not being displayed
+* `#155`_  Charts: Added chart showing relative frequency of protocols and study types
+* `#140`_  Charts: Added configuration options
+* `#139`_  Charts: Link to filtered dataset from histogram chart
+* `#138`_  Charts: Number of datapoints displayed on tooltip
+* `#41`_   Preview of DICOM Store SCP now available
+* `#20`_   Modality sections are now suppressed until populated
+
+
 0.5.1 (2015-03-12)
 ------------------
 
 * `#184`_  Documentation for 0.5.1
 * `#180`_  Rename all reverse lookups as a result of `#62`_
+* `#178`_  Added documentation regarding backing up and restoring PostgreSQL OpenREM databases
 * `#172`_  Revert all changes made to database so `#62`_ could take place first
 * `#165`_  Extract height and weight from DX, height from RDSR, all if available
 * `#161`_  Views and exports now look for accumulated data in the right table after changes in `#159`_ and `#160`_
@@ -228,6 +265,26 @@ Reopened issue
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#219`: https://bitbucket.org/openrem/openrem/issue/219/
+..  _`#218`: https://bitbucket.org/openrem/openrem/issue/218/
+..  _`#217`: https://bitbucket.org/openrem/openrem/issue/217/
+..  _`#216`: https://bitbucket.org/openrem/openrem/issue/216/
+..  _`#215`: https://bitbucket.org/openrem/openrem/issue/215/
+..  _`#214`: https://bitbucket.org/openrem/openrem/issue/214/
+..  _`#213`: https://bitbucket.org/openrem/openrem/issue/213/
+..  _`#212`: https://bitbucket.org/openrem/openrem/issue/212/
+..  _`#211`: https://bitbucket.org/openrem/openrem/issue/211/
+..  _`#210`: https://bitbucket.org/openrem/openrem/issue/210/
+..  _`#209`: https://bitbucket.org/openrem/openrem/issue/209/
+..  _`#208`: https://bitbucket.org/openrem/openrem/issue/208/
+..  _`#207`: https://bitbucket.org/openrem/openrem/issue/207/
+..  _`#206`: https://bitbucket.org/openrem/openrem/issue/206/
+..  _`#205`: https://bitbucket.org/openrem/openrem/issue/205/
+..  _`#204`: https://bitbucket.org/openrem/openrem/issue/204/
+..  _`#203`: https://bitbucket.org/openrem/openrem/issue/203/
+..  _`#202`: https://bitbucket.org/openrem/openrem/issue/202/
+..  _`#201`: https://bitbucket.org/openrem/openrem/issue/201/
+..  _`#200`: https://bitbucket.org/openrem/openrem/issue/200/
 ..  _`#199`: https://bitbucket.org/openrem/openrem/issue/199/
 ..  _`#198`: https://bitbucket.org/openrem/openrem/issue/198/
 ..  _`#197`: https://bitbucket.org/openrem/openrem/issue/197/
