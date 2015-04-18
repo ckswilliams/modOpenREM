@@ -473,18 +473,17 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        formData = {'plotCharts': userProfile.plotCharts,
-                    'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
-                    'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
-                    'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
-                    'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
-                    'plotCTStudyFreq': userProfile.plotCTStudyFreq,
-                    'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
-                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
-                    'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
-        chartOptionsForm = CTChartOptionsForm(formData)
+        else:
+            formData = {'plotCharts': userProfile.plotCharts,
+                        'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                        'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
+                        'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
+                        'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
+                        'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                        'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
+                        'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
+                        'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
+            chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
@@ -682,17 +681,17 @@ def ct_histogram_list_filter(request):
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
 
-    else:
-        formData = {'plotCharts': userProfile.plotCharts,
-                    'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
-                    'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
-                    'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
-                    'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
-                    'plotCTStudyFreq': userProfile.plotCTStudyFreq,
-                    'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
-                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
-                    'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
-        chartOptionsForm = CTChartOptionsForm(formData)
+        else:
+            formData = {'plotCharts': userProfile.plotCharts,
+                        'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                        'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
+                        'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
+                        'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
+                        'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                        'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
+                        'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
+                        'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
+            chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
