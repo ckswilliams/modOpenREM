@@ -464,6 +464,7 @@ def ct_summary_list_filter(request):
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
+            userProfile.plotCTAcquisitionMeanCTDI = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanCTDI']
             userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
             userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
@@ -472,20 +473,22 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
 
-        # If submit was not clicked then use the settings already stored in the user's profile
-        else:
-            formData = {'plotCharts': userProfile.plotCharts,
-                        'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
-                        'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
-                        'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
-                        'plotCTStudyFreq': userProfile.plotCTStudyFreq,
-                        'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
-                        'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
-                        'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
-            chartOptionsForm = CTChartOptionsForm(formData)
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        formData = {'plotCharts': userProfile.plotCharts,
+                    'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
+                    'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
+                    'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
+                    'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                    'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
+                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
+                    'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
+        chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
     plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
     plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
     plotCTStudyFreq = userProfile.plotCTStudyFreq
@@ -509,11 +512,20 @@ def ct_summary_list_filter(request):
         )
 
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+        if plotCTAcquisitionMeanCTDI:
+            acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+        else:
+            acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+            if plotCTAcquisitionMeanCTDI:
+                ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
+                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         # Required for mean DLP per study type plot
         studySummary = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
@@ -573,6 +585,9 @@ def ct_summary_list_filter(request):
         returnStructure['studyHistogramData'] = studyHistogramData
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCTAcquisitionMeanCTDI:
+        returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotting and plotCharts and plotCTStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
@@ -658,6 +673,7 @@ def ct_histogram_list_filter(request):
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']
+            userProfile.plotCTAcquisitionMeanCTDI = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanCTDI']
             userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
             userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
@@ -666,20 +682,21 @@ def ct_histogram_list_filter(request):
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             userProfile.save()
 
-        # If submit was not clicked then use the settings already stored in the user's profile
-        else:
-            formData = {'plotCharts': userProfile.plotCharts,
-                        'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
-                        'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
-                        'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
-                        'plotCTStudyFreq': userProfile.plotCTStudyFreq,
-                        'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
-                        'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
-                        'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
-            chartOptionsForm = CTChartOptionsForm(formData)
+    else:
+        formData = {'plotCharts': userProfile.plotCharts,
+                    'plotCTAcquisitionMeanDLP': userProfile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionMeanCTDI': userProfile.plotCTAcquisitionMeanCTDI,
+                    'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
+                    'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
+                    'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                    'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
+                    'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
+                    'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
+        chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
     plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
     plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
     plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
     plotCTStudyFreq = userProfile.plotCTStudyFreq
@@ -701,11 +718,20 @@ def ct_histogram_list_filter(request):
         )
 
         # Required for mean DLP per acquisition plot
-        acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+        if plotCTAcquisitionMeanCTDI:
+            acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+        else:
+            acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+            if plotCTAcquisitionMeanCTDI:
+                ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
+                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         # Required for mean DLP per study type plot
         studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
@@ -760,6 +786,9 @@ def ct_histogram_list_filter(request):
         returnStructure['studyHistogramData'] = studyHistogramData
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+    if plotting and plotCTAcquisitionMeanCTDI:
+        returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotting and plotCharts and plotCTStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays

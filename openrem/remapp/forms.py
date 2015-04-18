@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.safestring import mark_safe
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -50,6 +51,7 @@ class DXChartOptionsForm(forms.Form):
 class CTChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
     plotCTAcquisitionMeanDLP = forms.BooleanField(label='Mean DLP per acquisition',required=False)
+    plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('Mean CTDI<sub>vol</sub> per acquisition'),required=False)
     plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
     plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study',required=False)
     plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)
