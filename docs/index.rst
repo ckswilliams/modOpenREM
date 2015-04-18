@@ -28,6 +28,7 @@ Contents:
     import
     netdicom
     i_navigate
+    charts
     i_exporting
     i_administration
     code
