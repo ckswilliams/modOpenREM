@@ -585,7 +585,7 @@ def ct_summary_list_filter(request):
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
 
-    if plotting and plotCTAcquisitionMeanCTDI:
+    if plotting and plotCharts and plotCTAcquisitionMeanCTDI:
         returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotting and plotCharts and plotCTStudyPerDayAndHour:
@@ -786,7 +786,7 @@ def ct_histogram_list_filter(request):
         returnStructure['acquisitionSummary'] = acquisitionSummary
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
 
-    if plotting and plotCTAcquisitionMeanCTDI:
+    if plotting and plotCharts and plotCTAcquisitionMeanCTDI:
         returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotting and plotCharts and plotCTStudyPerDayAndHour:
