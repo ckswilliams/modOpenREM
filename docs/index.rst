@@ -27,7 +27,9 @@ Contents:
     releasenotes
     import
     netdicom
-    interface
+    i_navigate
+    i_exporting
+    i_administration
     code
 
 ..  Note::
