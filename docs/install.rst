@@ -90,7 +90,7 @@ Install pynetdicom
 Pynetdicom is used for the new DICOM store SCP function that is available as a preview in this release. See
 :doc:`netdicom` for details.
 
-.. sourecode::
+.. sourcecode:: bash
 
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
