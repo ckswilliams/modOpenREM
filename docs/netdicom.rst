@@ -56,7 +56,7 @@ RM_DCM_NOMATCH
 When DICOM objects are received they are checked for suitability to have dose related data extracted using any of the
 current extraction routines.
 
-If you want the DICOM object to be deleted if it can't be used set ``RM_DCM_NOMATCH`` to ``True``. Otherwise set this
+If you want the DICOM object to be deleted if it can't be used, set ``RM_DCM_NOMATCH`` to ``True``. Otherwise set this
 to ``False``.
 
 Setting this to ``True`` is advisable as otherwise your disk can fill up very quickly if enture CT studies get sent
@@ -86,3 +86,20 @@ You should see the following output, depending on your configuration::
     starting AE... AET:STOREOPENREM, port:8104 done
 
 Make sure that the Celery task manager is running, as all extraction jobs are passed to Celery.
+
+*****************************************
+Planned functionality for future releases
+*****************************************
+
+DICOM Store
+===========
+
+* Configuration will move to the database with a web interface
+* Web interface view of activity and logs
+
+DICOM Query-Retrieve
+====================
+
+* Function to query retrieve the PACS or modality
+* Ad hoc or scheduled
+* Web interface for configuration, activating, monitoring success and logs
