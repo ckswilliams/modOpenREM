@@ -79,7 +79,7 @@ Install NumPy
 -------------
 *(New for version 0.6.0)*
 
-Numpy is required for charts. OpenREM will work without numpy, but charts will not be displayed.
+Numpy is required for charts. OpenREM will work without NumPy, but charts will not be displayed.
 
 **Insert numpy install instructions here**
 
