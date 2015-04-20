@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.6.0 (2015-04-xx)
-------------------
+0.6.0b1 (2015-04-20)
+--------------------
 
 * `#205`_  Fixed issue of histogram tooltip links to data not working
 * `#204`_  Fixed issue of not being able to export with the charts features added
