@@ -23,10 +23,14 @@ Contents:
     :maxdepth: 2
 
     install
-    release-0.5.1
+    release-0.6.0
     releasenotes
     import
-    interface
+    netdicom
+    i_navigate
+    charts
+    i_exporting
+    i_administration
     code
 
 ..  Note::

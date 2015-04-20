@@ -45,3 +45,14 @@ SECRET_KEY = 'hmj#)-$smzqk*=wuz9^a46rex30^$_j$rghp+1#y&amp;i+pys5b@$'
 ALLOWED_HOSTS = [
     '',
 ]
+
+# DICOM networking settings
+# This is just a preview - future releases will have more DICOM networking functionality, and these settings will be
+# moved into the database with a web frontend. See http://docs.openrem.org/en/latest/netdicom.html for more information.
+STORE_AET = "STOREOPENREM"
+STORE_PORT = 8104
+RM_DCM_NOMATCH = True
+RM_DCM_RDSR = False
+RM_DCM_MG = False
+RM_DCM_DX = False
+RM_DCM_CTPHIL = False

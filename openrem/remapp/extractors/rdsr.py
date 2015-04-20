@@ -29,6 +29,18 @@
 
 """
 
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
+from celery import shared_task
+
 def _observercontext(dataset,obs): # TID 1002
     from remapp.tools.get_values import get_or_create_cid
     for cont in dataset.ContentSequence:
@@ -707,6 +719,7 @@ def _rsdr2db(dataset):
     _patientmoduleattributes(dataset,g)
 
 
+@shared_task
 def rdsr(rdsr_file):
     """Extract radiation dose related data from DICOM Radiation SR objects.
 
@@ -718,7 +731,12 @@ def rdsr(rdsr_file):
         * Fluoro: Siemens Artis Zee RDSR
     """
 
-    import sys, dicom
+    import dicom
+    try:
+        from openremproject.settings import RM_DCM_RDSR
+    except ImprtError:
+        RM_DCM_RDSR = False
+
     dataset = dicom.read_file(rdsr_file)
 
     if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22':
@@ -731,6 +749,10 @@ def rdsr(rdsr_file):
 
     _rsdr2db(dataset)
 
+    if RM_DCM_RDSR:
+        os.remove(rdsr_file)
+
+    return 0
 
 if __name__ == "__main__":
     import sys

@@ -75,6 +75,26 @@ For either install, just follow the defaults – no special configurations requi
 
     Before continuing, `consider virtualenv`_
 
+Install Numpy
+-------------
+*(New for version 0.6.0)*
+
+Numpy is required for charts. OpenREM will work without numpy, but charts will not be displayed.
+
+*Will pip install numpy work?* I think for linux it might need python-dev installed?
+
+Install pynetdicom
+------------------
+*(New for version 0.6.0)*
+
+Pynetdicom is used for the new DICOM store SCP function that is available as a preview in this release. See
+:doc:`netdicom` for details.
+
+.. sourcecode:: bash
+
+    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+
+
 Install and configure OpenREM
 =============================
 
@@ -83,7 +103,7 @@ Install latest beta version
 
 .. sourcecode:: bash
 
-    pip install openrem
+    pip install openrem==0.6.0b1
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -167,6 +187,10 @@ A dot before a hostname allows for subdomains (eg www.doseserver), a dot
 after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
+
+DICOM networking
+````````````````
+See :doc:`netdicom`
 
 Create the database
 -------------------
@@ -253,6 +277,11 @@ Windows::
     celery -A openremproject worker -l info
 
 For production use, see `Daemonising Celery`_ below
+
+Preview feature: Start the DICOM Store SCP
+------------------------------------------
+
+See :doc:`netdicom`
 
 Start using it!
 ---------------

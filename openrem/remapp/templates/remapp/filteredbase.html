@@ -5,11 +5,25 @@
     <!-- Bootstrap-datepicker CSS -->
     <!-- Bootstrap-datepicker JavaScript
     ================================================== -->
-     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/datepicker3.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/datepicker3.css">
     
     <script src="{{ STATIC_URL }}js/jquery-1.11.0.min.js"></script>
   
-     <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
+
+    <!-- Internet Explorer (up to version 8) doesn't support array indexOf. The script
+    below adds the functionality if it is missing. -->
+    <script>
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function(obj, start) {
+            for (var i = (start || 0), j = this.length; i < j; i++) {
+                if (this[i] === obj) { return i; }
+            }
+            return -1;
+        }
+    }
+    </script>
+
     {% block headscript %}
     {% endblock %}
     {% endblock %}
@@ -24,6 +38,12 @@
         <div class="col-md-3">
           {% block col2 %}
           {% endblock %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+            {% block plotdata %}
+            {% endblock %}
         </div>
       </div>
       {% endblock %}

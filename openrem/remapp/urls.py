@@ -54,8 +54,22 @@ urlpatterns = patterns('remapp.views',
             model=GeneralStudyModuleAttr,
             template_name='remapp/ctdetail.html'))),
 
+    url(r'^ct/hist/$',
+        'ct_histogram_list_filter'),
+    url(r'^ct/(?P<pk>\d+)/$',
+        login_required(DetailView.as_view(
+            model=GeneralStudyModuleAttr,
+            template_name='remapp/ctdetail.html'))),
+
     url(r'^dx/$',
         'dx_summary_list_filter'),
+    url(r'^dx/(?P<pk>\d+)/$',
+        login_required(DetailView.as_view(
+            model=GeneralStudyModuleAttr,
+            template_name='remapp/dxdetail.html'))),
+
+    url(r'^dx/hist/$',
+        'dx_histogram_list_filter'),
     url(r'^dx/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
             model=GeneralStudyModuleAttr,
@@ -84,6 +98,7 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^exportdxxlsx1/$', 'dxxlsx1'),
     url(r'^exportflcsv1/$', 'flcsv1'),
     url(r'^exportrfxlsx1/$', 'rfxlsx1'),
+    url(r'^exportrfopenskin/(?P<pk>\d+)$', 'rfopenskin'),
     url(r'^exportmgcsv1/$', 'mgcsv1'),
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
     url(r'^download/(?P<file_name>.+)$', 'download'),

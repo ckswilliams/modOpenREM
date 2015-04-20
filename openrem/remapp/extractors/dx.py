@@ -34,6 +34,18 @@
 
 """
 
+import os
+import sys
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+
+from celery import shared_task
+
 
 def _xrayfilters(filttype, material, thickmax, thickmin, source):
     from remapp.models import XrayFilters
@@ -303,6 +315,10 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     event.irradiation_event_type = get_or_create_cid('113611','Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName',dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription',dataset)
+    acquisition_protocol = get_value_kw('ProtocolName',dataset)
+    series_description = get_value_kw('SeriesDescription',dataset)
+    if series_description:
+        event.comment = series_description
     try:
         event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     except:
@@ -334,7 +350,10 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     if pc_fibroglandular:
         if '%' in pc_fibroglandular:
             event.percent_fibroglandular_tissue = pc_fibroglandular.replace('%','').strip()
-    event.comment = get_value_kw('ExposureControlModeDescription',dataset)
+    exposure_control = get_value_kw('ExposureControlModeDescription',dataset)
+
+    if event.comment and exposure_control:
+        event.comment = event.comment + ', ' + exposure_control
 
     dap = get_value_kw('ImageAndFluoroscopyAreaDoseProduct',dataset)
     if dap: event.dose_area_product = dap / 100000 # Value of DICOM tag (0018,115e) in dGy.cm2, converted to Gy.m2
@@ -524,6 +543,7 @@ def _dx2db(dataset):
     _generalstudymoduleattributes(dataset,g)
 
 
+@shared_task
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
     
@@ -535,8 +555,11 @@ def dx(dig_file):
     
     """
     
-    import sys
     import dicom
+    try:
+        from openremproject.settings import RM_DCM_DX
+    except ImportError:
+        RM_DCM_DX = False
     
     dataset = dicom.read_file(dig_file)
     isdx = _test_if_dx(dataset)
@@ -545,6 +568,9 @@ def dx(dig_file):
     
     _dx2db(dataset)
     
+    if RM_DCM_DX:
+        os.remove(dig_file)
+
     return 0
 
 

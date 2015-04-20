@@ -36,6 +36,7 @@ from django.db import models
 import django_filters
 from django import forms
 from remapp.models import GeneralStudyModuleAttr
+from django.utils.safestring import mark_safe
 
 
 class RFSummaryListFilter(django_filters.FilterSet):
@@ -94,6 +95,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
     date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label='Acquisition protocol', name='ctradiationdose__ctirradiationeventdata__acquisition_protocol')
+    requested_procedure = django_filters.CharFilter(lookup_type='icontains', label='Requested procedure', name='requested_procedure_code_meaning')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -101,6 +104,10 @@ class CTSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
+    study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
+    acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
+    acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [
@@ -108,12 +115,18 @@ class CTSummaryListFilter(django_filters.FilterSet):
             'date_before', 
             'institution_name', 
             'study_description',
+            'acquisition_protocol',
+            'requested_procedure',
             'patient_age_min',
             'patient_age_max',
             'manufacturer', 
             'model_name',
             'station_name',
             'accession_number',
+            'study_dlp_min',
+            'study_dlp_max',
+            'acquisition_dlp_min',
+            'acquisition_dlp_max',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
@@ -184,6 +197,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
     date_after = django_filters.DateFilter(lookup_type='gte', label='Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label='Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     study_description = django_filters.CharFilter(lookup_type='icontains', label='Study description')
+    acquisition_protocol = django_filters.CharFilter(lookup_type='icontains', label='Acquisition protocol', name='projectionxrayradiationdose__irradeventxraydata__acquisition_protocol')
     patient_age_min = django_filters.NumberFilter(lookup_type='gt', label='Min age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     patient_age_max = django_filters.NumberFilter(lookup_type='lt', label='Max age (yrs)', name='patientstudymoduleattr__patient_age_decimal')
     institution_name = django_filters.CharFilter(lookup_type='icontains', label='Hospital', name='generalequipmentmoduleattr__institution_name')
@@ -191,6 +205,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    study_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
+    study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
+    acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
+    acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [
@@ -198,12 +216,15 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'date_before', 
             'institution_name', 
             'study_description',
+            'acquisition_protocol',
             'patient_age_min',
             'patient_age_max',
             'manufacturer', 
             'model_name',
             'station_name',
             'accession_number',
+            'study_dap_min',
+            'study_dap_max',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),

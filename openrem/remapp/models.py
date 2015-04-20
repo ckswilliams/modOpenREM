@@ -34,6 +34,60 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
 
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+
+class UserProfile(models.Model):
+    DAYS = 'days'
+    WEEKS = 'weeks'
+    MONTHS = 'months'
+    YEARS = 'years'
+    TIME_PERIOD = (
+        (DAYS, 'Days'),
+        (WEEKS, 'Weeks'),
+        (MONTHS, 'Months'),
+        (YEARS, 'Years'),
+    )
+
+    # This field is required.
+    user = models.OneToOneField(User)
+
+    # Plotting controls
+    plotCharts = models.BooleanField(default=False)
+    plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
+    plotDXAcquisitionFreq = models.BooleanField(default=False)
+    plotDXAcquisitionMeankVp = models.BooleanField(default=False)
+    plotDXAcquisitionMeanmAs = models.BooleanField(default=False)
+    plotDXStudyPerDayAndHour = models.BooleanField(default=False)
+    plotDXAcquisitionMeanDAPOverTime = models.BooleanField(default=False)
+    plotDXAcquisitionMeanDAPOverTimePeriod = models.CharField(max_length=6,
+                                                              choices=TIME_PERIOD,
+                                                              default=MONTHS)
+
+    plotCTAcquisitionMeanDLP = models.BooleanField(default=True)
+    plotCTAcquisitionMeanCTDI = models.BooleanField(default=True)
+    plotCTAcquisitionFreq = models.BooleanField(default=False)
+    plotCTStudyMeanDLP = models.BooleanField(default=True)
+    plotCTStudyFreq = models.BooleanField(default=False)
+    plotCTStudyPerDayAndHour = models.BooleanField(default=False)
+    plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
+    plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
+                                                        choices=TIME_PERIOD,
+                                                        default=MONTHS)
+
+    displayCT = models.BooleanField(default=True)
+    displayRF = models.BooleanField(default=True)
+    displayMG = models.BooleanField(default=True)
+    displayDX = models.BooleanField(default=True)
+
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
+
+
 class SizeUpload(models.Model):
     sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)

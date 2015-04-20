@@ -16,16 +16,27 @@ requires = [
     'xlsxwriter',
     'south',
     'celery >= 3.1',
-    'argparse >= 1.2.1'
+    'argparse >= 1.2.1',
+    'django-qsstats-magic',
+    'python-dateutil',
+    'numpy',
+#    'https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2'
     ]
 
 setup(
     name='OpenREM',
-    version='0.5.1',
+    version='0.6.0b1',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
-    scripts=['openrem/scripts/openrem_rdsr.py','openrem/scripts/openrem_mg.py','openrem/scripts/openrem_dx.py','openrem/scripts/openrem_ctphilips.py','openrem/scripts/openrem_ptsizecsv.py'],
+    scripts=[
+        'openrem/scripts/openrem_rdsr.py',
+        'openrem/scripts/openrem_mg.py',
+        'openrem/scripts/openrem_dx.py',
+        'openrem/scripts/openrem_ctphilips.py',
+        'openrem/scripts/openrem_ptsizecsv.py',
+        'openrem/scripts/openrem_store.py'
+    ],
     license='GPLv3 with additional permissions',  
     description='Radiation Exposure Monitoring for physicists',
     long_description=README,
