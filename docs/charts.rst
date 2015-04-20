@@ -30,7 +30,8 @@ The available charts for CT data are as follows:
 
       .. image:: img/ChartCTMeanDLPandCTDI.png
          :width: 831px
-         :align: center:height: 765px
+         :align: center
+         :height: 765px
          :alt: OpenREM chart of mean DLP and CTDIvol screenshot
 
       Clicking on a bar takes the user to a histogram of DLP for that protocol.
