@@ -90,8 +90,8 @@ For linux::
 For Windows, easiest might be:
 
 * Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.2+mkl‑cp27‑none‑win32.whl`` is
-likely to be the right version, unless you have 64bit Python installed, in which case use the
-``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
+  likely to be the right version, unless you have 64bit Python installed, in which case use the
+  ``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
 * Install using pip::
 
     pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
