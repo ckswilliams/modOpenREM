@@ -1174,3 +1174,24 @@ def size_abort(request, pk):
         size.delete()
 
     return HttpResponseRedirect("/openrem/admin/sizeimports/")
+
+
+def charts_off(request):
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        if request.user.is_authenticated():
+            # Create a default userprofile for the user if one doesn't exist
+            create_user_profile(sender=request.user, instance=request.user, created=True)
+            userProfile = request.user.userprofile
+
+    # Switch chart plotting off
+    userProfile.plotCharts = False
+    userProfile.save()
+
+    # Go to the OpenREM home page
+    response = openrem_home(request)
+
+    return response
