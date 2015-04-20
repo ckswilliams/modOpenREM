@@ -39,9 +39,23 @@ OpenREM requires two additional programs to be installed to enable the new featu
 *pynetdicom* for the DICOM Store Service Class Provider. Note that the version of pynetdicom must be later than the
 current pypi release!
 
-Install numpy
+Install NumPy
 -------------
 **Insert numpy install instructions here**
+
+For linux::
+
+    sudo apt-get install python-numpy
+
+For Windows, easiest might be:
+
+* Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.2+mkl‑cp27‑none‑win32.whl`` is
+likely to be the right version, unless you have 64bit Python installed, in which case use the
+``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
+* Install using pip::
+
+    pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
+
 
 Install pynetdicom
 ------------------

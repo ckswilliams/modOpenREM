@@ -75,13 +75,26 @@ For either install, just follow the defaults – no special configurations requi
 
     Before continuing, `consider virtualenv`_
 
-Install Numpy
+Install NumPy
 -------------
 *(New for version 0.6.0)*
 
 Numpy is required for charts. OpenREM will work without numpy, but charts will not be displayed.
 
-*Will pip install numpy work?* I think for linux it might need python-dev installed?
+**Insert numpy install instructions here**
+
+For linux::
+
+    sudo apt-get install python-numpy
+
+For Windows, easiest might be:
+
+* Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.2+mkl‑cp27‑none‑win32.whl`` is
+likely to be the right version, unless you have 64bit Python installed, in which case use the
+``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
+* Install using pip::
+
+    pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
 
 Install pynetdicom
 ------------------
