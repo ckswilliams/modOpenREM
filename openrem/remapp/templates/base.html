@@ -57,7 +57,9 @@
           </ul>
           {% block loginlink %}
           <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
             <li><a href="/openrem/charts_off">Switch charts off</a></li>
+            {% endif %}
             {% if admin.exportperm or admin.adminperm %}
             {% block exportnav %}
             <li><a href="/openrem/export">Exports</a></li>
