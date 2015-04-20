@@ -39,6 +39,8 @@ OpenREM requires two additional programs to be installed to enable the new featu
 *pynetdicom* for the DICOM Store Service Class Provider. Note that the version of pynetdicom must be later than the
 current pypi release!
 
+Install numpy
+-------------
 **Insert numpy install instructions here**
 
 Install pynetdicom
@@ -58,7 +60,7 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b1 upgrade `must` be made from a 0.5.1 database, and a schema migration is required:
+* The 0.6.0b1 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
     .. sourcecode:: bash
 
