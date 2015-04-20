@@ -95,6 +95,26 @@ without needing to use Conquest or any other DICOM Store SCP. This feature is a 
 tested, but it is expected to work. For more information, please see :doc:`netdicom`.
 
 
+Exports for OpenSkin
+====================
+
+Fluoroscopy studies can now be exported in a format suitable for importing into Jonathan Cole's OpenSkin software. The
+export link is on the fluoroscopy study detail page. The software for creating the exposure incidence map can be
+downloaded from https://bitbucket.org/jacole/openskin/downloads (choose the zip file), and information about the project
+can be found on the `OpenSkin wiki`_. The software allows the user to choose between a 2D phantom that would represent
+the dose to a film laying on the couch surface, or a simple 3D phantom made up of a cuboid and two semi-cylinders
+(these can be seen on the `Phantom design`_ section of the wiki). For both options the output is an image of the dose
+distribution in 2D, along with calculated peak skin dose information.
+
+Automatic hiding of unused modality types
+=========================================
+
+A fresh install of OpenREM will no longer show any of the four modality types in the tables or in the navigation bar
+at the top. As DICOM objects are ingested, the appropriate tables and navigation links are created.
+
+Therefore a site that has no mammography for example will no longer have that table or navigation link in their
+interface.
+
 ******
 Charts
 ******
@@ -177,3 +197,5 @@ The available charts for radiographic data are as follows:
       legend to show or hide individual lines.
 
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
+.. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
+.. _`Phantom design`: https://bitbucket.org/jacole/openskin/wiki/Phantom%20design
