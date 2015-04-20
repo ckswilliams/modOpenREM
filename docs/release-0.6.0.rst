@@ -1,6 +1,6 @@
-####################
-Release Notes v0.6.0
-####################
+######################
+Release Notes v0.6.0b1
+######################
 
 ****************
 Headline changes
@@ -11,9 +11,93 @@ Headline changes
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 
+*************************
+Preparing for the upgrade
+*************************
+
+Convert to South
+================
+
+**Make sure you have converted your database to South before attempting an upgrade**
+
+Quick reminder of how, if you haven't done it already
+
+.. sourcecode:: bash
+
+    # Linux: Debian/Ubuntu and derivatives
+    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+    python /usr/local/lib/python2.7/site-packages/openrem/manage.py convert_to_south remapp
+
+    # Windows, assuming no virtualenv
+    python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
+
+Additional installs
+===================
+
+OpenREM requires two additional programs to be installed to enable the new features: *Numpy* for charts, and
+*pynetdicom* for the DICOM Store Service Class Provider. Note that the version of pynetdicom must be later than the
+current pypi release!
+
+**Insert numpy install instructions here**
+
+Install pynetdicom
+------------------
+
+.. sourcecode:: bash
+
+    pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+
+
+
+Upgrading from version 0.5.1
+============================
+
+* Back up your database
+
+    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
+    * For a non-production SQLite3 database, simply make a copy of the database file
+
+* The 0.6.0b1 upgrade `must` be made from a 0.5.1 database, and a schema migration is required:
+
+    .. sourcecode:: bash
+
+        pip install openrem==0.6.0b1
+
+            # Linux: Debian/Ubuntu and derivatives
+            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+            # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+            python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+            python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
+            # Windows:
+            python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+            python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+
+***********************
+Summary of new features
+***********************
+
+Charts
+======
+
+Release 0.6.0 has a range of charting options available for CT and radiographic data. These charts allow visualisation
+of trends and frequencies to inform surveys and monitor performance. For more information, please see :doc:`charts`.
+
+
+DICOM Store Service Class Provider
+==================================
+
+OpenREM can now act as the DICOM Store service, allowing direct sending of DICOM objects from modalities to OpenREM
+without needing to use Conquest or any other DICOM Store SCP. This feature is a preview as it hasn't been extensively
+tested, but it is expected to work. For more information, please see :doc:`netdicom`.
+
+
 ******
 Charts
 ******
+
+**To be moved to the charts doc**
 
 Charts of the currently filtered data can now be shown for CT and radiographic data.
 The user can configure which plots are shown using the ``Chart options`` on the CT
