@@ -40,20 +40,20 @@ Chart types
 
 The available charts for CT data are as follows:
 
-    * Bar chart of mean DLP and CTDI for each acquisition protocol:
+    * Bar chart of mean DLP and CTDI\ :sub: `vol` for each acquisition protocol:
 
       .. image:: img/ChartCTMeanDLPandCTDI.png
          :width: 831px
          :align: center
          :height: 765px
-         :alt: OpenREM chart of mean DLP and CTDIvol screenshot
+         :alt: OpenREM chart of mean DLP and CTDI\ :sub: `vol` screenshot
 
       The tooltip of each bar shows the user the name of the protocol, the
       number of acquisitions of that type and also the mean DLP and/or
-      CTDIvol value.
+      CTDI\ :sub: `vol` value.
 
       Clicking on an individual bar takes the user to a histogram of DLP or
-      CTDIvol for that protocol. The tooltip for each histogram bar shows the
+      CTDI\ :sub: `vol` for that protocol. The tooltip for each histogram bar shows the
       number of acquisitions. The DLP histogram tooltip also includes a link
       that will take the user to the list of studies that contain the
       acquisitions represented by that histogram bar:
