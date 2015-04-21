@@ -96,6 +96,12 @@ For Windows, easiest might be:
 
     pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
 
+For Windows, you could:
+
+* Download a pre-compiled Win32 .exe NumPy file from http://sourceforge.net/projects/numpy/files/NumPy/. At the time
+  of writing the latest version was 1.9.2. You need to download the file that matches your Python version.
+* Run the downloaded binary file to install NumPy.
+
 Install pynetdicom
 ------------------
 *(New for version 0.6.0)*
