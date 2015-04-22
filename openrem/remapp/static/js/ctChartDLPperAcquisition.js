@@ -44,6 +44,7 @@ var chartAcqDLP = new Highcharts.Chart({
             }
         },
         title: {
+            useHTML: true,
             text: 'Mean DLP per acquisition protocol'
         },
         legend: {
@@ -83,6 +84,7 @@ var chartAcqDLP = new Highcharts.Chart({
             }
         },
         series: [{
+            useHTML: true,
             name: 'Mean DLP per acquisition protocol',
             data: seriesData
         }],

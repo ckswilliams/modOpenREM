@@ -44,6 +44,7 @@ var chartStudyDLP = new Highcharts.Chart({
             }
         },
         title: {
+            useHTML: true,
             text: 'Mean DLP per study description'
         },
         legend: {
@@ -83,6 +84,7 @@ var chartStudyDLP = new Highcharts.Chart({
             }
         },
         series: [{
+            useHTML: true,
             name: 'Mean DLP per study description',
             data: studySeriesData
         }],
