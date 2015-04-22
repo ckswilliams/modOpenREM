@@ -15,7 +15,6 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'mAs range'});
                     chartmAsPerAcquisition.xAxis[0].setCategories([], true);
-                    chartmAsPerAcquisition.xAxis[0].update({labels:{rotation:0}});
                     chartmAsPerAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){

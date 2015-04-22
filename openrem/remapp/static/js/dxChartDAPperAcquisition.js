@@ -16,7 +16,6 @@ var chartDAPperAcquisition = new Highcharts.Chart({
                     chartDAPperAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartDAPperAcquisition.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
                     chartDAPperAcquisition.xAxis[0].setCategories([], true);
-                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:0}});
                     chartDAPperAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
