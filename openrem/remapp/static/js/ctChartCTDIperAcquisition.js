@@ -16,12 +16,9 @@ var chartAcqCTDI = new Highcharts.Chart({
                     chartAcqCTDI.yAxis[0].setTitle({text:'Number'});
                     chartAcqCTDI.xAxis[0].setTitle({text:'CTDI<sub>vol</sub> range (mGy)'});
                     chartAcqCTDI.xAxis[0].setCategories([], true);
-                    chartAcqCTDI.xAxis[0].update({labels:{rotation:0}});
                     chartAcqCTDI.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            var linkText = '';//'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
-                            //xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>');
                             xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr></table>');
                         });
                         return xyArr.join('<br/>');

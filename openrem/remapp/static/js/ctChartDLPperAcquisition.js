@@ -16,7 +16,6 @@ var chartAcqDLP = new Highcharts.Chart({
                     chartAcqDLP.yAxis[0].setTitle({text:'Number'});
                     chartAcqDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chartAcqDLP.xAxis[0].setCategories([], true);
-                    chartAcqDLP.xAxis[0].update({labels:{rotation:0}});
                     chartAcqDLP.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
