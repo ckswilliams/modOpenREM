@@ -13,7 +13,6 @@ var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
         },
         xAxis: {
             categories: dateAxis,
-            minTickInterval: 1,
             labels: {
                 rotation:90
             }

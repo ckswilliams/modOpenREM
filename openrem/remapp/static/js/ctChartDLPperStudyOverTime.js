@@ -12,7 +12,6 @@ var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
         },
         xAxis: {
             categories: dateAxis,
-            minTickInterval: 4,
             labels: {
                 useHTML: true,
                 rotation:90
