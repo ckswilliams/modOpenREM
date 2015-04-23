@@ -1,7 +1,7 @@
 $(function () {
-var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
+var chartStudyMeanDLPOverTime = new Highcharts.Chart({
         chart: {
-            renderTo: 'linechartWeeklyStudyMeanDIV',
+            renderTo: 'studyMeanDLPOverTimeDIV',
             zoomType: 'x'
         },
         title: {
@@ -19,7 +19,7 @@ var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
         },
         yAxis: {
             title: {
-                text: 'Mean DLP over the week (mGy.cm)'
+                text: 'Mean DLP (mGy.cm)'
             },
             floor: 0,
             plotLines: [{
@@ -34,7 +34,7 @@ var chartWeeklyStudyMeanDLP = new Highcharts.Chart({
             verticalAlign: 'middle',
             borderWidth: 0
         },
-        series: meanDLPperWeek
+        series: meanDLPOverTime
     });
 });
 

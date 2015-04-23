@@ -19,7 +19,7 @@ var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
         },
         yAxis: {
             title: {
-                text: 'Mean DAP over the time period (cGy.cm<sup>2</sup>)',
+                text: 'Mean DAP (cGy.cm<sup>2</sup>)',
                 useHTML: true
             },
             floor: 0,
