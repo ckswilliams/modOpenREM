@@ -734,7 +734,7 @@ def rdsr(rdsr_file):
     import dicom
     try:
         from openremproject.settings import RM_DCM_RDSR
-    except ImprtError:
+    except ImportError:
         RM_DCM_RDSR = False
 
     dataset = dicom.read_file(rdsr_file)
