@@ -7,38 +7,51 @@
             {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
 {% endblock %}
 
-{% block mainblock %}		
-<h1>Detail list of events</h1>
+{% block mainblock %}
+    <div class="row">
+        <div class="col-md-5">
+            <h1>Detail list of events</h1>
 
-<ul>
-    <li>Accession number: {{ generalstudymoduleattr.accession_number }}</li>
-    <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
-    <li>Study time: {{ generalstudymoduleattr.study_time }}</li>
-    <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
-    <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
-    <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
-    <li>
-        Total DAP:
-        {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
-        cGy.cm2
-    </li>
-    <li>Total dose at RP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
-    <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
-    <li>
-        Scanner: 
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-        {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
-    </li>
-    <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
-    <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
-</ul>
-
-<h2>Export for OpenSkin</h2>
-<p>
-    Assuming you have the right permissions, you will be able to do that by clicking <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">this link</a>
-</p>
+            <ul>
+                <li>Accession number: {{ generalstudymoduleattr.accession_number }}</li>
+                <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
+                <li>Study time: {{ generalstudymoduleattr.study_time }}</li>
+                <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
+                <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
+                <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
+                <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
+                <li>
+                    Total DAP:
+                    {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                    cGy.cm2
+                </li>
+                <li>Total dose at RP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
+                <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
+                <li>
+                    Scanner:
+                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
+                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                    {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
+                </li>
+                <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
+                <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
+            </ul>
+        </div>
+        <div class="col-md-7">
+            <h2>OpenSkin radiation exposure incidence map</h2>
+            <p>
+                Users with export permissions can export this study to a csv file in the format required by Jonathan
+                Cole's OpenSkin software. The OpenSkin software can be downloaded from
+                <a href="https://bitbucket.org/jacole/openskin/downloads">the BitBucket project pages</a> and there is
+                more information available in the
+                <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>. Future releases of
+                OpenREM will display the exposure incidence map and peak skin dose values here.
+            </p>
+            <h4>
+                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>
+            </h4>
+        </div>
+  </div>
 
 <table class="table table-striped table-bordered">
     <th>Time</th><th>Acquisition protocol</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
