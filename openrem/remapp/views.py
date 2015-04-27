@@ -504,6 +504,14 @@ def ct_summary_list_filter(request):
             ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
         )
 
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+        ).exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in = expInclude
+        )
+
         # Required for mean DLP per acquisition plot
         if plotCTAcquisitionMeanCTDI:
             acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
@@ -523,23 +531,21 @@ def ct_summary_list_filter(request):
 
         if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type plot
-            studySummary = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
+            studySummary = study_events.values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
             if plotCTStudyMeanDLP:
                 studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
             if plotCTStudyMeanDLPOverTime:
                 # Required for mean DLP per study type per week plot
                 studyDLPoverTime = [None] * len(studySummary)
-                startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
+                startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
                 today = datetime.date.today()
 
             if plotCTStudyMeanDLP or plotCTStudyMeanDLPOverTime:
-                # Required for all study plots
-                qs = f.qs.exclude(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True)
 
                 for idx, study in enumerate(studySummary):
                     # Required for mean DLP per study type plot AND mean DLP per study type per week plot
-                    subqs = f.qs.filter(study_description=study.get('study_description'))
+                    subqs = study_events.filter(study_description=study.get('study_description'))
 
                     if plotCTStudyMeanDLP:
                         # Required for mean DLP per study type plot
@@ -555,7 +561,7 @@ def ct_summary_list_filter(request):
                 # Required for studies per weekday and studies per hour in each weekday plot
                 studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
                 for day in range(7):
-                    studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                    studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_time')
                     if studyTimesOnThisWeekday:
                         for hour in range(24):
                             try:
@@ -716,6 +722,14 @@ def ct_histogram_list_filter(request):
             ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
         )
 
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+        ).exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in = expInclude
+        )
+
         # Required for mean DLP per acquisition plot
         if plotCTAcquisitionMeanCTDI:
             acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
@@ -735,20 +749,20 @@ def ct_histogram_list_filter(request):
 
         if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type plot
-            studySummary = f.qs.exclude(Q(study_description__isnull=True)|Q(study_description='')).values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
+            studySummary = study_events.values('study_description').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('study_description')
             if plotCTStudyMeanDLP:
                 studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
             if plotCTStudyMeanDLPOverTime:
                 # Required for mean DLP per study type per week plot
                 studyDLPoverTime = [None] * len(studySummary)
-                startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
+                startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
                 today = datetime.date.today()
 
             if plotCTStudyMeanDLP or plotCTStudyMeanDLPOverTime:
                 for idx, study in enumerate(studySummary):
                     # Required for Mean DLP per study type plot AND mean DLP per study type per week plot
-                    subqs = f.qs.filter(study_description=study.get('study_description'))
+                    subqs = study_events.filter(study_description=study.get('study_description'))
 
                     if plotCTStudyMeanDLP:
                         # Required for mean DLP per study type plot
@@ -764,7 +778,7 @@ def ct_histogram_list_filter(request):
             # Required for studies per weekday and studies per hour in each weekday plot
             studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
             for day in range(7):
-                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_time')
                 if studyTimesOnThisWeekday:
                     for hour in range(24):
                         try:
