@@ -34,16 +34,6 @@ Contents:
     i_administration
     code
 
-..  Note::
-    OpenREM does not currently include a DICOM Store SCP, ie you will
-    need to install a DICOM store server in order to send RSDRs or other
-    DICOM files from modalities.
-    
-    If you have no preference, `Conquest <http://ingenium.home.xs4all.nl/dicom.html>`_
-    is recommended as a free, open source, scriptable DICOM server. Please
-    note though that you will need to include the RSRD SOP in the dgatesop.lst
-    file.
-
 ******************
 Indices and tables
 ******************
