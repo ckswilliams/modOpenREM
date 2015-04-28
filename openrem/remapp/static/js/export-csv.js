@@ -42,7 +42,7 @@
                     rows[point.x].x = point.x;
 
                     // Pies, funnels etc. use point name in X row
-                    if (!series.xAxis) {
+                    if (!series.xAxis || point.name) {
                         rows[point.x].name = point.name;
                     }
 
@@ -192,7 +192,8 @@
                 var csv = this.getCSV(true);
                 getContent(
                     this,
-                    'data:text/csv,' + csv.replace(/\n/g, '%0A'),
+                    //'data:text/csv' + csv.replace(/\n/g, '%0A'),
+                    'data:text/csv;charset=utf-8,%EF%BB%BF' + csv.replace(/\n/g, '%0A'),
                     'csv',
                     csv,
                     'text/csv'
