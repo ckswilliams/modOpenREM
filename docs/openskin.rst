@@ -52,7 +52,7 @@ It should look something like this::
     Cells > 5 Gy    :                              0
     Cells > 10 Gy   :                              0
 
-The peak dose is the peak incident dose delivered to any one-cm-square area. If any of these 1 cm\ :sup:2 areas
+The peak dose is the peak incident dose delivered to any one-cm-square area. If any of these 1 cm\ :sup:`2` areas
 (referred to as cells) are above 3 Gy, then the number of cells in this category, or the two higher dose categories,
 are listed in the table accordingly.
 
@@ -70,12 +70,12 @@ A native and 'colour equalised' version of the same export are shown below:
 
 .. image:: img/skin_dose_map.png
     :width: 210px
-    :align: center
+    :align: left
     :alt: OpenSkin incidence map, unscaled
 
 .. image:: img/skin_dose_map_scaled.png
     :width: 210px
-    :align: center
+    :align: right
     :alt: OpenSkin incidence map, scaled
 
 
