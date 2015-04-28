@@ -192,7 +192,6 @@
                 var csv = this.getCSV(true);
                 getContent(
                     this,
-                    //'data:text/csv' + csv.replace(/\n/g, '%0A'),
                     'data:text/csv;charset=utf-8,%EF%BB%BF' + csv.replace(/\n/g, '%0A'),
                     'csv',
                     csv,
@@ -204,7 +203,7 @@
             text: Highcharts.getOptions().lang.downloadXLS || 'Download XLS',
             onclick: function () {
                 var uri = 'data:application/vnd.ms-excel;base64,',
-                    template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
+                    template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">' +
                         '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
                         '<x:Name>Ark1</x:Name>' +
                         '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
@@ -213,7 +212,7 @@
                         '</head><body>' +
                         this.getTable(true) +
                         '</body></html>',
-                    base64 = function (s) { return window.btoa(decodeURIComponent(encodeURIComponent(s))); };
+                    base64 = function (s) { return window.btoa(decodeURIComponent(unescape(encodeURIComponent(s)))); };
                 getContent(
                     this,
                     uri + base64(template),
