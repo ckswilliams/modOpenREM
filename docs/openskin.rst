@@ -36,6 +36,7 @@ work on Windows. When OpenSkin is built into OpenREM, it will work on both Linux
 * Wait! Depending on the number of events in the export and the power of your machine, this can take a few minutes
 
 Two files will be produced:
+
 * Text file called ``skin_dose_results.txt``::
 
     File created    : 04/21/15 17:42:45
