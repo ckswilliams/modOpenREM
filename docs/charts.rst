@@ -150,3 +150,11 @@ The available charts for radiographic data are as follows:
       in long calculation times. The user can zoom in to the plot by clicking
       and dragging the mouse to select a date range. The user can also click on
       items in the legend to show or hide individual lines.
+
+********************
+Exporting chart data
+********************
+
+An image file of a chart can be saved using the menu in the top-right hand side
+of any of the charts. The same menu can be used to save the data used to plot a
+chart: the data can be downloaded in either csv or xls format.
