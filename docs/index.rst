@@ -30,7 +30,6 @@ Contents:
     i_navigate
     charts
     i_exporting
-    openskin
     i_administration
     code
 
