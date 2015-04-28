@@ -29,6 +29,7 @@ Contents:
     netdicom
     i_navigate
     charts
+    openskin
     i_exporting
     i_administration
     code
