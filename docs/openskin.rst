@@ -78,9 +78,11 @@ A native and 'colour equalised' version of the same export are shown below:
     :align: right
     :alt: OpenSkin incidence map, scaled
 
+***********
+Limitations
+***********
 
-
-
+OpenSkin is yet to be validated independently - if this is something you want to do, please do go ahead and feed back your findings to Jonathan Cole at https://bitbucket.org/jacole/
 
 
 
