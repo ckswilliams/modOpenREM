@@ -6,7 +6,7 @@ Exporting studies to OpenSkin
 Functionality available
 ***********************
 
-This is a temporary solution for 0.6.0; future versions will have OpenSkin built-in.
+This is a temporary solution for 0.6.0; future versions will have OpenSkin integrated into the web interface.
 
 * Fluoroscopy study export in a format suitable for OpenSkin
 * Currently OpenSkin must be downloaded and run independently
