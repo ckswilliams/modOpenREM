@@ -16,10 +16,10 @@ Instructions for OpenREM
 ************************
 
 Select the fluoroscopy study you wish to create the exposure incidence map for and go to the detail view. Then click on
-link to create the OpenSkin export.
+link to create the OpenSkin export:
 
 .. image:: img/OpenSkinExport.png
-    :align: centre
+    :align: center
     :alt: Export from OpenREM to OpenSkin
 
 *************************
@@ -72,17 +72,23 @@ required map is there.
 
 A native and 'colour equalised' version of the same export are shown below:
 
-.. container:: wrapimages
+.. raw:: html
 
-    .. image:: img/skin_dose_map.png
-        :width: 210px
-        :align: left
-        :alt: OpenSkin incidence map, unscaled
+   <div class="clearfix">
 
-    .. image:: img/skin_dose_map_scaled.png
-        :width: 210px
-        :align: right
-        :alt: OpenSkin incidence map, scaled
+.. image:: img/skin_dose_map.png
+    :width: 210px
+    :align: left
+    :alt: OpenSkin incidence map, unscaled
+
+.. image:: img/skin_dose_map_scaled.png
+    :width: 210px
+    :align: right
+    :alt: OpenSkin incidence map, scaled
+
+.. raw:: html
+
+    </div>
 
 ***********
 Limitations
