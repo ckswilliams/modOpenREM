@@ -41,20 +41,18 @@ current pypi release!
 
 Install NumPy
 -------------
-**Insert numpy install instructions here**
 
 For linux::
 
     sudo apt-get install python-numpy
 
-For Windows, easiest might be:
+For Windows, there are various options. The easiest is probably:
 
-* Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.2+mkl‑cp27‑none‑win32.whl`` is
-  likely to be the right version, unless you have 64bit Python installed, in which case use the
-  ``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
-* Install using pip::
-
-    pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
+* Download a pre-compiled Win32 .exe NumPy file from http://sourceforge.net/projects/numpy/files/NumPy/. You need to
+  download the file that matches the Python version, which should be 2.7. At the time of writing the latest version was
+  1.9.2, and the filename to download was ``numpy-1.9.2-win32-superpack-python2.7.exe``. The filename is truncated on
+  SourceForge, so you may need to click on the *i* icon to see which is which. It's usually the third *superpack*.
+* Run the downloaded binary file to install NumPy.
 
 
 Install pynetdicom
