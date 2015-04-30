@@ -84,6 +84,8 @@ Numpy is required for charts. OpenREM will work without NumPy, but charts will n
 For linux::
 
     sudo apt-get install python-numpy
+    # If using a virtualenv, you might need to also do:
+    pip install numpy
 
 For Windows, there are various options. The easiest is probably:
 
