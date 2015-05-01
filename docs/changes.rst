@@ -543,4 +543,4 @@ Reopened issue
 ..  _`#1`: https://bitbucket.org/openrem/openrem/issue/1/
 
 
-..  _`NHSBSP specific mammography csv export` : https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
+..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
