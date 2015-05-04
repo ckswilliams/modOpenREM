@@ -10,7 +10,7 @@ var chartStudyDLP = new Highcharts.Chart({
             renderTo: 'histogramStudyPlotDIV',
             events: {
                 drilldown: function(e) {
-                    tooltipData[0] = studyNames[e.point.x];
+                    tooltipData[0] = (studyNames[e.point.x]).replace('&amp;', '%26');
                     tooltipData[1] = e.point.x;
                     chartStudyDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + studySeriesDataN[e.point.x] +')' });
                     chartStudyDLP.yAxis[0].setTitle({text:'Number'});
