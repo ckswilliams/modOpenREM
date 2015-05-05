@@ -5,11 +5,14 @@ OpenREM version history
 0.6.0b2 (2015-0x-xx)
 --------------------
 
+* `#219`_  Charts: Fixed issue where some charts showed data beyond the current filter
+* `#217`_  Charts: Code optimised to speed up calculation time
 * `#216`_  Fixed typo that prevented import of RSDR when DICOM store settings not present
 * `#215`_  Charts: Fixed x-axis labels for mean dose over time charts
 * `#214`_  Charts: Improved consistency of axis labels
 * `#213`_  Fixed admin menu not working
 * `#212`_  Charts: Created off-switch for charts
+* `#210`_  OpenSkin exports documented
 * `#209`_  Charts: Fixed server error when CT plots switched off and filter form submited
 * `#208`_  Charts: Fixed blank chart plotting options when clicking on histogram tooltip link
 * `#205`_  Charts: Fixed issue of histogram tooltip links to data not working
