@@ -139,8 +139,8 @@ def _irradiationeventxraymechanicaldata(dataset,event):
     from remapp.tools.get_values import get_value_kw
     mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = get_value_kw('BodyPartThickness',dataset)
-    manufacturer = mech.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name.lower()
-    if "senograph ds" in manufacturer:
+    modelname = mech.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name.lower()
+    if "senograph ds" in modelname:
         mech.compression_force = float(get_value_kw('CompressionForce', dataset))/10
         # GE Conformance statement says in N, treating as dN
     else:
