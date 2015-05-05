@@ -10,6 +10,7 @@ Headline changes
 * Preview of DICOM Store SCP functionality
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
+* Mammography import compression force behaviour changed
 
 *************************
 Preparing for the upgrade
@@ -139,6 +140,22 @@ at the top. As DICOM objects are ingested, the appropriate tables and navigation
 
 Therefore a site that has no mammography for example will no longer have that table or navigation link in their
 interface.
+
+Mammography import compression force change
+===========================================
+
+Prior to version 0.6, the compression force extracted from the mammography image header was divided by ten before being
+stored in the database. This was because the primary author only had access to GE Senograph DS units, which store the
+compression force in dN, despite claiming using Newtons in the DICOM conformance statement.
+
+The code now checks for the term *senograph ds* contained in the model name. If it matches, then the value is divided by
+ten. Otherwise, the value is stored without any further change. We know that later GE units, the GE Senograph Essential
+for example, and other manufacturer's units store this value in N. If you have a case that acts like the Senograph DS,
+please let us know and we'll try and cater for that.
+
+If you have existing non-GE Senograph mammography data in your database, the compression force field for those studies
+is likely to be incorrect by a factor of ten (it will be too small). Studies imported after the upgrade will be correct.
+If this is a problem for you, please let us know and we'll see about writing a script to correct the existing data.
 
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
 .. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home

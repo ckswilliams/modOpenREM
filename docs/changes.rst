@@ -41,6 +41,7 @@ OpenREM version history
 * `#140`_  Charts: Added configuration options
 * `#139`_  Charts: Link to filtered dataset from histogram chart
 * `#138`_  Charts: Number of datapoints displayed on tooltip
+* `#135`_  Mammography compression force now only divides by 10 if model contains *senograph ds* **Change in behaviour**
 * `#41`_   Preview of DICOM Store SCP now available
 * `#20`_   Modality sections are now suppressed until populated
 
