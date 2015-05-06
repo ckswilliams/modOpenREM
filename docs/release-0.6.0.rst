@@ -1,5 +1,5 @@
 ######################
-Release Notes v0.6.0b1
+Release Notes v0.6.0b2
 ######################
 
 ****************
@@ -11,6 +11,11 @@ Headline changes
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 * Mammography import compression force behaviour changed
+
+Changes since 0.6.0b1
+=====================
+
+Issues `#41`_, `#133`_, `#135`_, `#210`_, `#133`_ have been closed.
 
 *************************
 Preparing for the upgrade
@@ -86,11 +91,11 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b1 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
+* The 0.6.0b2 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
     .. sourcecode:: bash
 
-        pip install openrem==0.6.0b1
+        pip install openrem==0.6.0b2
 
             # Linux: Debian/Ubuntu and derivatives
             python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
