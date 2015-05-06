@@ -284,7 +284,7 @@
       <script>
         var protocolNames     = [
           {% for name in acquisitionSummary %}
-            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -375,7 +375,7 @@
       <script>
         var protocolkVpNames     = [
           {% for name in acquisitionkVpSummary %}
-            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -437,7 +437,7 @@
       <script>
         var protocolmAsNames     = [
           {% for name in acquisitionuAsSummary %}
-            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
