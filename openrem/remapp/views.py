@@ -496,12 +496,22 @@ def ct_summary_list_filter(request):
         # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
         # with null DLP values.
         expInclude = [o.study_instance_uid for o in f]
+
+        acquisitionFilters = {'ct_radiation_dose__general_study_module_attributes__study_instance_uid__in': expInclude}
+
+        if requestResults.get('acquisition_dlp_max'):
+            acquisitionFilters['dlp__lte'] = requestResults.get('acquisition_dlp_max')
+        if requestResults.get('acquisition_dlp_min'):
+            acquisitionFilters['dlp__gte'] = requestResults.get('acquisition_dlp_min')
+        if requestResults.get('acquisition_protocol'):
+            acquisitionFilters['acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+
         acquisition_events = CtIrradiationEventData.objects.exclude(
             ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
         ).exclude(
             dlp__isnull=True
         ).filter(
-            ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+            **acquisitionFilters
         )
 
         study_events = GeneralStudyModuleAttr.objects.exclude(
@@ -714,12 +724,22 @@ def ct_histogram_list_filter(request):
         # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
         # with null DLP values.
         expInclude = [o.study_instance_uid for o in f]
+
+        acquisitionFilters = {'ct_radiation_dose__general_study_module_attributes__study_instance_uid__in': expInclude}
+
+        if requestResults.get('acquisition_dlp_max'):
+            acquisitionFilters['dlp__lte'] = requestResults.get('acquisition_dlp_max')
+        if requestResults.get('acquisition_dlp_min'):
+            acquisitionFilters['dlp__gte'] = requestResults.get('acquisition_dlp_min')
+        if requestResults.get('acquisition_protocol'):
+            acquisitionFilters['acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+
         acquisition_events = CtIrradiationEventData.objects.exclude(
             ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
         ).exclude(
             dlp__isnull=True
         ).filter(
-            ct_radiation_dose__general_study_module_attributes__study_instance_uid__in = expInclude
+            **acquisitionFilters
         )
 
         study_events = GeneralStudyModuleAttr.objects.exclude(
