@@ -15,8 +15,7 @@ Headline changes
 Changes since 0.6.0b1
 =====================
 
-Issues `#41`_, `#133`_, `#135`_, `#210`_, `#221diff
-`_ have been closed.
+Issues `#41`_, `#133`_, `#135`_, `#210`_, `#221`_ have been closed.
 
 *************************
 Preparing for the upgrade
