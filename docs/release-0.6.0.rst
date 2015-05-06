@@ -15,7 +15,8 @@ Headline changes
 Changes since 0.6.0b1
 =====================
 
-Issues `#41`_, `#133`_, `#135`_, `#210`_, `#133`_ have been closed.
+Issues `#41`_, `#133`_, `#135`_, `#210`_, `#221diff
+`_ have been closed.
 
 *************************
 Preparing for the upgrade
@@ -165,3 +166,8 @@ If this is a problem for you, please let us know and we'll see about writing a s
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
 .. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
 .. _`Phantom design`: https://bitbucket.org/jacole/openskin/wiki/Phantom%20design
+..  _`#41`: https://bitbucket.org/openrem/openrem/issue/41/
+..  _`#133`: https://bitbucket.org/openrem/openrem/issue/133/
+..  _`#135`: https://bitbucket.org/openrem/openrem/issue/135/
+..  _`#210`: https://bitbucket.org/openrem/openrem/issue/210/
+..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/
