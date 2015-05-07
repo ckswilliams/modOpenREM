@@ -75,13 +75,36 @@ For either install, just follow the defaults – no special configurations requi
 
     Before continuing, `consider virtualenv`_
 
-Install Numpy
+Install NumPy
 -------------
 *(New for version 0.6.0)*
 
-Numpy is required for charts. OpenREM will work without numpy, but charts will not be displayed.
+Numpy is required for charts. OpenREM will work without NumPy, but charts will not be displayed.
 
-*Will pip install numpy work?* I think for linux it might need python-dev installed?
+For linux::
+
+    sudo apt-get install python-numpy
+    # If using a virtualenv, you might need to also do:
+    pip install numpy
+
+For Windows, there are various options:
+
+1. Download executable install file from SourceForge:
+
+    * Download a pre-compiled Win32 .exe NumPy file from http://sourceforge.net/projects/numpy/files/NumPy/. You need to
+      download the file that matches the Python version, which should be 2.7. At the time of writing the latest version was
+      1.9.2, and the filename to download was ``numpy-1.9.2-win32-superpack-python2.7.exe``. The filename is truncated on
+      SourceForge, so you may need to click on the *i* icon to see which is which. It's usually the third *superpack*.
+    * Run the downloaded binary file to install NumPy.
+
+2. Or download a ``pip`` installable wheel file:
+
+    * Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.2+mkl‑cp27‑none‑win32.whl`` is
+      likely to be the right version, unless you have 64bit Python installed, in which case use the
+      ``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
+    * Install using pip::
+
+        pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
 
 Install pynetdicom
 ------------------
@@ -103,7 +126,7 @@ Install latest beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.6.0b1
+    pip install openrem==0.6.0b2
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 

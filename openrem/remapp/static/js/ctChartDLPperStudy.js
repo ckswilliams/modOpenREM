@@ -10,13 +10,12 @@ var chartStudyDLP = new Highcharts.Chart({
             renderTo: 'histogramStudyPlotDIV',
             events: {
                 drilldown: function(e) {
-                    tooltipData[0] = studyNames[e.point.x];
+                    tooltipData[0] = (studyNames[e.point.x]).replace('&amp;', '%26');
                     tooltipData[1] = e.point.x;
                     chartStudyDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + studySeriesDataN[e.point.x] +')' });
                     chartStudyDLP.yAxis[0].setTitle({text:'Number'});
                     chartStudyDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chartStudyDLP.xAxis[0].setCategories([], true);
-                    chartStudyDLP.xAxis[0].update({labels:{rotation:0}});
                     chartStudyDLP.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -44,6 +43,7 @@ var chartStudyDLP = new Highcharts.Chart({
             }
         },
         title: {
+            useHTML: true,
             text: 'Mean DLP per study description'
         },
         legend: {
@@ -83,6 +83,7 @@ var chartStudyDLP = new Highcharts.Chart({
             }
         },
         series: [{
+            useHTML: true,
             name: 'Mean DLP per study description',
             data: studySeriesData
         }],

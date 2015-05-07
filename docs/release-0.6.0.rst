@@ -1,5 +1,5 @@
 ######################
-Release Notes v0.6.0b1
+Release Notes v0.6.0b2
 ######################
 
 ****************
@@ -10,6 +10,12 @@ Headline changes
 * Preview of DICOM Store SCP functionality
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
+* Mammography import compression force behaviour changed
+
+Changes since 0.6.0b1
+=====================
+
+Issues `#41`_, `#133`_, `#135`_, `#210`_, `#221`_ have been closed.
 
 *************************
 Preparing for the upgrade
@@ -39,9 +45,34 @@ OpenREM requires two additional programs to be installed to enable the new featu
 *pynetdicom* for the DICOM Store Service Class Provider. Note that the version of pynetdicom must be later than the
 current pypi release!
 
-Install numpy
+Install NumPy
 -------------
-**Insert numpy install instructions here**
+
+For linux::
+
+    sudo apt-get install python-numpy
+    # If using a virtualenv, you might need to also do:
+    pip install numpy
+
+For Windows, there are various options:
+
+1. Download executable install file from SourceForge:
+
+    * Download a pre-compiled Win32 .exe NumPy file from http://sourceforge.net/projects/numpy/files/NumPy/. You need to
+      download the file that matches the Python version, which should be 2.7. At the time of writing the latest version was
+      1.9.2, and the filename to download was ``numpy-1.9.2-win32-superpack-python2.7.exe``. The filename is truncated on
+      SourceForge, so you may need to click on the *i* icon to see which is which. It's usually the third *superpack*.
+    * Run the downloaded binary file to install NumPy.
+
+2. Or download a ``pip`` installable wheel file:
+
+    * Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.2+mkl‑cp27‑none‑win32.whl`` is
+      likely to be the right version, unless you have 64bit Python installed, in which case use the
+      ``numpy‑1.9.2+mkl‑cp27‑none‑win_amd64.whl`` version instead.
+    * Install using pip::
+
+        pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
+
 
 Install pynetdicom
 ------------------
@@ -60,11 +91,11 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b1 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
+* The 0.6.0b2 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
     .. sourcecode:: bash
 
-        pip install openrem==0.6.0b1
+        pip install openrem==0.6.0b2
 
             # Linux: Debian/Ubuntu and derivatives
             python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
@@ -115,87 +146,27 @@ at the top. As DICOM objects are ingested, the appropriate tables and navigation
 Therefore a site that has no mammography for example will no longer have that table or navigation link in their
 interface.
 
-******
-Charts
-******
+Mammography import compression force change
+===========================================
 
-**To be moved to the charts doc**
+Prior to version 0.6, the compression force extracted from the mammography image header was divided by ten before being
+stored in the database. This was because the primary author only had access to GE Senograph DS units, which store the
+compression force in dN, despite claiming using Newtons in the DICOM conformance statement.
 
-Charts of the currently filtered data can now be shown for CT and radiographic data.
-The user can configure which plots are shown using the ``Chart options`` on the CT
-and radiographic pages.
+The code now checks for the term *senograph ds* contained in the model name. If it matches, then the value is divided by
+ten. Otherwise, the value is stored without any further change. We know that later GE units, the GE Senograph Essential
+for example, and other manufacturer's units store this value in N. If you have a case that acts like the Senograph DS,
+please let us know and we'll try and cater for that.
 
-The first option, ``Plot charts?``, determines whether any plots are shown. This also
-controls whether the data for the plots is calculated by OpenREM. Some plot data is
-slow to calculate when there is a large amount of data: some users may prefer to leave
-``Plot charts?`` off for performance reasons. ``Plot charts?`` can be switched on and
-activated with a click of the ``submit`` button after the data has been filtered.
-
-A user's chart options can also be changed via OpenREM's user administration page.
-
-The available charts for CT data are as follows:
-
-    * Bar chart of mean DLP for each acquisition protocol. Clicking on a bar takes the
-      user to a histogram of DLP for that protocol. Clicking on the tool-tip link of
-      a histogram bar takes the user to the list of studies that contain the
-      acquisitions in the histogram bar.
-
-    * Pie chart of the frequency of each acquisition protocol. Clicking on a segment
-      of the pie chart takes the user to the list of studies that contain the
-      acquisitions in that segment.
-
-    * Bar chart of mean DLP for each study name. Clicking on a bar takes the user to
-      a histogram of DLP for that study name. Clicking on the tool-tip link of a
-      histogram bar takes the user to the list of studies that correspond to the
-      data in the histogram bar.
-
-    * Pie chart of the frequency of each study name. Clicking on a segment of the
-      pie chart takes the user to the list of studies that correspond to the data
-      in that segment.
-
-    * Pie chart showing the number of studies carried out per weekday. Clicking on
-      a segment of the pie chart takes the user to a pie chart showing the studies
-      for that weekday broken down per hour.
-
-    * Line chart showing how the mean DLP of each study name varies over time. The
-      time period per data point can be chosen by the user in the ``Chart options``.
-      Note that selecting a short time period may result in long calculation times.
-      The user can zoom in to the plot by clicking and dragging the mouse to select
-      a date range. The user can also click on items in the legend to show or hide
-      individual lines.
-
-The available charts for radiographic data are as follows:
-
-    * Bar chart of mean DAP for each acquisition protocol. Clicking on a bar takes the
-      user to a histogram of DAP for that protocol. Clicking on the tool-tip link of
-      a histogram bar takes the user to the list of studies that contain the
-      acquisitions in the histogram bar.
-
-    * Pie chart of the frequency of each acquisition protocol. Clicking on a segment
-      of the pie chart takes the user to the list of studies that contain the
-      acquisitions in that segment.
-
-    * Bar chart of mean kVp for each acquisition protocol. Clicking on a bar takes the
-      user to a histogram of kVp for that protocol. Clicking on the tool-tip link of
-      a histogram bar takes the user to the list of studies that contain the
-      acquisitions in the histogram bar.
-
-    * Bar chart of mean mAs for each acquisition protocol. Clicking on a bar takes the
-      user to a histogram of mAs for that protocol. Clicking on the tool-tip link of
-      a histogram bar takes the user to the list of studies that contain the
-      acquisitions in the histogram bar.
-
-    * Pie chart showing the number of studies carried out per weekday. Clicking on
-      a segment of the pie chart takes the user to a pie chart showing the studies
-      for that weekday broken down per hour.
-
-    * Line chart showing how the mean DAP of each acquisition protocol varies over
-      time. The time period per data point can be chosen by the user in the
-      ``Chart options``. Note that selecting a short time period may result in long
-      calculation times. The user can zoom in to the plot by clicking and dragging
-      the mouse to select a date range. The user can also click on items in the
-      legend to show or hide individual lines.
+If you have existing non-GE Senograph mammography data in your database, the compression force field for those studies
+is likely to be incorrect by a factor of ten (it will be too small). Studies imported after the upgrade will be correct.
+If this is a problem for you, please let us know and we'll see about writing a script to correct the existing data.
 
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
 .. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
 .. _`Phantom design`: https://bitbucket.org/jacole/openskin/wiki/Phantom%20design
+..  _`#41`: https://bitbucket.org/openrem/openrem/issue/41/
+..  _`#133`: https://bitbucket.org/openrem/openrem/issue/133/
+..  _`#135`: https://bitbucket.org/openrem/openrem/issue/135/
+..  _`#210`: https://bitbucket.org/openrem/openrem/issue/210/
+..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/

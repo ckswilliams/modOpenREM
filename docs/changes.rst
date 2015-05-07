@@ -2,11 +2,22 @@
 OpenREM version history
 =======================
 
-0.6.0b1 (2015-04-20)
+0.6.0b2 (2015-05-07)
 --------------------
 
-* `#205`_  Fixed issue of histogram tooltip links to data not working
-* `#204`_  Fixed issue of not being able to export with the charts features added
+* `#221`_  Charts: Fixed issue where filters at acquisition event level were not adequately restricting the chart data
+* `#219`_  Charts: Fixed issue where some charts showed data beyond the current filter
+* `#217`_  Charts: Code optimised to speed up calculation time
+* `#216`_  Fixed typo that prevented import of RSDR when DICOM store settings not present
+* `#215`_  Charts: Fixed x-axis labels for mean dose over time charts
+* `#214`_  Charts: Improved consistency of axis labels
+* `#213`_  Fixed admin menu not working
+* `#212`_  Charts: Created off-switch for charts
+* `#210`_  OpenSkin exports documented
+* `#209`_  Charts: Fixed server error when CT plots switched off and filter form submited
+* `#208`_  Charts: Fixed blank chart plotting options when clicking on histogram tooltip link
+* `#205`_  Charts: Fixed issue of histogram tooltip links to data not working
+* `#204`_  Charts: Fixed issue of not being able to export with the charts features added
 * `#203`_  Charts: Fixed display of HTML in plots issue
 * `#202`_  Charts: Added mean CTDIvol to charts
 * `#200`_  Charts: Now exclude Philips Ingenuity SPRs from plots
@@ -34,6 +45,8 @@ OpenREM version history
 * `#140`_  Charts: Added configuration options
 * `#139`_  Charts: Link to filtered dataset from histogram chart
 * `#138`_  Charts: Number of datapoints displayed on tooltip
+* `#135`_  Mammography compression force now only divides by 10 if model contains *senograph ds* **Change in behaviour**
+* `#133`_  Documented installation of NumPy, initially for charts
 * `#41`_   Preview of DICOM Store SCP now available
 * `#20`_   Modality sections are now suppressed until populated
 
@@ -265,6 +278,56 @@ Reopened issue
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#269`: https://bitbucket.org/openrem/openrem/issue/269/
+..  _`#268`: https://bitbucket.org/openrem/openrem/issue/268/
+..  _`#267`: https://bitbucket.org/openrem/openrem/issue/267/
+..  _`#266`: https://bitbucket.org/openrem/openrem/issue/266/
+..  _`#265`: https://bitbucket.org/openrem/openrem/issue/265/
+..  _`#264`: https://bitbucket.org/openrem/openrem/issue/264/
+..  _`#263`: https://bitbucket.org/openrem/openrem/issue/263/
+..  _`#262`: https://bitbucket.org/openrem/openrem/issue/262/
+..  _`#261`: https://bitbucket.org/openrem/openrem/issue/261/
+..  _`#260`: https://bitbucket.org/openrem/openrem/issue/260/
+..  _`#259`: https://bitbucket.org/openrem/openrem/issue/259/
+..  _`#258`: https://bitbucket.org/openrem/openrem/issue/258/
+..  _`#257`: https://bitbucket.org/openrem/openrem/issue/257/
+..  _`#256`: https://bitbucket.org/openrem/openrem/issue/256/
+..  _`#255`: https://bitbucket.org/openrem/openrem/issue/255/
+..  _`#254`: https://bitbucket.org/openrem/openrem/issue/254/
+..  _`#253`: https://bitbucket.org/openrem/openrem/issue/253/
+..  _`#252`: https://bitbucket.org/openrem/openrem/issue/252/
+..  _`#251`: https://bitbucket.org/openrem/openrem/issue/251/
+..  _`#250`: https://bitbucket.org/openrem/openrem/issue/250/
+..  _`#249`: https://bitbucket.org/openrem/openrem/issue/249/
+..  _`#248`: https://bitbucket.org/openrem/openrem/issue/248/
+..  _`#247`: https://bitbucket.org/openrem/openrem/issue/247/
+..  _`#246`: https://bitbucket.org/openrem/openrem/issue/246/
+..  _`#245`: https://bitbucket.org/openrem/openrem/issue/245/
+..  _`#244`: https://bitbucket.org/openrem/openrem/issue/244/
+..  _`#243`: https://bitbucket.org/openrem/openrem/issue/243/
+..  _`#242`: https://bitbucket.org/openrem/openrem/issue/242/
+..  _`#241`: https://bitbucket.org/openrem/openrem/issue/241/
+..  _`#240`: https://bitbucket.org/openrem/openrem/issue/240/
+..  _`#239`: https://bitbucket.org/openrem/openrem/issue/239/
+..  _`#238`: https://bitbucket.org/openrem/openrem/issue/238/
+..  _`#237`: https://bitbucket.org/openrem/openrem/issue/237/
+..  _`#236`: https://bitbucket.org/openrem/openrem/issue/236/
+..  _`#235`: https://bitbucket.org/openrem/openrem/issue/235/
+..  _`#234`: https://bitbucket.org/openrem/openrem/issue/234/
+..  _`#233`: https://bitbucket.org/openrem/openrem/issue/233/
+..  _`#232`: https://bitbucket.org/openrem/openrem/issue/232/
+..  _`#231`: https://bitbucket.org/openrem/openrem/issue/231/
+..  _`#230`: https://bitbucket.org/openrem/openrem/issue/230/
+..  _`#229`: https://bitbucket.org/openrem/openrem/issue/229/
+..  _`#228`: https://bitbucket.org/openrem/openrem/issue/228/
+..  _`#227`: https://bitbucket.org/openrem/openrem/issue/227/
+..  _`#226`: https://bitbucket.org/openrem/openrem/issue/226/
+..  _`#225`: https://bitbucket.org/openrem/openrem/issue/225/
+..  _`#224`: https://bitbucket.org/openrem/openrem/issue/224/
+..  _`#223`: https://bitbucket.org/openrem/openrem/issue/223/
+..  _`#222`: https://bitbucket.org/openrem/openrem/issue/222/
+..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/
+..  _`#220`: https://bitbucket.org/openrem/openrem/issue/220/
 ..  _`#219`: https://bitbucket.org/openrem/openrem/issue/219/
 ..  _`#218`: https://bitbucket.org/openrem/openrem/issue/218/
 ..  _`#217`: https://bitbucket.org/openrem/openrem/issue/217/
@@ -486,4 +549,4 @@ Reopened issue
 ..  _`#1`: https://bitbucket.org/openrem/openrem/issue/1/
 
 
-..  _`NHSBSP specific mammography csv export` : https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
+..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330

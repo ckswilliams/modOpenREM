@@ -111,3 +111,7 @@ urlpatterns += patterns('remapp.exports',
         'xlsx.ctxlsx'),
 )
 
+urlpatterns += patterns('remapp.views',
+    url(r'^charts_off/$',
+        'charts_off'),
+)

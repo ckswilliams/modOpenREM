@@ -15,7 +15,6 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'kVp range'});
                     chartkVpPerAcquisition.xAxis[0].setCategories([], true);
-                    chartkVpPerAcquisition.xAxis[0].update({labels:{rotation:0}});
                     chartkVpPerAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){

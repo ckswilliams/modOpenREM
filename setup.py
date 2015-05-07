@@ -19,13 +19,13 @@ requires = [
     'argparse >= 1.2.1',
     'django-qsstats-magic',
     'python-dateutil',
-    'numpy',
+#    'numpy',
 #    'https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2'
     ]
 
 setup(
     name='OpenREM',
-    version='0.6.0b1',
+    version='0.6.0b2',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,

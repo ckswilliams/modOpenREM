@@ -251,7 +251,7 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime">
-                Line plot showing monthly mean DAP of each acquisition protocol over time.
+                Line plot showing mean DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
               </a>
             </h4>
           </div>
@@ -269,6 +269,7 @@
     <!-- Include JavaScript to enable highcharts plots -->
     <script src="{{ STATIC_URL }}js/highcharts.js"></script>
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
+    <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <script src="{{ STATIC_URL }}js/drilldown.js"></script>
     <!-- End of include JavaScript for the plots -->
 
@@ -283,7 +284,7 @@
       <script>
         var protocolNames     = [
           {% for name in acquisitionSummary %}
-            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -374,7 +375,7 @@
       <script>
         var protocolkVpNames     = [
           {% for name in acquisitionkVpSummary %}
-            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -436,7 +437,7 @@
       <script>
         var protocolmAsNames     = [
           {% for name in acquisitionuAsSummary %}
-            "{{name.projectionxrayradiationdose__irradeventxraydata__acquisition_protocol}}"
+            "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];

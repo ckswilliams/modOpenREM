@@ -10,13 +10,12 @@ var chartAcqDLP = new Highcharts.Chart({
             renderTo: 'histogramPlotDIV',
             events: {
                 drilldown: function(e) {
-                    tooltipData[0] = protocolNames[e.point.x];
+                    tooltipData[0] = (protocolNames[e.point.x]).replace('&amp;', '%26');
                     tooltipData[1] = e.point.x;
                     chartAcqDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chartAcqDLP.yAxis[0].setTitle({text:'Number'});
                     chartAcqDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chartAcqDLP.xAxis[0].setCategories([], true);
-                    chartAcqDLP.xAxis[0].update({labels:{rotation:0}});
                     chartAcqDLP.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
@@ -44,6 +43,7 @@ var chartAcqDLP = new Highcharts.Chart({
             }
         },
         title: {
+            useHTML: true,
             text: 'Mean DLP per acquisition protocol'
         },
         legend: {
@@ -83,6 +83,7 @@ var chartAcqDLP = new Highcharts.Chart({
             }
         },
         series: [{
+            useHTML: true,
             name: 'Mean DLP per acquisition protocol',
             data: seriesData
         }],

@@ -141,7 +141,11 @@ def store(*args, **kwargs):
     args = parser.parse_args()
 
     # setup AE
-    MyAE = AE(args.aet, args.port, [], [StorageSOPClass, VerificationSOPClass], [ExplicitVRLittleEndian])
+    MyAE = AE(
+        args.aet, args.port, [],
+        [StorageSOPClass, VerificationSOPClass],
+        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
+    )
     MyAE.OnAssociateRequest = OnAssociateRequest
     MyAE.OnAssociateResponse = OnAssociateResponse
     MyAE.OnReceiveStore = OnReceiveStore

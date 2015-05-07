@@ -143,6 +143,7 @@
     <!-- Include JavaScript to enable highcharts plots -->
     <script src="{{ STATIC_URL }}js/highcharts.js"></script>
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
+    <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <!-- End of include JavaScript to enable highcharts plots -->
 
 
@@ -481,13 +482,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyStudyMeanChart">
-                Line plot showing weekly mean DLP of each study type over time.
+                Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
               </a>
             </h4>
           </div>
           <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="linechartWeeklyStudyMeanDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <div id="studyMeanDLPOverTimeDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
             </div>
           </div>
@@ -657,7 +658,7 @@
 
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
 
-        meanDLPperWeek = [
+        meanDLPOverTime = [
           {% for studyData in studyDLPoverTime %}
             {{'{'}}name:studyNames[{{forloop.counter}}-1],
                   color:studyLineColours[{{forloop.counter}}-1],
@@ -671,8 +672,8 @@
             {{'}'}}
             {{'}'}},
             data:[
-              {% for weekEntries in studyData %}
-                {{'{'}}y:{% if weekEntries.1 %}{{ weekEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}})).setDate((new Date({{weekEntries.0.year}},{{weekEntries.0.month}}-1,{{weekEntries.0.day}})).getDate()+6))){{'}'}}
+              {% for dateEntries in studyData %}
+                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setDate((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getDate()+6))){{'}'}}
                       {% if not forloop.last %},{% endif %}
               {% endfor %}
             ]{{'}'}}
@@ -681,7 +682,7 @@
         ];
       </script>
 
-      <script src="{{ STATIC_URL }}js/ctChartDAPperStudyOverTime.js"></script>
+      <script src="{{ STATIC_URL }}js/ctChartDLPperStudyOverTime.js"></script>
       <!-- End of JavaScript for mean DLP per study description -->
     {% endif %}
 

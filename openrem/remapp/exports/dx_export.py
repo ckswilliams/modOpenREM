@@ -520,7 +520,7 @@ def dxxlsx(filterdict):
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
