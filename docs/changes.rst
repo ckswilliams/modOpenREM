@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.6.0b2 (2015-0x-xx)
+0.6.0b2 (2015-05-07)
 --------------------
 
 * `#221`_  Charts: Fixd issue where filters at acquisition event level were not adequately restricting the chart data
