@@ -2,10 +2,10 @@
 OpenREM version history
 =======================
 
-0.6.0b2 (2015-0x-xx)
+0.6.0b2 (2015-05-07)
 --------------------
 
-* `#221`_  Charts: Fixd issue where filters at acquisition event level were not adequately restricting the chart data
+* `#221`_  Charts: Fixed issue where filters at acquisition event level were not adequately restricting the chart data
 * `#219`_  Charts: Fixed issue where some charts showed data beyond the current filter
 * `#217`_  Charts: Code optimised to speed up calculation time
 * `#216`_  Fixed typo that prevented import of RSDR when DICOM store settings not present
@@ -46,6 +46,7 @@ OpenREM version history
 * `#139`_  Charts: Link to filtered dataset from histogram chart
 * `#138`_  Charts: Number of datapoints displayed on tooltip
 * `#135`_  Mammography compression force now only divides by 10 if model contains *senograph ds* **Change in behaviour**
+* `#133`_  Documented installation of NumPy, initially for charts
 * `#41`_   Preview of DICOM Store SCP now available
 * `#20`_   Modality sections are now suppressed until populated
 

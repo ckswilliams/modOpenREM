@@ -2,14 +2,18 @@
 OpenREM version history
 =======================
 
-0.6.0b2 (2015-0x-xx)
+0.6.0b2 (2015-05-07)
 --------------------
 
+* `#221`_  Charts: Fixed issue where filters at acquisition event level were not adequately restricting the chart data
+* `#219`_  Charts: Fixed issue where some charts showed data beyond the current filter
+* `#217`_  Charts: Code optimised to speed up calculation time
 * `#216`_  Fixed typo that prevented import of RSDR when DICOM store settings not present
 * `#215`_  Charts: Fixed x-axis labels for mean dose over time charts
 * `#214`_  Charts: Improved consistency of axis labels
 * `#213`_  Fixed admin menu not working
 * `#212`_  Charts: Created off-switch for charts
+* `#210`_  OpenSkin exports documented
 * `#209`_  Charts: Fixed server error when CT plots switched off and filter form submited
 * `#208`_  Charts: Fixed blank chart plotting options when clicking on histogram tooltip link
 * `#205`_  Charts: Fixed issue of histogram tooltip links to data not working
@@ -41,6 +45,8 @@ OpenREM version history
 * `#140`_  Charts: Added configuration options
 * `#139`_  Charts: Link to filtered dataset from histogram chart
 * `#138`_  Charts: Number of datapoints displayed on tooltip
+* `#135`_  Mammography compression force now only divides by 10 if model contains *senograph ds* **Change in behaviour**
+* `#133`_  Documented installation of NumPy, initially for charts
 * `#41`_   Preview of DICOM Store SCP now available
 * `#20`_   Modality sections are now suppressed until populated
 
@@ -254,7 +260,7 @@ Reopened issue
 ------------------
 
 ..      Note::
-        
+
         Installs of OpenREM earlier than 0.3.3 will break on upgrade if the scripts are called from other programs.
         For example openrem_rdsr is now called openrem_rdsr.py
 
@@ -262,7 +268,7 @@ Reopened issue
 * `#10`_   Added .py suffix to the scripts to allow them to be executed on Windows (thanks to DJ Platten)
 * `#8`_    Removed superfluous '/' in base html file, harmless on linux, prevented Windows loading stylesheets (thanks to DJ Platten)
 * `#7`_    Added windows and linux path examples for test SQLite database creation
-* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten) 
+* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten)
 * `#4`_    Added some text to the documentation relating to importing files to OpenREM
 * `#3`_    Corrected copyright notice in documentation
 
@@ -543,4 +549,4 @@ Reopened issue
 ..  _`#1`: https://bitbucket.org/openrem/openrem/issue/1/
 
 
-..  _`NHSBSP specific mammography csv export` : https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
+..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
