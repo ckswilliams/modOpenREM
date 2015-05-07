@@ -5,6 +5,7 @@ OpenREM version history
 0.6.0b2 (2015-0x-xx)
 --------------------
 
+* `#221`_  Charts: Fixd issue where filters at acquisition event level were not adequately restricting the chart data
 * `#219`_  Charts: Fixed issue where some charts showed data beyond the current filter
 * `#217`_  Charts: Code optimised to speed up calculation time
 * `#216`_  Fixed typo that prevented import of RSDR when DICOM store settings not present
