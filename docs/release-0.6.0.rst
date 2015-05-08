@@ -107,6 +107,11 @@ Upgrading from version 0.5.1
     python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
+* Restart the services
+
+    * Restart the webserver
+    * Restart Celery
+
 ***********************
 Summary of new features
 ***********************
