@@ -97,15 +97,15 @@ Upgrading from version 0.5.1
 
         pip install openrem==0.6.0b2
 
-            # Linux: Debian/Ubuntu and derivatives
-            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
-            python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
-            # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-            python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
-            python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
-            # Windows:
-            python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
-            python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+        # Linux: Debian/Ubuntu and derivatives
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/dist-packages/openrem/manage.py migrate remapp
+        # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py schemamigration --auto remapp
+        python /usr/local/lib/python2.7/site-packages/openrem/manage.py migrate remapp
+        # Windows:
+        python C:\Python27\Lib\site-packages\openrem\manage.py schemamigration --auto remapp
+        python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
 ***********************
 Summary of new features
