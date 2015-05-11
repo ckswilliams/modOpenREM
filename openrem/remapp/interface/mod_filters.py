@@ -211,6 +211,11 @@ class DXSummaryListFilter(django_filters.FilterSet):
     study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
     acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
     acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
+    acquisition_kvp_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', widget=forms.HiddenInput())
+    acquisition_kvp_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', widget=forms.HiddenInput())
+    acquisition_mas_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
+    acquisition_mas_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
+
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [
