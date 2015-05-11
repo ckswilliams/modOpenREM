@@ -41,7 +41,7 @@
       </div>
       <div class="panel-body">
         <i>Date format yyyy-mm-dd</i>
-        {% for field in filter.form %}
+        {% for field in filter.form.visible_fields %}
           <div class="form-group">
             <div class="col-xs-4">
               <label>{{ field.label_tag }}</label>
@@ -51,6 +51,9 @@
               {{ field }}
             </div>
           </div>
+        {% endfor %}
+        {% for field in filter.form.hidden_fields %}
+          <div style="display:none">{{ field }}</div>
         {% endfor %}
         <input name="submit" type="submit" />
       </div>

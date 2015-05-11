@@ -108,6 +108,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
     acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
+    acquisition_ctdi_min = django_filters.NumberFilter(lookup_type='gte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
+    acquisition_ctdi_max = django_filters.NumberFilter(lookup_type='lte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [

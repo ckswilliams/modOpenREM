@@ -574,6 +574,10 @@ def ct_summary_list_filter(request):
             acquisitionFilters['dlp__gte'] = requestResults.get('acquisition_dlp_min')
         if requestResults.get('acquisition_protocol'):
             acquisitionFilters['acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_ctdi_max'):
+            acquisitionFilters['mean_ctdivol__lte'] = requestResults.get('acquisition_ctdi_max')
+        if requestResults.get('acquisition_ctdi_min'):
+            acquisitionFilters['mean_ctdivol__gte'] = requestResults.get('acquisition_ctdi_min')
 
         acquisition_events = CtIrradiationEventData.objects.exclude(
             ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
@@ -802,6 +806,10 @@ def ct_histogram_list_filter(request):
             acquisitionFilters['dlp__gte'] = requestResults.get('acquisition_dlp_min')
         if requestResults.get('acquisition_protocol'):
             acquisitionFilters['acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_ctdi_max'):
+            acquisitionFilters['mean_ctdivol__lte'] = requestResults.get('acquisition_ctdi_max')
+        if requestResults.get('acquisition_ctdi_min'):
+            acquisitionFilters['mean_ctdivol__gte'] = requestResults.get('acquisition_ctdi_min')
 
         acquisition_events = CtIrradiationEventData.objects.exclude(
             ct_acquisition_type__code_meaning__exact = u'Constant Angle Acquisition'
