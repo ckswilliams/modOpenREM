@@ -97,11 +97,11 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b2 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
+* The 0.6.0b3 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.6.0b2
+    pip install openrem==0.6.0b3
 
     # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
