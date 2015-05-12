@@ -1,5 +1,5 @@
 ######################
-Release Notes v0.6.0b2
+Release Notes v0.6.0b3
 ######################
 
 ****************
@@ -11,6 +11,12 @@ Headline changes
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 * Mammography import compression force behaviour changed
+
+Changes since 0.6.0b2
+=====================
+
+Minor improvement to documentation, issues `#224`_ and `#225`_ - both regarding tooltip links to associated data from
+histograms - have been opened and closed.
 
 Changes since 0.6.0b1
 =====================
@@ -175,3 +181,5 @@ If this is a problem for you, please let us know and we'll see about writing a s
 ..  _`#135`: https://bitbucket.org/openrem/openrem/issue/135/
 ..  _`#210`: https://bitbucket.org/openrem/openrem/issue/210/
 ..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/
+..  _`#224`: https://bitbucket.org/openrem/openrem/issue/224/
+..  _`#225`: https://bitbucket.org/openrem/openrem/issue/225/
