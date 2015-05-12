@@ -2,9 +2,11 @@
 OpenREM version history
 =======================
 
-0.6.0b2 (2015-05-07)
+0.6.0b3 (2015-05-12)
 --------------------
 
+* `#225`_  Charts: Added link from mAs and kVp histograms to associated data
+* `#224`_  Charts: Added link from CTDIvol histograms to associated data
 * `#221`_  Charts: Fixed issue where filters at acquisition event level were not adequately restricting the chart data
 * `#219`_  Charts: Fixed issue where some charts showed data beyond the current filter
 * `#217`_  Charts: Code optimised to speed up calculation time

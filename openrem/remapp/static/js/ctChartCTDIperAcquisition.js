@@ -19,7 +19,8 @@ var chartAcqCTDI = new Highcharts.Chart({
                     chartAcqCTDI.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr></table>');
+                            var linkText = 'acquisition_ctdi_min=' + protocolBinsCTDI[tooltipData[1]][this.x] + '&acquisition_ctdi_max=' + protocolBinsCTDI[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }

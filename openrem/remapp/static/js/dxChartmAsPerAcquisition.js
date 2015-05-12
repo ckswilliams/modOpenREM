@@ -2,7 +2,7 @@ $(function () {
 
 var drilldownmAsTitle = 'Histogram of ';
 var defaultmAsTitle   = 'Mean mAs per acquisition protocol';
-var tooltipmAsData = [1];
+var tooltipmAsData = [2];
 
 var chartmAsPerAcquisition = new Highcharts.Chart({
         chart: {
@@ -10,16 +10,21 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             renderTo: 'chartAcquisitionMeanmAs',
             events: {
                 drilldown: function(ee) {
-                    tooltipmAsData[0] = ee.point.x;
+                    tooltipmAsData[0] = (protocolmAsNames[ee.point.x]).replace('&amp;', '%26');
+                    tooltipmAsData[1] = ee.point.x;
                     chartmAsPerAcquisition.setTitle({ text: drilldownmAsTitle + ee.point.name + ' mAs values' }, { text: '(n = ' + seriesmAsDataN[ee.point.x] +')' });
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'mAs range'});
                     chartmAsPerAcquisition.xAxis[0].setCategories([], true);
                     chartmAsPerAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
+                        //$.each(this.points,function(){
+                        //    var linkText = tooltipmAsData[0];
+                        //    xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr></table>');
+                        //});
                         $.each(this.points,function(){
-                            var linkText = tooltipmAsData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr></table>');
+                            var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }

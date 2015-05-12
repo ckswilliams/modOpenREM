@@ -37,7 +37,7 @@
       </div>
       <div class="panel-body">
         <i>Date format yyyy-mm-dd</i>
-        {% for field in filter.form %}
+        {% for field in filter.form.visible_fields %}
           <div class="form-group">
             <div class="col-xs-4">
               <label>{{ field.label_tag }}</label>
@@ -47,6 +47,9 @@
               {{ field }}
             </div>
           </div>
+        {% endfor %}
+        {% for field in filter.form.hidden_fields %}
+          <div style="display:none">{{ field }}</div>
         {% endfor %}
         <input name="submit" type="submit" />
       </div>
@@ -424,7 +427,7 @@
           {% endfor %}
         ];
 
-        var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+        var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
       <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisition.js"></script>
@@ -486,7 +489,7 @@
           {% endfor %}
         ];
 
-        var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+        var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
       <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisition.js"></script>

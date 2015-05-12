@@ -2,7 +2,7 @@ $(function () {
 
 var drilldownkVpTitle = 'Histogram of ';
 var defaultkVpTitle   = 'Mean kVp per acquisition protocol';
-var tooltipkVpData = [1];
+var tooltipkVpData = [2];
 
 var chartkVpPerAcquisition = new Highcharts.Chart({
         chart: {
@@ -10,7 +10,8 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
             renderTo: 'chartAcquisitionMeankVp',
             events: {
                 drilldown: function(ee) {
-                    tooltipkVpData[0] = ee.point.x;
+                    tooltipkVpData[0] = (protocolkVpNames[ee.point.x]).replace('&amp;', '%26');
+                    tooltipkVpData[1] = ee.point.x;
                     chartkVpPerAcquisition.setTitle({ text: drilldownkVpTitle + ee.point.name + ' kVp values' }, { text: '(n = ' + serieskVpDataN[ee.point.x] +')' });
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'kVp range'});
@@ -18,8 +19,8 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
                     chartkVpPerAcquisition.tooltip.options.formatter = function() {
                         var xyArr=[];
                         $.each(this.points,function(){
-                            var linkText = tooltipkVpData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr></table>');
+                            var linkText = 'acquisition_kvp_min=' + protocolkVpBins[tooltipkVpData[1]][this.x] + '&acquisition_kvp_max=' + protocolkVpBins[tooltipkVpData[1]][this.x+1] + '&acquisition_protocol=' + tooltipkVpData[0];
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFilterskVp + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }
