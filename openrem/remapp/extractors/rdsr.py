@@ -297,10 +297,9 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation':
             event.patient_orientation_cid = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-            for cont2 in cont.ContentSequence:
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation Modifier':
-                    event.patient_orientation_modifier_cid = get_or_create_cid(
-                        cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation Modifier':
+            event.patient_orientation_modifier_cid = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
             event.target_region = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
