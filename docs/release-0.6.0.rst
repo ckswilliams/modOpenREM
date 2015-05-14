@@ -11,6 +11,7 @@ Headline changes
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 * Mammography import compression force behaviour changed
+* Import of Toshiba planar RDSRs fixed
 
 Changes since 0.6.0b2
 =====================
@@ -172,6 +173,13 @@ please let us know and we'll try and cater for that.
 If you have existing non-GE Senograph mammography data in your database, the compression force field for those studies
 is likely to be incorrect by a factor of ten (it will be too small). Studies imported after the upgrade will be correct.
 If this is a problem for you, please let us know and we'll see about writing a script to correct the existing data.
+
+Import of Toshiba Planar RDSRs fixed
+====================================
+
+Toshiba include Patient Orientation and Patient Orientation Modifier information in their cath lab RDSRs. The extractor
+code was deficient for this as the RDSRs previously used didn't have this information. This has now been fixed. There
+might however be an issue with Station Name not being provided - it is not yet clear if this is a configuration issue.
 
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
 .. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
