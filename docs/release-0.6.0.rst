@@ -94,7 +94,10 @@ Install pynetdicom
 
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+Upgrading from versions prior to 0.5.1
+======================================
 
+You must upgrade to 0.5.1 first. Instructions for doing this can be found in the :doc:`release-0.5.1`.
 
 Upgrading from version 0.5.1
 ============================
