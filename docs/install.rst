@@ -5,6 +5,9 @@ OpenREM can be installed with a single command; however, there are two
 prerequisites that need to be installed first – python and pip – and
 RabbitMQ needs to be installed for exports and patient size imports to work.
 
+New to this version, NumPy needs to be installed if you want charts, and a specific version of PyNetDICOM needs to be
+installed for the DICOM C-Store function.
+
 Once installed, there are a few configuration choices that need to be made,
 and finally a couple of services that need to be started. Then you are
 ready to go!
@@ -64,7 +67,6 @@ you::
 
 Install RabbitMQ
 ----------------
-*(New for version 0.4.3)*
 
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
@@ -121,12 +123,9 @@ Pynetdicom is used for the new DICOM store SCP function that is available as a p
 Install and configure OpenREM
 =============================
 
-Install latest beta version
----------------------------
-
 .. sourcecode:: bash
 
-    pip install openrem==0.6.0b3
+    pip install openrem
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -275,7 +274,6 @@ Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openre
 
 Start the Celery task queue
 ---------------------------
-*(New for version 0.4.3)*
 
 Celery will have been automatically installed with OpenREM, and along with
 RabbitMQ allows for asynchronous task processing for imports and exports.
@@ -369,7 +367,6 @@ has instructions and links to get you set up with Apache.
 
 Daemonising Celery
 ------------------
-*(New for version 0.4.3)*
 
 In a production environment, Celery will need to start automatically and
 not depend on a particular user being logged in. Therefore, much like

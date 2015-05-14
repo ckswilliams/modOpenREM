@@ -1,6 +1,6 @@
-######################
-Release Notes v0.6.0b3
-######################
+####################
+Release Notes v0.6.0
+####################
 
 ****************
 Headline changes
@@ -11,17 +11,8 @@ Headline changes
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 * Mammography import compression force behaviour changed
+* Import of Toshiba planar RDSRs fixed
 
-Changes since 0.6.0b2
-=====================
-
-Minor improvement to documentation, issues `#224`_ and `#225`_ - both regarding tooltip links to associated data from
-histograms - have been opened and closed.
-
-Changes since 0.6.0b1
-=====================
-
-Issues `#41`_, `#133`_, `#135`_, `#210`_, `#221`_ have been closed.
 
 *************************
 Preparing for the upgrade
@@ -87,7 +78,10 @@ Install pynetdicom
 
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+Upgrading from versions prior to 0.5.1
+======================================
 
+You must upgrade to 0.5.1 first. Instructions for doing this can be found in the :doc:`release-0.5.1`.
 
 Upgrading from version 0.5.1
 ============================
@@ -97,11 +91,11 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b3 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
+* The 0.6.0 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.6.0b3
+    pip install openrem==0.6.0
 
     # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
@@ -173,6 +167,13 @@ If you have existing non-GE Senograph mammography data in your database, the com
 is likely to be incorrect by a factor of ten (it will be too small). Studies imported after the upgrade will be correct.
 If this is a problem for you, please let us know and we'll see about writing a script to correct the existing data.
 
+Import of Toshiba Planar RDSRs fixed
+====================================
+
+Toshiba include Patient Orientation and Patient Orientation Modifier information in their cath lab RDSRs. The extractor
+code was deficient for this as the RDSRs previously used didn't have this information. This has now been fixed. There
+might however be an issue with Station Name not being provided - it is not yet clear if this is a configuration issue.
+
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
 .. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
 .. _`Phantom design`: https://bitbucket.org/jacole/openskin/wiki/Phantom%20design
@@ -183,3 +184,5 @@ If this is a problem for you, please let us know and we'll see about writing a s
 ..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/
 ..  _`#224`: https://bitbucket.org/openrem/openrem/issue/224/
 ..  _`#225`: https://bitbucket.org/openrem/openrem/issue/225/
+..  _`#226`: https://bitbucket.org/openrem/openrem/issue/226/
+..  _`#227`: https://bitbucket.org/openrem/openrem/issue/227/

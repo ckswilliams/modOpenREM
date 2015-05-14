@@ -2,9 +2,11 @@
 OpenREM version history
 =======================
 
-0.6.0b3 (2015-05-12)
---------------------
+0.6.0 (2015-05-14)
+------------------
 
+* `#227`_  Fixed import of RDSRs from Toshiba Cath Labs
+* `#226`_  Charts: Updated Highcharts code and partially fixed issues with CTDIvol and DLP combined chart
 * `#225`_  Charts: Added link from mAs and kVp histograms to associated data
 * `#224`_  Charts: Added link from CTDIvol histograms to associated data
 * `#221`_  Charts: Fixed issue where filters at acquisition event level were not adequately restricting the chart data
@@ -262,7 +264,7 @@ Reopened issue
 ------------------
 
 ..      Note::
-
+        
         Installs of OpenREM earlier than 0.3.3 will break on upgrade if the scripts are called from other programs.
         For example openrem_rdsr is now called openrem_rdsr.py
 
@@ -270,7 +272,7 @@ Reopened issue
 * `#10`_   Added .py suffix to the scripts to allow them to be executed on Windows (thanks to DJ Platten)
 * `#8`_    Removed superfluous '/' in base html file, harmless on linux, prevented Windows loading stylesheets (thanks to DJ Platten)
 * `#7`_    Added windows and linux path examples for test SQLite database creation
-* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten)
+* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten) 
 * `#4`_    Added some text to the documentation relating to importing files to OpenREM
 * `#3`_    Corrected copyright notice in documentation
 

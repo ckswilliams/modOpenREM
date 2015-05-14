@@ -255,7 +255,9 @@ def _imageviewmodifier(dataset,event):
     modifier = ImageViewModifier.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View Modifier':
-            modifier.image_view_modifier = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            modifier.image_view_modifier = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+        # TODO: Projection Eponymous Name should be in here - needs db change
     modifier.save()
 
 
@@ -289,16 +291,18 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View':
             event.image_view = cont.CodeValue
             _imageviewmodifier(cont,event)
-            # need something here for the projection eponymous name
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Table Relationship':
-            event.patient_table_relationship = cont.CodeValue
+            event.patient_table_relationship_cid = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation':
-            event.patient_orientation = cont.CodeValue
-            for cont2 in cont.ContentSequence:
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation Modifier':
-                    event.patient_orientation_modifier = cont2.ConceptCodeSequence[0].CodeValue
+            event.patient_orientation_cid = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation Modifier':
+            event.patient_orientation_modifier_cid = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
-            event.target_region = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            event.target_region = get_or_create_cid(
+                cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product':
             event.dose_area_product = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Half Value Layer':
