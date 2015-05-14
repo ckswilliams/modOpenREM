@@ -1,5 +1,5 @@
 ######################
-Release Notes v0.6.0b3
+Release Notes v0.6.0b4
 ######################
 
 ****************
@@ -12,6 +12,12 @@ Headline changes
 * Modalities with no data are hidden in the user interface
 * Mammography import compression force behaviour changed
 * Import of Toshiba planar RDSRs fixed
+
+Changes since 0.6.0b3
+=====================
+
+HighCharts code has been updated and CTDIvol/DLP combined chart has been modified (`#226`_). Toshiba RDSR import has
+been fixed (`#227`_).
 
 Changes since 0.6.0b2
 =====================
@@ -98,11 +104,11 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b3 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
+* The 0.6.0b4 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.6.0b3
+    pip install openrem==0.6.0b4
 
     # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
@@ -191,3 +197,5 @@ might however be an issue with Station Name not being provided - it is not yet c
 ..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/
 ..  _`#224`: https://bitbucket.org/openrem/openrem/issue/224/
 ..  _`#225`: https://bitbucket.org/openrem/openrem/issue/225/
+..  _`#226`: https://bitbucket.org/openrem/openrem/issue/226/
+..  _`#227`: https://bitbucket.org/openrem/openrem/issue/227/

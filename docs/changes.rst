@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.6.0b3 (2015-05-12)
+0.6.0b4 (2015-05-14)
 --------------------
 
 * `#227`_  Fixed import of RDSRs from Toshiba Cath Labs
