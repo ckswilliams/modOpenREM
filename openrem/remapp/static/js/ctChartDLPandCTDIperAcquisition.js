@@ -31,7 +31,7 @@ $(function () {
                     }
                     chartAcqDLPandCTDI.xAxis[0].setCategories([], true);
                     chartAcqDLPandCTDI.tooltip.options.formatter = function(args) {
-                        if (this.series.name.indexOf('DLP') != -1) {
+                        if (this.series.name.indexOf('DLP') != -1) {  // Now working
                             var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x + 1] + '&acquisition_protocol=' + tooltipData[0];
                             var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
                         }
