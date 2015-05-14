@@ -2,9 +2,11 @@
 OpenREM version history
 =======================
 
-0.6.0b3 (2015-05-12)
+0.6.0b4 (2015-05-14)
 --------------------
 
+* `#227`_  Fixed import of RDSRs from Toshiba Cath Labs
+* `#226`_  Charts: Updated Highcharts code and partially fixed issues with CTDIvol and DLP combined chart
 * `#225`_  Charts: Added link from mAs and kVp histograms to associated data
 * `#224`_  Charts: Added link from CTDIvol histograms to associated data
 * `#221`_  Charts: Fixed issue where filters at acquisition event level were not adequately restricting the chart data

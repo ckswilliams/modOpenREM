@@ -80,3 +80,7 @@ body {
     padding-top: 10px;
 }
 
+.highcharts-drilldown-axis-label {
+    text-decoration: none !important;
+    font-weight: normal !important;
+}

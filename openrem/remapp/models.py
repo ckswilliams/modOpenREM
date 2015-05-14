@@ -261,6 +261,7 @@ class IrradEventXRayData(models.Model):  # TID 10003
     patient_table_relationship = models.CharField(max_length=16, blank=True, null=True)
     patient_orientation = models.CharField(max_length=16, blank=True, null=True)
     patient_orientation_modifier = models.CharField(max_length=16, blank=True, null=True)
+    # TODO: Projection Eponymous Name should be in ImageViewModifier, not here :-(
     projection_eponymous_name_cid = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10003_pojectioneponymous')  # CID 4012
     patient_table_relationship_cid = models.ForeignKey(
@@ -304,6 +305,7 @@ class ImageViewModifier(models.Model):  # EV 111032
     image_view_modifier = models.ForeignKey(
         ContextID, blank=True, null=True
     )  # CID 4011 "DX View Modifier" or CID 4015 "View Modifier for Mammography"
+    # TODO: Add Projection Eponymous Name
 
 
 class IrradEventXRayDetectorData(models.Model):  # TID 10003a

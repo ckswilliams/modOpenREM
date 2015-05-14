@@ -1,37 +1,64 @@
 (function (H) {
-    H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
-        var point = proceed.call(this, series, options, x),
-            chart = series.chart,
-            tick = series.xAxis && series.xAxis.ticks[x],
-            tickLabel = tick && tick.label;
+        //DATALABELS
+        H.wrap(H.Series.prototype, 'drawDataLabels', function (proceed) {
+var css = this.chart.options.drilldown.activeDataLabelStyle;
+            proceed.call(this);
 
-        if (point.drilldown) {
+            css.textDecoration = 'none';
+            css.fontWeight = 'normal';
+            css.cursor = 'default';
+            css.color = 'blue';
 
-            // Add the click event to the point label
-            H.addEvent(point, 'click', function () {
-                point.doDrilldown();
-            });
 
-            // Make axis labels click-able
-            if (tickLabel) {
-                if (!tickLabel._basicStyle) {
-                    tickLabel._basicStyle = tickLabel.element.getAttribute('style');
-                }
-                tickLabel.addClass('highcharts-drilldown-axis-label')          .css({
-                    'text-decoration': 'none',
-                    'font-weight': 'normal',
-                    'cursor': 'auto'
-                    })
-                    .on('click', function () {
-                    if (point.doDrilldown) {
+            H.each(this.points, function (point) {
+
+                if (point.drilldown && point.dataLabel) {
+                    point.dataLabel
+                        .css(css)
+                        .on('click', function () {
                         return false;
-                    }
+                    });
+                }
+            });
+        });
+
+        //For X-axis labels
+        H.wrap(H.Point.prototype, 'init', function (proceed, series, options, x) {
+            var point = proceed.call(this, series, options, x),
+                chart = series.chart,
+                tick = series.xAxis && series.xAxis.ticks[x],
+                tickLabel = tick && tick.label;
+            console.log("series");
+            console.log(series);
+
+            if (point.drilldown) {
+
+                // Add the click event to the point label
+                H.addEvent(point, 'click', function () {
+                    point.doDrilldown;
                 });
 
-            }
-        } else if (tickLabel && tickLabel._basicStyle) {
-        }
+                // Make axis labels clickable
+                if (tickLabel) {
+                    if (!tickLabel._basicStyle) {
+                        tickLabel._basicStyle = tickLabel.element.getAttribute('style');
+                    }
+                    tickLabel.addClass('highcharts-drilldown-axis-label')
+                        .css({
+                        'text-decoration': 'none',
+                        'font-weight': 'normal',
+                        'cursor': 'auto'
+                        })
+                        .on('click', function () {
+                        if (point.doDrilldown) {
+                            return false;
+                        }
+                    });
 
-        return point;
-    });
-})(Highcharts);
+                }
+            } else if (tickLabel && tickLabel._basicStyle) {
+            }
+
+            return point;
+        });
+    })(Highcharts);

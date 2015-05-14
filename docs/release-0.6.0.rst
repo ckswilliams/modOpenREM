@@ -1,5 +1,5 @@
 ######################
-Release Notes v0.6.0b3
+Release Notes v0.6.0b4
 ######################
 
 ****************
@@ -11,6 +11,13 @@ Headline changes
 * Exports available to import into `OpenSkin`_
 * Modalities with no data are hidden in the user interface
 * Mammography import compression force behaviour changed
+* Import of Toshiba planar RDSRs fixed
+
+Changes since 0.6.0b3
+=====================
+
+HighCharts code has been updated and CTDIvol/DLP combined chart has been modified (`#226`_). Toshiba RDSR import has
+been fixed (`#227`_).
 
 Changes since 0.6.0b2
 =====================
@@ -97,11 +104,11 @@ Upgrading from version 0.5.1
     * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
-* The 0.6.0b2 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
+* The 0.6.0b4 upgrade must be made from a 0.5.1 (or later) database, and a schema migration is required:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.6.0b2
+    pip install openrem==0.6.0b4
 
     # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
@@ -173,6 +180,13 @@ If you have existing non-GE Senograph mammography data in your database, the com
 is likely to be incorrect by a factor of ten (it will be too small). Studies imported after the upgrade will be correct.
 If this is a problem for you, please let us know and we'll see about writing a script to correct the existing data.
 
+Import of Toshiba Planar RDSRs fixed
+====================================
+
+Toshiba include Patient Orientation and Patient Orientation Modifier information in their cath lab RDSRs. The extractor
+code was deficient for this as the RDSRs previously used didn't have this information. This has now been fixed. There
+might however be an issue with Station Name not being provided - it is not yet clear if this is a configuration issue.
+
 .. _`OpenSkin`: https://bitbucket.org/jacole/openskin
 .. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
 .. _`Phantom design`: https://bitbucket.org/jacole/openskin/wiki/Phantom%20design
@@ -183,3 +197,5 @@ If this is a problem for you, please let us know and we'll see about writing a s
 ..  _`#221`: https://bitbucket.org/openrem/openrem/issue/221/
 ..  _`#224`: https://bitbucket.org/openrem/openrem/issue/224/
 ..  _`#225`: https://bitbucket.org/openrem/openrem/issue/225/
+..  _`#226`: https://bitbucket.org/openrem/openrem/issue/226/
+..  _`#227`: https://bitbucket.org/openrem/openrem/issue/227/
