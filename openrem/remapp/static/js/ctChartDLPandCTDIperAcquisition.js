@@ -1,10 +1,15 @@
 $(function () {
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Mean DLP and CTDI<sub>vol</sub> per acquisition protocol';
-var tooltipData = [2];
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'Mean DLP and CTDI<sub>vol</sub> per acquisition protocol';
+    var tooltipData = [2];
 
-var chartAcqDLPandCTDI = new Highcharts.Chart({
+    var index;
+    for (index = 0; index < seriesDrilldownCTDI.length; ++index) {
+        seriesDrilldownCTDI[index].xAxis = 1;
+    }
+
+    var chartAcqDLPandCTDI = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'histogramPlotDLPandCTDIdiv',
@@ -18,6 +23,12 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
                     chartAcqDLPandCTDI.setTitle({ text: drilldownTitle + e.point.name + this_series_title}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
                     chartAcqDLPandCTDI.yAxis[0].setTitle({text:'Number'});
                     chartAcqDLPandCTDI.xAxis[0].setTitle({text:parentSeriesName.indexOf('DLP') != -1 ? 'DLP range (mGy.cm)' : 'CTDI<sub>vol</sub> range (mGy)'});
+                    if (parentSeriesName.indexOf('DLP') != -1) {
+                        chartAcqDLPandCTDI.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
+                    }
+                    if (parentSeriesName.indexOf('CTDI') != -1) {
+                        chartAcqDLPandCTDI.xAxis[1].setTitle({text:'CTDI range (mGy)'});
+                    }
                     chartAcqDLPandCTDI.xAxis[0].setCategories([], true);
                     chartAcqDLPandCTDI.tooltip.options.formatter = function(args) {
                         if (parentSeriesName.indexOf('DLP') != -1) {
@@ -44,6 +55,7 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
                     chartAcqDLPandCTDI.yAxis[0].setTitle({text:'DLP (mGy.cm)'});
                     chartAcqDLPandCTDI.yAxis[1].setTitle({text:'CTDI<sub>vol</sub> (mGy)'});
                     chartAcqDLPandCTDI.xAxis[0].setTitle({text:''});
+                    chartAcqDLPandCTDI.xAxis[1].setTitle({text:''});
                     chartAcqDLPandCTDI.xAxis[0].setCategories(protocolNames, true);
                     chartAcqDLPandCTDI.xAxis[0].update({labels:{rotation:90}});
                     chartAcqDLPandCTDI.tooltip.options.formatter = function(args) {
@@ -77,16 +89,28 @@ var chartAcqDLPandCTDI = new Highcharts.Chart({
             useHTML: true,
             text: 'Mean DLP and CTDI<sub>vol</sub> per acquisition protocol'
         },
-        xAxis: {
+        xAxis: [{
             title: {
                 useHTML: true
             },
-            categories: protocolNames,
+            type: 'category',
+            //categories: protocolNames,
             labels: {
                 useHTML: true,
                 rotation:90
             }
-        },
+        }, {
+            title: {
+                useHTML: true
+            },
+            type: 'category',
+            opposite: true,
+            //categories: protocolNames,
+            labels: {
+                useHTML: true,
+                rotation:90
+            }
+        }],
         yAxis: [{
             min: 0,
             title: {
