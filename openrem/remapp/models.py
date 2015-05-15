@@ -153,6 +153,7 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
     study_time = models.TimeField(blank=True, null=True)
+    study_datetime = models.DateTimeField(blank=True, null=True)
     referring_physician_name = models.TextField(blank=True, null=True)
     referring_physician_identification = models.TextField(blank=True, null=True)
     study_id = models.CharField(max_length=16, blank=True, null=True)
