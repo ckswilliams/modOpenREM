@@ -210,13 +210,12 @@ def dx_summary_list_filter(request):
             # Required for studies per weekday and studies per hour in each weekday plot
             studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
             for day in range(7):
-                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_datetime_time')
                 if studyTimesOnThisWeekday:
+                    qss = qsstats.QuerySetStats(studyTimesOnThisWeekday, 'study_datetime_time')
+                    hourlyBreakdown = qss.time_series(datetime.datetime(1900,1,1,0,0), datetime.datetime(1900,1,1,23,59),interval='hours')
                     for hour in range(24):
-                        try:
-                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                        except:
-                            studiesPerHourInWeekdays[day][hour] = 0
+                        studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -454,13 +453,12 @@ def dx_histogram_list_filter(request):
             # Required for studies per weekday and studies per hour in each weekday plot
             studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
             for day in range(7):
-                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_time')
+                studyTimesOnThisWeekday = f.qs.filter(study_date__week_day=day+1).values('study_datetime_time')
                 if studyTimesOnThisWeekday:
+                    qss = qsstats.QuerySetStats(studyTimesOnThisWeekday, 'study_datetime_time')
+                    hourlyBreakdown = qss.time_series(datetime.datetime(1900,1,1,0,0), datetime.datetime(1900,1,1,23,59),interval='hours')
                     for hour in range(24):
-                        try:
-                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                        except:
-                            studiesPerHourInWeekdays[day][hour] = 0
+                        studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -666,13 +664,12 @@ def ct_summary_list_filter(request):
                 # Required for studies per weekday and studies per hour in each weekday plot
                 studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
                 for day in range(7):
-                    studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_time')
+                    studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_datetime_time')
                     if studyTimesOnThisWeekday:
+                        qss = qsstats.QuerySetStats(studyTimesOnThisWeekday, 'study_datetime_time')
+                        hourlyBreakdown = qss.time_series(datetime.datetime(1900,1,1,0,0), datetime.datetime(1900,1,1,23,59),interval='hours')
                         for hour in range(24):
-                            try:
-                                studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                            except:
-                                studiesPerHourInWeekdays[day][hour] = 0
+                            studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -907,13 +904,12 @@ def ct_histogram_list_filter(request):
             # Required for studies per weekday and studies per hour in each weekday plot
             studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
             for day in range(7):
-                studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_time')
+                studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_datetime_time')
                 if studyTimesOnThisWeekday:
+                    qss = qsstats.QuerySetStats(studyTimesOnThisWeekday, 'study_datetime_time')
+                    hourlyBreakdown = qss.time_series(datetime.datetime(1900,1,1,0,0), datetime.datetime(1900,1,1,23,59),interval='hours')
                     for hour in range(24):
-                        try:
-                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                        except:
-                            studiesPerHourInWeekdays[day][hour] = 0
+                        studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     try:
         vers = pkg_resources.require("openrem")[0].version
