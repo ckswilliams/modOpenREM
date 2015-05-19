@@ -59,15 +59,17 @@ $(function () {
                     chartAcqDLPandCTDI.xAxis[0].setCategories(protocolNames, true);
                     chartAcqDLPandCTDI.xAxis[0].update({labels:{rotation:90}});
                     chartAcqDLPandCTDI.tooltip.options.formatter = function(args) {
-                        var this_point_index = this.series.data.indexOf( this.point );
-                        var this_point = args.chart.series[0].data[this_point_index];
-                        var that_point = args.chart.series[1].data[this_point_index];
-                        var this_series_label = ' mGy.cm DLP';
-                        var that_series_label = ' mGy CTDI<sub>vol</sub>';
-                        return this.point.name +
-                            '<br/>' + this_point.y.toFixed(1) + this_series_label +
-                            '<br/>' + that_point.y.toFixed(1) + that_series_label +
-                            '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+						var this_point_index = this.series.data.indexOf( this.point );
+						if (this.series.name.indexOf('DLP') != -1) {
+							var this_series_label = ' mGy.cm DLP';
+							var this_series = args.chart.series[0];
+						}
+						else {
+							var this_series_label = ' mGy CTDI<sub>vol</sub>';
+							var this_series = args.chart.series[1];
+						}
+						var this_point = this_series.data[this_point_index];
+						return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
                     };
                     chartAcqDLPandCTDI.yAxis[1].update({
                         labels: {
@@ -90,7 +92,6 @@ $(function () {
                 useHTML: true
             },
             type: 'category',
-            //categories: protocolNames,
             labels: {
                 useHTML: true,
                 rotation:90
@@ -101,7 +102,6 @@ $(function () {
             },
             type: 'category',
             opposite: true,
-            //categories: protocolNames,
             labels: {
                 useHTML: true,
                 rotation:90
@@ -122,19 +122,17 @@ $(function () {
         tooltip: {
             useHTML: true,
             formatter: function(args) {
-                var this_point_index = this.series.data.indexOf( this.point );
-                var this_series_index = 0;//this.series.index;
-                var that_series_index = 1;//this.series.index == 0 ? 1 : 0; // assuming 2 series
-                var this_series = args.chart.series[this_series_index];
-                var that_series = args.chart.series[that_series_index];
+				var this_point_index = this.series.data.indexOf( this.point );
+				if (this.series.name.indexOf('DLP') != -1) {
+					var this_series_label = ' mGy.cm DLP';
+					var this_series = args.chart.series[0];
+				}
+				else {
+					var this_series_label = ' mGy CTDI<sub>vol</sub>';
+					var this_series = args.chart.series[1];
+				}
                 var this_point = this_series.data[this_point_index];
-                var that_point = that_series.data[this_point_index];
-                var this_series_label = ' mGy.cm DLP';//this.series.index == 0 ? ' mGy.cm DLP' : ' mGy CTDI<sub>vol</sub>';
-                var that_series_label = ' mGy CTDI<sub>vol</sub>';//this.series.index == 0 ? ' mGy CTDI<sub>vol</sub>' : ' mGy.cm DLP';
-                return this.point.name +
-                    '<br/>' + this_point.y.toFixed(1) + this_series_label +
-                    '<br/>' + that_point.y.toFixed(1) + that_series_label +
-                    '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
             }
         },
         plotOptions: {
