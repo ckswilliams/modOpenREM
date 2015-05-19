@@ -55,6 +55,8 @@ class CTChartOptionsForm(forms.Form):
     plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
     plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study',required=False)
     plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)
+    plotCTRequestMeanDLP = forms.BooleanField(label='Mean DLP per requested procedure',required=False)
+    plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency',required=False)
     plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Mean study DLP over time',required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)

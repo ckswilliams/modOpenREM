@@ -553,6 +553,8 @@ def ct_summary_list_filter(request):
             userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
             userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
+            userProfile.plotCTRequestMeanDLP = chartOptionsForm.cleaned_data['plotCTRequestMeanDLP']
+            userProfile.plotCTRequestFreq = chartOptionsForm.cleaned_data['plotCTRequestFreq']
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
@@ -565,6 +567,8 @@ def ct_summary_list_filter(request):
                         'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
                         'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
                         'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                        'plotCTRequestMeanDLP': userProfile.plotCTRequestMeanDLP,
+                        'plotCTRequestFreq': userProfile.plotCTRequestFreq,
                         'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
                         'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
                         'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
@@ -576,6 +580,8 @@ def ct_summary_list_filter(request):
     plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
     plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
     plotCTStudyFreq = userProfile.plotCTStudyFreq
+    plotCTRequestMeanDLP = userProfile.plotCTRequestMeanDLP
+    plotCTRequestFreq = userProfile.plotCTRequestFreq
     plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
@@ -613,6 +619,14 @@ def ct_summary_list_filter(request):
             ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
         ).exclude(
             study_description__isnull=True
+        ).filter(
+            study_instance_uid__in = expInclude
+        )
+
+        request_events = GeneralStudyModuleAttr.objects.exclude(
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+        ).exclude(
+            requested_procedure_code_meaning__isnull=True
         ).filter(
             study_instance_uid__in = expInclude
         )
@@ -674,6 +688,17 @@ def ct_summary_list_filter(request):
                             except:
                                 studiesPerHourInWeekdays[day][hour] = 0
 
+        if plotCTRequestMeanDLP or plotCTRequestFreq:
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('requested_procedure_code_meaning')
+
+            if plotCTRequestMeanDLP:
+                requestHistogramData = [[None for i in xrange(2)] for i in xrange(len(requestSummary))]
+
+                for idx, study in enumerate(requestSummary):
+                    subqs = study_events.filter(requested_procedure_code_meaning=study.get('requested_procedure_code_meaning'))
+                    dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
+                    requestHistogramData[idx][0], requestHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -700,6 +725,10 @@ def ct_summary_list_filter(request):
                 returnStructure['studySummary'] = studySummary
             if plotCTStudyMeanDLP:
                 returnStructure['studyHistogramData'] = studyHistogramData
+            if plotCTRequestMeanDLP or plotCTRequestFreq:
+                returnStructure['requestSummary'] = requestSummary
+            if plotCTRequestMeanDLP:
+                returnStructure['requestHistogramData'] = requestHistogramData
             if plotCTStudyPerDayAndHour:
                 returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
             if plotCTStudyMeanDLPOverTime:
@@ -775,6 +804,7 @@ def ct_histogram_list_filter(request):
     if requestResults.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
     if requestResults.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
     if requestResults.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
+    if requestResults.get('requested_procedure_code_meaning') : f.qs.filter(generalequipmentmoduleattr__requested_procedure_code_meaning=requestResults.get('requested_procedure_code_meaning'))
 
     try:
         # See if the user has plot settings in userprofile
@@ -797,6 +827,8 @@ def ct_histogram_list_filter(request):
             userProfile.plotCTAcquisitionFreq = chartOptionsForm.cleaned_data['plotCTAcquisitionFreq']
             userProfile.plotCTStudyMeanDLP = chartOptionsForm.cleaned_data['plotCTStudyMeanDLP']
             userProfile.plotCTStudyFreq = chartOptionsForm.cleaned_data['plotCTStudyFreq']
+            userProfile.plotCTRequestMeanDLP = chartOptionsForm.cleaned_data['plotCTRequestMeanDLP']
+            userProfile.plotCTRequestFreq = chartOptionsForm.cleaned_data['plotCTRequestFreq']
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
@@ -809,6 +841,8 @@ def ct_histogram_list_filter(request):
                         'plotCTAcquisitionFreq': userProfile.plotCTAcquisitionFreq,
                         'plotCTStudyMeanDLP': userProfile.plotCTStudyMeanDLP,
                         'plotCTStudyFreq': userProfile.plotCTStudyFreq,
+                        'plotCTRequestMeanDLP': userProfile.plotCTRequestMeanDLP,
+                        'plotCTRequestFreq': userProfile.plotCTRequestFreq,
                         'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
                         'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
                         'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
@@ -820,6 +854,8 @@ def ct_histogram_list_filter(request):
     plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
     plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
     plotCTStudyFreq = userProfile.plotCTStudyFreq
+    plotCTRequestMeanDLP = userProfile.plotCTRequestMeanDLP
+    plotCTRequestFreq = userProfile.plotCTRequestFreq
     plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
@@ -855,6 +891,14 @@ def ct_histogram_list_filter(request):
             ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
         ).exclude(
             study_description__isnull=True
+        ).filter(
+            study_instance_uid__in = expInclude
+        )
+
+        request_events = GeneralStudyModuleAttr.objects.exclude(
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+        ).exclude(
+            requested_procedure_code_meaning__isnull=True
         ).filter(
             study_instance_uid__in = expInclude
         )
@@ -903,17 +947,28 @@ def ct_histogram_list_filter(request):
                         qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
                         studyDLPoverTime[idx] = qss.time_series(startDate, today,interval=plotCTStudyMeanDLPOverTimePeriod)
 
-        if plotCTStudyPerDayAndHour:
-            # Required for studies per weekday and studies per hour in each weekday plot
-            studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
-            for day in range(7):
-                studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_time')
-                if studyTimesOnThisWeekday:
-                    for hour in range(24):
-                        try:
-                            studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
-                        except:
-                            studiesPerHourInWeekdays[day][hour] = 0
+            if plotCTStudyPerDayAndHour:
+                # Required for studies per weekday and studies per hour in each weekday plot
+                studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+                for day in range(7):
+                    studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day+1).values('study_time')
+                    if studyTimesOnThisWeekday:
+                        for hour in range(24):
+                            try:
+                                studiesPerHourInWeekdays[day][hour] = studyTimesOnThisWeekday.filter(study_time__gte = str(hour)+':00').filter(study_time__lte = str(hour)+':59').values('study_time').count()
+                            except:
+                                studiesPerHourInWeekdays[day][hour] = 0
+
+        if plotCTRequestMeanDLP or plotCTRequestFreq:
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('requested_procedure_code_meaning')
+
+            if plotCTRequestMeanDLP:
+                requestHistogramData = [[None for i in xrange(2)] for i in xrange(len(requestSummary))]
+
+                for idx, study in enumerate(requestSummary):
+                    subqs = study_events.filter(requested_procedure_code_meaning=study.get('requested_procedure_code_meaning'))
+                    dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
+                    requestHistogramData[idx][0], requestHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -939,6 +994,10 @@ def ct_histogram_list_filter(request):
                 returnStructure['studySummary'] = studySummary
             if plotCTStudyMeanDLP:
                 returnStructure['studyHistogramData'] = studyHistogramData
+            if plotCTRequestMeanDLP or plotCTRequestFreq:
+                returnStructure['requestSummary'] = requestSummary
+            if plotCTRequestMeanDLP:
+                returnStructure['requestHistogramData'] = requestHistogramData
             if plotCTStudyPerDayAndHour:
                 returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
             if plotCTStudyMeanDLPOverTime:
