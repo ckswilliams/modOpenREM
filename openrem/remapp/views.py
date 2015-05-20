@@ -631,22 +631,23 @@ def ct_summary_list_filter(request):
             study_instance_uid__in = expInclude
         )
 
-        # Required for mean DLP per acquisition plot
-        if plotCTAcquisitionMeanCTDI:
-            acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
-            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-        else:
-            acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
-
-        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-
-        for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
-            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
-
+        if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
+            # Required for mean DLP per acquisition plot
             if plotCTAcquisitionMeanCTDI:
-                ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
-                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
+                acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+                acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+            else:
+                acquisitionSummary = acquisition_events.values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+
+            acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
+            for idx, protocol in enumerate(acquisitionSummary):
+                dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+
+                if plotCTAcquisitionMeanCTDI:
+                    ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
+                    acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type plot
@@ -689,7 +690,7 @@ def ct_summary_list_filter(request):
                                 studiesPerHourInWeekdays[day][hour] = 0
 
         if plotCTRequestMeanDLP or plotCTRequestFreq:
-            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('requested_procedure_code_meaning')
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_req = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('requested_procedure_code_meaning')
 
             if plotCTRequestMeanDLP:
                 requestHistogramData = [[None for i in xrange(2)] for i in xrange(len(requestSummary))]
@@ -770,20 +771,45 @@ def ct_histogram_list_filter(request):
         f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
             **filters
             ).order_by().distinct())
-        if requestResults.get('study_description') : f.qs.filter(study_description=requestResults.get('study_description'))
-        if requestResults.get('study_dlp_max')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
-        if requestResults.get('study_dlp_min')     : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
+
+        if requestResults.get('study_description')   : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('study_dlp_max')       : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('study_dlp_min')       : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('requested_procedure') : f.qs.filter(requested_procedure_code_meaning=requestResults.get('requested_procedure'))
 
     elif requestResults.get('studyhist'):
+        filters = {'modality_type__exact': 'CT'}
+        filters['study_description'] = requestResults.get('study_description')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
+
         f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT',
-            study_description=requestResults.get('study_description'),
-            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'),
-            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max')
+            **filters
             ).order_by().distinct())
+
         if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
-        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('study_dlp_max'))
-        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
+        if requestResults.get('requested_procedure')  : f.qs.filter(requested_procedure_code_meaning=requestResults.get('requested_procedure'))
+
+    elif requestResults.get('requesthist'):
+        filters = {'modality_type__exact': 'CT'}
+        filters['requested_procedure_code_meaning'] = requestResults.get('requested_procedure')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
+
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            **filters
+            ).order_by().distinct())
+
+        if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
 
     else:
         f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
@@ -792,19 +818,21 @@ def ct_histogram_list_filter(request):
         if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
         if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
         if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
-        if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('study_dlp_max'))
-        if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
+        if requestResults.get('requested_procedure')  : f.qs.filter(requested_procedure_code_meaning=requestResults.get('requested_procedure'))
 
-    if requestResults.get('accession_number')  : f.qs.filter(accession_number=requestResults.get('accession_number'))
-    if requestResults.get('date_after')        : f.qs.filter(study_date__gt=requestResults.get('date_after'))
-    if requestResults.get('date_before')       : f.qs.filter(study_date__lt=requestResults.get('date_before'))
-    if requestResults.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=requestResults.get('institution_name'))
-    if requestResults.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=requestResults.get('manufacturer'))
-    if requestResults.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__model_name=requestResults.get('model_name'))
-    if requestResults.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
-    if requestResults.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
-    if requestResults.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
-    if requestResults.get('requested_procedure_code_meaning') : f.qs.filter(generalequipmentmoduleattr__requested_procedure_code_meaning=requestResults.get('requested_procedure_code_meaning'))
+    if requestResults.get('accession_number') : f.qs.filter(accession_number=requestResults.get('accession_number'))
+    if requestResults.get('date_after')       : f.qs.filter(study_date__gt=requestResults.get('date_after'))
+    if requestResults.get('date_before')      : f.qs.filter(study_date__lt=requestResults.get('date_before'))
+    if requestResults.get('institution_name') : f.qs.filter(generalequipmentmoduleattr__institution_name=requestResults.get('institution_name'))
+    if requestResults.get('manufacturer')     : f.qs.filter(generalequipmentmoduleattr__manufacturer=requestResults.get('manufacturer'))
+    if requestResults.get('model_name')       : f.qs.filter(generalequipmentmoduleattr__model_name=requestResults.get('model_name'))
+    if requestResults.get('patient_age_max')  : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
+    if requestResults.get('patient_age_min')  : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
+    if requestResults.get('station_name')     : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
 
     try:
         # See if the user has plot settings in userprofile
@@ -903,22 +931,23 @@ def ct_histogram_list_filter(request):
             study_instance_uid__in = expInclude
         )
 
-        # Required for mean DLP per acquisition plot
-        if plotCTAcquisitionMeanCTDI:
-            acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
-            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-        else:
-            acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
-
-        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-
-        for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
-            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
-
+        if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
+            # Required for mean DLP per acquisition plot
             if plotCTAcquisitionMeanCTDI:
-                ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
-                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
+                acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_ctdi = Avg('mean_ctdivol'), mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+                acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+            else:
+                acquisitionSummary = acquisition_events.exclude(Q(acquisition_protocol__isnull=True)|Q(acquisition_protocol='')).values('acquisition_protocol').distinct().annotate(mean_dlp = Avg('dlp'), num_acq = Count('dlp')).order_by('acquisition_protocol')
+
+            acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
+            for idx, protocol in enumerate(acquisitionSummary):
+                dlpValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+
+                if plotCTAcquisitionMeanCTDI:
+                    ctdiValues = acquisition_events.filter(acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
+                    acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram([float(x) for x in ctdiValues], bins=20)
 
         if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type plot
