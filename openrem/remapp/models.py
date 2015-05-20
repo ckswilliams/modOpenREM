@@ -69,6 +69,8 @@ class UserProfile(models.Model):
     plotCTAcquisitionFreq = models.BooleanField(default=False)
     plotCTStudyMeanDLP = models.BooleanField(default=True)
     plotCTStudyFreq = models.BooleanField(default=False)
+    plotCTRequestMeanDLP = models.BooleanField(default=False)
+    plotCTRequestFreq = models.BooleanField(default=False)
     plotCTStudyPerDayAndHour = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
