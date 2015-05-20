@@ -657,6 +657,8 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+
+        var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
     {% endif %}
 
@@ -701,8 +703,6 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
-
-        var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
       <script src="{{ STATIC_URL }}js/ctChartDLPperRequest.js"></script>
