@@ -1006,7 +1006,7 @@ def ct_histogram_list_filter(request):
                                 studiesPerHourInWeekdays[day][hour] = 0
 
         if plotCTRequestMeanDLP or plotCTRequestFreq:
-            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_acq = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('requested_procedure_code_meaning')
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(mean_dlp = Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'), num_req = Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by('requested_procedure_code_meaning')
 
             if plotCTRequestMeanDLP:
                 requestHistogramData = [[None for i in xrange(2)] for i in xrange(len(requestSummary))]
