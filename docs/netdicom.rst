@@ -79,7 +79,7 @@ How to use the DICOM store service
 
 Open a command window or shell::
 
-    openrem_storescp.py
+    openrem_store.py
 
 You should see the following output, depending on your configuration::
 
