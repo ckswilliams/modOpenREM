@@ -34,7 +34,7 @@ var chartRequestFreq = new Highcharts.Chart({
                 events: {
                     click: function(e) {
                         var linkText = 'requested_procedure=' + (this.name).replace('&amp;', '%26');
-                        location.href = '/openrem/ct/hist/?requestfreq=1&' + linkText + tooltipFiltersRequest; //e.point.url;
+                        location.href = '/openrem/ct/hist/?requestfreq=1&' + linkText + tooltipFiltersRequest;
                         e.preventDefault();
                     }
                 }
@@ -43,6 +43,3 @@ var chartRequestFreq = new Highcharts.Chart({
         }]
     });
 });
-
-                //var linkText = 'requested_procedure=' + (this.key).replace('&amp;', '%26');
-                //var url = '/openrem/ct/hist/?requesthist=1&' + linkText + tooltipFiltersRequest;
