@@ -678,7 +678,7 @@ def _generalstudymoduleattributes(dataset,g):
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
-    g.operator_name = get_value_kw('OperatorName',dataset)
+    g.operator_name = get_value_kw('OperatorsName',dataset)
     g.procedure_code_value = get_seq_code_value('ProcedureCodeSequence',dataset)
     g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
