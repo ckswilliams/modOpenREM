@@ -25,10 +25,10 @@ import tempfile
 parser = argparse.ArgumentParser(description='storage SCU example')
 parser.add_argument('remotehost')
 parser.add_argument('remoteport', type=int)
-parser.add_argument('searchstring')
-parser.add_argument('-p', help='local server port', type=int, default=9999)
-parser.add_argument('-aet', help='calling AE title', default='PYNETDICOM')
-parser.add_argument('-aec', help='called AE title', default='REMOTESCU')
+#parser.add_argument('searchstring')
+parser.add_argument('-p', help='local server port', type=int, default=8104)
+parser.add_argument('-aet', help='calling AE title', default='OPENREM')
+parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
 parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
 parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
 
@@ -98,26 +98,46 @@ print 'done with status "%s"' % st
 
 print "DICOM FindSCU ... ",
 d = Dataset()
-d.PatientsName = args.searchstring
-d.QueryRetrieveLevel = "PATIENT"
-d.PatientID = "*"
-st = assoc.PatientRootFindSOPClass.SCU(d, 1)
-print 'done with status "%s"' % st
+d.QueryRetrieveLevel = "STUDY"
+d.PatientID = ''
+d.SOPInstaceUID = ''
+d.Modality = ''
+d.StudyDescription = ''
+d.SeriesDescription = ''
+d.StudyInstanceUID = ''
+d.StudyDate = ''
 
+st = assoc.PatientRootFindSOPClass.SCU(d, 1)
+# print 'done with status "%s"' % st
+
+responses = True
 
 for ss in st:
-    if not ss[1]: continue
+    if not ss[1]:
+        continue
     try:
-        d.PatientID = ss[1].PatientID
+        print ss[1].PatientID
+        print ss[1].Modality
+        print ss[1].StudyDate
     except:
         continue
-    print "Moving"
-    print d
-    assoc2 = MyAE.RequestAssociation(RemoteAE)
-    gen = assoc2.PatientRootMoveSOPClass.SCU(d, 'PYNETDICOM', 1)
-    for gg in gen:
-        print gg
-    assoc2.Release(0)
+
+
+
+
+#for ss in st:
+#    if not ss[1]: continue
+#     try:
+#         d.PatientID = ss[1].PatientID
+#     except:
+#         continue
+#     print "Moving"
+#     print d
+#     assoc2 = MyAE.RequestAssociation(RemoteAE)
+#     gen = assoc2.PatientRootMoveSOPClass.SCU(d, 'PYNETDICOM', 1)
+#     for gg in gen:
+#         print gg
+#     assoc2.Release(0)
 
 print "Release association"
 assoc.Release(0)
