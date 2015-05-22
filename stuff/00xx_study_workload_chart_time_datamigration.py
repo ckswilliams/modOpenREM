@@ -13,7 +13,7 @@ class Migration(DataMigration):
             studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
             studyTime = studyData.study_time
             studyDatetime = datetime.combine(studyDate, studyTime)
-            studyData.study_datetime_time = studyDatetime
+            studyData.study_workload_chart_time = studyDatetime
             studyData.save()
 
     def backwards(self, orm):
@@ -296,11 +296,11 @@ class Migration(DataMigration):
             'requested_procedure_code_meaning': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'requested_procedure_code_value': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
             'study_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'study_datetime_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'study_description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'study_id': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
             'study_instance_uid': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'study_time': ('django.db.models.fields.TimeField', [], {'null': 'True', 'blank': 'True'})
+            'study_time': ('django.db.models.fields.TimeField', [], {'null': 'True', 'blank': 'True'}),
+            'study_workload_chart_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
         u'remapp.imageviewmodifier': {
             'Meta': {'object_name': 'ImageViewModifier'},
@@ -539,6 +539,8 @@ class Migration(DataMigration):
             'plotCTAcquisitionFreq': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'plotCTAcquisitionMeanCTDI': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'plotCTAcquisitionMeanDLP': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'plotCTRequestFreq': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'plotCTRequestMeanDLP': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'plotCTStudyFreq': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'plotCTStudyMeanDLP': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'plotCTStudyMeanDLPOverTime': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
