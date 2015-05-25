@@ -72,6 +72,31 @@ def OnReceiveStore(SOPClass, DS):
     # must return appropriate status
     return SOPClass.Success
 
+def CTSeriesQuery(d2):
+    d2.QueryRetrieveLevel = "SERIES"
+    d2.SeriesDescription = ''
+    d2.SeriesNumber = ''
+    d2.SeriesInstanceUID = ''
+
+    assoc2 = MyAE.RequestAssociation(RemoteAE)
+    st2 = assoc2.PatientRootFindSOPClass.SCU(d2, 1)
+
+    for series in st2:
+        if not series[1]:
+            continue
+        if series[1].Modality == 'SR':
+            # Not sure if they will be SR are series level but CT at study level?
+            # If they are, send C-Move request
+            continue
+        if ('502' or '998') in str(series[1].SeriesNumber):
+            # Find Siemens and GE RDSR or Enhanced SR
+            # Then Send a C-Move request for that series
+            continue
+        if series[1].SeriesDescription == 'Dose Info':
+            # Get Philips Dose Info series - not SR but enough information in the header
+            continue
+        # Do something for Toshiba...
+
 # create application entity with Find and Move SOP classes as SCU and
 # Storage SOP class as SCP
 MyAE = AE(args.aet, args.p, [PatientRootFindSOPClass,
@@ -100,10 +125,9 @@ print "DICOM FindSCU ... ",
 d = Dataset()
 d.QueryRetrieveLevel = "STUDY"
 d.PatientID = ''
-d.SOPInstaceUID = ''
+d.SOPInstanceUID = ''
 d.Modality = ''
 d.StudyDescription = ''
-d.SeriesDescription = ''
 d.StudyInstanceUID = ''
 d.StudyDate = ''
 
@@ -115,12 +139,26 @@ responses = True
 for ss in st:
     if not ss[1]:
         continue
-    try:
-        print ss[1].PatientID
-        print ss[1].Modality
-        print ss[1].StudyDate
-    except:
-        continue
+    if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
+        # new query for series level information
+        CTSeriesQuery(ss[1])
+    if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
+        # get everything
+        pass
+    if 'MG' in ss[1].Modality:
+        # get everything
+        pass
+    if 'SR' in ss[1].Modality:
+        # get it - you may as well
+        pass
+    if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
+        # Don't know if you need both...
+        # Get series level information to look for SR
+        pass
+
+    print ss[1].PatientID
+    print ss[1].Modality
+    print ss[1].StudyDate
 
 
 
