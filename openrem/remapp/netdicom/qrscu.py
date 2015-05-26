@@ -72,11 +72,12 @@ def OnReceiveStore(SOPClass, DS):
     # must return appropriate status
     return SOPClass.Success
 
-def CTSeriesQuery(d2):
+def _querySeriesCT(d2):
     d2.QueryRetrieveLevel = "SERIES"
     d2.SeriesDescription = ''
     d2.SeriesNumber = ''
     d2.SeriesInstanceUID = ''
+    d2.Modality = ''
 
     assoc2 = MyAE.RequestAssociation(RemoteAE)
     st2 = assoc2.PatientRootFindSOPClass.SCU(d2, 1)
@@ -87,15 +88,21 @@ def CTSeriesQuery(d2):
         if series[1].Modality == 'SR':
             # Not sure if they will be SR are series level but CT at study level?
             # If they are, send C-Move request
+            print "C-Move request for series with modality type SR"
             continue
-        if ('502' or '998') in str(series[1].SeriesNumber):
-            # Find Siemens and GE RDSR or Enhanced SR
+        if ('502' or '998' or '990' or '9001') in str(series[1].SeriesNumber):
+            # Find Siemens (502 CT, 990 RF) and GE (998 CT) RDSR or Enhanced SR
+            # Added 9001 for Toshiba XA based on a sample of 1
             # Then Send a C-Move request for that series
+            print "C-Move request for series with number [0]".format(series[1].SeriesNumber)
             continue
         if series[1].SeriesDescription == 'Dose Info':
             # Get Philips Dose Info series - not SR but enough information in the header
+            print "C-Move request for series with description [0]".format(series[1].SeriesDescription)
             continue
-        # Do something for Toshiba...
+        # Do something for Toshiba CT...
+
+    assoc2.Release(0)
 
 # create application entity with Find and Move SOP classes as SCU and
 # Storage SOP class as SCP
@@ -139,22 +146,28 @@ responses = True
 for ss in st:
     if not ss[1]:
         continue
-    if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
+    if ('CT' or 'PT') in ss[1].Modality:
         # new query for series level information
-        CTSeriesQuery(ss[1])
-    if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
+        print "Starting a series level query for modality type [0]".format(ss[1].Modality)
+        _querySeriesCT(ss[1])
+        continue
+    if ('DX' or 'CR') in ss[1].Modality:
         # get everything
-        pass
+        print "Getting a study with modality type [0]".format(ss[1].Modality)
+        continue
     if 'MG' in ss[1].Modality:
         # get everything
-        pass
+        print "Getting a study with modality type [0]".format(ss[1].Modality)
+        continue
     if 'SR' in ss[1].Modality:
         # get it - you may as well
-        pass
-    if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
+        print "Getting a study with modality type [0]".format(ss[1].Modality)
+        continue
+    if ('RF' or 'XA') in ss[1].Modality:
         # Don't know if you need both...
         # Get series level information to look for SR
-        pass
+        print "Starting a series level query for modality type [0]".format(ss[1].Modality)
+        _querySeriesCT(ss[1])
 
     print ss[1].PatientID
     print ss[1].Modality
@@ -182,3 +195,24 @@ assoc.Release(0)
 
 # done
 MyAE.Quit()
+
+
+# (0008, 0018) SOP Instance UID                    UI:
+# (0008, 0020) Study Date                          DA: ''
+# (0008, 0050) Accession Number                    SH: ''
+# (0008, 0052) Query/Retrieve Level                CS: 'SERIES'
+# (0008, 0060) Modality                            CS: ''
+# (0008, 0062) SOP Classes in Study                UI:
+# (0008, 0070) Manufacturer                        LO: ''
+# (0008, 1010) Station Name                        SH: ''
+# (0008, 1030) Study Description                   LO: ''
+# (0008, 103e) Series Description                  LO: ''
+# (0010, 0020) Patient ID                          LO: ''
+# (0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.23849.1666612369.116.1635621988901632614
+# (0020, 000e) Series Instance UID                 UI:
+# (0020, 0011) Series Number                       IS: ''
+# (0020, 1202) Number of Patient Related Series    IS: ''
+# (0020, 1204) Number of Patient Related Instances IS: ''
+# (0020, 1206) Number of Study Related Series      IS: ''
+# (0020, 1208) Number of Study Related Instances   IS: ''
+# (0020, 1209) Number of Series Related Instances  IS: ''
