@@ -83,11 +83,13 @@ def _querySeriesCT(d2):
     st2 = assoc2.PatientRootFindSOPClass.SCU(d2, 1)
 
     print 'In _querySeriesCT'
+    seRspNo = 0
 
     for series in st2:
-        print series[1]
         if not series[1]:
             continue
+        seRspNo += 1
+        print "Series response number {0}".format(seRspNo)
         if series[1].Modality == 'SR':
             # Not sure if they will be SR are series level but CT at study level?
             # If they are, send C-Move request
@@ -100,13 +102,18 @@ def _querySeriesCT(d2):
             # Then Send a C-Move request for that series
             print "C-Move request for series with number {0}".format(seNum)
             continue
-        if series[1].SeriesDescription == 'Dose Info':
-            # Get Philips Dose Info series - not SR but enough information in the header
-            print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
-            continue
+        try:
+            if series[1].SeriesDescription == 'Dose Info':
+                # Get Philips Dose Info series - not SR but enough information in the header
+                print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
+                continue
+        except AttributeError:
+            # Try an image level find?
+            pass
         # Do something for Toshiba CT...
 
     assoc2.Release(0)
+    print "Released series association"
 
 # create application entity with Find and Move SOP classes as SCU and
 # Storage SOP class as SCP
