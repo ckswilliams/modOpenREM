@@ -82,7 +82,10 @@ def _querySeriesCT(d2):
     assoc2 = MyAE.RequestAssociation(RemoteAE)
     st2 = assoc2.PatientRootFindSOPClass.SCU(d2, 1)
 
+    print 'In _querySeriesCT'
+
     for series in st2:
+        print series[1]
         if not series[1]:
             continue
         if series[1].Modality == 'SR':
@@ -90,15 +93,16 @@ def _querySeriesCT(d2):
             # If they are, send C-Move request
             print "C-Move request for series with modality type SR"
             continue
-        if ('502' or '998' or '990' or '9001') in str(series[1].SeriesNumber):
+        seNum = str(series[1].SeriesNumber)
+        if (seNum is '502') or (seNum is '998') or (seNum is '990') or (seNum is '9001'):
             # Find Siemens (502 CT, 990 RF) and GE (998 CT) RDSR or Enhanced SR
             # Added 9001 for Toshiba XA based on a sample of 1
             # Then Send a C-Move request for that series
-            print "C-Move request for series with number [0]".format(series[1].SeriesNumber)
+            print "C-Move request for series with number {0}".format(seNum)
             continue
         if series[1].SeriesDescription == 'Dose Info':
             # Get Philips Dose Info series - not SR but enough information in the header
-            print "C-Move request for series with description [0]".format(series[1].SeriesDescription)
+            print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
             continue
         # Do something for Toshiba CT...
 
@@ -142,36 +146,40 @@ st = assoc.PatientRootFindSOPClass.SCU(d, 1)
 # print 'done with status "%s"' % st
 
 responses = True
+rspno = 0
 
 for ss in st:
     if not ss[1]:
         continue
-    if ('CT' or 'PT') in ss[1].Modality:
+    rspno += 1
+    print "Response {0}".format(rspno)
+    if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
         # new query for series level information
-        print "Starting a series level query for modality type [0]".format(ss[1].Modality)
+        print "Starting a series level query for modality type {0}".format(ss[1].Modality)
         _querySeriesCT(ss[1])
         continue
-    if ('DX' or 'CR') in ss[1].Modality:
+    if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
         # get everything
-        print "Getting a study with modality type [0]".format(ss[1].Modality)
+        print "Getting a study with modality type {0}".format(ss[1].Modality)
         continue
     if 'MG' in ss[1].Modality:
         # get everything
-        print "Getting a study with modality type [0]".format(ss[1].Modality)
+        print "Getting a study with modality type {0}".format(ss[1].Modality)
         continue
     if 'SR' in ss[1].Modality:
         # get it - you may as well
-        print "Getting a study with modality type [0]".format(ss[1].Modality)
+        print "Getting a study with modality type {0}".format(ss[1].Modality)
         continue
-    if ('RF' or 'XA') in ss[1].Modality:
+    if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
         # Don't know if you need both...
         # Get series level information to look for SR
-        print "Starting a series level query for modality type [0]".format(ss[1].Modality)
+        print "Starting a series level query for modality type {0}".format(ss[1].Modality)
         _querySeriesCT(ss[1])
+    print "I got here"
 
-    print ss[1].PatientID
-    print ss[1].Modality
-    print ss[1].StudyDate
+#    print ss[1].PatientID
+#    print ss[1].Modality
+#    print ss[1].StudyDate
 
 
 
