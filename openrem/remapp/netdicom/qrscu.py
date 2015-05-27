@@ -96,7 +96,7 @@ def _querySeriesCT(d2):
             print "C-Move request for series with modality type SR"
             continue
         seNum = str(series[1].SeriesNumber)
-        if (seNum is '502') or (seNum is '998') or (seNum is '990') or (seNum is '9001'):
+        if (seNum == '502') or (seNum == '998') or (seNum == '990') or (seNum == '9001'):
             # Find Siemens (502 CT, 990 RF) and GE (998 CT) RDSR or Enhanced SR
             # Added 9001 for Toshiba XA based on a sample of 1
             # Then Send a C-Move request for that series
