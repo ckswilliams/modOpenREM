@@ -61,7 +61,7 @@ def OnReceiveStore(SOPClass, DS):
         file_meta = Dataset()
         file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
         file_meta.MediaStorageSOPInstanceUID = "1.2.3"  # !! Need valid UID here
-        file_meta.ImplementationClassUID = "1.2.3.4"  # !!! Need valid UIDs here
+        file_meta.ImplementationClassUID = "1.3.5.1.4.1.45593.1.0.7.0.1"  # !!! Need valid UIDs here
         filename = '%s/%s.dcm' % (tempfile.gettempdir(), DS.SOPInstanceUID)
         ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
         ds.update(DS)
@@ -117,8 +117,8 @@ def _querySeriesCT(d2):
 
 # create application entity with Find and Move SOP classes as SCU and
 # Storage SOP class as SCP
-MyAE = AE(args.aet, args.p, [PatientRootFindSOPClass,
-                             PatientRootMoveSOPClass,
+MyAE = AE(args.aet, args.p, [StudyRootFindSOPClass,
+                             StudyRootMoveSOPClass,
                              VerificationSOPClass], [StorageSOPClass], ts)
 MyAE.OnAssociateResponse = OnAssociateResponse
 MyAE.OnAssociateRequest = OnAssociateRequest
