@@ -12,7 +12,10 @@ class Migration(DataMigration):
         for studyData in orm.GeneralStudyModuleAttr.objects.all():
             studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
             studyTime = studyData.study_time
-            studyDatetime = datetime.combine(studyDate, studyTime)
+            if studyTime:
+                studyDatetime = datetime.combine(studyDate, studyTime)
+            else:
+                studyDatetime = None
             studyData.study_workload_chart_time = studyDatetime
             studyData.save()
 
