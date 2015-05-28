@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='storage SCU example')
 parser.add_argument('remotehost')
 parser.add_argument('remoteport', type=int)
 #parser.add_argument('searchstring')
-parser.add_argument('-p', help='local server port', type=int, default=8104)
+parser.add_argument('-p', help='local server port', type=int, default=8105)
 parser.add_argument('-aet', help='calling AE title', default='OPENREM')
 parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
 parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
@@ -54,23 +54,17 @@ def OnAssociateRequest(association):
     print "Association resquested"
     return True
 
-def OnReceiveStore(SOPClass, DS):
-    print "Received C-STORE", DS.PatientName
-    try:
-        # do something with dataset. For instance, store it.
-        file_meta = Dataset()
-        file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
-        file_meta.MediaStorageSOPInstanceUID = "1.2.3"  # !! Need valid UID here
-        file_meta.ImplementationClassUID = "1.3.5.1.4.1.45593.1.0.7.0.1"  # !!! Need valid UIDs here
-        filename = '%s/%s.dcm' % (tempfile.gettempdir(), DS.SOPInstanceUID)
-        ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
-        ds.update(DS)
-        ds.save_as(filename)
-        print "File %s written" % filename
-    except:
-        pass
-    # must return appropriate status
-    return SOPClass.Success
+def _moveStudy(d):
+    assocMove = MyAE.RequestAssociation(RemoteAE)
+    print "Move association requested"
+    print "d is {0}".format(d)
+    gen = assocMove.StudyRootMoveSOPClass.SCU(d, 'STOREOPENREM', 1)
+    for gg in gen:
+        print "gg is {0}".format(gg)
+    assocMove.Release(0)
+    print "Move association released"
+
+
 
 def _querySeriesCT(d2):
     d2.QueryRetrieveLevel = "SERIES"
@@ -80,7 +74,7 @@ def _querySeriesCT(d2):
     d2.Modality = ''
 
     assoc2 = MyAE.RequestAssociation(RemoteAE)
-    st2 = assoc2.PatientRootFindSOPClass.SCU(d2, 1)
+    st2 = assoc2.StudyRootFindSOPClass.SCU(d2, 1)
 
     print 'In _querySeriesCT'
     seRspNo = 0
@@ -94,6 +88,7 @@ def _querySeriesCT(d2):
             # Not sure if they will be SR are series level but CT at study level?
             # If they are, send C-Move request
             print "C-Move request for series with modality type SR"
+            _moveStudy(series[1])
             continue
         seNum = str(series[1].SeriesNumber)
         if (seNum == '502') or (seNum == '998') or (seNum == '990') or (seNum == '9001'):
@@ -101,11 +96,13 @@ def _querySeriesCT(d2):
             # Added 9001 for Toshiba XA based on a sample of 1
             # Then Send a C-Move request for that series
             print "C-Move request for series with number {0}".format(seNum)
+            _moveStudy(series[1])
             continue
         try:
             if series[1].SeriesDescription == 'Dose Info':
                 # Get Philips Dose Info series - not SR but enough information in the header
                 print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
+                _moveStudy(series[1])
                 continue
         except AttributeError:
             # Try an image level find?
@@ -122,7 +119,7 @@ MyAE = AE(args.aet, args.p, [StudyRootFindSOPClass,
                              VerificationSOPClass], [], ts)
 MyAE.OnAssociateResponse = OnAssociateResponse
 MyAE.OnAssociateRequest = OnAssociateRequest
-MyAE.OnReceiveStore = OnReceiveStore
+# MyAE.OnReceiveStore = OnReceiveStore
 MyAE.start()
 
 
@@ -149,7 +146,7 @@ d.StudyDescription = ''
 d.StudyInstanceUID = ''
 d.StudyDate = ''
 
-st = assoc.PatientRootFindSOPClass.SCU(d, 1)
+st = assoc.StudyRootFindSOPClass.SCU(d, 1)
 # print 'done with status "%s"' % st
 
 responses = True
@@ -168,14 +165,17 @@ for ss in st:
     if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
         # get everything
         print "Getting a study with modality type {0}".format(ss[1].Modality)
+        _moveStudy(ss[1])
         continue
     if 'MG' in ss[1].Modality:
         # get everything
         print "Getting a study with modality type {0}".format(ss[1].Modality)
+        _moveStudy(ss[1])
         continue
     if 'SR' in ss[1].Modality:
         # get it - you may as well
         print "Getting a study with modality type {0}".format(ss[1].Modality)
+        _moveStudy(ss[1])
         continue
     if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
         # Don't know if you need both...
@@ -184,26 +184,7 @@ for ss in st:
         _querySeriesCT(ss[1])
     print "I got here"
 
-#    print ss[1].PatientID
-#    print ss[1].Modality
-#    print ss[1].StudyDate
 
-
-
-
-#for ss in st:
-#    if not ss[1]: continue
-#     try:
-#         d.PatientID = ss[1].PatientID
-#     except:
-#         continue
-#     print "Moving"
-#     print d
-#     assoc2 = MyAE.RequestAssociation(RemoteAE)
-#     gen = assoc2.PatientRootMoveSOPClass.SCU(d, 'PYNETDICOM', 1)
-#     for gg in gen:
-#         print gg
-#     assoc2.Release(0)
 
 print "Release association"
 assoc.Release(0)
