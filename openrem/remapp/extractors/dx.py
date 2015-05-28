@@ -466,7 +466,7 @@ def _generalstudymoduleattributes(dataset,g):
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
-    g.study_datetime_time = datetime.combine(datetime.date(datetime(1900,1,1)), g.study_time)
+    g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), g.study_time)
     g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
