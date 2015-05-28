@@ -119,7 +119,7 @@ def _querySeriesCT(d2):
 # Storage SOP class as SCP
 MyAE = AE(args.aet, args.p, [StudyRootFindSOPClass,
                              StudyRootMoveSOPClass,
-                             VerificationSOPClass], [StorageSOPClass], ts)
+                             VerificationSOPClass], [], ts)
 MyAE.OnAssociateResponse = OnAssociateResponse
 MyAE.OnAssociateRequest = OnAssociateRequest
 MyAE.OnReceiveStore = OnReceiveStore
