@@ -5,6 +5,15 @@
 
       <p>
           There are {{ homedata.total }} studies in this database. Page last refreshed on {% now "jS F Y \a\t H:i" %}.
+          {% if user.is_authenticated %}
+              {% if request.user.userprofile.plotCharts %}
+                  Chart plotting on.
+              {% else %}
+                  Chart plotting off.
+              {% endif %}
+          {% else %}
+              Chart plotting status unknown - <a href="/login/?next={{ request.get_full_path|urlencode }}">login</a>
+          {% endif %}
       </p>
       {% endblock %}
 

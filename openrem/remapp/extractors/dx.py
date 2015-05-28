@@ -462,9 +462,11 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 def _generalstudymoduleattributes(dataset,g):
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
+    from datetime import datetime
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
+    g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), g.study_time)
     g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)

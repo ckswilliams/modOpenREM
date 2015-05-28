@@ -23,7 +23,7 @@ Contents:
     :maxdepth: 2
 
     install
-    release-0.6.0
+    release-0.7.0
     releasenotes
     import
     netdicom
