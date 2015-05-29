@@ -25,7 +25,7 @@ requires = [
 
 setup(
     name='OpenREM',
-    version='0.6.0',
+    version='0.7.0b1',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
@@ -38,7 +38,8 @@ setup(
         'openrem/scripts/openrem_store.py'
     ],
     license='GPLv3 with additional permissions',  
-    description='Radiation Exposure Monitoring for physicists',
+#    description='Radiation Exposure Monitoring for physicists',
+    description='Developer beta only',
     long_description=README,
     url='http://openrem.org/',
     author='Ed McDonagh',
