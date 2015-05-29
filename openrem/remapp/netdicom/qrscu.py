@@ -25,8 +25,6 @@ import tempfile
 parser = argparse.ArgumentParser(description='storage SCU example')
 parser.add_argument('remotehost')
 parser.add_argument('remoteport', type=int)
-#parser.add_argument('searchstring')
-parser.add_argument('-p', help='local server port', type=int, default=8105)
 parser.add_argument('-aet', help='calling AE title', default='OPENREM')
 parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
 parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
@@ -112,9 +110,8 @@ def _querySeriesCT(d2):
     assoc2.Release(0)
     print "Released series association"
 
-# create application entity with Find and Move SOP classes as SCU and
-# Storage SOP class as SCP
-MyAE = AE(args.aet, args.p, [StudyRootFindSOPClass,
+# create application entity with Find and Move SOP classes as SCU
+MyAE = AE(args.aet, 0, [StudyRootFindSOPClass,
                              StudyRootMoveSOPClass,
                              VerificationSOPClass], [], ts)
 MyAE.OnAssociateResponse = OnAssociateResponse
