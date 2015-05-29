@@ -69,6 +69,8 @@ class UserProfile(models.Model):
     plotCTAcquisitionFreq = models.BooleanField(default=False)
     plotCTStudyMeanDLP = models.BooleanField(default=True)
     plotCTStudyFreq = models.BooleanField(default=False)
+    plotCTRequestMeanDLP = models.BooleanField(default=False)
+    plotCTRequestFreq = models.BooleanField(default=False)
     plotCTStudyPerDayAndHour = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTime = models.BooleanField(default=False)
     plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
@@ -153,6 +155,7 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
     study_time = models.TimeField(blank=True, null=True)
+    study_workload_chart_time = models.DateTimeField(blank=True, null=True)
     referring_physician_name = models.TextField(blank=True, null=True)
     referring_physician_identification = models.TextField(blank=True, null=True)
     study_id = models.CharField(max_length=16, blank=True, null=True)

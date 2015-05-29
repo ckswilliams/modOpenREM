@@ -4,4 +4,5 @@ docs/
 stuff/
 openrem/remapp/migrations
 openrem/openremproject/local_settings.py
+openrem/openremproject/wsgi.py
 *.pyc

@@ -462,9 +462,11 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 def _generalstudymoduleattributes(dataset,g):
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
+    from datetime import datetime
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
+    g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), datetime.time(g.study_time))
     g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
@@ -475,7 +477,7 @@ def _generalstudymoduleattributes(dataset,g):
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
-    g.operator_name = get_value_kw('OperatorName',dataset)
+    g.operator_name = get_value_kw('OperatorsName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)

@@ -6,6 +6,8 @@
 
 # ImplementationUID 1.2.826.0.1.3680043.9.5224.1.0.6.0.1
 # = 1.2.826.0.1.3680043.9.5224.1.versionnumber.betanumber
+# IANA version
+# = 1.3.5.1.4.1.45593.1.0.7.0.1
 
 # UID root for objects
 # = 1.2.826.0.1.3680043.9.5224.2.machine-root.machineID.numberperimage
