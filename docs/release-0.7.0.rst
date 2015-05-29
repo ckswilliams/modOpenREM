@@ -37,7 +37,15 @@ Upgrading from version 0.6.0
 
 * You now need to run a data migration to populate the new database field
 
-    Method 1:
+    First, rename the data migration file to remove the `.inactive` extension:
+        .. sourcecode:: bash
+
+            # Linux: Debian/Ubuntu and derivatives. In a virtualenv replace all up to lib/ as appropriate
+            mv /usr/local/lib/python2.7/dist-packages/openrem/remapp/migrations/00xx_study_workload_chart_time_datamigration.py.inactive /usr/local/lib/python2.7/dist-packages/openrem/remapp/migrations/00xx_study_workload_chart_time_datamigration.py
+            # Windows (alternatively use the file browser):
+            rename C:\Python27\Lib\site-packages\openrem\remapp\migrations\00xx_study_workload_chart_time_datamigration.py.inactive C:\Python27\Lib\site-packages\openrem\remapp\migrations\00xx_study_workload_chart_time_datamigration.py
+
+    Then, method 1:
 
         Use a file browser or terminal to list the contents of the ``migrations`` folder, eg:
 
@@ -50,7 +58,7 @@ Upgrading from version 0.6.0
             # Windows (alternatively use the file browser):
             dir C:\Python27\Lib\site-packages\openrem\remapp\migrations\
 
-    Method 2:
+    or method 2:
 
         Use the Django ``manage.py`` program to list the existing migrations:
 
