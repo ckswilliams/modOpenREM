@@ -12,6 +12,7 @@ TIME_PERIOD = (
     (YEARS, 'Years'),
 )
 
+
 class SizeUploadForm(forms.Form):
     """Form for patient size csv file upload
     """
@@ -19,11 +20,21 @@ class SizeUploadForm(forms.Form):
         label='Select a file'
     )
 
+
 class DicomStoreConfigForm(forms.Form):
     """Form for setting the DICOM Store SCP details
     """
     aetitle_field = forms.CharField(max_length=16)
     port_field = forms.IntegerField(max_value=65535)
+
+
+class DicomQRConfigForm(forms.Form):
+    """Form for setting the remote DICOM Query Retrieve node details
+    """
+    name_field = forms.CharField(max_length=64)
+    aetitle_field = forms.CharField(max_length=16)
+    port_field = forms.IntegerField(max_value=65535)
+    ip_field = forms.GenericIPAddressField()
 
 
 class SizeHeadersForm(forms.Form):
@@ -39,31 +50,38 @@ class SizeHeadersForm(forms.Form):
         super(SizeHeadersForm, self).__init__(**kwargs)
         if my_choice:
 
-            self.fields['height_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
-            self.fields['weight_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
-            self.fields['id_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
-            ID_TYPES = (("acc-no", "Accession Number"),("si-uid", "Study instance UID"))
-            self.fields['id_type'] = forms.ChoiceField(choices=ID_TYPES, widget=forms.Select(attrs={"class":"form-control"}))
+            self.fields['height_field'] = forms.ChoiceField(
+                choices=my_choice, widget=forms.Select(attrs={"class": "form-control"}))
+            self.fields['weight_field'] = forms.ChoiceField(
+                choices=my_choice, widget=forms.Select(attrs={"class": "form-control"}))
+            self.fields['id_field'] = forms.ChoiceField(
+                choices=my_choice, widget=forms.Select(attrs={"class": "form-control"}))
+            ID_TYPES = (("acc-no", "Accession Number"), ("si-uid", "Study instance UID"))
+            self.fields['id_type'] = forms.ChoiceField(
+                choices=ID_TYPES, widget=forms.Select(attrs={"class": "form-control"}))
+
 
 class DXChartOptionsForm(forms.Form):
-    plotCharts = forms.BooleanField(label='Plot charts?',required=False)
-    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean DAP per acquisition',required=False)
-    plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
-    plotDXAcquisitionMeankVp = forms.BooleanField(label='Mean kVp per acquisition',required=False)
-    plotDXAcquisitionMeanmAs = forms.BooleanField(label='Mean mAs per acquisition',required=False)
-    plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
-    plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time',required=False)
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean DAP per acquisition', required=False)
+    plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
+    plotDXAcquisitionMeankVp = forms.BooleanField(label='Mean kVp per acquisition', required=False)
+    plotDXAcquisitionMeanmAs = forms.BooleanField(label='Mean mAs per acquisition', required=False)
+    plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time', required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
 
+
 class CTChartOptionsForm(forms.Form):
-    plotCharts = forms.BooleanField(label='Plot charts?',required=False)
-    plotCTAcquisitionMeanDLP = forms.BooleanField(label='Mean DLP per acquisition',required=False)
-    plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('Mean CTDI<sub>vol</sub> per acquisition'),required=False)
-    plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
-    plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study',required=False)
-    plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)
-    plotCTRequestMeanDLP = forms.BooleanField(label='Mean DLP per requested procedure',required=False)
-    plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency',required=False)
-    plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
-    plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Mean study DLP over time',required=False)
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotCTAcquisitionMeanDLP = forms.BooleanField(label='Mean DLP per acquisition', required=False)
+    plotCTAcquisitionMeanCTDI = forms.BooleanField(
+        label=mark_safe('Mean CTDI<sub>vol</sub> per acquisition'), required=False)
+    plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
+    plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study', required=False)
+    plotCTStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotCTRequestMeanDLP = forms.BooleanField(label='Mean DLP per requested procedure', required=False)
+    plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency', required=False)
+    plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Mean study DLP over time', required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
