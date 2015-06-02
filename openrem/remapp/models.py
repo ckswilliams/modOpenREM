@@ -34,8 +34,22 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
 
+class DicomStoreSCP(models.Model):
+    aetitle = models.CharField(max_length=16, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+
+
+class DicomRemoteQR(models.Model):
+    name = models.CharField(max_length=64, blank=True, null=True)
+    aetitle = models.CharField(max_length=16, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    ip = models.GenericIPAddressField(blank=True, null=True)
+    hostname = models.CharField(max_length=32, blank=True, null=True)
+
+
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+
 
 class UserProfile(models.Model):
     DAYS = 'days'

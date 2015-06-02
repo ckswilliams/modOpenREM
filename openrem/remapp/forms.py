@@ -35,6 +35,7 @@ class DicomQRConfigForm(forms.Form):
     aetitle_field = forms.CharField(max_length=16)
     port_field = forms.IntegerField(max_value=65535)
     ip_field = forms.GenericIPAddressField()
+    hostname_field = forms.CharField(max_length=32)
 
 
 class SizeHeadersForm(forms.Form):
