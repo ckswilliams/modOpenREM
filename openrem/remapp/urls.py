@@ -88,6 +88,8 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/sizeimports', 'size_imports', name='size_imports'),
     url(r'^admin/sizedelete', 'size_delete', name='size_delete'),
     url(r'^admin/sizeimport/abort/(?P<pk>\d+)$', 'size_abort'),
+    url(r'^admin/dicomsummary', 'dicom_summary', name='dicom_summary'),
+    url(r'^admin/dicomconfig', 'dicom_config', name='dicom_config'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

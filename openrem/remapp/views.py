@@ -1445,3 +1445,68 @@ def charts_off(request):
     response = openrem_home(request)
 
     return response
+
+from remapp.models import DicomStoreSCP, DicomRemoteQR
+from remapp.forms import DicomStoreConfigForm, DicomQRConfigForm
+
+@login_required
+def dicom_summary(request):
+    """Displays current DICOM configuration
+    """
+    store = DicomStoreSCP.objects.all()
+    remoteqr = DicomRemoteQR.objects.all()
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/dicomsummary.html',
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+
+
+@login_required
+def dicom_config(request):
+    """Form for configuring DICOM services. POST request passes ?
+
+    :param request: If POST, contains the file upload information
+    """
+    # Handle file upload
+    if request.method == 'POST':
+        form = SizeUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            newcsv = SizeUpload(sizefile = request.FILES['sizefile'])
+            newcsv.save()
+
+            # Redirect to the document list after POST
+            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(newcsv.id))
+    else:
+        form = SizeUploadForm() # A empty, unbound form
+
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/sizeupload.html',
+        {'form': form, 'admin':admin},
+        context_instance=RequestContext(request)
+    )
