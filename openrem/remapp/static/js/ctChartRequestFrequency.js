@@ -34,7 +34,7 @@ var chartRequestFreq = new Highcharts.Chart({
                 events: {
                     click: function(e) {
                         var linkText = 'requested_procedure=' + (this.name).replace('&amp;', '%26');
-                        location.href = '/openrem/ct/hist/?requestfreq=1&' + linkText + tooltipFiltersRequest;
+                        location.href = '/openrem/ct/?requestfreq=1&' + linkText + tooltipFiltersRequest;
                         e.preventDefault();
                     }
                 }
