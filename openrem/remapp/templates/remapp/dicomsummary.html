@@ -40,16 +40,44 @@
 
       <div class="row">
       <div class="col-md-8 col-md-offset-2">
-          <h4>DICOM Store SCP settings</h4>
-          <p>
-              ...
-          </p>
-          <h4>
+          <div class="panel panel-info">
+          <div class="panel-heading">
+              <h3 class="panel-title">DICOM Store SCP settings</h3>
+          </div>
+          <div class="panel-body">
+
+          {% for scp in store %}
+
+          <ul>
+              <li>{{ scp.aetitle }}</li>
+              <li>{{ scp.port }}</li>
+              <li>{{ scp.enabled }}</li>
+          </ul>
+
+          {% endfor %}
+          </div>
+          </div>
+
+          <h2>
             Remote DICOM Query Retrieve nodes
-          </h4>
-          <p>
-              ...
-          </p>
+          </h2>
+
+          {% for qr in remoteqr %}
+              <div class="panel panel-info">
+              <div class="panel heading">
+                  <h3 class="panel-title">{{ qr.name }}</h3>
+              </div>
+              <div class="panel-body">
+              <ul>
+                <li>{{ qr.aetitle }}</li>
+                <li>{{ qr.hostname }}</li>
+                <li>{{ qr.ip }}</li>
+                <li>{{ qr.port }}</li>
+                <li>{{ qr.enabled }}</li>
+              </ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
+              </div>
+          {% endfor %}
       </div>
       </div>
 
