@@ -64,18 +64,24 @@
 
           {% for qr in remoteqr %}
               <div class="panel panel-info">
-              <div class="panel heading">
-                  <h3 class="panel-title">{{ qr.name }}</h3>
-              </div>
-              <div class="panel-body">
-              <ul>
-                <li>{{ qr.aetitle }}</li>
-                <li>{{ qr.hostname }}</li>
-                <li>{{ qr.ip }}</li>
-                <li>{{ qr.port }}</li>
-                <li>{{ qr.enabled }}</li>
-              </ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
+                  <div class="panel-heading">
+                      <h3 class="panel-title">{{ qr.name }}
+                      <small>
+                      {% if qr.enabled %}
+                        (active)
+                      {% else %}
+                        (disabled)
+                      {% endif %}</small>
+                      </h3>
+                  </div>
+                  <div class="panel-body">
+                      <ul>
+                        <li>{{ qr.aetitle }}</li>
+                        <li>{{ qr.hostname }}</li>
+                        <li>{{ qr.ip }}</li>
+                        <li>{{ qr.port }}</li>
+                      </ul>
+                  </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
               </div>
           {% endfor %}
       </div>
