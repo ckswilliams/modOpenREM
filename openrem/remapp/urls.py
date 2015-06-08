@@ -33,6 +33,7 @@ from django_filters.views import FilterView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
+from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 
 
 urlpatterns = patterns('remapp.views',
@@ -89,7 +90,9 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/sizedelete', 'size_delete', name='size_delete'),
     url(r'^admin/sizeimport/abort/(?P<pk>\d+)$', 'size_abort'),
     url(r'^admin/dicomsummary', 'dicom_summary', name='dicom_summary'),
-    url(r'^admin/dicomconfig', 'dicom_config', name='dicom_config'),
+    url(r'^admin/dicomstore/add/$', DicomStoreCreate.as_view(), name='dicomstore_add'),
+    url(r'^admin/dicomstore/(?P<pk>\d+)/$', DicomStoreUpdate.as_view(), name='dicomstore_update'),
+    url(r'^admin/dicomstore/(?P<pk>\d+)/delete/$', DicomStoreDelete.as_view(), name='dicomstore_delete'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

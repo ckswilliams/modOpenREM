@@ -32,12 +32,16 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
+from django.core.urlresolvers import reverse
 
 
 class DicomStoreSCP(models.Model):
     aetitle = models.CharField(max_length=16, blank=True, null=True)
     port = models.IntegerField(blank=True, null=True)
     enabled = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
 
 
 class DicomRemoteQR(models.Model):

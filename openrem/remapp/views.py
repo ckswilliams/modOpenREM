@@ -1447,7 +1447,7 @@ def charts_off(request):
     return response
 
 from remapp.models import DicomStoreSCP, DicomRemoteQR
-from remapp.forms import DicomStoreConfigForm, DicomQRConfigForm
+#from remapp.forms import DicomStoreConfigForm, DicomQRConfigForm
 
 @login_required
 def dicom_summary(request):
@@ -1472,41 +1472,20 @@ def dicom_summary(request):
         context_instance=RequestContext(request)
     )
 
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.core.urlresolvers import reverse_lazy
 
 
-@login_required
-def dicom_config(request):
-    """Form for configuring DICOM services. POST request passes ?
-
-    :param request: If POST, contains the file upload information
-    """
-    # Handle file upload
-    if request.method == 'POST':
-        form = SizeUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            newcsv = SizeUpload(sizefile = request.FILES['sizefile'])
-            newcsv.save()
-
-            # Redirect to the document list after POST
-            return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(newcsv.id))
-    else:
-        form = SizeUploadForm() # A empty, unbound form
+class DicomStoreCreate(CreateView):
+    model = DicomStoreSCP
+    fields = ['aetitle', 'port', 'enabled']
 
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion' : vers}
+class DicomStoreUpdate(UpdateView):
+    model = DicomStoreSCP
+    fields = ['aetitle', 'port', 'enabled']
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
 
-    # Render list page with the documents and the form
-    return render_to_response(
-        'remapp/sizeupload.html',
-        {'form': form, 'admin':admin},
-        context_instance=RequestContext(request)
-    )
+class DicomStoreDelete(DeleteView):
+    model = DicomStoreSCP
+    success_url = reverse_lazy('dicom_summary')
