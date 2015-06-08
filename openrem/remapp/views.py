@@ -177,7 +177,7 @@ def dx_summary_list_filter(request):
 
     if plotting and plotCharts:
         acquisitionDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData, acquisitionHistogramuAsData,\
-        acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary, studiesPerHourInWeekdays = \
+        acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary, studiesPerHourInWeekdays, acquisition_names = \
             dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
                                  plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
                                  plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults)
@@ -197,6 +197,7 @@ def dx_summary_list_filter(request):
 
     if plotting and plotCharts:
         if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
+            returnStructure['acquisition_names'] = acquisition_names
             returnStructure['acquisitionSummary'] = acquisitionSummary
         if plotDXAcquisitionMeanDAP:
             returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
@@ -266,7 +267,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
     acquisition_names = acquisition_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
 
-    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq:
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
             mean_dap=Avg('dose_area_product'),
             num_acq=Count('dose_area_product'))\
@@ -343,7 +344,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
 
     return acquisitionDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData, acquisitionHistogramuAsData,\
-           acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary, studiesPerHourInWeekdays
+           acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary, studiesPerHourInWeekdays, acquisition_names
 
 
 @login_required
