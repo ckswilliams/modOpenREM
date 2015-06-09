@@ -52,6 +52,9 @@ class DicomRemoteQR(models.Model):
     hostname = models.CharField(max_length=32, blank=True, null=True)
     enabled = models.BooleanField(default=False)
 
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
 
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save

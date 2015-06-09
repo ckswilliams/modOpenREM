@@ -1489,3 +1489,18 @@ class DicomStoreUpdate(UpdateView):
 class DicomStoreDelete(DeleteView):
     model = DicomStoreSCP
     success_url = reverse_lazy('dicom_summary')
+
+
+class DicomQRCreate(CreateView):
+    model = DicomRemoteQR
+    fields = ['name', 'aetitle', 'port', 'ip', 'hostname', 'enabled']
+
+
+class DicomQRUpdate(UpdateView):
+    model = DicomRemoteQR
+    fields = ['name', 'aetitle', 'port', 'ip', 'hostname', 'enabled']
+
+
+class DicomQRDelete(DeleteView):
+    model = DicomRemoteQR
+    success_url = reverse_lazy('dicom_summary')

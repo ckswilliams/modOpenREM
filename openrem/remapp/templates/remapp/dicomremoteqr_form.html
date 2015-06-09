@@ -32,36 +32,8 @@
         {% endfor %}
     {% endif %}
 
-
-      <div class="row col-md-offset-2">
-        <h1>DICOM Network configuration</h1>
-      </div>
-
-      <div class="row">
-      <div class="col-md-8 col-md-offset-2">
-          <div class="panel panel-info">
-          <div class="panel-heading">
-              <h3 class="panel-title">Are you sure you want to remove this DICOM Store SCP?</h3>
-          </div>
-          <div class="panel-body">
-
-          <ul>
-              <li>{{ object.aetitle }}</li>
-              <li>{{ object.port }}</li>
-              <li>{{ object.enabled }}</li>
-          </ul>
-
-          <form action="" method="post">
-              {% csrf_token %}
-              <input type="submit" value="Delete!"/>
-              <input type="button" value="No, changed my mind..." onclick="window.history.go(-1);" />
-          </form>
-
-        </div>
-      </div>
-      </div>
-    </div>
-
-
+<form action="" method="post">
+{% csrf_token %}{{ form.as_p }}
+<input type="submit" value="Submit" /> </form>
 
 {% endblock %}	

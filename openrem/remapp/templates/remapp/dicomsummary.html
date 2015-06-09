@@ -47,16 +47,27 @@
           <div class="panel-body">
 
           {% for scp in store %}
+              <table>
+                  <tr>
+                      <th>AE Title</th>
+                      <td>{{ scp.aetitle }}</td>
+                  </tr>
+                  <tr>
+                      <th>Port</th>
+                      <td>{{ scp.port }}</td>
+                  </tr>
+                  <tr>
+                      <th>Currently enabled?</th>
+                      <td>{{ scp.enabled }}</td>
+                  </tr>
+              </table>
 
-          <ul>
-              <li>{{ scp.aetitle }}</li>
-              <li>{{ scp.port }}</li>
-              <li>{{ scp.enabled }}</li>
-          </ul>
-          <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
-          <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a>
+          | <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
+          | <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a> |
+          <hr>
 
           {% endfor %}
+
 
           <a href="/openrem/admin/dicomstore/add/">Add new store</a>
           </div>
@@ -65,6 +76,8 @@
           <h2>
             Remote DICOM Query Retrieve nodes
           </h2>
+
+          <a href="/openrem/admin/dicomqr/add/">Add new QR Node</a>
 
           {% for qr in remoteqr %}
               <div class="panel panel-info">
@@ -79,16 +92,35 @@
                       </h3>
                   </div>
                   <div class="panel-body">
-                      <ul>
-                        <li>{{ qr.aetitle }}</li>
-                        <li>{{ qr.hostname }}</li>
-                        <li>{{ qr.ip }}</li>
-                        <li>{{ qr.port }}</li>
-                      </ul>
-                  </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                      <table>
+                          <tr>
+                              <th>AE Title</th>
+                              <td>{{ qr.aetitle }}</td>
+                          </tr>
+                          <tr>
+                              <th>Port</th>
+                              <td>{{ qr.port }}</td>
+                          </tr>
+                          <tr>
+                              <th>Hostname</th>
+                              <td>{{ qr.hostname }}</td>
+                          </tr>
+                          <tr>
+                              <th>IP Address</th>
+                              <td>{{ qr.ip }}</td>
+                          </tr>
+                          <tr>
+                              <th>Currently enabled?</th>
+                              <td>{{ qr.enabled }}</td>
+                          </tr>
+                      </table>
+
+                      | <a href="/openrem/admin/dicomqr/{{ qr.id }}/">Modify</a>
+                      | <a href="/openrem/admin/dicomqr/{{ qr.id }}/delete/">Delete</a> |
+                  </div>
               </div>
           {% endfor %}
-      </div>
+          </div>
       </div>
 
 {% else %}
