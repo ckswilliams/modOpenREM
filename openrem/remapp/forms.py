@@ -21,21 +21,6 @@ class SizeUploadForm(forms.Form):
     )
 
 
-#class DicomStoreConfigForm(forms.Form):
-#    """Form for setting the DICOM Store SCP details
-#    """
-#    aetitle_field = forms.CharField(max_length=16)
-#    port_field = forms.IntegerField(max_value=65535)
-
-
-class DicomQRConfigForm(forms.Form):
-    """Form for setting the remote DICOM Query Retrieve node details
-    """
-    name_field = forms.CharField(max_length=64)
-    aetitle_field = forms.CharField(max_length=16)
-    port_field = forms.IntegerField(max_value=65535)
-    ip_field = forms.GenericIPAddressField()
-    hostname_field = forms.CharField(max_length=32)
 
 
 class SizeHeadersForm(forms.Form):
