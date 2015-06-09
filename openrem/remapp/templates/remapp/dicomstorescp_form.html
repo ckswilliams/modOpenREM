@@ -32,8 +32,13 @@
         {% endfor %}
     {% endif %}
 
-<form action="" method="post">
-{% csrf_token %}{{ form.as_p }}
-<input type="submit" value="Submit" /> </form>
+    {% if admin.adminperm %}
+        <form action="" method="post">
+            {% csrf_token %}{{ form.as_p }}
+        <input type="submit" value="Submit" /> </form>
+    {% else %}
+        <p>Only users in the Admin group can create new DICOM Store SCP entries.</p>
+    {% endif %}
+
 
 {% endblock %}	

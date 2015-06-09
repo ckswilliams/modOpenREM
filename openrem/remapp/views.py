@@ -1447,7 +1447,6 @@ def charts_off(request):
     return response
 
 from remapp.models import DicomStoreSCP, DicomRemoteQR
-#from remapp.forms import DicomStoreConfigForm, DicomQRConfigForm
 
 @login_required
 def dicom_summary(request):
@@ -1479,6 +1478,18 @@ from django.core.urlresolvers import reverse_lazy
 class DicomStoreCreate(CreateView):
     model = DicomStoreSCP
     fields = ['aetitle', 'port', 'enabled']
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
 
 
 class DicomStoreUpdate(UpdateView):
