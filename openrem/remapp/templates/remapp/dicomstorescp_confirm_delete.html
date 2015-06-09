@@ -1,0 +1,66 @@
+{% extends "remapp/base.html" %}
+
+
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+            <li><a href="/openrem/dx">Radiography</a></li>
+{% endblock %}
+
+{% block adminnav %}
+    <li class="dropdown active">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-blank fa-fw"></i>Admin <b class="caret"></b>
+        </a>
+{% endblock %}
+
+
+
+{% block mainblock %}		
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {% if message.level == 40 %}
+                    <strong>Warning!</strong>
+                {% endif %}
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+      <div class="row col-md-offset-2">
+        <h1>DICOM Network configuration</h1>
+      </div>
+
+      <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+          <div class="panel panel-info">
+          <div class="panel-heading">
+              <h3 class="panel-title">Are you sure you want to remove this DICOM Store SCP?</h3>
+          </div>
+          <div class="panel-body">
+
+          <ul>
+              <li>{{ object.aetitle }}</li>
+              <li>{{ object.port }}</li>
+              <li>{{ object.enabled }}</li>
+          </ul>
+
+          <form action="" method="post">
+              {% csrf_token %}
+              <input type="submit" value="Delete!"/>
+              <input type="button" value="No, changed my mind..." onclick="window.history.go(-1);" />
+          </form>
+
+        </div>
+      </div>
+      </div>
+
+
+
+{% endblock %}	

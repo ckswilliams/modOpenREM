@@ -53,8 +53,12 @@
               <li>{{ scp.port }}</li>
               <li>{{ scp.enabled }}</li>
           </ul>
+          <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
+          <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a>
 
           {% endfor %}
+
+          <a href="/openrem/admin/dicomstore/add/">Add new store</a>
           </div>
           </div>
 
