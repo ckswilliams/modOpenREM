@@ -47,6 +47,6 @@ def storescp(request, pk):
     from remapp.netdicom.storescp import store
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = storescp.delay(pk)
+        job = store.delay(pk)
 
     return redirect('/openrem/admin/dicomsummary/')
