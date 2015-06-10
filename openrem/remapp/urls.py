@@ -125,8 +125,7 @@ urlpatterns += patterns('remapp.views',
         'charts_off'),
 )
 
-from remapp.netdicom import storescp
 
-urlpatterns += patterns('',
-    url(r'admin/dicomstore/(?P<pk>\d+)/start/$', storescp)
+urlpatterns += patterns('remapp.netdicom.dicomviews',
+    url(r'admin/dicomstore/(?P<pk>\d+)/start/$', 'storescp')
 )
