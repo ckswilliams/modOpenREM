@@ -122,7 +122,7 @@ def OnReceiveStore(SOPClass, DS):
     return SOPClass.Success
 
 @shared_task
-def store(*args, **kwargs):
+def store(store_pk=None, *args, **kwargs):
 
     import sys
     import argparse
@@ -142,12 +142,11 @@ def store(*args, **kwargs):
     parser = argparse.ArgumentParser(description='OpenREM Store SCP')
     parser.add_argument('-port', help='Override local_settings port used by this server', type=int, default=STORE_PORT)
     parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
-    parser.add_argument('-pk', help='Primary key of database entry for store scp settings')
     args = parser.parse_args()
 
-    if args.pk:
+    if store_pk:
         try:
-            conf = DicomStoreSCP.objects.get(pk__exact = args.pk)
+            conf = DicomStoreSCP.objects.get(pk__exact=store_pk)
             args.aet = conf.aetitle
             args.port = conf.port
         except ObjectDoesNotExist:
