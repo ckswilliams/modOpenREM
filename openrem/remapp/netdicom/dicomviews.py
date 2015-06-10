@@ -37,6 +37,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
+
+
 @csrf_exempt
 @login_required
 def storescp(request, pk):
@@ -49,6 +51,7 @@ def storescp(request, pk):
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         job = threading.Thread(target=web_store(store_pk=pk))
+        job.daemon = True
         job.start()
 
     return redirect('/openrem/admin/dicomsummary/')
