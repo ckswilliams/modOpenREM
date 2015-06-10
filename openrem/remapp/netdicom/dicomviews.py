@@ -44,7 +44,7 @@ def storescp(request, pk):
 
     """
     from django.shortcuts import redirect
-    from remapp.netdicom import storescp
+    from remapp.netdicom.storescp import store
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         job = storescp.delay(pk)
