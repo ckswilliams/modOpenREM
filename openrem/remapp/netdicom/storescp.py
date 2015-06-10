@@ -123,7 +123,10 @@ def OnReceiveStore(SOPClass, DS):
 
 def store(*args, **kwargs):
 
+    import sys
     import argparse
+    from remapp.models import DicomStoreSCP
+    from django.core.exceptions import ObjectDoesNotExist
 
     try:
         from openremproject.settings import STORE_AET
@@ -138,7 +141,17 @@ def store(*args, **kwargs):
     parser = argparse.ArgumentParser(description='OpenREM Store SCP')
     parser.add_argument('-port', help='Override local_settings port used by this server', type=int, default=STORE_PORT)
     parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
+    parser.add_argument('-pk', help='Primary key of database entry for store scp settings')
     args = parser.parse_args()
+
+    if args.pk:
+        try:
+            conf = DicomStoreSCP.objects.get(pk__exact = args.pk)
+            args.aet = conf.aetitle
+            args.port = conf.port
+        except ObjectDoesNotExist:
+            sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
+
 
     # setup AE
     MyAE = AE(
