@@ -32,8 +32,15 @@
         {% endfor %}
     {% endif %}
 
-<form action="" method="post">
-{% csrf_token %}{{ form.as_p }}
-<input type="submit" value="Submit" /> </form>
+      <div class="row col-md-offset-2">
+        <h3>Create or modify remote DICOM Query Retrieve Service Class Providers</h3>
+        {% if admin.adminperm %}
+            <form action="" method="post">
+                {% csrf_token %}{{ form.as_p }}
+            <input type="submit" value="Submit" /> </form>
+        {% else %}
+            <p>Only users in the Admin group can create or modify DICOM QR SCP entries.</p>
+        {% endif %}
+      </div>
 
 {% endblock %}	

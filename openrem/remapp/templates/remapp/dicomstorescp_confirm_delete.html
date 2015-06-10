@@ -46,11 +46,20 @@
           </div>
           <div class="panel-body">
 
-          <ul>
-              <li>{{ object.aetitle }}</li>
-              <li>{{ object.port }}</li>
-              <li>{{ object.enabled }}</li>
-          </ul>
+              <table>
+                  <tr>
+                      <th>AE Title</th>
+                      <td>{{ object.aetitle }}</td>
+                  </tr>
+                  <tr>
+                      <th>Port</th>
+                      <td>{{ object.port }}</td>
+                  </tr>
+                  <tr>
+                      <th>Currently enabled?</th>
+                      <td>{{ object.enabled }}</td>
+                  </tr>
+              </table>
 
           <form action="" method="post">
               {% csrf_token %}
