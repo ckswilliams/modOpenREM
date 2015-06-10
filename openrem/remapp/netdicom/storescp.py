@@ -12,6 +12,7 @@ python storescp.py -h
 import os
 import sys
 import errno
+from celery import shared_task
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -120,7 +121,7 @@ def OnReceiveStore(SOPClass, DS):
     # must return appropriate status
     return SOPClass.Success
 
-
+@shared_task
 def store(*args, **kwargs):
 
     import sys
