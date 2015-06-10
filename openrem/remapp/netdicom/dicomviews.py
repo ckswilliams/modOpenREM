@@ -57,6 +57,7 @@ def storescp(request, pk):
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         t = DICOMStoreSCP(store_pk=pk)
+        t.daemon = True
         t.start()
 
     return redirect('/openrem/admin/dicomsummary/')
