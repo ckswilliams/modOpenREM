@@ -20,7 +20,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                         var xyArr=[];
                         $.each(this.points,function(){
                             var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }

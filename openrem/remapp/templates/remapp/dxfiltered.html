@@ -286,17 +286,19 @@
       <!-- JavaScript for acquisition plot that is also required by some other plots -->
       <script>
         var protocolNames     = [
-          {% for name in acquisitionSummary %}
+          {% for name in acquisition_names %}
             "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotDXAcquisitionMeanDAP or request.user.userprofile.plotDXAcquisitionFreq %}
         var seriesDataN       = [
           {% for testData in acquisitionSummary %}
             '{{testData.num_acq}}'
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
       </script>
     {% endif %}
 
@@ -356,9 +358,16 @@
         var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
         var protocolPiechartData = new Array(protocolNames.length);
         for(var i=0; i<protocolNames.length; i++) {
+          {% if request.user.userprofile.plotDXAcquisitionFreq %}
           protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
+          {% else %}
+          protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
+          {% endif %}
         }
+
+        {% if request.user.userprofile.plotDXAcquisitionFreq %}
         protocolPiechartData.sort(sort_by_y);
+        {% endif %}
 
         protocolColours = getColours(protocolNames.length);
         for(var i=0; i<protocolNames.length; i++) {
