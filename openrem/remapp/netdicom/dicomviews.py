@@ -43,10 +43,12 @@ def storescp(request, pk):
     """View to start DICOM store scp
 
     """
+    import threading
     from django.shortcuts import redirect
-    from remapp.netdicom.storescp import celery_store
+    from remapp.netdicom.storescp import web_store
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = celery_store.delay(store_pk=pk)
+        job = threading.Thread(target=web_store(store_pk=pk))
+        job.start()
 
     return redirect('/openrem/admin/dicomsummary/')

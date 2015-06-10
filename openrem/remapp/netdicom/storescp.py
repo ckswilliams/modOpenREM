@@ -12,7 +12,6 @@ python storescp.py -h
 import os
 import sys
 import errno
-from celery import shared_task
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -158,8 +157,7 @@ def store(*args, **kwargs):
     print "done"
     MyAE.QuitOnKeyboardInterrupt()
 
-@shared_task
-def celery_store(store_pk=None):
+def web_store(store_pk=None):
     from remapp.models import DicomStoreSCP
     from django.core.exceptions import ObjectDoesNotExist
 
