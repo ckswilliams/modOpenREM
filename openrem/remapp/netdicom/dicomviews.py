@@ -44,9 +44,9 @@ def storescp(request, pk):
 
     """
     from django.shortcuts import redirect
-    from remapp.netdicom.storescp import store
+    from remapp.netdicom.storescp import celery_store
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = store.delay(store_pk=pk)
+        job = celery_store.delay(store_pk=pk)
 
     return redirect('/openrem/admin/dicomsummary/')

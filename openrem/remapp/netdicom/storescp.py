@@ -121,13 +121,10 @@ def OnReceiveStore(SOPClass, DS):
     # must return appropriate status
     return SOPClass.Success
 
-@shared_task
-def store(store_pk=None, *args, **kwargs):
+def store(*args, **kwargs):
 
     import sys
     import argparse
-    from remapp.models import DicomStoreSCP
-    from django.core.exceptions import ObjectDoesNotExist
 
     try:
         from openremproject.settings import STORE_AET
@@ -144,15 +141,6 @@ def store(store_pk=None, *args, **kwargs):
     parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
     args = parser.parse_args()
 
-    if store_pk:
-        try:
-            conf = DicomStoreSCP.objects.get(pk__exact=store_pk)
-            args.aet = conf.aetitle
-            args.port = conf.port
-        except ObjectDoesNotExist:
-            sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
-
-
     # setup AE
     MyAE = AE(
         args.aet, args.port, [],
@@ -166,6 +154,35 @@ def store(store_pk=None, *args, **kwargs):
 
     # start AE
     print "starting AE... AET:{0}, port:{1}".format(args.aet, args.port),
+    MyAE.start()
+    print "done"
+    MyAE.QuitOnKeyboardInterrupt()
+
+@shared_task
+def celery_store(store_pk=None):
+    from remapp.models import DicomStoreSCP
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        conf = DicomStoreSCP.objects.get(pk__exact=store_pk)
+        aet = conf.aetitle
+        port = conf.port
+    except ObjectDoesNotExist:
+        sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
+
+    # setup AE
+    MyAE = AE(
+        aet, port, [],
+        [StorageSOPClass, VerificationSOPClass],
+        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
+    )
+    MyAE.OnAssociateRequest = OnAssociateRequest
+    MyAE.OnAssociateResponse = OnAssociateResponse
+    MyAE.OnReceiveStore = OnReceiveStore
+    MyAE.OnReceiveEcho = OnReceiveEcho
+
+    # start AE
+    print "starting AE... AET:{0}, port:{1}".format(aet, port),
     MyAE.start()
     print "done"
     MyAE.QuitOnKeyboardInterrupt()
