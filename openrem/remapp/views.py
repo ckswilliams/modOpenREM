@@ -1496,10 +1496,34 @@ class DicomStoreUpdate(UpdateView):
     model = DicomStoreSCP
     fields = ['aetitle', 'port', 'enabled']
 
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
 
 class DicomStoreDelete(DeleteView):
     model = DicomStoreSCP
     success_url = reverse_lazy('dicom_summary')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
 
 
 class DicomQRCreate(CreateView):
