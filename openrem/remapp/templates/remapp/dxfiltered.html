@@ -333,6 +333,12 @@
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        var seriesMedianData        = [
+          {% for testData in acquisitionSummary %}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}}/10000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
         var seriesDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramData %}
             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [

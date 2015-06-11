@@ -40,7 +40,7 @@ class SizeHeadersForm(forms.Form):
 
 class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
-    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean DAP per acquisition',required=False)
+    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean and median DAP per acquisition',required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
     plotDXAcquisitionMeankVp = forms.BooleanField(label='Mean kVp per acquisition',required=False)
     plotDXAcquisitionMeanmAs = forms.BooleanField(label='Mean mAs per acquisition',required=False)
