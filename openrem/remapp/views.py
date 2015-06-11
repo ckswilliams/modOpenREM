@@ -223,7 +223,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                          plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp, plotDXAcquisitionMeanmAs,
                          plotDXStudyPerDayAndHour, requestResults):
 
-    from remapp.models import IrradEventXRayData
+    from remapp.models import IrradEventXRayData, Median
     from django.db.models import Avg, Count, Min
     import datetime, qsstats
     if plotting:
@@ -270,6 +270,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq:
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
             mean_dap=Avg('dose_area_product'),
+            median_dap=Median('dose_area_product'),
             num_acq=Count('dose_area_product'))\
             .order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
@@ -277,12 +278,14 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if plotDXAcquisitionMeankVp:
         acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
             mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
+            median_kVp=Median('irradeventxraysourcedata__kvp__kvp'),
             num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
         acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
 
     if plotDXAcquisitionMeanmAs:
         acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
             mean_uAs=Avg('irradeventxraysourcedata__exposure__exposure'),
+            median_uAs=Median('irradeventxraysourcedata__exposure__exposure'),
             num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
         acquisitionHistogramuAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionuAsSummary))]
 

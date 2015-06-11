@@ -881,3 +881,20 @@ class PersonParticipant(models.Model):  # TID 1020
 
     def __unicode__(self):
         return self.person_name
+
+
+from django.db.models.sql.aggregates import Aggregate as SQLAggregate
+
+class MedianSQL(SQLAggregate):
+    sql_function = 'Median'
+    sql_template = '%(function)s(%(field)s)'
+    is_ordinal = True
+
+
+class Median(models.Aggregate):
+    name = 'Median'
+    sql = MedianSQL
+
+    def add_to_query(self, query, alias, col, source, is_summary):
+        aggregate = self.sql(col, **self.extra)
+        query.aggregates[alias] = aggregate
