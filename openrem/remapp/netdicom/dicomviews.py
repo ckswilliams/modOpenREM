@@ -44,11 +44,16 @@ from remapp.netdicom.storescp import web_store
 
 class DICOMStoreSCP(Thread):
     def __init__(self, store_pk):
+        self.__running = True
         self.pk = store_pk
         super(DICOMStoreSCP, self).__init__()
 
+    def terminate(self):
+        self.__running = False
+
     def run(self):
-        job = web_store(store_pk=self.pk)
+        while self.__running:
+            job = web_store(store_pk=self.pk)
 
 @csrf_exempt
 @login_required
@@ -59,5 +64,6 @@ def storescp(request, pk):
         t = DICOMStoreSCP(store_pk=pk)
         t.daemon = True
         t.start()
+        print "Thread ident is {0}".format(t.ident)
 
     return redirect('/openrem/admin/dicomsummary/')
