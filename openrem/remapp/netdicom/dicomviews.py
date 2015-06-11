@@ -37,23 +37,28 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
-
+import time
 from threading import Thread
 from remapp.netdicom.storescp import web_store
 
 
 class DICOMStoreSCP(Thread):
-    def __init__(self, store_pk):
+    def __init__(self):
         self.__running = True
-        self.pk = store_pk
-        super(DICOMStoreSCP, self).__init__()
+        # self.pk = store_pk
+        # super(DICOMStoreSCP, self).__init__()
 
     def terminate(self):
         self.__running = False
 
-    def run(self):
-        while self.__running:
-            job = web_store(store_pk=self.pk)
+    def run(self, store_pk):
+        n = 30
+        while self.__running and n > 0:
+            web_store(store_pk=store_pk)
+            print('T-minus', n)
+            n -= 1
+            time.sleep(1)
+
 
 @csrf_exempt
 @login_required
