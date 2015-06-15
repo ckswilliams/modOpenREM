@@ -49,12 +49,25 @@ class UserProfile(models.Model):
         (YEARS, 'Years'),
     )
 
+    MEAN = 'mean'
+    MEDIAN = 'median'
+    BOTH = 'both'
+    AVERAGES = (
+        (MEAN, 'mean'),
+        (MEDIAN, 'median'),
+        (BOTH, 'both'),
+    )
+
     # This field is required.
     user = models.OneToOneField(User)
 
     # Flag to set whether median calculations can be carried out
     median_available = models.BooleanField(default=False,
                                            editable=False)
+
+    plotAverageChoice = models.CharField(max_length=6,
+                                         choices=AVERAGES,
+                                         default=MEAN)
 
     # Plotting controls
     plotCharts = models.BooleanField(default=False)

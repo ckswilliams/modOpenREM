@@ -27,7 +27,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
                 },
                 drillup: function(e) {
                     chartDAPperAcquisition.setTitle({ text: defaultTitle }, { text: '' });
-                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Mean DAP (cGy.cm<sup>2</sup>)'});
+                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Median DAP (cGy.cm<sup>2</sup>)'});
                     chartDAPperAcquisition.xAxis[0].setTitle({text:'Protocol name'});
                     chartDAPperAcquisition.xAxis[0].setCategories(protocolNames, true);
                     chartDAPperAcquisition.xAxis[0].update({labels:{rotation:90}});
@@ -63,7 +63,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean DAP (cGy.cm<sup>2</sup>)'
+                text: 'Median DAP (cGy.cm<sup>2</sup>)'
             }
         },
         tooltip: {
@@ -83,7 +83,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
         },
         series: [{
             name: 'Median DAP per acquisition protocol',
-            data: seriesData
+            data: seriesMedianData
         }],
         drilldown: {
             series: seriesDrilldown

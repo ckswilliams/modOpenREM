@@ -138,6 +138,17 @@ def dx_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
 
+    if userProfile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        userProfile.median_available = True
+        userProfile.save()
+        median_available = True
+    else:
+        userProfile.median_available = False
+        userProfile.save()
+        median_available = False
+
     # Obtain the chart options from the request
     chartOptionsForm = DXChartOptionsForm(requestResults)
     # check whether the form data is valid
@@ -153,6 +164,8 @@ def dx_summary_list_filter(request):
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
+            if median_available:
+                userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
 
         # If submit was not clicked then use the settings already stored in the user's profile
@@ -164,7 +177,8 @@ def dx_summary_list_filter(request):
                         'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
                         'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
                         'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
-                        'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod}
+                        'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod,
+                        'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = DXChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
@@ -175,24 +189,15 @@ def dx_summary_list_filter(request):
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
-
-    if userProfile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        median_available = True
-    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        userProfile.median_available = True
-        userProfile.save()
-        median_available = True
-    else:
-        userProfile.median_available = False
-        userProfile.save()
-        median_available = False
+    plotAverageChoice = userProfile.plotAverageChoice
 
     if plotting and plotCharts:
         acquisitionDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData, acquisitionHistogramuAsData,\
         acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary, studiesPerHourInWeekdays, acquisition_names = \
             dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
                                  plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
-                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults, median_available)
+                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
+                                 median_available, plotAverageChoice)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -233,7 +238,7 @@ def dx_summary_list_filter(request):
 
 def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
                          plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp, plotDXAcquisitionMeanmAs,
-                         plotDXStudyPerDayAndHour, requestResults, median_available):
+                         plotDXStudyPerDayAndHour, requestResults, median_available, plotAverageChoice):
 
     from remapp.models import IrradEventXRayData, Median
     from django.db.models import Avg, Count, Min
@@ -279,7 +284,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
     acquisition_names = acquisition_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
 
-    if median_available and (plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq):
+    if median_available and (plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq) and (plotAverageChoice=='median' or plotAverageChoice=='both'):
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
             mean_dap=Avg('dose_area_product'),
             median_dap=Median('dose_area_product'),
@@ -292,7 +297,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
             .order_by('acquisition_protocol')
     acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
-    if median_available and plotDXAcquisitionMeankVp:
+    if median_available and plotDXAcquisitionMeankVp and (plotAverageChoice=='median' or plotAverageChoice=='both'):
         acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
             mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
             median_kVp=Median('irradeventxraysourcedata__kvp__kvp'),
@@ -303,7 +308,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
             num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
     acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
 
-    if median_available and plotDXAcquisitionMeanmAs:
+    if median_available and plotDXAcquisitionMeanmAs and (plotAverageChoice=='median' or plotAverageChoice=='both'):
         acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
             mean_uAs=Avg('irradeventxraysourcedata__exposure__exposure'),
             median_uAs=Median('irradeventxraysourcedata__exposure__exposure'),

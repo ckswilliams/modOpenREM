@@ -142,7 +142,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DAP for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median DAP for each acquisition protocol.
+                {% else %}
+                Plot of mean and median DAP for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -327,18 +333,22 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesData        = [
           {% for testData in acquisitionSummary %}
             {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}}*1000000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianData        = [
           {% for testData in acquisitionSummary %}
             {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}}/10000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
         var seriesDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramData %}
             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -353,7 +363,13 @@
         var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition plot -->
     {% endif %}
 

@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.safestring import mark_safe
+from openremproject import settings
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -10,6 +11,15 @@ TIME_PERIOD = (
     (WEEKS, 'Weeks'),
     (MONTHS, 'Months'),
     (YEARS, 'Years'),
+)
+
+MEAN = 'mean'
+MEDIAN = 'median'
+BOTH = 'both'
+AVERAGES = (
+    (MEAN, 'mean'),
+    (MEDIAN, 'median'),
+    (BOTH, 'both'),
 )
 
 class SizeUploadForm(forms.Form):
@@ -47,6 +57,9 @@ class DXChartOptionsForm(forms.Form):
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Averages', choices=AVERAGES, required=False)
+
 
 class CTChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
