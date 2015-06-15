@@ -272,7 +272,11 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -627,10 +631,17 @@
       <!-- JavaScript for mean DAP per acquisition protocol per time period -->
       <script>
         dateAxis = [
-          {% for dateEntries in acquisitionDAPoverTime.0 %}
+        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+          {% for dateEntries in acquisitionMeanDAPoverTime.0 %}
             "{{ dateEntries.0.date|date:"d/m/Y" }}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
+        {% else %}
+          {% for dateEntries in acquisitionMedianDAPoverTime.0 %}
+            "{{ dateEntries.0.date|date:"d/m/Y" }}"
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        {% endif %}
         ];
 
         // Create the same colours as for the study pie chart, so that the colours
@@ -644,8 +655,9 @@
 
         var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 
+        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
         meanDAPOverTime = [
-          {% for protocolData in acquisitionDAPoverTime %}
+          {% for protocolData in acquisitionMeanDAPoverTime %}
             {{'{'}}name:protocolNames[{{forloop.counter}}-1],
                   color:protocolLineColours[{{forloop.counter}}-1],
                   marker:{{'{'}}enabled:true{{'}'}},
@@ -666,9 +678,37 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% else %}
+        medianDAPOverTime = [
+          {% for protocolData in acquisitionMedianDAPoverTime %}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],
+                  color:protocolLineColours[{{forloop.counter}}-1],
+                  marker:{{'{'}}enabled:true{{'}'}},
+                  point: {{'{'}}
+            events: {{'{'}}
+                    click: function(e) {{'{'}}
+            location.href = e.point.url;
+            e.preventDefault();
+            {{'}'}}
+            {{'}'}}
+            {{'}'}},
+            data:[
+              {% for dateEntries in protocolData %}
+                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}/10000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
+                      {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]{{'}'}}
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionOverTime.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeanDAPperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMedianDAPperAcquisitionOverTime.js"></script>
+      {% endif %}
       <!-- End of JavaScript for mean DAP per acquisition protocol per time period -->
     {% endif %}
 
