@@ -83,12 +83,11 @@ var chartDAPperAcquisition = new Highcharts.Chart({
                 return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
             },
 
-            //shared: true,
             useHTML: true
         },
         plotOptions: {
             column: {
-                pointPadding: 0.2,
+                pointPadding: 0,
                 borderWidth: 0
             }
         },

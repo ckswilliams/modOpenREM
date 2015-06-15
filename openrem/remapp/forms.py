@@ -17,9 +17,9 @@ MEAN = 'mean'
 MEDIAN = 'median'
 BOTH = 'both'
 AVERAGES = (
-    (MEAN, 'mean'),
-    (MEDIAN, 'median'),
-    (BOTH, 'both'),
+    (MEAN, 'Mean'),
+    (MEDIAN, 'Median'),
+    (BOTH, 'Both'),
 )
 
 class SizeUploadForm(forms.Form):
@@ -50,15 +50,15 @@ class SizeHeadersForm(forms.Form):
 
 class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
-    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean and median DAP per acquisition',required=False)
+    plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition',required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
-    plotDXAcquisitionMeankVp = forms.BooleanField(label='Mean kVp per acquisition',required=False)
-    plotDXAcquisitionMeanmAs = forms.BooleanField(label='Mean mAs per acquisition',required=False)
+    plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition',required=False)
+    plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition',required=False)
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        plotMeanMedianOrBoth = forms.ChoiceField(label='Averages', choices=AVERAGES, required=False)
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
 
 class CTChartOptionsForm(forms.Form):
