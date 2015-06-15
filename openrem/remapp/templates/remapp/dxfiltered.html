@@ -216,7 +216,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsChart">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean mAs for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median mAs for each acquisition protocol.
+                {% else %}
+                Plot of mean and median mAs for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -503,12 +509,23 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesmAsData        = [
           {% for testData in acquisitionuAsSummary %}
             {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_uAs}}/1000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var seriesMedianmAsData        = [
+          {% for testData in acquisitionuAsSummary %}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_uAs}}/10000000000000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
+
         var seriesmAsDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramuAsData %}
             {id: protocolmAsNames[{{forloop.counter}}-1],name: protocolmAsNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -523,7 +540,13 @@
         var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition mean mAs plot -->
     {% endif %}
 
