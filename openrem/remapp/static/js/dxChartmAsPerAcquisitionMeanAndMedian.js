@@ -17,12 +17,6 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'mAs range'});
                     chartmAsPerAcquisition.xAxis[0].setCategories([], true);
                     chartmAsPerAcquisition.tooltip.options.formatter = function(args) {
-                        //var xyArr=[];
-                        //$.each(this.points,function(){
-                        //    var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
-                        //    xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
-                        //});
-                        //return xyArr.join('<br/>');
                         var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>';
                         return returnValue;
@@ -35,12 +29,6 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                     chartmAsPerAcquisition.xAxis[0].setCategories(protocolmAsNames, true);
                     chartmAsPerAcquisition.xAxis[0].update({labels:{rotation:90}});
                     chartmAsPerAcquisition.tooltip.options.formatter = function(args) {
-                        //var xyArr=[];
-                        //$.each(this.points,function(){
-                        //    var index = protocolmAsNames.indexOf(this.x);
-                        //    xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mAs' + '<br/>(n=' + seriesmAsDataN[index] + ')');
-                        //});
-                        //return xyArr.join('<br/>');
                         var this_point_index = this.series.data.indexOf(this.point);
                         if (this.series.name.indexOf('Mean') != -1) {
                             var this_series_label = ' mean mAs';
@@ -57,7 +45,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             }
         },
         title: {
-            text: 'Mean mAs per acquisition protocol'
+            text: 'mAs per acquisition protocol'
         },
         legend: {
             enabled: true
@@ -77,14 +65,11 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean mAs'
+                text: 'mAs'
             }
         },
         tooltip: {
             formatter: function (args) {
-                //var index = protocolmAsNames.indexOf(this.x);
-                //var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mAs' + '<br/>(n=' + seriesmAsDataN[index] + ')';
-                //return comment;
                 var this_point_index = this.series.data.indexOf(this.point);
                 if (this.series.name.indexOf('Mean') != -1) {
                     var this_series_label = ' mean mAs';
@@ -97,7 +82,6 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                 var this_point = this_series.data[this_point_index];
                 return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesmAsDataN[this_point_index] + ')';
             },
-
             useHTML: true
         },
         plotOptions: {

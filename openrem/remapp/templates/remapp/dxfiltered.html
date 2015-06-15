@@ -194,7 +194,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpChart">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean kVp for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median kVp for each acquisition protocol.
+                {% else %}
+                Plot of mean and median kVp for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -447,12 +453,23 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var serieskVpData        = [
           {% for testData in acquisitionkVpSummary %}
             {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.mean_kVp}},drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var seriesMediankVpData        = [
+          {% for testData in acquisitionkVpSummary %}
+            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}}/10000000000,drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
+
         var serieskVpDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramkVpData %}
             {id: protocolkVpNames[{{forloop.counter}}-1],name: protocolkVpNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -467,7 +484,13 @@
         var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition mean kVp plot -->
     {% endif %}
 

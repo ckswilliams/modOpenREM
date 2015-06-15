@@ -1,7 +1,7 @@
 $(function () {
 
 var drilldownkVpTitle = 'Histogram of ';
-var defaultkVpTitle   = 'Mean kVp per acquisition protocol';
+var defaultkVpTitle   = 'Median kVp per acquisition protocol';
 var tooltipkVpData = [2];
 
 var chartkVpPerAcquisition = new Highcharts.Chart({
@@ -27,7 +27,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
                 },
                 drillup: function(ee) {
                     chartkVpPerAcquisition.setTitle({ text: defaultkVpTitle }, { text: '' });
-                    chartkVpPerAcquisition.yAxis[0].setTitle({text:'Mean kVp'});
+                    chartkVpPerAcquisition.yAxis[0].setTitle({text:'Median kVp'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
                     chartkVpPerAcquisition.xAxis[0].setCategories(protocolkVpNames, true);
                     chartkVpPerAcquisition.xAxis[0].update({labels:{rotation:90}});
@@ -43,7 +43,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
             }
         },
         title: {
-            text: 'Mean kVp per acquisition protocol'
+            text: 'Median kVp per acquisition protocol'
         },
         legend: {
             enabled: false
@@ -62,7 +62,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean kVp'
+                text: 'Median kVp'
             }
         },
         tooltip: {
@@ -81,8 +81,8 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Mean kVp per acquisition protocol',
-            data: serieskVpData
+            name: 'Median kVp per acquisition protocol',
+            data: seriesMediankVpData
         }],
         drilldown: {
             series: serieskVpDrilldown
