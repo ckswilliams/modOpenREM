@@ -70,6 +70,7 @@ def dx_summary_list_filter(request):
     from django.db.models import Q
     import pkg_resources # part of setuptools
     from remapp.forms import DXChartOptionsForm
+    from openremproject import settings
 
     requestResults = request.GET
 
@@ -175,12 +176,23 @@ def dx_summary_list_filter(request):
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
 
+    if userProfile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        userProfile.median_available = True
+        userProfile.save()
+        median_available = True
+    else:
+        userProfile.median_available = False
+        userProfile.save()
+        median_available = False
+
     if plotting and plotCharts:
         acquisitionDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData, acquisitionHistogramuAsData,\
         acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary, studiesPerHourInWeekdays, acquisition_names = \
             dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
                                  plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
-                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults)
+                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults, median_available)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -221,7 +233,7 @@ def dx_summary_list_filter(request):
 
 def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
                          plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp, plotDXAcquisitionMeanmAs,
-                         plotDXStudyPerDayAndHour, requestResults):
+                         plotDXStudyPerDayAndHour, requestResults, median_available):
 
     from remapp.models import IrradEventXRayData, Median
     from django.db.models import Avg, Count, Min
@@ -267,27 +279,40 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
     acquisition_names = acquisition_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
 
-    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq:
+    if median_available and (plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq):
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
             mean_dap=Avg('dose_area_product'),
             median_dap=Median('dose_area_product'),
             num_acq=Count('dose_area_product'))\
             .order_by('acquisition_protocol')
-        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+    else:
+        acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
+            mean_dap=Avg('dose_area_product'),
+            num_acq=Count('dose_area_product'))\
+            .order_by('acquisition_protocol')
+    acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
-    if plotDXAcquisitionMeankVp:
+    if median_available and plotDXAcquisitionMeankVp:
         acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
             mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
             median_kVp=Median('irradeventxraysourcedata__kvp__kvp'),
             num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
-        acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
+    else:
+        acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
+            mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
+            num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
+    acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
 
-    if plotDXAcquisitionMeanmAs:
+    if median_available and plotDXAcquisitionMeanmAs:
         acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
             mean_uAs=Avg('irradeventxraysourcedata__exposure__exposure'),
             median_uAs=Median('irradeventxraysourcedata__exposure__exposure'),
             num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
-        acquisitionHistogramuAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionuAsSummary))]
+    else:
+        acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
+            mean_uAs=Avg('irradeventxraysourcedata__exposure__exposure'),
+            num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
+    acquisitionHistogramuAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionuAsSummary))]
 
     if plotDXAcquisitionMeanDAPOverTime:
         # Required for mean DAP per month plot

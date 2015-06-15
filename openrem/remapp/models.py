@@ -52,6 +52,10 @@ class UserProfile(models.Model):
     # This field is required.
     user = models.OneToOneField(User)
 
+    # Flag to set whether median calculations can be carried out
+    median_available = models.BooleanField(default=False,
+                                           editable=False)
+
     # Plotting controls
     plotCharts = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
