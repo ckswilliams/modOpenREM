@@ -158,6 +158,7 @@ def store(*args, **kwargs):
     MyAE.QuitOnKeyboardInterrupt()
 
 def web_store(store_pk=None):
+    import time
     from remapp.models import DicomStoreSCP
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -183,6 +184,14 @@ def web_store(store_pk=None):
     print "starting AE... AET:{0}, port:{1}".format(aet, port),
     MyAE.start()
     print "done"
+
+    while 1:
+        try:
+            time.sleep(1)
+        except SystemExit:
+            MyAE.Quit()
+            sys.exit(0)
+
     MyAE.QuitOnKeyboardInterrupt()
 
 

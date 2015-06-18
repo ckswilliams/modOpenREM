@@ -28,37 +28,48 @@
 
 """
 
-# Following two lines added so that sphinx autodocumentation works.
+Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import json
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-
+import ctypes
+import threading
 import time
-from threading import Thread
-from remapp.netdicom.storescp import web_store
 
+NULL = 0
 
-class DICOMStoreSCP(Thread):
-    def __init__(self):
-        self.__running = True
-        # self.pk = store_pk
-        # super(DICOMStoreSCP, self).__init__()
+def ctype_async_raise(thread_obj, exception):
+    found = False
+    target_tid = 0
+    for tid, tobj in threading._active.items():
+        if tobj is thread_obj:
+            found = True
+            target_tid = tid
+            break
 
-    def terminate(self):
-        self.__running = False
+    if not found:
+        raise ValueError("Invalid thread object")
 
-    def run(self, store_pk):
-        n = 30
-        while self.__running and n > 0:
-            web_store(store_pk=store_pk)
-            print('T-minus', n)
-            n -= 1
-            time.sleep(1)
+    ret = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(target_tid), ctypes.py_object(exception))
+    # ref: http://docs.python.org/c-api/init.html#PyThreadState_SetAsyncExc
+    if ret == 0:
+        raise ValueError("Invalid thread ID")
+    elif ret > 1:
+        # Huh? Why would we notify more than one threads?
+        # Because we punch a hole into C level interpreter.
+        # So it is better to clean up the mess.
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(target_tid, NULL)
+        raise SystemError("PyThreadState_SetAsyncExc failed")
+    print "Successfully set asynchronized exception for", target_tid
 
+def run_store(store_pk):
+    from remapp.netdicom.storescp import web_store
+    try:
+        web_store(store_pk=store_pk)
+    finally:
+        print "Exited"
 
 @csrf_exempt
 @login_required
@@ -66,9 +77,10 @@ def storescp(request, pk):
     from django.shortcuts import redirect
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        t = DICOMStoreSCP(store_pk=pk)
+        t = threading.Thread(target=run_store, args=(pk,))
         t.daemon = True
         t.start()
         print "Thread ident is {0}".format(t.ident)
 
     return redirect('/openrem/admin/dicomsummary/')
+
