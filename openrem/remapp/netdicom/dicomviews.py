@@ -41,6 +41,8 @@ import time
 NULL = 0
 
 def ctype_async_raise(thread_obj, exception):
+    # From https://gist.github.com/liuw/2407154
+    # TODO: split function off into a file without the copyright claim
     found = False
     target_tid = 0
     for tid, tobj in threading._active.items():
