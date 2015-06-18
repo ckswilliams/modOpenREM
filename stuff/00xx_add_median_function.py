@@ -1,9 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations
+from django.db import models, migrations
 from django.conf import settings
 from openremproject import settings as project_settings
+from datetime import datetime
+
+
+def populate_study_workload_chart_time(self, orm):
+
+    for studyData in orm.GeneralStudyModuleAttr.objects.all():
+        studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
+        studyTime = studyData.study_time
+        if studyTime:
+            studyDatetime = datetime.combine(studyDate, studyTime)
+        else:
+            studyDatetime = None
+        studyData.study_workload_chart_time = studyDatetime
+        studyData.save()
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -13,6 +28,7 @@ class Migration(migrations.Migration):
 
     if 'postgresql' in project_settings.DATABASES['default']['ENGINE']:
         operations = [
+            migrations.RunPython(populate_study_workload_chart_time),
             migrations.RunSQL([
                 "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
                 "  WITH q AS"
@@ -45,4 +61,6 @@ class Migration(migrations.Migration):
             ),
         ]
     else:
-        operations = []
+        operations = [
+            migrations.RunPython(populate_study_workload_chart_time),
+        ]
