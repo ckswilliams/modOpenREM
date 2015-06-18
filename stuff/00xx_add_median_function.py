@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
         migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
         migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
-        migrations.RunSQL([
+        migrations.RunSQL(
             "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
             "  WITH q AS"
             "  ("
@@ -66,6 +66,6 @@ class Migration(migrations.Migration):
             "  INITCOND='{}'"
             ");",
             "DROP AGGREGATE median(anyelement);"
-            "DROP FUNCTION _final_median(anyarray);"]
+            "DROP FUNCTION _final_median(anyarray);"
         ),
     ]
