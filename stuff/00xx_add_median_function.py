@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
+        migrations.RunSQL([
             "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
             "  WITH q AS"
             "  ("
@@ -38,6 +38,8 @@ class Migration(migrations.Migration):
             "  STYPE=anyarray,"
             "  FINALFUNC=_final_median,"
             "  INITCOND='{}'"
-            ");"
+            ");",
+            "DROP AGGREGATE median(anyelement);"
+            "DROP FUNCTION _final_median(anyarray);"]
         ),
     ]
