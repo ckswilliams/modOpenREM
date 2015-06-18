@@ -30,41 +30,52 @@ class Migration(migrations.Migration):
         ('remapp', '0001_initial'),
     ]
 
-    operations = [
-        migrations.AddField('generalstudymoduleattr', 'study_workload_chart_time', models.DateTimeField(blank=True, null=True)),
-        migrations.RunPython(populate_study_workload_chart_time),
-        migrations.AddField('userprofile', 'median_available', models.BooleanField(default=False)),
-        migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
-        migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
-        migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
-        migrations.RunSQL(
-            "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
-            "  WITH q AS"
-            "  ("
-            "     SELECT val"
-            "     FROM UNNEST($1) val"
-            "     WHERE val IS NOT NULL"
-            "     ORDER BY 1"
-            "  ),"
-            "  cnt AS"
-            "  ("
-            "    SELECT COUNT(*) AS c FROM q"
-            "  )"
-            "  SELECT AVG(val * 10000000000.0)"
-            "  FROM"
-            "  ("
-            "    SELECT val FROM q"
-            "    LIMIT  2 - MOD((SELECT c FROM cnt), 2)"
-            "    OFFSET GREATEST(CEIL((SELECT c FROM cnt) / 2.0) - 1, 0)"
-            "  ) q2;"
-            "$$ LANGUAGE SQL IMMUTABLE;"
-            "CREATE AGGREGATE median(anyelement) ("
-            "  SFUNC=array_append,"
-            "  STYPE=anyarray,"
-            "  FINALFUNC=_final_median,"
-            "  INITCOND='{}'"
-            ");",
-            "DROP AGGREGATE median(anyelement);"
-            "DROP FUNCTION _final_median(anyarray);"
-        ),
-    ]
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        operations = [
+            migrations.AddField('generalstudymoduleattr', 'study_workload_chart_time', models.DateTimeField(blank=True, null=True)),
+            migrations.RunPython(populate_study_workload_chart_time),
+            migrations.AddField('userprofile', 'median_available', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
+            migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
+            migrations.RunSQL(
+                "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
+                "  WITH q AS"
+                "  ("
+                "     SELECT val"
+                "     FROM UNNEST($1) val"
+                "     WHERE val IS NOT NULL"
+                "     ORDER BY 1"
+                "  ),"
+                "  cnt AS"
+                "  ("
+                "    SELECT COUNT(*) AS c FROM q"
+                "  )"
+                "  SELECT AVG(val * 10000000000.0)"
+                "  FROM"
+                "  ("
+                "    SELECT val FROM q"
+                "    LIMIT  2 - MOD((SELECT c FROM cnt), 2)"
+                "    OFFSET GREATEST(CEIL((SELECT c FROM cnt) / 2.0) - 1, 0)"
+                "  ) q2;"
+                "$$ LANGUAGE SQL IMMUTABLE;"
+                "CREATE AGGREGATE median(anyelement) ("
+                "  SFUNC=array_append,"
+                "  STYPE=anyarray,"
+                "  FINALFUNC=_final_median,"
+                "  INITCOND='{}'"
+                ");",
+                "DROP AGGREGATE median(anyelement);"
+                "DROP FUNCTION _final_median(anyarray);"
+            ),
+        ]
+    else:
+        operations = [
+            migrations.AddField('generalstudymoduleattr', 'study_workload_chart_time', models.DateTimeField(blank=True, null=True)),
+            migrations.RunPython(populate_study_workload_chart_time),
+            migrations.AddField('userprofile', 'median_available', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
+            migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
+        ]
+
