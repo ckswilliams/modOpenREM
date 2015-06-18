@@ -24,12 +24,11 @@ def populate_study_workload_chart_time(self, orm):
 
 
 class Migration(migrations.Migration):
+
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('remapp', '0001_initial'),
     ]
-
-
 
     operations = [
         migrations.AddField('generalstudymoduleattr', 'study_workload_chart_time', models.DateTimeField(blank=True, null=True)),
