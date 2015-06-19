@@ -8,7 +8,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 requires = [
     'django >= 1.8',
-    'django-filter',
+    'django-filter >= 0.10',
     'pytz >= 0a',
     'humanize',
     'pydicom >= 0.9.7',
