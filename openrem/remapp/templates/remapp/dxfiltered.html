@@ -142,7 +142,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DAP for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median DAP for each acquisition protocol.
+                {% else %}
+                Plot of mean and median DAP for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -188,7 +194,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpChart">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean kVp for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median kVp for each acquisition protocol.
+                {% else %}
+                Plot of mean and median kVp for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -210,7 +222,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsChart">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean mAs for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median mAs for each acquisition protocol.
+                {% else %}
+                Plot of mean and median mAs for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -254,7 +272,11 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -327,12 +349,22 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesData        = [
           {% for testData in acquisitionSummary %}
             {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}}*1000000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var seriesMedianData        = [
+          {% for testData in acquisitionSummary %}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}}/10000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
         var seriesDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramData %}
             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -347,7 +379,13 @@
         var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition plot -->
     {% endif %}
 
@@ -419,12 +457,23 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var serieskVpData        = [
           {% for testData in acquisitionkVpSummary %}
             {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.mean_kVp}},drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var seriesMediankVpData        = [
+          {% for testData in acquisitionkVpSummary %}
+            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}}/10000000000,drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
+
         var serieskVpDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramkVpData %}
             {id: protocolkVpNames[{{forloop.counter}}-1],name: protocolkVpNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -439,7 +488,13 @@
         var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition mean kVp plot -->
     {% endif %}
 
@@ -481,12 +536,23 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesmAsData        = [
           {% for testData in acquisitionuAsSummary %}
             {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_uAs}}/1000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var seriesMedianmAsData        = [
+          {% for testData in acquisitionuAsSummary %}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_uAs}}/10000000000000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
+
         var seriesmAsDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramuAsData %}
             {id: protocolmAsNames[{{forloop.counter}}-1],name: protocolmAsNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -501,7 +567,13 @@
         var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition mean mAs plot -->
     {% endif %}
 
@@ -559,10 +631,17 @@
       <!-- JavaScript for mean DAP per acquisition protocol per time period -->
       <script>
         dateAxis = [
-          {% for dateEntries in acquisitionDAPoverTime.0 %}
+        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+          {% for dateEntries in acquisitionMeanDAPoverTime.0 %}
             "{{ dateEntries.0.date|date:"d/m/Y" }}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
+        {% else %}
+          {% for dateEntries in acquisitionMedianDAPoverTime.0 %}
+            "{{ dateEntries.0.date|date:"d/m/Y" }}"
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        {% endif %}
         ];
 
         // Create the same colours as for the study pie chart, so that the colours
@@ -576,8 +655,9 @@
 
         var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 
+        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
         meanDAPOverTime = [
-          {% for protocolData in acquisitionDAPoverTime %}
+          {% for protocolData in acquisitionMeanDAPoverTime %}
             {{'{'}}name:protocolNames[{{forloop.counter}}-1],
                   color:protocolLineColours[{{forloop.counter}}-1],
                   marker:{{'{'}}enabled:true{{'}'}},
@@ -598,9 +678,37 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% else %}
+        medianDAPOverTime = [
+          {% for protocolData in acquisitionMedianDAPoverTime %}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],
+                  color:protocolLineColours[{{forloop.counter}}-1],
+                  marker:{{'{'}}enabled:true{{'}'}},
+                  point: {{'{'}}
+            events: {{'{'}}
+                    click: function(e) {{'{'}}
+            location.href = e.point.url;
+            e.preventDefault();
+            {{'}'}}
+            {{'}'}}
+            {{'}'}},
+            data:[
+              {% for dateEntries in protocolData %}
+                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}/10000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
+                      {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]{{'}'}}
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionOverTime.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeanDAPperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMedianDAPperAcquisitionOverTime.js"></script>
+      {% endif %}
       <!-- End of JavaScript for mean DAP per acquisition protocol per time period -->
     {% endif %}
 

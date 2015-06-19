@@ -49,8 +49,25 @@ class UserProfile(models.Model):
         (YEARS, 'Years'),
     )
 
+    MEAN = 'mean'
+    MEDIAN = 'median'
+    BOTH = 'both'
+    AVERAGES = (
+        (MEAN, 'mean'),
+        (MEDIAN, 'median'),
+        (BOTH, 'both'),
+    )
+
     # This field is required.
     user = models.OneToOneField(User)
+
+    # Flag to set whether median calculations can be carried out
+    median_available = models.BooleanField(default=False,
+                                           editable=False)
+
+    plotAverageChoice = models.CharField(max_length=6,
+                                         choices=AVERAGES,
+                                         default=MEAN)
 
     # Plotting controls
     plotCharts = models.BooleanField(default=False)
@@ -881,3 +898,20 @@ class PersonParticipant(models.Model):  # TID 1020
 
     def __unicode__(self):
         return self.person_name
+
+
+from django.db.models.sql.aggregates import Aggregate as SQLAggregate
+
+class MedianSQL(SQLAggregate):
+    sql_function = 'Median'
+    sql_template = '%(function)s(%(field)s)'
+    is_ordinal = True
+
+
+class Median(models.Aggregate):
+    name = 'Median'
+    sql = MedianSQL
+
+    def add_to_query(self, query, alias, col, source, is_summary):
+        aggregate = self.sql(col, **self.extra)
+        query.aggregates[alias] = aggregate

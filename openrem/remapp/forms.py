@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.safestring import mark_safe
+from openremproject import settings
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -10,6 +11,15 @@ TIME_PERIOD = (
     (WEEKS, 'Weeks'),
     (MONTHS, 'Months'),
     (YEARS, 'Years'),
+)
+
+MEAN = 'mean'
+MEDIAN = 'median'
+BOTH = 'both'
+AVERAGES = (
+    (MEAN, 'Mean'),
+    (MEDIAN, 'Median'),
+    (BOTH, 'Both'),
 )
 
 class SizeUploadForm(forms.Form):
@@ -40,13 +50,16 @@ class SizeHeadersForm(forms.Form):
 
 class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
-    plotDXAcquisitionMeanDAP = forms.BooleanField(label='Mean DAP per acquisition',required=False)
+    plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition',required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
-    plotDXAcquisitionMeankVp = forms.BooleanField(label='Mean kVp per acquisition',required=False)
-    plotDXAcquisitionMeanmAs = forms.BooleanField(label='Mean mAs per acquisition',required=False)
+    plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition',required=False)
+    plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition',required=False)
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
-    plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Mean acquisition DAP over time',required=False)
+    plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
 
 class CTChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)

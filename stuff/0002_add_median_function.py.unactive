@@ -11,7 +11,6 @@ def populate_study_workload_chart_time(self, orm):
 
     test = self.get_model('remapp', 'GeneralStudyModuleAttr')
 
-#    for studyData in orm.GeneralStudyModuleAttr.objects.all():
     for studyData in test.objects.all():
         studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
         studyTime = studyData.study_time
@@ -78,4 +77,3 @@ class Migration(migrations.Migration):
             migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
             migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
         ]
-
