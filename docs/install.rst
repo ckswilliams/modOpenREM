@@ -120,12 +120,17 @@ Pynetdicom is used for the new DICOM store SCP function that is available as a p
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 
-Install and configure OpenREM
-=============================
+Install and configure OpenREM 0.7 beta version
+==============================================
+
+.. Warning::
+
+    This is a beta version for developer testing. It is not suitable for general use, and the instructions below are
+    likely to be incorrect.
 
 .. sourcecode:: bash
 
-    pip install openrem
+    pip install openrem==0.7.0b2
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 

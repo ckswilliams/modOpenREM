@@ -20,7 +20,7 @@ var chartStudyDLP = new Highcharts.Chart({
                         var xyArr=[];
                         $.each(this.points,function(){
                             var linkText = 'study_dlp_min=' + studyBins[tooltipData[1]][this.x] + '&study_dlp_max=' + studyBins[tooltipData[1]][this.x+1] + '&study_description=' + tooltipData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/hist/?studyhist=1&' + linkText + tooltipFiltersStudy + '">Click to view</a></td></tr></table>');
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?studyhist=1&' + linkText + tooltipFiltersStudy + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }

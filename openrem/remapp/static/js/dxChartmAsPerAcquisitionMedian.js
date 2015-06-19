@@ -1,7 +1,7 @@
 $(function () {
 
 var drilldownmAsTitle = 'Histogram of ';
-var defaultmAsTitle   = 'Mean mAs per acquisition protocol';
+var defaultmAsTitle   = 'Median mAs per acquisition protocol';
 var tooltipmAsData = [2];
 
 var chartmAsPerAcquisition = new Highcharts.Chart({
@@ -20,14 +20,14 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                         var xyArr=[];
                         $.each(this.points,function(){
                             var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
+                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
                         });
                         return xyArr.join('<br/>');
                     }
                 },
                 drillup: function(ee) {
                     chartmAsPerAcquisition.setTitle({ text: defaultmAsTitle }, { text: '' });
-                    chartmAsPerAcquisition.yAxis[0].setTitle({text:'Mean mAs'});
+                    chartmAsPerAcquisition.yAxis[0].setTitle({text:'Median mAs'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
                     chartmAsPerAcquisition.xAxis[0].setCategories(protocolmAsNames, true);
                     chartmAsPerAcquisition.xAxis[0].update({labels:{rotation:90}});
@@ -43,7 +43,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             }
         },
         title: {
-            text: 'Mean mAs per acquisition protocol'
+            text: 'Median mAs per acquisition protocol'
         },
         legend: {
             enabled: false
@@ -62,7 +62,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean mAs'
+                text: 'Median mAs'
             }
         },
         tooltip: {
@@ -81,8 +81,8 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Mean mAs per acquisition protocol',
-            data: seriesmAsData
+            name: 'Median mAs per acquisition protocol',
+            data: seriesMedianmAsData
         }],
         drilldown: {
             series: seriesmAsDrilldown
