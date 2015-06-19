@@ -9,7 +9,9 @@ from datetime import datetime
 
 def populate_study_workload_chart_time(self, orm):
 
-    for studyData in orm.GeneralStudyModuleAttr.objects.all():
+    test = self.get_model('remapp', 'GeneralStudyModuleAttr')
+
+    for studyData in test.objects.all():
         studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
         studyTime = studyData.study_time
         if studyTime:
@@ -21,15 +23,21 @@ def populate_study_workload_chart_time(self, orm):
 
 
 class Migration(migrations.Migration):
+
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('remapp', '0001_initial'),
     ]
 
-    if 'postgresql' in project_settings.DATABASES['default']['ENGINE']:
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         operations = [
+            migrations.AddField('generalstudymoduleattr', 'study_workload_chart_time', models.DateTimeField(blank=True, null=True)),
             migrations.RunPython(populate_study_workload_chart_time),
-            migrations.RunSQL([
+            migrations.AddField('userprofile', 'median_available', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
+            migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
+            migrations.RunSQL(
                 "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
                 "  WITH q AS"
                 "  ("
@@ -57,10 +65,15 @@ class Migration(migrations.Migration):
                 "  INITCOND='{}'"
                 ");",
                 "DROP AGGREGATE median(anyelement);"
-                "DROP FUNCTION _final_median(anyarray);"]
+                "DROP FUNCTION _final_median(anyarray);"
             ),
         ]
     else:
         operations = [
+            migrations.AddField('generalstudymoduleattr', 'study_workload_chart_time', models.DateTimeField(blank=True, null=True)),
             migrations.RunPython(populate_study_workload_chart_time),
+            migrations.AddField('userprofile', 'median_available', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
+            migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
         ]
