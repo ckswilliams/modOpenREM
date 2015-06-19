@@ -2,6 +2,13 @@
 OpenREM version history
 =======================
 
+0.7.0b2 (2015-06-19)
+--------------------
+*This list is not up to date*
+
+* `#230`_  Fixed error in OperatorsName field in DICOM extraction
+
+
 0.6.0 (2015-05-14)
 ------------------
 

@@ -9,7 +9,7 @@ This is a developer release of 0.7.0 - please don't use in production, documenta
 
 Full documentation can be found on Read the Docs: http://docs.openrem.org
 
-**For upgrades**, please look at the `version release notes <http://docs.openrem.org/en/latest/release-0.6.0.html>`_
+**For upgrades**, please look at the `version release notes <http://docs.openrem.org/en/latest/release-0.7.0.html>`_
 
 For fresh installs, please look at the `install docs <http://docs.openrem.org/page/install.html>`_
 
