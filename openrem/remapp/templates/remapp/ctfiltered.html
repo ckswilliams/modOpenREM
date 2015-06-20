@@ -414,7 +414,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
-                Plot mean DLP for each study description in currently filtered data.
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Plot of mean DLP for each study description.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median DLP for each study description.
+                {% else %}
+                Plot of mean and median DLP for each study description.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -592,12 +598,22 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var studySeriesData = [
           {% for testData in studySummary %}
             {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var studySeriesMedianData = [
+          {% for testData in studySummary %}
+            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
         var studySeriesDrilldown   = [
           {% for studyCountsArray in studyHistogramData %}
             {id: studyNames[{{forloop.counter}}-1],name: studyNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -612,7 +628,13 @@
         var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/ctChartDLPperStudy.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for study plot -->
     {% endif %}
 

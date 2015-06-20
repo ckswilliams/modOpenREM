@@ -63,15 +63,15 @@ class DXChartOptionsForm(forms.Form):
 
 class CTChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
-    plotCTAcquisitionMeanDLP = forms.BooleanField(label='Mean DLP per acquisition',required=False)
-    plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('Mean CTDI<sub>vol</sub> per acquisition'),required=False)
+    plotCTAcquisitionMeanDLP = forms.BooleanField(label='DLP per acquisition',required=False)
+    plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per acquisition'),required=False)
     plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
-    plotCTStudyMeanDLP = forms.BooleanField(label='Mean DLP per study',required=False)
+    plotCTStudyMeanDLP = forms.BooleanField(label='DLP per study',required=False)
     plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)
-    plotCTRequestMeanDLP = forms.BooleanField(label='Mean DLP per requested procedure',required=False)
+    plotCTRequestMeanDLP = forms.BooleanField(label='DLP per requested procedure',required=False)
     plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency',required=False)
     plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
-    plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Mean study DLP over time',required=False)
+    plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Study DLP over time',required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)

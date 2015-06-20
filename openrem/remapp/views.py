@@ -573,6 +573,8 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
+            if median_available:
+                userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
 
         else:
@@ -586,7 +588,8 @@ def ct_summary_list_filter(request):
                         'plotCTRequestFreq': userProfile.plotCTRequestFreq,
                         'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
                         'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
-                        'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod}
+                        'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod,
+                        'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = CTChartOptionsForm(formData)
 
     plotCharts = userProfile.plotCharts
@@ -600,14 +603,16 @@ def ct_summary_list_filter(request):
     plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
+    plotAverageChoice = userProfile.plotAverageChoice
 
     if plotting and plotCharts:
         acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData,\
-        requestSummary, studiesPerHourInWeekdays, studyDLPoverTime, studyHistogramData, studySummary = \
+        requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData,\
+        studySummary = \
             ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                                  plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                                  plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                                 requestResults)
+                                 requestResults, median_available, plotAverageChoice)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -640,7 +645,10 @@ def ct_summary_list_filter(request):
             if plotCTStudyPerDayAndHour:
                 returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
             if plotCTStudyMeanDLPOverTime:
-                returnStructure['studyDLPoverTime'] = studyDLPoverTime
+                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                    returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
+                if plotAverageChoice == 'median' or plotAverageChoice == 'both':
+                    returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -652,11 +660,11 @@ def ct_summary_list_filter(request):
 def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                          plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                          plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                         requestResults):
+                         requestResults, median_available, plotAverageChoice):
 
     from django.db.models import Q, Avg, Count, Min
     import datetime, qsstats
-    from remapp.models import CtIrradiationEventData
+    from remapp.models import CtIrradiationEventData, Median
     if plotting:
         import numpy as np
 
@@ -730,17 +738,29 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
         # Required for mean DLP per study type plot
-        studySummary = study_events.values('study_description').distinct().annotate(
-            mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-            num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-            'study_description')
+        if median_available and plotAverageChoice=='both':
+            studySummary = study_events.values('study_description').distinct().annotate(
+                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'study_description')
+        elif median_available and plotAverageChoice=='median':
+            studySummary = study_events.values('study_description').distinct().annotate(
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'study_description')
+        else:
+            studySummary = study_events.values('study_description').distinct().annotate(
+                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'study_description')
 
         if plotCTStudyMeanDLP:
             studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
 
         if plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type per week plot
-            studyDLPoverTime = [None] * len(studySummary)
+            studyMeanDLPoverTime = [None] * len(studySummary)
             startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
 
@@ -759,7 +779,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     # Required for mean DLP per study type per time period plot
                     qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                    studyDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
+                    studyMeanDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
 
         if plotCTStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
@@ -797,12 +817,14 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     if not 'requestHistogramData' in locals(): requestHistogramData = 0
     if not 'requestSummary' in locals(): requestSummary = 0
     if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
-    if not 'studyDLPoverTime' in locals(): studyDLPoverTime = 0
+    if not 'studyMeanDLPoverTime' in locals(): studyMeanDLPoverTime = 0
+    if not 'studyMedianDLPoverTime' in locals(): studyMedianDLPoverTime = 0
     if not 'studyHistogramData' in locals(): studyHistogramData = 0
     if not 'studySummary' in locals(): studySummary = 0
 
     return acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData,\
-           requestSummary, studiesPerHourInWeekdays, studyDLPoverTime, studyHistogramData, studySummary
+           requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData,\
+           studySummary
 
 
 @login_required
