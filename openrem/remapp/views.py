@@ -796,10 +796,22 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
-        requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-            mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-            'requested_procedure_code_meaning')
+        if median_available and plotAverageChoice=='both':
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'requested_procedure_code_meaning')
+        elif median_available and plotAverageChoice=='median':
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'requested_procedure_code_meaning')
+        else:
+            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'requested_procedure_code_meaning')
 
         if plotCTRequestMeanDLP:
             requestHistogramData = [[None for i in xrange(2)] for i in xrange(len(requestSummary))]

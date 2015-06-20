@@ -468,7 +468,13 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseRequestMeanDLP">
-                Plot mean DLP for each requested procedure type in currently filtered data.
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Plot of mean DLP for each requested procedure type.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median DLP for each requested procedure type.
+                {% else %}
+                Plot of mean and median DLP for each requested procedure type.
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -709,12 +715,22 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var requestSeriesData = [
           {% for testData in requestSummary %}
             {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+        var requestSeriesMedianData = [
+          {% for testData in requestSummary %}
+            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
+                  {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
         var requestSeriesDrilldown   = [
           {% for requestCountsArray in requestHistogramData %}
             {id: requestNames[{{forloop.counter}}-1],name: requestNames[{{forloop.counter}}-1],useHTML: true,data: [
@@ -727,7 +743,13 @@
         ];
       </script>
 
-      <script src="{{ STATIC_URL }}js/ctChartDLPperRequest.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for request plot -->
     {% endif %}
 
