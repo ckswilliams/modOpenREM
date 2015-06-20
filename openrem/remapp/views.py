@@ -435,6 +435,7 @@ def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import CTSummaryListFilter
     import pkg_resources # part of setuptools
     from remapp.forms import CTChartOptionsForm
+    from openremproject import settings
 
     requestResults = request.GET
 
@@ -542,6 +543,17 @@ def ct_summary_list_filter(request):
         # Create a default userprofile for the user if one doesn't exist
         create_user_profile(sender=request.user, instance=request.user, created=True)
         userProfile = request.user.userprofile
+
+    if userProfile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        userProfile.median_available = True
+        userProfile.save()
+        median_available = True
+    else:
+        userProfile.median_available = False
+        userProfile.save()
+        median_available = False
 
     # Obtain the chart options from the request
     chartOptionsForm = CTChartOptionsForm(requestResults)
