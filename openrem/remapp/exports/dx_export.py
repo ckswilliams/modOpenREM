@@ -90,7 +90,7 @@ def exportDX2excel(filterdict):
                 e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
 
     # Remove duplicate entries from the results
-    e = e.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
+    e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
