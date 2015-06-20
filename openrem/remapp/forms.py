@@ -73,3 +73,5 @@ class CTChartOptionsForm(forms.Form):
     plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Mean study DLP over time',required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
