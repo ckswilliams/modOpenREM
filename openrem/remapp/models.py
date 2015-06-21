@@ -39,6 +39,7 @@ class DicomStoreSCP(models.Model):
     aetitle = models.CharField(max_length=16, blank=True, null=True)
     port = models.IntegerField(blank=True, null=True)
     enabled = models.BooleanField(default=False)
+    task_id = models.CharField(max_length=64, blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('dicom_summary')
