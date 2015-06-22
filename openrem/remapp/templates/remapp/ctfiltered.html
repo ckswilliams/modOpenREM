@@ -545,7 +545,11 @@
           <div class="panel-heading">
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyStudyMeanChart">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
+                {% endif %}
               </a>
             </h4>
           </div>
@@ -835,10 +839,17 @@
       <!-- JavaScript for mean DLP per study description -->
       <script>
         dateAxis = [
-          {% for dateEntries in studyDLPoverTime.0 %}
+        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+          {% for dateEntries in studyMeanDLPoverTime.0 %}
             "{{ dateEntries.0.date|date:"d/m/Y" }}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
+        {% else %}
+          {% for dateEntries in studyMedianDLPoverTime.0 %}
+            "{{ dateEntries.0.date|date:"d/m/Y" }}"
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        {% endif %}
         ];
 
         // Create the same colours as for the study pie chart, so that the colours
@@ -852,8 +863,9 @@
 
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
 
+        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
         meanDLPOverTime = [
-          {% for studyData in studyDLPoverTime %}
+          {% for studyData in studyMeanDLPoverTime %}
             {{'{'}}name:studyNames[{{forloop.counter}}-1],
                   color:studyLineColours[{{forloop.counter}}-1],
                   marker:{{'{'}}enabled:true{{'}'}},
@@ -874,9 +886,37 @@
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
+        {% else %}
+        medianDLPOverTime = [
+          {% for studyData in studyMedianDLPoverTime %}
+            {{'{'}}name:studyNames[{{forloop.counter}}-1],
+                  color:studyLineColours[{{forloop.counter}}-1],
+                  marker:{{'{'}}enabled:true{{'}'}},
+                  point: {{'{'}}
+            events: {{'{'}}
+                    click: function(e) {{'{'}}
+            location.href = e.point.url;
+            e.preventDefault();
+            {{'}'}}
+            {{'}'}}
+            {{'}'}},
+            data:[
+              {% for dateEntries in studyData %}
+                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}/10000000000{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setDate((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getDate()+6))){{'}'}}
+                      {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            ]{{'}'}}
+            {% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
+        {% endif %}
       </script>
 
-      <script src="{{ STATIC_URL }}js/ctChartDLPperStudyOverTime.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/ctChartMeanDLPperStudyOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/ctChartMedianDLPperStudyOverTime.js"></script>
+      {% endif %}
       <!-- End of JavaScript for mean DLP per study description -->
     {% endif %}
 

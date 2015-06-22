@@ -760,7 +760,10 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
         if plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type per week plot
-            studyMeanDLPoverTime = [None] * len(studySummary)
+            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                studyMedianDLPoverTime = [None] * len(studySummary)
+            if median_available and (plotAverageChoice=='mean' or plotAverageChoice=='both'):
+                studyMeanDLPoverTime = [None] * len(studySummary)
             startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
 
@@ -777,9 +780,14 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
                 if plotCTStudyMeanDLPOverTime:
                     # Required for mean DLP per study type per time period plot
-                    qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
-                        'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                    studyMeanDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
+                    if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                        qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
+                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
+                        studyMeanDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
+                    if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                        qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
+                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
+                        studyMedianDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
 
         if plotCTStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
