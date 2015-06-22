@@ -1,34 +1,34 @@
 $(function () {
 
 var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'DLP per requested procedure type';
+var defaultTitle   = 'DLP per acquisition protocol';
 var tooltipData = [2];
 
-var chartRequestDLP = new Highcharts.Chart({
+var chartAcqDLP = new Highcharts.Chart({
         chart: {
             type: 'column',
-            renderTo: 'histogramRequestPlotDIV',
+            renderTo: 'histogramPlotDIV',
             events: {
                 drilldown: function(e) {
-                    tooltipData[0] = (requestNames[e.point.x]).replace('&amp;', '%26');
+                    tooltipData[0] = (protocolNames[e.point.x]).replace('&amp;', '%26');
                     tooltipData[1] = e.point.x;
-                    chartRequestDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + requestSeriesDataN[e.point.x] +')' });
-                    chartRequestDLP.yAxis[0].setTitle({text:'Number'});
-                    chartRequestDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
-                    chartRequestDLP.xAxis[0].setCategories([], true);
-                    chartRequestDLP.tooltip.options.formatter = function(args) {
-                        var linkText = 'study_dlp_min=' + requestBins[tooltipData[1]][this.x] + '&study_dlp_max=' + requestBins[tooltipData[1]][this.x+1] + '&requested_procedure=' + tooltipData[0];
-                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?requesthist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
+                    chartAcqDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
+                    chartAcqDLP.yAxis[0].setTitle({text:'Number'});
+                    chartAcqDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
+                    chartAcqDLP.xAxis[0].setCategories([], true);
+                    chartAcqDLP.tooltip.options.formatter = function(args) {
+                        var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
+                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function(e) {
-                    chartRequestDLP.setTitle({ text: defaultTitle }, { text: '' });
-                    chartRequestDLP.yAxis[0].setTitle({text:'DLP (mGy.cm)'});
-                    chartRequestDLP.xAxis[0].setTitle({text:'Requested procedure'});
-                    chartRequestDLP.xAxis[0].setCategories(requestNames, true);
-                    chartRequestDLP.xAxis[0].update({labels:{rotation:90}});
-                    chartRequestDLP.tooltip.options.formatter = function(args) {
+                    chartAcqDLP.setTitle({ text: defaultTitle }, { text: '' });
+                    chartAcqDLP.yAxis[0].setTitle({text:'DLP (mGy.cm)'});
+                    chartAcqDLP.xAxis[0].setTitle({text:'Protocol name'});
+                    chartAcqDLP.xAxis[0].setCategories(protocolNames, true);
+                    chartAcqDLP.xAxis[0].update({labels:{rotation:90}});
+                    chartAcqDLP.tooltip.options.formatter = function(args) {
                         var this_point_index = this.series.data.indexOf(this.point);
                         if (this.series.name.indexOf('Mean') != -1) {
                             var this_series_label = ' mean DLP';
@@ -39,23 +39,23 @@ var chartRequestDLP = new Highcharts.Chart({
                             var this_series = args.chart.series[1];
                         }
                         var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + requestSeriesDataN[this_point_index] + ')';
+                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
                     }
                 }
             }
         },
         title: {
             useHTML: true,
-            text: 'DLP per requested procedure type'
+            text: 'DLP per acquisition protocol'
         },
         legend: {
             enabled: true
         },
         xAxis: {
-            categories: requestNames,
+            categories: protocolNames,
             title: {
                 useHTML: true,
-                text: 'Requested procedure type'
+                text: 'Protocol name'
             },
             labels: {
                 useHTML: true,
@@ -81,7 +81,7 @@ var chartRequestDLP = new Highcharts.Chart({
                     var this_series = args.chart.series[1];
                 }
                 var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + requestSeriesDataN[this_point_index] + ')';
+                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
             },
             useHTML: true
         },
@@ -93,15 +93,15 @@ var chartRequestDLP = new Highcharts.Chart({
         },
         series: [{
             useHTML: true,
-            name: 'Mean DLP',
-            data: requestSeriesData
+            name: 'Mean DLP per acquisition protocol',
+            data: seriesData
         }, {
             useHTML: true,
-            name: 'Median DLP',
-            data: requestSeriesMedianData
+            name: 'Median DLP per acquisition protocol',
+            data: seriesMedianData
         }],
         drilldown: {
-            series: requestSeriesDrilldown
+            series: seriesDrilldown
         }
     });
 });

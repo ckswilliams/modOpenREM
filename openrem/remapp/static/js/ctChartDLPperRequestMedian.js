@@ -84,7 +84,7 @@ var chartRequestDLP = new Highcharts.Chart({
         },
         series: [{
             useHTML: true,
-            name: 'Median DLP per request description',
+            name: 'Median DLP',
             data: requestSeriesMedianData
         }],
         drilldown: {

@@ -84,7 +84,7 @@ var chartStudyDLP = new Highcharts.Chart({
         },
         series: [{
             useHTML: true,
-            name: 'Median DLP per study description',
+            name: 'Median DLP',
             data: studySeriesMedianData
         }],
         drilldown: {

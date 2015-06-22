@@ -711,16 +711,45 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
         # Required for mean DLP per acquisition plot
         if plotCTAcquisitionMeanCTDI:
-            acquisitionSummary = acquisition_events.exclude(
-                Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'), mean_dlp=Avg('dlp'),
-                                                            num_acq=Count('dlp')).order_by('acquisition_protocol')
+            if median_available and plotAverageChoice=='both':
+                acquisitionSummary = acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
+                                                                median_ctdi=Median('mean_ctdivol'),
+                                                                mean_dlp=Avg('dlp'),
+                                                                median_dlp=Median('dlp'),
+                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
+            elif median_available and plotAverageChoice=='median':
+                acquisitionSummary = acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(median_ctdi=Median('mean_ctdivol'),
+                                                                median_dlp=Median('dlp'),
+                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
+            else:
+                acquisitionSummary = acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
+                                                                mean_dlp=Avg('dlp'),
+                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
+
             acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         else:
-            acquisitionSummary = acquisition_events.exclude(
-                Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'), num_acq=Count('dlp')).order_by(
-                'acquisition_protocol')
+            if median_available and plotAverageChoice=='both':
+                acquisitionSummary = acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
+                                                                median_dlp=Median('dlp'),
+                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
+            elif median_available and plotAverageChoice=='median':
+                acquisitionSummary = acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(median_dlp=Median('dlp'),
+                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
+            else:
+                acquisitionSummary = acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
+                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
 
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
