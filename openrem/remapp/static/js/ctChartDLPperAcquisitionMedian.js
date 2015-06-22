@@ -84,7 +84,7 @@ var chartAcqDLP = new Highcharts.Chart({
         },
         series: [{
             useHTML: true,
-            name: 'Median DLP per acquisition protocol',
+            name: 'Median DLP',
             data: seriesMedianData
         }],
         drilldown: {

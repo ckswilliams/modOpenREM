@@ -141,10 +141,10 @@ $(function () {
             }
         },
         series: [{
-            name: 'Median DLP per acquisition protocol',
+            name: 'Median DLP',
             data: seriesMedianData
         }, {
-            name: 'Median CTDI<sub>vol</sub> per acquisition protocol',
+            name: 'Median CTDI<sub>vol</sub>',
             data: seriesMedianDataCTDI,
             yAxis: 1
         }],

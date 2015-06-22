@@ -81,7 +81,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Mean kVp per acquisition protocol',
+            name: 'Mean kVp',
             data: serieskVpData
         }],
         drilldown: {

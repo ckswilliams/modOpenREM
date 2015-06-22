@@ -81,7 +81,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Median mAs per acquisition protocol',
+            name: 'Median mAs',
             data: seriesMedianmAsData
         }],
         drilldown: {

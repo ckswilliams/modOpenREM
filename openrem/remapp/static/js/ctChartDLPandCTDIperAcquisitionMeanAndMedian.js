@@ -191,7 +191,12 @@ $(function () {
             floating: true,
             borderWidth: 0,
             x: 100,
-            y: 120
+            y: 120,
+            width: 220,
+            itemWidth: 110,
+            itemStyle: {
+              width:100
+            }
         }
     });
 });

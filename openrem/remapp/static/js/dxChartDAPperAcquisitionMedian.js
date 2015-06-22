@@ -82,7 +82,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Median DAP per acquisition protocol',
+            name: 'Median DAP',
             data: seriesMedianData
         }],
         drilldown: {

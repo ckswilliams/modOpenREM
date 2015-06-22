@@ -84,7 +84,7 @@ var chartRequestDLP = new Highcharts.Chart({
         },
         series: [{
             useHTML: true,
-            name: 'Mean DLP per request description',
+            name: 'Mean DLP',
             data: requestSeriesData
         }],
         drilldown: {

@@ -141,10 +141,10 @@ $(function () {
             }
         },
         series: [{
-            name: 'Mean DLP per acquisition protocol',
+            name: 'Mean DLP',
             data: seriesData
         }, {
-            name: 'Mean CTDI<sub>vol</sub> per acquisition protocol',
+            name: 'Mean CTDI<sub>vol</sub>',
             data: seriesDataCTDI,
             yAxis: 1
         }],
