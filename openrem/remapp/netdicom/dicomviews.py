@@ -28,61 +28,23 @@
 
 """
 
-Following two lines added so that sphinx autodocumentation works.
+# Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-import ctypes
-import threading
-import time
-
-NULL = 0
-
-def ctype_async_raise(thread_obj, exception):
-    # From https://gist.github.com/liuw/2407154
-    # TODO: split function off into a file without the copyright claim
-    found = False
-    target_tid = 0
-    for tid, tobj in threading._active.items():
-        if tobj is thread_obj:
-            found = True
-            target_tid = tid
-            break
-
-    if not found:
-        raise ValueError("Invalid thread object")
-
-    ret = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(target_tid), ctypes.py_object(exception))
-    # ref: http://docs.python.org/c-api/init.html#PyThreadState_SetAsyncExc
-    if ret == 0:
-        raise ValueError("Invalid thread ID")
-    elif ret > 1:
-        # Huh? Why would we notify more than one threads?
-        # Because we punch a hole into C level interpreter.
-        # So it is better to clean up the mess.
-        ctypes.pythonapi.PyThreadState_SetAsyncExc(target_tid, NULL)
-        raise SystemError("PyThreadState_SetAsyncExc failed")
-    print "Successfully set asynchronized exception for", target_tid
-
-def run_store(store_pk):
-    from remapp.netdicom.storescp import web_store
-    try:
-        web_store(store_pk=store_pk)
-    finally:
-        print "Exited"
 
 @csrf_exempt
 @login_required
-def storescp(request, pk):
+def run_store(request, pk):
     from django.shortcuts import redirect
-
+    from remapp.netdicom.storescp import web_store
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        t = threading.Thread(target=run_store, args=(pk,))
-        t.daemon = True
-        t.start()
-        print "Thread ident is {0}".format(t.ident)
-
+        try:
+            storetask = web_store.delay(store_pk=pk)
+            print storetask.task_id
+            print "web_store.delay started"
+        finally:
+            print "Exited"
     return redirect('/openrem/admin/dicomsummary/')
-
