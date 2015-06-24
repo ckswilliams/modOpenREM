@@ -189,7 +189,6 @@ def web_store(store_pk=None):
     print "starting AE... AET:{0}, port:{1}".format(aet, port),
     MyAE.start()
     print "done"
-    print 'task id from web_store is {0}'.format(conf.task_id)
 
     while 1:
         try:

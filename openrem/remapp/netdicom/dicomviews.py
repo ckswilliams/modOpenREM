@@ -41,10 +41,19 @@ def run_store(request, pk):
     from django.shortcuts import redirect
     from remapp.netdicom.storescp import web_store
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        try:
-            storetask = web_store.delay(store_pk=pk)
-            print storetask.task_id
-            print "web_store.delay started"
-        finally:
-            print "Exited"
+        storetask = web_store.delay(store_pk=pk)
+    return redirect('/openrem/admin/dicomsummary/')
+
+@csrf_exempt
+@login_required
+def stop_store(request, pk):
+    from django.shortcuts import redirect
+    from celery.result import AsyncResult
+    from remapp.models import DicomStoreSCP
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        store = DicomStoreSCP.objects.filter(pk__exact = pk)
+        if store and store[0].task_id:
+            AsyncResult(store[0].task_id).revoke(terminate=True, signal='SIGQUIT')
+        else:
+            print "Invalid primary key or no task_id recoreded"
     return redirect('/openrem/admin/dicomsummary/')

@@ -113,5 +113,6 @@ urlpatterns += patterns('remapp.views',
 
 
 urlpatterns += patterns('remapp.netdicom.dicomviews',
-    url(r'admin/dicomstore/(?P<pk>\d+)/start/$', 'run_store')
+    url(r'admin/dicomstore/(?P<pk>\d+)/start/$', 'run_store'),
+    url(r'admin/dicomstore/(?P<pk>\d+)/stop/$', 'stop_store')
 )
