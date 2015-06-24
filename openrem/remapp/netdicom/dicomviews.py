@@ -54,6 +54,8 @@ def stop_store(request, pk):
         store = DicomStoreSCP.objects.filter(pk__exact = pk)
         if store and store[0].task_id:
             AsyncResult(store[0].task_id).revoke(terminate=True, signal='SIGQUIT')
+            store[0].status = "Quit signal sent"
+            store[0].save()
         else:
             print "Invalid primary key or no task_id recoreded"
     return redirect('/openrem/admin/dicomsummary/')

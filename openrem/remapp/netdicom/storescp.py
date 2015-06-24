@@ -186,9 +186,11 @@ def web_store(store_pk=None):
     MyAE.OnReceiveEcho = OnReceiveEcho
 
     # start AE
-    print "starting AE... AET:{0}, port:{1}".format(aet, port),
+    conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
+    conf.save()
     MyAE.start()
-    print "done"
+    conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
+    conf.save()
 
     while 1:
         try:
