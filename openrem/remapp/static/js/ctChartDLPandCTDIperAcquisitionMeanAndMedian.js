@@ -192,7 +192,7 @@ $(function () {
             borderWidth: 0,
             x: 100,
             y: 120,
-            width: 220,
+            width: 120,
             itemWidth: 110,
             itemStyle: {
               width:100
