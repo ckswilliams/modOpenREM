@@ -157,6 +157,9 @@ def store(*args, **kwargs):
     print "done"
     MyAE.QuitOnKeyboardInterrupt()
 
+from celery import shared_task
+
+@shared_task
 def web_store(store_pk=None):
     import time
     from remapp.models import DicomStoreSCP
@@ -166,6 +169,8 @@ def web_store(store_pk=None):
         conf = DicomStoreSCP.objects.get(pk__exact=store_pk)
         aet = conf.aetitle
         port = conf.port
+        conf.task_id = web_store.request.id
+        conf.save()
     except ObjectDoesNotExist:
         sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
 
@@ -184,11 +189,12 @@ def web_store(store_pk=None):
     print "starting AE... AET:{0}, port:{1}".format(aet, port),
     MyAE.start()
     print "done"
+    print 'task id from web_store is {0}'.format(conf.task_id)
 
     while 1:
         try:
             time.sleep(1)
-        except SystemExit:
+        except KeyboardInterrupt:
             MyAE.Quit()
             sys.exit(0)
 
