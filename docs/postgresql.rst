@@ -8,7 +8,7 @@ Install PostgreSQL and the python connector
 + ``sudo apt-get build-dep python-psycopg2``
 
 The second command installed a lot of things, at least some of which are
-necessary for this to work!
+necessary for this to work! It might be possible to ``sudo apt-get install postgresql-server-dev-9.1`` instead.
 
 If you are using a virtualenv, make sure you are in it and it is active (``source bin/activate``)
 
@@ -59,7 +59,7 @@ Change the security configuration
 The default security settings are too restrictive to allow access to the database.
 
 + ``sudo nano /etc/postgresql/9.1/main/pg_hba.conf``
-+ Add the following line:
++ Add the following line, and comment out the other 'local' line:
     + ``local openrem_db openrem_user md5``
 + ``sudo /etc/init.d/postgresql restart``
 
