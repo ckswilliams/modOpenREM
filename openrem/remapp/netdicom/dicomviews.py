@@ -39,8 +39,12 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def run_store(request, pk):
     from django.shortcuts import redirect
+    from remapp.models import DicomStoreSCP
     from remapp.netdicom.storescp import web_store
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        store = DicomStoreSCP.objects.get(pk__exact = pk)
+        store.run = True
+        store.save()
         storetask = web_store.delay(store_pk=pk)
     return redirect('/openrem/admin/dicomsummary/')
 
