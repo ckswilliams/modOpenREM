@@ -61,5 +61,5 @@ def stop_store(request, pk):
             store[0].status = "Quit signal sent"
             store[0].save()
         else:
-            print "Invalid primary key or no task_id recoreded"
+            print "Invalid primary key or no task_id recorded"
     return redirect('/openrem/admin/dicomsummary/')
