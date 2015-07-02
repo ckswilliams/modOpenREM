@@ -629,6 +629,7 @@ class GeneralEquipmentModuleAttr(models.Model):  # C.7.5.1
     spatial_resolution = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     date_of_last_calibration = models.DateTimeField(blank=True, null=True)
     time_of_last_calibration = models.DateTimeField(blank=True, null=True)
+    unique_equipment_name = models.ForeignKey(UniqueEquipmentName)
 
     def __unicode__(self):
         return self.station_name
@@ -915,3 +916,15 @@ class Median(models.Aggregate):
     def add_to_query(self, query, alias, col, source, is_summary):
         aggregate = self.sql(col, **self.extra)
         query.aggregates[alias] = aggregate
+
+
+class UniqueEquipmentName(models.Model):
+    manufacturer = models.TextField(blank=True, null=True)
+    institution_name = models.TextField(blank=True, null=True)
+    station_name = models.CharField(max_length=32, blank=True, null=True)
+    institutional_department_name = models.TextField(blank=True, null=True)
+    manufacturer_model_name = models.TextField(blank=True, null=True)
+    device_serial_number = models.TextField(blank=True, null=True)
+    software_versions = models.TextField(blank=True, null=True)
+    gantry_id = models.TextField(blank=True, null=True)
+    display_name = models.TextField(blank=True, null=True)
