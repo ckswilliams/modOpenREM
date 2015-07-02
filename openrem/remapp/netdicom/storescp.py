@@ -197,6 +197,7 @@ def web_store(store_pk=None):
         stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
         if not stay_alive.run:
             MyAE.Quit()
+            break
 
 
 if __name__ == "__main__":
