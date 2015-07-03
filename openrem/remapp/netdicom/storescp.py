@@ -193,13 +193,11 @@ def web_store(store_pk=None):
     conf.save()
 
     while 1:
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
+        time.sleep(1)
+        stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
+        if not stay_alive.run:
             MyAE.Quit()
-            sys.exit(0)
-
-    MyAE.QuitOnKeyboardInterrupt()
+            break
 
 
 if __name__ == "__main__":

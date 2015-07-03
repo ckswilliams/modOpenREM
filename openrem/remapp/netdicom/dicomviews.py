@@ -39,8 +39,12 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def run_store(request, pk):
     from django.shortcuts import redirect
+    from remapp.models import DicomStoreSCP
     from remapp.netdicom.storescp import web_store
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        store = DicomStoreSCP.objects.get(pk__exact = pk)
+        store.run = True
+        store.save()
         storetask = web_store.delay(store_pk=pk)
     return redirect('/openrem/admin/dicomsummary/')
 
@@ -48,14 +52,14 @@ def run_store(request, pk):
 @login_required
 def stop_store(request, pk):
     from django.shortcuts import redirect
-    from celery.result import AsyncResult
     from remapp.models import DicomStoreSCP
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
         store = DicomStoreSCP.objects.filter(pk__exact = pk)
         if store and store[0].task_id:
-            AsyncResult(store[0].task_id).revoke(terminate=True, signal='SIGQUIT')
+            store[0].run = False
+            store[0].save()
             store[0].status = "Quit signal sent"
             store[0].save()
         else:
-            print "Invalid primary key or no task_id recoreded"
+            print "Invalid primary key or no task_id recorded"
     return redirect('/openrem/admin/dicomsummary/')
