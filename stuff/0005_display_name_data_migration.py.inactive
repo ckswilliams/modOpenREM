@@ -1,0 +1,46 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
+from django.db.models.loading import get_model
+
+def populate_unique_equipment_names(self, orm):
+
+    test = self.get_model('remapp','GeneralStudyModuleAttr')
+
+    unique_combinations = test.objects.values_list('generalequipmentmoduleattr__manufacturer',
+                                                   'generalequipmentmoduleattr__institution_name',
+                                                   'generalequipmentmoduleattr__station_name',
+                                                   'generalequipmentmoduleattr__institutional_department_name',
+                                                   'generalequipmentmoduleattr__manufacturer_model_name',
+                                                   'generalequipmentmoduleattr__device_serial_number',
+                                                   'generalequipmentmoduleattr__software_versions',
+                                                   'generalequipmentmoduleattr__gantry_id').distinct()
+
+    from remapp.models import UniqueEquipmentNames
+
+    for each_combination in unique_combinations:
+        new_combination = UniqueEquipmentNames(manufacturer=each_combination[0],
+                                               institution_name=each_combination[1],
+                                               station_name=each_combination[2],
+                                               institutional_department_name=each_combination[3],
+                                               manufacturer_model_name=each_combination[4],
+                                               device_serial_number=each_combination[5],
+                                               software_versions=each_combination[6],
+                                               gantry_id=each_combination[7],
+                                               display_name=each_combination[2] if each_combination[1] is None else each_combination[1] + ' ' + each_combination[2]
+                                               )
+        new_combination.save()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('remapp', '0004_auto_20150703_1127'),
+    ]
+
+    operations = [
+        migrations.RunPython(populate_unique_equipment_names)
+    ]
