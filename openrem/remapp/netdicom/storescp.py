@@ -33,7 +33,7 @@ from dicom.dataset import Dataset, FileDataset
 import tempfile
 from django.views.decorators.csrf import csrf_exempt
 
-debug(True)
+debug(False)
 
 # callbacks
 def OnAssociateRequest(association):
