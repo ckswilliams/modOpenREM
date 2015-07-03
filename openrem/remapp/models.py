@@ -930,3 +930,8 @@ class UniqueEquipmentName(models.Model):
     gantry_id = models.TextField(blank=True, null=True)
     device_observer_uid = models.TextField(blank=True, null=True)
     display_name = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('manufacturer', 'institution_name', 'station_name', 'institutional_department_name',
+                           'manufacturer_model_name', 'device_serial_number', 'software_versions', 'gantry_id',
+                           'device_observer_uid')
