@@ -13,7 +13,6 @@ For help on usage,
 python qrscu.py -h 
 """
 
-import argparse
 from netdicom.applicationentity import AE
 from netdicom.SOPclass import *
 from dicom.dataset import Dataset, FileDataset
