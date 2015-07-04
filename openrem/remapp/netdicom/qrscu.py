@@ -88,23 +88,14 @@ def _querySeriesCT(MyAE, RemoteAE, d2):
     assoc2.Release(0)
     print "Released series association"
 
-def qrscu(*args, **kwargs):
-    import argparse
+def qrscu(
+        remotehost=None, remoteport=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False,
+        *args, **kwargs
+    ):
 
-    # parse commandline
-    parser = argparse.ArgumentParser(description='storage SCU example')
-    parser.add_argument('remotehost')
-    parser.add_argument('remoteport', type=int)
-    parser.add_argument('-aet', help='calling AE title', default='OPENREM')
-    parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
-    parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
-    parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
-
-    args = parser.parse_args()
-
-    if args.implicit:
+    if implicit:
         ts = [ImplicitVRLittleEndian]
-    elif args.explicit:
+    elif explicit:
         ts = [ExplicitVRLittleEndian]
     else:
         ts = [
@@ -113,7 +104,7 @@ def qrscu(*args, **kwargs):
             ExplicitVRBigEndian
             ]
     # create application entity with Find and Move SOP classes as SCU
-    MyAE = AE(args.aet, 0, [StudyRootFindSOPClass,
+    MyAE = AE(aet, 0, [StudyRootFindSOPClass,
                                  StudyRootMoveSOPClass,
                                  VerificationSOPClass], [], ts)
     MyAE.OnAssociateResponse = OnAssociateResponse
@@ -122,10 +113,10 @@ def qrscu(*args, **kwargs):
     MyAE.start()
 
     # remote application entity
-    RemoteAE = dict(Address=args.remotehost, Port=args.remoteport, AET=args.aec)
+    RemoteAE = dict(Address=remotehost, Port=remoteport, AET=aec)
 
     # create association with remote AE
-    print "Request association"
+    print "Request association with {0} {1} {2}".format(remotehost, remoteport, aec)
     assoc = MyAE.RequestAssociation(RemoteAE)
 
     # perform a DICOM ECHO
@@ -190,7 +181,25 @@ def qrscu(*args, **kwargs):
 
 if __name__ == "__main__":
     import sys
-    sys.exit(qrscu())
+    import argparse
+
+    # parse commandline
+    parser = argparse.ArgumentParser(description='storage SCU example')
+    parser.add_argument('remotehost')
+    parser.add_argument('remoteport', type=int)
+    parser.add_argument('-aet', help='calling AE title', default='OPENREM')
+    parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
+    parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
+    parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
+
+    args = parser.parse_args()
+
+    sys.exit(
+        qrscu(
+            remotehost=args.remotehost, remoteport=args.remoteport, aet=args.aet, aec=args.aec,
+            implicit=args.implicit, explicit=args.explicit
+        )
+    )
 
 
 # (0008, 0018) SOP Instance UID                    UI:
