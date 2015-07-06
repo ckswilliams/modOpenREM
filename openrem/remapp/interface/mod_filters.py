@@ -207,8 +207,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
-    study_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
-    study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
+    #study_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
+    #study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
     acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
     acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
     acquisition_kvp_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', widget=forms.HiddenInput())
@@ -232,8 +232,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'station_name',
             'display_name',
             'accession_number',
-            'study_dap_min',
-            'study_dap_max',
+            #'study_dap_min',
+            #'study_dap_max',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
