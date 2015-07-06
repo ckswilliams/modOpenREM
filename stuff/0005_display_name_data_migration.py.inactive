@@ -22,6 +22,16 @@ def populate_unique_equipment_names(self, orm):
     from remapp.models import GeneralEquipmentModuleAttr
 
     for each_combination in unique_combinations:
+
+        if each_combination[1] and each_combination[2]:
+            display_name_text = each_combination[1] + ' ' + each_combination[2]
+        elif each_combination[1]:
+            display_name_text = each_combination[1]
+        elif each_combination[2]:
+            display_name_text = each_combination[2]
+        else:
+            display_name_text = "Blank"
+
         new_combination = UniqueEquipmentNames(manufacturer=each_combination[0],
                                                institution_name=each_combination[1],
                                                station_name=each_combination[2],
@@ -30,7 +40,7 @@ def populate_unique_equipment_names(self, orm):
                                                device_serial_number=each_combination[5],
                                                software_versions=each_combination[6],
                                                gantry_id=each_combination[7],
-                                               display_name=each_combination[2] if each_combination[1] is None else each_combination[1] + ' ' + each_combination[2]
+                                               display_name=display_name_text
                                                )
         new_combination.save()
 
