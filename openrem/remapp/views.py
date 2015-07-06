@@ -986,37 +986,36 @@ def openrem_home(request):
             studies = allstudies.filter(modality_type__contains = modality).all()
         # End of 10/10/2014 DJP code changes
 
-        stations = studies.values_list('generalequipmentmoduleattr__station_name').distinct()
+        display_names = studies.values_list('generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
         modalitydata = {}
-        for station in stations:
+        for display_name in display_names:
             latestdate = studies.filter(
-                generalequipmentmoduleattr__station_name__exact = station[0]
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).latest('study_date').study_date
-            latestuid = studies.filter(generalequipmentmoduleattr__station_name__exact = station[0]
+            latestuid = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
             inst_name = studies.filter(
-                generalequipmentmoduleattr__station_name__exact = station[0]
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).latest('study_date').generalequipmentmoduleattr_set.get().institution_name
                 
             model_name = studies.filter(
-                generalequipmentmoduleattr__station_name__exact = station[0]
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).latest('study_date').generalequipmentmoduleattr_set.get().manufacturer_model_name
             
             institution = '{0}, {1}'.format(inst_name,model_name)
                        
-            modalitydata[station[0]] = {
+            modalitydata[display_name[0]] = {
                 'total' : studies.filter(
-                    generalequipmentmoduleattr__station_name__exact = station[0]
+                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                     ).count(),
                 'latest' : latestdatetime,
                 'institution' : institution
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
-    
-    
+
     return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
 @login_required
