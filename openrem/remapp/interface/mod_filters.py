@@ -215,6 +215,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
     acquisition_kvp_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', widget=forms.HiddenInput())
     acquisition_mas_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
     acquisition_mas_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
+    display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -229,6 +230,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'manufacturer', 
             'model_name',
             'station_name',
+            'display_name',
             'accession_number',
             'study_dap_min',
             'study_dap_max',
