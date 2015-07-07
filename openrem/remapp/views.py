@@ -1274,10 +1274,22 @@ def charts_off(request):
 @login_required
 def display_names_view(request):
     from remapp.models import UniqueEquipmentNames
+    import pkg_resources # part of setuptools
 
     f = UniqueEquipmentNames.objects
 
-    return_structure = {'name_list': f}
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    return_structure = {'name_list': f, 'admin':admin}
 
     return render_to_response(
         'remapp/displaynameview.html',
