@@ -44,12 +44,12 @@
                 </a>
             </td>
             <td>
-                <a href="/openrem/ct/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
                 {{ value.total }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/ct/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
                 {{ value.latest|naturaltime }}
                 </a>
             </td>
@@ -67,17 +67,17 @@
     {% for key,value in homedata.RF.items %}
         <tr>
             <td>
-                <a href="/openrem/rf/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
                     {{ value.institution }} ({{ key }})
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
                     {{ value.total }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/rf/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
                     {{ value.latest|naturaltime }}
                 </a>
             </td>
@@ -95,17 +95,17 @@
     {% for key,value in homedata.MG.items %}
         <tr>
             <td>
-                <a href="/openrem/mg/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
                     {{ value.institution }} ({{ key }})
                 </a>
             </td>
             <td>
-                <a href="/openrem/mg/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
                     {{ value.total }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/mg/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
                     {{ value.latest|naturaltime }}
                 </a>
             </td>
@@ -123,17 +123,17 @@
     {% for key,value in homedata.DX.items %}
         <tr>
             <td>
-                <a href="/openrem/dx/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
                     {{ value.institution }} ({{ key }})
                 </a>
             </td>
             <td>
-                <a href="/openrem/dx/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
                     {{ value.total }}
                 </a>
             </td>
             <td>
-                <a href="/openrem/dx/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
                     {{ value.latest|naturaltime }}
                 </a>
             </td>
