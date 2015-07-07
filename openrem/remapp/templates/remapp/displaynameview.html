@@ -1,0 +1,61 @@
+{% extends "remapp/base.html" %}
+
+
+{% block navbar %}
+  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
+  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
+  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
+  {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
+{% endblock %}
+
+
+{% block toprow %}
+  {% load pagination_tags %}
+  <p>
+    There are {{ name_list.count }} entries in this table.
+  </p>
+{% endblock %}
+
+
+{% block mainblock %}
+
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in name_list.values %}
+      <tr>
+        <td>
+          {{ eachrow.display_name }}
+        </td>
+        <td>
+          {{ eachrow.institution_name }}
+        </td>
+        <td>
+          {{ eachrow.institutional_department_name }}
+        </td>
+        <td>
+          {{ eachrow.manufacturer }}
+        </td>
+        <td>
+          {{ eachrow.manufacturer_model_name }}
+        </td>
+        <td>
+          {{ eachrow.station_name }}
+        </td>
+        <td>
+          {{ eachrow.device_serial_number }}
+        </td>
+        <td>
+          {{ eachrow.software_versions }}
+        </td>
+        <td>
+          {{ eachrow.gantry_id }}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  {% paginate %}
+
+{% endblock %}

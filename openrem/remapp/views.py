@@ -1269,3 +1269,18 @@ def charts_off(request):
     response = openrem_home(request)
 
     return response
+
+
+@login_required
+def display_names_view(request):
+    from remapp.models import UniqueEquipmentNames
+
+    f = UniqueEquipmentNames.objects
+
+    return_structure = {'name_list': f}
+
+    return render_to_response(
+        'remapp/displaynameview.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )
