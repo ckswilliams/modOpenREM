@@ -34,13 +34,13 @@
 <h4>CT summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.CT.items %}
         <tr>
             <td>
-                <a href="/openrem/ct/?station_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
+                    {{ value.displayname }} <!--({{ key }})-->
                 </a>
             </td>
             <td>
@@ -62,13 +62,13 @@
 <h4>Fluoroscopy summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Room</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.RF.items %}
         <tr>
             <td>
                 <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+                    {{ value.displayname }} <!--({{ key }})-->
                 </a>
             </td>
             <td>
@@ -90,13 +90,13 @@
 <h4>Mammography summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Room</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.MG.items %}
         <tr>
             <td>
                 <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+                    {{ value.displayname }} <!--({{ key }})-->
                 </a>
             </td>
             <td>
@@ -118,13 +118,13 @@
 <h4>Radiography summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Room</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.DX.items %}
         <tr>
             <td>
                 <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+                    {{ value.displayname }} <!--({{ key }})-->
                 </a>
             </td>
             <td>

@@ -929,7 +929,6 @@ def openrem_home(request):
         'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
         'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
-        #'dx' : allstudies.filter(modality_type__contains = 'CR').count(),
         'dx' : allstudies.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).count(),
         }
 
@@ -1005,14 +1004,16 @@ def openrem_home(request):
                 generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).latest('study_date').generalequipmentmoduleattr_set.get().manufacturer_model_name
             
-            institution = '{0}, {1}'.format(inst_name,model_name)
+            #institution = '{0}, {1}'.format(inst_name,model_name)
+            displayname = str(display_name[0])
                        
             modalitydata[display_name[0]] = {
                 'total' : studies.filter(
                     generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                     ).count(),
                 'latest' : latestdatetime,
-                'institution' : institution
+                #'institution' : institution
+                'displayname' : displayname
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
@@ -1118,7 +1119,6 @@ def size_process(request, *args, **kwargs):
         else:
             messages.error(request, "Duplicate column header selection. Each field must have a different header.")
             return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
-            
 
     else:
     
