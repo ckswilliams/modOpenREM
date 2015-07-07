@@ -1,0 +1,38 @@
+{% extends "remapp/base.html" %}
+
+
+{% block navbar %}
+  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
+  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
+  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
+  {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
+{% endblock %}
+
+
+{% block mainblock %}
+
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in name_list.values %}
+      <tr>
+        <td><a>{{ eachrow.display_name }}</a></td>
+        <td><a>{{ eachrow.institution_name }}</a></td>
+        <td><a>{{ eachrow.institutional_department_name }}</a></td>
+        <td><a>{{ eachrow.manufacturer }}</a></td>
+        <td><a>{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a>{{ eachrow.station_name }}</a></td>
+        <td><a>{{ eachrow.device_serial_number }}</a></td>
+        <td><a>{{ eachrow.software_versions }}</a></td>
+        <td><a>{{ eachrow.gantry_id }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
+{% endblock %}
+
+
+      </div>
+    </div>
+  </form>

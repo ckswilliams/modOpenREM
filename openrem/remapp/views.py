@@ -1302,7 +1302,7 @@ def display_name_update(request, pk):
     from remapp.models import UniqueEquipmentNames
     import pkg_resources # part of setuptools
 
-    f = UniqueEquipmentNames.objects
+    f = UniqueEquipmentNames.objects.filter(pk=pk)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1318,7 +1318,7 @@ def display_name_update(request, pk):
     return_structure = {'name_list': f, 'admin':admin}
 
     return render_to_response(
-        'remapp/displaynameview.html',
+        'remapp/displaynameupdate.html',
         return_structure,
         context_instance=RequestContext(request)
     )
