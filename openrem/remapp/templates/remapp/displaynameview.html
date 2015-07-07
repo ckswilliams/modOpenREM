@@ -22,36 +22,26 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+      {% if admin.adminperm %}
+        <th>Update?</th>
+      {% endif %}
+
     </row>
     {% for eachrow in name_list.values %}
       <tr>
-        <td>
-          {{ eachrow.display_name }}
-        </td>
-        <td>
-          {{ eachrow.institution_name }}
-        </td>
-        <td>
-          {{ eachrow.institutional_department_name }}
-        </td>
-        <td>
-          {{ eachrow.manufacturer }}
-        </td>
-        <td>
-          {{ eachrow.manufacturer_model_name }}
-        </td>
-        <td>
-          {{ eachrow.station_name }}
-        </td>
-        <td>
-          {{ eachrow.device_serial_number }}
-        </td>
-        <td>
-          {{ eachrow.software_versions }}
-        </td>
-        <td>
-          {{ eachrow.gantry_id }}
-        </td>
+        <td><a>{{ eachrow.display_name }}</a></td>
+        <td><a>{{ eachrow.institution_name }}</a></td>
+        <td><a>{{ eachrow.institutional_department_name }}</a></td>
+        <td><a>{{ eachrow.manufacturer }}</a></td>
+        <td><a>{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a>{{ eachrow.station_name }}</a></td>
+        <td><a>{{ eachrow.device_serial_number }}</a></td>
+        <td><a>{{ eachrow.software_versions }}</a></td>
+        <td><a>{{ eachrow.gantry_id }}</a></td>
+        {% if admin.adminperm %}
+        <td><a href="{% url 'display_name_update' eachrow.id %}">Click to update</a></td>
+        {% endif %}
+
       </tr>
     {% endfor %}
   </table>
