@@ -1306,6 +1306,10 @@ def display_name_update(request, pk):
     if request.method == 'POST':
         form = UpdateDisplayNameForm(request.POST)
         if form.is_valid():
+            new_display_name = form.cleaned_data['display_name']
+            display_name_data = UniqueEquipmentNames.objects.get(pk=pk)
+            display_name_data.display_name = new_display_name
+            display_name_data.save()
             return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
     else:
