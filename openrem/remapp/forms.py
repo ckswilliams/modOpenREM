@@ -75,3 +75,7 @@ class CTChartOptionsForm(forms.Form):
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class UpdateDisplayNameForm(forms.Form):
+        display_name = forms.CharField()

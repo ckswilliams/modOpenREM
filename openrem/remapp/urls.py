@@ -77,6 +77,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/sizeimports', 'size_imports', name='size_imports'),
     url(r'^admin/sizedelete', 'size_delete', name='size_delete'),
     url(r'^admin/sizeimport/abort/(?P<pk>\d+)$', 'size_abort'),
+    url(r'^updatedisplayname/$', 'display_name_update', name='display_name_update'),
     url(r'^updatedisplayname/(?P<pk>\d+)$', 'display_name_update', name='display_name_update'),
 )
 

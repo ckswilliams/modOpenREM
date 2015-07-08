@@ -1301,24 +1301,38 @@ def display_names_view(request):
 def display_name_update(request, pk):
     from remapp.models import UniqueEquipmentNames
     import pkg_resources # part of setuptools
+    from remapp.forms import UpdateDisplayNameForm
 
-    f = UniqueEquipmentNames.objects.filter(pk=pk)
+    if request.method == 'POST':
+        form = UpdateDisplayNameForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion' : vers}
+    else:
+        f = UniqueEquipmentNames.objects.filter(pk=pk)
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+        form = UpdateDisplayNameForm(initial={'display_name': str(f.values_list('display_name')[0][0])}, auto_id=False)
 
-    return_structure = {'name_list': f, 'admin':admin}
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion' : vers}
 
-    return render_to_response(
-        'remapp/displaynameupdate.html',
-        return_structure,
-        context_instance=RequestContext(request)
-    )
+        if request.user.groups.filter(name="exportgroup"):
+            admin['exportperm'] = True
+        if request.user.groups.filter(name="admingroup"):
+            admin['adminperm'] = True
+
+        return_structure = {'name_list': f, 'admin':admin, 'form': form}
+
+    return render_to_response('remapp/displaynameupdate.html',
+                              return_structure,
+                              context_instance=RequestContext(request))
+
+
+#    return render_to_response(
+#        'remapp/displaynameupdate.html',
+#        return_structure,
+#        context_instance=RequestContext(request)
+#    )

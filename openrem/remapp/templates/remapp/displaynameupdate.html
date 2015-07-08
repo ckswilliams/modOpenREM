@@ -11,24 +11,25 @@
 
 {% block mainblock %}
 
+  <form action="/openrem/updatedisplayname/{{ name_list.values.get.id }}" method="post">{% csrf_token %}
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
-    {% for eachrow in name_list.values %}
       <tr>
-        <td><a>{{ eachrow.display_name }}</a></td>
-        <td><a>{{ eachrow.institution_name }}</a></td>
-        <td><a>{{ eachrow.institutional_department_name }}</a></td>
-        <td><a>{{ eachrow.manufacturer }}</a></td>
-        <td><a>{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a>{{ eachrow.station_name }}</a></td>
-        <td><a>{{ eachrow.device_serial_number }}</a></td>
-        <td><a>{{ eachrow.software_versions }}</a></td>
-        <td><a>{{ eachrow.gantry_id }}</a></td>
+        <td><a>{{ form.display_name }}</a></td>
+        <td><a>{{ name_list.values.get.institution_name }}</a></td>
+        <td><a>{{ name_list.values.get.institutional_department_name }}</a></td>
+        <td><a>{{ name_list.values.get.manufacturer }}</a></td>
+        <td><a>{{ name_list.values.get.manufacturer_model_name }}</a></td>
+        <td><a>{{ name_list.values.get.station_name }}</a></td>
+        <td><a>{{ name_list.values.get.device_serial_number }}</a></td>
+        <td><a>{{ name_list.values.get.software_versions }}</a></td>
+        <td><a>{{ name_list.values.get.gantry_id }}</a></td>
       </tr>
-    {% endfor %}
   </table>
+  <input type="submit" value="Submit" />
+  </form>
 
 {% endblock %}
 
