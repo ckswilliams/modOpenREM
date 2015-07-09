@@ -63,3 +63,22 @@ def stop_store(request, pk):
         else:
             print "Invalid primary key or no task_id recorded"
     return redirect('/openrem/admin/dicomsummary/')
+
+from django.http import HttpResponseRedirect, HttpResponse
+from django.http import Http404
+
+@csrf_exempt
+def ajax_test(request):
+
+    sometext = '<div id="sharemenu"><p>[page content goes here]</p></div>'
+    return HttpResponse(sometext)
+#    if request.is_ajax():
+#         try:
+#             pass
+#         except KeyError:
+#             return HttpResponse('Error') # incorrect post
+#         # do stuff, e.g. calculate a score
+#         sometext = "Here be some text"
+#         return HttpResponse(sometext)
+#     else:
+#         raise Http404
