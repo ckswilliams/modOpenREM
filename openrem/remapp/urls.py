@@ -83,6 +83,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/dicomqr/add/$', DicomQRCreate.as_view(), name='dicomqr_add'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/$', DicomQRUpdate.as_view(), name='dicomqr_update'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/delete/$', DicomQRDelete.as_view(), name='dicomqr_delete'),
+    url(r'^admin/dicomajax', 'dicom_ajax', name='dicom_ajax'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

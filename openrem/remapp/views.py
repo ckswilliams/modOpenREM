@@ -1257,3 +1257,26 @@ class DicomQRDelete(DeleteView):
             admin["adminperm"] = True
         context['admin'] = admin
         return context
+
+@login_required
+def dicom_ajax(request):
+    """Displays current DICOM configuration
+    """
+    store = DicomStoreSCP.objects.all()
+    remoteqr = DicomRemoteQR.objects.all()
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/ajaxtest.html',
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
+        context_instance=RequestContext(request)
+    )

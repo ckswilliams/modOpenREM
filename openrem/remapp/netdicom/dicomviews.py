@@ -82,3 +82,4 @@ def ajax_test(request):
 #         return HttpResponse(sometext)
 #     else:
 #         raise Http404
+
