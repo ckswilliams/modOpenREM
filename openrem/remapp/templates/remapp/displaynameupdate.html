@@ -10,25 +10,32 @@
 
 
 {% block mainblock %}
-
+  {% if admin.adminperm %}
   <form action="/openrem/updatedisplayname/{{ name_list.values.get.id }}" method="post">{% csrf_token %}
+  {% endif %}
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
       <tr>
-        <td><a>{{ form.display_name }}</a></td>
-        <td><a>{{ name_list.values.get.institution_name }}</a></td>
-        <td><a>{{ name_list.values.get.institutional_department_name }}</a></td>
-        <td><a>{{ name_list.values.get.manufacturer }}</a></td>
-        <td><a>{{ name_list.values.get.manufacturer_model_name }}</a></td>
-        <td><a>{{ name_list.values.get.station_name }}</a></td>
-        <td><a>{{ name_list.values.get.device_serial_number }}</a></td>
-        <td><a>{{ name_list.values.get.software_versions }}</a></td>
-        <td><a>{{ name_list.values.get.gantry_id }}</a></td>
+        {% if admin.adminperm %}
+        <td><a style="text-decoration: none">{{ form.display_name }}</a></td>
+        {% else %}
+        <td><a style="text-decoration: none">{{ name_list.values.get.display_name }}</a></td>
+        {% endif %}
+        <td><a style="text-decoration: none">{{ name_list.values.get.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ name_list.values.get.gantry_id }}</a></td>
       </tr>
   </table>
-  <input type="submit" value="Submit" />
+  {% if admin.adminperm %}
+  <input type="submit" value="Update" />
+  {% endif %}
   </form>
 
 {% endblock %}

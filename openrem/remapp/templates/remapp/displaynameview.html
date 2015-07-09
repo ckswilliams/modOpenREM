@@ -13,35 +13,37 @@
   {% load pagination_tags %}
   <p>
     There are {{ name_list.count }} entries in this table.
+    {% if admin.adminperm %} Click on a row to edit the display name.{% endif %}
   </p>
 {% endblock %}
 
 
 {% block mainblock %}
+  {% if admin.adminperm %}
+  <script>
+  jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.document.location = $(this).data("href");
+    });
+  });
+  </script>
+  {% endif %}
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-      {% if admin.adminperm %}
-        <th>Update?</th>
-      {% endif %}
-
     </row>
     {% for eachrow in name_list.values %}
-      <tr>
-        <td><a>{{ eachrow.display_name }}</a></td>
-        <td><a>{{ eachrow.institution_name }}</a></td>
-        <td><a>{{ eachrow.institutional_department_name }}</a></td>
-        <td><a>{{ eachrow.manufacturer }}</a></td>
-        <td><a>{{ eachrow.manufacturer_model_name }}</a></td>
-        <td><a>{{ eachrow.station_name }}</a></td>
-        <td><a>{{ eachrow.device_serial_number }}</a></td>
-        <td><a>{{ eachrow.software_versions }}</a></td>
-        <td><a>{{ eachrow.gantry_id }}</a></td>
-        {% if admin.adminperm %}
-        <td><a href="{% url 'display_name_update' eachrow.id %}">Click to update</a></td>
-        {% endif %}
-
+      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
       </tr>
     {% endfor %}
   </table>

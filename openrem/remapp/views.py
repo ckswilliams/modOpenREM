@@ -1276,7 +1276,7 @@ def display_names_view(request):
     from remapp.models import UniqueEquipmentNames
     import pkg_resources # part of setuptools
 
-    f = UniqueEquipmentNames.objects
+    f = UniqueEquipmentNames.objects.order_by('display_name')
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1313,7 +1313,11 @@ def display_name_update(request, pk):
             return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
     else:
-        f = UniqueEquipmentNames.objects.filter(pk=pk)
+        max_pk = UniqueEquipmentNames.objects.all().order_by('-pk').values_list('pk')[0][0]
+        if int(pk) <= max_pk:
+            f = UniqueEquipmentNames.objects.filter(pk=pk)
+        else:
+            return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
         form = UpdateDisplayNameForm(initial={'display_name': str(f.values_list('display_name')[0][0])}, auto_id=False)
 
@@ -1333,10 +1337,3 @@ def display_name_update(request, pk):
     return render_to_response('remapp/displaynameupdate.html',
                               return_structure,
                               context_instance=RequestContext(request))
-
-
-#    return render_to_response(
-#        'remapp/displaynameupdate.html',
-#        return_structure,
-#        context_instance=RequestContext(request)
-#    )
