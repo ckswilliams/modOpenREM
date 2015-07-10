@@ -34,6 +34,29 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 from django.core.urlresolvers import reverse
 
+class DicomQRRspStudy(models.Model):
+    query_id = models.CharField(max_length=64, unique=True)
+    patient_id = models.CharField(max_length=64, blank=True, null=True)
+    sop_instance_uid = models.TextField(blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
+    study_description = models.TextField(blank=True, null=True)
+    study_instance_uid = models.TextField(blank=True, null=True)
+    study_date = models.DateField(blank=True, null=True)
+
+
+class DicomQRRspSeries(models.Model):
+    dicom_qr_rsp_study = models.ForeignKey(DicomQRRspStudy)
+    query_id = models.CharField(max_length=64, unique=True)
+    patient_id = models.CharField(max_length=64, blank=True, null=True)
+    sop_instance_uid = models.TextField(blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
+    study_description = models.TextField(blank=True, null=True)
+    study_instance_uid = models.TextField(blank=True, null=True)
+    study_date = models.DateField(blank=True, null=True)
+    series_description = models.TextField(blank=True, null=True)
+    series_instance_uid = models.TextField(blank=True, null=True)
+    series_number = models.IntegerField(blank=True, null=True)
+
 
 class DicomStoreSCP(models.Model):
     aetitle = models.CharField(max_length=16, blank=True, null=True)
