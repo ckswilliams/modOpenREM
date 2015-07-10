@@ -121,8 +121,8 @@ def qrscu(
 
     # perform a DICOM ECHO
     print "DICOM Echo ... ",
-    st = assoc.VerificationSOPClass.SCU(1)
-    print 'done with status "%s"' % st
+    echo = assoc.VerificationSOPClass.SCU(1)
+    print 'done with status "%s"' % echo
 
     print "DICOM FindSCU ... ",
     d = Dataset()
