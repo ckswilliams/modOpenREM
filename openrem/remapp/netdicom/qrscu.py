@@ -13,13 +13,6 @@ For help on usage,
 python qrscu.py -h 
 """
 
-from netdicom.applicationentity import AE
-from netdicom.SOPclass import *
-from dicom.dataset import Dataset, FileDataset
-from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-import netdicom
-import tempfile
-
 
 # call back
 def OnAssociateResponse(association):
@@ -89,9 +82,13 @@ def _querySeriesCT(MyAE, RemoteAE, d2):
     print "Released series association"
 
 def qrscu(
-        remotehost=None, remoteport=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False,
+        rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False,
         *args, **kwargs
     ):
+    from netdicom.applicationentity import AE
+    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
+    from dicom.dataset import Dataset, FileDataset
+    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 
     if implicit:
         ts = [ImplicitVRLittleEndian]
@@ -113,11 +110,13 @@ def qrscu(
     MyAE.start()
 
     # remote application entity
-    RemoteAE = dict(Address=remotehost, Port=remoteport, AET=aec)
+    RemoteAE = dict(Address=rh, Port=rp, AET=aec)
 
     # create association with remote AE
-    print "Request association with {0} {1} {2}".format(remotehost, remoteport, aec)
+    print "Request association with {0} {1} {2}".format(rh, rp, aec)
     assoc = MyAE.RequestAssociation(RemoteAE)
+
+    print "assoc is ... {0}".format(assoc)
 
     # perform a DICOM ECHO
     print "DICOM Echo ... ",
@@ -196,7 +195,7 @@ if __name__ == "__main__":
 
     sys.exit(
         qrscu(
-            remotehost=args.remotehost, remoteport=args.remoteport, aet=args.aet, aec=args.aec,
+            rh=args.remotehost, rp=args.remoteport, aet=args.aet, aec=args.aec,
             implicit=args.implicit, explicit=args.explicit
         )
     )
