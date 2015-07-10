@@ -996,15 +996,6 @@ def openrem_home(request):
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
-            inst_name = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
-                ).latest('study_date').generalequipmentmoduleattr_set.get().institution_name
-                
-            model_name = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
-                ).latest('study_date').generalequipmentmoduleattr_set.get().manufacturer_model_name
-            
-            #institution = '{0}, {1}'.format(inst_name,model_name)
             displayname = str(display_name[0])
                        
             modalitydata[display_name[0]] = {
@@ -1012,7 +1003,6 @@ def openrem_home(request):
                     generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                     ).count(),
                 'latest' : latestdatetime,
-                #'institution' : institution
                 'displayname' : displayname
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
