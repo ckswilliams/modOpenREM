@@ -35,7 +35,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 class DicomQRRspStudy(models.Model):
-    query_id = models.CharField(max_length=64, unique=True)
+    query_id = models.CharField(max_length=64)
     patient_id = models.CharField(max_length=64, blank=True, null=True)
     sop_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
@@ -46,7 +46,7 @@ class DicomQRRspStudy(models.Model):
 
 class DicomQRRspSeries(models.Model):
     dicom_qr_rsp_study = models.ForeignKey(DicomQRRspStudy)
-    query_id = models.CharField(max_length=64, unique=True)
+    query_id = models.CharField(max_length=64)
     patient_id = models.CharField(max_length=64, blank=True, null=True)
     sop_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
