@@ -70,7 +70,7 @@ from django.http import Http404
 @csrf_exempt
 def ajax_test(request):
 
-    sometext = '<div id="sharemenu"><p>[page content goes here]</p></div>'
+    sometext = '<div id="sharemenu"><p>AJAX fo the win</p></div>'
     return HttpResponse(sometext)
 #    if request.is_ajax():
 #         try:
