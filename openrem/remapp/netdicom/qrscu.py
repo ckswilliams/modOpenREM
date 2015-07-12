@@ -35,7 +35,10 @@ def _moveStudy(MyAE, RemoteAE, d):
 
 
 
-def _querySeriesCT(MyAE, RemoteAE, d2):
+def _querySeriesCT(MyAE, RemoteAE, d2, move, studyrsp):
+    import uuid
+    from remapp.tools.dcmdatetime import make_date
+    from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
     d2.SeriesDescription = ''
     d2.SeriesNumber = ''
@@ -45,6 +48,8 @@ def _querySeriesCT(MyAE, RemoteAE, d2):
     assoc2 = MyAE.RequestAssociation(RemoteAE)
     st2 = assoc2.StudyRootFindSOPClass.SCU(d2, 1)
 
+    query_id = uuid.uuid4()
+
     print 'In _querySeriesCT'
     seRspNo = 0
 
@@ -52,26 +57,44 @@ def _querySeriesCT(MyAE, RemoteAE, d2):
         if not series[1]:
             continue
         seRspNo += 1
+        seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
+        seriesrsp.query_id = query_id
+        seriesrsp.patient_id = series[1].PatientID
+        seriesrsp.sop_instance_uid = series[1].SOPInstanceUID
+        seriesrsp.modality = series[1].Modality
+        seriesrsp.study_description = series[1].StudyDescription
+        seriesrsp.study_instance_uid = series[1].StudyInstanceUID
+        seriesrsp.study_date = make_date(series[1].StudyDate)
+        try:
+            seriesrsp.series_description = series[1].SeriesDescription
+        except:
+            pass
+        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        seriesrsp.series_number = series[1].SeriesNumber
+        seriesrsp.save()
 #        print "Series response number {0}".format(seRspNo)
         if series[1].Modality == 'SR':
             # Not sure if they will be SR are series level but CT at study level?
             # If they are, send C-Move request
-#            print "C-Move request for series with modality type SR"
-            _moveStudy(MyAE, RemoteAE, series[1])
+            #print "C-Move request for series with modality type SR"
+            if move:
+                _moveStudy(MyAE, RemoteAE, series[1])
             continue
         seNum = str(series[1].SeriesNumber)
         if (seNum == '502') or (seNum == '998') or (seNum == '990') or (seNum == '9001'):
             # Find Siemens (502 CT, 990 RF) and GE (998 CT) RDSR or Enhanced SR
             # Added 9001 for Toshiba XA based on a sample of 1
             # Then Send a C-Move request for that series
-#            print "C-Move request for series with number {0}".format(seNum)
-            _moveStudy(MyAE, RemoteAE, series[1])
+            #print "C-Move request for series with number {0}".format(seNum)
+            if move:
+                _moveStudy(MyAE, RemoteAE, series[1])
             continue
         try:
             if series[1].SeriesDescription == 'Dose Info':
                 # Get Philips Dose Info series - not SR but enough information in the header
-#                print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
-                _moveStudy(MyAE, RemoteAE, series[1])
+                #print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
+                if move:
+                    _moveStudy(MyAE, RemoteAE, series[1])
                 continue
         except AttributeError:
             # Try an image level find?
@@ -82,7 +105,7 @@ def _querySeriesCT(MyAE, RemoteAE, d2):
     print "Released series association"
 
 def qrscu(
-        rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False,
+        rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False,
         *args, **kwargs
     ):
     import uuid
@@ -90,7 +113,7 @@ def qrscu(
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset, FileDataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import DicomQRRspStudy, DicomQRRspSeries
+    from remapp.models import DicomQRRspStudy
     from remapp.tools.dcmdatetime import make_date
 
     if implicit:
@@ -111,8 +134,6 @@ def qrscu(
     MyAE.OnAssociateRequest = OnAssociateRequest
     # MyAE.OnReceiveStore = OnReceiveStore
     MyAE.start()
-
-    query_id = uuid.uuid4()
 
     # remote application entity
     RemoteAE = dict(Address=rh, Port=rp, AET=aec)
@@ -141,6 +162,8 @@ def qrscu(
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st
 
+    query_id = uuid.uuid4()
+
     responses = True
     rspno = 0
 
@@ -160,29 +183,32 @@ def qrscu(
         rsp.save()
         if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
             # new query for series level information
-            print "Starting a series level query for modality type {0}".format(ss[1].Modality)
-            _querySeriesCT(MyAE, RemoteAE, ss[1])
+            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
+            _querySeriesCT(MyAE, RemoteAE, ss[1], move, rsp)
             continue
         if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
             # get everything
-#            print "Getting a study with modality type {0}".format(ss[1].Modality)
-            _moveStudy(MyAE, RemoteAE, ss[1])
+            if move:
+                # print "Getting a study with modality type {0}".format(ss[1].Modality)
+                _moveStudy(MyAE, RemoteAE, ss[1])
             continue
         if 'MG' in ss[1].Modality:
             # get everything
-#            print "Getting a study with modality type {0}".format(ss[1].Modality)
-            _moveStudy(MyAE, RemoteAE, ss[1])
+            if move:
+                # print "Getting a study with modality type {0}".format(ss[1].Modality)
+                _moveStudy(MyAE, RemoteAE, ss[1])
             continue
         if 'SR' in ss[1].Modality:
             # get it - you may as well
-#            print "Getting a study with modality type {0}".format(ss[1].Modality)
-            _moveStudy(MyAE, RemoteAE, ss[1])
+            if move:
+                # print "Getting a study with modality type {0}".format(ss[1].Modality)
+                _moveStudy(MyAE, RemoteAE, ss[1])
             continue
         if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
             # Don't know if you need both...
             # Get series level information to look for SR
-#            print "Starting a series level query for modality type {0}".format(ss[1].Modality)
-            _querySeriesCT(MyAE, RemoteAE, ss[1])
+            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
+            _querySeriesCT(MyAE, RemoteAE, ss[1], move, rsp)
             continue
         else:
             rsp.delete()
@@ -206,13 +232,14 @@ if __name__ == "__main__":
     parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
     parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
     parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
+    parser.add_argument('-move', action='store_true', help='automatically request objects to be moved', default=False)
 
     args = parser.parse_args()
 
     sys.exit(
         qrscu(
             rh=args.remotehost, rp=args.remoteport, aet=args.aet, aec=args.aec,
-            implicit=args.implicit, explicit=args.explicit
+            implicit=args.implicit, explicit=args.explicit, move=args.move
         )
     )
 
