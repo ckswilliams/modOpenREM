@@ -1,0 +1,53 @@
+{% extends "remapp/base.html" %}
+
+
+{% block navbar %}
+  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
+  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
+  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
+  {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
+{% endblock %}
+
+
+{% block toprow %}
+  {% load pagination_tags %}
+  <p>
+    There are {{ name_list.count }} entries in this table.
+    {% if admin.adminperm %} Click on a row to edit the display name.{% endif %}
+  </p>
+{% endblock %}
+
+
+{% block mainblock %}
+  {% if admin.adminperm %}
+  <script>
+  jQuery(document).ready(function($) {
+    $(".clickable-row").click(function() {
+        window.document.location = $(this).data("href");
+    });
+  });
+  </script>
+  {% endif %}
+
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in name_list.values %}
+      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  {% paginate %}
+
+{% endblock %}

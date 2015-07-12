@@ -90,45 +90,45 @@ def dx_summary_list_filter(request):
             filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get('acquisition_mas_min')
         if requestResults.get('acquisition_mas_max'):
             filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get('acquisition_mas_max')
-
-        f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-            **filters
-            ).order_by().distinct())
-        if requestResults.get('study_description') : f.qs.filter(study_description=requestResults.get('study_description'))
-        if requestResults.get('study_dap_max')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=requestResults.get('study_dap_max'))
-        if requestResults.get('study_dap_min')     : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=requestResults.get('study_dap_min'))
-
-    elif requestResults.get('studyhist'):
-        f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-            projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=requestResults.get('study_description'),
-            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=requestResults.get('study_dap_min'),
-            projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=requestResults.get('study_dap_max')
-            ).order_by().distinct())
-        if requestResults.get('acquisition_protocol') : f.qs.filter(study_description=requestResults.get('acquisition_protocol'))
-        if requestResults.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=requestResults.get('acquisition_dap_max'))
-        if requestResults.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=requestResults.get('acquisition_dap_min'))
+        if requestResults.get('study_description'):
+            filters['study_description__icontains'] = requestResults.get('study_description')
 
     else:
-        f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).order_by().distinct())
-        if requestResults.get('study_description')    : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__acquisition_protocol=requestResults.get('study_description'))
-        if requestResults.get('study_dap_min')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__gte=requestResults.get('study_dap_min'))
-        if requestResults.get('study_dap_max')        : f.qs.filter(projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total__lte=requestResults.get('study_dap_max'))
-        if requestResults.get('acquisition_protocol') : f.qs.filter(study_description=requestResults.get('acquisition_protocol'))
-        if requestResults.get('acquisition_dap_max')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte=requestResults.get('acquisition_dap_max'))
-        if requestResults.get('acquisition_dap_min')  : f.qs.filter(projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte=requestResults.get('acquisition_dap_min'))
+        filters = {}
+        if requestResults.get('study_description'):
+            filters['study_description__icontains'] = requestResults.get('study_description')
+        if requestResults.get('acquisition_protocol'):
+            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_dap_min'):
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
+        if requestResults.get('acquisition_dap_max'):
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
 
-    if requestResults.get('accession_number')  : f.qs.filter(accession_number=requestResults.get('accession_number'))
-    if requestResults.get('date_after')        : f.qs.filter(study_date__gt=requestResults.get('date_after'))
-    if requestResults.get('date_before')       : f.qs.filter(study_date__lt=requestResults.get('date_before'))
-    if requestResults.get('institution_name')  : f.qs.filter(generalequipmentmoduleattr__institution_name=requestResults.get('institution_name'))
-    if requestResults.get('manufacturer')      : f.qs.filter(generalequipmentmoduleattr__manufacturer=requestResults.get('manufacturer'))
-    if requestResults.get('model_name')        : f.qs.filter(generalequipmentmoduleattr__manufacturer_model_name=requestResults.get('model_name'))
-    if requestResults.get('patient_age_max')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
-    if requestResults.get('patient_age_min')   : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
-    if requestResults.get('station_name')      : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
+    if requestResults.get('accession_number'):
+        filters['accession_number'] = requestResults.get('accession_number')
+    if requestResults.get('date_after'):
+        filters['study_date__gt'] = requestResults.get('date_after')
+    if requestResults.get('date_before'):
+        filters['study_date__lt'] = requestResults.get('date_before')
+    if requestResults.get('institution_name'):
+        filters['generalequipmentmoduleattr__institution_name'] = requestResults.get('institution_name')
+    if requestResults.get('manufacturer'):
+        filters['generalequipmentmoduleattr__manufacturer'] = requestResults.get('manufacturer')
+    if requestResults.get('model_name'):
+        filters['generalequipmentmoduleattr__manufacturer_model_name'] = requestResults.get('model_name')
+    if requestResults.get('patient_age_max'):
+        filters['patientstudymoduleattr__patient_age_decimal__lte'] = requestResults.get('patient_age_max')
+    if requestResults.get('patient_age_min'):
+        filters['patientstudymoduleattr__patient_age_decimal__gte'] = requestResults.get('patient_age_min')
+    if requestResults.get('station_name'):
+        filters['generalequipmentmoduleattr__station_name'] = requestResults.get('station_name')
+    if requestResults.get('display_name'):
+        filters['generalequipmentmoduleattr__unique_equipment_name__display_name'] = requestResults.get('display_name')
+
+    f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+        Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+        **filters
+    ))
 
     try:
         # See if the user has plot settings in userprofile
@@ -535,6 +535,7 @@ def ct_summary_list_filter(request):
     if requestResults.get('patient_age_max')  : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
     if requestResults.get('patient_age_min')  : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
     if requestResults.get('station_name')     : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
+    if requestResults.get('display_name')     : f.qs.filter(generalequipmentmoduleattr__unique_equipment_name__display_name=requestResults.get('display_name'))
 
     try:
         # See if the user has plot settings in userprofile
@@ -928,7 +929,6 @@ def openrem_home(request):
         'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
         'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
-        #'dx' : allstudies.filter(modality_type__contains = 'CR').count(),
         'dx' : allstudies.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).count(),
         }
 
@@ -986,37 +986,28 @@ def openrem_home(request):
             studies = allstudies.filter(modality_type__contains = modality).all()
         # End of 10/10/2014 DJP code changes
 
-        stations = studies.values_list('generalequipmentmoduleattr__station_name').distinct()
+        display_names = studies.values_list('generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
         modalitydata = {}
-        for station in stations:
+        for display_name in display_names:
             latestdate = studies.filter(
-                generalequipmentmoduleattr__station_name__exact = station[0]
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).latest('study_date').study_date
-            latestuid = studies.filter(generalequipmentmoduleattr__station_name__exact = station[0]
+            latestuid = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
-            inst_name = studies.filter(
-                generalequipmentmoduleattr__station_name__exact = station[0]
-                ).latest('study_date').generalequipmentmoduleattr_set.get().institution_name
-                
-            model_name = studies.filter(
-                generalequipmentmoduleattr__station_name__exact = station[0]
-                ).latest('study_date').generalequipmentmoduleattr_set.get().manufacturer_model_name
-            
-            institution = '{0}, {1}'.format(inst_name,model_name)
+            displayname = str(display_name[0])
                        
-            modalitydata[station[0]] = {
+            modalitydata[display_name[0]] = {
                 'total' : studies.filter(
-                    generalequipmentmoduleattr__station_name__exact = station[0]
+                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                     ).count(),
                 'latest' : latestdatetime,
-                'institution' : institution
+                'displayname' : displayname
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
-    
-    
+
     return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
 
 @login_required
@@ -1118,7 +1109,6 @@ def size_process(request, *args, **kwargs):
         else:
             messages.error(request, "Duplicate column header selection. Each field must have a different header.")
             return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
-            
 
     else:
     
@@ -1269,3 +1259,71 @@ def charts_off(request):
     response = openrem_home(request)
 
     return response
+
+
+@login_required
+def display_names_view(request):
+    from remapp.models import UniqueEquipmentNames
+    import pkg_resources # part of setuptools
+
+    f = UniqueEquipmentNames.objects.order_by('display_name')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    return_structure = {'name_list': f, 'admin':admin}
+
+    return render_to_response(
+        'remapp/displaynameview.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )
+
+@login_required
+def display_name_update(request, pk):
+    from remapp.models import UniqueEquipmentNames
+    import pkg_resources # part of setuptools
+    from remapp.forms import UpdateDisplayNameForm
+
+    if request.method == 'POST':
+        form = UpdateDisplayNameForm(request.POST)
+        if form.is_valid():
+            new_display_name = form.cleaned_data['display_name']
+            display_name_data = UniqueEquipmentNames.objects.get(pk=pk)
+            display_name_data.display_name = new_display_name
+            display_name_data.save()
+            return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+    else:
+        max_pk = UniqueEquipmentNames.objects.all().order_by('-pk').values_list('pk')[0][0]
+        if int(pk) <= max_pk:
+            f = UniqueEquipmentNames.objects.filter(pk=pk)
+        else:
+            return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+        form = UpdateDisplayNameForm(initial={'display_name': str(f.values_list('display_name')[0][0])}, auto_id=False)
+
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion' : vers}
+
+        if request.user.groups.filter(name="exportgroup"):
+            admin['exportperm'] = True
+        if request.user.groups.filter(name="admingroup"):
+            admin['adminperm'] = True
+
+        return_structure = {'name_list': f, 'admin':admin, 'form': form}
+
+    return render_to_response('remapp/displaynameupdate.html',
+                              return_structure,
+                              context_instance=RequestContext(request))

@@ -84,7 +84,7 @@
 
   <table class="table table-bordered table-hover row-clickable">
     <tr>
-      <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
       {% if admin.adminperm %}
         <th>Delete?</th>
       {% endif %}
@@ -100,7 +100,7 @@
           <a href="/openrem/ct/{{ exam.id }}/">
             {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
             {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-            {{ exam.generalequipmentmoduleattr_set.get.station_name }}
+            {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
           </a>
         </td>
         <td>

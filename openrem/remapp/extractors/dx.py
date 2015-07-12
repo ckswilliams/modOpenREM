@@ -405,7 +405,7 @@ def _projectionxrayradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import GeneralEquipmentModuleAttr
+    from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
@@ -421,6 +421,29 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.spatial_resolution = get_value_kw("SpatialResolution",dataset)
     equip.date_of_last_calibration = get_date("DateOfLastCalibration",dataset)
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration",dataset)
+
+    equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
+                                                                             institution_name=equip.institution_name,
+                                                                             station_name=equip.station_name,
+                                                                             institutional_department_name=equip.institutional_department_name,
+                                                                             manufacturer_model_name=equip.manufacturer_model_name,
+                                                                             device_serial_number=equip.device_serial_number,
+                                                                             software_versions=equip.software_versions,
+                                                                             gantry_id=equip.gantry_id
+                                                                             )
+    if created:
+        if equip.institution_name and equip.station_name:
+            equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
+        elif equip.institution_name:
+            equip_display_name.display_name = equip.institution_name
+        elif equip.station_name:
+            equip_display_name.display_name = equip.station_name
+        else:
+            equip_display_name.display_name = 'Blank'
+        equip_display_name.save()
+
+    equip.unique_equipment_name = UniqueEquipmentNames(pk=equip_display_name.pk)
+
     equip.save()
 
 
