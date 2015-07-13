@@ -89,5 +89,65 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             series: seriesDrilldown
         }
     });
+
+    $('#sortAscY').click(function() {
+		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
+			return b.y < a.y;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortDesY').click(function() {
+		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
+			return b.y > a.y;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortAscFreq').click(function() {
+		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
+			return b.freq < a.freq;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortDesFreq').click(function() {
+		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
+			return b.freq > a.freq;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortAscAlph').click(function() {
+		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
+			return b.category < a.category;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortDesAlph').click(function() {
+		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
+			return b.category > a.category;
+		});
+        rebuildSeries();
+    });
+
+    function rebuildSeries() {
+        var newData = {};
+        var newCategories = [];
+
+        for (var i = 0; i < chartDAPperAcquisition.series[0].data.length; i++) {
+            newData.x = i;
+            newData.y = chartDAPperAcquisition.series[0].data[i].y;
+            newData.category = chartDAPperAcquisition.series[0].data[i].category;
+            newData.drilldown = chartDAPperAcquisition.series[0].data[i].drilldown;
+            newData.name = chartDAPperAcquisition.series[0].data[i].name;
+            newData.freq = chartDAPperAcquisition.series[0].data[i].freq;
+            newCategories.push(chartDAPperAcquisition.series[0].data[i].category);
+            chartDAPperAcquisition.series[0].data[i].update(newData, false);
+        }
+        chartDAPperAcquisition.xAxis[0].categories = newCategories;
+        chartDAPperAcquisition.redraw({ duration: 1000 });
+    }
 });
 

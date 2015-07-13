@@ -91,5 +91,65 @@ var chartAcqDLP = new Highcharts.Chart({
             series: seriesDrilldown
         }
     });
+
+    $('#sortAscY').click(function() {
+		chartAcqDLP.series[0].data.sort(function(a, b) {
+			return b.y < a.y;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortDesY').click(function() {
+		chartAcqDLP.series[0].data.sort(function(a, b) {
+			return b.y > a.y;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortAscFreq').click(function() {
+		chartAcqDLP.series[0].data.sort(function(a, b) {
+			return b.freq < a.freq;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortDesFreq').click(function() {
+		chartAcqDLP.series[0].data.sort(function(a, b) {
+			return b.freq > a.freq;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortAscAlph').click(function() {
+		chartAcqDLP.series[0].data.sort(function(a, b) {
+			return b.category < a.category;
+		});
+        rebuildSeries();
+    });
+
+    $('#sortDesAlph').click(function() {
+		chartAcqDLP.series[0].data.sort(function(a, b) {
+			return b.category > a.category;
+		});
+        rebuildSeries();
+    });
+
+    function rebuildSeries() {
+        var newData = {};
+        var newCategories = [];
+
+        for (var i = 0; i < chartAcqDLP.series[0].data.length; i++) {
+            newData.x = i;
+            newData.y = chartAcqDLP.series[0].data[i].y;
+            newData.category = chartAcqDLP.series[0].data[i].category;
+            newData.drilldown = chartAcqDLP.series[0].data[i].drilldown;
+            newData.name = chartAcqDLP.series[0].data[i].name;
+            newData.freq = chartAcqDLP.series[0].data[i].freq;
+            newCategories.push(chartAcqDLP.series[0].data[i].category);
+            chartAcqDLP.series[0].data[i].update(newData, false);
+        }
+        chartAcqDLP.xAxis[0].categories = newCategories;
+        chartAcqDLP.redraw({ duration: 1000 });
+    }
 });
 
