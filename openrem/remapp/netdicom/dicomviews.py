@@ -64,6 +64,7 @@ def stop_store(request, pk):
             print "Invalid primary key or no task_id recorded"
     return redirect('/openrem/admin/dicomsummary/')
 
+import json
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import Http404
 
@@ -83,3 +84,25 @@ def ajax_test(request):
 #     else:
 #         raise Http404
 
+@csrf_exempt
+def ajax_test2(request):
+    import uuid
+    from remapp.netdicom.qrscu import qrscu
+
+    query_id = str(uuid.uuid4())
+    task = qrscu.delay(rh="localhost", rp=1104, query_id=query_id)
+
+    resp = {}
+    resp['message'] = 'this might be possible'
+    resp['query_id'] = query_id
+    return HttpResponse(json.dumps(resp), content_type='application/json')
+
+@csrf_exempt
+def ajax_test3(request):
+
+    data = request.POST
+    query_id = data.get('query_id')
+
+    resp = {}
+    resp['message'] = 'this is possible - we are performing query_id {0}'.format(query_id)
+    return HttpResponse(json.dumps(resp), content_type='application/json')

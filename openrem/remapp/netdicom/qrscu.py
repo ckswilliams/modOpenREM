@@ -104,6 +104,9 @@ def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
     assoc2.Release(0)
     print "Released series association"
 
+from celery import shared_task
+
+@shared_task
 def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
         *args, **kwargs
