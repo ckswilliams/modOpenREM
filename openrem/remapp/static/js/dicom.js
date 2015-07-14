@@ -30,27 +30,9 @@ $(document).ready(function(){
             },
             type: "POST",
             dataType: "json",
-            success: setInterval(function( json ) {
-                $.ajax({
-                    url: "/openrem/admin/dicomstore/ajax_test3",
-                    data: {
-                        query_id: json.query_id
-                    },
-                    type: "POST",
-                    dataType: "json",
-                    success: function( json ) {
-                        $( '#qr-status' ).text( json.message);
-                    },
-                    error: function( xhr, status, errorThrown ) {
-                        alert( "Sorry, there was a problem getting the status!" );
-                        console.log( "Error: " + errorThrown );
-                        console.log( "Status: " + status );
-                        console.dir( xhr );
-                    },
-
-                });
-
-            }, 1000),
+            success: function( json ) {
+                query_progress( json );
+            },
             error: function( xhr, status, errorThrown ) {
                 alert( "Sorry, there was a problem starting the job!" );
                 console.log( "Error: " + errorThrown );
@@ -63,3 +45,27 @@ $(document).ready(function(){
         });
     });
 });
+
+
+function query_progress( json ) {
+    $.ajax({
+        url: "/openrem/admin/dicomstore/ajax_test3",
+        data: {
+            query_id: json.query_id
+        },
+        type: "POST",
+        dataType: "json",
+        success: function( json ) {
+            alert( "I'm in test3!");
+            $( '#qr-status' ).text( json.message);
+        },
+        error: function( xhr, status, errorThrown ) {
+            alert( "Sorry, there was a problem getting the status!" );
+            console.log( "Error: " + errorThrown );
+            console.log( "Status: " + status );
+            console.dir( xhr );
+        },
+
+    });
+
+}
