@@ -3,6 +3,7 @@ $(function () {
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DAP per acquisition protocol';
 var tooltipData = [2];
+var originalData = seriesData;
 
 var chartDAPperAcquisition = new Highcharts.Chart({
         chart: {
@@ -83,7 +84,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
         },
         series: [{
             name: 'Mean DAP per acquisition protocol',
-            data: seriesData
+            data: $.extend(true, [], originalData), // use copy
         }],
         drilldown: {
             series: seriesDrilldown
@@ -91,63 +92,81 @@ var chartDAPperAcquisition = new Highcharts.Chart({
     });
 
     $('#sortAscY').click(function() {
-		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
-			return b.y < a.y;
-		});
+        bubbleSort(originalData, "y", 1);
         rebuildSeries();
     });
 
     $('#sortDesY').click(function() {
-		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
-			return b.y > a.y;
-		});
+        bubbleSort(originalData, "y", -1);
         rebuildSeries();
     });
 
     $('#sortAscFreq').click(function() {
-		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
-			return b.freq < a.freq;
-		});
+        bubbleSort(originalData, "freq", 1);
         rebuildSeries();
     });
 
     $('#sortDesFreq').click(function() {
-		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
-			return b.freq > a.freq;
-		});
+        bubbleSort(originalData, "freq", -1);
         rebuildSeries();
     });
 
     $('#sortAscAlph').click(function() {
-		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
-			return b.category < a.category;
-		});
+        bubbleSort(originalData, "name", 1);
         rebuildSeries();
     });
 
     $('#sortDesAlph').click(function() {
-		chartDAPperAcquisition.series[0].data.sort(function(a, b) {
-			return b.category > a.category;
-		});
+        bubbleSort(originalData, "name", -1);
         rebuildSeries();
     });
 
     function rebuildSeries() {
-        var newData = {};
-        var newCategories = [];
+            var newData = {};
+            var newCategories = [],
+                newPoints = [],
+                data = $.extend(true, [], originalData),
+                point;
 
-        for (var i = 0; i < chartDAPperAcquisition.series[0].data.length; i++) {
-            newData.x = i;
-            newData.y = chartDAPperAcquisition.series[0].data[i].y;
-            newData.category = chartDAPperAcquisition.series[0].data[i].category;
-            newData.drilldown = chartDAPperAcquisition.series[0].data[i].drilldown;
-            newData.name = chartDAPperAcquisition.series[0].data[i].name;
-            newData.freq = chartDAPperAcquisition.series[0].data[i].freq;
-            newCategories.push(chartDAPperAcquisition.series[0].data[i].category);
-            chartDAPperAcquisition.series[0].data[i].update(newData, false);
-        }
-        chartDAPperAcquisition.xAxis[0].categories = newCategories;
-        chartDAPperAcquisition.redraw({ duration: 1000 });
+            for (var i = 0; i < data.length; i++) {
+                point = data[i];
+                newCategories.push(point.name);
+                chartDAPperAcquisition.series[0].data[i].update({
+                    name: point.name,
+                    y: point.y,
+                    x: i,
+                    freq: point.freq,
+                    drilldown: point.drilldown,
+                    category: point.name
+                }, false);
+            }
+            chartDAPperAcquisition.xAxis[0].categories = newCategories;
+            chartDAPperAcquisition.redraw({ duration: 1000 });
+    }
+
+    function bubbleSort(a, p, d) {
+        var swapped;
+        do {
+            swapped = false;
+            for (var i=0; i < a.length-1; i++) {
+                if (d == 1) {
+                    if (a[i][p] > a[i + 1][p]) {
+                        var temp = a[i];
+                        a[i] = a[i + 1];
+                        a[i + 1] = temp;
+                        swapped = true;
+                    }
+                }
+                else {
+                    if (a[i][p] < a[i + 1][p]) {
+                        var temp = a[i];
+                        a[i] = a[i + 1];
+                        a[i + 1] = temp;
+                        swapped = true;
+                    }
+                }
+            }
+        } while (swapped);
     }
 });
 
