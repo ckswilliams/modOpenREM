@@ -105,4 +105,5 @@ def ajax_test3(request):
 
     resp = {}
     resp['message'] = 'this is possible - we are performing query_id {0}'.format(query_id)
+    resp['status'] = 'not complete'
     return HttpResponse(json.dumps(resp), content_type='application/json')

@@ -58,13 +58,19 @@ function query_progress( json ) {
         success: function( json ) {
             alert( "I'm in test3!");
             $( '#qr-status' ).text( json.message);
+            if (json.status != "complete") setTimeout(function(){
+                var data = {
+                    query_id: json.query_id
+                }
+                query_progress( data );
+            }, 1000);
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the status!" );
             console.log( "Error: " + errorThrown );
             console.log( "Status: " + status );
             console.dir( xhr );
-        },
+        }
 
     });
 
