@@ -42,7 +42,7 @@ class DicomQRRspStudy(models.Model):
     study_description = models.TextField(blank=True, null=True)
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
-
+    patient_age_decimal = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
 
 class DicomQRRspSeries(models.Model):
     dicom_qr_rsp_study = models.ForeignKey(DicomQRRspStudy)
@@ -53,6 +53,7 @@ class DicomQRRspSeries(models.Model):
     study_description = models.TextField(blank=True, null=True)
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
+    patient_age_decimal = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
     series_description = models.TextField(blank=True, null=True)
     series_instance_uid = models.TextField(blank=True, null=True)
     series_number = models.IntegerField(blank=True, null=True)
