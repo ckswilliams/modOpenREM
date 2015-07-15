@@ -265,8 +265,9 @@ def _doserelateddistancemeasurements(dataset,mech):
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
+    model_name = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name.lower()
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
-    if dist.distance_source_to_detector and "kodak" in manufacturer:
+    if dist.distance_source_to_detector and "kodak" in manufacturer and "dr 7500" in model_name:
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
     dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToPatient',dataset)
     dist.distance_source_to_isocenter = get_value_kw('DistanceSourceToIsocenter',dataset)
