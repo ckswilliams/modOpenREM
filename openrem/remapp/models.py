@@ -34,8 +34,13 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 from django.core.urlresolvers import reverse
 
-class DicomQRRspStudy(models.Model):
+class DicomQuery(models.Model):
+    complete = models.BooleanField(default=False)
     query_id = models.CharField(max_length=64)
+
+
+class DicomQRRspStudy(models.Model):
+    dicom_query = models.ForeignKey(DicomQuery)
     patient_id = models.CharField(max_length=64, blank=True, null=True)
     sop_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
@@ -43,6 +48,7 @@ class DicomQRRspStudy(models.Model):
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
     patient_age_decimal = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
+
 
 class DicomQRRspSeries(models.Model):
     dicom_qr_rsp_study = models.ForeignKey(DicomQRRspStudy)

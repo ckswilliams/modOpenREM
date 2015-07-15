@@ -117,7 +117,7 @@ def qrscu(
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset, FileDataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import DicomQRRspStudy
+    from remapp.models import DicomQRRspStudy, DicomQuery
     from remapp.tools.dcmdatetime import make_date
 
     if implicit:
@@ -171,6 +171,11 @@ def qrscu(
     if not query_id:
         query_id = uuid.uuid4()
 
+    query = DicomQuery.objects.create()
+    query.query_id = query_id
+    query.complete = False
+    query.save()
+
     responses = True
     rspno = 0
 
@@ -179,7 +184,7 @@ def qrscu(
             continue
         rspno += 1
         print "Response {0}".format(rspno)
-        rsp = DicomQRRspStudy.objects.create()
+        rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
         rsp.patient_id = ss[1].PatientID
         rsp.sop_instance_uid = ss[1].SOPInstanceUID
@@ -197,7 +202,6 @@ def qrscu(
                 rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('12')
             elif ss[1].PatientAge[-1:]=='D':
                 rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('365.25')
-
         rsp.save()
 
         if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
@@ -237,6 +241,9 @@ def qrscu(
 
     # done
     MyAE.Quit()
+    query.complete = True
+    query.save()
+
 
 
 if __name__ == "__main__":

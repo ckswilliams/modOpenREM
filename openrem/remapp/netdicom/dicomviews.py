@@ -90,6 +90,7 @@ def ajax_test2(request):
     from remapp.netdicom.qrscu import qrscu
 
     query_id = str(uuid.uuid4())
+    print query_id
     task = qrscu.delay(rh="localhost", rp=1104, query_id=query_id)
 
     resp = {}
@@ -99,11 +100,28 @@ def ajax_test2(request):
 
 @csrf_exempt
 def ajax_test3(request):
-
-    data = request.POST
-    query_id = data.get('query_id')
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomQuery
 
     resp = {}
+    data = request.POST
+    query_id = data.get('query_id')
+    try:
+        query = DicomQuery.objects.get(query_id=query_id)
+    except ObjectDoesNotExist:
+        resp['status'] = 'not complete'
+        resp['message'] = 'Query not yet started'
+        return HttpResponse(json.dumps(resp), content_type='application/json')
+
+    study_rsp = query.dicomqrrspstudy_set.all()
+
+
+
+
+
     resp['message'] = 'this is possible - we are performing query_id {0}'.format(query_id)
-    resp['status'] = 'not complete'
+    if query.complete:
+        resp['status'] = 'complete'
+    else:
+        resp['status'] = 'not complete'
     return HttpResponse(json.dumps(resp), content_type='application/json')
