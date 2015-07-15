@@ -1,10 +1,9 @@
 $(function () {
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'DLP per requested procedure type';
+    var tooltipData = [2];
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'DLP per requested procedure type';
-var tooltipData = [2];
-
-var chartRequestDLP = new Highcharts.Chart({
+    var chartRequestDLP = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'histogramRequestPlotDIV',
@@ -105,4 +104,3 @@ var chartRequestDLP = new Highcharts.Chart({
         }
     });
 });
-

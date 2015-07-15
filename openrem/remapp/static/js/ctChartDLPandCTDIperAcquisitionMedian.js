@@ -1,5 +1,4 @@
 $(function () {
-
     var drilldownTitle = 'Histogram of ';
     var defaultTitle = 'Median DLP and CTDI<sub>vol</sub> per acquisition protocol';
     var tooltipData = [2];

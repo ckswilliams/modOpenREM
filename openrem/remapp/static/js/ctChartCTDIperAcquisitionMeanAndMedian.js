@@ -1,10 +1,9 @@
 $(function () {
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'CTDI<sub>vol</sub> per acquisition protocol';
+    var tooltipData = [2];
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'CTDI<sub>vol</sub> per acquisition protocol';
-var tooltipData = [2];
-
-var chartAcqCTDI = new Highcharts.Chart({
+    var chartAcqCTDI = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'histogramPlotCTDIdiv',
@@ -105,4 +104,3 @@ var chartAcqCTDI = new Highcharts.Chart({
         }
     });
 });
-

@@ -1,10 +1,9 @@
 $(function () {
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'DLP per study description';
+    var tooltipData = [2];
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'DLP per study description';
-var tooltipData = [2];
-
-var chartStudyDLP = new Highcharts.Chart({
+    var chartStudyDLP = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'histogramStudyPlotDIV',
@@ -105,4 +104,3 @@ var chartStudyDLP = new Highcharts.Chart({
         }
     });
 });
-
