@@ -268,13 +268,16 @@ def _doserelateddistancemeasurements(dataset,mech):
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
     if dist.distance_source_to_detector and "kodak" in manufacturer:
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
-    dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToEntrance',dataset)
+    dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToPatient',dataset)
     dist.distance_source_to_isocenter = get_value_kw('DistanceSourceToIsocenter',dataset)
-    dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
-    dist.table_longitudinal_position = get_value_kw('TableLongitudinalPosition',dataset)
-    dist.table_lateral_position = get_value_kw('TableLateralPosition',dataset)
-    dist.table_height_position = get_value_kw('TableHeightPosition',dataset)
-    dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
+    # DistanceSourceToReferencePoint isn't a DICOM tag. Same as DistanceSourceToPatient?
+#    dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
+    # Table longitudinal and lateral positions not DICOM elements.
+#    dist.table_longitudinal_position = get_value_kw('TableLongitudinalPosition',dataset)
+#    dist.table_lateral_position = get_value_kw('TableLateralPosition',dataset)
+    dist.table_height_position = get_value_kw('TableHeight',dataset)
+    # DistanceSourceToTablePlane not a DICOM tag.
+#    dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
     dist.radiological_thickness = get_value_num(0x00451049,dataset)
     dist.save()        
 
