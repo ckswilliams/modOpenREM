@@ -267,16 +267,20 @@ def _doserelateddistancemeasurements(dataset,mech):
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
+    model_name = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name.lower()
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
-    if dist.distance_source_to_detector and "kodak" in manufacturer:
+    if dist.distance_source_to_detector and "kodak" in manufacturer and "dr 7500" in model_name:
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
-    dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToEntrance',dataset)
+    dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToPatient',dataset)
     dist.distance_source_to_isocenter = get_value_kw('DistanceSourceToIsocenter',dataset)
-    dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
-    dist.table_longitudinal_position = get_value_kw('TableLongitudinalPosition',dataset)
-    dist.table_lateral_position = get_value_kw('TableLateralPosition',dataset)
-    dist.table_height_position = get_value_kw('TableHeightPosition',dataset)
-    dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
+    # DistanceSourceToReferencePoint isn't a DICOM tag. Same as DistanceSourceToPatient?
+#    dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
+    # Table longitudinal and lateral positions not DICOM elements.
+#    dist.table_longitudinal_position = get_value_kw('TableLongitudinalPosition',dataset)
+#    dist.table_lateral_position = get_value_kw('TableLateralPosition',dataset)
+    dist.table_height_position = get_value_kw('TableHeight',dataset)
+    # DistanceSourceToTablePlane not a DICOM tag.
+#    dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
     dist.radiological_thickness = get_value_num(0x00451049,dataset)
     dist.save()        
 
