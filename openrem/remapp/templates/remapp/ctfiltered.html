@@ -217,18 +217,18 @@
               {% if request.user.userprofile.plotAverageChoice == 'mean' %}
               <table style="border:none">
                   <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortAscY" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortAscFreq" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a id="sortAscAlph" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                       <td rowspan="2" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                           Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                           this will include acquisitions at the upper bin boundary, so in some cases may display more data than
                           shown in the histogram bin.</td>
                   </tr>
                   <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortDesY" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortDesFreq" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a id="sortDesAlph" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
               {% else %}

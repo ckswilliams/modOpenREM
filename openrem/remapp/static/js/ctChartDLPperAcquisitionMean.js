@@ -1,9 +1,8 @@
-$(function () {
+//$(function () {
 
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DLP per acquisition protocol';
 var tooltipData = [2];
-var originalData = seriesData;
 
 var chartAcqDLP = new Highcharts.Chart({
         chart: {
@@ -86,64 +85,38 @@ var chartAcqDLP = new Highcharts.Chart({
         series: [{
             useHTML: true,
             name: 'Mean DLP',
-            data: $.extend(true, [], originalData), // use copy
+            data: seriesData
         }],
         drilldown: {
             series: seriesDrilldown
         }
     });
 
-    $('#sortAscY').click(function() {
-        bubbleSort(originalData, "y", 1);
-        rebuildSeries();
-    });
+    function seriesSort(chartContainer, p, d) {
+        var chart = $(chartContainer).highcharts();
+        if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "object") {
+            bubbleSort(chart.series[0].data, p, d);
+            rebuildSeries(chartContainer);
+        }
+    }
 
-    $('#sortDesY').click(function() {
-        bubbleSort(originalData, "y", -1);
-        rebuildSeries();
-    });
+    function rebuildSeries(chartContainer) {
+        var chart = $(chartContainer).highcharts();
+        var newData = {};
+        var newCategories = [];
 
-    $('#sortAscFreq').click(function() {
-        bubbleSort(originalData, "freq", 1);
-        rebuildSeries();
-    });
-
-    $('#sortDesFreq').click(function() {
-        bubbleSort(originalData, "freq", -1);
-        rebuildSeries();
-    });
-
-    $('#sortAscAlph').click(function() {
-        bubbleSort(originalData, "name", 1);
-        rebuildSeries();
-    });
-
-    $('#sortDesAlph').click(function() {
-        bubbleSort(originalData, "name", -1);
-        rebuildSeries();
-    });
-
-    function rebuildSeries() {
-            var newData = {};
-            var newCategories = [],
-                newPoints = [],
-                data = $.extend(true, [], originalData),
-                point;
-
-            for (var i = 0; i < data.length; i++) {
-                point = data[i];
-                newCategories.push(point.name);
-                chartAcqDLP.series[0].data[i].update({
-                    name: point.name,
-                    y: point.y,
-                    x: i,
-                    freq: point.freq,
-                    drilldown: point.drilldown,
-                    category: point.name
-                }, false);
-            }
-            chartAcqDLP.xAxis[0].categories = newCategories;
-            chartAcqDLP.redraw({ duration: 1000 });
+        for (var i = 0; i < chart.series[0].data.length; i++) {
+            newData.x = i;
+            newData.y = chart.series[0].data[i].y;
+            newData.category = chart.series[0].data[i].category;
+            newData.drilldown = chart.series[0].data[i].drilldown;
+            newData.name = chart.series[0].data[i].name;
+            newData.freq = chart.series[0].data[i].freq;
+            newCategories.push(chart.series[0].data[i].category);
+            chart.series[0].data[i].update(newData, false);
+        }
+        chart.xAxis[0].categories = newCategories;
+        chart.redraw({ duration: 1000 });
     }
 
     function bubbleSort(a, p, d) {
@@ -170,5 +143,4 @@ var chartAcqDLP = new Highcharts.Chart({
             }
         } while (swapped);
     }
-});
-
+//});
