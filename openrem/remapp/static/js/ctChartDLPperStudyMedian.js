@@ -1,5 +1,3 @@
-$(function () {
-
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Median DLP per study description';
 var tooltipData = [2];
@@ -91,5 +89,3 @@ var chartStudyDLP = new Highcharts.Chart({
             series: studySeriesDrilldown
         }
     });
-});
-

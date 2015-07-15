@@ -215,7 +215,7 @@
             <div class="panel-body">
               <div id="histogramPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
 
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or 'median' %}
               <table style="border:none">
                   <tr>
                       <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
@@ -266,10 +266,31 @@
           <div id="collapseCTDI" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="histogramPlotCTDIdiv" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
-              <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                more data than shown in the histogram bin.</p>
+
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or 'median' %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+                          Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+                          more data than shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% else %}
+                  <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+                  <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+                      Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+                      more data than shown in the histogram bin.</p>
+              {% endif %}
+
             </div>
           </div>
         </div>
@@ -418,7 +439,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesDataCTDI = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_ctdi}},drilldown:protocolNames[{{forloop.counter}}-1]+'CTDI'{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_ctdi}},freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]+'CTDI'{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -426,7 +447,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianDataCTDI = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_ctdi}}/10000000000,drilldown:protocolNames[{{forloop.counter}}-1]+'CTDI'{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_ctdi}}/10000000000,freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]+'CTDI'{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -512,12 +533,8 @@
           <div id="collapseThree" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="histogramStudyPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that study.</p>
-              <p>Click on a histogram bin tooltip to see the studies in the bin. Note that this will
-                include studies at the upper bin boundary, so in some cases may display more data than
-                shown in the histogram bin.</p>
 
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or 'median' %}
               <table style="border:none">
                   <tr>
                       <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
@@ -591,10 +608,31 @@
           <div id="collapseRequestMeanDLP" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="histogramRequestPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that study.</p>
-              <p>Click on a histogram bin tooltip to see the studies in the bin. Note that this will
-                include studies at the upper bin boundary, so in some cases may display more data than
-                shown in the histogram bin.</p>
+
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or 'median' %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px">Click on an individual column to show a histogram of data for that requested exam type.<br>
+                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                          this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                          shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% else %}
+                  <p>Click on an individual column to show a histogram of data for that requested exam type.</p>
+                  <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                      this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                      shown in the histogram bin.</p>
+              {% endif %}
+
             </div>
           </div>
         </div>
@@ -832,7 +870,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var requestSeriesData = [
           {% for testData in requestSummary %}
-            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},freq:{{testData.num_req}},drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -840,7 +878,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var requestSeriesMedianData = [
           {% for testData in requestSummary %}
-            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,freq:{{testData.num_req}},drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -889,12 +927,6 @@
       <script src="{{ STATIC_URL }}js/ctChartRequestFrequency.js"></script>
       <!-- End of JavaScript for request pie chart -->
     {% endif %}
-
-
-
-
-
-
 
 
     {% if request.user.userprofile.plotCTStudyPerDayAndHour %}

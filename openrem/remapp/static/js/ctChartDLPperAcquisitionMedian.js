@@ -1,5 +1,3 @@
-$(function () {
-
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Median DLP per acquisition protocol';
 var tooltipData = [2];
@@ -91,5 +89,3 @@ var chartAcqDLP = new Highcharts.Chart({
             series: seriesDrilldown
         }
     });
-});
-

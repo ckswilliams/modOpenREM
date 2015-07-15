@@ -1,5 +1,3 @@
-$(function () {
-
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean CTDI<sub>vol</sub> per acquisition protocol';
 var tooltipData = [2];
@@ -91,5 +89,3 @@ var chartAcqCTDI = new Highcharts.Chart({
             series: seriesDrilldownCTDI
         }
     });
-});
-

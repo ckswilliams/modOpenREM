@@ -1,5 +1,3 @@
-$(function () {
-
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Median DLP per requested procedure type';
 var tooltipData = [2];
@@ -91,5 +89,3 @@ var chartRequestDLP = new Highcharts.Chart({
             series: requestSeriesDrilldown
         }
     });
-});
-
