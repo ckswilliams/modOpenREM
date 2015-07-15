@@ -1,4 +1,4 @@
-$(function () {
+//$(function () {
 
 var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'Mean DLP per study description';
@@ -91,5 +91,5 @@ var chartStudyDLP = new Highcharts.Chart({
             series: studySeriesDrilldown
         }
     });
-});
+//});
 

@@ -147,6 +147,7 @@
     <script src="{{ STATIC_URL }}js/highcharts.js"></script>
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
     <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+    <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
     <!-- End of include JavaScript to enable highcharts plots -->
 
     <!-- JavaScript to enable bootstrap tooltips -->
@@ -515,6 +516,31 @@
               <p>Click on a histogram bin tooltip to see the studies in the bin. Note that this will
                 include studies at the upper bin boundary, so in some cases may display more data than
                 shown in the histogram bin.</p>
+
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px">Click on an individual column to show a histogram of data for that study.<br>
+                          Click on a histogram bin tooltip to see the studies in the bin. Note that this will
+                          include studies at the upper bin boundary, so in some cases may display more data than
+                          shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% else %}
+                  <p>Click on an individual column to show a histogram of data for that study.</p>
+                  <p>Click on a histogram bin tooltip to see the studies in the bin. Note that this will
+                      include studies at the upper bin boundary, so in some cases may display more data than
+                      shown in the histogram bin.</p>
+              {% endif %}
+
             </div>
           </div>
         </div>
@@ -695,7 +721,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var studySeriesData = [
           {% for testData in studySummary %}
-            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},freq:{{testData.num_acq}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -703,7 +729,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var studySeriesMedianData = [
           {% for testData in studySummary %}
-            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,freq:{{testData.num_acq}},drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];

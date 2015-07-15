@@ -1,0 +1,51 @@
+function seriesSort(chartContainer, p, d) {
+    var chart = $(chartContainer).highcharts();
+    if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "object") {
+        bubbleSort(chart.series[0].data, p, d);
+        rebuildSeries(chartContainer);
+    }
+}
+
+function rebuildSeries(chartContainer) {
+    var chart = $(chartContainer).highcharts();
+    var newData = {};
+    var newCategories = [];
+
+    for (var i = 0; i < chart.series[0].data.length; i++) {
+        newData.x = i;
+        newData.y = chart.series[0].data[i].y;
+        newData.category = chart.series[0].data[i].category;
+        newData.drilldown = chart.series[0].data[i].drilldown;
+        newData.name = chart.series[0].data[i].name;
+        newData.freq = chart.series[0].data[i].freq;
+        newCategories.push(chart.series[0].data[i].category);
+        chart.series[0].data[i].update(newData, false);
+    }
+    chart.xAxis[0].categories = newCategories;
+    chart.redraw({ duration: 1000 });
+}
+
+function bubbleSort(a, p, d) {
+    var swapped;
+    do {
+        swapped = false;
+        for (var i=0; i < a.length-1; i++) {
+            if (d == 1) {
+                if (a[i][p] > a[i + 1][p]) {
+                    var temp = a[i];
+                    a[i] = a[i + 1];
+                    a[i + 1] = temp;
+                    swapped = true;
+                }
+            }
+            else {
+                if (a[i][p] < a[i + 1][p]) {
+                    var temp = a[i];
+                    a[i] = a[i + 1];
+                    a[i + 1] = temp;
+                    swapped = true;
+                }
+            }
+        }
+    } while (swapped);
+}
