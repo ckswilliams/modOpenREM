@@ -106,6 +106,7 @@ def ajax_test3(request):
     resp = {}
     data = request.POST
     query_id = data.get('query_id')
+    resp['query_id'] = query_id
     try:
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
@@ -122,6 +123,7 @@ def ajax_test3(request):
     resp['message'] = 'this is possible - we are performing query_id {0}'.format(query_id)
     if query.complete:
         resp['status'] = 'complete'
+        resp['message'] ='Finito'
     else:
         resp['status'] = 'not complete'
     return HttpResponse(json.dumps(resp), content_type='application/json')
