@@ -25,20 +25,15 @@ $(function () {
                     chartAcqCTDI.setTitle({ text: defaultTitle }, { text: '' });
                     chartAcqCTDI.yAxis[0].setTitle({text:'CTDI<sub>vol</sub> (mGy)'});
                     chartAcqCTDI.xAxis[0].setTitle({text:'Protocol name'});
-                    chartAcqCTDI.xAxis[0].setCategories(protocolNames, true);
-                    chartAcqCTDI.xAxis[0].update({labels:{rotation:90}});
+                    chartAcqCTDI.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartAcqCTDI.tooltip.options.formatter = function(args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('Mean') != -1) {
-                            var this_series_label = ' mean CTDI';
-                            var this_series = args.chart.series[0];
-                        }
-                        else {
-                            var this_series_label = ' median CTDI';
-                            var this_series = args.chart.series[1];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -70,17 +65,7 @@ $(function () {
         },
         tooltip: {
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('Mean') != -1) {
-                    var this_series_label = ' mean CTDI';
-                    var this_series = args.chart.series[0];
-                }
-                else {
-                    var this_series_label = ' median CTDI';
-                    var this_series = args.chart.series[1];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                return this.point.tooltip;
             },
             useHTML: true
         },

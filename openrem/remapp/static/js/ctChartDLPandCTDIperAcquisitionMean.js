@@ -56,20 +56,17 @@ $(function () {
                     chartAcqDLPandCTDI.yAxis[1].setTitle({text: 'CTDI<sub>vol</sub> (mGy)'});
                     chartAcqDLPandCTDI.xAxis[0].setTitle({text: ''});
                     chartAcqDLPandCTDI.xAxis[1].setTitle({text: ''});
-                    chartAcqDLPandCTDI.xAxis[0].setCategories(protocolNames, true);
-                    chartAcqDLPandCTDI.xAxis[0].update({labels: {rotation: 90}});
+                    //chartAcqDLPandCTDI.xAxis[0].setCategories(protocolNames, true);
+                    //chartAcqDLPandCTDI.xAxis[0].update({labels: {rotation: 90}});
+                    chartAcqDLPandCTDI.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartAcqDLPandCTDI.tooltip.options.formatter = function (args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('DLP') != -1) {
-                            var this_series_label = ' mGy.cm DLP';
-                            var this_series = args.chart.series[0];
-                        }
-                        else {
-                            var this_series_label = ' mGy CTDI<sub>vol</sub>';
-                            var this_series = args.chart.series[1];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     };
                     chartAcqDLPandCTDI.yAxis[1].update({
                         labels: {
@@ -123,17 +120,7 @@ $(function () {
         tooltip: {
             useHTML: true,
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('DLP') != -1) {
-                    var this_series_label = ' mGy.cm DLP';
-                    var this_series = args.chart.series[0];
-                }
-                else {
-                    var this_series_label = ' mGy CTDI<sub>vol</sub>';
-                    var this_series = args.chart.series[1];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                return this.point.tooltip;
             }
         },
         plotOptions: {

@@ -16,27 +16,24 @@ $(function () {
                     chartAcqCTDI.xAxis[0].setTitle({text: 'CTDI<sub>vol</sub> range (mGy)'});
                     chartAcqCTDI.xAxis[0].setCategories([], true);
                     chartAcqCTDI.tooltip.options.formatter = function () {
-                        var xyArr = [];
-                        $.each(this.points, function () {
-                            var linkText = 'acquisition_ctdi_min=' + protocolBinsCTDI[tooltipData[1]][this.x] + '&acquisition_ctdi_max=' + protocolBinsCTDI[tooltipData[1]][this.x + 1] + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
+                        var linkText = 'acquisition_ctdi_min=' + protocolBinsCTDI[tooltipData[1]][this.x] + '&acquisition_ctdi_max=' + protocolBinsCTDI[tooltipData[1]][this.x + 1] + '&acquisition_protocol=' + tooltipData[0];
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>';
+                        return returnValue;
                     }
                 },
                 drillup: function (e) {
                     chartAcqCTDI.setTitle({text: defaultTitle}, {text: ''});
                     chartAcqCTDI.yAxis[0].setTitle({text: 'Median CTDI<sub>vol</sub> (mGy)'});
                     chartAcqCTDI.xAxis[0].setTitle({text: 'Protocol name'});
-                    chartAcqCTDI.xAxis[0].setCategories(protocolNames, true);
-                    chartAcqCTDI.xAxis[0].update({labels: {rotation: 90}});
+                    chartAcqCTDI.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.point.category;
+                            }
+                        }
+                    }, true);
                     chartAcqCTDI.tooltip.options.formatter = function () {
-                        var xyArr = [];
-                        $.each(this.points, function () {
-                            var index = protocolNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy' + '<br/>(n=' + seriesDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -68,11 +65,8 @@ $(function () {
         },
         tooltip: {
             formatter: function () {
-                var index = protocolNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy' + '<br/>(n=' + seriesDataN[index] + ')';
-                return comment;
+                return this.point.tooltip;
             },
-            shared: true,
             useHTML: true
         },
         plotOptions: {

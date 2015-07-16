@@ -25,20 +25,15 @@ $(function () {
                     chartStudyDLP.setTitle({ text: defaultTitle }, { text: '' });
                     chartStudyDLP.yAxis[0].setTitle({text:'DLP (mGy.cm)'});
                     chartStudyDLP.xAxis[0].setTitle({text:'Study description'});
-                    chartStudyDLP.xAxis[0].setCategories(studyNames, true);
-                    chartStudyDLP.xAxis[0].update({labels:{rotation:90}});
+                    chartStudyDLP.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartStudyDLP.tooltip.options.formatter = function(args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('Mean') != -1) {
-                            var this_series_label = ' mean DLP';
-                            var this_series = args.chart.series[0];
-                        }
-                        else {
-                            var this_series_label = ' median DLP';
-                            var this_series = args.chart.series[1];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + studySeriesDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -70,17 +65,7 @@ $(function () {
         },
         tooltip: {
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('Mean') != -1) {
-                    var this_series_label = ' mean DLP';
-                    var this_series = args.chart.series[0];
-                }
-                else {
-                    var this_series_label = ' median DLP';
-                    var this_series = args.chart.series[1];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + studySeriesDataN[this_point_index] + ')';
+                return this.point.tooltip;
             },
             useHTML: true
         },

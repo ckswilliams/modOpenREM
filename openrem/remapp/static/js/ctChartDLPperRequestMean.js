@@ -16,27 +16,24 @@ $(function () {
                     chartRequestDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
                     chartRequestDLP.xAxis[0].setCategories([], true);
                     chartRequestDLP.tooltip.options.formatter = function () {
-                        var xyArr = [];
-                        $.each(this.points, function () {
-                            var linkText = 'study_dlp_min=' + requestBins[tooltipData[1]][this.x] + '&study_dlp_max=' + requestBins[tooltipData[1]][this.x + 1] + '&requested_procedure=' + tooltipData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?requesthist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
+                        var linkText = 'study_dlp_min=' + requestBins[tooltipData[1]][this.x] + '&study_dlp_max=' + requestBins[tooltipData[1]][this.x + 1] + '&requested_procedure=' + tooltipData[0];
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?requesthist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
+                        return returnValue;
                     }
                 },
                 drillup: function (e) {
                     chartRequestDLP.setTitle({text: defaultTitle}, {text: ''});
                     chartRequestDLP.yAxis[0].setTitle({text: 'Mean DLP (mGy.cm)'});
                     chartRequestDLP.xAxis[0].setTitle({text: 'Requested procedure'});
-                    chartRequestDLP.xAxis[0].setCategories(requestNames, true);
-                    chartRequestDLP.xAxis[0].update({labels: {rotation: 90}});
+                    chartRequestDLP.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.point.category;
+                            }
+                        }
+                    }, true);
                     chartRequestDLP.tooltip.options.formatter = function () {
-                        var xyArr = [];
-                        $.each(this.points, function () {
-                            var index = requestNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + requestSeriesDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -68,11 +65,8 @@ $(function () {
         },
         tooltip: {
             formatter: function () {
-                var index = requestNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + requestSeriesDataN[index] + ')';
-                return comment;
+                return this.point.tooltip;
             },
-            shared: true,
             useHTML: true
         },
         plotOptions: {

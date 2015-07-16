@@ -25,8 +25,13 @@ $(function () {
                     chartAcqDLP.setTitle({text: defaultTitle}, {text: ''});
                     chartAcqDLP.yAxis[0].setTitle({text: 'DLP (mGy.cm)'});
                     chartAcqDLP.xAxis[0].setTitle({text: 'Protocol name'});
-                    chartAcqDLP.xAxis[0].setCategories(protocolNames, true);
-                    chartAcqDLP.xAxis[0].update({labels: {rotation: 90}});
+                    chartAcqDLP.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartAcqDLP.tooltip.options.formatter = function (args) {
                         return this.point.tooltip;
                     }
