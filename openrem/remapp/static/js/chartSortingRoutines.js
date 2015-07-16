@@ -35,7 +35,7 @@ function rebuildSeries(chartContainer) {
         newData.drilldown = chart.series[0].data[i].drilldown;
         newData.name = chart.series[0].data[i].name;
         newData.freq = chart.series[0].data[i].freq;
-        newCategories.push(chart.series[0].data[i].name);
+        newCategories.push(chart.series[0].data[i].category);
         chart.series[0].data[i].update(newData, false);
     }
     chart.xAxis[0].categories = newCategories;
@@ -58,7 +58,7 @@ function rebuildTwoSeries(chartContainer, s) {
         newData.name = chart.series[s].data[i].name;
         newData.freq = chart.series[s].data[i].freq;
         chart.series[s].data[i].update(newData, false);
-        newCategories.push(chart.series[s].data[i].name);
+        newCategories.push(chart.series[s].data[i].category);
     }
     chart.xAxis[0].categories = newCategories;
 

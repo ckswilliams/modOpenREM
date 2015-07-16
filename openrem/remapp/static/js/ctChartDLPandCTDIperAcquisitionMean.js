@@ -88,6 +88,7 @@ $(function () {
             text: 'Mean DLP and CTDI<sub>vol</sub> per acquisition protocol'
         },
         xAxis: [{
+            categories: protocolNames,
             title: {
                 useHTML: true
             },
