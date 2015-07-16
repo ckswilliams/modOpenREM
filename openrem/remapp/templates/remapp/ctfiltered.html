@@ -431,7 +431,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y:{{testData.mean_dlp}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dlp|floatformat:0}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y:{{testData.mean_dlp}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dlp|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -439,7 +439,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dlp}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{ testData.median_dlp|floatformat:0 }}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dlp}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{ testData.median_dlp|floatformat:1 }}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
