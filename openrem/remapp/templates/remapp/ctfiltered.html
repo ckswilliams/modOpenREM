@@ -204,10 +204,24 @@
               </table>
 
               {% else %}
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
-              <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                more data than shown in the histogram bin.</p>
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, 2)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
+                          Note that this will include acquisitions at the upper bin boundary, so in some cases may display
+                          more data than shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, 2)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
               {% endif %}
             </div>
           </div>
@@ -417,7 +431,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y:{{testData.mean_dlp}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dlp|floatformat:0}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -425,7 +439,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dlp}}/10000000000,freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{% widthratio testData.median_dlp 10000000000 1 %}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
