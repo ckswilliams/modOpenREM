@@ -26,20 +26,15 @@ var chartDAPperAcquisition = new Highcharts.Chart({
                     chartDAPperAcquisition.setTitle({ text: defaultTitle }, { text: '' });
                     chartDAPperAcquisition.yAxis[0].setTitle({text:'DAP (cGy.cm<sup>2</sup>)'});
                     chartDAPperAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartDAPperAcquisition.xAxis[0].setCategories(protocolNames, true);
-                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartDAPperAcquisition.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartDAPperAcquisition.tooltip.options.formatter = function(args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('Mean') != -1) {
-                            var this_series_label = ' mean DAP';
-                            var this_series = args.chart.series[0];
-                        }
-                        else {
-                            var this_series_label = ' median DAP';
-                            var this_series = args.chart.series[1];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -70,17 +65,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('Mean') != -1) {
-                    var this_series_label = ' mean DAP';
-                    var this_series = args.chart.series[0];
-                }
-                else {
-                    var this_series_label = ' median DAP';
-                    var this_series = args.chart.series[1];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                return this.point.tooltip;
             },
 
             useHTML: true

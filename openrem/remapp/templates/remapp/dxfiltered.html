@@ -156,28 +156,40 @@
             <div class="panel-body">
               <div id="container" style="width: 95%; height: 600px; margin: 0 0"></div>
 
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'median' %}
               <table style="border:none">
                   <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortAscY" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortAscFreq" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a id="sortAscAlph" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#container', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
                       <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                           Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                           this will include acquisitions at the upper bin boundary, so in some cases may display more data than
                           shown in the histogram bin.</td>
                   </tr>
                   <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortDesY" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a id="sortDesFreq" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a id="sortDesAlph" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#container', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
               {% else %}
-                  <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
-                  <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
-                      this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                      shown in the histogram bin.</p>
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'y', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'freq', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'name', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                          this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                          shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'y', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'freq', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'name', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
               {% endif %}
 
             </div>
@@ -228,7 +240,37 @@
           <div id="collapseAcquisitionMeankVpChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="chartAcquisitionMeankVp" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'median' %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% else %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'y', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'freq', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'name', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'y', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'freq', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'name', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% endif %}
+
             </div>
           </div>
         </div>
@@ -256,7 +298,37 @@
           <div id="collapseAcquisitionMeanmAsChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="chartAcquisitionMeanmAs" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'median' %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'y', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'freq', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'name', 1)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'y', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'freq', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'name', -1)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% else %}
+              <table style="border:none">
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'y', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'freq', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'name', 1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                  </tr>
+                  <tr>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'y', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'freq', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'name', -1, 0)" style="text-decoration: none" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                  </tr>
+              </table>
+              {% endif %}
+
             </div>
           </div>
         </div>
@@ -317,6 +389,7 @@
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
     <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+    <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
     <!-- End of include JavaScript for the plots -->
 
     <!-- JavaScript to enable bootstrap tooltips -->
@@ -380,7 +453,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}},freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dap|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -388,7 +461,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}},freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}},freq:{{testData.num_acq}},tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_dap|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -488,7 +561,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var serieskVpData        = [
           {% for testData in acquisitionkVpSummary %}
-            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.mean_kVp}},drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.mean_kVp}},freq:{{testData.num_acq}},tooltip:protocolkVpNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_kVp|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -496,7 +569,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMediankVpData        = [
           {% for testData in acquisitionkVpSummary %}
-            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}},drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}},freq:{{testData.num_acq}},tooltip:protocolkVpNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_kVp|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -567,7 +640,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesmAsData        = [
           {% for testData in acquisitionmAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_mAs}},drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_mAs}},freq:{{testData.num_acq}},tooltip:protocolkVpNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_mAs|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -575,7 +648,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianmAsData        = [
           {% for testData in acquisitionmAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_mAs}},drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_mAs}},freq:{{testData.num_acq}},tooltip:protocolkVpNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_mAs|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];

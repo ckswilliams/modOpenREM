@@ -17,27 +17,24 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'kVp range'});
                     chartkVpPerAcquisition.xAxis[0].setCategories([], true);
                     chartkVpPerAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var linkText = 'acquisition_kvp_min=' + protocolkVpBins[tooltipkVpData[1]][this.x] + '&acquisition_kvp_max=' + protocolkVpBins[tooltipkVpData[1]][this.x+1] + '&acquisition_protocol=' + tooltipkVpData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFilterskVp + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
+                        var linkText = 'acquisition_kvp_min=' + protocolkVpBins[tooltipkVpData[1]][this.x] + '&acquisition_kvp_max=' + protocolkVpBins[tooltipkVpData[1]][this.x+1] + '&acquisition_protocol=' + tooltipkVpData[0];
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/hist/?acquisitionhist=1&' + linkText + tooltipFilterskVp + '">Click to view</a></td></tr></table>';
+                        return returnValue;
                     }
                 },
                 drillup: function(ee) {
                     chartkVpPerAcquisition.setTitle({ text: defaultkVpTitle }, { text: '' });
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'Mean kVp'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartkVpPerAcquisition.xAxis[0].setCategories(protocolkVpNames, true);
-                    chartkVpPerAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartkVpPerAcquisition.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.point.category;
+                            }
+                        }
+                    }, true);
                     chartkVpPerAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var index = protocolkVpNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' kVp' + '<br/>(n=' + serieskVpDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -67,11 +64,8 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function () {
-                var index = protocolkVpNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' kVp' + '<br/>(n=' + serieskVpDataN[index] + ')';
-                return comment;
+                return this.point.tooltip;
             },
-            shared: true,
             useHTML: true
         },
         plotOptions: {

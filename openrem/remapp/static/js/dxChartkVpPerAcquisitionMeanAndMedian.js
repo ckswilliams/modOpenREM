@@ -26,20 +26,15 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
                     chartkVpPerAcquisition.setTitle({ text: defaultkVpTitle }, { text: '' });
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'kVp'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartkVpPerAcquisition.xAxis[0].setCategories(protocolkVpNames, true);
-                    chartkVpPerAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartkVpPerAcquisition.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartkVpPerAcquisition.tooltip.options.formatter = function(args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('Mean') != -1) {
-                            var this_series_label = ' mean kVp';
-                            var this_series = args.chart.series[0];
-                        }
-                        else {
-                            var this_series_label = ' median kVp';
-                            var this_series = args.chart.series[1];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + serieskVpDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -70,17 +65,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('Mean') != -1) {
-                    var this_series_label = ' mean kVp';
-                    var this_series = args.chart.series[0];
-                }
-                else {
-                    var this_series_label = ' median kVp';
-                    var this_series = args.chart.series[1];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + serieskVpDataN[this_point_index] + ')';
+                return this.point.tooltip;
             },
             useHTML: true
         },

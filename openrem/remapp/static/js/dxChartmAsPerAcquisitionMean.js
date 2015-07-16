@@ -17,27 +17,24 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'mAs range'});
                     chartmAsPerAcquisition.xAxis[0].setCategories([], true);
                     chartmAsPerAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
+                        var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>';
+                        return returnValue;
                     }
                 },
                 drillup: function(ee) {
                     chartmAsPerAcquisition.setTitle({ text: defaultmAsTitle }, { text: '' });
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'Mean mAs'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartmAsPerAcquisition.xAxis[0].setCategories(protocolmAsNames, true);
-                    chartmAsPerAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartmAsPerAcquisition.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.point.category;
+                            }
+                        }
+                    }, true);
                     chartmAsPerAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var index = protocolmAsNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mAs' + '<br/>(n=' + seriesmAsDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -67,11 +64,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function () {
-                var index = protocolmAsNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mAs' + '<br/>(n=' + seriesmAsDataN[index] + ')';
-                return comment;
-            },
-            shared: true,
+                return this.point.tooltip;            },
             useHTML: true
         },
         plotOptions: {
