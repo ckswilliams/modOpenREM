@@ -101,6 +101,7 @@ def ajax_test2(request):
 @csrf_exempt
 def ajax_test3(request):
     from django.core.exceptions import ObjectDoesNotExist
+    from django.db.models import Count
     from remapp.models import DicomQuery
 
     resp = {}
@@ -111,19 +112,25 @@ def ajax_test3(request):
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
         resp['status'] = 'not complete'
-        resp['message'] = 'Query not yet started'
+        resp['message'] = '<h3>Query not yet started</h3>'
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     study_rsp = query.dicomqrrspstudy_set.all()
+    modalities = study_rsp.values('modality').annotate(count=Count('pk'))
+    table = ['<table>']
+    for m in modalities:
+        table.append('<tr><td>')
+        table.append(m['modality'])
+        table.append('</td><td>')
+        table.append(str(m['count']))
+        table.append('</tr></td>')
+    table.append('</table>')
+    tablestr = ''.join(table)
 
-
-
-
-
-    resp['message'] = 'this is possible - we are performing query_id {0}'.format(query_id)
     if query.complete:
         resp['status'] = 'complete'
-        resp['message'] ='Finito'
+        resp['message'] ='<h3>Query Complete</h3> {0}'.format(tablestr)
     else:
         resp['status'] = 'not complete'
+        resp['message'] ='<h3>Query not yet complete</h3><p>Responses so far:</p> {0}'.format(tablestr)
     return HttpResponse(json.dumps(resp), content_type='application/json')

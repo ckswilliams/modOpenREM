@@ -57,7 +57,7 @@ function query_progress( json ) {
         dataType: "json",
         success: function( json ) {
             alert( "I'm in test3!");
-            $( '#qr-status' ).text( json.message);
+            $( '#qr-status' ).html( json.message);
             if (json.status != "complete") setTimeout(function(){
                 var data = {
                     query_id: json.query_id
