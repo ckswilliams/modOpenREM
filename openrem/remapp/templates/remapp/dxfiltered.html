@@ -380,7 +380,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}}*1000000,freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}},freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -388,7 +388,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianData        = [
           {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}}/10000,freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}},freq:{{testData.num_acq}},drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -496,7 +496,7 @@
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMediankVpData        = [
           {% for testData in acquisitionkVpSummary %}
-            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}}/10000000000,drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
+            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}},drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
@@ -531,19 +531,19 @@
       <!-- JavaScript for acquisition mean mAs plot -->
       <script>
         var protocolmAsNames     = [
-          {% for name in acquisitionuAsSummary %}
+          {% for name in acquisitionmAsSummary %}
             "{{name.acquisition_protocol}}"
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
         var seriesmAsDataN       = [
-          {% for testData in acquisitionuAsSummary %}
+          {% for testData in acquisitionmAsSummary %}
             '{{testData.num_acq}}'
             {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
         var protocolmAsCounts    = [
-          {% for protocol in acquisitionHistogramuAsData %}
+          {% for protocol in acquisitionHistogrammAsData %}
             [
               {% for dataCounts in protocol.0 %}
                 {{dataCounts}}
@@ -554,10 +554,10 @@
           {% endfor %}
         ];
         var protocolmAsBins      = [
-          {% for protocolEdges in acquisitionHistogramuAsData %}
+          {% for protocolEdges in acquisitionHistogrammAsData %}
             [
               {% for edges in protocolEdges.1 %}
-                {{edges}}/1000
+                {{edges}}
                 {% if not forloop.last %},{% endif %}
               {% endfor %}
             ]
@@ -566,23 +566,23 @@
         ];
         {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesmAsData        = [
-          {% for testData in acquisitionuAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_uAs}}/1000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+          {% for testData in acquisitionmAsSummary %}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_mAs}},drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
         {% endif %}
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianmAsData        = [
-          {% for testData in acquisitionuAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_uAs}}/10000000000000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
+          {% for testData in acquisitionmAsSummary %}
+            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_mAs}},drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];
         {% endif %}
 
         var seriesmAsDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogramuAsData %}
+          {% for protocolCountsArray in acquisitionHistogrammAsData %}
             {id: protocolmAsNames[{{forloop.counter}}-1],name: protocolmAsNames[{{forloop.counter}}-1],useHTML: true,data: [
               {% for dataCounts in protocolCountsArray.0 %}
                 [protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
@@ -699,7 +699,7 @@
             {{'}'}},
             data:[
               {% for dateEntries in protocolData %}
-                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}*1000000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
+                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
                       {% if not forloop.last %},{% endif %}
               {% endfor %}
             ]{{'}'}}
@@ -722,7 +722,7 @@
             {{'}'}},
             data:[
               {% for dateEntries in protocolData %}
-                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}/10000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
+                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
                       {% if not forloop.last %},{% endif %}
               {% endfor %}
             ]{{'}'}}

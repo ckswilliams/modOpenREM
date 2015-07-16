@@ -193,7 +193,7 @@ def dx_summary_list_filter(request):
 
     if plotting and plotCharts:
         acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData,\
-        acquisitionHistogramuAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionuAsSummary,\
+        acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary,\
         studiesPerHourInWeekdays, acquisition_names = \
             dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
                                  plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
@@ -223,8 +223,8 @@ def dx_summary_list_filter(request):
             returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
             returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
         if plotDXAcquisitionMeanmAs:
-            returnStructure['acquisitionuAsSummary'] = acquisitionuAsSummary
-            returnStructure['acquisitionHistogramuAsData'] = acquisitionHistogramuAsData
+            returnStructure['acquisitionmAsSummary'] = acquisitionmAsSummary
+            returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
         if plotDXAcquisitionMeanDAPOverTime:
             if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                 returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
@@ -290,18 +290,18 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
     if median_available and (plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq) and plotAverageChoice=='both':
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-            mean_dap=Avg('dose_area_product'),
-            median_dap=Median('dose_area_product'),
+            mean_dap=Avg('dose_area_product')*1000000,
+            median_dap=Median('dose_area_product')/10000,
             num_acq=Count('dose_area_product'))\
             .order_by('acquisition_protocol')
     elif median_available and (plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq) and plotAverageChoice=='median':
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-            median_dap=Median('dose_area_product'),
+            median_dap=Median('dose_area_product')/10000,
             num_acq=Count('dose_area_product'))\
             .order_by('acquisition_protocol')
     else:
         acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-            mean_dap=Avg('dose_area_product'),
+            mean_dap=Avg('dose_area_product')*1000000,
             num_acq=Count('dose_area_product'))\
             .order_by('acquisition_protocol')
     acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
@@ -309,11 +309,11 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if median_available and plotDXAcquisitionMeankVp and plotAverageChoice=='both':
         acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
             mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
-            median_kVp=Median('irradeventxraysourcedata__kvp__kvp'),
+            median_kVp=Median('irradeventxraysourcedata__kvp__kvp')/10000000000,
             num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
     elif median_available and plotDXAcquisitionMeankVp and plotAverageChoice=='median':
         acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
-            median_kVp=Median('irradeventxraysourcedata__kvp__kvp'),
+            median_kVp=Median('irradeventxraysourcedata__kvp__kvp')/10000000000,
             num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
     else:
         acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
@@ -322,19 +322,19 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
 
     if median_available and plotDXAcquisitionMeanmAs and plotAverageChoice=='both':
-        acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-            mean_uAs=Avg('irradeventxraysourcedata__exposure__exposure'),
-            median_uAs=Median('irradeventxraysourcedata__exposure__exposure'),
+        acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
+            mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure')/1000,
+            median_mAs=Median('irradeventxraysourcedata__exposure__exposure')/10000000000000,
             num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
     elif median_available and plotDXAcquisitionMeanmAs and plotAverageChoice=='median':
-        acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-            median_uAs=Median('irradeventxraysourcedata__exposure__exposure'),
+        acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
+            median_mAs=Median('irradeventxraysourcedata__exposure__exposure')/10000000000000,
             num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
     else:
-        acquisitionuAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-            mean_uAs=Avg('irradeventxraysourcedata__exposure__exposure'),
+        acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
+            mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure')/1000,
             num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
-    acquisitionHistogramuAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionuAsSummary))]
+    acquisitionHistogrammAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionmAsSummary))]
 
     if plotDXAcquisitionMeanDAPOverTime:
         # Required for mean DAP per month plot
@@ -367,16 +367,16 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 # Required for mean mAs per acquisition plot
                 subqsmas = acquisition_mas_events.filter(acquisition_protocol=protocol.get('acquisition_protocol'))
                 uAsValues = subqsmas.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
-                acquisitionHistogramuAsData[idx][0], acquisitionHistogramuAsData[idx][1] = np.histogram(
+                acquisitionHistogrammAsData[idx][0], acquisitionHistogrammAsData[idx][1] = np.histogram(
                     [float(x) for x in uAsValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP over time
                 if plotAverageChoice=='mean' or plotAverageChoice=='both':
-                    qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Avg('dose_area_product'))
+                    qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Avg('dose_area_product')*1000000)
                     acquisitionMeanDAPoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
                 if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
-                    qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Median('dose_area_product'))
+                    qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Median('dose_area_product')/10000)
                     acquisitionMedianDAPoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
     if plotDXStudyPerDayAndHour:
@@ -395,15 +395,15 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if not 'acquisitionMedianDAPoverTime' in locals(): acquisitionMedianDAPoverTime = 0
     if not 'acquisitionHistogramData' in locals(): acquisitionHistogramData = 0
     if not 'acquisitionHistogramkVpData' in locals(): acquisitionHistogramkVpData = 0
-    if not 'acquisitionHistogramuAsData' in locals(): acquisitionHistogramuAsData = 0
+    if not 'acquisitionHistogrammAsData' in locals(): acquisitionHistogrammAsData = 0
     if not 'acquisitionSummary' in locals(): acquisitionSummary = 0
     if not 'acquisitionkVpSummary' in locals(): acquisitionkVpSummary = 0
-    if not 'acquisitionuAsSummary' in locals(): acquisitionuAsSummary = 0
+    if not 'acquisitionmAsSummary' in locals(): acquisitionmAsSummary = 0
     if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
 
     return acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData,\
-           acquisitionHistogramkVpData, acquisitionHistogramuAsData, acquisitionSummary, acquisitionkVpSummary,\
-           acquisitionuAsSummary, studiesPerHourInWeekdays, acquisition_names
+           acquisitionHistogramkVpData, acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary,\
+           acquisitionmAsSummary, studiesPerHourInWeekdays, acquisition_names
 
 
 @login_required
@@ -716,15 +716,15 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
-                                                                median_ctdi=Median('mean_ctdivol'),
+                                                                median_ctdi=Median('mean_ctdivol')/10000000000,
                                                                 mean_dlp=Avg('dlp'),
-                                                                median_dlp=Median('dlp'),
+                                                                median_dlp=Median('dlp')/10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
             elif median_available and plotAverageChoice=='median':
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(median_ctdi=Median('mean_ctdivol'),
-                                                                median_dlp=Median('dlp'),
+                    'acquisition_protocol').distinct().annotate(median_ctdi=Median('mean_ctdivol')/10000000000,
+                                                                median_dlp=Median('dlp')/10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
             else:
                 acquisitionSummary = acquisition_events.exclude(
@@ -739,12 +739,12 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
-                                                                median_dlp=Median('dlp'),
+                                                                median_dlp=Median('dlp')/10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
             elif median_available and plotAverageChoice=='median':
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(median_dlp=Median('dlp'),
+                    'acquisition_protocol').distinct().annotate(median_dlp=Median('dlp')/10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
             else:
                 acquisitionSummary = acquisition_events.exclude(
@@ -771,12 +771,12 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         if median_available and plotAverageChoice=='both':
             studySummary = study_events.values('study_description').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
                 num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'study_description')
         elif median_available and plotAverageChoice=='median':
             studySummary = study_events.values('study_description').distinct().annotate(
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
                 num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'study_description')
         else:
@@ -816,7 +816,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studyMeanDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
                     if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
                         qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
+                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000)
                         studyMedianDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
 
         if plotCTStudyPerDayAndHour:
@@ -837,12 +837,12 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         if median_available and plotAverageChoice=='both':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
                 num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'requested_procedure_code_meaning')
         elif median_available and plotAverageChoice=='median':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
                 num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'requested_procedure_code_meaning')
         else:
