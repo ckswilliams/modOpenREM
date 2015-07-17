@@ -78,7 +78,7 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Median DLP',
-            data: seriesMedianData
+            data: $.extend(true, [], seriesMedianData)
         }],
         drilldown: {
             series: seriesDrilldown

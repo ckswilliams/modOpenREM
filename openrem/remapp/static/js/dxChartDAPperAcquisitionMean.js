@@ -1,10 +1,9 @@
 $(function () {
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'Mean DAP per acquisition protocol';
+    var tooltipData = [2];
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Mean DAP per acquisition protocol';
-var tooltipData = [2];
-
-var chartDAPperAcquisition = new Highcharts.Chart({
+    var chartDAPperAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'container',
@@ -40,6 +39,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             }
         },
         title: {
+            useHTML: true,
             text: 'Mean DAP per acquisition protocol'
         },
         legend: {
@@ -76,6 +76,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
+            useHTML: true,
             name: 'Mean DAP per acquisition protocol',
             data: seriesData
         }],
@@ -84,4 +85,3 @@ var chartDAPperAcquisition = new Highcharts.Chart({
         }
     });
 });
-
