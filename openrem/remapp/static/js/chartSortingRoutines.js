@@ -24,7 +24,7 @@ function twoSeriesSort(chartContainer, chartData, chartData2, p, d, s) {
 
 // chartContainer is the div that holds the HighChart; p is the property to sort on; d is the direction of sort: 1 for
 // ascending, anything else for descending; s is the index of the series to sort.
-function fourSeriesSort(chartContainer, p, d, s) {
+function fourSeriesSortOld(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
     if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
         if (s == 0) {
@@ -44,6 +44,20 @@ function fourSeriesSort(chartContainer, p, d, s) {
         bubbleSort(chart.series[s2].data, 'x', 1);
         bubbleSort(chart.series[s3].data, 'x', 1);
         bubbleSort(chart.series[s4].data, 'x', 1);
+        chart.redraw({ duration: 1000 });
+    }
+}
+
+// chartContainer is the div that holds the HighChart; p is the property to sort on; d is the direction of sort: 1 for
+// ascending, anything else for descending; s is the index of the series to sort.
+function fourSeriesSort(chartContainer, chartData, chartData2, chartData3, chartData4, p, d, s) {
+    var chart = $(chartContainer).highcharts();
+    if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+        bubbleSort(chartData, p, d);
+        rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, chartData4, s);
+        bubbleSort(chartData2, 'x', 1);
+        bubbleSort(chartData3, 'x', 1);
+        bubbleSort(chartData4, 'x', 1);
         chart.redraw({ duration: 1000 });
     }
 }
@@ -124,7 +138,7 @@ function rebuildTwoSeries(chartContainer, chartData, chartData2, s) {
 }
 
 // chartContainer is the div that holds the HighChart; s is the index of the series to sort.
-function rebuildFourSeries(chartContainer, s) {
+function rebuildFourSeriesOld(chartContainer, s) {
     var s2 = (s == 0 ? 1 : 0);
     var chart = $(chartContainer).highcharts();
     var newData = {};
@@ -202,6 +216,103 @@ function rebuildFourSeries(chartContainer, s) {
                 newData.freq = chart.series[s4].data[i].freq;
                 newData.tooltip = chart.series[s4].data[i].tooltip;
                 chart.series[s4].data[i].update(newData, false);
+                found = true;
+            }
+            else {
+                j++;
+            }
+        }
+    }
+}
+
+// chartContainer is the div that holds the HighChart; s is the index of the series to sort.
+function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, chartData4, s) {
+    var chart = $(chartContainer).highcharts();
+    var newCategories = [];
+    var data = $.extend(true, [], chartData);
+    var data2 = $.extend(true, [], chartData2);
+    var data3 = $.extend(true, [], chartData3);
+    var data4 = $.extend(true, [], chartData4);
+    var point;
+    var i = 0;
+
+    for (i = 0; i < data.length; i++) {
+        point = data[i];
+        newCategories.push(point.name);
+        chart.series[s[0]].data[i].update({
+            name: point.name,
+            y: point.y,
+            x: i,
+            freq: point.freq,
+            drilldown: point.drilldown,
+            category: point.name,
+            tooltip: point.tooltip
+        }, false);
+    }
+    chart.xAxis[0].categories = newCategories;
+
+
+
+    for (i = 0; i < data.length; i++) {
+        var found = false;
+        var j = 0;
+        while (found == false) {
+            if (data2[i].name == data[j].name) {
+                point = data2[i];
+                chart.series[s[1]].data[i].update({
+                    index: j,
+                    name: point.name,
+                    y: point.y,
+                    x: j,
+                    freq: point.freq,
+                    drilldown: point.drilldown,
+                    category: point.category,
+                    tooltip: point.tooltip
+                }, false);
+                found = true;
+            }
+            else {
+                j++;
+            }
+        }
+
+        var found = false;
+        var j = 0;
+        while (found == false) {
+            if (data3[i].name == data[j].name) {
+                point = data3[i];
+                chart.series[s[2]].data[i].update({
+                    index: j,
+                    name: point.name,
+                    y: point.y,
+                    x: j,
+                    freq: point.freq,
+                    drilldown: point.drilldown,
+                    category: point.category,
+                    tooltip: point.tooltip
+                }, false);
+                found = true;
+            }
+            else {
+                j++;
+            }
+        }
+
+        var found = false;
+        var j = 0;
+        while (found == false) {
+            if (data4[i].name == data[j].name) {
+                point = data4[i];
+                chart.series[s[3]].data[i].update({
+                    index: j,
+                    name: point.name,
+                    y: point.y,
+                    x: j,
+                    freq: point.freq,
+                    drilldown: point.drilldown,
+                    category: point.category,
+                    tooltip: point.tooltip
+                }, false);
                 found = true;
             }
             else {

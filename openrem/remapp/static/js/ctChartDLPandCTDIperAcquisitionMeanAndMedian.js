@@ -129,23 +129,23 @@ $(function () {
         },
         series: [{
             name: 'Mean DLP',
-            data: seriesData,
+            data: $.extend(true, [], seriesData),
             color: '#2b8cbe',
             pointPlacement: -0.02
         }, {
             name: 'Median DLP',
-            data: seriesMedianData,
+            data: $.extend(true, [], seriesMedianData),
             color: '#7bccc4',
             pointPlacement: -0.02,
         }, {
             name: 'Mean CTDI<sub>vol</sub>',
-            data: seriesDataCTDI,
+            data: $.extend(true, [], seriesDataCTDI),
             color: '#d7301f',
             pointPlacement: 0.02,
             yAxis: 1
         }, {
             name: 'Median CTDI<sub>vol</sub>',
-            data: seriesMedianDataCTDI,
+            data: $.extend(true, [], seriesMedianDataCTDI),
             color: '#fdcc8a',
             pointPlacement: 0.02,
             yAxis: 1
