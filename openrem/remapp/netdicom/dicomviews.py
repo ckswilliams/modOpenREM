@@ -112,12 +112,12 @@ def ajax_test3(request):
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
         resp['status'] = 'not complete'
-        resp['message'] = '<h3>Query not yet started</h3>'
+        resp['message'] = '<h4>Query not yet started</h4>'
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     study_rsp = query.dicomqrrspstudy_set.all()
     modalities = study_rsp.values('modality').annotate(count=Count('pk'))
-    table = ['<table>']
+    table = ['<table class="table table-bordered">']
     for m in modalities:
         table.append('<tr><td>')
         table.append(m['modality'])
@@ -129,8 +129,8 @@ def ajax_test3(request):
 
     if query.complete:
         resp['status'] = 'complete'
-        resp['message'] ='<h3>Query Complete</h3> {0}'.format(tablestr)
+        resp['message'] ='<h4>Query Complete</h4> {0}'.format(tablestr)
     else:
         resp['status'] = 'not complete'
-        resp['message'] ='<h3>Query not yet complete</h3><p>Responses so far:</p> {0}'.format(tablestr)
+        resp['message'] ='<h4>Query not yet complete</h4><p>Responses so far:</p> {0}'.format(tablestr)
     return HttpResponse(json.dumps(resp), content_type='application/json')
