@@ -129,10 +129,10 @@ $(function () {
         },
         series: [{
             name: 'Median DLP',
-            data: seriesMedianData
+            data: $.extend(true, [], seriesMedianData)
         }, {
             name: 'Median CTDI<sub>vol</sub>',
-            data: seriesMedianDataCTDI,
+            data: $.extend(true, [], seriesMedianDataCTDI),
             yAxis: 1
         }],
         drilldown: {

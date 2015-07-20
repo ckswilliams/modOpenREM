@@ -130,10 +130,10 @@ $(function () {
         },
         series: [{
             name: 'Mean DLP',
-            data: seriesData
+            data: $.extend(true, [], seriesData)
         }, {
             name: 'Mean CTDI<sub>vol</sub>',
-            data: seriesDataCTDI,
+            data: $.extend(true, [], seriesDataCTDI),
             yAxis: 1
         }],
         drilldown: {

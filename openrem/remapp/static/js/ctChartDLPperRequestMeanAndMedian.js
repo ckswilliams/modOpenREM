@@ -78,11 +78,11 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Mean DLP',
-            data: requestSeriesData
+            data: $.extend(true, [], requestSeriesData)
         }, {
             useHTML: true,
             name: 'Median DLP',
-            data: requestSeriesMedianData
+            data: $.extend(true, [], requestSeriesMedianData)
         }],
         drilldown: {
             series: requestSeriesDrilldown

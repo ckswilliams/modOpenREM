@@ -78,7 +78,7 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Mean CTDI<sub>vol</sub>',
-            data: seriesDataCTDI
+            data: $.extend(true, [], seriesDataCTDI)
         }],
         drilldown: {
             series: seriesDrilldownCTDI

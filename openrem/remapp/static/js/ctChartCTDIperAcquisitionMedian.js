@@ -78,7 +78,7 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Median CTDI<sub>vol</sub> per acquisition protocol',
-            data: seriesMedianDataCTDI
+            data: $.extend(true, [], seriesMedianDataCTDI)
         }],
         drilldown: {
             series: seriesDrilldownCTDI
