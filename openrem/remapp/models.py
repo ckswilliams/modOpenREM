@@ -77,7 +77,7 @@ class DicomStoreSCP(models.Model):
 
 
 class DicomRemoteQR(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
     aetitle = models.CharField(max_length=16, blank=True, null=True)
     port = models.IntegerField(blank=True, null=True)
     ip = models.GenericIPAddressField(blank=True, null=True)
@@ -86,6 +86,9 @@ class DicomRemoteQR(models.Model):
 
     def get_absolute_url(self):
         return reverse('dicom_summary')
+
+    def __unicode__(self):
+        return self.name
 
 
 from django.contrib.auth.models import User
