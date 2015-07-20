@@ -134,3 +134,58 @@ def ajax_test3(request):
         resp['status'] = 'not complete'
         resp['message'] ='<h4>Query not yet complete</h4><p>Responses so far:</p> {0}'.format(tablestr)
     return HttpResponse(json.dumps(resp), content_type='application/json')
+
+@csrf_exempt
+@login_required
+def qr_new(request, *args, **kwargs):
+    import uuid
+    from remapp.netdicom.qrscu import qrscu
+    from remapp.models import DicomRemoteQR
+
+    if request.method == 'POST':
+        rh_pk = request.POST['remote_host_field']
+        date_from = request.POST['date_from_field']
+        date_until = request.POST['date_until_field']
+        modalities = request.POST['modality_field']
+        query_id = str(uuid.uuid4())
+
+        rh = DicomRemoteQR.objects.get(pk=rh_pk)
+        if rh.hostname:
+            host = rh.hostname
+        else:
+            host = rh.ip
+        task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id)
+
+        resp = {}
+        resp['message'] = 'Request created'
+        resp['status'] = 'not complete'
+        resp['query_id'] = query_id
+
+        return HttpResponse(json.dumps(resp), content_type='application/json')
+
+
+
+@login_required
+def dicom_qr_page(request, *args, **kwargs):
+    from django.shortcuts import render_to_response
+    from django.template import RequestContext
+    from remapp.forms import DicomQueryForm
+
+    form = DicomQueryForm
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    return render_to_response(
+        'remapp/dicomqr.html',
+        {'form':form, 'admin':admin},
+        context_instance=RequestContext(request)
+    )

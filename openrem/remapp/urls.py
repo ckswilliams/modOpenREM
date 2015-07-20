@@ -119,4 +119,6 @@ urlpatterns += patterns('remapp.netdicom.dicomviews',
     url(r'admin/dicomstore/ajax_test$', 'ajax_test'),
     url(r'admin/dicomstore/ajax_test2$', 'ajax_test2'),
     url(r'admin/dicomstore/ajax_test3$', 'ajax_test3'),
+    url(r'admin/dicomqr/new$', 'qr_new', name='qr_new'),
+    url(r'admin/dicomqr$', 'dicom_qr_page', name='dicom_qr_page'),
 )
