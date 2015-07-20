@@ -21,6 +21,26 @@ class SizeUploadForm(forms.Form):
     )
 
 
+class DicomQueryForm(forms.Form):
+    """Form for launching DICOM Query
+    """
+
+    MODALITIES = (
+        ('CT', 'CT'),
+        ('FL', 'Fluoroscopy'),
+        ('DX', 'DX, including CR'),
+        ('MG', 'Mammography'),
+    )
+
+    remote_host_field = forms.ChoiceField(choices=[])
+    date_from_field = forms.DateField(label='Date from')
+    date_until_field = forms.DateField(label='Date until')
+    modality_field = forms.MultipleChoiceField(choices=MODALITIES)
+
+    def __init__(self, *args, **kwargs):
+        super(DicomQueryForm, self).__init__(*args, **kwargs)
+        from remapp.models import DicomRemoteQR
+        self.fields['remotehost'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
 
 
 class SizeHeadersForm(forms.Form):
