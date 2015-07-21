@@ -53,7 +53,8 @@ function rebuildSeries(chartContainer, chartData) {
             freq: point.freq,
             drilldown: point.drilldown,
             category: point.name,
-            tooltip: point.tooltip
+            tooltip: point.tooltip,
+            bins: point.bins
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
@@ -80,7 +81,8 @@ function rebuildTwoSeries(chartContainer, chartData, chartData2, s) {
             freq: point.freq,
             drilldown: point.drilldown,
             category: point.name,
-            tooltip: point.tooltip
+            tooltip: point.tooltip,
+            bins: point.bins
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
@@ -100,7 +102,8 @@ function rebuildTwoSeries(chartContainer, chartData, chartData2, s) {
                     freq: point.freq,
                     drilldown: point.drilldown,
                     category: point.category,
-                    tooltip: point.tooltip
+                    tooltip: point.tooltip,
+                    bins: point.bins
                 }, false);
                 found = true;
             }
@@ -132,7 +135,8 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
             freq: point.freq,
             drilldown: point.drilldown,
             category: point.name,
-            tooltip: point.tooltip
+            tooltip: point.tooltip,
+            bins: point.bins
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
@@ -153,7 +157,8 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
                     freq: point.freq,
                     drilldown: point.drilldown,
                     category: point.category,
-                    tooltip: point.tooltip
+                    tooltip: point.tooltip,
+                    bins: point.bins
                 }, false);
                 found = true;
             }
@@ -175,7 +180,8 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
                     freq: point.freq,
                     drilldown: point.drilldown,
                     category: point.category,
-                    tooltip: point.tooltip
+                    tooltip: point.tooltip,
+                    bins: point.bins
                 }, false);
                 found = true;
             }
@@ -197,7 +203,8 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
                     freq: point.freq,
                     drilldown: point.drilldown,
                     category: point.category,
-                    tooltip: point.tooltip
+                    tooltip: point.tooltip,
+                    bins: point.bins
                 }, false);
                 found = true;
             }
