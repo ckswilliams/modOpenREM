@@ -1,7 +1,8 @@
 $(function () {
     var drilldownTitle = 'Histogram of ';
     var defaultTitle = 'DLP per acquisition protocol';
-    var tooltipData = [2];
+    var bins = [];
+    var name = '';
 
     var chartAcqDLP = new Highcharts.Chart({
         chart: {
@@ -9,14 +10,14 @@ $(function () {
             renderTo: 'histogramPlotDIV',
             events: {
                 drilldown: function (e) {
-                    tooltipData[0] = (protocolNames[e.point.x]).replace('&amp;', '%26');
-                    tooltipData[1] = e.point.x;
-                    chartAcqDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + seriesDataN[e.point.x] + ')'});
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartAcqDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + e.point.freq + ')'});
                     chartAcqDLP.yAxis[0].setTitle({text: 'Number'});
                     chartAcqDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
                     chartAcqDLP.xAxis[0].setCategories([], true);
-                    chartAcqDLP.tooltip.options.formatter = function (args) {
-                        var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x + 1] + '&acquisition_protocol=' + tooltipData[0];
+                    chartAcqDLP.tooltip.options.formatter = function (e) {
+                        var linkText = 'acquisition_dlp_min=' + bins[this.x] + '&acquisition_dlp_max=' + bins[this.x + 1] + '&acquisition_protocol=' + name;
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }

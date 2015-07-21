@@ -1,7 +1,8 @@
 $(function () {
     var drilldownTitle = 'Histogram of ';
     var defaultTitle   = 'DLP per requested procedure type';
-    var tooltipData = [2];
+    var bins = [];
+    var name = '';
 
     var chartRequestDLP = new Highcharts.Chart({
         chart: {
@@ -9,14 +10,14 @@ $(function () {
             renderTo: 'histogramRequestPlotDIV',
             events: {
                 drilldown: function(e) {
-                    tooltipData[0] = (requestNames[e.point.x]).replace('&amp;', '%26');
-                    tooltipData[1] = e.point.x;
-                    chartRequestDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + requestSeriesDataN[e.point.x] +')' });
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartRequestDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + e.point.freq +')' });
                     chartRequestDLP.yAxis[0].setTitle({text:'Number'});
                     chartRequestDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
                     chartRequestDLP.xAxis[0].setCategories([], true);
-                    chartRequestDLP.tooltip.options.formatter = function(args) {
-                        var linkText = 'study_dlp_min=' + requestBins[tooltipData[1]][this.x] + '&study_dlp_max=' + requestBins[tooltipData[1]][this.x+1] + '&requested_procedure=' + tooltipData[0];
+                    chartRequestDLP.tooltip.options.formatter = function(e) {
+                        var linkText = 'study_dlp_min=' + bins[this.x] + '&study_dlp_max=' + bins[this.x+1] + '&requested_procedure=' + name;
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?requesthist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }

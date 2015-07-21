@@ -1,7 +1,8 @@
 $(function () {
     var drilldownTitle = 'Histogram of ';
     var defaultTitle = 'Mean DLP per study description';
-    var tooltipData = [2];
+    var bins = [];
+    var name = '';
 
     var chartStudyDLP = new Highcharts.Chart({
         chart: {
@@ -9,14 +10,14 @@ $(function () {
             renderTo: 'histogramStudyPlotDIV',
             events: {
                 drilldown: function (e) {
-                    tooltipData[0] = (studyNames[e.point.x]).replace('&amp;', '%26');
-                    tooltipData[1] = e.point.x;
-                    chartStudyDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + studySeriesDataN[e.point.x] + ')'});
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartStudyDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + e.point.freq + ')'});
                     chartStudyDLP.yAxis[0].setTitle({text: 'Number'});
                     chartStudyDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
                     chartStudyDLP.xAxis[0].setCategories([], true);
-                    chartStudyDLP.tooltip.options.formatter = function () {
-                        var linkText = 'study_dlp_min=' + studyBins[tooltipData[1]][this.x] + '&study_dlp_max=' + studyBins[tooltipData[1]][this.x + 1] + '&study_description=' + tooltipData[0];
+                    chartStudyDLP.tooltip.options.formatter = function (e) {
+                        var linkText = 'study_dlp_min=' + bins[this.x] + '&study_dlp_max=' + bins[this.x + 1] + '&study_description=' + name;
                         returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?studyhist=1&' + linkText + tooltipFiltersStudy + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
