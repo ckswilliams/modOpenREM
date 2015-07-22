@@ -128,7 +128,7 @@ def dx_summary_list_filter(request):
     f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
         Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
         **filters
-    ))
+    ).order_by().distinct())
 
     try:
         # See if the user has plot settings in userprofile
