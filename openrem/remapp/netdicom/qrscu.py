@@ -142,10 +142,25 @@ def qrscu(
     # remote application entity
     RemoteAE = dict(Address=rh, Port=rp, AET=aec)
 
+    if not query_id:
+        query_id = uuid.uuid4()
+
+    query = DicomQuery.objects.create()
+    query.query_id = query_id
+    query.complete = False
+    query.save()
+
     # create association with remote AE
     print "Request association with {0} {1} {2}".format(rh, rp, aec)
     assoc = MyAE.RequestAssociation(RemoteAE)
 
+    if not assoc:
+        query.failed = True
+        query.message = "Association unsuccessful"
+        query.complete = True
+        query.save()
+        MyAE.Quit()
+        return
     print "assoc is ... {0}".format(assoc)
 
     # perform a DICOM ECHO
@@ -167,14 +182,6 @@ def qrscu(
 
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st
-
-    if not query_id:
-        query_id = uuid.uuid4()
-
-    query = DicomQuery.objects.create()
-    query.query_id = query_id
-    query.complete = False
-    query.save()
 
     responses = True
     rspno = 0

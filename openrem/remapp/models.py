@@ -37,6 +37,8 @@ from django.core.urlresolvers import reverse
 class DicomQuery(models.Model):
     complete = models.BooleanField(default=False)
     query_id = models.CharField(max_length=64)
+    failed = models.BooleanField(default=False)
+    message = models.TextField(blank=True, null=True)
 
 
 class DicomQRRspStudy(models.Model):

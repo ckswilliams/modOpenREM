@@ -119,6 +119,11 @@ def ajax_test3(request):
         resp['message'] = '<h4>Query {0} not yet started</h4>'.format(query_id)
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
+    if query.failed:
+        resp['status'] = 'complete'
+        resp['message'] ='<h4>Query Failed</h4> {0}'.format(query.message)
+        return HttpResponse(json.dumps(resp), content_type='application/json')
+
     study_rsp = query.dicomqrrspstudy_set.all()
     modalities = study_rsp.values('modality').annotate(count=Count('pk'))
     table = ['<table class="table table-bordered">']
@@ -156,7 +161,7 @@ def q_process(request, *args, **kwargs):
             rh_pk = request.POST['remote_host_field']
             date_from = request.POST['date_from_field']
             date_until = request.POST['date_until_field']
-            modalities = request.POST['modality_field']
+            modalities = request.POST.get('modality_field',None);
             query_id = str(uuid.uuid4())
             print query_id
             rh = DicomRemoteQR.objects.get(pk=rh_pk)
