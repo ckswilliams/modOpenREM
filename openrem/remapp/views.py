@@ -361,14 +361,14 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 subqskvp = acquisition_kvp_events.filter(acquisition_protocol=protocol.get('acquisition_protocol'))
                 kVpValues = subqskvp.values_list('irradeventxraysourcedata__kvp__kvp', flat=True)
                 acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram(
-                    [float(x) for x in kVpValues], bins=20)
+                    [float(x)/1000 for x in kVpValues], bins=20)
 
             if plotDXAcquisitionMeanmAs:
                 # Required for mean mAs per acquisition plot
                 subqsmas = acquisition_mas_events.filter(acquisition_protocol=protocol.get('acquisition_protocol'))
                 uAsValues = subqsmas.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
                 acquisitionHistogrammAsData[idx][0], acquisitionHistogrammAsData[idx][1] = np.histogram(
-                    [float(x) for x in uAsValues], bins=20)
+                    [float(x)/1000 for x in uAsValues], bins=20)
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP over time
