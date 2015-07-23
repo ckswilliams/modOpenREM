@@ -23,24 +23,28 @@
  <script src="{{ STATIC_URL }}js/dicom.js"></script>
 
 
-  // Think about using jQuery form plugin: http://malsup.com/jquery/form/#getting-started
-  // Also http://stackoverflow.com/questions/16151050/handling-form-upload-success-with-jquery-to-django-app
-  // or this https://realpython.com/blog/python/django-and-ajax-form-submissions/
-
-
-    <form action="{% url "qr_new" %}" method="post" enctype="multipart/form-data" role="form">
+    <form action="{% url "q_process" %}" method="post" enctype="multipart/form-data" role="form"  id="post-form">
 			{% csrf_token %}
             <div class="row">
                 <p>{{ form.non_field_errors }}</p>
                 <div class="col-md-4 col-md-offset-4 form-group">
-                    {{ form.sizefile.label_tag }}
-                    {{ form.sizefile.errors }}
-                    {{ form.sizefile }}
+                    {{ form.remote_host_field.label_tag }}
+                    {{ form.remote_host_field.errors }}
+                    {{ form.remote_host_field }}
+                    {{ form.date_from_field.label_tag }}
+                    {{ form.date_from_field.errors }}
+                    {{ form.date_from_field }}
+                    {{ form.date_until_field.label_tag }}
+                    {{ form.date_until_field.errors }}
+                    {{ form.date_until_field }}
+                    {{ form.modality_field.label_tag }}
+                    {{ form.modality_field.errors }}
+                    {{ form.modality_field }}
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
-                    <button type="submit" class="btn btn-default" id="qr-go">
+                    <button type="submit" class="btn btn-default">
                       launch the query
                     </button>
                 </div>

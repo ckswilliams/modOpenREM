@@ -32,15 +32,15 @@ class DicomQueryForm(forms.Form):
         ('MG', 'Mammography'),
     )
 
-    remote_host_field = forms.ChoiceField(choices=[])
-    date_from_field = forms.DateField(label='Date from')
-    date_until_field = forms.DateField(label='Date until')
-    modality_field = forms.MultipleChoiceField(choices=MODALITIES)
+    remote_host_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
+    date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control"}), required=False)
+    date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control"}), required=False)
+    modality_field = forms.MultipleChoiceField(choices=MODALITIES, widget=forms.CheckboxSelectMultiple(attrs={"class": "form-control"}), required=False)
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
         from remapp.models import DicomRemoteQR
-        self.fields['remotehost'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
+        self.fields['remote_host_field'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
 
 
 class SizeHeadersForm(forms.Form):
