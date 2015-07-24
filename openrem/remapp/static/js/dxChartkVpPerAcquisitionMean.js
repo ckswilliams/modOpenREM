@@ -1,18 +1,18 @@
 $(function () {
-var drilldownkVpTitle = 'Histogram of ';
-var defaultkVpTitle   = 'Mean kVp per acquisition protocol';
-var bins = [];
-var name = '';
+    var drilldownkVpTitle = 'Histogram of ';
+    var defaultkVpTitle   = 'Mean kVp per acquisition protocol';
+    var bins = [];
+    var name = '';
 
-var chartkVpPerAcquisition = new Highcharts.Chart({
+    var chartkVpPerAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'chartAcquisitionMeankVp',
             events: {
-                drilldown: function(ee) {
-                    bins = ee.point.bins;
-                    name = (ee.point.name).replace('&amp;', '%26');
-                    chartkVpPerAcquisition.setTitle({ text: drilldownkVpTitle + ee.point.name + ' kVp values' }, { text: '(n = ' + ee.point.freq +')' });
+                drilldown: function(e) {
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartkVpPerAcquisition.setTitle({ text: drilldownkVpTitle + e.point.name + ' kVp values' }, { text: '(n = ' + e.point.freq +')' });
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'kVp range'});
                     chartkVpPerAcquisition.xAxis[0].setCategories([], true);
@@ -22,7 +22,7 @@ var chartkVpPerAcquisition = new Highcharts.Chart({
                         return returnValue;
                     }
                 },
-                drillup: function(ee) {
+                drillup: function(e) {
                     chartkVpPerAcquisition.setTitle({ text: defaultkVpTitle }, { text: '' });
                     chartkVpPerAcquisition.yAxis[0].setTitle({text:'Mean kVp'});
                     chartkVpPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});

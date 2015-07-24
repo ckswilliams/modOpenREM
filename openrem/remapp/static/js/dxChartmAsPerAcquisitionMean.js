@@ -1,18 +1,18 @@
 $(function () {
-var drilldownmAsTitle = 'Histogram of ';
-var defaultmAsTitle   = 'Mean mAs per acquisition protocol';
-var bins = [];
-var name = '';
+    var drilldownmAsTitle = 'Histogram of ';
+    var defaultmAsTitle   = 'Mean mAs per acquisition protocol';
+    var bins = [];
+    var name = '';
 
-var chartmAsPerAcquisition = new Highcharts.Chart({
+    var chartmAsPerAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'chartAcquisitionMeanmAs',
             events: {
-                drilldown: function(ee) {
-                    bins = ee.point.bins;
-                    name = (ee.point.name).replace('&amp;', '%26');
-                    chartmAsPerAcquisition.setTitle({ text: drilldownmAsTitle + ee.point.name + ' mAs values' }, { text: '(n = ' + ee.point.freq +')' });
+                drilldown: function(e) {
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartmAsPerAcquisition.setTitle({ text: drilldownmAsTitle + e.point.name + ' mAs values' }, { text: '(n = ' + e.point.freq +')' });
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'mAs range'});
                     chartmAsPerAcquisition.xAxis[0].setCategories([], true);
@@ -22,7 +22,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                         return returnValue;
                     }
                 },
-                drillup: function(ee) {
+                drillup: function(e) {
                     chartmAsPerAcquisition.setTitle({ text: defaultmAsTitle }, { text: '' });
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'Mean mAs'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});

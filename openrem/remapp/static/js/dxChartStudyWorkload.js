@@ -1,10 +1,9 @@
 $(function () {
-
-var chartWorkload = new Highcharts.Chart({
+    var chartWorkload = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartStudyWorkloadDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,//null,
+            plotBorderWidth: 1,
             plotShadow: false,
             events: {
                 drilldown: function(e) {

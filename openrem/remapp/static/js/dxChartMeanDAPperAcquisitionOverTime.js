@@ -1,5 +1,5 @@
 $(function () {
-var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
+    var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
         chart: {
             renderTo: 'AcquisitionMeanDAPOverTimeDIV',
             zoomType: 'x'

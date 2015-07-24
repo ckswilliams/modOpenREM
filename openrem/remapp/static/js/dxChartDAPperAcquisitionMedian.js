@@ -1,11 +1,11 @@
 $(function () {
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Median DAP per acquisition protocol';
-var bins = [];
-var name = '';
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'Median DAP per acquisition protocol';
+    var bins = [];
+    var name = '';
 
 
-var chartDAPperAcquisition = new Highcharts.Chart({
+    var chartDAPperAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'container',

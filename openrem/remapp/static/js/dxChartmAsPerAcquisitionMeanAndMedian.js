@@ -1,10 +1,10 @@
 $(function () {
-var drilldownmAsTitle = 'Histogram of ';
-var defaultmAsTitle   = 'mAs per acquisition protocol';
-var bins = [];
-var name = '';
+    var drilldownmAsTitle = 'Histogram of ';
+    var defaultmAsTitle   = 'mAs per acquisition protocol';
+    var bins = [];
+    var name = '';
 
-var chartmAsPerAcquisition = new Highcharts.Chart({
+    var chartmAsPerAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'chartAcquisitionMeanmAs',
