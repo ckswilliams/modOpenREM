@@ -44,6 +44,7 @@ def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
     d2.SeriesNumber = ''
     d2.SeriesInstanceUID = ''
     d2.Modality = ''
+    d2.NumberOfSeriesRelatedInstances
 
     assoc2 = MyAE.RequestAssociation(RemoteAE)
     st2 = assoc2.StudyRootFindSOPClass.SCU(d2, 1)
@@ -109,7 +110,7 @@ from celery import shared_task
 @shared_task
 def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
-        *args, **kwargs
+        date_from=None, date_until=None, modalities=None, *args, **kwargs
     ):
     import uuid
     from decimal import Decimal
@@ -171,14 +172,22 @@ def qrscu(
     print "DICOM FindSCU ... ",
     d = Dataset()
     d.QueryRetrieveLevel = "STUDY"
+    d.PatientName = ''
     d.PatientID = ''
     d.SOPInstanceUID = ''
+    d.AccessionNumber = ''
     d.Modality = ''
+    d.ModalitiesInStudy = ''
     d.StudyDescription = ''
+    d.StudyID = ''
     d.StudyInstanceUID = ''
     d.StudyDate = ''
+    d.StudyTime = ''
     d.PatientAge = ''
     d.PatientBirthDate = ''
+
+    if date_from and date_until:
+        df =
 
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st

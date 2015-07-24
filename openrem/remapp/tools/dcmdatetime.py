@@ -112,3 +112,46 @@ def make_date_time(dicomdatetime):
     elif len(dicomdatetime) <= 8:
         return datetime.datetime.strptime(dicomdatetime, "%Y%m%d")
     return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
+
+def make_dcm_date(pythondate):
+    """Given a Python date, return a DICOM date
+    :param pythondate:  Date
+    :type pythondate:   Python date object
+    :returns:           DICOM date as string
+    """
+    import datetime
+    if type(pythondate) is not datetime.datetime:
+        return None
+
+    return pythondate.strftime("%Y%m%d")
+
+def make_dcm_date_range(date1=None, date2=None):
+    """Given one or two python dates, return a DICOM date range
+    :param: date1, date2:   One or two Python dates
+    :type date1, date2:     Python date objects
+    :returns:               DICOM date range as string
+    """
+    import datetime
+
+    date_single= None
+
+    if (type(date1) is datetime.datetime) and (type(date2) is datetime.datetime):
+        if date1 < date2:
+            date_from= make_dcm_date(date1)
+            date_until = make_dcm_date(date2)
+        elif date1 == date2:
+            date_single = make_dcm_date(date1)
+        elif date1 > date2:
+            date_until = make_dcm_date(date1)
+            date_from= make_dcm_date(date2)
+    elif type(date1) is datetime.datetime:
+        date_single = make_dcm_date(date1)
+    elif type(date2) is datetime.datetime:
+        date_single = make_dcm_date(date2)
+    else:
+        return None
+
+    if date_single:
+        return date_single
+    else:
+        return '{0}-{1}'.format(date_from, date_until)
