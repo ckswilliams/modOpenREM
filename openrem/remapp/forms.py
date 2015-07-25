@@ -33,8 +33,8 @@ class DicomQueryForm(forms.Form):
     )
 
     remote_host_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
-    date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control"}), required=False)
-    date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control"}), required=False)
+    date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
+    date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
     modality_field = forms.MultipleChoiceField(choices=MODALITIES, widget=forms.CheckboxSelectMultiple(attrs={"class": "form-control"}), required=False)
 
     def __init__(self, *args, **kwargs):
