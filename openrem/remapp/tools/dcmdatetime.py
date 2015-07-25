@@ -120,22 +120,31 @@ def make_dcm_date(pythondate):
     :returns:           DICOM date as string
     """
     import datetime
-    if type(pythondate) is not datetime.datetime:
+    if type(pythondate) is not datetime.date:
         return None
 
     return pythondate.strftime("%Y%m%d")
 
 def make_dcm_date_range(date1=None, date2=None):
-    """Given one or two python dates, return a DICOM date range
-    :param: date1, date2:   One or two Python dates
-    :type date1, date2:     Python date objects
+    """Given one or two dates of the form yyyy-mm-dd, return a DICOM date range
+    :param: date1, date2:   One or two yyyy-mm-dd dates
+    :type date1, date2:     String
     :returns:               DICOM date range as string
     """
     import datetime
 
     date_single= None
 
-    if (type(date1) is datetime.datetime) and (type(date2) is datetime.datetime):
+    try:
+        date1 = datetime.datetime.strptime(date1,"%Y-%m-%d").date()
+    except:
+        date1 = None
+    try:
+        date2 = datetime.datetime.strptime(date2,"%Y-%m-%d").date()
+    except:
+        date2 = None
+
+    if date1 and date2:
         if date1 < date2:
             date_from= make_dcm_date(date1)
             date_until = make_dcm_date(date2)
@@ -144,10 +153,12 @@ def make_dcm_date_range(date1=None, date2=None):
         elif date1 > date2:
             date_until = make_dcm_date(date1)
             date_from= make_dcm_date(date2)
-    elif type(date1) is datetime.datetime:
-        date_single = make_dcm_date(date1)
-    elif type(date2) is datetime.datetime:
-        date_single = make_dcm_date(date2)
+    elif date1:
+        date_from = make_dcm_date(date1)
+        date_until = make_dcm_date(datetime.date.today())
+    elif date2:
+        date_from = '19000101'
+        date_until = make_dcm_date(date2)
     else:
         return None
 

@@ -111,10 +111,6 @@ def ajax_test3(request):
     try:
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
-        print 'query_id: {0}'.format(query_id)
-        queries = DicomQuery.objects.all()
-        for q in queries:
-            print q.query_id
         resp['status'] = 'not complete'
         resp['message'] = '<h4>Query {0} not yet started</h4>'.format(query_id)
         return HttpResponse(json.dumps(resp), content_type='application/json')
@@ -148,8 +144,6 @@ def ajax_test3(request):
 @login_required
 def q_process(request, *args, **kwargs):
     import uuid
-    from django.shortcuts import render_to_response
-    from django.template import RequestContext
     from remapp.netdicom.qrscu import qrscu
     from remapp.models import DicomRemoteQR
     from remapp.forms import DicomQueryForm
@@ -157,19 +151,18 @@ def q_process(request, *args, **kwargs):
     if request.method == 'POST':
         form = DicomQueryForm(request.POST)
         if form.is_valid():
-            print "Form is valid"
             rh_pk = request.POST['remote_host_field']
             date_from = request.POST['date_from_field']
             date_until = request.POST['date_until_field']
             modalities = request.POST.get('modality_field',None);
             query_id = str(uuid.uuid4())
-            print query_id
             rh = DicomRemoteQR.objects.get(pk=rh_pk)
             if rh.hostname:
                 host = rh.hostname
             else:
                 host = rh.ip
-            task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id)
+
+            task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id, date_from=date_from, date_until=date_until)
 
             resp = {}
             resp['message'] = 'Request created'

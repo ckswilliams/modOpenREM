@@ -44,7 +44,7 @@ def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
     d2.SeriesNumber = ''
     d2.SeriesInstanceUID = ''
     d2.Modality = ''
-    d2.NumberOfSeriesRelatedInstances
+    d2.NumberOfSeriesRelatedInstances = ''
 
     assoc2 = MyAE.RequestAssociation(RemoteAE)
     st2 = assoc2.StudyRootFindSOPClass.SCU(d2, 1)
@@ -110,8 +110,7 @@ from celery import shared_task
 @shared_task
 def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, *args, **kwargs
-    ):
+        date_from=None, date_until=None, modalities=None, *args, **kwargs):
     import uuid
     from decimal import Decimal
     from netdicom.applicationentity import AE
@@ -119,7 +118,7 @@ def qrscu(
     from dicom.dataset import Dataset, FileDataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import DicomQRRspStudy, DicomQuery
-    from remapp.tools.dcmdatetime import make_date
+    from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
 
     if implicit:
         ts = [ImplicitVRLittleEndian]
@@ -181,16 +180,24 @@ def qrscu(
     d.StudyDescription = ''
     d.StudyID = ''
     d.StudyInstanceUID = ''
-    d.StudyDate = ''
     d.StudyTime = ''
     d.PatientAge = ''
     d.PatientBirthDate = ''
 
-    if date_from and date_until:
-        df =
+    d.StudyDate = make_dcm_date_range(date_from, date_until)
+    if not d.StudyDate:
+        d.StudyDate = ''
 
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st
+
+    if not st:
+        query.failed = True
+        query.message = "Study Root Find unsuccessful"
+        query.complete = True
+        query.save()
+        MyAE.Quit()
+        return
 
     responses = True
     rspno = 0
