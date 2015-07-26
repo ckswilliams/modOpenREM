@@ -125,7 +125,10 @@ def ajax_test3(request):
     table = ['<table class="table table-bordered">']
     for m in modalities:
         table.append('<tr><td>')
-        table.append(m['modality'])
+        if m['modality']:
+            table.append(m['modality'])
+        else:
+            table.append('Unknown')
         table.append('</td><td>')
         table.append(str(m['count']))
         table.append('</tr></td>')
