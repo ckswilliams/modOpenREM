@@ -187,6 +187,8 @@ def qrscu(
     d.StudyDate = make_dcm_date_range(date_from, date_until)
     if not d.StudyDate:
         d.StudyDate = ''
+    if modalities:
+        d.ModalitiesInStudy = modalities
 
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st

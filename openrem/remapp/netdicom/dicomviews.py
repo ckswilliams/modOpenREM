@@ -147,6 +147,7 @@ def ajax_test3(request):
 @login_required
 def q_process(request, *args, **kwargs):
     import uuid
+    import datetime
     from remapp.netdicom.qrscu import qrscu
     from remapp.models import DicomRemoteQR
     from remapp.forms import DicomQueryForm
@@ -154,10 +155,10 @@ def q_process(request, *args, **kwargs):
     if request.method == 'POST':
         form = DicomQueryForm(request.POST)
         if form.is_valid():
-            rh_pk = request.POST['remote_host_field']
-            date_from = request.POST['date_from_field']
-            date_until = request.POST['date_until_field']
-            modalities = request.POST.get('modality_field',None);
+            rh_pk = form.cleaned_data.get('remote_host_field')
+            date_from = form.cleaned_data.get('date_from_field')
+            date_until = form.cleaned_data.get('date_until_field')
+            modalities = form.cleaned_data.get('modality_field')
             query_id = str(uuid.uuid4())
             rh = DicomRemoteQR.objects.get(pk=rh_pk)
             if rh.hostname:
@@ -165,7 +166,13 @@ def q_process(request, *args, **kwargs):
             else:
                 host = rh.ip
 
-            task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id, date_from=date_from, date_until=date_until)
+            if date_from:
+                date_from = date_from.isoformat()
+            if date_until:
+                date_until = date_until.isoformat()
+
+            task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id, date_from=date_from,
+                               date_until=date_until, modalities=modalities)
 
             resp = {}
             resp['message'] = 'Request created'
