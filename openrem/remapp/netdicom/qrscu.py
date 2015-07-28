@@ -64,16 +64,6 @@ def _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move):
         rsp.study_description = ss[1].StudyDescription
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         rsp.study_date = make_date(ss[1].StudyDate)
-        if ss[1].PatientBirthDate and ss[1].StudyDate:
-            dob = make_date(ss[1].PatientBirthDate)
-            rsp.patient_age_decimal = Decimal((rsp.study_date.date() - dob.date()).days)/Decimal('365.25')
-        elif ss[1].PatientAge:
-            if ss[1].PatientAge[-1:]=='Y':
-                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])
-            elif ss[1].PatientAge[-1:]=='M':
-                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('12')
-            elif ss[1].PatientAge[-1:]=='D':
-                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('365.25')
         rsp.save()
 
         if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
