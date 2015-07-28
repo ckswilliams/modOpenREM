@@ -149,7 +149,7 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
         while (found == false) {
             if (data2[i].name == data[j].name) {
                 point = data2[i];
-                chart.series[s[1]].data[i].update({
+                chart.series[s[1]].data[j].update({
                     index: j,
                     name: point.name,
                     y: point.y,
@@ -172,7 +172,7 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
         while (found == false) {
             if (data3[i].name == data[j].name) {
                 point = data3[i];
-                chart.series[s[2]].data[i].update({
+                chart.series[s[2]].data[j].update({
                     index: j,
                     name: point.name,
                     y: point.y,
@@ -195,7 +195,7 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
         while (found == false) {
             if (data4[i].name == data[j].name) {
                 point = data4[i];
-                chart.series[s[3]].data[i].update({
+                chart.series[s[3]].data[j].update({
                     index: j,
                     name: point.name,
                     y: point.y,
