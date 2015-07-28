@@ -94,7 +94,7 @@ function rebuildTwoSeries(chartContainer, chartData, chartData2, s) {
         while (found == false) {
             if (data2[i].name == data[j].name) {
                 point = data2[i];
-                chart.series[s2].data[i].update({
+                chart.series[s2].data[j].update({
                     index: j,
                     name: point.name,
                     y: point.y,
