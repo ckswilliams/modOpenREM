@@ -33,6 +33,80 @@ def _move_req(MyAE, RemoteAE, d):
     assocMove.Release(0)
     print "Move association released"
 
+def _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move):
+    from decimal import Decimal
+    from remapp.models import DicomQRRspStudy
+    from remapp.tools.dcmdatetime import make_date
+
+    st = assoc.StudyRootFindSOPClass.SCU(d, 1)
+    # print 'done with status "%s"' % st
+
+    if not st:
+        query.failed = True
+        query.message = "Study Root Find unsuccessful"
+        query.complete = True
+        query.save()
+        MyAE.Quit()
+        return
+
+    rspno = 0
+
+    for ss in st:
+        if not ss[1]:
+            continue
+        rspno += 1
+        print "Response {0}".format(rspno)
+        rsp = DicomQRRspStudy.objects.create(dicom_query=query)
+        rsp.query_id = query_id
+        rsp.patient_id = ss[1].PatientID
+        rsp.sop_instance_uid = ss[1].SOPInstanceUID
+        rsp.modality = ss[1].Modality
+        rsp.study_description = ss[1].StudyDescription
+        rsp.study_instance_uid = ss[1].StudyInstanceUID
+        rsp.study_date = make_date(ss[1].StudyDate)
+        if ss[1].PatientBirthDate and ss[1].StudyDate:
+            dob = make_date(ss[1].PatientBirthDate)
+            rsp.patient_age_decimal = Decimal((rsp.study_date.date() - dob.date()).days)/Decimal('365.25')
+        elif ss[1].PatientAge:
+            if ss[1].PatientAge[-1:]=='Y':
+                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])
+            elif ss[1].PatientAge[-1:]=='M':
+                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('12')
+            elif ss[1].PatientAge[-1:]=='D':
+                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('365.25')
+        rsp.save()
+
+        if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
+            # new query for series level information
+            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
+            _query_series(MyAE, RemoteAE, ss[1], move, rsp)
+            continue
+        if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
+            # get everything
+            if move:
+                # print "Getting a study with modality type {0}".format(ss[1].Modality)
+                _move_req(MyAE, RemoteAE, ss[1])
+            continue
+        if 'MG' in ss[1].Modality:
+            # get everything
+            if move:
+                # print "Getting a study with modality type {0}".format(ss[1].Modality)
+                _move_req(MyAE, RemoteAE, ss[1])
+            continue
+        if 'SR' in ss[1].Modality:
+            # get it - you may as well
+            if move:
+                # print "Getting a study with modality type {0}".format(ss[1].Modality)
+                _move_req(MyAE, RemoteAE, ss[1])
+            continue
+        if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
+            # Don't know if you need both...
+            # Get series level information to look for SR
+            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
+            _query_series(MyAE, RemoteAE, ss[1], move, rsp)
+            continue
+        else:
+            rsp.delete()
 
 
 def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
@@ -112,7 +186,6 @@ def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, *args, **kwargs):
     import uuid
-    from decimal import Decimal
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset, FileDataset
@@ -190,76 +263,7 @@ def qrscu(
     if modalities:
         d.ModalitiesInStudy = modalities
 
-    st = assoc.StudyRootFindSOPClass.SCU(d, 1)
-    # print 'done with status "%s"' % st
-
-    if not st:
-        query.failed = True
-        query.message = "Study Root Find unsuccessful"
-        query.complete = True
-        query.save()
-        MyAE.Quit()
-        return
-
-    responses = True
-    rspno = 0
-
-    for ss in st:
-        if not ss[1]:
-            continue
-        rspno += 1
-        print "Response {0}".format(rspno)
-        rsp = DicomQRRspStudy.objects.create(dicom_query=query)
-        rsp.query_id = query_id
-        rsp.patient_id = ss[1].PatientID
-        rsp.sop_instance_uid = ss[1].SOPInstanceUID
-        rsp.modality = ss[1].Modality
-        rsp.study_description = ss[1].StudyDescription
-        rsp.study_instance_uid = ss[1].StudyInstanceUID
-        rsp.study_date = make_date(ss[1].StudyDate)
-        if ss[1].PatientBirthDate and ss[1].StudyDate:
-            dob = make_date(ss[1].PatientBirthDate)
-            rsp.patient_age_decimal = Decimal((rsp.study_date.date() - dob.date()).days)/Decimal('365.25')
-        elif ss[1].PatientAge:
-            if ss[1].PatientAge[-1:]=='Y':
-                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])
-            elif ss[1].PatientAge[-1:]=='M':
-                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('12')
-            elif ss[1].PatientAge[-1:]=='D':
-                rsp.patient_age_decimal = Decimal(ss[1].PatientAge[:-1])/Decimal('365.25')
-        rsp.save()
-
-        if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
-            # new query for series level information
-            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
-            _query_series(MyAE, RemoteAE, ss[1], move, rsp)
-            continue
-        if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
-            # get everything
-            if move:
-                # print "Getting a study with modality type {0}".format(ss[1].Modality)
-                _move_req(MyAE, RemoteAE, ss[1])
-            continue
-        if 'MG' in ss[1].Modality:
-            # get everything
-            if move:
-                # print "Getting a study with modality type {0}".format(ss[1].Modality)
-                _move_req(MyAE, RemoteAE, ss[1])
-            continue
-        if 'SR' in ss[1].Modality:
-            # get it - you may as well
-            if move:
-                # print "Getting a study with modality type {0}".format(ss[1].Modality)
-                _move_req(MyAE, RemoteAE, ss[1])
-            continue
-        if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
-            # Don't know if you need both...
-            # Get series level information to look for SR
-            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
-            _query_series(MyAE, RemoteAE, ss[1], move, rsp)
-            continue
-        else:
-            rsp.delete()
+    _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move)
 
     print "Release association"
     assoc.Release(0)
@@ -314,3 +318,17 @@ if __name__ == "__main__":
 # (0020, 1206) Number of Study Related Series      IS: ''
 # (0020, 1208) Number of Study Related Instances   IS: ''
 # (0020, 1209) Number of Series Related Instances  IS: ''
+
+
+
+# If one or more than one modality selected:
+#     Query with first modality in 'ModalitiesInStudy' field
+#         1/ Respected as match, repeat with other modalities
+#         2/ Not respected as match, but returned in rsp - not likely
+#         3/ Ignored, returned all modalities
+
+# Detect 1/ because none of rsp have ModalitiesInStudy that don't include modality, or because field is not empty?
+# If 3/, don't repeat query with other modality selected - will get same results
+# If 3/, need to filter on rsp before presenting results or requesting move
+
+# Always go to series level query, and do move on series level.
