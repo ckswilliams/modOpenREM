@@ -33,7 +33,7 @@ def _move_req(MyAE, RemoteAE, d):
     assocMove.Release(0)
     print "Move association released"
 
-def _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move):
+def _query_study(assoc, d, query, query_id, move):
     from decimal import Decimal
     from remapp.models import DicomQRRspStudy
     from remapp.tools.dcmdatetime import make_date
@@ -41,13 +41,14 @@ def _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move):
     st = assoc.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st
 
-    if not st:
-        query.failed = True
-        query.message = "Study Root Find unsuccessful"
-        query.complete = True
-        query.save()
-        MyAE.Quit()
-        return
+    # TODO: Replace the code below to deal with find failure
+    # if not st:
+    #     query.failed = True
+    #     query.message = "Study Root Find unsuccessful"
+    #     query.complete = True
+    #     query.save()
+    #     MyAE.Quit()
+    #     return
 
     rspno = 0
 
@@ -66,40 +67,11 @@ def _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move):
         rsp.study_date = make_date(ss[1].StudyDate)
         rsp.save()
 
-        if ('CT' in ss[1].Modality) or ('PT' in ss[1].Modality):
-            # new query for series level information
-            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
-            _query_series(MyAE, RemoteAE, ss[1], move, rsp)
-            continue
-        if ('DX' in ss[1].Modality) or ('CR' in ss[1].Modality):
-            # get everything
-            if move:
-                # print "Getting a study with modality type {0}".format(ss[1].Modality)
-                _move_req(MyAE, RemoteAE, ss[1])
-            continue
-        if 'MG' in ss[1].Modality:
-            # get everything
-            if move:
-                # print "Getting a study with modality type {0}".format(ss[1].Modality)
-                _move_req(MyAE, RemoteAE, ss[1])
-            continue
-        if 'SR' in ss[1].Modality:
-            # get it - you may as well
-            if move:
-                # print "Getting a study with modality type {0}".format(ss[1].Modality)
-                _move_req(MyAE, RemoteAE, ss[1])
-            continue
-        if ('RF' in ss[1].Modality) or ('XA' in ss[1].Modality):
-            # Don't know if you need both...
-            # Get series level information to look for SR
-            # print "Starting a series level query for modality type {0}".format(ss[1].Modality)
-            _query_series(MyAE, RemoteAE, ss[1], move, rsp)
-            continue
-        else:
-            rsp.delete()
+        _query_series(assoc, ss[1], rsp)
 
 
-def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
+
+def _query_series(assoc, d2, studyrsp):
     import uuid
     from remapp.tools.dcmdatetime import make_date
     from remapp.models import DicomQRRspSeries
@@ -110,8 +82,7 @@ def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
     d2.Modality = ''
     d2.NumberOfSeriesRelatedInstances = ''
 
-    assoc2 = MyAE.RequestAssociation(RemoteAE)
-    st2 = assoc2.StudyRootFindSOPClass.SCU(d2, 1)
+    st2 = assoc.StudyRootFindSOPClass.SCU(d2, 1)
 
     query_id = uuid.uuid4()
 
@@ -138,36 +109,7 @@ def _query_series(MyAE, RemoteAE, d2, move, studyrsp):
         seriesrsp.series_number = series[1].SeriesNumber
         seriesrsp.save()
 #        print "Series response number {0}".format(seRspNo)
-        if series[1].Modality == 'SR':
-            # Not sure if they will be SR are series level but CT at study level?
-            # If they are, send C-Move request
-            #print "C-Move request for series with modality type SR"
-            if move:
-                _move_req(MyAE, RemoteAE, series[1])
-            continue
-        seNum = str(series[1].SeriesNumber)
-        if (seNum == '502') or (seNum == '998') or (seNum == '990') or (seNum == '9001'):
-            # Find Siemens (502 CT, 990 RF) and GE (998 CT) RDSR or Enhanced SR
-            # Added 9001 for Toshiba XA based on a sample of 1
-            # Then Send a C-Move request for that series
-            #print "C-Move request for series with number {0}".format(seNum)
-            if move:
-                _move_req(MyAE, RemoteAE, series[1])
-            continue
-        try:
-            if series[1].SeriesDescription == 'Dose Info':
-                # Get Philips Dose Info series - not SR but enough information in the header
-                #print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
-                if move:
-                    _move_req(MyAE, RemoteAE, series[1])
-                continue
-        except AttributeError:
-            # Try an image level find?
-            pass
-        # Do something for Toshiba CT...
 
-    assoc2.Release(0)
-    print "Released series association"
 
 from celery import shared_task
 
@@ -253,7 +195,9 @@ def qrscu(
     if modalities:
         d.ModalitiesInStudy = modalities
 
-    _query_study(MyAE, RemoteAE, assoc, d, query, query_id, move)
+    _query_study(assoc, d, query, query_id, move)
+
+    # Now have full response - look at it and decide what to do next
 
     print "Release association"
     assoc.Release(0)
@@ -322,3 +266,34 @@ if __name__ == "__main__":
 # If 3/, need to filter on rsp before presenting results or requesting move
 
 # Always go to series level query, and do move on series level.
+
+
+# From series level query function
+
+        # if series[1].Modality == 'SR':
+        #     # Not sure if they will be SR are series level but CT at study level?
+        #     # If they are, send C-Move request
+        #     #print "C-Move request for series with modality type SR"
+        #     if move:
+        #         _move_req(MyAE, RemoteAE, series[1])
+        #     continue
+        # seNum = str(series[1].SeriesNumber)
+        # if (seNum == '502') or (seNum == '998') or (seNum == '990') or (seNum == '9001'):
+        #     # Find Siemens (502 CT, 990 RF) and GE (998 CT) RDSR or Enhanced SR
+        #     # Added 9001 for Toshiba XA based on a sample of 1
+        #     # Then Send a C-Move request for that series
+        #     #print "C-Move request for series with number {0}".format(seNum)
+        #     if move:
+        #         _move_req(MyAE, RemoteAE, series[1])
+        #     continue
+        # try:
+        #     if series[1].SeriesDescription == 'Dose Info':
+        #         # Get Philips Dose Info series - not SR but enough information in the header
+        #         #print "C-Move request for series with description {0}".format(series[1].SeriesDescription)
+        #         if move:
+        #             _move_req(MyAE, RemoteAE, series[1])
+        #         continue
+        # except AttributeError:
+        #     # Try an image level find?
+        #     pass
+        # # Do something for Toshiba CT...
