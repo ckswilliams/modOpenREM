@@ -574,6 +574,8 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
+            userProfile.plotCTInitialSortingChoice = chartOptionsForm.cleaned_data['plotCTInitialSortingChoice']
+            userProfile.plotCTInitialSortingDirection = chartOptionsForm.cleaned_data['plotCTInitialSortingDirection']
             if median_available:
                 userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
@@ -590,6 +592,8 @@ def ct_summary_list_filter(request):
                         'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
                         'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
                         'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod,
+                        'plotCTInitialSortingChoice': userProfile.plotCTInitialSortingChoice,
+                        'plotCTInitialSortingDirection': userProfile.plotCTInitialSortingDirection,
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = CTChartOptionsForm(formData)
 

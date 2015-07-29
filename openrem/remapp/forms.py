@@ -22,6 +22,24 @@ AVERAGES = (
     (BOTH, 'Both'),
 )
 
+DLP = 'dlp'
+CTDI = 'ctdi'
+FREQ = 'freq'
+NAME = 'name'
+SORTING_CHOICES_CT = (
+    (DLP, 'DLP'),
+    (CTDI, 'CTDI'),
+    (FREQ, 'Frequency'),
+    (NAME, 'Name'),
+)
+
+ASCENDING = 1
+DESCENDING = -1
+SORTING_DIRECTION = (
+    (ASCENDING, 'Ascending'),
+    (DESCENDING, 'Descending'),
+)
+
 class SizeUploadForm(forms.Form):
     """Form for patient size csv file upload
     """
@@ -75,6 +93,8 @@ class CTChartOptionsForm(forms.Form):
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+    plotCTInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_CT, required=False)
+    plotCTInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION, required=False)
 
 
 class UpdateDisplayNameForm(forms.Form):

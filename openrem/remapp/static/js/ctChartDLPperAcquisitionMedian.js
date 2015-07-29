@@ -85,4 +85,19 @@ $(function () {
             series: seriesDrilldown
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            seriesSort('#histogramPlotDIV', seriesMedianData, 'freq', chartSortingDirection);
+            break;
+        case 'dlp':
+            seriesSort('#histogramPlotDIV', seriesMedianData, 'y', chartSortingDirection);
+            break;
+        case 'name':
+            seriesSort('#histogramPlotDIV', seriesMedianData, 'name', chartSortingDirection);
+            break;
+        default:
+            seriesSort('#histogramPlotDIV', seriesMedianData, 'name', 1);
+    }
+
 });

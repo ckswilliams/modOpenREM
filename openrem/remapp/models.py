@@ -58,6 +58,24 @@ class UserProfile(models.Model):
         (BOTH, 'both'),
     )
 
+    DLP = 'dlp'
+    CTDI = 'ctdi'
+    FREQ = 'freq'
+    NAME = 'name'
+    SORTING_CHOICES_CT = (
+        (DLP, 'DLP'),
+        (CTDI, 'CTDI'),
+        (FREQ, 'Frequency'),
+        (NAME, 'Name'),
+    )
+
+    ASCENDING = 1
+    DESCENDING = -1
+    SORTING_DIRECTION = (
+        (ASCENDING, 'Ascending'),
+        (DESCENDING, 'Descending'),
+    )
+
     # This field is required.
     user = models.OneToOneField(User)
 
@@ -93,6 +111,12 @@ class UserProfile(models.Model):
     plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
                                                         choices=TIME_PERIOD,
                                                         default=MONTHS)
+    plotCTInitialSortingChoice = models.CharField(max_length=4,
+                                                  choices=SORTING_CHOICES_CT,
+                                                  default=FREQ)
+    plotCTInitialSortingDirection = models.IntegerField(null=True,
+                                                        choices=SORTING_DIRECTION,
+                                                        default=DESCENDING)
 
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)

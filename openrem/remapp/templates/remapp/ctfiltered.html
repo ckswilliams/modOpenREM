@@ -148,6 +148,11 @@
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
     <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+    <script>
+        var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
+        var chartSortingDirection = {{ request.user.userprofile.plotCTInitialSortingDirection }};
+    </script>
+
     <!-- End of include JavaScript to enable highcharts plots -->
 
     <!-- JavaScript to enable bootstrap tooltips -->

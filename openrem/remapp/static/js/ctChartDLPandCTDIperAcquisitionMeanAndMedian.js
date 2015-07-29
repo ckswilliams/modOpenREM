@@ -169,4 +169,22 @@ $(function () {
             }
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'freq', chartSortingDirection, [0,1,2,3]);
+            break;
+        case 'dlp':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'y', chartSortingDirection, [0,1,2,3]);
+            break;
+        case 'ctdi':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesDataCTDI, seriesMedianDataCTDI, seriesData, seriesMedianData, 'y', chartSortingDirection, [2,3,0,1]);
+            break;
+        case 'name':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'name', chartSortingDirection, [0,1,2,3]);
+            break;
+        default:
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'name', chartSortingDirection, [0,1,2,3]);
+    }
+
 });
