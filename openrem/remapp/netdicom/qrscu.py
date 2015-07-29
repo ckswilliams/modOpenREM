@@ -33,7 +33,7 @@ def _move_req(MyAE, RemoteAE, d):
     assocMove.Release(0)
     print "Move association released"
 
-def _query_study(assoc, d, query, query_id, move):
+def _query_study(assoc, d, query, query_id):
     from decimal import Decimal
     from remapp.models import DicomQRRspStudy
     from remapp.tools.dcmdatetime import make_date
@@ -62,12 +62,13 @@ def _query_study(assoc, d, query, query_id, move):
         rsp.patient_id = ss[1].PatientID
         rsp.sop_instance_uid = ss[1].SOPInstanceUID
         rsp.modality = ss[1].Modality
+        rsp.modalities_in_study = ss[1].ModalitiesInStudy
         rsp.study_description = ss[1].StudyDescription
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         rsp.study_date = make_date(ss[1].StudyDate)
         rsp.save()
 
-        _query_series(assoc, ss[1], rsp)
+#        _query_series(assoc, ss[1], rsp)
 
 
 
@@ -101,12 +102,18 @@ def _query_series(assoc, d2, studyrsp):
         seriesrsp.study_description = series[1].StudyDescription
         seriesrsp.study_instance_uid = series[1].StudyInstanceUID
         seriesrsp.study_date = make_date(series[1].StudyDate)
-        try:
+        try:  # CR images for example don't have series information
             seriesrsp.series_description = series[1].SeriesDescription
         except:
             pass
-        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
-        seriesrsp.series_number = series[1].SeriesNumber
+        try:
+            seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        except:
+            pass
+        try:
+            seriesrsp.series_number = series[1].SeriesNumber
+        except:
+            pass
         seriesrsp.save()
 #        print "Series response number {0}".format(seRspNo)
 
@@ -192,12 +199,28 @@ def qrscu(
     d.StudyDate = make_dcm_date_range(date_from, date_until)
     if not d.StudyDate:
         d.StudyDate = ''
+
     if modalities:
-        d.ModalitiesInStudy = modalities
+        d.ModalitiesInStudy = modalities[0]
+        _query_study(assoc, d, query, query_id)
+        study_rsp = query.dicomqrrspstudy_set.all()
+        study_rsp_mods = study_rsp.values('modality').annotate(count=Count('pk'))
+        study_rsp_mods_in_study = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
+        if len(modalities) is 1:
+            # delete any that don't match
+            pass
+        else:
+            # see if any responses have only modalities we haven't asked for
+                # delete others, finish (ready for retrieve)
+            # if not, modalitiesinstudy is being respected, and we need to ask for the others
+                # set next modality, _query_study
+            pass
+    else:
+        _query_study(assoc, d, query, query_id)
 
-    _query_study(assoc, d, query, query_id, move)
+    # Now have full study level response - look at it and decide what to do next
 
-    # Now have full response - look at it and decide what to do next
+
 
     print "Release association"
     assoc.Release(0)

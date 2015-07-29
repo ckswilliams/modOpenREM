@@ -46,6 +46,7 @@ class DicomQRRspStudy(models.Model):
     patient_id = models.CharField(max_length=64, blank=True, null=True)
     sop_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
+    modalities_in_study = models.CharField(max_length=32, blank=True, null=True)
     study_description = models.TextField(blank=True, null=True)
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
