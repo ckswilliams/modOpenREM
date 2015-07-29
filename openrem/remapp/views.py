@@ -574,8 +574,8 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
-            userProfile.plotCTInitialSortingChoice = chartOptionsForm.cleaned_data['plotCTInitialSortingChoice']
-            userProfile.plotCTInitialSortingDirection = chartOptionsForm.cleaned_data['plotCTInitialSortingDirection']
+            #userProfile.plotCTInitialSortingChoice = chartOptionsForm.cleaned_data['plotCTInitialSortingChoice']
+            #userProfile.plotCTInitialSortingDirection = chartOptionsForm.cleaned_data['plotCTInitialSortingDirection']
             if median_available:
                 userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
@@ -592,8 +592,8 @@ def ct_summary_list_filter(request):
                         'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
                         'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
                         'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod,
-                        'plotCTInitialSortingChoice': userProfile.plotCTInitialSortingChoice,
-                        'plotCTInitialSortingDirection': userProfile.plotCTInitialSortingDirection,
+                        #'plotCTInitialSortingChoice': userProfile.plotCTInitialSortingChoice,
+                        #'plotCTInitialSortingDirection': userProfile.plotCTInitialSortingDirection,
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = CTChartOptionsForm(formData)
 
@@ -1331,3 +1331,108 @@ def display_name_update(request, pk):
     return render_to_response('remapp/displaynameupdate.html',
                               return_structure,
                               context_instance=RequestContext(request))
+
+@login_required
+def chart_options_view(request):
+    from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm
+    from openremproject import settings
+    import pkg_resources # part of setuptools
+
+    if request.method == 'POST':
+        general_form = GeneralChartOptionsDisplayForm(request.POST)
+        ct_form = CTChartOptionsDisplayForm(request.POST)
+        dx_form = DXChartOptionsDisplayForm(request.POST)
+        if general_form.is_valid() and ct_form.is_valid() and dx_form.is_valid():
+            try:
+                # See if the user has plot settings in userprofile
+                user_profile = request.user.userprofile
+            except:
+                # Create a default userprofile for the user if one doesn't exist
+                create_user_profile(sender=request.user, instance=request.user, created=True)
+                user_profile = request.user.userprofile
+
+            user_profile.plotCharts = general_form.cleaned_data['plotCharts']
+            user_profile.plotCTInitialSortingChoice = general_form.cleaned_data['plotCTInitialSortingChoice']
+            user_profile.plotCTInitialSortingDirection = general_form.cleaned_data['plotCTInitialSortingDirection']
+
+            user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
+            user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
+            user_profile.plotCTAcquisitionFreq = ct_form.cleaned_data['plotCTAcquisitionFreq']
+            user_profile.plotCTStudyMeanDLP = ct_form.cleaned_data['plotCTStudyMeanDLP']
+            user_profile.plotCTStudyFreq = ct_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTRequestMeanDLP = ct_form.cleaned_data['plotCTRequestMeanDLP']
+            user_profile.plotCTRequestFreq = ct_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTStudyPerDayAndHour = ct_form.cleaned_data['plotCTStudyPerDayAndHour']
+            user_profile.plotCTStudyMeanDLPOverTime = ct_form.cleaned_data['plotCTStudyMeanDLPOverTime']
+            user_profile.plotCTStudyMeanDLPOverTimePeriod = ct_form.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
+            if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+                user_profile.plotMeanMedianOrBoth = ct_form.cleaned_data['plotMeanMedianOrBoth']
+
+            user_profile.plotDXAcquisitionMeanDAP = dx_form.cleaned_data['plotDXAcquisitionMeanDAP']
+            user_profile.plotDXAcquisitionFreq = dx_form.cleaned_data['plotDXAcquisitionFreq']
+            user_profile.plotDXAcquisitionMeankVp = dx_form.cleaned_data['plotDXAcquisitionMeankVp']
+            user_profile.plotDXAcquisitionMeanmAs = dx_form.cleaned_data['plotDXAcquisitionMeanmAs']
+            user_profile.plotDXStudyPerDayAndHour = dx_form.cleaned_data['plotDXStudyPerDayAndHour']
+            user_profile.plotDXAcquisitionMeanDAPOverTime = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
+            user_profile.plotDXAcquisitionMeanDAPOverTimePeriod = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
+
+            user_profile.save()
+
+    try:
+        version = pkg_resources.require("openrem")[0].version
+    except:
+        version = ''
+    admin = {'openremversion' : version}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    try:
+        # See if the user has plot settings in userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    general_form_data = {'plotCharts': user_profile.plotCharts,
+                       'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice,
+                       'plotCTInitialSortingDirection': user_profile.plotCTInitialSortingDirection}
+
+    ct_form_data = {'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
+                  'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
+                  'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
+                  'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
+                  'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
+                  'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                  'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
+                  'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                  'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
+                  'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
+                  'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod}
+
+    dx_form_data = {'plotDXAcquisitionMeanDAP': user_profile.plotDXAcquisitionMeanDAP,
+                  'plotDXAcquisitionFreq': user_profile.plotDXAcquisitionFreq,
+                  'plotDXAcquisitionMeankVp': user_profile.plotDXAcquisitionMeankVp,
+                  'plotDXAcquisitionMeanmAs': user_profile.plotDXAcquisitionMeanmAs,
+                  'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour,
+                  'plotDXAcquisitionMeanDAPOverTime': user_profile.plotDXAcquisitionMeanDAPOverTime,
+                  'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod}
+
+    general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
+    ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
+    dx_chart_options_form = DXChartOptionsDisplayForm(dx_form_data)
+
+    return_structure = {'admin':admin,
+                        'GeneralChartOptionsForm':general_chart_options_form,
+                        'CTChartOptionsForm':ct_chart_options_form,
+                        'DXChartOptionsForm':dx_chart_options_form,
+                        }
+
+    return render_to_response(
+        'remapp/displaychartoptions.html',
+        return_structure,
+        context_instance=RequestContext(request)
+    )

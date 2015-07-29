@@ -93,6 +93,39 @@ class CTChartOptionsForm(forms.Form):
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class DXChartOptionsDisplayForm(forms.Form):
+    plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition',required=False)
+    plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
+    plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition',required=False)
+    plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition',required=False)
+    plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
+    plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Acquisition DAP over time',required=False)
+    plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class CTChartOptionsDisplayForm(forms.Form):
+    plotCTAcquisitionMeanDLP = forms.BooleanField(label='DLP per acquisition',required=False)
+    plotCTAcquisitionMeanCTDI = forms.BooleanField(label=mark_safe('CTDI<sub>vol</sub> per acquisition'),required=False)
+    plotCTAcquisitionFreq = forms.BooleanField(label='Acquisition frequency',required=False)
+    plotCTStudyMeanDLP = forms.BooleanField(label='DLP per study',required=False)
+    plotCTStudyFreq = forms.BooleanField(label='Study frequency',required=False)
+    plotCTRequestMeanDLP = forms.BooleanField(label='DLP per requested procedure',required=False)
+    plotCTRequestFreq = forms.BooleanField(label='Requested procedure frequency',required=False)
+    plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
+    plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Study DLP over time',required=False)
+    plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class GeneralChartOptionsDisplayForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?',required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
     plotCTInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_CT, required=False)
     plotCTInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION, required=False)
 
