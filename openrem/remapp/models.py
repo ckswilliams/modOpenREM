@@ -69,6 +69,13 @@ class UserProfile(models.Model):
         (NAME, 'Name'),
     )
 
+    DAP = 'dap'
+    SORTING_CHOICES_DX = (
+        (DAP, 'DAP'),
+        (FREQ, 'Frequency'),
+        (NAME, 'Name'),
+    )
+
     ASCENDING = 1
     DESCENDING = -1
     SORTING_DIRECTION = (
@@ -87,6 +94,10 @@ class UserProfile(models.Model):
                                          choices=AVERAGES,
                                          default=MEAN)
 
+    plotInitialSortingDirection = models.IntegerField(null=True,
+                                                      choices=SORTING_DIRECTION,
+                                                      default=DESCENDING)
+
     # Plotting controls
     plotCharts = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
@@ -98,6 +109,9 @@ class UserProfile(models.Model):
     plotDXAcquisitionMeanDAPOverTimePeriod = models.CharField(max_length=6,
                                                               choices=TIME_PERIOD,
                                                               default=MONTHS)
+    plotDXInitialSortingChoice = models.CharField(max_length=4,
+                                                  choices=SORTING_CHOICES_DX,
+                                                  default=FREQ)
 
     plotCTAcquisitionMeanDLP = models.BooleanField(default=True)
     plotCTAcquisitionMeanCTDI = models.BooleanField(default=True)
@@ -114,9 +128,6 @@ class UserProfile(models.Model):
     plotCTInitialSortingChoice = models.CharField(max_length=4,
                                                   choices=SORTING_CHOICES_CT,
                                                   default=FREQ)
-    plotCTInitialSortingDirection = models.IntegerField(null=True,
-                                                        choices=SORTING_DIRECTION,
-                                                        default=DESCENDING)
 
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)

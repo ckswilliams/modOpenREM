@@ -33,6 +33,13 @@ SORTING_CHOICES_CT = (
     (NAME, 'Name'),
 )
 
+DAP = 'dap'
+SORTING_CHOICES_DX = (
+    (DAP, 'DAP or kVp or mAs'),
+    (FREQ, 'Frequency'),
+    (NAME, 'Name'),
+)
+
 ASCENDING = 1
 DESCENDING = -1
 SORTING_DIRECTION = (
@@ -105,6 +112,7 @@ class DXChartOptionsDisplayForm(forms.Form):
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+    plotDXInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX, required=False)
 
 
 class CTChartOptionsDisplayForm(forms.Form):
@@ -120,14 +128,14 @@ class CTChartOptionsDisplayForm(forms.Form):
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+    plotCTInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_CT, required=False)
 
 
 class GeneralChartOptionsDisplayForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
-    plotCTInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_CT, required=False)
-    plotCTInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION, required=False)
+    plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION, required=False)
 
 
 class UpdateDisplayNameForm(forms.Form):

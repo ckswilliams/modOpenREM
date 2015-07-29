@@ -85,4 +85,19 @@ $(function () {
             series: seriesDrilldown
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            seriesSort('#container', seriesData, 'freq', chartSortingDirection);
+            break;
+        case 'dap':
+            seriesSort('#container', seriesData, 'y', chartSortingDirection);
+            break;
+        case 'name':
+            seriesSort('#container', seriesData, 'name', chartSortingDirection);
+            break;
+        default:
+            seriesSort('#container', seriesData, 'name', 1);
+    }
+
 });

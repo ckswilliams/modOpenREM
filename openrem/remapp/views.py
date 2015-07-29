@@ -1352,8 +1352,7 @@ def chart_options_view(request):
                 user_profile = request.user.userprofile
 
             user_profile.plotCharts = general_form.cleaned_data['plotCharts']
-            user_profile.plotCTInitialSortingChoice = general_form.cleaned_data['plotCTInitialSortingChoice']
-            user_profile.plotCTInitialSortingDirection = general_form.cleaned_data['plotCTInitialSortingDirection']
+            user_profile.plotInitialSortingDirection = general_form.cleaned_data['plotInitialSortingDirection']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1367,6 +1366,7 @@ def chart_options_view(request):
             user_profile.plotCTStudyMeanDLPOverTimePeriod = ct_form.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
             if 'postgresql' in settings.DATABASES['default']['ENGINE']:
                 user_profile.plotMeanMedianOrBoth = ct_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.plotCTInitialSortingChoice = ct_form.cleaned_data['plotCTInitialSortingChoice']
 
             user_profile.plotDXAcquisitionMeanDAP = dx_form.cleaned_data['plotDXAcquisitionMeanDAP']
             user_profile.plotDXAcquisitionFreq = dx_form.cleaned_data['plotDXAcquisitionFreq']
@@ -1375,6 +1375,7 @@ def chart_options_view(request):
             user_profile.plotDXStudyPerDayAndHour = dx_form.cleaned_data['plotDXStudyPerDayAndHour']
             user_profile.plotDXAcquisitionMeanDAPOverTime = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             user_profile.plotDXAcquisitionMeanDAPOverTimePeriod = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
+            user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
 
             user_profile.save()
 
@@ -1398,8 +1399,7 @@ def chart_options_view(request):
         user_profile = request.user.userprofile
 
     general_form_data = {'plotCharts': user_profile.plotCharts,
-                       'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice,
-                       'plotCTInitialSortingDirection': user_profile.plotCTInitialSortingDirection}
+                         'plotInitialSortingDirection': user_profile.plotInitialSortingDirection}
 
     ct_form_data = {'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
                   'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
@@ -1411,7 +1411,8 @@ def chart_options_view(request):
                   'plotCTRequestFreq': user_profile.plotCTRequestFreq,
                   'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                   'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
-                  'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod}
+                  'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
+                  'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice}
 
     dx_form_data = {'plotDXAcquisitionMeanDAP': user_profile.plotDXAcquisitionMeanDAP,
                   'plotDXAcquisitionFreq': user_profile.plotDXAcquisitionFreq,
@@ -1419,7 +1420,8 @@ def chart_options_view(request):
                   'plotDXAcquisitionMeanmAs': user_profile.plotDXAcquisitionMeanmAs,
                   'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour,
                   'plotDXAcquisitionMeanDAPOverTime': user_profile.plotDXAcquisitionMeanDAPOverTime,
-                  'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod}
+                  'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
+                  'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)

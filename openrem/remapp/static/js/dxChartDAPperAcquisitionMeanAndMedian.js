@@ -87,5 +87,20 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             series: seriesDrilldown
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            twoSeriesSort('#container', seriesData, seriesMedianData, 'freq', chartSortingDirection, 0);
+            break;
+        case 'dap':
+            twoSeriesSort('#container', seriesData, seriesMedianData, 'y', chartSortingDirection, 0);
+            break;
+        case 'name':
+            twoSeriesSort('#container', seriesData, seriesMedianData, 'name', chartSortingDirection, 0);
+            break;
+        default:
+            twoSeriesSort('#container', seriesData, seriesMedianData, 'name', chartSortingDirection, 0);
+    }
+
 });
 

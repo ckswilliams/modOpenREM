@@ -77,7 +77,7 @@ $(function () {
         },
         series: [{
             name: 'Mean kVp',
-            data: serieskVpData
+            data: $.extend(true, [], serieskVpData)
         }, {
             name: 'Median kVp',
             data: $.extend(true, [], seriesMediankVpData)
@@ -86,5 +86,19 @@ $(function () {
             series: serieskVpDrilldown
         }
     });
-});
 
+    switch(chartSorting) {
+        case 'freq':
+            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'freq', chartSortingDirection, 0);
+            break;
+        case 'dap':
+            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'y', chartSortingDirection, 0);
+            break;
+        case 'name':
+            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'name', chartSortingDirection, 0);
+            break;
+        default:
+            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'name', chartSortingDirection, 0);
+    }
+
+});

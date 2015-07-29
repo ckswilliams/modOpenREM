@@ -81,5 +81,20 @@ $(function () {
             series: seriesmAsDrilldown
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'freq', chartSortingDirection);
+            break;
+        case 'dap':
+            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'y', chartSortingDirection);
+            break;
+        case 'name':
+            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'name', chartSortingDirection);
+            break;
+        default:
+            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'name', 1);
+    }
+
 });
 

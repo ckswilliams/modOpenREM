@@ -150,7 +150,7 @@
     <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
     <script>
         var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
-        var chartSortingDirection = {{ request.user.userprofile.plotCTInitialSortingDirection }};
+        var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
     </script>
 
     <!-- End of include JavaScript to enable highcharts plots -->

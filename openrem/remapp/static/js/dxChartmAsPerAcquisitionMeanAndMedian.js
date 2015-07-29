@@ -77,7 +77,7 @@ $(function () {
         },
         series: [{
             name: 'Mean mAs',
-            data: seriesmAsData
+            data: $.extend(true, [], seriesmAsData)
         }, {
             name: 'Median mAs',
             data: $.extend(true, [], seriesMedianmAsData)
@@ -86,5 +86,20 @@ $(function () {
             series: seriesmAsDrilldown
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'freq', chartSortingDirection, 0);
+            break;
+        case 'dap':
+            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'y', chartSortingDirection, 0);
+            break;
+        case 'name':
+            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'name', chartSortingDirection, 0);
+            break;
+        default:
+            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'name', chartSortingDirection, 0);
+    }
+
 });
 
