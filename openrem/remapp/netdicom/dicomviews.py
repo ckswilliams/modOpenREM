@@ -171,6 +171,8 @@ def q_process(request, *args, **kwargs):
             if date_until:
                 date_until = date_until.isoformat()
 
+            print "Modalities are {0} and it is of type {1}".format(modalities, type(modalities))
+
             task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities)
 

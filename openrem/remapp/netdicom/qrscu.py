@@ -62,14 +62,19 @@ def _query_study(assoc, d, query, query_id):
         rsp.patient_id = ss[1].PatientID
         rsp.sop_instance_uid = ss[1].SOPInstanceUID
         rsp.modality = ss[1].Modality
-        rsp.modalities_in_study = ss[1].ModalitiesInStudy
         rsp.study_description = ss[1].StudyDescription
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         rsp.study_date = make_date(ss[1].StudyDate)
         rsp.save()
+        print 'Study IUID: {0}, SOP Instance UID: {1}, Modality: {2}, Study Desc: {3}, Date: {4}'.format(
+            rsp.study_instance_uid, rsp.sop_instance_uid, rsp.modality, rsp.study_description, rsp.study_date)
+        _query_series(assoc, ss[1], rsp)
 
-#        _query_series(assoc, ss[1], rsp)
-
+        try:
+            rsp.modalities_in_study = ss[1].ModalitiesInStudy.split(',')
+        except:
+            series_rsp = rsp.dicomqrrspseries_set.all()
+            rsp.modalities_in_study = set(val for dic in series_rsp.values('modality') for val in dic.values() )
 
 
 def _query_series(assoc, d2, studyrsp):
@@ -83,18 +88,30 @@ def _query_series(assoc, d2, studyrsp):
     d2.Modality = ''
     d2.NumberOfSeriesRelatedInstances = ''
 
+    print 'd2: {0}'.format(d2)
+
     st2 = assoc.StudyRootFindSOPClass.SCU(d2, 1)
 
     query_id = uuid.uuid4()
 
-    print 'In _querySeriesCT'
+    print 'In _query_series'
     seRspNo = 0
 
     for series in st2:
         if not series[1]:
             continue
+        try:
+            series[1].SeriesInstanceUID
+        except:
+            break
         seRspNo += 1
+        print "Series Response {0}: {1}".format(seRspNo, series[1])
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
+        try:  # Some series level responses were nonsense
+            seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        except:
+            seriesrsp.delete()
+            continue
         seriesrsp.query_id = query_id
         seriesrsp.patient_id = series[1].PatientID
         seriesrsp.sop_instance_uid = series[1].SOPInstanceUID
@@ -102,20 +119,12 @@ def _query_series(assoc, d2, studyrsp):
         seriesrsp.study_description = series[1].StudyDescription
         seriesrsp.study_instance_uid = series[1].StudyInstanceUID
         seriesrsp.study_date = make_date(series[1].StudyDate)
-        try:  # CR images for example don't have series information
+        seriesrsp.series_number = series[1].SeriesNumber
+        try:  # CR images for example don't always have series information
             seriesrsp.series_description = series[1].SeriesDescription
         except:
             pass
-        try:
-            seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
-        except:
-            pass
-        try:
-            seriesrsp.series_number = series[1].SeriesNumber
-        except:
-            pass
         seriesrsp.save()
-#        print "Series response number {0}".format(seRspNo)
 
 
 from celery import shared_task
@@ -142,6 +151,12 @@ def qrscu(
             ImplicitVRLittleEndian,
             ExplicitVRBigEndian
             ]
+
+    mods = {'CT': False, 'FL': False, 'MG': False, 'DX': False}
+    for m in mods:
+        if m in modalities:
+            mods[m] = True
+
     # create application entity with Find and Move SOP classes as SCU
     MyAE = AE(aet, 0, [StudyRootFindSOPClass,
                                  StudyRootMoveSOPClass,
@@ -200,23 +215,114 @@ def qrscu(
     if not d.StudyDate:
         d.StudyDate = ''
 
-    if modalities:
-        d.ModalitiesInStudy = modalities[0]
-        _query_study(assoc, d, query, query_id)
-        study_rsp = query.dicomqrrspstudy_set.all()
-        study_rsp_mods = study_rsp.values('modality').annotate(count=Count('pk'))
-        study_rsp_mods_in_study = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
-        if len(modalities) is 1:
-            # delete any that don't match
-            pass
-        else:
-            # see if any responses have only modalities we haven't asked for
-                # delete others, finish (ready for retrieve)
-            # if not, modalitiesinstudy is being respected, and we need to ask for the others
-                # set next modality, _query_study
-            pass
-    else:
-        _query_study(assoc, d, query, query_id)
+    while True:
+        if mods['MG']:
+            d.ModalitiesInStudy = 'MG'
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            print "I've just completed a query for MG"
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'MG' not in rsp.modalities_in_study:
+                    break  # This indicates that there was no modality match, so we have everything already
+        if mods['DX']:
+            d.ModalitiesInStudy = 'DX'  # DX could be DX or CR
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'DX' not in rsp.modalities_in_study:
+                    break
+        if mods['DX']:
+            d.ModalitiesInStudy = 'CR'  # DX could be DX or CR
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'CR' not in rsp.modalities_in_study:
+                    break
+        if mods['FL']:
+            d.ModalitiesInStudy = 'RF'  # Fluoroscopy could be RF or XA
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'RF' not in rsp.modalities_in_study:
+                    break
+        if mods['FL']:
+            d.ModalitiesInStudy = 'XA'  # Fluoroscopy could be RF or XA
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'XA' not in rsp.modalities_in_study:
+                    break
+        if mods['CT']:
+            d.ModalitiesInStudy = 'CT'
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'CT' not in rsp.modalities_in_study:
+                    break
+        if mods['CT']:
+            # Not sure we need this one. If modsinstudy is respected, we'll catch them. If not, we'll have it anyway.
+            d.ModalitiesInStudy = 'PT'
+            query_id = uuid.uuid4()
+            _query_study(assoc, d, query, query_id)
+            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+            for rsp in study_rsp:
+                if 'PT' not in rsp.modalities_in_study:
+                    break
+
+    # NOW we have all our studies. Time to throw away any we don't want
+    study_rsp =query.dicomqrrspstudy_set.all()
+    mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
+    for mod_set in mods_in_study_set:
+        delete = True
+        for m, inc in mods.iteritems():
+            if inc:
+                if m in mod_set:
+                    delete = False
+        if delete:
+            studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)
+            studies_to_delete.delete()
+
+    # Now we need to delete any unwanted series
+
+
+
+
+
+
+
+
+    # d.ModalitiesInStudy = modalities[0]
+    # _query_study(assoc, d, query, query_id)
+    # study_rsp = query.dicomqrrspstudy_set.all()
+    # study_rsp_mods = study_rsp.values('modality').annotate(count=Count('pk'))
+    # study_rsp_mods_in_study = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
+    # if len(modalities) is 1:
+    #     if study_rsp[0].modalities_in_study:  # Then reasonable bet it can match on this
+    #         for rsp in study_rsp:
+    #             if modalities[0] not in rsp.modalities_in_study:
+    #                 rsp.delete()  # We shouldn't get here
+    #     else:
+    #         for rsp in study_rsp:
+    #             if modalities[0] not in rsp.modality:
+    #                 ser_rsp = rsp.dicomqrrspseries_set.all()
+    #                 if ser_rsp:
+    #                     for srsp in ser_rsp:
+    #                         if modalities[0] not in srsp.modality and
+    #
+    #     # delete any that don't match
+    #
+    # else:
+    #     # see if any responses have only modalities we haven't asked for
+    #         # delete others, finish (ready for retrieve)
+    #     # if not, modalitiesinstudy is being respected, and we need to ask for the others
+    #         # set next modality, _query_study
+    #     pass
 
     # Now have full study level response - look at it and decide what to do next
 
@@ -320,3 +426,6 @@ if __name__ == "__main__":
         #     # Try an image level find?
         #     pass
         # # Do something for Toshiba CT...
+
+# More rambling thoughts...
+#
