@@ -110,8 +110,6 @@ class DXChartOptionsDisplayForm(forms.Form):
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
-    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
     plotDXInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX, required=False)
 
 
@@ -126,8 +124,6 @@ class CTChartOptionsDisplayForm(forms.Form):
     plotCTStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
     plotCTStudyMeanDLPOverTime = forms.BooleanField(label='Study DLP over time',required=False)
     plotCTStudyMeanDLPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
-    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
     plotCTInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_CT, required=False)
 
 
