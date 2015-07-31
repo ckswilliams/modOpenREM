@@ -43,6 +43,7 @@ class DicomQuery(models.Model):
 
 class DicomQRRspStudy(models.Model):
     dicom_query = models.ForeignKey(DicomQuery)
+    query_id = models.CharField(max_length=64)
     patient_id = models.CharField(max_length=64, blank=True, null=True)
     sop_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
