@@ -1353,6 +1353,8 @@ def chart_options_view(request):
 
             user_profile.plotCharts = general_form.cleaned_data['plotCharts']
             user_profile.plotInitialSortingDirection = general_form.cleaned_data['plotInitialSortingDirection']
+            if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+                user_profile.plotAverageChoice = general_form.cleaned_data['plotMeanMedianOrBoth']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1364,8 +1366,6 @@ def chart_options_view(request):
             user_profile.plotCTStudyPerDayAndHour = ct_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = ct_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = ct_form.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
-            if 'postgresql' in settings.DATABASES['default']['ENGINE']:
-                user_profile.plotMeanMedianOrBoth = ct_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.plotCTInitialSortingChoice = ct_form.cleaned_data['plotCTInitialSortingChoice']
 
             user_profile.plotDXAcquisitionMeanDAP = dx_form.cleaned_data['plotDXAcquisitionMeanDAP']
@@ -1399,29 +1399,29 @@ def chart_options_view(request):
         user_profile = request.user.userprofile
 
     general_form_data = {'plotCharts': user_profile.plotCharts,
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
                          'plotInitialSortingDirection': user_profile.plotInitialSortingDirection}
 
-    ct_form_data = {'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
-                  'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
-                  'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
-                  'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
-                  'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
-                  'plotCTStudyFreq': user_profile.plotCTStudyFreq,
-                  'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
-                  'plotCTRequestFreq': user_profile.plotCTRequestFreq,
-                  'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
-                  'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
-                  'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
-                  'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice}
+    ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
+                    'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
+                    'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
+                    'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
+                    'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                    'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
+                    'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                    'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
+                    'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
+                    'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
+                    'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice}
 
     dx_form_data = {'plotDXAcquisitionMeanDAP': user_profile.plotDXAcquisitionMeanDAP,
-                  'plotDXAcquisitionFreq': user_profile.plotDXAcquisitionFreq,
-                  'plotDXAcquisitionMeankVp': user_profile.plotDXAcquisitionMeankVp,
-                  'plotDXAcquisitionMeanmAs': user_profile.plotDXAcquisitionMeanmAs,
-                  'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour,
-                  'plotDXAcquisitionMeanDAPOverTime': user_profile.plotDXAcquisitionMeanDAPOverTime,
-                  'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
-                  'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
+                    'plotDXAcquisitionFreq': user_profile.plotDXAcquisitionFreq,
+                    'plotDXAcquisitionMeankVp': user_profile.plotDXAcquisitionMeankVp,
+                    'plotDXAcquisitionMeanmAs': user_profile.plotDXAcquisitionMeanmAs,
+                    'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour,
+                    'plotDXAcquisitionMeanDAPOverTime': user_profile.plotDXAcquisitionMeanDAPOverTime,
+                    'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
+                    'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
