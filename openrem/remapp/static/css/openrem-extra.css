@@ -21,3 +21,9 @@ table.row-clickable tbody tr td a:focus {
 table.row-clickable tbody tr th {
     background-color: #d9edf7;
 }
+
+a.sorting-option {
+    text-decoration: none;
+    cursor: pointer;
+    cursor: hand;
+}
