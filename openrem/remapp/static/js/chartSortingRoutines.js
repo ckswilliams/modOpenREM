@@ -6,6 +6,7 @@ function seriesSort(chartContainer, chartData, p, d) {
         //bubbleSort(chart.series[0].data, p, d);
         bubbleSort(chartData, p, d);
         rebuildSeries(chartContainer, chartData);
+        chart.yAxis[0].isDirty = true;
         chart.redraw({ duration: 1000 });
     }
 }
@@ -18,6 +19,7 @@ function twoSeriesSort(chartContainer, chartData, chartData2, p, d, s) {
         bubbleSort(chartData, p, d);
         rebuildTwoSeries(chartContainer, chartData, chartData2, s);
         bubbleSort(chartData2, 'x', 1);
+        chart.yAxis[0].isDirty = true;
         chart.redraw({ duration: 1000 });
     }
 }
@@ -32,6 +34,7 @@ function fourSeriesSort(chartContainer, chartData, chartData2, chartData3, chart
         bubbleSort(chartData2, 'x', 1);
         bubbleSort(chartData3, 'x', 1);
         bubbleSort(chartData4, 'x', 1);
+        chart.yAxis[0].isDirty = true;
         chart.redraw({ duration: 1000 });
     }
 }
