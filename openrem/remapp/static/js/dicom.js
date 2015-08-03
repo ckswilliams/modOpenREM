@@ -91,7 +91,7 @@ function query_progress( json ) {
                     query_id: json.query_id
                 }
                 query_progress( data );
-            }, 3000);
+            }, 500);
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the status!" );
