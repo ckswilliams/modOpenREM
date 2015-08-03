@@ -33,12 +33,13 @@ def _move_req(MyAE, RemoteAE, d):
     assocMove.Release(0)
     print "Move association released"
 
-def _query_study(assoc, d, query, query_id):
+def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
     from remapp.models import DicomQRRspStudy
     from remapp.tools.dcmdatetime import make_date
 
-    st = assoc.StudyRootFindSOPClass.SCU(d, 1)
+    assoc_study = my_ae.RequestAssociation(remote_ae)
+    st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
     # print 'done with status "%s"' % st
 
     # TODO: Replace the code below to deal with find failure
@@ -68,16 +69,22 @@ def _query_study(assoc, d, query, query_id):
         rsp.save()
         print 'Study IUID: {0}, SOP Instance UID: {1}, Modality: {2}, Study Desc: {3}, Date: {4}'.format(
             rsp.study_instance_uid, rsp.sop_instance_uid, rsp.modality, rsp.study_description, rsp.study_date)
-        _query_series(assoc, ss[1], rsp)
+        _query_series(my_ae, remote_ae, ss[1], rsp)
 
         try:
             rsp.modalities_in_study = ss[1].ModalitiesInStudy.split(',')
+            print "Modalities_in_study was populated. It's value is {0} which becomes {1}".format(
+                ss[1].ModalitiesInStudy, rsp.modalities_in_study)
         except:
             series_rsp = rsp.dicomqrrspseries_set.all()
             rsp.modalities_in_study = set(val for dic in series_rsp.values('modality') for val in dic.values() )
+            print "Modalities in study wasn't populated. We've created {0}".format(rsp.modalities_in_study)
+        rsp.save()
+
+    assoc_study.Release(0)
 
 
-def _query_series(assoc, d2, studyrsp):
+def _query_series(my_ae, remote_ae, d2, studyrsp):
     import uuid
     from remapp.tools.dcmdatetime import make_date
     from remapp.models import DicomQRRspSeries
@@ -90,7 +97,9 @@ def _query_series(assoc, d2, studyrsp):
 
     print 'd2: {0}'.format(d2)
 
-    st2 = assoc.StudyRootFindSOPClass.SCU(d2, 1)
+    assoc_series = my_ae.RequestAssociation(remote_ae)
+
+    st2 = assoc_series.StudyRootFindSOPClass.SCU(d2, 1)
 
     query_id = uuid.uuid4()
 
@@ -100,18 +109,19 @@ def _query_series(assoc, d2, studyrsp):
     for series in st2:
         if not series[1]:
             continue
-        try:
-            series[1].SeriesInstanceUID
-        except:
-            break
+        # try:
+        #     series[1].SeriesInstanceUID
+        # except:
+        #     break
         seRspNo += 1
         print "Series Response {0}: {1}".format(seRspNo, series[1])
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
-        try:  # Some series level responses were nonsense
-            seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
-        except:
-            seriesrsp.delete()
-            continue
+        # try:  # Some series level responses were nonsense
+        #     seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        # except:
+        #     seriesrsp.delete()
+        #     continue
+        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
         seriesrsp.query_id = query_id
         seriesrsp.patient_id = series[1].PatientID
         seriesrsp.sop_instance_uid = series[1].SOPInstanceUID
@@ -125,6 +135,8 @@ def _query_series(assoc, d2, studyrsp):
         except:
             pass
         seriesrsp.save()
+
+    assoc_series.Release(0)
 
 
 from celery import shared_task
@@ -215,64 +227,81 @@ def qrscu(
     if not d.StudyDate:
         d.StudyDate = ''
 
-    while True:
+    modality_matching = True
+    modalities_left = True
+
+    while modalities_left:
         if mods['MG']:
             d.ModalitiesInStudy = 'MG'
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             print "I've just completed a query for MG"
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'MG' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break  # This indicates that there was no modality match, so we have everything already
-        if mods['DX']:
+        if mods['DX'] and modality_matching:
             d.ModalitiesInStudy = 'DX'  # DX could be DX or CR
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'DX' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break
-        if mods['DX']:
+        if mods['DX'] and modality_matching:
             d.ModalitiesInStudy = 'CR'  # DX could be DX or CR
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'CR' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break
-        if mods['FL']:
+        if mods['FL'] and modality_matching:
             d.ModalitiesInStudy = 'RF'  # Fluoroscopy could be RF or XA
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'RF' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break
-        if mods['FL']:
+        if mods['FL'] and modality_matching:
             d.ModalitiesInStudy = 'XA'  # Fluoroscopy could be RF or XA
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'XA' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break
-        if mods['CT']:
+        if mods['CT'] and modality_matching:
             d.ModalitiesInStudy = 'CT'
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'CT' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break
-        if mods['CT']:
+        if mods['CT'] and modality_matching:
             # Not sure we need this one. If modsinstudy is respected, we'll catch them. If not, we'll have it anyway.
             d.ModalitiesInStudy = 'PT'
             query_id = uuid.uuid4()
-            _query_study(assoc, d, query, query_id)
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'PT' not in rsp.modalities_in_study:
+                    modality_matching = False
+                    modalities_left = False
                     break
 
     # NOW we have all our studies. Time to throw away any we don't want
