@@ -168,6 +168,14 @@ def qrscu(
     for m in mods:
         if m in modalities:
             mods[m] = True
+    all_mods = {'CT': {'inc': False, 'mods': ['CT','SR']},
+           'MG': {'inc': False, 'mods': ['MG','SR']},
+           'FL': {'inc': False, 'mods': ['RF','XA','SR']},
+           'DX': {'inc': False, 'mods': ['DX','CR','SR']}
+           }
+    for m in all_mods:
+        if m in modalities:
+            all_mods[m]['inc'] = True
 
     # create application entity with Find and Move SOP classes as SCU
     MyAE = AE(aet, 0, [StudyRootFindSOPClass,
@@ -309,10 +317,12 @@ def qrscu(
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
     for mod_set in mods_in_study_set:
         delete = True
-        for m, inc in mods.iteritems():
-            if inc:
-                if m in mod_set:
-                    delete = False
+
+        for mod_choice, details in all_mods.iteritems():
+            if details['inc']:
+                for mod in details['mods']:
+                    if mod in mod_set:
+                        delete = False
         if delete:
             studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)
             studies_to_delete.delete()
