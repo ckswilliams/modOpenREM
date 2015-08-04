@@ -40,7 +40,8 @@ $(function () {
             }
         },
         title: {
-            text: 'kVp per acquisition protocol'
+            text: 'kVp per acquisition protocol',
+            useHTML: true
         },
         legend: {
             enabled: true

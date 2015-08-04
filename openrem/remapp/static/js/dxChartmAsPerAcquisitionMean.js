@@ -40,7 +40,8 @@ $(function () {
             }
         },
         title: {
-            text: 'Mean mAs per acquisition protocol'
+            text: 'Mean mAs per acquisition protocol',
+            useHTML: true
         },
         legend: {
             enabled: false
@@ -52,6 +53,7 @@ $(function () {
                 text: 'Protocol name'
             },
             labels: {
+                useHTML: true,
                 rotation:90
             }
         },

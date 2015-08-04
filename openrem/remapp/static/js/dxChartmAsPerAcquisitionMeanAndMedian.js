@@ -40,7 +40,8 @@ $(function () {
             }
         },
         title: {
-            text: 'mAs per acquisition protocol'
+            text: 'mAs per acquisition protocol',
+            useHTML: true
         },
         legend: {
             enabled: true

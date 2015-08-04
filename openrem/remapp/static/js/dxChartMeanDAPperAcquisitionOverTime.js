@@ -33,7 +33,8 @@ $(function () {
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle',
-            borderWidth: 0
+            borderWidth: 0,
+            useHTML: true
         },
         series: meanDAPOverTime
     });
