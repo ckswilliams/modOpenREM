@@ -121,12 +121,12 @@ def ajax_test3(request):
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     study_rsp = query.dicomqrrspstudy_set.all()
-    modalities = study_rsp.values('modality').annotate(count=Count('pk'))
+    modalities = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
     table = ['<table class="table table-bordered">']
     for m in modalities:
         table.append('<tr><td>')
-        if m['modality']:
-            table.append(m['modality'])
+        if m['modalities_in_study']:
+            table.append(', '.join(json.loads(m['modalities_in_study'])))
         else:
             table.append('Unknown')
         table.append('</td><td>')

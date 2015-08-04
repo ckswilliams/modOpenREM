@@ -31,6 +31,7 @@
 # Following two lines added so that sphinx autodocumentation works. 
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+import json
 from django.db import models
 from django.core.urlresolvers import reverse
 
@@ -47,11 +48,17 @@ class DicomQRRspStudy(models.Model):
     patient_id = models.CharField(max_length=64, blank=True, null=True)
     sop_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
-    modalities_in_study = models.CharField(max_length=32, blank=True, null=True)
+    modalities_in_study = models.CharField(max_length=100, blank=True, null=True)
     study_description = models.TextField(blank=True, null=True)
     study_instance_uid = models.TextField(blank=True, null=True)
     study_date = models.DateField(blank=True, null=True)
     patient_age_decimal = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
+
+    def set_modalities_in_study(self, x):
+        self.modalities_in_study = json.dumps(x)
+
+    def get_modalities_in_study(self):
+        return json.loads(self.modalities_in_study)
 
 
 class DicomQRRspSeries(models.Model):

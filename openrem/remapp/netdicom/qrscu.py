@@ -72,12 +72,13 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         _query_series(my_ae, remote_ae, ss[1], rsp)
 
         try:
-            rsp.modalities_in_study = ss[1].ModalitiesInStudy.split(',')
+            rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
+#            rsp.modalities_in_study = ss[1].ModalitiesInStudy.split(',')
             print "Modalities_in_study was populated. It's value is {0} which becomes {1}".format(
                 ss[1].ModalitiesInStudy, rsp.modalities_in_study)
         except:
             series_rsp = rsp.dicomqrrspseries_set.all()
-            rsp.modalities_in_study = set(val for dic in series_rsp.values('modality') for val in dic.values() )
+            rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
             print "Modalities in study wasn't populated. We've created {0}".format(rsp.modalities_in_study)
         rsp.save()
 
@@ -146,6 +147,7 @@ def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, *args, **kwargs):
     import uuid
+    import json
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset, FileDataset
@@ -242,7 +244,7 @@ def qrscu(
             print "I've just completed a query for MG"
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'MG' not in rsp.modalities_in_study:
+                if 'MG' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break  # This indicates that there was no modality match, so we have everything already
@@ -252,7 +254,7 @@ def qrscu(
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'DX' not in rsp.modalities_in_study:
+                if 'DX' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
@@ -262,7 +264,7 @@ def qrscu(
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'CR' not in rsp.modalities_in_study:
+                if 'CR' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
@@ -272,7 +274,7 @@ def qrscu(
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'RF' not in rsp.modalities_in_study:
+                if 'RF' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
@@ -282,7 +284,7 @@ def qrscu(
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'XA' not in rsp.modalities_in_study:
+                if 'XA' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
@@ -292,7 +294,7 @@ def qrscu(
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'CT' not in rsp.modalities_in_study:
+                if 'CT' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
@@ -303,7 +305,7 @@ def qrscu(
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
-                if 'PT' not in rsp.modalities_in_study:
+                if 'PT' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
