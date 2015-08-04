@@ -1,6 +1,5 @@
 $(function () {
-
-var chartRequestFreq = new Highcharts.Chart({
+    var chartRequestFreq = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartRequestDIV',
             plotBackgroundColor: null,

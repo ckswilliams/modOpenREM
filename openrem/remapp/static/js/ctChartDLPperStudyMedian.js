@@ -85,7 +85,6 @@ $(function () {
             series: studySeriesDrilldown
         }
     });
-
     switch(chartSorting) {
         case 'freq':
             seriesSort('#histogramStudyPlotDIV', studySeriesMedianData, 'freq', chartSortingDirection);
@@ -99,5 +98,4 @@ $(function () {
         default:
             seriesSort('#histogramStudyPlotDIV', studySeriesMedianData, 'name', 1);
     }
-
 });

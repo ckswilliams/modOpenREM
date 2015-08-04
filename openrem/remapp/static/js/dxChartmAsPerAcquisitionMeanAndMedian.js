@@ -87,7 +87,6 @@ $(function () {
             series: seriesmAsDrilldown
         }
     });
-
     switch(chartSorting) {
         case 'freq':
             twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'freq', chartSortingDirection, 0);
@@ -101,6 +100,4 @@ $(function () {
         default:
             twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'name', chartSortingDirection, 0);
     }
-
 });
-

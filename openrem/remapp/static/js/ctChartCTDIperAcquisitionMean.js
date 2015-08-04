@@ -84,7 +84,6 @@ $(function () {
             series: seriesDrilldownCTDI
         }
     });
-
     switch(chartSorting) {
         case 'freq':
             seriesSort('#histogramPlotCTDIdiv', seriesDataCTDI, 'freq', chartSortingDirection);
@@ -98,5 +97,4 @@ $(function () {
         default:
             seriesSort('#histogramPlotCTDIdiv', seriesDataCTDI, 'name', 1);
     }
-
 });

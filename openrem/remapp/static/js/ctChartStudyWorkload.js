@@ -1,6 +1,5 @@
 $(function () {
-
-var chartStudyWorkload = new Highcharts.Chart({
+    var chartStudyWorkload = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartStudyWorkloadDIV',
             plotBackgroundColor: null,
@@ -51,4 +50,3 @@ var chartStudyWorkload = new Highcharts.Chart({
         }
     });
 });
-

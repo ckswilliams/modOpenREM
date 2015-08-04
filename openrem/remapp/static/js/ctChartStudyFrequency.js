@@ -1,6 +1,5 @@
 $(function () {
-
-var chartStudyFreq = new Highcharts.Chart({
+    var chartStudyFreq = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartStudyDIV',
             plotBackgroundColor: null,
@@ -42,4 +41,3 @@ var chartStudyFreq = new Highcharts.Chart({
         }]
     });
 });
-

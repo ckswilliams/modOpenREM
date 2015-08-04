@@ -39,4 +39,3 @@ $(function () {
         series: meanDAPOverTime
     });
 });
-

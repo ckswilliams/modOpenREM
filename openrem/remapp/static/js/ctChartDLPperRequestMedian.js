@@ -84,7 +84,6 @@ $(function () {
             series: requestSeriesDrilldown
         }
     });
-
     switch(chartSorting) {
         case 'freq':
             seriesSort('#histogramRequestPlotDIV', requestSeriesMedianData, 'freq', chartSortingDirection);
@@ -98,5 +97,4 @@ $(function () {
         default:
             seriesSort('#histogramRequestPlotDIV', requestSeriesMedianData, 'name', 1);
     }
-
 });

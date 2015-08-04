@@ -1,5 +1,5 @@
 $(function () {
-var chartStudyMeanDLPOverTime = new Highcharts.Chart({
+    var chartStudyMeanDLPOverTime = new Highcharts.Chart({
         chart: {
             renderTo: 'studyMeanDLPOverTimeDIV',
             zoomType: 'x'
@@ -38,4 +38,3 @@ var chartStudyMeanDLPOverTime = new Highcharts.Chart({
         series: meanDLPOverTime
     });
 });
-
