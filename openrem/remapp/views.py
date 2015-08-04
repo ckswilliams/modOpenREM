@@ -71,6 +71,7 @@ def dx_summary_list_filter(request):
     import pkg_resources # part of setuptools
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
+    from django.http import JsonResponse
 
     requestResults = request.GET
 
@@ -191,7 +192,7 @@ def dx_summary_list_filter(request):
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
     plotAverageChoice = userProfile.plotAverageChoice
 
-    if plotting and plotCharts:
+    if plotting and plotCharts and request.is_ajax():
         acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData,\
         acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary,\
         studiesPerHourInWeekdays, acquisition_names = \
@@ -213,7 +214,7 @@ def dx_summary_list_filter(request):
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
-    if plotting and plotCharts:
+    if plotting and plotCharts and request.is_ajax():
         if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
             returnStructure['acquisition_names'] = acquisition_names
             returnStructure['acquisitionSummary'] = acquisitionSummary
@@ -233,10 +234,13 @@ def dx_summary_list_filter(request):
         if plotDXStudyPerDayAndHour:
             returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
-    return render_to_response(
-        'remapp/dxfiltered.html',
-        returnStructure,
-        context_instance=RequestContext(request)
+        return JsonResponse(returnStructure)
+
+    else:
+        return render_to_response(
+            'remapp/dxfiltered.html',
+            returnStructure,
+            context_instance=RequestContext(request)
         )
 
 
@@ -436,6 +440,7 @@ def ct_summary_list_filter(request):
     import pkg_resources # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
+    from django.http import JsonResponse
 
     requestResults = request.GET
 
@@ -610,7 +615,7 @@ def ct_summary_list_filter(request):
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
     plotAverageChoice = userProfile.plotAverageChoice
 
-    if plotting and plotCharts:
+    if plotting and plotCharts and request.is_ajax():
         acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData,\
         requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData,\
         studySummary = \
@@ -632,7 +637,7 @@ def ct_summary_list_filter(request):
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
-    if plotting and plotCharts:
+    if plotting and plotCharts and request.is_ajax():
             if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
                 returnStructure['acquisitionSummary'] = acquisitionSummary
             if plotCTAcquisitionMeanDLP:
@@ -655,10 +660,13 @@ def ct_summary_list_filter(request):
                 if plotAverageChoice == 'median' or plotAverageChoice == 'both':
                     returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
 
-    return render_to_response(
-        'remapp/ctfiltered.html',
-        returnStructure,
-        context_instance=RequestContext(request)
+        return JsonResponse(returnStructure)
+
+    else:
+        return render_to_response(
+            'remapp/ctfiltered.html',
+            returnStructure,
+            context_instance=RequestContext(request)
         )
 
 
