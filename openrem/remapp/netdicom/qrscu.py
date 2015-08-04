@@ -164,10 +164,6 @@ def qrscu(
             ExplicitVRBigEndian
             ]
 
-    mods = {'CT': False, 'FL': False, 'MG': False, 'DX': False}
-    for m in mods:
-        if m in modalities:
-            mods[m] = True
     all_mods = {'CT': {'inc': False, 'mods': ['CT','SR']},
            'MG': {'inc': False, 'mods': ['MG','SR']},
            'FL': {'inc': False, 'mods': ['RF','XA','SR']},
@@ -239,7 +235,7 @@ def qrscu(
     modalities_left = True
 
     while modalities_left:
-        if mods['MG']:
+        if all_mods['MG']['inc']:
             d.ModalitiesInStudy = 'MG'
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -250,7 +246,7 @@ def qrscu(
                     modality_matching = False
                     modalities_left = False
                     break  # This indicates that there was no modality match, so we have everything already
-        if mods['DX'] and modality_matching:
+        if all_mods['DX']['inc'] and modality_matching:
             d.ModalitiesInStudy = 'DX'  # DX could be DX or CR
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -260,7 +256,7 @@ def qrscu(
                     modality_matching = False
                     modalities_left = False
                     break
-        if mods['DX'] and modality_matching:
+        if all_mods['DX']['inc'] and modality_matching:
             d.ModalitiesInStudy = 'CR'  # DX could be DX or CR
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -270,7 +266,7 @@ def qrscu(
                     modality_matching = False
                     modalities_left = False
                     break
-        if mods['FL'] and modality_matching:
+        if all_mods['FL']['inc'] and modality_matching:
             d.ModalitiesInStudy = 'RF'  # Fluoroscopy could be RF or XA
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -280,7 +276,7 @@ def qrscu(
                     modality_matching = False
                     modalities_left = False
                     break
-        if mods['FL'] and modality_matching:
+        if all_mods['FL']['inc'] and modality_matching:
             d.ModalitiesInStudy = 'XA'  # Fluoroscopy could be RF or XA
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -290,7 +286,7 @@ def qrscu(
                     modality_matching = False
                     modalities_left = False
                     break
-        if mods['CT'] and modality_matching:
+        if all_mods['CT']['inc'] and modality_matching:
             d.ModalitiesInStudy = 'CT'
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -300,7 +296,7 @@ def qrscu(
                     modality_matching = False
                     modalities_left = False
                     break
-        if mods['CT'] and modality_matching:
+        if all_mods['CT']['inc'] and modality_matching:
             # Not sure we need this one. If modsinstudy is respected, we'll catch them. If not, we'll have it anyway.
             d.ModalitiesInStudy = 'PT'
             query_id = uuid.uuid4()
