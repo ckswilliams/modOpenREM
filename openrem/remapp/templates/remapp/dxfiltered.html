@@ -134,39 +134,32 @@
 
 {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}
-      <div >
-          <button type="submit" id="ajaxTesting">Ajax test</button>
-      </div>
 
       <script>
           $(document).ready(function() {
               var form = $('form#examFilterForm');
               form.submit(function(event) {
-// Do something here to get the chart data via Ajax.
-// I think I need to use the new dx_summary_chart_data view.
-// This view will need to be sent information for it to be able to carry out the appropriate database queries to
-// generate the chart data. Not sure how I'm going to do this at the moment. The view needs to pass the chart data
-// back here so that the charts can be drawn.
-//                  event.preventDefault();
-//                  console.log('ajax form submission function called successfully.');
-//                  form = $(this);
-//                  console.log(form)
-//                  var serialized_form = form.serialize();
-//                  serialized_form += "&submit=submit";
-//                  $.ajax({ type: "GET",
-//                      url: $(this).attr('action'),
-//                      data: serialized_form,
-//                      dataType: "json",
-//                      success: function( json ) {
-//                          query_progress( json );
-//                      },
-//                      error: function( xhr, status, errorThrown ) {
-//                          alert( "Sorry, there was a problem starting the job!" );
-//                          console.log( "Error: " + errorThrown );
-//                          console.log( "Status: " + status );
-//                          console.dir( xhr );
-//                      },
-//                  })
+                  console.log('Form has been submitted');
+                  console.log(form);
+                  var serialized_form = form.serialize();
+                  serialized_form += "&submit=submit";
+                  $.ajax({ type: "GET",
+                      url: $(this).attr('action') + "chart/",
+                      data: serialized_form,
+                      dataType: "json",
+                      success: function( json ) {
+                          alert(json);
+                          // code here to take the json data and use it to populate JavaScript arrays for the plots
+                          //var names = $.map(json.acquisition_names, function(el) { return el; });
+                          //console.log(json.acquisition_names);
+                      },
+                      error: function( xhr, status, errorThrown ) {
+                          alert( "Sorry, there was a problem getting the data" );
+                          console.log( "Error: " + errorThrown );
+                          console.log( "Status: " + status );
+                          console.dir( xhr );
+                      },
+                  })
               })
           });
       </script>

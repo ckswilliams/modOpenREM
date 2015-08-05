@@ -205,7 +205,6 @@ def dx_summary_list_filter(request):
 def dx_summary_chart_data(request):
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q
-    import pkg_resources # part of setuptools
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
     from django.http import JsonResponse
@@ -306,19 +305,6 @@ def dx_summary_chart_data(request):
                 userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
 
-        # If submit was not clicked then use the settings already stored in the user's profile
-        else:
-            formData = {'plotCharts': userProfile.plotCharts,
-                        'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
-                        'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
-                        'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
-                        'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
-                        'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
-                        'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
-                        'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod,
-                        'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
-            #chartOptionsForm = DXChartOptionsForm(formData)
-
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
     plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
@@ -336,29 +322,18 @@ def dx_summary_chart_data(request):
                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
                                 median_available, plotAverageChoice)
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion' : vers}
-
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-
     returnStructure = {}
 
     if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
-        returnStructure['acquisition_names'] = acquisition_names
-        returnStructure['acquisitionSummary'] = acquisitionSummary
+        returnStructure['acquisition_names'] = list(acquisition_names)
+        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
     if plotDXAcquisitionMeanDAP:
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
     if plotDXAcquisitionMeankVp:
-        returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
+        returnStructure['acquisitionkVpSummary'] = list(acquisitionkVpSummary)
         returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
     if plotDXAcquisitionMeanmAs:
-        returnStructure['acquisitionmAsSummary'] = acquisitionmAsSummary
+        returnStructure['acquisitionmAsSummary'] = list(acquisitionmAsSummary)
         returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
     if plotDXAcquisitionMeanDAPOverTime:
         if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
@@ -368,7 +343,8 @@ def dx_summary_chart_data(request):
     if plotDXStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
-    return JsonResponse(returnStructure, safe=False)
+    #return JsonResponse(returnStructure)
+    return HttpResponse(json.dumps(returnStructure), content_type='application/json', status=200)
 
 
 def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
@@ -486,6 +462,8 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 dapValues = subqs.values_list('dose_area_product', flat=True)
                 acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
                     [float(x) * 1000000 for x in dapValues], bins=20)
+                acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
+                acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
 
             if plotDXAcquisitionMeankVp:
                 # Required for mean kVp per acquisition plot
@@ -493,6 +471,8 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 kVpValues = subqskvp.values_list('irradeventxraysourcedata__kvp__kvp', flat=True)
                 acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram(
                     [float(x) for x in kVpValues], bins=20)
+                acquisitionHistogramkVpData[idx][0] = acquisitionHistogramkVpData[idx][0].tolist()
+                acquisitionHistogramkVpData[idx][1] = acquisitionHistogramkVpData[idx][1].tolist()
 
             if plotDXAcquisitionMeanmAs:
                 # Required for mean mAs per acquisition plot
@@ -500,6 +480,8 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 uAsValues = subqsmas.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
                 acquisitionHistogrammAsData[idx][0], acquisitionHistogrammAsData[idx][1] = np.histogram(
                     [float(x)/1000 for x in uAsValues], bins=20)
+                acquisitionHistogrammAsData[idx][0] = acquisitionHistogrammAsData[idx][0].tolist()
+                acquisitionHistogrammAsData[idx][1] = acquisitionHistogrammAsData[idx][1].tolist()
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP over time
