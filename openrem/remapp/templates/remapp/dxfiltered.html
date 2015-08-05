@@ -148,7 +148,28 @@
                       data: serialized_form,
                       dataType: "json",
                       success: function( json ) {
-                          alert(json.acquisition_names[0].acquisition_protocol);
+                          // A [num acq protocols] list of acquisition protocol names
+                          var names = $.map(json.acquisition_names, function(el) { return el.acquisition_protocol; });
+
+                          // [num acq protocols] lists of 2-element arrays.
+                          // Element 0 contains a 20-element array of DAP values
+                          // Element 1 contains a 21-element array of bin boundaries
+                          var acq_histogram_data = json.acquisitionHistogramData
+                          var acq_histogram_kVp_data = json.acquisitionHistogramkVpData
+                          var acq_histogram_mAs_data = json.acquisitionHistogrammAsData
+
+                          // A [num acq protocols] list of objects with acquisition_protocol, mean_dap, median_dap and num_acq properties
+                          var acq_summary = $.map(json.acquisitionSummary, function(el) { return el; });
+                          var acq_kVp_summary = $.map(json.acquisitionkVpSummary, function(el) { return el; });
+                          var acq_mAs_summary = $.map(json.acquisitionmAsSummary, function(el) { return el; });
+
+                          // A [7][24] list of integer values
+                          var studies_per_hour_in_weekdays = json.studiesPerHourInWeekdays
+
+                          // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average DAP values
+                          var acq_mean_dap_over_time = json.acquisitionMeanDAPoverTime
+
+                          alert(names);
                       },
                       error: function( xhr, status, errorThrown ) {
                           alert( "Sorry, there was a problem getting the data" );
