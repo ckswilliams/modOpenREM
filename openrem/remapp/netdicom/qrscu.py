@@ -145,7 +145,7 @@ from celery import shared_task
 @shared_task
 def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, *args, **kwargs):
+        date_from=None, date_until=None, modalities=None, inc_sr=True, *args, **kwargs):
     import uuid
     import json
     from netdicom.applicationentity import AE
@@ -166,10 +166,10 @@ def qrscu(
             ExplicitVRBigEndian
             ]
 
-    all_mods = {'CT': {'inc': False, 'mods': ['CT','SR']},
-           'MG': {'inc': False, 'mods': ['MG','SR']},
-           'FL': {'inc': False, 'mods': ['RF','XA','SR']},
-           'DX': {'inc': False, 'mods': ['DX','CR','SR']}
+    all_mods = {'CT': {'inc': False, 'mods': ['CT','PT']},
+           'MG': {'inc': False, 'mods': ['MG']},
+           'FL': {'inc': False, 'mods': ['RF','XA']},
+           'DX': {'inc': False, 'mods': ['DX','CR']}
            }
     for m in all_mods:
         if m in modalities:
@@ -320,6 +320,9 @@ def qrscu(
             if details['inc']:
                 for mod in details['mods']:
                     if mod in mod_set:
+                        delete = False
+                        continue
+                    if inc_sr and 'SR' in mod_set:
                         delete = False
         if delete:
             studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)

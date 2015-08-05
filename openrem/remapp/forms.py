@@ -38,6 +38,7 @@ class DicomQueryForm(forms.Form):
     modality_field = forms.MultipleChoiceField(
         choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
             attrs={"class": "form-control", "checked":""}), required=True)
+    inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=True)
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
