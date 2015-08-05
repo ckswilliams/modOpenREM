@@ -55,7 +55,7 @@ urlpatterns = patterns('remapp.views',
             template_name='remapp/ctdetail.html'))),
 
     url(r'^dx/$',
-        'dx_summary_list_filter'),
+        'dx_summary_list_filter', name='dx_summary'),
     url(r'^dx/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
             model=GeneralStudyModuleAttr,

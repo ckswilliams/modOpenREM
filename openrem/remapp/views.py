@@ -71,7 +71,6 @@ def dx_summary_list_filter(request):
     import pkg_resources # part of setuptools
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
-    from django.http import JsonResponse
 
     requestResults = request.GET
 
@@ -182,25 +181,6 @@ def dx_summary_list_filter(request):
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = DXChartOptionsForm(formData)
 
-    plotCharts = userProfile.plotCharts
-    plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
-    plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
-    plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
-    plotDXAcquisitionMeanmAs = userProfile.plotDXAcquisitionMeanmAs
-    plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
-    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
-    plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
-    plotAverageChoice = userProfile.plotAverageChoice
-
-    if plotting and plotCharts and request.is_ajax():
-        acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData,\
-        acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary,\
-        studiesPerHourInWeekdays, acquisition_names = \
-            dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
-                                 plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
-                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
-                                 median_available, plotAverageChoice)
-
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -214,34 +194,181 @@ def dx_summary_list_filter(request):
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
-    if plotting and plotCharts and request.is_ajax():
-        if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
-            returnStructure['acquisition_names'] = acquisition_names
-            returnStructure['acquisitionSummary'] = acquisitionSummary
-        if plotDXAcquisitionMeanDAP:
-            returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
-        if plotDXAcquisitionMeankVp:
-            returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
-            returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
-        if plotDXAcquisitionMeanmAs:
-            returnStructure['acquisitionmAsSummary'] = acquisitionmAsSummary
-            returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
-        if plotDXAcquisitionMeanDAPOverTime:
-            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
-            if plotAverageChoice == 'median' or plotAverageChoice == 'both':
-                returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
-        if plotDXStudyPerDayAndHour:
-            returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
+    return render_to_response(
+        'remapp/dxfiltered.html',
+        returnStructure,
+        context_instance=RequestContext(request)
+    )
 
-        return JsonResponse(returnStructure)
+
+@login_required
+def dx_summary_chart_data(request):
+    from remapp.interface.mod_filters import DXSummaryListFilter
+    from django.db.models import Q
+    import pkg_resources # part of setuptools
+    from remapp.forms import DXChartOptionsForm
+    from openremproject import settings
+    from django.http import JsonResponse
+
+    requestResults = request.GET
+
+    if requestResults.get('acquisitionhist'):
+        filters = {}
+        if requestResults.get('acquisition_protocol'):
+            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_dap_min'):
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
+        if requestResults.get('acquisition_dap_max'):
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
+        if requestResults.get('acquisition_kvp_min'):
+            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__gte'] = requestResults.get('acquisition_kvp_min')
+        if requestResults.get('acquisition_kvp_max'):
+            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get('acquisition_kvp_max')
+        if requestResults.get('acquisition_mas_min'):
+            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get('acquisition_mas_min')
+        if requestResults.get('acquisition_mas_max'):
+            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get('acquisition_mas_max')
+        if requestResults.get('study_description'):
+            filters['study_description__icontains'] = requestResults.get('study_description')
 
     else:
-        return render_to_response(
-            'remapp/dxfiltered.html',
-            returnStructure,
-            context_instance=RequestContext(request)
-        )
+        filters = {}
+        if requestResults.get('study_description'):
+            filters['study_description__icontains'] = requestResults.get('study_description')
+        if requestResults.get('acquisition_protocol'):
+            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_dap_min'):
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
+        if requestResults.get('acquisition_dap_max'):
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
+
+    if requestResults.get('accession_number'):
+        filters['accession_number'] = requestResults.get('accession_number')
+    if requestResults.get('date_after'):
+        filters['study_date__gt'] = requestResults.get('date_after')
+    if requestResults.get('date_before'):
+        filters['study_date__lt'] = requestResults.get('date_before')
+    if requestResults.get('institution_name'):
+        filters['generalequipmentmoduleattr__institution_name'] = requestResults.get('institution_name')
+    if requestResults.get('manufacturer'):
+        filters['generalequipmentmoduleattr__manufacturer'] = requestResults.get('manufacturer')
+    if requestResults.get('model_name'):
+        filters['generalequipmentmoduleattr__manufacturer_model_name'] = requestResults.get('model_name')
+    if requestResults.get('patient_age_max'):
+        filters['patientstudymoduleattr__patient_age_decimal__lte'] = requestResults.get('patient_age_max')
+    if requestResults.get('patient_age_min'):
+        filters['patientstudymoduleattr__patient_age_decimal__gte'] = requestResults.get('patient_age_min')
+    if requestResults.get('station_name'):
+        filters['generalequipmentmoduleattr__station_name'] = requestResults.get('station_name')
+    if requestResults.get('display_name'):
+        filters['generalequipmentmoduleattr__unique_equipment_name__display_name'] = requestResults.get('display_name')
+
+    f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+        Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+        **filters
+    ).order_by().distinct())
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
+
+    if userProfile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        userProfile.median_available = True
+        userProfile.save()
+        median_available = True
+    else:
+        userProfile.median_available = False
+        userProfile.save()
+        median_available = False
+
+    # Obtain the chart options from the request
+    chartOptionsForm = DXChartOptionsForm(requestResults)
+    # check whether the form data is valid
+    if chartOptionsForm.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in requestResults:
+            # process the data in form.cleaned_data as required
+            userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
+            userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
+            userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
+            userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
+            userProfile.plotDXAcquisitionMeanmAs = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAs']
+            userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
+            userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
+            userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
+            if median_available:
+                userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
+            userProfile.save()
+
+        # If submit was not clicked then use the settings already stored in the user's profile
+        else:
+            formData = {'plotCharts': userProfile.plotCharts,
+                        'plotDXAcquisitionMeanDAP': userProfile.plotDXAcquisitionMeanDAP,
+                        'plotDXAcquisitionFreq': userProfile.plotDXAcquisitionFreq,
+                        'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
+                        'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
+                        'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
+                        'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
+                        'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod,
+                        'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
+            #chartOptionsForm = DXChartOptionsForm(formData)
+
+    plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
+    plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
+    plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
+    plotDXAcquisitionMeanmAs = userProfile.plotDXAcquisitionMeanmAs
+    plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
+    plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
+    plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
+    plotAverageChoice = userProfile.plotAverageChoice
+
+    acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData,\
+    acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary,\
+    studiesPerHourInWeekdays, acquisition_names = \
+        dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
+                                plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
+                                plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
+                                median_available, plotAverageChoice)
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="exportgroup"):
+        admin['exportperm'] = True
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    returnStructure = {}
+
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
+        returnStructure['acquisition_names'] = acquisition_names
+        returnStructure['acquisitionSummary'] = acquisitionSummary
+    if plotDXAcquisitionMeanDAP:
+        returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+    if plotDXAcquisitionMeankVp:
+        returnStructure['acquisitionkVpSummary'] = acquisitionkVpSummary
+        returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
+    if plotDXAcquisitionMeanmAs:
+        returnStructure['acquisitionmAsSummary'] = acquisitionmAsSummary
+        returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
+    if plotDXAcquisitionMeanDAPOverTime:
+        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+            returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
+        if plotAverageChoice == 'median' or plotAverageChoice == 'both':
+            returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
+    if plotDXStudyPerDayAndHour:
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
+
+    return JsonResponse(returnStructure, safe=False)
 
 
 def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
@@ -638,27 +765,27 @@ def ct_summary_list_filter(request):
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
     if plotting and plotCharts and request.is_ajax():
-            if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
-                returnStructure['acquisitionSummary'] = acquisitionSummary
-            if plotCTAcquisitionMeanDLP:
-                returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
-            if plotCTAcquisitionMeanCTDI:
-                returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
-            if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
-                returnStructure['studySummary'] = studySummary
-            if plotCTStudyMeanDLP:
-                returnStructure['studyHistogramData'] = studyHistogramData
-            if plotCTRequestMeanDLP or plotCTRequestFreq:
-                returnStructure['requestSummary'] = requestSummary
-            if plotCTRequestMeanDLP:
-                returnStructure['requestHistogramData'] = requestHistogramData
-            if plotCTStudyPerDayAndHour:
-                returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
-            if plotCTStudyMeanDLPOverTime:
-                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                    returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
-                if plotAverageChoice == 'median' or plotAverageChoice == 'both':
-                    returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
+        if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
+            returnStructure['acquisitionSummary'] = acquisitionSummary
+        if plotCTAcquisitionMeanDLP:
+            returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+        if plotCTAcquisitionMeanCTDI:
+            returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
+        if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
+            returnStructure['studySummary'] = studySummary
+        if plotCTStudyMeanDLP:
+            returnStructure['studyHistogramData'] = studyHistogramData
+        if plotCTRequestMeanDLP or plotCTRequestFreq:
+            returnStructure['requestSummary'] = requestSummary
+        if plotCTRequestMeanDLP:
+            returnStructure['requestHistogramData'] = requestHistogramData
+        if plotCTStudyPerDayAndHour:
+            returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
+        if plotCTStudyMeanDLPOverTime:
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
+            if plotAverageChoice == 'median' or plotAverageChoice == 'both':
+                returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
 
         return JsonResponse(returnStructure)
 

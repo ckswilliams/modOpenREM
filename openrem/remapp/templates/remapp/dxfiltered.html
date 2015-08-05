@@ -30,7 +30,7 @@
 
   {{ studyfilter }}
 
-  <form action="" method="get" class="form-horizontal" role="form">
+  <form action="{% url "dx_summary" %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">Exam filter</h3>
@@ -134,6 +134,43 @@
 
 {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}
+      <div >
+          <button type="submit" id="ajaxTesting">Ajax test</button>
+      </div>
+
+      <script>
+          $(document).ready(function() {
+              var form = $('form#examFilterForm');
+              form.submit(function(event) {
+// Do something here to get the chart data via Ajax.
+// I think I need to use the new dx_summary_chart_data view.
+// This view will need to be sent information for it to be able to carry out the appropriate database queries to
+// generate the chart data. Not sure how I'm going to do this at the moment. The view needs to pass the chart data
+// back here so that the charts can be drawn.
+//                  event.preventDefault();
+//                  console.log('ajax form submission function called successfully.');
+//                  form = $(this);
+//                  console.log(form)
+//                  var serialized_form = form.serialize();
+//                  serialized_form += "&submit=submit";
+//                  $.ajax({ type: "GET",
+//                      url: $(this).attr('action'),
+//                      data: serialized_form,
+//                      dataType: "json",
+//                      success: function( json ) {
+//                          query_progress( json );
+//                      },
+//                      error: function( xhr, status, errorThrown ) {
+//                          alert( "Sorry, there was a problem starting the job!" );
+//                          console.log( "Error: " + errorThrown );
+//                          console.log( "Status: " + status );
+//                          console.dir( xhr );
+//                      },
+//                  })
+              })
+          });
+      </script>
+
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
       <!-- HTML to include div container for acquisition plot -->
