@@ -343,8 +343,7 @@ def dx_summary_chart_data(request):
     if plotDXStudyPerDayAndHour:
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
-    #return JsonResponse(returnStructure)
-    return HttpResponse(json.dumps(returnStructure), content_type='application/json', status=200)
+    return JsonResponse(returnStructure, safe=False)
 
 
 def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,

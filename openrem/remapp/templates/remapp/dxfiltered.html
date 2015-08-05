@@ -61,7 +61,7 @@
           {% csrf_token %}
           {{ chartOptionsForm }}
         </table>
-        <input name="submit" type="submit" />
+        <input name="submit" type="submit" id="examFilterFormSubmit" />
 
       </div>
     </div>
@@ -148,10 +148,7 @@
                       data: serialized_form,
                       dataType: "json",
                       success: function( json ) {
-                          alert(json);
-                          // code here to take the json data and use it to populate JavaScript arrays for the plots
-                          //var names = $.map(json.acquisition_names, function(el) { return el; });
-                          //console.log(json.acquisition_names);
+                          alert(json.acquisition_names[0].acquisition_protocol);
                       },
                       error: function( xhr, status, errorThrown ) {
                           alert( "Sorry, there was a problem getting the data" );
