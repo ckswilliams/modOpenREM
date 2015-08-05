@@ -166,11 +166,15 @@ def qrscu(
             ExplicitVRBigEndian
             ]
 
-    all_mods = {'CT': {'inc': False, 'mods': ['CT','PT']},
+    all_mods = {'CT': {'inc': False, 'mods': ['CT']},
            'MG': {'inc': False, 'mods': ['MG']},
            'FL': {'inc': False, 'mods': ['RF','XA']},
            'DX': {'inc': False, 'mods': ['DX','CR']}
-           }
+                }
+    # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
+    # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
+    # If not, then the PET-CT will be returned with everything else, and the CT will show up in the series level
+    # query. Therefore, there is no need to search for PT at any stage.
     for m in all_mods:
         if m in modalities:
             all_mods[m]['inc'] = True
@@ -295,17 +299,6 @@ def qrscu(
             study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
             for rsp in study_rsp:
                 if 'CT' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break
-        if all_mods['CT']['inc'] and modality_matching:
-            # Not sure we need this one. If modsinstudy is respected, we'll catch them. If not, we'll have it anyway.
-            d.ModalitiesInStudy = 'PT'
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'PT' not in rsp.get_modalities_in_study():
                     modality_matching = False
                     modalities_left = False
                     break
