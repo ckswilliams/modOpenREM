@@ -241,67 +241,19 @@ def qrscu(
     modalities_left = True
 
     while modalities_left:
-        if all_mods['MG']['inc']:
-            d.ModalitiesInStudy = 'MG'
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            print "I've just completed a query for MG"
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'MG' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break  # This indicates that there was no modality match, so we have everything already
-        if all_mods['DX']['inc'] and modality_matching:
-            d.ModalitiesInStudy = 'DX'  # DX could be DX or CR
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'DX' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break
-        if all_mods['DX']['inc'] and modality_matching:
-            d.ModalitiesInStudy = 'CR'  # DX could be DX or CR
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'CR' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break
-        if all_mods['FL']['inc'] and modality_matching:
-            d.ModalitiesInStudy = 'RF'  # Fluoroscopy could be RF or XA
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'RF' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break
-        if all_mods['FL']['inc'] and modality_matching:
-            d.ModalitiesInStudy = 'XA'  # Fluoroscopy could be RF or XA
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'XA' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break
-        if all_mods['CT']['inc'] and modality_matching:
-            d.ModalitiesInStudy = 'CT'
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-            for rsp in study_rsp:
-                if 'CT' not in rsp.get_modalities_in_study():
-                    modality_matching = False
-                    modalities_left = False
-                    break
+        for selection, details in all_mods.iteritems():
+            if details['inc']:  # No need to check for modality_matching here as modalities_left would also be false
+                for mod in details['mods']:
+                    if modality_matching:
+                        d.ModalitiesInStudy = mod
+                        query_id = uuid.uuid4()
+                        _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
+                        study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+                        for rsp in study_rsp:
+                            if mod not in rsp.get_modalities_in_study():
+                                modality_matching = False
+                                modalities_left = False
+                                break  # This indicates that there was no modality match, so we have everything already
 
     # NOW we have all our studies. Time to throw away any we don't want
     study_rsp =query.dicomqrrspstudy_set.all()
