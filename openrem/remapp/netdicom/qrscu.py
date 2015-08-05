@@ -254,6 +254,12 @@ def qrscu(
                                 modality_matching = False
                                 modalities_left = False
                                 break  # This indicates that there was no modality match, so we have everything already
+        if inc_sr and modality_matching:
+            d.ModalitiesInStudy = 'SR'
+            query_id = uuid.uuid4()
+            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
+            # Nothing to gain by checking the response
+
 
     # NOW we have all our studies. Time to throw away any we don't want
     study_rsp =query.dicomqrrspstudy_set.all()
