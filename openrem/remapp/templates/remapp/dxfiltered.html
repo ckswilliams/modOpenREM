@@ -9,6 +9,7 @@
 
 {% block toprow %}
   {% load pagination_tags %}
+
   <p>
     There are {{ filter.count }} studies in this list.
   </p>
@@ -52,6 +53,7 @@
           <div style="display:none">{{ field }}</div>
         {% endfor %}
         <input name="submit" type="submit" />
+      <!--<input type="button" value="post" id="postData">-->
       </div>
       <div class="panel-heading">
         <h3 class="panel-title">Chart options</h3>
@@ -62,6 +64,7 @@
           {{ chartOptionsForm }}
         </table>
         <input name="submit" type="submit" id="examFilterFormSubmit" />
+        <!--<input type="button" value="post" id="postData">-->
 
       </div>
     </div>
@@ -73,7 +76,10 @@
 
 {% endblock %}
 
+
 {% block col1 %}
+    <div id="DJP">
+<a href=DJPstart></a>
   {% autopaginate filter.qs 50 as filter_list %}
   {% paginate %}
 
@@ -129,8 +135,10 @@
   </table>
 
   {% paginate %}
-
+<a href=DJPend></a>
+    </div>
 {% endblock %}
+
 
 {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}

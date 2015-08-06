@@ -21,6 +21,8 @@ function ArrayToURL(array) {
 
 $(document).ready(function() {
 /*    // Run AJAX request for chart data when document is first loaded
+      // (I can't get this to work at the moment...).
+
     var request_data = ArrayToURL(URLToArray(this.URL));
 
     $.ajax({
@@ -89,21 +91,22 @@ $(document).ready(function() {
     });
 */
 
-    // Run AJAX request for chart data after form submissions
+    // Submit the form
     var form = $('form#examFilterForm');
-    // First submit form to usual view to update tabular data
     form.submit(function(event) {
-        //event.preventDefault();
-        console.log('Form has been submitted');
-        console.log(form);
+        event.preventDefault();
         var serialized_form = form.serialize();
-        console.log(serialized_form);
-        /*$.ajax({ type: "GET",
+
+        // Send the form data to the usual view
+        $.ajax({ type: "GET",
             url: $(this).attr('action'),
             data: serialized_form,
             dataType: "html",
-            success: function( json ) {
-                alert("Tabular form worked");
+            success: function(html_response) {
+                // Extract the new HTML that is contained within the DJP tags
+                var new_DJP_div = html_response.replace(/^[\S\s]*DJPstart><\/a>/i, "").replace(/<a href=DJPend[\S\s]*$/i, "");
+                // Replace the html in the DJP div with the new HTML. Note I also need to replace the number of studies here too.
+                $('#DJP').html(new_DJP_div);
             },
             error: function( xhr, status, errorThrown ) {
                 alert( "Sorry, there was a problem getting the data for the updated tabular form" );
@@ -111,15 +114,17 @@ $(document).ready(function() {
                 console.log( "Status: " + status );
                 console.dir( xhr );
             }
-        });*/
+        });
 
-        // Then submit form to the chart data view
+        // Submit the form data again, but to the chart data view
         $.ajax({
             type: "GET",
             url: "/openrem/dx/chart/",
             data: serialized_form,
             dataType: "json",
             success: function( json ) {
+                //$('#examFilterForm').submit();
+
                 // A [num acq protocols] list of acquisition protocol names
                 var names = $.map(json.acquisition_names, function(el) { return el.acquisition_protocol; });
 
@@ -168,8 +173,7 @@ $(document).ready(function() {
                 chart.series[0].setData(seriesData);
                 chart.xAxis[0].setCategories(protocolNames);
                 chart.redraw({ duration: 1000 });
-
-                alert("Updated chart data received after form submission. Names are: " + names);
+                // The drilldown data isn't replaced at the moment.
             },
             error: function( xhr, status, errorThrown ) {
                 alert( "Sorry, there was a problem getting the data for the updated chart data" );
