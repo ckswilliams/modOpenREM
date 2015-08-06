@@ -205,7 +205,6 @@ def dx_summary_list_filter(request):
 def dx_summary_chart_data(request):
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q
-    from remapp.forms import DXChartOptionsForm
     from openremproject import settings
     from django.http import JsonResponse
 
@@ -285,25 +284,6 @@ def dx_summary_chart_data(request):
         userProfile.median_available = False
         userProfile.save()
         median_available = False
-
-    # Obtain the chart options from the request
-    chartOptionsForm = DXChartOptionsForm(requestResults)
-    # check whether the form data is valid
-    if chartOptionsForm.is_valid():
-        # Use the form data if the user clicked on the submit button
-        if "submit" in requestResults:
-            # process the data in form.cleaned_data as required
-            userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
-            userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
-            userProfile.plotDXAcquisitionFreq = chartOptionsForm.cleaned_data['plotDXAcquisitionFreq']
-            userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
-            userProfile.plotDXAcquisitionMeanmAs = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAs']
-            userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
-            userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
-            userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
-            if median_available:
-                userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
-            userProfile.save()
 
     plotDXAcquisitionMeanDAP = userProfile.plotDXAcquisitionMeanDAP
     plotDXAcquisitionFreq = userProfile.plotDXAcquisitionFreq
