@@ -20,7 +20,7 @@ function ArrayToURL(array) {
 }
 
 $(document).ready(function() {
-    // Run AJAX request for chart data when document is first loaded
+/*    // Run AJAX request for chart data when document is first loaded
     var request_data = ArrayToURL(URLToArray(this.URL));
 
     $.ajax({
@@ -60,10 +60,24 @@ $(document).ready(function() {
                 seriesDataN.push(acq_summary[i].num_acq);
                 protocolCounts.push(acq_histogram_data[i][0]);
                 protocolBins.push(acq_histogram_data[i][1]);
-                seriesData.push({name:protocolNames[i], y:acq_summary[i].mean_dap, freq:acq_summary[i].num_acq, bins:protocolBins[i], tooltip:protocolNames[i]+'<br>'+acq_summary[i].mean_dap+' mean<br>(n='+acq_summary[i].num_acq+')',drilldown:protocolNames[i]});
+                seriesData.push({name:protocolNames[i], y:acq_summary[i].mean_dap, freq:acq_summary[i].num_acq, bins:protocolBins[i], tooltip:protocolNames[i]+'<br>'+acq_summary[i].mean_dap.toFixed(1)+' mean<br>(n='+acq_summary[i].num_acq+')',drilldown:protocolNames[i]});
             }
 
-            //alert(names);
+            var temp = [];
+            seriesDrilldown = [];
+            for (i = 0; i < names.length; i++) {
+                temp = [];
+                for (j = 0; j < protocolCounts[0].length; j++) {
+                    temp.push([protocolBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocolBins[i][j+1].toFixed(1).toString(), protocolCounts[i][j]]);
+                }
+                seriesDrilldown.push({id: protocolNames[1-1], name: protocolNames[1-1], useHTML: true, data: temp});
+            }
+
+            var chart = $('#container').highcharts();
+            chart.series[0].setData(seriesData);
+            chart.xAxis[0].setCategories(protocolNames);
+            chart.redraw({ duration: 1000 });
+
             alert("Chart data received after page ready. Names are: " + names);
         },
         error: function( xhr, status, errorThrown ) {
@@ -73,7 +87,7 @@ $(document).ready(function() {
             console.dir( xhr );
         }
     });
-
+*/
 
     // Run AJAX request for chart data after form submissions
     var form = $('form#examFilterForm');
@@ -83,7 +97,7 @@ $(document).ready(function() {
         console.log('Form has been submitted');
         console.log(form);
         var serialized_form = form.serialize();
-        serialized_form += "&submit=submit";
+        console.log(serialized_form);
         /*$.ajax({ type: "GET",
             url: $(this).attr('action'),
             data: serialized_form,
@@ -100,8 +114,9 @@ $(document).ready(function() {
         });*/
 
         // Then submit form to the chart data view
-        $.ajax({ type: "GET",
-            url: $(this).attr('action') + "chart/",
+        $.ajax({
+            type: "GET",
+            url: "/openrem/dx/chart/",
             data: serialized_form,
             dataType: "json",
             success: function( json ) {
@@ -136,10 +151,24 @@ $(document).ready(function() {
                     seriesDataN.push(acq_summary[i].num_acq);
                     protocolCounts.push(acq_histogram_data[i][0]);
                     protocolBins.push(acq_histogram_data[i][1]);
-                    seriesData.push({name:protocolNames[i], y:acq_summary[i].mean_dap, freq:acq_summary[i].num_acq, bins:protocolBins[i], tooltip:protocolNames[i]+'<br>'+acq_summary[i].mean_dap+' mean<br>(n='+acq_summary[i].num_acq+')',drilldown:protocolNames[i]});
+                    seriesData.push({name:protocolNames[i], y:acq_summary[i].mean_dap, freq:acq_summary[i].num_acq, bins:protocolBins[i], tooltip:protocolNames[i]+'<br>'+acq_summary[i].mean_dap.toFixed(1)+' mean<br>(n='+acq_summary[i].num_acq+')',drilldown:protocolNames[i]});
                 }
 
-                //alert(names);
+                var temp = [];
+                seriesDrilldown = [];
+                for (i = 0; i < names.length; i++) {
+                    temp = [];
+                    for (j = 0; j < protocolCounts[0].length; j++) {
+                        temp.push([protocolBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocolBins[i][j+1].toFixed(1).toString(), protocolCounts[i][j]]);
+                    }
+                    seriesDrilldown.push({id: protocolNames[1-1], name: protocolNames[1-1], useHTML: true, data: temp});
+                }
+
+                var chart = $('#container').highcharts();
+                chart.series[0].setData(seriesData);
+                chart.xAxis[0].setCategories(protocolNames);
+                chart.redraw({ duration: 1000 });
+
                 alert("Updated chart data received after form submission. Names are: " + names);
             },
             error: function( xhr, status, errorThrown ) {
@@ -148,6 +177,7 @@ $(document).ready(function() {
                 console.log( "Status: " + status );
                 console.dir( xhr );
             }
-        })
+        });
+        return false;
     })
 });

@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: protocolNames,
+            categories: [1,2,3,4,5],//protocolNames,
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -79,10 +79,10 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Mean DAP per acquisition protocol',
-            data: $.extend(true, [], seriesData)
+            data: [] //$.extend(true, [], seriesData)
         }],
         drilldown: {
-            series: seriesDrilldown
+            series: [] //seriesDrilldown
         }
     });
 
