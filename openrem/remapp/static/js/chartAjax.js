@@ -19,10 +19,9 @@ function ArrayToURL(array) {
     return pairs.join('&');
 }
 
-$(document).ready(function() {
-/*    // Run AJAX request for chart data when document is first loaded
-      // (I can't get this to work at the moment...).
 
+// Code to update the page and chart data on initial page load.
+$(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
 
     $.ajax({
@@ -79,8 +78,7 @@ $(document).ready(function() {
             chart.series[0].setData(seriesData);
             chart.xAxis[0].setCategories(protocolNames);
             chart.redraw({ duration: 1000 });
-
-            alert("Chart data received after page ready. Names are: " + names);
+            // The drilldown data isn't replaced at the moment.
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );
@@ -89,9 +87,12 @@ $(document).ready(function() {
             console.dir( xhr );
         }
     });
-*/
+    return false;
+});
 
-    // Submit the form
+
+// Code to update the page and chart data when the user clicks on the submit button.
+$(document).ready(function() {
     var form = $('form#examFilterForm');
     form.submit(function(event) {
         event.preventDefault();
