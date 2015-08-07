@@ -22,6 +22,7 @@ function ArrayToURL(array) {
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
+    var i, j;
 
     $.ajax({
         type: "GET",
@@ -32,7 +33,7 @@ $(document).ready(function() {
             // this.url contains info about which charts need to be plotted
             var plotting_info = URLToArray(this.url);
 
-            if("plotDXAcquisitionMeanDAP" in plotting_info || "plotDXAcquisitionFreq" in plotting_info || "plotDXAcquisitionMeanDAPOverTime" in plotting_info) {
+            if( typeof plotDXAcquisitionMeanDAP !== 'undefined' || typeof plotDXAcquisitionFreq !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
 
                 var acq_summary = $.map(json.acquisitionSummary, function (el) {
                     return el;
@@ -48,7 +49,7 @@ $(document).ready(function() {
                 }
             }
 
-            if("plotDXAcquisitionMeanDAP" in plotting_info) {
+            if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 var acq_histogram_data = json.acquisitionHistogramData;
 
                 protocolCounts = [];
@@ -58,7 +59,7 @@ $(document).ready(function() {
                     protocolBins.push(acq_histogram_data[i][1]);
                 }
 
-                if(plotting_info.plotMeanMedianOrBoth == "mean" || plotting_info.plotMeanMedianOrBoth == "both") {
+                if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
                     seriesData = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesData.push({
@@ -72,7 +73,7 @@ $(document).ready(function() {
                     }
                 }
 
-                if(plotting_info.plotMeanMedianOrBoth == "median" || plotting_info.plotMeanMedianOrBoth == "both") {
+                if(plotAverageChoice == "median" || plotAverageChoice == "both") {
                     seriesMedianData = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesMedianData.push({
@@ -96,31 +97,55 @@ $(document).ready(function() {
                     seriesDrilldown.push({id: protocolNames[i], name: protocolNames[i], useHTML: true, data: temp});
                 }
 
-                if(plotting_info.plotMeanMedianOrBoth == "mean") {
-                    var chart = $('#container').highcharts();
-                    chart.series[0].setData(seriesData);
-                    chart.xAxis[0].setCategories(protocolNames);
-                    chart.options.drilldown.series = seriesDrilldown;
-                    chart.redraw({ duration: 1000 });
+                var chartplotMeanMedianOrBoth = $('#container').highcharts();
+                if(plotAverageChoice == "mean") {
+                    chartplotMeanMedianOrBoth.series[0].setData(seriesData);
+                    chartplotMeanMedianOrBoth.xAxis[0].setCategories(protocolNames);
+                    chartplotMeanMedianOrBoth.options.drilldown.series = seriesDrilldown;
+                    chartplotMeanMedianOrBoth.redraw({ duration: 1000 });
                 }
-                else if(plotting_info.plotMeanMedianOrBoth == "median") {
-                    var chart = $('#container').highcharts();
-                    chart.series[0].setData(seriesMedianData);
-                    chart.xAxis[0].setCategories(protocolNames);
-                    chart.options.drilldown.series = seriesDrilldown;
-                    chart.redraw({ duration: 1000 });
+                else if(plotAverageChoice == "median") {
+                    chartplotMeanMedianOrBoth.series[0].setData(seriesMedianData);
+                    chartplotMeanMedianOrBoth.xAxis[0].setCategories(protocolNames);
+                    chartplotMeanMedianOrBoth.options.drilldown.series = seriesDrilldown;
+                    chartplotMeanMedianOrBoth.redraw({ duration: 1000 });
                 }
                 else {
-                    var chart = $('#container').highcharts();
-                    chart.series[0].setData(seriesData);
-                    chart.series[1].setData(seriesMedianData);
-                    chart.xAxis[0].setCategories(protocolNames);
-                    chart.options.drilldown.series = seriesDrilldown;
-                    chart.redraw({ duration: 1000 });
+                    chartplotMeanMedianOrBoth.series[0].setData(seriesData);
+                    chartplotMeanMedianOrBoth.series[1].setData(seriesMedianData);
+                    chartplotMeanMedianOrBoth.xAxis[0].setCategories(protocolNames);
+                    chartplotMeanMedianOrBoth.options.drilldown.series = seriesDrilldown;
+                    chartplotMeanMedianOrBoth.redraw({ duration: 1000 });
                 }
             }
 
+            if(typeof plotDXAcquisitionFreq !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
+                //var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+                var protocolPiechartData = new Array(protocolNames.length);
+                for(i=0; i<protocolNames.length; i++) {
+                    if(typeof plotDXAcquisitionFreq !== 'undefined') {
+                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(seriesDataN[i]), url: urlStart + protocolNames[i]};
+                    }
+                    else {
+                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
+                    }
+                }
 
+                if(typeof plotDXAcquisitionFreq !== 'undefined') {
+                    protocolPiechartData.sort(sort_by_y);
+                }
+
+                protocolColours = getColours(protocolNames.length);
+                for(i=0; i<protocolNames.length; i++) {
+                    protocolPiechartData[i].color = protocolColours[i];
+                }
+            }
+
+            if(typeof plotDXAcquisitionFreq !== 'undefined') {
+                var chart = $('#piechartProtocolDIV').highcharts();
+                chart.series[0].setData(protocolPiechartData);
+                chart.redraw({ duration: 1000 });
+            }
 
 
             // [num acq protocols] lists of 2-element arrays.

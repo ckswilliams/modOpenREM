@@ -434,113 +434,61 @@
     <script src="{{ STATIC_URL }}js/chartAjax.js"></script>
     <!-- End of JavaScript chart AJAX code. -->
 
-    {% if request.user.userprofile.plotDXAcquisitionMeanDAP or request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
-      <!-- JavaScript for acquisition plot that is also required by some other plots -->
-      <script>
-/*        var protocolNames     = [
-          {% for name in acquisition_names %}
-            "{{name.acquisition_protocol}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-        {% if request.user.userprofile.plotDXAcquisitionMeanDAP or request.user.userprofile.plotDXAcquisitionFreq %}
-/*        var seriesDataN       = [
-          {% for testData in acquisitionSummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-        {% endif %}
-      </script>
-    {% endif %}
-
+    <!-- Flags to determine if charts should be plotted -->
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
-      <!-- JavaScript for acquisition plot -->
-      <script>
-/*        var protocolCounts    = [
-          {% for protocol in acquisitionHistogramData %}
-            [
-              {% for dataCounts in protocol.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolBins      = [
-          {% for protocolEdges in acquisitionHistogramData %}
-            [
-              {% for edges in protocolEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
-/*        var seriesData        = [
-          {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}},freq:{{testData.num_acq}},bins:protocolBins[{{forloop.counter}}-1],tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dap|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-/*        {% endif %}
-        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var seriesMedianData        = [
-          {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}},freq:{{testData.num_acq}},bins:protocolBins[{{forloop.counter}}-1],tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_dap|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-        {% endif %}
-/*        var seriesDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogramData %}
-            {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in protocolCountsArray.0 %}
-                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-
-        var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMedian.js"></script>
-      {% endif %}
-      <!-- End of JavaScript for acquisition plot -->
+    <script>var plotDXAcquisitionMeanDAP = true;</script>
     {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionFreq %}
+    <script>var plotDXAcquisitionFreq = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
+    <script>var plotDXAcquisitionMeanDAPOverTime = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
+    <script>var plotDXAcquisitionMeankVp = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
+    <script>var plotDXAcquisitionMeanmAs = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
+    <script>var plotDXStudyPerDayAndHour = true;</script>
+    {% endif %}
+
+    <script>var plotDXAcquisitionMeanDAPOverTimePeriod = '{{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}';</script>
+
+    <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
+      {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
+          <script>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
+                  var seriesData = [];
+              {% endif %}
+              {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+                  var seriesMedianData = [];
+              {% endif %}
+              var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          </script>
+
+          {% if request.user.userprofile.plotAverageChoice == 'both' %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
+          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMean.js"></script>
+          {% else %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMedian.js"></script>
+          {% endif %}
+          <!-- End of JavaScript for acquisition plot -->
+      {% endif %}
 
 
     {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
       <script>
         var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-        var protocolPiechartData = new Array(protocolNames.length);
-        for(var i=0; i<protocolNames.length; i++) {
-          {% if request.user.userprofile.plotDXAcquisitionFreq %}
-          protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
-          {% else %}
-          protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
-          {% endif %}
-        }
-
-        {% if request.user.userprofile.plotDXAcquisitionFreq %}
-        protocolPiechartData.sort(sort_by_y);
-        {% endif %}
-
-        protocolColours = getColours(protocolNames.length);
-        for(var i=0; i<protocolNames.length; i++) {
-          protocolPiechartData[i].color = protocolColours[i];
-        }
       </script>
     {% endif %}
 
