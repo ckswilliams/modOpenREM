@@ -96,14 +96,14 @@ $(document).ready(function() {
                 for (j = 0; j < protocolCounts[0].length; j++) {
                     temp.push([protocolBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocolBins[i][j+1].toFixed(1).toString(), protocolCounts[i][j]]);
                 }
-                seriesDrilldown.push({id: protocolNames[1-1], name: protocolNames[1-1], useHTML: true, data: temp});
+                seriesDrilldown.push({id: protocolNames[i], name: protocolNames[i], useHTML: true, data: temp});
             }
 
             var chart = $('#container').highcharts();
             chart.series[0].setData(seriesData);
             chart.xAxis[0].setCategories(protocolNames);
+            chart.options.drilldown.series = seriesDrilldown;
             chart.redraw({ duration: 1000 });
-            // The drilldown data isn't replaced at the moment.
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );
