@@ -556,54 +556,11 @@
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- JavaScript for mean DAP per acquisition protocol per time period -->
       <script>
-        dateAxis = [
-        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-          {% for dateEntries in acquisitionMeanDAPoverTime.0 %}
-            "{{ dateEntries.0.date|date:"d/m/Y" }}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        {% else %}
-          {% for dateEntries in acquisitionMedianDAPoverTime.0 %}
-            "{{ dateEntries.0.date|date:"d/m/Y" }}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        {% endif %}
-        ];
 
-        // Create the same colours as for the study pie chart, so that the colours
-        // are the same for the studies in the pie chart and this plot.
-        var protocolLineColours =  new Array(protocolNames.length);
-        protocolPiechartData.sort(sort_by_name);
-        for(var i=0; i<protocolNames.length; i++) {
-          protocolLineColours[i] = protocolPiechartData[i].color;
-        }
-        protocolPiechartData.sort(sort_by_y);
-
-        var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
 
         {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-        meanDAPOverTime = [
-          {% for protocolData in acquisitionMeanDAPoverTime %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],
-                  color:protocolLineColours[{{forloop.counter}}-1],
-                  marker:{{'{'}}enabled:true{{'}'}},
-                  point: {{'{'}}
-            events: {{'{'}}
-                    click: function(e) {{'{'}}
-            location.href = e.point.url;
-            e.preventDefault();
-            {{'}'}}
-            {{'}'}}
-            {{'}'}},
-            data:[
-              {% for dateEntries in protocolData %}
-                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
-                      {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]{{'}'}}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
+        var meanDAPOverTime = [];
+
         {% else %}
         medianDAPOverTime = [
           {% for protocolData in acquisitionMedianDAPoverTime %}

@@ -357,10 +357,87 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
 
 
+            //-------------------------------------------------------------------------------------
+            // DAP over time chart data start
             // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average DAP values
-            if("acquisitionMeanDAPoverTime" in json) {
-                var acq_mean_dap_over_time = json.acquisitionMeanDAPoverTime;
+            if(typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
+                if(plotAverageChoice == "mean") {
+                    var acq_mean_dap_over_time = json.acquisitionMeanDAPoverTime;
+
+                    dateAxis = [];
+                    var tempDate;
+                    for(i=0; i<acq_mean_dap_over_time[0].length; i++) {
+                        tempDate = new Date(Date.parse(acq_mean_dap_over_time[0][i][0]));
+                        tempDate = formatDate(tempDate);
+                        dateAxis.push(tempDate);
+                    }
+
+                    var protocolLineColours =  new Array(protocolNames.length);
+                    protocolPiechartData.sort(sort_by_name);
+                    for(i=0; i<protocolNames.length; i++) {
+                        protocolLineColours[i] = protocolPiechartData[i].color;
+                    }
+                    protocolPiechartData.sort(sort_by_y);
+
+                    var date_after, date_before;
+                    meanDAPOverTime = [];
+                    for(i=0; i<acq_mean_dap_over_time.length; i++) {
+                        temp = [];
+                        for(j=0; j<acq_mean_dap_over_time[0].length; j++) {
+                            tempDate = new Date(Date.parse(acq_mean_dap_over_time[i][j][0]));
+                            date_after = formatDate(tempDate);
+                            date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+                            temp.push({y:acq_mean_dap_over_time[i][j][1], url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        }
+                        meanDAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp});
+                    }
+
+                    var chartDXAcquisitionMeanDAPOverTime = $('#AcquisitionMeanDAPOverTimeDIV').highcharts();
+                    chartDXAcquisitionMeanDAPOverTime.xAxis[0].setCategories(dateAxis);
+                    for(i=0; i<meanDAPOverTime.length; i++) {
+                        chartDXAcquisitionMeanDAPOverTime.addSeries(meanDAPOverTime[i]);
+                    }
+                    chartDXAcquisitionMeanDAPOverTime.redraw({duration: 1000});
+                }
+                else {
+                    var acq_median_dap_over_time = json.acquisitionMedianDAPoverTime;
+
+                    dateAxis = [];
+                    var tempDate;
+                    for(i=0; i<acq_median_dap_over_time[0].length; i++) {
+                        tempDate = new Date(Date.parse(acq_median_dap_over_time[0][i][0]));
+                        tempDate = formatDate(tempDate);
+                        dateAxis.push(tempDate);
+                    }
+
+                    var protocolLineColours =  new Array(protocolNames.length);
+                    protocolPiechartData.sort(sort_by_name);
+                    for(i=0; i<protocolNames.length; i++) {
+                        protocolLineColours[i] = protocolPiechartData[i].color;
+                    }
+                    protocolPiechartData.sort(sort_by_y);
+
+                    var date_after, date_before;
+                    medianDAPOverTime = [];
+                    for(i=0; i<acq_median_dap_over_time.length; i++) {
+                        temp = [];
+                        for(j=0; j<acq_median_dap_over_time[0].length; j++) {
+                            tempDate = new Date(Date.parse(acq_median_dap_over_time[i][j][0]));
+                            date_after = formatDate(tempDate);
+                            date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+                            temp.push({y:acq_median_dap_over_time[i][j][1], url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        }
+                        medianDAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp});
+                    }
+
+                    var chartDXAcquisitionMeanDAPOverTime = $('#AcquisitionMeanDAPOverTimeDIV').highcharts();
+                    chartDXAcquisitionMeanDAPOverTime.xAxis[0].setCategories(dateAxis);
+                    chartDXAcquisitionMeanDAPOverTime.series.update({data: medianDAPOverTime});
+                    chartDXAcquisitionMeanDAPOverTime.redraw({duration: 1000});
+                }
             }
+            // DAP over time chart data end
+            //-------------------------------------------------------------------------------------
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );
