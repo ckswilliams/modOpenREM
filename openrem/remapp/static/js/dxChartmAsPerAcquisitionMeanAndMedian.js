@@ -47,7 +47,7 @@ $(function () {
             enabled: true
         },
         xAxis: {
-            categories: protocolmAsNames,
+            categories: [], //protocolmAsNames,
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,13 +78,13 @@ $(function () {
         },
         series: [{
             name: 'Mean mAs',
-            data: $.extend(true, [], seriesmAsData)
+            data: [] //$.extend(true, [], seriesmAsData)
         }, {
             name: 'Median mAs',
-            data: $.extend(true, [], seriesMedianmAsData)
+            data: [] //$.extend(true, [], seriesMedianmAsData)
         }],
         drilldown: {
-            series: seriesmAsDrilldown
+            series: [] //seriesmAsDrilldown
         }
     });
     switch(chartSorting) {

@@ -43,10 +43,10 @@ $(function () {
             endAngle:90,
             center: ['50%','75%'],
             innerSize: '50%',
-            data: studyWorkloadPieChartData
+            data: []
         }],
         drilldown: {
-            series:seriesDrillDownPieChart
+            series: []
         }
     });
 });

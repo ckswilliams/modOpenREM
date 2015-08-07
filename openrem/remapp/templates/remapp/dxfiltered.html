@@ -499,72 +499,17 @@
 
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
-      <!-- JavaScript for acquisition mean kVp plot -->
-      <script>
-        var protocolkVpNames     = [
-          {% for name in acquisitionkVpSummary %}
-            "{{name.acquisition_protocol}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var serieskVpDataN       = [
-          {% for testData in acquisitionkVpSummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolkVpCounts    = [
-          {% for protocol in acquisitionHistogramkVpData %}
-            [
-              {% for dataCounts in protocol.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolkVpBins      = [
-          {% for protocolEdges in acquisitionHistogramkVpData %}
-            [
-              {% for edges in protocolEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var serieskVpData        = [
-          {% for testData in acquisitionkVpSummary %}
-            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.mean_kVp}},freq:{{testData.num_acq}},bins:protocolkVpBins[{{forloop.counter}}-1],tooltip:protocolkVpNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_kVp|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var seriesMediankVpData        = [
-          {% for testData in acquisitionkVpSummary %}
-            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.median_kVp}},freq:{{testData.num_acq}},bins:protocolkVpBins[{{forloop.counter}}-1],tooltip:protocolkVpNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_kVp|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
+        <!-- JavaScript for acquisition mean kVp plot -->
+        <script>
+            {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
+                var serieskVpData = [];
+            {% endif %}
+            {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+                var seriesMediankVpData = [];
+            {% endif %}
 
-        var serieskVpDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogramkVpData %}
-            {id: protocolkVpNames[{{forloop.counter}}-1],name: protocolkVpNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in protocolCountsArray.0 %}
-                [protocolkVpBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolkVpBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
+            var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+        </script>
 
       {% if request.user.userprofile.plotAverageChoice == 'both' %}
           <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMeanAndMedian.js"></script>
@@ -580,67 +525,12 @@
     {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
       <!-- JavaScript for acquisition mean mAs plot -->
       <script>
-        var protocolmAsNames     = [
-          {% for name in acquisitionmAsSummary %}
-            "{{name.acquisition_protocol}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var seriesmAsDataN       = [
-          {% for testData in acquisitionmAsSummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolmAsCounts    = [
-          {% for protocol in acquisitionHistogrammAsData %}
-            [
-              {% for dataCounts in protocol.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolmAsBins      = [
-          {% for protocolEdges in acquisitionHistogrammAsData %}
-            [
-              {% for edges in protocolEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var seriesmAsData        = [
-          {% for testData in acquisitionmAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_mAs}},freq:{{testData.num_acq}},bins:protocolmAsBins[{{forloop.counter}}-1],tooltip:protocolmAsNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_mAs|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var seriesMedianmAsData        = [
-          {% for testData in acquisitionmAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.median_mAs}},freq:{{testData.num_acq}},bins:protocolmAsBins[{{forloop.counter}}-1],tooltip:protocolmAsNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_mAs|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-
-        var seriesmAsDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogrammAsData %}
-            {id: protocolmAsNames[{{forloop.counter}}-1],name: protocolmAsNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in protocolCountsArray.0 %}
-                [protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
+            {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
+                var seriesmAsData = [];
+            {% endif %}
+            {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
+                var seriesMedianmAsData = [];
+            {% endif %}
 
         var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
@@ -658,48 +548,6 @@
 
     {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
       <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-      <script>
-        var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-        var studiesPerHourEachWeekday = [
-          {% for dayCounts in studiesPerHourInWeekdays %}
-            [
-              {% for hourCounts in dayCounts %}
-                {{hourCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var studiesPerWeekday = new Array(7);
-        for(var i=0; i<7; i++) {
-          var tempTotal = 0;
-          for(var j=0; j<24; j++) {
-            tempTotal = tempTotal + studiesPerHourEachWeekday[i][j];
-          }
-          studiesPerWeekday[i] = tempTotal;
-        }
-
-        var hourColours = getColours(24);
-        var seriesDrillDownPieChart   = [
-          {% for dayCounts in studiesPerHourInWeekdays %}
-            {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
-              {% for hourCounts in dayCounts %}
-                {{'{'}}name:'{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', y:studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1],color:hourColours[{{forloop.counter}}]{{'}'}}{% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var dayColours = getColours(7);
-        var studyWorkloadPieChartData= new Array(7);
-        for(var i=0; i<7; i++) {
-          studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
-        }
-      </script>
-
       <script src="{{ STATIC_URL }}js/dxChartStudyWorkload.js"></script>
       <!-- End of JavaScript for studies per week day pie chart -->
     {% endif %}

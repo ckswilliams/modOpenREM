@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: protocolkVpNames,
+            categories: [1,2,3,4,5], //protocolkVpNames,
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,10 +78,10 @@ $(function () {
         },
         series: [{
             name: 'Median kVp',
-            data: $.extend(true, [], seriesMediankVpData)
+            data: [] //$.extend(true, [], seriesMediankVpData)
         }],
         drilldown: {
-            series: serieskVpDrilldown
+            series: [] //serieskVpDrilldown
         }
     });
 

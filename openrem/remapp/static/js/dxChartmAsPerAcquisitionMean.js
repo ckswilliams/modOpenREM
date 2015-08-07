@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: protocolmAsNames,
+            categories: [], //protocolmAsNames,
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -77,10 +77,10 @@ $(function () {
         },
         series: [{
             name: 'Mean mAs',
-            data: $.extend(true, [], seriesmAsData)
+            data: [] //$.extend(true, [], seriesmAsData)
         }],
         drilldown: {
-            series: seriesmAsDrilldown
+            series: [] //seriesmAsDrilldown
         }
     });
 
