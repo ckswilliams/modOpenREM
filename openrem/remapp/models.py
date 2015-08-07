@@ -45,14 +45,11 @@ class DicomQuery(models.Model):
 class DicomQRRspStudy(models.Model):
     dicom_query = models.ForeignKey(DicomQuery)
     query_id = models.CharField(max_length=64)
-    patient_id = models.CharField(max_length=64, blank=True, null=True)
-    sop_instance_uid = models.TextField(blank=True, null=True)
+    study_instance_uid = models.TextField(blank=True, null=True)
     modality = models.CharField(max_length=16, blank=True, null=True)
     modalities_in_study = models.CharField(max_length=100, blank=True, null=True)
     study_description = models.TextField(blank=True, null=True)
-    study_instance_uid = models.TextField(blank=True, null=True)
-    study_date = models.DateField(blank=True, null=True)
-    patient_age_decimal = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
+    number_of_study_related_series = models.IntegerField(blank=True, null=True)
 
     def set_modalities_in_study(self, x):
         self.modalities_in_study = json.dumps(x)
@@ -64,16 +61,11 @@ class DicomQRRspStudy(models.Model):
 class DicomQRRspSeries(models.Model):
     dicom_qr_rsp_study = models.ForeignKey(DicomQRRspStudy)
     query_id = models.CharField(max_length=64)
-    patient_id = models.CharField(max_length=64, blank=True, null=True)
-    sop_instance_uid = models.TextField(blank=True, null=True)
-    modality = models.CharField(max_length=16, blank=True, null=True)
-    study_description = models.TextField(blank=True, null=True)
-    study_instance_uid = models.TextField(blank=True, null=True)
-    study_date = models.DateField(blank=True, null=True)
-    patient_age_decimal = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True)
-    series_description = models.TextField(blank=True, null=True)
     series_instance_uid = models.TextField(blank=True, null=True)
     series_number = models.IntegerField(blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
+    series_description = models.TextField(blank=True, null=True)
+    number_of_series_related_instances = models.IntegerField(blank=True, null=True)
 
 
 class DicomStoreSCP(models.Model):

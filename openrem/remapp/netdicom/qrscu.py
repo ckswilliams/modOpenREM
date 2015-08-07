@@ -33,6 +33,53 @@ def _move_req(MyAE, RemoteAE, d):
     assocMove.Release(0)
     print "Move association released"
 
+def _try_query_return(rsp, tag):
+    try:
+        x = rsp.tag
+    except:
+        x = None
+    return x
+
+def _query_series(my_ae, remote_ae, d2, studyrsp):
+    import uuid
+    from remapp.tools.dcmdatetime import make_date
+    from remapp.models import DicomQRRspSeries
+    d2.QueryRetrieveLevel = "SERIES"
+    d2.SeriesDescription = ''
+    d2.SeriesNumber = ''
+    d2.SeriesInstanceUID = ''
+    d2.Modality = ''
+    d2.NumberOfSeriesRelatedInstances = ''
+
+    print 'd2: {0}'.format(d2)
+
+    assoc_series = my_ae.RequestAssociation(remote_ae)
+
+    st2 = assoc_series.StudyRootFindSOPClass.SCU(d2, 1)
+
+    query_id = uuid.uuid4()
+
+    print 'In _query_series'
+    seRspNo = 0
+
+    for series in st2:
+        if not series[1]:
+            continue
+        seRspNo += 1
+        print "Series Response {0}: {1}".format(seRspNo, series[1])
+        seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
+        seriesrsp.query_id = query_id
+        # Mandatory tags
+        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        seriesrsp.modality = series[1].Modality
+        seriesrsp.series_number = series[1].SeriesNumber
+        # Optional useful tags
+        seriesrsp.series_description = _try_query_return(series[1], 'SeriesDescription')
+        seriesrsp.number_of_series_related_instances = _try_query_return(series[1], 'NumberOfSeriesRelatedInstances')
+        seriesrsp.save()
+
+    assoc_series.Release(0)
+
 def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
     from remapp.models import DicomQRRspStudy
@@ -60,7 +107,6 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         print "Response {0}".format(rspno)
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
-        rsp.patient_id = ss[1].PatientID
         rsp.sop_instance_uid = ss[1].SOPInstanceUID
         rsp.modality = ss[1].Modality
         rsp.study_description = ss[1].StudyDescription
@@ -83,62 +129,6 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         rsp.save()
 
     assoc_study.Release(0)
-
-
-def _query_series(my_ae, remote_ae, d2, studyrsp):
-    import uuid
-    from remapp.tools.dcmdatetime import make_date
-    from remapp.models import DicomQRRspSeries
-    d2.QueryRetrieveLevel = "SERIES"
-    d2.SeriesDescription = ''
-    d2.SeriesNumber = ''
-    d2.SeriesInstanceUID = ''
-    d2.Modality = ''
-    d2.NumberOfSeriesRelatedInstances = ''
-
-    print 'd2: {0}'.format(d2)
-
-    assoc_series = my_ae.RequestAssociation(remote_ae)
-
-    st2 = assoc_series.StudyRootFindSOPClass.SCU(d2, 1)
-
-    query_id = uuid.uuid4()
-
-    print 'In _query_series'
-    seRspNo = 0
-
-    for series in st2:
-        if not series[1]:
-            continue
-        # try:
-        #     series[1].SeriesInstanceUID
-        # except:
-        #     break
-        seRspNo += 1
-        print "Series Response {0}: {1}".format(seRspNo, series[1])
-        seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
-        # try:  # Some series level responses were nonsense
-        #     seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
-        # except:
-        #     seriesrsp.delete()
-        #     continue
-        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
-        seriesrsp.query_id = query_id
-        seriesrsp.patient_id = series[1].PatientID
-        seriesrsp.sop_instance_uid = series[1].SOPInstanceUID
-        seriesrsp.modality = series[1].Modality
-        seriesrsp.study_description = series[1].StudyDescription
-        seriesrsp.study_instance_uid = series[1].StudyInstanceUID
-        seriesrsp.study_date = make_date(series[1].StudyDate)
-        seriesrsp.series_number = series[1].SeriesNumber
-        try:  # CR images for example don't always have series information
-            seriesrsp.series_description = series[1].SeriesDescription
-        except:
-            pass
-        seriesrsp.save()
-
-    assoc_series.Release(0)
-
 
 from celery import shared_task
 
@@ -261,8 +251,8 @@ def qrscu(
             # Nothing to gain by checking the response
 
 
-    # NOW we have all our studies. Time to throw away any we don't want
-    study_rsp =query.dicomqrrspstudy_set.all()
+    # Now we have all our studies. Time to throw away any we don't want
+    study_rsp = query.dicomqrrspstudy_set.all()
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
     for mod_set in mods_in_study_set:
         delete = True
@@ -280,6 +270,36 @@ def qrscu(
             studies_to_delete.delete()
 
     # Now we need to delete any unwanted series
+    for study in study_rsp:
+        if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
+            study.modality = 'MG'
+            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
+            # be weeded out
+        if all_mods['DX']['inc']:
+            if 'CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study():
+                study.modality = 'DX'
+                pass
+                # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
+        if all_mods['FL']['inc']:
+            if 'RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study():
+                study.modality = 'FL'
+                # Assume structured reports have modality 'SR' at series level?
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    if s.modality != 'SR':
+                        s.delete()
+        if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
+            study.modality = 'CT'
+            if 'SR' in study.get_modalities_in_study():
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    if s.modality != 'SR':
+                        s.delete() # Need to check if GE Enhanced SR has modality SR
+            else:
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    try:
+                        if s.series_description == 'Dose Info':
 
 
 
@@ -287,33 +307,6 @@ def qrscu(
 
 
 
-
-    # d.ModalitiesInStudy = modalities[0]
-    # _query_study(assoc, d, query, query_id)
-    # study_rsp = query.dicomqrrspstudy_set.all()
-    # study_rsp_mods = study_rsp.values('modality').annotate(count=Count('pk'))
-    # study_rsp_mods_in_study = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
-    # if len(modalities) is 1:
-    #     if study_rsp[0].modalities_in_study:  # Then reasonable bet it can match on this
-    #         for rsp in study_rsp:
-    #             if modalities[0] not in rsp.modalities_in_study:
-    #                 rsp.delete()  # We shouldn't get here
-    #     else:
-    #         for rsp in study_rsp:
-    #             if modalities[0] not in rsp.modality:
-    #                 ser_rsp = rsp.dicomqrrspseries_set.all()
-    #                 if ser_rsp:
-    #                     for srsp in ser_rsp:
-    #                         if modalities[0] not in srsp.modality and
-    #
-    #     # delete any that don't match
-    #
-    # else:
-    #     # see if any responses have only modalities we haven't asked for
-    #         # delete others, finish (ready for retrieve)
-    #     # if not, modalitiesinstudy is being respected, and we need to ask for the others
-    #         # set next modality, _query_study
-    #     pass
 
     # Now have full study level response - look at it and decide what to do next
 
