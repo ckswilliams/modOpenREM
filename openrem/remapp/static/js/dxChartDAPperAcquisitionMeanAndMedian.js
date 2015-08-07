@@ -46,7 +46,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             enabled: true
         },
         xAxis: {
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,13 +78,13 @@ var chartDAPperAcquisition = new Highcharts.Chart({
         },
         series: [{
             name: 'Mean DAP per acquisition protocol',
-            data: $.extend(true, [], seriesData)
+            data: []
         }, {
             name: 'Median DAP per acquisition protocol',
-            data: $.extend(true, [], seriesMedianData)
+            data: []
         }],
         drilldown: {
-            series: seriesDrilldown
+            series: []
         }
     });
 

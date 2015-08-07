@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,10 +78,10 @@ $(function () {
         },
         series: [{
             name: 'Median DAP',
-            data: $.extend(true, [], seriesMedianData)
+            data: []
         }],
         drilldown: {
-            series: seriesDrilldown
+            series: []
         }
     });
 

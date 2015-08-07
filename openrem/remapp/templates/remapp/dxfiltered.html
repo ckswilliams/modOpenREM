@@ -486,16 +486,16 @@
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
         ];*/
-        {% endif %}
+/*        {% endif %}
         {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
         var seriesMedianData        = [
           {% for testData in acquisitionSummary %}
             {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.median_dap}},freq:{{testData.num_acq}},bins:protocolBins[{{forloop.counter}}-1],tooltip:protocolNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_dap|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
                   {% if not forloop.last %},{% endif %}
           {% endfor %}
-        ];
+        ];*/
         {% endif %}
-        var seriesDrilldown   = [
+/*        var seriesDrilldown   = [
           {% for protocolCountsArray in acquisitionHistogramData %}
             {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
               {% for dataCounts in protocolCountsArray.0 %}
@@ -504,7 +504,7 @@
               {% endfor %}]}
             {% if not forloop.last %},{% endif %}
           {% endfor %}
-        ];
+        ];*/
 
         var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
