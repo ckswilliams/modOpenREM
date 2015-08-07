@@ -98,34 +98,29 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     #     MyAE.Quit()
     #     return
 
-    rspno = 0
+#    rspno = 0
 
     for ss in st:
         if not ss[1]:
             continue
-        rspno += 1
-        print "Response {0}".format(rspno)
+#        rspno += 1
+#        print "Response {0}".format(rspno)
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
-        rsp.sop_instance_uid = ss[1].SOPInstanceUID
-        rsp.modality = ss[1].Modality
-        rsp.study_description = ss[1].StudyDescription
+        # Unique key
         rsp.study_instance_uid = ss[1].StudyInstanceUID
-        rsp.study_date = make_date(ss[1].StudyDate)
-        rsp.save()
-        print 'Study IUID: {0}, SOP Instance UID: {1}, Modality: {2}, Study Desc: {3}, Date: {4}'.format(
-            rsp.study_instance_uid, rsp.sop_instance_uid, rsp.modality, rsp.study_description, rsp.study_date)
+        # Required keys - none of interest
+        # Optional and special keys
+        rsp.study_description = _try_query_return( ss[1], 'StudyDescription')
+        # Series level query
         _query_series(my_ae, remote_ae, ss[1], rsp)
-
+        # Populate modalities_in_study, stored as JSON
         try:
             rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
-#            rsp.modalities_in_study = ss[1].ModalitiesInStudy.split(',')
-            print "Modalities_in_study was populated. It's value is {0} which becomes {1}".format(
-                ss[1].ModalitiesInStudy, rsp.modalities_in_study)
         except:
             series_rsp = rsp.dicomqrrspseries_set.all()
             rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
-            print "Modalities in study wasn't populated. We've created {0}".format(rsp.modalities_in_study)
+        rsp.modality = None  # Used later
         rsp.save()
 
     assoc_study.Release(0)
@@ -222,6 +217,7 @@ def qrscu(
     d.StudyTime = ''
     d.PatientAge = ''
     d.PatientBirthDate = ''
+    d.NumberOfStudyRelatedSeries = ''
 
     d.StudyDate = make_dcm_date_range(date_from, date_until)
     if not d.StudyDate:
@@ -295,11 +291,11 @@ def qrscu(
                 for s in series:
                     if s.modality != 'SR':
                         s.delete() # Need to check if GE Enhanced SR has modality SR
-            else:
-                series = study.dicomqrrspseries_set.all()
-                for s in series:
-                    try:
-                        if s.series_description == 'Dose Info':
+            # else:
+            #     series = study.dicomqrrspseries_set.all()
+            #     for s in series:
+            #         try:
+            #             if s.series_description == 'Dose Info':
 
 
 
