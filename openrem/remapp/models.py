@@ -68,6 +68,14 @@ class DicomQRRspSeries(models.Model):
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
 
 
+class DicomQRRspImage(models.Model):
+    dicom_qr_rsp_series = models.ForeignKey(DicomQRRspSeries)
+    query_id = models.CharField(max_length=64)
+    sop_instance_uid = models.TextField(blank=True, null=True)
+    instance_number = models.IntegerField(blank=True, null=True)
+    sop_class_uid = models.TextField(blank=True, null=True)
+
+
 class DicomStoreSCP(models.Model):
     aetitle = models.CharField(max_length=16, blank=True, null=True)
     port = models.IntegerField(blank=True, null=True)

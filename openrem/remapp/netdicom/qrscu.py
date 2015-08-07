@@ -290,23 +290,14 @@ def qrscu(
                 series = study.dicomqrrspseries_set.all()
                 for s in series:
                     if s.modality != 'SR':
-                        s.delete() # Need to check if GE Enhanced SR has modality SR
-            # else:
-            #     series = study.dicomqrrspseries_set.all()
-            #     for s in series:
-            #         try:
-            #             if s.series_description == 'Dose Info':
-
-
-
-
-
-
-
-
-    # Now have full study level response - look at it and decide what to do next
-
-
+                        s.delete()
+            else:
+                series = study.dicomqrrspseries_set.all()
+                series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+                if 'Dose Info' in series_descriptions:  # i.e. Philips dose info series
+                    for s in series:
+                        if s.series_description != 'Dose Info':
+                            s.delete()
 
     print "Release association"
     assoc.Release(0)
