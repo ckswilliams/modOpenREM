@@ -122,67 +122,67 @@ $(document).ready(function() {
 
                 var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
 
-                protocolkVNames = [];
+                protocolkVpNames = [];
                 for (i = 0; i < acq_kVp_summary.length; i++) {
-                    protocolkVNames.push(acq_kVp_summary[i].acquisition_protocol);
+                    protocolkVpNames.push(acq_kVp_summary[i].acquisition_protocol);
                 }
 
                 protocolkVpCounts = [];
                 protocolkVpBins = [];
-                for (i = 0; i < protocolkVNames.length; i++) {
+                for (i = 0; i < protocolkVpNames.length; i++) {
                     protocolkVpCounts.push(acq_histogram_kVp_data[i][0]);
                     protocolkVpBins.push(acq_histogram_kVp_data[i][1]);
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    serieskVData = [];
-                    for (i = 0; i < protocolkVNames.length; i++) {
-                        serieskVData.push({
-                            name: protocolkVNames[i],
+                    serieskVpData = [];
+                    for (i = 0; i < protocolkVpNames.length; i++) {
+                        serieskVpData.push({
+                            name: protocolkVpNames[i],
                             y: acq_kVp_summary[i].mean_kVp,
                             freq: acq_kVp_summary[i].num_acq,
                             bins: protocolkVpBins[i],
-                            tooltip: protocolkVNames[i] + '<br>' + acq_kVp_summary[i].mean_kVp.toFixed(1) + ' mean<br>(n=' + acq_kVp_summary[i].num_acq + ')',
-                            drilldown: protocolkVNames[i]
+                            tooltip: protocolkVpNames[i] + '<br>' + acq_kVp_summary[i].mean_kVp.toFixed(1) + ' mean<br>(n=' + acq_kVp_summary[i].num_acq + ')',
+                            drilldown: protocolkVpNames[i]
                         });
                     }
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
                     seriesMediankVpData = [];
-                    for (i = 0; i < protocolkVNames.length; i++) {
+                    for (i = 0; i < protocolkVpNames.length; i++) {
                         seriesMediankVpData.push({
-                            name: protocolkVNames[i],
+                            name: protocolkVpNames[i],
                             y: parseFloat(acq_kVp_summary[i].median_kVp),
                             freq: acq_kVp_summary[i].num_acq,
                             bins: protocolkVpBins[i],
-                            tooltip: protocolkVNames[i] + '<br>' + parseFloat(acq_kVp_summary[i].median_kVp).toFixed(1) + ' median<br>(n=' + acq_kVp_summary[i].num_acq + ')',
-                            drilldown: protocolkVNames[i]
+                            tooltip: protocolkVpNames[i] + '<br>' + parseFloat(acq_kVp_summary[i].median_kVp).toFixed(1) + ' median<br>(n=' + acq_kVp_summary[i].num_acq + ')',
+                            drilldown: protocolkVpNames[i]
                         });
                     }
                 }
 
                 var temp = [];
                 serieskVpDrilldown = [];
-                for (i = 0; i < protocolkVNames.length; i++) {
+                for (i = 0; i < protocolkVpNames.length; i++) {
                     temp = [];
                     for (j = 0; j < protocolkVpCounts[0].length; j++) {
                         temp.push([protocolkVpBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocolkVpBins[i][j+1].toFixed(1).toString(), protocolkVpCounts[i][j]]);
                     }
-                    serieskVpDrilldown.push({id: protocolkVNames[i], name: protocolkVNames[i], useHTML: true, data: temp});
+                    serieskVpDrilldown.push({id: protocolkVpNames[i], name: protocolkVpNames[i], useHTML: true, data: temp});
                 }
 
                 var chartplotDXAcquisitionMeankVp = $('#chartAcquisitionMeankVp').highcharts();
-                chartplotDXAcquisitionMeankVp.xAxis[0].setCategories(protocolkVNames);
+                chartplotDXAcquisitionMeankVp.xAxis[0].setCategories(protocolkVpNames);
                 chartplotDXAcquisitionMeankVp.options.drilldown.series = serieskVpDrilldown;
                 if(plotAverageChoice == "mean") {
-                    chartplotDXAcquisitionMeankVp.series[0].setData(serieskVData);
+                    chartplotDXAcquisitionMeankVp.series[0].setData(serieskVpData);
                 }
                 else if(plotAverageChoice == "median") {
                     chartplotDXAcquisitionMeankVp.series[0].setData(seriesMediankVpData);
                 }
                 else {
-                    chartplotDXAcquisitionMeankVp.series[0].setData(serieskVData);
+                    chartplotDXAcquisitionMeankVp.series[0].setData(serieskVpData);
                     chartplotDXAcquisitionMeankVp.series[1].setData(seriesMediankVpData);
                 }
                 chartplotDXAcquisitionMeankVp.redraw({ duration: 1000 });
