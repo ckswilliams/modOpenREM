@@ -160,6 +160,7 @@ def q_process(request, *args, **kwargs):
             date_until = form.cleaned_data.get('date_until_field')
             modalities = form.cleaned_data.get('modality_field')
             inc_sr = form.cleaned_data.get('inc_sr_field')
+            duplicates = form.cleaned_data.get('duplicates_field')
             query_id = str(uuid.uuid4())
             rh = DicomRemoteQR.objects.get(pk=rh_pk)
             if rh.hostname:
@@ -173,7 +174,7 @@ def q_process(request, *args, **kwargs):
                 date_until = date_until.isoformat()
 
             task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id, date_from=date_from,
-                               date_until=date_until, modalities=modalities, inc_sr=inc_sr)
+                               date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates)
 
             resp = {}
             resp['message'] = 'Request created'

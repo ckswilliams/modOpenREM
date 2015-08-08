@@ -130,14 +130,14 @@ from celery import shared_task
 @shared_task
 def qrscu(
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, inc_sr=True, *args, **kwargs):
+        date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True, *args, **kwargs):
     import uuid
     import json
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset, FileDataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import DicomQRRspStudy, DicomQuery
+    from remapp.models import GeneralStudyModuleAttr, DicomQuery
     from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
 
     if implicit:
@@ -249,6 +249,12 @@ def qrscu(
 
     # Now we have all our studies. Time to throw away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all()
+
+    if duplicates:
+        for uid in study_rsp.values_list('study_instance_uid', flat=True):
+            if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
+                study_rsp.filter(study_instance_uid__exact = uid).delete()
+
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
     for mod_set in mods_in_study_set:
         delete = True
