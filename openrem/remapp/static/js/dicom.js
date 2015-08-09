@@ -47,31 +47,6 @@ $(document).ready(function(){
             },
         })
     })
-    //$('#post-form').on('submit', function(event){
-    //    event.preventDefault();
-    //    console.log("form submitted!")  // sanity check
-    //    //query_progress();
-    //    $.ajax({
-    //        url: "/openrem/admin/queryprocess",
-    //        data: {
-    //            qr_id: 1
-    //        },
-    //        type: "POST",
-    //        dataType: "json",
-    //        success: function( json ) {
-    //            query_progress( json );
-    //        },
-    //        error: function( xhr, status, errorThrown ) {
-    //            alert( "Sorry, there was a problem starting the job!" );
-    //            console.log( "Error: " + errorThrown );
-    //            console.log( "Status: " + status );
-    //            console.dir( xhr );
-    //        },
-    //        //complete: function( xhr, status ) {
-    //        //    alert( "The request is complete!" );
-    //        //}
-    //    });
-    //});
 });
 
 
@@ -84,7 +59,6 @@ function query_progress( json ) {
         type: "POST",
         dataType: "json",
         success: function( json ) {
-            //alert( "I'm in test3!");
             $( '#qr-status' ).html( json.message);
             if (json.status != "complete") setTimeout(function(){
                 var data = {

@@ -69,36 +69,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.http import Http404
 
 @csrf_exempt
-def ajax_test(request):
-
-    sometext = '<div id="sharemenu"><p>AJAX fo the win</p></div>'
-    return HttpResponse(sometext)
-#    if request.is_ajax():
-#         try:
-#             pass
-#         except KeyError:
-#             return HttpResponse('Error') # incorrect post
-#         # do stuff, e.g. calculate a score
-#         sometext = "Here be some text"
-#         return HttpResponse(sometext)
-#     else:
-#         raise Http404
-
-@csrf_exempt
-def ajax_test2(request):
-    import uuid
-    from remapp.netdicom.qrscu import qrscu
-
-    query_id = str(uuid.uuid4())
-    print query_id
-    task = qrscu.delay(rh="localhost", rp=1104, query_id=query_id)
-
-    resp = {}
-    resp['message'] = 'this might be possible'
-    resp['query_id'] = query_id
-    return HttpResponse(json.dumps(resp), content_type='application/json')
-
-@csrf_exempt
 def q_update(request):
     from django.core.exceptions import ObjectDoesNotExist
     from django.db.models import Count
