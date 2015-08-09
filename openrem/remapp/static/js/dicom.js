@@ -77,7 +77,7 @@ $(document).ready(function(){
 
 function query_progress( json ) {
     $.ajax({
-        url: "/openrem/admin/dicomstore/ajax_test3",
+        url: "/openrem/admin/queryupdate",
         data: {
             query_id: json.query_id
         },

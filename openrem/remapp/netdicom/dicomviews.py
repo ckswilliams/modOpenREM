@@ -99,7 +99,7 @@ def ajax_test2(request):
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
 @csrf_exempt
-def ajax_test3(request):
+def q_update(request):
     from django.core.exceptions import ObjectDoesNotExist
     from django.db.models import Count
     from remapp.models import DicomQuery
