@@ -40,6 +40,7 @@ class DicomQuery(models.Model):
     query_id = models.CharField(max_length=64)
     failed = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True)
+    stage = models.TextField(blank=True, null=True)
 
 
 class DicomQRRspStudy(models.Model):

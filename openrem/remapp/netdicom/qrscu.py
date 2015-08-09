@@ -230,6 +230,8 @@ def qrscu(
         for selection, details in all_mods.iteritems():
             if details['inc']:  # No need to check for modality_matching here as modalities_left would also be false
                 for mod in details['mods']:
+                    query.stage = 'Currently querying for {0} studies...'.format(mod)
+                    query.save()
                     if modality_matching:
                         d.ModalitiesInStudy = mod
                         query_id = uuid.uuid4()
@@ -241,6 +243,8 @@ def qrscu(
                                 modalities_left = False
                                 break  # This indicates that there was no modality match, so we have everything already
         if inc_sr and modality_matching:
+            query.stage = 'Currently querying for SR only studies'
+            query.save()
             d.ModalitiesInStudy = 'SR'
             query_id = uuid.uuid4()
             _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -251,14 +255,17 @@ def qrscu(
     study_rsp = query.dicomqrrspstudy_set.all()
 
     if duplicates:
+        query.stage = 'Checking to see if any response studies are already in the OpenREM database'
+        query.save()
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
                 study_rsp.filter(study_instance_uid__exact = uid).delete()
 
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
+    query.stage = "Deleting studies we didn't ask for"
+    query.save()
     for mod_set in mods_in_study_set:
         delete = True
-
         for mod_choice, details in all_mods.iteritems():
             if details['inc']:
                 for mod in details['mods']:
@@ -272,19 +279,23 @@ def qrscu(
             studies_to_delete.delete()
 
     # Now we need to delete any unwanted series
+    query.stage = "Deleting series we can't use"
+    query.save()
     for study in study_rsp:
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
             study.modality = 'MG'
+            study.save()
             # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
             # be weeded out
         if all_mods['DX']['inc']:
             if 'CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study():
                 study.modality = 'DX'
-                pass
+                study.save()
                 # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
         if all_mods['FL']['inc']:
             if 'RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study():
                 study.modality = 'FL'
+                study.save()
                 # Assume structured reports have modality 'SR' at series level?
                 series = study.dicomqrrspseries_set.all()
                 for s in series:
@@ -292,6 +303,7 @@ def qrscu(
                         s.delete()
         if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
             study.modality = 'CT'
+            study.save()
             if 'SR' in study.get_modalities_in_study():
                 series = study.dicomqrrspseries_set.all()
                 for s in series:

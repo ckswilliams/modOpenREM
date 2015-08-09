@@ -91,26 +91,39 @@ def q_update(request):
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     study_rsp = query.dicomqrrspstudy_set.all()
-    modalities = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
-    table = ['<table class="table table-bordered">']
-    for m in modalities:
-        table.append('<tr><td>')
-        if m['modalities_in_study']:
-            table.append(', '.join(json.loads(m['modalities_in_study'])))
-        else:
-            table.append('Unknown')
-        table.append('</td><td>')
-        table.append(str(m['count']))
-        table.append('</tr></td>')
-    table.append('</table>')
-    tablestr = ''.join(table)
-
-    if query.complete:
-        resp['status'] = 'complete'
-        resp['message'] ='<h4>Query Complete</h4> {0}'.format(tablestr)
-    else:
+    if not query.complete:
+        modalities = study_rsp.values('modalities_in_study').annotate(count=Count('pk'))
+        table = ['<table class="table table-bordered"><tr><th>Modalities in study</th><th>Number of responses</th></tr>']
+        for m in modalities:
+            table.append('<tr><td>')
+            if m['modalities_in_study']:
+                table.append(', '.join(json.loads(m['modalities_in_study'])))
+            else:
+                table.append('Unknown')
+            table.append('</td><td>')
+            table.append(str(m['count']))
+            table.append('</tr></td>')
+        table.append('</table>')
+        tablestr = ''.join(table)
         resp['status'] = 'not complete'
-        resp['message'] ='<h4>Query not yet complete</h4><p>Responses so far:</p> {0}'.format(tablestr)
+        resp['message'] ='<h4>{0}</h4><p>Responses so far:</p> {1}'.format(query.stage, tablestr)
+    else:
+        modalities = study_rsp.values('modality').annotate(count=Count('pk'))
+        table = ['<table class="table table-bordered"><tr><th>Modality</th><th>Number of responses</th></tr>']
+        for m in modalities:
+            table.append('<tr><td>')
+            if m['modality']:
+                table.append(m['modality'])
+            else:
+                table.append('Unknown - SR only study?')
+            table.append('</td><td>')
+            table.append(str(m['count']))
+            table.append('</tr></td>')
+        table.append('</table>')
+        tablestr = ''.join(table)
+        resp['status'] = 'complete'
+        resp['message'] ='<h4>Query complete</h4> {0}'.format(tablestr)
+
     return HttpResponse(json.dumps(resp), content_type='application/json')
 
 @csrf_exempt
