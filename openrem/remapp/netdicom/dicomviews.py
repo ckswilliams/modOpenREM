@@ -131,6 +131,8 @@ def q_update(request):
 def q_process(request, *args, **kwargs):
     import uuid
     import datetime
+    from django.shortcuts import render_to_response
+    from django.template import RequestContext
     from remapp.netdicom.qrscu import qrscu
     from remapp.models import DicomRemoteQR
     from remapp.forms import DicomQueryForm
@@ -176,10 +178,28 @@ def q_process(request, *args, **kwargs):
             resp = {}
             resp['message'] = errors
             resp['status'] = 'not complete'
-            return HttpResponse(
-                json.dumps(resp),
-                content_type="application/json"
+
+            try:
+                vers = pkg_resources.require("openrem")[0].version
+            except:
+                vers = ''
+            admin = {'openremversion' : vers}
+
+            if request.user.groups.filter(name="exportgroup"):
+                admin['exportperm'] = True
+            if request.user.groups.filter(name="admingroup"):
+                admin['adminperm'] = True
+
+
+            return render_to_response(
+                'remapp/dicomqr.html',
+                {'form':form, 'admin':admin},
+                context_instance=RequestContext(request)
             )
+            # return HttpResponse(
+            #     json.dumps(resp),
+            #     content_type="application/json"
+            # )
 
 
 
