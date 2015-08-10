@@ -37,7 +37,7 @@ class DicomQueryForm(forms.Form):
     date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
     modality_field = forms.MultipleChoiceField(
         choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
-            attrs={"class": "form-control", "checked":""}), required=True)
+        attrs={"checked": ""}), required=True)
     inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=True)
     duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True)
 
