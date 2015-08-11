@@ -118,4 +118,5 @@ urlpatterns += patterns('remapp.netdicom.dicomviews',
     url(r'admin/queryupdate$', 'q_update', name='q_update'),
     url(r'admin/queryprocess$', 'q_process', name='q_process'),
     url(r'admin/queryremote$', 'dicom_qr_page', name='dicom_qr_page'),
+    url(r'admin/queryretrieve$', 'r_start', name='r_start'),
 )

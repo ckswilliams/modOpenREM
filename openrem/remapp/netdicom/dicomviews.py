@@ -227,3 +227,13 @@ def dicom_qr_page(request, *args, **kwargs):
         {'form':form, 'admin':admin},
         context_instance=RequestContext(request)
     )
+
+@csrf_exempt
+@login_required
+def r_start(request):
+    resp = {}
+    data = request.POST
+    query_id = data.get('query_id')
+    resp['query_id'] = query_id
+
+    return HttpResponse(json.dumps(resp), content_type='application/json')

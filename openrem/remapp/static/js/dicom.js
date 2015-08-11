@@ -21,7 +21,7 @@ $(document).ready(function(){
                 console.dir( xhr );
             },
         })
-    })
+    });
 });
 
 
@@ -38,14 +38,33 @@ function query_progress( json ) {
             if (json.status == "not complete") setTimeout(function(){
                 var data = {
                     query_id: json.query_id
-                }
+                };
                 query_progress( data );
             }, 500);
             if (json.status == "complete"){
                 var data = {
                     query_id: json.query_id
-                }
-                move_button( data );
+                };
+                var move_html = '<div><button type="button" class="btn btn-default" id="move" data-id="'
+                    + json.query_id
+                    + '">Move</button></div>';
+                $( '#move-button').html( move_html );
+                $('#move').click(function(){
+                    console.log("In the move function");
+                    var query_id = $(this).data("id");
+                    console.log(query_id);
+                    $.ajax({
+                        url: "/openrem/admin/queryretrieve",
+                        data: {
+                            query_id: query_id
+                        },
+                        type: "POST",
+                        dataType: "json",
+                        success: function( json ) {
+                            console.log("In the qr success function.")
+                        }
+                    });
+                });
             }
         },
         error: function( xhr, status, errorThrown ) {
@@ -59,6 +78,4 @@ function query_progress( json ) {
 
 }
 
-function move_button( json ) {
 
-}
