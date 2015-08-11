@@ -1,29 +1,4 @@
 $(document).ready(function(){
-
-    $('#qr-go').click(function ( event ){
-        event.preventDefault();
-
-        $.ajax({
-            url: "/openrem/admin/dicomstore/ajax_test2",
-            data: {
-                qr_id: 1
-            },
-            type: "POST",
-            dataType: "json",
-            success: function( json ) {
-                query_progress( json );
-            },
-            error: function( xhr, status, errorThrown ) {
-                alert( "Sorry, there was a problem starting the job!" );
-                console.log( "Error: " + errorThrown );
-                console.log( "Status: " + status );
-                console.dir( xhr );
-            },
-            //complete: function( xhr, status ) {
-            //    alert( "The request is complete!" );
-            //}
-        });
-    });
     // Submit post on submit
     var form = $('form#post-form');
     form.submit(function(event) {
