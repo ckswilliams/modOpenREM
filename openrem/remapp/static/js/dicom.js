@@ -59,13 +59,19 @@ function query_progress( json ) {
         type: "POST",
         dataType: "json",
         success: function( json ) {
-            $( '#qr-status' ).html( json.message);
-            if (json.status != "complete") setTimeout(function(){
+            $( '#qr-status' ).html( json.message );
+            if (json.status == "not complete") setTimeout(function(){
                 var data = {
                     query_id: json.query_id
                 }
                 query_progress( data );
             }, 500);
+            if (json.status == "complete"){
+                var data = {
+                    query_id: json.query_id
+                }
+                move_button( data );
+            }
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the status!" );
@@ -78,4 +84,6 @@ function query_progress( json ) {
 
 }
 
+function move_button( json ) {
 
+}

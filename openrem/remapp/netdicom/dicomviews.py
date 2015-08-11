@@ -86,7 +86,7 @@ def q_update(request):
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
     if query.failed:
-        resp['status'] = 'complete'
+        resp['status'] = 'failed'
         resp['message'] ='<h4>Query Failed</h4> {0}'.format(query.message)
         return HttpResponse(json.dumps(resp), content_type='application/json')
 
