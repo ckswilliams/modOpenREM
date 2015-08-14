@@ -35,12 +35,41 @@ import json
 from django.db import models
 from django.core.urlresolvers import reverse
 
+class DicomStoreSCP(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+    aetitle = models.CharField(max_length=16, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    task_id = models.CharField(max_length=64, blank=True, null=True)
+    status = models.CharField(max_length=64, blank=True, null=True)
+    run = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
+
+class DicomRemoteQR(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+    aetitle = models.CharField(max_length=16, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    ip = models.GenericIPAddressField(blank=True, null=True)
+    hostname = models.CharField(max_length=32, blank=True, null=True)
+    enabled = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
+    def __unicode__(self):
+        return self.name
+
+
 class DicomQuery(models.Model):
     complete = models.BooleanField(default=False)
     query_id = models.CharField(max_length=64)
     failed = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True)
     stage = models.TextField(blank=True, null=True)
+    qr_scp_fk = models.ForeignKey(DicomRemoteQR, blank=True, null=True)
+    store_scp_fk = models.ForeignKey(DicomStoreSCP, blank=True, null=True)
 
 
 class DicomQRRspStudy(models.Model):
@@ -75,32 +104,6 @@ class DicomQRRspImage(models.Model):
     sop_instance_uid = models.TextField(blank=True, null=True)
     instance_number = models.IntegerField(blank=True, null=True)
     sop_class_uid = models.TextField(blank=True, null=True)
-
-
-class DicomStoreSCP(models.Model):
-    aetitle = models.CharField(max_length=16, blank=True, null=True)
-    port = models.IntegerField(blank=True, null=True)
-    task_id = models.CharField(max_length=64, blank=True, null=True)
-    status = models.CharField(max_length=64, blank=True, null=True)
-    run = models.BooleanField(default=False)
-
-    def get_absolute_url(self):
-        return reverse('dicom_summary')
-
-
-class DicomRemoteQR(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-    aetitle = models.CharField(max_length=16, blank=True, null=True)
-    port = models.IntegerField(blank=True, null=True)
-    ip = models.GenericIPAddressField(blank=True, null=True)
-    hostname = models.CharField(max_length=32, blank=True, null=True)
-    enabled = models.BooleanField(default=False)
-
-    def get_absolute_url(self):
-        return reverse('dicom_summary')
-
-    def __unicode__(self):
-        return self.name
 
 
 from django.contrib.auth.models import User

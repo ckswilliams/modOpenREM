@@ -141,24 +141,25 @@ def q_process(request, *args, **kwargs):
         form = DicomQueryForm(request.POST)
         if form.is_valid():
             rh_pk = form.cleaned_data.get('remote_host_field')
+            store_pk = form.cleaned_data.get('store_scp_field')
             date_from = form.cleaned_data.get('date_from_field')
             date_until = form.cleaned_data.get('date_until_field')
             modalities = form.cleaned_data.get('modality_field')
             inc_sr = form.cleaned_data.get('inc_sr_field')
             duplicates = form.cleaned_data.get('duplicates_field')
             query_id = str(uuid.uuid4())
-            rh = DicomRemoteQR.objects.get(pk=rh_pk)
-            if rh.hostname:
-                host = rh.hostname
-            else:
-                host = rh.ip
+            # rh = DicomRemoteQR.objects.get(pk=rh_pk)
+            # if rh.hostname:
+            #     host = rh.hostname
+            # else:
+            #     host = rh.ip
 
             if date_from:
                 date_from = date_from.isoformat()
             if date_until:
                 date_until = date_until.isoformat()
 
-            task = qrscu.delay(rh=host, rp=rh.port, query_id=query_id, date_from=date_from,
+            task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates)
 
             resp = {}
@@ -231,9 +232,12 @@ def dicom_qr_page(request, *args, **kwargs):
 @csrf_exempt
 @login_required
 def r_start(request):
+    from remapp.netdicom.qrscu import movescu
     resp = {}
     data = request.POST
     query_id = data.get('query_id')
     resp['query_id'] = query_id
+
+    movescu.delay(query_id)
 
     return HttpResponse(json.dumps(resp), content_type='application/json')

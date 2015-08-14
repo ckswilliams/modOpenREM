@@ -14,4 +14,4 @@ from remapp.extractors.rdsr import rdsr
 from remapp.extractors.mam import mam
 from remapp.extractors.ct_philips import ct_philips
 from remapp.netdicom.storescp import web_store
-from remapp.netdicom.qrscu import qrscu
+from remapp.netdicom.qrscu import qrscu, movescu

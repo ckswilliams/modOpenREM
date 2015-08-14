@@ -33,6 +33,7 @@ class DicomQueryForm(forms.Form):
     )
 
     remote_host_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
+    store_scp_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
     date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
     date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
     modality_field = forms.MultipleChoiceField(
@@ -43,8 +44,9 @@ class DicomQueryForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
-        from remapp.models import DicomRemoteQR
+        from remapp.models import DicomRemoteQR, DicomStoreSCP
         self.fields['remote_host_field'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
+        self.fields['store_scp_field'].choices = [(x.pk, x.name) for x in DicomStoreSCP.objects.all()]
 
 
 class SizeHeadersForm(forms.Form):

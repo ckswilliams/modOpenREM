@@ -23,8 +23,8 @@ def OnAssociateRequest(association):
     print "Association resquested"
     return True
 
-def _move_req(MyAE, RemoteAE, d):
-    assocMove = MyAE.RequestAssociation(RemoteAE)
+def _move_req(my_ae, remote_ae, d):
+    assocMove = my_ae.RequestAssociation(remote_ae)
     print "Move association requested"
     print "d is {0}".format(d)
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, 'STOREOPENREM', 1)
@@ -129,6 +129,7 @@ from celery import shared_task
 
 @shared_task
 def qrscu(
+        qr_scp_pk=None, store_scp_pk=None,
         rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True, *args, **kwargs):
     import uuid
@@ -137,8 +138,16 @@ def qrscu(
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset, FileDataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import GeneralStudyModuleAttr, DicomQuery
+    from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
     from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
+
+    qr_scp = DicomRemoteQR.objects.get(pk=qr_scp_pk)
+    if qr_scp.hostname:
+        rh = qr_scp.hostname
+    else:
+        rh = qr_scp.ip
+    rp = qr_scp.port
+    aec = qr_scp.aetitle
 
     if implicit:
         ts = [ImplicitVRLittleEndian]
@@ -165,7 +174,7 @@ def qrscu(
             all_mods[m]['inc'] = True
 
     # create application entity with Find and Move SOP classes as SCU
-    MyAE = AE(aet, 0, [StudyRootFindSOPClass,
+    MyAE = AE(aet.encode('ascii','ignore'), 0, [StudyRootFindSOPClass,
                                  StudyRootMoveSOPClass,
                                  VerificationSOPClass], [], ts)
     MyAE.OnAssociateResponse = OnAssociateResponse
@@ -174,7 +183,7 @@ def qrscu(
     MyAE.start()
 
     # remote application entity
-    RemoteAE = dict(Address=rh, Port=rp, AET=aec)
+    RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii','ignore'))
 
     if not query_id:
         query_id = uuid.uuid4()
@@ -182,6 +191,8 @@ def qrscu(
     query = DicomQuery.objects.create()
     query.query_id = query_id
     query.complete = False
+    query.store_scp_fk = DicomStoreSCP.objects.get(pk=store_scp_pk)
+    query.qr_scp_fk = qr_scp
     query.save()
 
     # create association with remote AE
@@ -349,6 +360,54 @@ if __name__ == "__main__":
             implicit=args.implicit, explicit=args.explicit, move=args.move
         )
     )
+
+
+@shared_task
+def movescu(query_id):
+    from netdicom.applicationentity import AE
+    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
+    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+    from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
+    from dicom.dataset import Dataset
+
+    query = DicomQuery.objects.get(query_id = query_id)
+    qr_scp = query.qr_scp_fk
+    store_scp = query.store_scp_fk
+
+    ts = [
+        ExplicitVRLittleEndian,
+        ImplicitVRLittleEndian,
+        ExplicitVRBigEndian
+        ]
+
+    if qr_scp.hostname:
+        rh = qr_scp.hostname
+    else:
+        rh = qr_scp.ip
+
+    my_ae = AE(store_scp.aetitle.encode('ascii','ignore'), 0, [StudyRootFindSOPClass,
+                                 StudyRootMoveSOPClass,
+                                 VerificationSOPClass], [], ts)
+    my_ae.OnAssociateResponse = OnAssociateResponse
+    my_ae.OnAssociateRequest = OnAssociateRequest
+    # MyAE.OnReceiveStore = OnReceiveStore
+    my_ae.start()
+
+    # remote application entity
+    remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii','ignore'))
+
+
+
+    for study in query.dicomqrrspstudy_set.all():
+        d = Dataset()
+        d.StudyInstanceUID = study.study_instance_uid
+        for series in study.dicomqrrspseries_set.all():
+            d.QueryRetrieveLevel = "SERIES"
+            d.SeriesInstanceUID = series.series_instance_uid
+            _move_req(my_ae, remote_ae, d)
+
+
+    my_ae.Quit()
 
 
 # (0008, 0018) SOP Instance UID                    UI:
