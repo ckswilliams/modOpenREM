@@ -12,7 +12,7 @@ $(function () {
             useHTML: true
         },
         xAxis: {
-            categories: [1,2,3,4,5], //dateAxis,
+            categories: [1,2,3,4,5],
             labels: {
                 rotation:90
             }

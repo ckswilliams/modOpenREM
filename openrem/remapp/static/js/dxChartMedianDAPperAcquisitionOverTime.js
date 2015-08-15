@@ -12,7 +12,7 @@ $(function () {
             useHTML: true
         },
         xAxis: {
-            categories: dateAxis,
+            categories: [1,2,3,4,5],
             labels: {
                 rotation:90
             }
@@ -36,6 +36,6 @@ $(function () {
             borderWidth: 0,
             useHTML: true
         },
-        series: medianDAPOverTime
+        series: []
     });
 });
