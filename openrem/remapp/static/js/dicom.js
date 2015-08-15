@@ -53,6 +53,7 @@ function query_progress( json ) {
                     console.log("In the move function");
                     var query_id = $(this).data("id");
                     console.log(query_id);
+                    $( '#move-button').html( '' );
                     $.ajax({
                         url: "/openrem/admin/queryretrieve",
                         data: {
@@ -62,6 +63,7 @@ function query_progress( json ) {
                         dataType: "json",
                         success: function( json ) {
                             console.log("In the qr success function.")
+                            retrieve_progress( json );
                         }
                     });
                 });
@@ -79,3 +81,30 @@ function query_progress( json ) {
 }
 
 
+function retrieve_progress( json ) {
+    $.ajax({
+        url: "/openrem/admin/moveupdate",
+        data: {
+            query_id: json.query_id
+        },
+        type: "POST",
+        dataType: "json",
+        success: function( json ) {
+            $( '#move-status' ).html( json.message );
+            if (json.status != "move complete") setTimeout(function(){
+                var data = {
+                    query_id: json.query_id
+                };
+                retrieve_progress( data );
+            }, 500);
+        },
+        error: function( xhr, status, errorThrown ) {
+            alert( "Sorry, there was a problem getting the status!" );
+            console.log( "Error: " + errorThrown );
+            console.log( "Status: " + status );
+            console.dir( xhr );
+        }
+
+    });
+
+}

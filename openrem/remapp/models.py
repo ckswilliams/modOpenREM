@@ -70,6 +70,7 @@ class DicomQuery(models.Model):
     stage = models.TextField(blank=True, null=True)
     qr_scp_fk = models.ForeignKey(DicomRemoteQR, blank=True, null=True)
     store_scp_fk = models.ForeignKey(DicomStoreSCP, blank=True, null=True)
+    move_complete = models.BooleanField(default=False)
 
 
 class DicomQRRspStudy(models.Model):

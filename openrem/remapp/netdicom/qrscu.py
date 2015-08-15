@@ -371,6 +371,9 @@ def movescu(query_id):
     from dicom.dataset import Dataset
 
     query = DicomQuery.objects.get(query_id = query_id)
+    query.move_complete = False
+    query.failed = False
+    query.save()
     qr_scp = query.qr_scp_fk
     store_scp = query.store_scp_fk
 
@@ -396,9 +399,19 @@ def movescu(query_id):
     # remote application entity
     remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii','ignore'))
 
+    query.stage = "Preparing to start move request"
+    query.save()
 
+    studies = query.dicomqrrspstudy_set.all()
+    query.stage = "Requesting move of {0} studies".format(studies.count())
+    query.save()
 
-    for study in query.dicomqrrspstudy_set.all():
+    study_no = 0
+    for study in studies:
+        study_no += 1
+        query.stage = "Requesting move of study {0} of {1} studies (type {2})".format(
+            study_no, studies.count(), study.modality)
+        query.save()
         d = Dataset()
         d.StudyInstanceUID = study.study_instance_uid
         for series in study.dicomqrrspseries_set.all():
@@ -406,6 +419,8 @@ def movescu(query_id):
             d.SeriesInstanceUID = series.series_instance_uid
             _move_req(my_ae, remote_ae, d)
 
+    query.move_complete = True
+    query.save()
 
     my_ae.Quit()
 

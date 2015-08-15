@@ -241,3 +241,34 @@ def r_start(request):
     movescu.delay(query_id)
 
     return HttpResponse(json.dumps(resp), content_type='application/json')
+
+@csrf_exempt
+def r_update(request):
+    from django.core.exceptions import ObjectDoesNotExist
+    from django.db.models import Count
+    from remapp.models import DicomQuery
+
+    resp = {}
+    data = request.POST
+    query_id = data.get('query_id')
+    resp['query_id'] = query_id
+    try:
+        query = DicomQuery.objects.get(query_id=query_id)
+    except ObjectDoesNotExist:
+        resp['status'] = 'not complete'
+        resp['message'] = '<h4>Move request {0} not yet started</h4>'.format(query_id)
+        return HttpResponse(json.dumps(resp), content_type='application/json')
+
+    if query.failed:
+        resp['status'] = 'failed'
+        resp['message'] ='<h4>Move request failed</h4> {0}'.format(query.message)
+        return HttpResponse(json.dumps(resp), content_type='application/json')
+
+    if not query.move_complete:
+        resp['status'] = 'not complete'
+        resp['message'] ='<h4>{0}</h4>'.format(query.stage)
+    else:
+        resp['status'] = 'move complete'
+        resp['message'] = '<h4>Move request complete</h4>'
+
+    return HttpResponse(json.dumps(resp), content_type='application/json')
