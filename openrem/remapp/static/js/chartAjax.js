@@ -22,7 +22,7 @@ function ArrayToURL(array) {
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
-    var i, j;
+    var i, j, temp;
 
     $.ajax({
         type: "GET",
@@ -41,7 +41,7 @@ $(document).ready(function() {
                     return el;
                 });
 
-                protocolNames = $.map(json.acquisition_names, function (el) {
+                var protocolNames = $.map(json.acquisition_names, function (el) {
                     return el.acquisition_protocol;
                 });
             }
@@ -49,15 +49,15 @@ $(document).ready(function() {
             if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 var acq_histogram_data = json.acquisitionHistogramData;
 
-                protocolCounts = [];
-                protocolBins = [];
+                var protocolCounts = [];
+                var protocolBins = [];
                 for (i = 0; i < protocolNames.length; i++) {
                     protocolCounts.push(acq_histogram_data[i][0]);
                     protocolBins.push(acq_histogram_data[i][1]);
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    seriesData = [];
+                    seriesData = []; // This must be a global variable for the chart sorting routines to work
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesData.push({
                             name: protocolNames[i],
@@ -71,7 +71,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMedianData = [];
+                    seriesMedianData = []; // This must be a global variable for the chart sorting routines to work
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesMedianData.push({
                             name: protocolNames[i],
@@ -84,8 +84,8 @@ $(document).ready(function() {
                     }
                 }
 
-                var temp = [];
-                seriesDrilldown = [];
+                temp = [];
+                var seriesDrilldown = [];
                 for (i = 0; i < protocolNames.length; i++) {
                     temp = [];
                     for (j = 0; j < protocolCounts[0].length; j++) {
@@ -122,20 +122,20 @@ $(document).ready(function() {
 
                 var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
 
-                protocolkVpNames = [];
+                var protocolkVpNames = [];
                 for (i = 0; i < acq_kVp_summary.length; i++) {
                     protocolkVpNames.push(acq_kVp_summary[i].acquisition_protocol);
                 }
 
-                protocolkVpCounts = [];
-                protocolkVpBins = [];
+                var protocolkVpCounts = [];
+                var protocolkVpBins = [];
                 for (i = 0; i < protocolkVpNames.length; i++) {
                     protocolkVpCounts.push(acq_histogram_kVp_data[i][0]);
                     protocolkVpBins.push(acq_histogram_kVp_data[i][1]);
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    serieskVpData = [];
+                    serieskVpData = []; // This must be a global variable for the chart sorting routines to work
                     for (i = 0; i < protocolkVpNames.length; i++) {
                         serieskVpData.push({
                             name: protocolkVpNames[i],
@@ -149,7 +149,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMediankVpData = [];
+                    seriesMediankVpData = []; // This must be a global variable for the chart sorting routines to work
                     for (i = 0; i < protocolkVpNames.length; i++) {
                         seriesMediankVpData.push({
                             name: protocolkVpNames[i],
@@ -162,8 +162,8 @@ $(document).ready(function() {
                     }
                 }
 
-                var temp = [];
-                serieskVpDrilldown = [];
+                temp = [];
+                var serieskVpDrilldown = [];
                 for (i = 0; i < protocolkVpNames.length; i++) {
                     temp = [];
                     for (j = 0; j < protocolkVpCounts[0].length; j++) {
@@ -200,20 +200,20 @@ $(document).ready(function() {
 
                 var acq_histogram_mAs_data = json.acquisitionHistogrammAsData;
 
-                protocolmAsNames = [];
+                var protocolmAsNames = [];
                 for (i = 0; i < acq_mAs_summary.length; i++) {
                     protocolmAsNames.push(acq_mAs_summary[i].acquisition_protocol);
                 }
 
-                protocolmAsCounts = [];
-                protocolmAsBins = [];
+                var protocolmAsCounts = [];
+                var protocolmAsBins = [];
                 for (i = 0; i < protocolmAsNames.length; i++) {
                     protocolmAsCounts.push(acq_histogram_mAs_data[i][0]);
                     protocolmAsBins.push(acq_histogram_mAs_data[i][1]);
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    seriesmAsData = [];
+                    seriesmAsData = []; // This must be a global variable for the chart sorting routines to work
                     for (i = 0; i < protocolmAsNames.length; i++) {
                         seriesmAsData.push({
                             name: protocolmAsNames[i],
@@ -227,7 +227,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMedianmAsData = [];
+                    seriesMedianmAsData = []; // This must be a global variable for the chart sorting routines to work
                     for (i = 0; i < protocolmAsNames.length; i++) {
                         seriesMedianmAsData.push({
                             name: protocolmAsNames[i],
@@ -240,8 +240,8 @@ $(document).ready(function() {
                     }
                 }
 
-                var temp = [];
-                seriesmAsDrilldown = [];
+                temp = [];
+                var seriesmAsDrilldown = [];
                 for (i = 0; i < protocolmAsNames.length; i++) {
                     temp = [];
                     for (j = 0; j < protocolmAsCounts[0].length; j++) {
@@ -287,7 +287,7 @@ $(document).ready(function() {
                     protocolPiechartData.sort(sort_by_y);
                 }
 
-                protocolColours = getColours(protocolNames.length);
+                var protocolColours = getColours(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
                     protocolPiechartData[i].color = protocolColours[i];
                 }
@@ -305,7 +305,7 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Study workload chart data start
             if(typeof plotDXStudyPerDayAndHour !== 'undefined') {
-                dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
                 // A [7][24] list of integer values
                 var studies_per_hour_in_weekdays = json.studiesPerHourInWeekdays;
@@ -361,93 +361,46 @@ $(document).ready(function() {
             // DAP over time chart data start
             // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average DAP values
             if(typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
-                var meanDAPOverTime, dateAxis, currentValue;
+                var DAPOverTime, acq_dap_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
+                var chartDXAcquisitionMeanDAPOverTime = $('#AcquisitionMeanDAPOverTimeDIV').highcharts();
 
-                if(plotAverageChoice == "mean") {
-                    var acq_mean_dap_over_time = json.acquisitionMeanDAPoverTime;
-
-                    dateAxis = [];
-                    var tempDate;
-                    for(i=0; i<acq_mean_dap_over_time[0].length; i++) {
-                        tempDate = new Date(Date.parse(acq_mean_dap_over_time[0][i][0]));
-                        tempDate = formatDate(tempDate);
-                        dateAxis.push(tempDate);
-                    }
-
-                    var protocolLineColours =  new Array(protocolNames.length);
-                    protocolPiechartData.sort(sort_by_name);
-                    for(i=0; i<protocolNames.length; i++) {
-                        protocolLineColours[i] = protocolPiechartData[i].color;
-                    }
-                    protocolPiechartData.sort(sort_by_y);
-
-                    var date_after, date_before;
-                    meanDAPOverTime = [];
-                    for(i=0; i<acq_mean_dap_over_time.length; i++) {
-                        temp = [];
-                        for(j=0; j<acq_mean_dap_over_time[0].length; j++) {
-                            tempDate = new Date(Date.parse(acq_mean_dap_over_time[i][j][0]));
-                            date_after = formatDate(tempDate);
-                            date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
-
-                            currentValue = acq_mean_dap_over_time[i][j][1];
-                            if(currentValue == 0) currentValue = null;
-
-                            temp.push({y:currentValue, url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
-                        }
-                        meanDAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
-                    }
-
-                    var chartDXAcquisitionMeanDAPOverTime = $('#AcquisitionMeanDAPOverTimeDIV').highcharts();
-                    chartDXAcquisitionMeanDAPOverTime.xAxis[0].setCategories(dateAxis);
-                    for(i=0; i<meanDAPOverTime.length; i++) {
-                        chartDXAcquisitionMeanDAPOverTime.addSeries(meanDAPOverTime[i]);
-                    }
-                    chartDXAcquisitionMeanDAPOverTime.redraw({duration: 1000});
+                var protocolLineColours =  new Array(protocolNames.length);
+                protocolPiechartData.sort(sort_by_name);
+                for(i=0; i<protocolNames.length; i++) {
+                    protocolLineColours[i] = protocolPiechartData[i].color;
                 }
-                else {
-                    var acq_median_dap_over_time = json.acquisitionMedianDAPoverTime;
-                    var medianDAPOverTime;
+                protocolPiechartData.sort(sort_by_y);
 
-                    dateAxis = [];
-                    var tempDate;
-                    for(i=0; i<acq_median_dap_over_time[0].length; i++) {
-                        tempDate = new Date(Date.parse(acq_median_dap_over_time[0][i][0]));
-                        tempDate = formatDate(tempDate);
-                        dateAxis.push(tempDate);
-                    }
+                acq_dap_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeanDAPoverTime : json.acquisitionMedianDAPoverTime;
 
-                    var protocolLineColours =  new Array(protocolNames.length);
-                    protocolPiechartData.sort(sort_by_name);
-                    for(i=0; i<protocolNames.length; i++) {
-                        protocolLineColours[i] = protocolPiechartData[i].color;
-                    }
-                    protocolPiechartData.sort(sort_by_y);
-
-                    var date_after, date_before;
-                    medianDAPOverTime = [];
-                    for(i=0; i<acq_median_dap_over_time.length; i++) {
-                        temp = [];
-                        for(j=0; j<acq_median_dap_over_time[0].length; j++) {
-                            tempDate = new Date(Date.parse(acq_median_dap_over_time[i][j][0]));
-                            date_after = formatDate(tempDate);
-                            date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
-
-                            currentValue = parseFloat( acq_median_dap_over_time[i][j][1]);
-                            if(currentValue == 0) currentValue = null;
-
-                            temp.push({y:currentValue, url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
-                        }
-                        medianDAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp});
-                    }
-
-                    var chartDXAcquisitionMeanDAPOverTime = $('#AcquisitionMeanDAPOverTimeDIV').highcharts();
-                    chartDXAcquisitionMeanDAPOverTime.xAxis[0].setCategories(dateAxis);
-                    for(i=0; i<medianDAPOverTime.length; i++) {
-                        chartDXAcquisitionMeanDAPOverTime.addSeries(medianDAPOverTime[i]);
-                    }
-                    chartDXAcquisitionMeanDAPOverTime.redraw({duration: 1000});
+                dateAxis = [];
+                for(i=0; i<acq_dap_over_time[0].length; i++) {
+                    tempDate = new Date(Date.parse(acq_dap_over_time[0][i][0]));
+                    tempDate = formatDate(tempDate);
+                    dateAxis.push(tempDate);
                 }
+
+                DAPOverTime = [];
+                for(i=0; i<acq_dap_over_time.length; i++) {
+                    temp = [];
+                    for(j=0; j<acq_dap_over_time[0].length; j++) {
+                        tempDate = new Date(Date.parse(acq_dap_over_time[i][j][0]));
+                        date_after = formatDate(tempDate);
+                        date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+
+                        currentValue = parseFloat(acq_dap_over_time[i][j][1]);
+                        if(currentValue == 0) currentValue = null;
+
+                        temp.push({y:currentValue, url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                    }
+                    DAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                }
+
+                chartDXAcquisitionMeanDAPOverTime.xAxis[0].setCategories(dateAxis);
+                for(i=0; i<DAPOverTime.length; i++) {
+                    chartDXAcquisitionMeanDAPOverTime.addSeries(DAPOverTime[i]);
+                }
+                chartDXAcquisitionMeanDAPOverTime.redraw({duration: 1000});
             }
             // DAP over time chart data end
             //-------------------------------------------------------------------------------------
