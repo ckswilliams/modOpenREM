@@ -92,16 +92,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#histogramRequestPlotDIV', requestSeriesData, requestSeriesMedianData, 'freq', chartSortingDirection, 0);
+            twoSeriesSort('#histogramRequestPlotDIV', 'freq', chartSortingDirection, 0);
             break;
         case 'dlp':
-            twoSeriesSort('#histogramRequestPlotDIV', requestSeriesData, requestSeriesMedianData, 'y', chartSortingDirection, 0);
+            twoSeriesSort('#histogramRequestPlotDIV', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#histogramRequestPlotDIV', requestSeriesData, requestSeriesMedianData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#histogramRequestPlotDIV', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#histogramRequestPlotDIV', requestSeriesData, requestSeriesMedianData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#histogramRequestPlotDIV', 'name', chartSortingDirection, 0);
     }
 
 });

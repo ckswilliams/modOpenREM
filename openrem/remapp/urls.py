@@ -49,6 +49,8 @@ urlpatterns = patterns('remapp.views',
 
     url(r'^ct/$',
         'ct_summary_list_filter'),
+    url(r'^ct/chart/$',
+        'ct_summary_chart_data', name='ct_summary_chart_data'),
     url(r'^ct/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
             model=GeneralStudyModuleAttr,

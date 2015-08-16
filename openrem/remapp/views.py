@@ -528,7 +528,6 @@ def ct_summary_list_filter(request):
     import pkg_resources # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
-    from django.http import JsonResponse
 
     requestResults = request.GET
 
@@ -667,8 +666,6 @@ def ct_summary_list_filter(request):
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
             userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
-            #userProfile.plotCTInitialSortingChoice = chartOptionsForm.cleaned_data['plotCTInitialSortingChoice']
-            #userProfile.plotCTInitialSortingDirection = chartOptionsForm.cleaned_data['plotCTInitialSortingDirection']
             if median_available:
                 userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
@@ -685,32 +682,8 @@ def ct_summary_list_filter(request):
                         'plotCTStudyPerDayAndHour': userProfile.plotCTStudyPerDayAndHour,
                         'plotCTStudyMeanDLPOverTime': userProfile.plotCTStudyMeanDLPOverTime,
                         'plotCTStudyMeanDLPOverTimePeriod': userProfile.plotCTStudyMeanDLPOverTimePeriod,
-                        #'plotCTInitialSortingChoice': userProfile.plotCTInitialSortingChoice,
-                        #'plotCTInitialSortingDirection': userProfile.plotCTInitialSortingDirection,
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = CTChartOptionsForm(formData)
-
-    plotCharts = userProfile.plotCharts
-    plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
-    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
-    plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
-    plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
-    plotCTStudyFreq = userProfile.plotCTStudyFreq
-    plotCTRequestMeanDLP = userProfile.plotCTRequestMeanDLP
-    plotCTRequestFreq = userProfile.plotCTRequestFreq
-    plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
-    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
-    plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
-    plotAverageChoice = userProfile.plotAverageChoice
-
-    if plotting and plotCharts and request.is_ajax():
-        acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData,\
-        requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData,\
-        studySummary = \
-            ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
-                                 plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
-                                 plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                                 requestResults, median_available, plotAverageChoice)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -725,37 +698,186 @@ def ct_summary_list_filter(request):
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
-    if plotting and plotCharts and request.is_ajax():
-        if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
-            returnStructure['acquisitionSummary'] = acquisitionSummary
-        if plotCTAcquisitionMeanDLP:
-            returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
-        if plotCTAcquisitionMeanCTDI:
-            returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
-        if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
-            returnStructure['studySummary'] = studySummary
-        if plotCTStudyMeanDLP:
-            returnStructure['studyHistogramData'] = studyHistogramData
-        if plotCTRequestMeanDLP or plotCTRequestFreq:
-            returnStructure['requestSummary'] = requestSummary
-        if plotCTRequestMeanDLP:
-            returnStructure['requestHistogramData'] = requestHistogramData
-        if plotCTStudyPerDayAndHour:
-            returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
-        if plotCTStudyMeanDLPOverTime:
-            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
-            if plotAverageChoice == 'median' or plotAverageChoice == 'both':
-                returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
+    return render_to_response(
+        'remapp/ctfiltered.html',
+        returnStructure,
+        context_instance=RequestContext(request)
+    )
 
-        return JsonResponse(returnStructure)
+
+@login_required
+def ct_summary_chart_data(request):
+    from remapp.interface.mod_filters import CTSummaryListFilter
+    import pkg_resources # part of setuptools
+    from remapp.forms import CTChartOptionsForm
+    from openremproject import settings
+    from django.http import JsonResponse
+
+    requestResults = request.GET
+
+    if requestResults.get('acquisitionhist'):
+        filters = {'modality_type__exact': 'CT'}
+
+        if requestResults.get('acquisition_protocol'):
+            filters['ctradiationdose__ctirradiationeventdata__acquisition_protocol'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_dlp_min'):
+            filters['ctradiationdose__ctirradiationeventdata__dlp__gte'] = requestResults.get('acquisition_dlp_min')
+        if requestResults.get('acquisition_dlp_max'):
+            filters['ctradiationdose__ctirradiationeventdata__dlp__lte'] = requestResults.get('acquisition_dlp_max')
+        if requestResults.get('acquisition_ctdi_max'):
+            filters['ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte'] = requestResults.get('acquisition_ctdi_max')
+        if requestResults.get('acquisition_ctdi_min'):
+            filters['ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte'] = requestResults.get('acquisition_ctdi_min')
+
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            **filters
+            ).order_by().distinct())
+
+        if requestResults.get('study_description')   : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('study_dlp_max')       : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('study_dlp_min')       : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('requested_procedure') : f.qs.filter(requested_procedure_code_meaning=requestResults.get('requested_procedure'))
+
+    elif requestResults.get('studyhist'):
+        filters = {'modality_type__exact': 'CT'}
+        filters['study_description'] = requestResults.get('study_description')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
+
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            **filters
+            ).order_by().distinct())
+
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
+        if requestResults.get('requested_procedure')  : f.qs.filter(requested_procedure_code_meaning=requestResults.get('requested_procedure'))
+
+    elif requestResults.get('requesthist'):
+        filters = {'modality_type__exact': 'CT'}
+        filters['requested_procedure_code_meaning'] = requestResults.get('requested_procedure')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
+        filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
+
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            **filters
+            ).order_by().distinct())
+
+        if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
+
+    elif requestResults.get('requestfreq'):
+        filters = {'modality_type__exact': 'CT'}
+        filters['requested_procedure_code_meaning'] = requestResults.get('requested_procedure')
+
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            **filters
+            ).order_by().distinct())
+
+        if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
 
     else:
-        return render_to_response(
-            'remapp/ctfiltered.html',
-            returnStructure,
-            context_instance=RequestContext(request)
-        )
+        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact = 'CT').order_by().distinct())
+        if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
+        if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
+        if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
+        if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
+        if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
+        if requestResults.get('acquisition_dlp_min')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__gte=requestResults.get('acquisition_dlp_min'))
+        if requestResults.get('acquisition_ctdi_max') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__lte=requestResults.get('acquisition_ctdi_max'))
+        if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
+        if requestResults.get('requested_procedure')  : f.qs.filter(requested_procedure_code_meaning=requestResults.get('requested_procedure'))
+
+    if requestResults.get('accession_number') : f.qs.filter(accession_number=requestResults.get('accession_number'))
+    if requestResults.get('date_after')       : f.qs.filter(study_date__gt=requestResults.get('date_after'))
+    if requestResults.get('date_before')      : f.qs.filter(study_date__lt=requestResults.get('date_before'))
+    if requestResults.get('institution_name') : f.qs.filter(generalequipmentmoduleattr__institution_name=requestResults.get('institution_name'))
+    if requestResults.get('manufacturer')     : f.qs.filter(generalequipmentmoduleattr__manufacturer=requestResults.get('manufacturer'))
+    if requestResults.get('model_name')       : f.qs.filter(generalequipmentmoduleattr__manufacturer_model_name=requestResults.get('model_name'))
+    if requestResults.get('patient_age_max')  : f.qs.filter(patientstudymoduleattr__patient_age_decimal__lte=requestResults.get('patient_age_max'))
+    if requestResults.get('patient_age_min')  : f.qs.filter(patientstudymoduleattr__patient_age_decimal__gte=requestResults.get('patient_age_min'))
+    if requestResults.get('station_name')     : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
+    if requestResults.get('display_name')     : f.qs.filter(generalequipmentmoduleattr__unique_equipment_name__display_name=requestResults.get('display_name'))
+
+    try:
+        # See if the user has plot settings in userprofile
+        userProfile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        userProfile = request.user.userprofile
+
+    if userProfile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        userProfile.median_available = True
+        userProfile.save()
+        median_available = True
+    else:
+        userProfile.median_available = False
+        userProfile.save()
+        median_available = False
+
+    plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
+    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
+    plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
+    plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
+    plotCTStudyFreq = userProfile.plotCTStudyFreq
+    plotCTRequestMeanDLP = userProfile.plotCTRequestMeanDLP
+    plotCTRequestFreq = userProfile.plotCTRequestFreq
+    plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
+    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
+    plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
+    plotAverageChoice = userProfile.plotAverageChoice
+
+
+    acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
+    requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
+    studySummary = \
+        ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
+                             plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
+                             plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
+                             requestResults, median_available, plotAverageChoice)
+
+    returnStructure = {}
+
+    if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
+        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
+    if plotCTAcquisitionMeanDLP:
+        returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
+    if plotCTAcquisitionMeanCTDI:
+        returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
+    if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
+        returnStructure['studySummary'] = list(studySummary)
+    if plotCTStudyMeanDLP:
+        returnStructure['studyHistogramData'] = studyHistogramData
+    if plotCTRequestMeanDLP or plotCTRequestFreq:
+        returnStructure['requestSummary'] = list(requestSummary)
+    if plotCTRequestMeanDLP:
+        returnStructure['requestHistogramData'] = requestHistogramData
+    if plotCTStudyPerDayAndHour:
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
+    if plotCTStudyMeanDLPOverTime:
+        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+            returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
+        if plotAverageChoice == 'median' or plotAverageChoice == 'both':
+            returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
+
+    return JsonResponse(returnStructure, safe=False)
 
 
 def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
@@ -859,12 +981,16 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
                 [float(x) for x in dlpValues], bins=20)
+            acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
+            acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
 
             if plotCTAcquisitionMeanCTDI:
                 ctdiValues = acquisition_events.filter(
                     acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
                 acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram(
                     [float(x) for x in ctdiValues], bins=20)
+                acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
+                acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
         # Required for mean DLP per study type plot
@@ -907,6 +1033,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
                     studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                    studyHistogramData[idx][0] = studyHistogramData[idx][0].tolist()
+                    studyHistogramData[idx][1] = studyHistogramData[idx][1].tolist()
 
                 if plotCTStudyMeanDLPOverTime:
                     # Required for mean DLP per study type per time period plot

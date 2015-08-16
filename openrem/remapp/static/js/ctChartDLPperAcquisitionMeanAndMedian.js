@@ -47,7 +47,7 @@ $(function () {
             enabled: true
         },
         xAxis: {
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -79,29 +79,29 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Mean DLP',
-            data: $.extend(true, [], seriesData)
+            data: []
         }, {
             useHTML: true,
             name: 'Median DLP',
-            data: $.extend(true, [], seriesMedianData)
+            data: []
         }],
         drilldown: {
-            series: seriesDrilldown
+            series: []
         }
     });
 
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#histogramPlotDIV', seriesData, seriesMedianData, 'freq', chartSortingDirection, 0);
+            twoSeriesSort('#histogramPlotDIV', 'freq', chartSortingDirection, 0);
             break;
         case 'dlp':
-            twoSeriesSort('#histogramPlotDIV', seriesData, seriesMedianData, 'y', chartSortingDirection, 0);
+            twoSeriesSort('#histogramPlotDIV', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#histogramPlotDIV', seriesData, seriesMedianData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#histogramPlotDIV', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#histogramPlotDIV', seriesData, seriesMedianData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#histogramPlotDIV', 'name', chartSortingDirection, 0);
     }
 
 });
