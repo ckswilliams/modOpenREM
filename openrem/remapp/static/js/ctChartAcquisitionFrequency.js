@@ -1,5 +1,4 @@
 $(function () {
-
 var chartAcqFreq = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartProtocolDIV',

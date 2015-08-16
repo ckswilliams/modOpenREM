@@ -1088,6 +1088,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                               flat=True)
                 requestHistogramData[idx][0], requestHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                requestHistogramData[idx][0] = requestHistogramData[idx][0].tolist()
+                requestHistogramData[idx][1] = requestHistogramData[idx][1].tolist()
 
     if not 'acquisitionHistogramData' in locals(): acquisitionHistogramData = 0
     if not 'acquisitionHistogramDataCTDI' in locals(): acquisitionHistogramDataCTDI = 0

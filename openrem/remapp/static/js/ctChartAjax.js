@@ -358,6 +358,120 @@ $(document).ready(function() {
             // Study frequency chart data end
             //-------------------------------------------------------------------------------------
 
+
+            //-------------------------------------------------------------------------------------
+            // DLP per request chart data start
+            if(typeof plotCTRequestMeanDLP !== 'undefined' || typeof plotCTRequestFreq !== 'undefined') {
+
+                var request_summary = $.map(json.requestSummary, function (el) {
+                    return el;
+                });
+
+                var request_names = [];
+                for (i = 0; i < request_summary.length; i++) {
+                    request_names.push(request_summary[i].requested_procedure_code_meaning);
+                }
+            }
+
+            if(typeof plotCTRequestMeanDLP !== 'undefined') {
+
+                var request_histogram_data = json.requestHistogramData;
+
+                var request_counts = [];
+                var request_bins = [];
+                for (i = 0; i < request_names.length; i++) {
+                    request_counts.push(request_histogram_data[i][0]);
+                    request_bins.push(request_histogram_data[i][1]);
+                }
+
+                if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var request_data = [];
+                    for (i = 0; i < request_names.length; i++) {
+                        request_data.push({
+                            name: request_names[i],
+                            y: request_summary[i].mean_dlp,
+                            freq: request_summary[i].num_req,
+                            bins: request_bins[i],
+                            tooltip: request_names[i] + '<br>' + request_summary[i].mean_dlp.toFixed(1) + ' mean<br>(n=' + request_summary[i].num_req + ')',
+                            drilldown: request_names[i]
+                        });
+                    }
+                }
+
+                if (plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var request_data_median = [];
+                    for (i = 0; i < request_names.length; i++) {
+                        request_data_median.push({
+                            name: request_names[i],
+                            y: parseFloat(request_summary[i].median_dlp),
+                            freq: request_summary[i].num_req,
+                            bins: request_bins[i],
+                            tooltip: request_names[i] + '<br>' + parseFloat(request_summary[i].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i].num_req + ')',
+                            drilldown: request_names[i]
+                        });
+                    }
+                }
+
+                temp = [];
+                var series_drilldown_request = [];
+                for (i = 0; i < request_names.length; i++) {
+                    temp = [];
+                    for (j = 0; j < request_counts[0].length; j++) {
+                        temp.push([request_bins[i][j].toFixed(1).toString() + ' \u2264 x < ' + request_bins[i][j + 1].toFixed(1).toString(), request_counts[i][j]]);
+                    }
+                    series_drilldown_request.push({id: request_names[i], name: request_names[i], useHTML: true, data: temp});
+                }
+
+                var chartplotCTRequestMeanDLP = $('#histogramRequestPlotDIV').highcharts();
+                chartplotCTRequestMeanDLP.xAxis[0].setCategories(request_names);
+                chartplotCTRequestMeanDLP.options.drilldown.series = series_drilldown_request;
+                if (plotAverageChoice == "mean") {
+                    chartplotCTRequestMeanDLP.series[0].setData(request_data);
+                }
+                else if (plotAverageChoice == "median") {
+                    chartplotCTRequestMeanDLP.series[0].setData(request_data_median);
+                }
+                else {
+                    chartplotCTRequestMeanDLP.series[0].setData(request_data);
+                    chartplotCTRequestMeanDLP.series[1].setData(request_data_median);
+                }
+                chartplotCTRequestMeanDLP.redraw({duration: 1000});
+            }
+            // DLP per request chart data end
+            //-------------------------------------------------------------------------------------
+
+            //-------------------------------------------------------------------------------------
+            // Request frequency chart data start
+            if(typeof plotCTRequestFreq !== 'undefined' || typeof plotCTRequestMeanDLPOverTime !== 'undefined') {
+                //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'request_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&request_description=';
+                var request_piechart_data = new Array(request_names.length);
+                for(i=0; i<request_names.length; i++) {
+                    if(typeof plotCTRequestFreq !== 'undefined') {
+                        request_piechart_data[i] = {name: request_names[i], y: parseInt(request_summary[i].num_req), url: urlStart + request_names[i]};
+                    }
+                    else {
+                        request_piechart_data[i] = {name: request_names[i], y:parseInt(i), url:urlStart+request_names[i]};
+                    }
+                }
+
+                if(typeof plotCTRequestFreq !== 'undefined') {
+                    request_piechart_data.sort(sort_by_y);
+                }
+
+                var request_colours = getColours(request_names.length);
+                for(i=0; i<request_names.length; i++) {
+                    request_piechart_data[i].color = request_colours[i];
+                }
+            }
+
+            if(typeof plotCTRequestFreq !== 'undefined') {
+                var chart = $('#piechartRequestDIV').highcharts();
+                chart.series[0].setData(request_piechart_data);
+                chart.redraw({ duration: 1000 });
+            }
+            // Request frequency chart data end
+            //-------------------------------------------------------------------------------------
+
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );

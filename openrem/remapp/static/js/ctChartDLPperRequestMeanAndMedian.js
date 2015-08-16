@@ -47,7 +47,7 @@ $(function () {
             enabled: true
         },
         xAxis: {
-            categories: requestNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Requested procedure type'
@@ -79,14 +79,14 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Mean DLP',
-            data: $.extend(true, [], requestSeriesData)
+            data: []
         }, {
             useHTML: true,
             name: 'Median DLP',
-            data: $.extend(true, [], requestSeriesMedianData)
+            data: []
         }],
         drilldown: {
-            series: requestSeriesDrilldown
+            series: []
         }
     });
 

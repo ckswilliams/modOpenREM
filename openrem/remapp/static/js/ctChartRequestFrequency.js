@@ -38,7 +38,7 @@ $(function () {
                     }
                 }
             },
-            data: requestPiechartData
+            data: []
         }]
     });
 });

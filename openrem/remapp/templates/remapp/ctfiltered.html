@@ -204,6 +204,10 @@
     <script>var plotCTRequestMeanDLP = true;</script>
     {% endif %}
 
+    {% if request.user.userprofile.plotCTRequestFreq %}
+    <script>var plotCTRequestFreq = true;</script>
+    {% endif %}
+
     <script>var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';</script>
 
     <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
@@ -798,75 +802,11 @@
     {% if request.user.userprofile.plotCTRequestMeanDLP or request.user.userprofile.plotCTRequestFreq %}
       <!-- JavaScript for request mean DLP and request frequency plot. -->
       <script>
-        var requestNames     = [
-          {% for name in requestSummary %}
-            "{{name.requested_procedure_code_meaning}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var requestSeriesDataN = [
-          {% for testData in requestSummary %}
-            '{{testData.num_req}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
         var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
     {% endif %}
 
     {% if request.user.userprofile.plotCTRequestMeanDLP %}
-      <script>
-        <!-- JavaScript for study plot. -->
-        var requestCounts    = [
-          {% for request in requestHistogramData %}
-            [
-              {% for dataCounts in request.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var requestBins      = [
-          {% for requestEdges in requestHistogramData %}
-            [
-              {% for edges in requestEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var requestSeriesData = [
-          {% for testData in requestSummary %}
-            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},freq:{{testData.num_req}},bins:requestBins[{{forloop.counter}}-1],tooltip:requestNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dlp|floatformat:1}}+' mean<br>(n='+{{testData.num_req}}+')',drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var requestSeriesMedianData = [
-          {% for testData in requestSummary %}
-            {{'{'}}name:requestNames[{{forloop.counter}}-1],y: {{testData.median_dlp}},freq:{{testData.num_req}},bins:requestBins[{{forloop.counter}}-1],tooltip:requestNames[{{forloop.counter}}-1]+'<br>'+{{ testData.median_dlp|floatformat:1}}+' median<br>(n='+{{testData.num_req}}+')',drilldown:requestNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-        var requestSeriesDrilldown   = [
-          {% for requestCountsArray in requestHistogramData %}
-            {id: requestNames[{{forloop.counter}}-1],name: requestNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in requestCountsArray.0 %}
-                [requestBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + requestBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-      </script>
 
       {% if request.user.userprofile.plotAverageChoice == 'both' %}
           <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMeanAndMedian.js"></script>
@@ -883,16 +823,6 @@
       <!-- JavaScript for request pie chart. -->
       <script>
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
-        var requestPiechartData = new Array(requestNames.length);
-        for(var i=0; i<requestNames.length; i++) {
-          requestPiechartData[i] = {name:requestNames[i], y:parseInt(requestSeriesDataN[i]), url:urlStart+requestNames[i]};
-        }
-        requestPiechartData.sort(sort_by_y);
-
-        requestColours = getColours(requestNames.length);
-        for(var i=0; i<requestNames.length; i++) {
-          requestPiechartData[i].color = requestColours[i];
-        }
       </script>
     {% endif %}
 
