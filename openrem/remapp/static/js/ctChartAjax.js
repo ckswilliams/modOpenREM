@@ -325,6 +325,39 @@ $(document).ready(function() {
             // DLP per study chart data end
             //-------------------------------------------------------------------------------------
 
+
+            //-------------------------------------------------------------------------------------
+            // Study frequency chart data start
+            if(typeof plotCTStudyFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+                //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                var study_piechart_data = new Array(study_names.length);
+                for(i=0; i<study_names.length; i++) {
+                    if(typeof plotCTStudyFreq !== 'undefined') {
+                        study_piechart_data[i] = {name: study_names[i], y: parseInt(study_summary[i].num_acq), url: urlStart + study_names[i]};
+                    }
+                    else {
+                        study_piechart_data[i] = {name: study_names[i], y:parseInt(i), url:urlStart+study_names[i]};
+                    }
+                }
+
+                if(typeof plotCTStudyFreq !== 'undefined') {
+                    study_piechart_data.sort(sort_by_y);
+                }
+
+                var study_colours = getColours(study_names.length);
+                for(i=0; i<study_names.length; i++) {
+                    study_piechart_data[i].color = study_colours[i];
+                }
+            }
+
+            if(typeof plotCTStudyFreq !== 'undefined') {
+                var chart = $('#piechartStudyDIV').highcharts();
+                chart.series[0].setData(study_piechart_data);
+                chart.redraw({ duration: 1000 });
+            }
+            // Study frequency chart data end
+            //-------------------------------------------------------------------------------------
+
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );

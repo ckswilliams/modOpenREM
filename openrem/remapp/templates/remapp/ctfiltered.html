@@ -764,76 +764,8 @@
     {% endif %}
 
 
-    {% if request.user.userprofile.plotCTStudyMeanDLP or request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-      <!-- JavaScript for study plot. Some data also required by other plots -->
-      <script>
-/*        var studyNames     = [
-          {% for name in studySummary %}
-            "{{name.study_description}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var studySeriesDataN = [
-          {% for testData in studySummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-      </script>
-    {% endif %}
-
     {% if request.user.userprofile.plotCTStudyMeanDLP %}
       <script>
-        <!-- JavaScript for study plot. -->
-        var studyCounts    = [
-          {% for study in studyHistogramData %}
-            [
-              {% for dataCounts in study.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var studyBins      = [
-          {% for studyEdges in studyHistogramData %}
-            [
-              {% for edges in studyEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% if request.user.userprofile.plotAverageChoice == 'mean' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var studySeriesData = [
-          {% for testData in studySummary %}
-            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.mean_dlp}},freq:{{testData.num_acq}},bins:studyBins[{{forloop.counter}}-1],tooltip:studyNames[{{forloop.counter}}-1]+'<br>'+{{testData.mean_dlp|floatformat:1}}+' mean<br>(n='+{{testData.num_acq}}+')',drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-        {% if request.user.userprofile.plotAverageChoice == 'median' or request.user.userprofile.plotAverageChoice == 'both' %}
-        var studySeriesMedianData = [
-          {% for testData in studySummary %}
-            {{'{'}}name:studyNames[{{forloop.counter}}-1],y: {{testData.median_dlp}},freq:{{testData.num_acq}},bins:studyBins[{{forloop.counter}}-1],tooltip:studyNames[{{forloop.counter}}-1]+'<br>'+{{testData.median_dlp|floatformat:1}}+' median<br>(n='+{{testData.num_acq}}+')',drilldown:studyNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-        var studySeriesDrilldown   = [
-          {% for studyCountsArray in studyHistogramData %}
-            {id: studyNames[{{forloop.counter}}-1],name: studyNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in studyCountsArray.0 %}
-                [studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + studyBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
         var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
@@ -852,16 +784,6 @@
       <!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
       <script>
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-        var studyPiechartData = new Array(studyNames.length);
-        for(var i=0; i<studyNames.length; i++) {
-          studyPiechartData[i] = {name:studyNames[i], y:parseInt(studySeriesDataN[i]), url:urlStart+studyNames[i]};
-        }
-        studyPiechartData.sort(sort_by_y);
-
-        studyColours = getColours(studyNames.length);
-        for(var i=0; i<studyNames.length; i++) {
-          studyPiechartData[i].color = studyColours[i];
-        }
       </script>
     {% endif %}
 

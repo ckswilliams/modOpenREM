@@ -3,7 +3,7 @@ $(function () {
         chart: {
             renderTo: 'piechartStudyDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,//null,
+            plotBorderWidth: 1,
             plotShadow: false
         },
         title: {
@@ -37,7 +37,7 @@ $(function () {
                     }
                 }
             },
-            data: studyPiechartData
+            data: []
         }]
     });
 });
