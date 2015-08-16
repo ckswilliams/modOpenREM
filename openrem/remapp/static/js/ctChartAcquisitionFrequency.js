@@ -38,7 +38,7 @@ var chartAcqFreq = new Highcharts.Chart({
                     }
                 }
             },
-            data: protocolPiechartData
+            data: []
         }]
     });
 });

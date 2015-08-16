@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: studyNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Study description'
@@ -79,10 +79,10 @@ $(function () {
         series: [{
             useHTML: true,
             name: 'Median DLP',
-            data: $.extend(true, [], studySeriesMedianData)
+            data: []
         }],
         drilldown: {
-            series: studySeriesDrilldown
+            series: []
         }
     });
     switch(chartSorting) {

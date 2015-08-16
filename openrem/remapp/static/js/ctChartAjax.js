@@ -58,7 +58,7 @@ $(document).ready(function() {
                 }
 
                 if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    seriesData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesData = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesData.push({
                             name: protocolNames[i],
@@ -72,7 +72,7 @@ $(document).ready(function() {
                 }
 
                 if (plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMedianData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesMedianData = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesMedianData.push({
                             name: protocolNames[i],
@@ -112,7 +112,7 @@ $(document).ready(function() {
                 }
 
                 if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    series_data_ctdi = []; // This must be a global variable for the chart sorting routines to work
+                    var series_data_ctdi = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         series_data_ctdi.push({
                             name: protocolNames[i],
@@ -126,7 +126,7 @@ $(document).ready(function() {
                 }
 
                 if (plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    series_median_data_ctdi = []; // This must be a global variable for the chart sorting routines to work
+                    var series_median_data_ctdi = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         series_median_data_ctdi.push({
                             name: protocolNames[i],
@@ -152,8 +152,9 @@ $(document).ready(function() {
             // CTDI per acquisition chart data end
             //-------------------------------------------------------------------------------------
 
-            
-            // Use above DLP and CTDI data to populate the 1, 2 or 4 series as appropriate
+
+            //-------------------------------------------------------------------------------------
+            // Use above DLP and CTDI data to populate the 1, 2 or 4 series in the DLP and/or CTDI plot as appropriate
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined' && typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
                 var chartplotCTAcquisitionMeanDLPandCTDI = $('#histogramPlotDLPandCTDIdiv').highcharts();
                 chartplotCTAcquisitionMeanDLPandCTDI.xAxis[0].setCategories(protocolNames);
@@ -190,7 +191,7 @@ $(document).ready(function() {
                 }
                 chartplotCTAcquisitionMeanDLP.redraw({duration: 1000});
             }
-            else {
+            else if(typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
                 var chartplotCTAcquisitionMeanCTDI = $('#histogramPlotCTDIdiv').highcharts();
                 chartplotCTAcquisitionMeanCTDI.xAxis[0].setCategories(protocolNames);
                 chartplotCTAcquisitionMeanCTDI.options.drilldown.series = series_drilldown_ctdi;
@@ -206,6 +207,124 @@ $(document).ready(function() {
                 }
                 chartplotCTAcquisitionMeanCTDI.redraw({duration: 1000});
             }
+            // End of populating the DLP and/or CTDI plot
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // Acquisition frequency chart data start
+            if(typeof plotCTAcquisitionFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+                //var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+                var protocolPiechartData = new Array(protocolNames.length);
+                for(i=0; i<protocolNames.length; i++) {
+                    if(typeof plotCTAcquisitionFreq !== 'undefined') {
+                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStart + protocolNames[i]};
+                    }
+                    else {
+                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
+                    }
+                }
+
+                if(typeof plotCTAcquisitionFreq !== 'undefined') {
+                    protocolPiechartData.sort(sort_by_y);
+                }
+
+                var protocolColours = getColours(protocolNames.length);
+                for(i=0; i<protocolNames.length; i++) {
+                    protocolPiechartData[i].color = protocolColours[i];
+                }
+            }
+
+            if(typeof plotCTAcquisitionFreq !== 'undefined') {
+                var chart = $('#piechartProtocolDIV').highcharts();
+                chart.series[0].setData(protocolPiechartData);
+                chart.redraw({ duration: 1000 });
+            }
+            // Acquisition frequency chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // DLP per study chart data start
+            if( typeof plotCTStudyMeanDLP !== 'undefined' || typeof plotCTStudyFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+
+                var study_summary = $.map(json.studySummary, function (el) {
+                    return el;
+                });
+
+                var study_names = [];
+                for (i = 0; i < study_summary.length; i++) {
+                    study_names.push(study_summary[i].study_description);
+                }
+            }
+
+            if(typeof plotCTStudyMeanDLP !== 'undefined') {
+                
+                var study_histogram_data = json.studyHistogramData;
+
+                var study_counts = [];
+                var study_bins = [];
+                for (i = 0; i < study_names.length; i++) {
+                    study_counts.push(study_histogram_data[i][0]);
+                    study_bins.push(study_histogram_data[i][1]);
+                }
+
+                if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var study_data = [];
+                    for (i = 0; i < study_names.length; i++) {
+                        study_data.push({
+                            name: study_names[i],
+                            y: study_summary[i].mean_dlp,
+                            freq: study_summary[i].num_acq,
+                            bins: study_bins[i],
+                            tooltip: study_names[i] + '<br>' + study_summary[i].mean_dlp.toFixed(1) + ' mean<br>(n=' + study_summary[i].num_acq + ')',
+                            drilldown: study_names[i]
+                        });
+                    }
+                }
+
+                if (plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var study_data_median = [];
+                    for (i = 0; i < study_names.length; i++) {
+                        study_data_median.push({
+                            name: study_names[i],
+                            y: parseFloat(study_summary[i].median_dlp),
+                            freq: study_summary[i].num_acq,
+                            bins: study_bins[i],
+                            tooltip: study_names[i] + '<br>' + parseFloat(study_summary[i].median_dlp).toFixed(1) + ' median<br>(n=' + study_summary[i].num_acq + ')',
+                            drilldown: study_names[i]
+                        });
+                    }
+                }
+
+                temp = [];
+                var series_drilldown_study = [];
+                for (i = 0; i < study_names.length; i++) {
+                    temp = [];
+                    for (j = 0; j < study_counts[0].length; j++) {
+                        temp.push([study_bins[i][j].toFixed(1).toString() + ' \u2264 x < ' + study_bins[i][j + 1].toFixed(1).toString(), study_counts[i][j]]);
+                    }
+                    series_drilldown_study.push({id: study_names[i], name: study_names[i], useHTML: true, data: temp});
+                }
+
+                var chartplotCTStudyMeanDLP = $('#histogramStudyPlotDIV').highcharts();
+                chartplotCTStudyMeanDLP.xAxis[0].setCategories(study_names);
+                chartplotCTStudyMeanDLP.options.drilldown.series = series_drilldown_study;
+                if (plotAverageChoice == "mean") {
+                    chartplotCTStudyMeanDLP.series[0].setData(study_data);
+                }
+                else if (plotAverageChoice == "median") {
+                    chartplotCTStudyMeanDLP.series[0].setData(study_data_median);
+                }
+                else {
+                    chartplotCTStudyMeanDLP.series[0].setData(study_data);
+                    chartplotCTStudyMeanDLP.series[1].setData(study_data_median);
+                }
+                chartplotCTStudyMeanDLP.redraw({duration: 1000});
+            }
+            // DLP per study chart data end
+            //-------------------------------------------------------------------------------------
+
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );

@@ -57,7 +57,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    seriesData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesData = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesData.push({
                             name: protocolNames[i],
@@ -71,7 +71,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMedianData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesMedianData = [];
                     for (i = 0; i < protocolNames.length; i++) {
                         seriesMedianData.push({
                             name: protocolNames[i],
@@ -135,7 +135,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    serieskVpData = []; // This must be a global variable for the chart sorting routines to work
+                    var serieskVpData = [];
                     for (i = 0; i < protocolkVpNames.length; i++) {
                         serieskVpData.push({
                             name: protocolkVpNames[i],
@@ -149,7 +149,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMediankVpData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesMediankVpData = [];
                     for (i = 0; i < protocolkVpNames.length; i++) {
                         seriesMediankVpData.push({
                             name: protocolkVpNames[i],
@@ -213,7 +213,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    seriesmAsData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesmAsData = [];
                     for (i = 0; i < protocolmAsNames.length; i++) {
                         seriesmAsData.push({
                             name: protocolmAsNames[i],
@@ -227,7 +227,7 @@ $(document).ready(function() {
                 }
 
                 if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    seriesMedianmAsData = []; // This must be a global variable for the chart sorting routines to work
+                    var seriesMedianmAsData = [];
                     for (i = 0; i < protocolmAsNames.length; i++) {
                         seriesMedianmAsData.push({
                             name: protocolmAsNames[i],

@@ -521,16 +521,6 @@
       <!-- JavaScript for acquisition pie chart -->
       <script>
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-        var protocolPiechartData = new Array(protocolNames.length);
-        for(var i=0; i<protocolNames.length; i++) {
-          protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
-        }
-        protocolPiechartData.sort(sort_by_y);
-
-        protocolColours = getColours(protocolNames.length);
-        for(var i=0; i<protocolNames.length; i++) {
-          protocolPiechartData[i].color = protocolColours[i];
-        }
       </script>
 
       <script src="{{ STATIC_URL }}js/ctChartAcquisitionFrequency.js"></script>
@@ -777,7 +767,7 @@
     {% if request.user.userprofile.plotCTStudyMeanDLP or request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for study plot. Some data also required by other plots -->
       <script>
-        var studyNames     = [
+/*        var studyNames     = [
           {% for name in studySummary %}
             "{{name.study_description}}"
             {% if not forloop.last %},{% endif %}
@@ -788,7 +778,7 @@
             '{{testData.num_acq}}'
             {% if not forloop.last %},{% endif %}
           {% endfor %}
-        ];
+        ];*/
       </script>
     {% endif %}
 
