@@ -47,7 +47,7 @@ $(function () {
             enabled: true
         },
         xAxis: {
-            categories: [1,2,3,4,5], //protocolkVpNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,28 +78,28 @@ $(function () {
         },
         series: [{
             name: 'Mean kVp',
-            data: [] //$.extend(true, [], serieskVpData)
+            data: []
         }, {
             name: 'Median kVp',
-            data: [] //$.extend(true, [], seriesMediankVpData)
+            data: []
         }],
         drilldown: {
-            series: [] //serieskVpDrilldown
+            series: []
         }
     });
 
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'freq', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeankVp', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'y', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeankVp', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeankVp', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#chartAcquisitionMeankVp', serieskVpData, seriesMediankVpData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeankVp', 'name', chartSortingDirection, 0);
     }
 
 });

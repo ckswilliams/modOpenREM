@@ -47,7 +47,7 @@ $(function () {
             enabled: true
         },
         xAxis: {
-            categories: [], //protocolmAsNames,
+            categories: [],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,26 +78,26 @@ $(function () {
         },
         series: [{
             name: 'Mean mAs',
-            data: [] //$.extend(true, [], seriesmAsData)
+            data: []
         }, {
             name: 'Median mAs',
-            data: [] //$.extend(true, [], seriesMedianmAsData)
+            data: []
         }],
         drilldown: {
-            series: [] //seriesmAsDrilldown
+            series: []
         }
     });
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'freq', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'y', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#chartAcquisitionMeanmAs', seriesmAsData, seriesMedianmAsData, 'name', chartSortingDirection, 0);
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'name', chartSortingDirection, 0);
     }
 });

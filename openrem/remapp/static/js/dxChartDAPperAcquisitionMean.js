@@ -88,16 +88,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#container', seriesData, 'freq', chartSortingDirection);
+            seriesSort('#container', 'freq', chartSortingDirection);
             break;
         case 'dap':
-            seriesSort('#container', seriesData, 'y', chartSortingDirection);
+            seriesSort('#container', 'y', chartSortingDirection);
             break;
         case 'name':
-            seriesSort('#container', seriesData, 'name', chartSortingDirection);
+            seriesSort('#container', 'name', chartSortingDirection);
             break;
         default:
-            seriesSort('#container', seriesData, 'name', 1);
+            seriesSort('#container', 'name', 1);
     }
 
 });

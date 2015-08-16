@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: [1,2,3,4,5], //protocolkVpNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -78,25 +78,25 @@ $(function () {
         },
         series: [{
             name: 'Median kVp',
-            data: [] //$.extend(true, [], seriesMediankVpData)
+            data: []
         }],
         drilldown: {
-            series: [] //serieskVpDrilldown
+            series: []
         }
     });
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#chartAcquisitionMeankVp', seriesMediankVpData, 'freq', chartSortingDirection);
+            seriesSort('#chartAcquisitionMeankVp', 'freq', chartSortingDirection);
             break;
         case 'dap':
-            seriesSort('#chartAcquisitionMeankVp', seriesMediankVpData, 'y', chartSortingDirection);
+            seriesSort('#chartAcquisitionMeankVp', 'y', chartSortingDirection);
             break;
         case 'name':
-            seriesSort('#chartAcquisitionMeankVp', seriesMediankVpData, 'name', chartSortingDirection);
+            seriesSort('#chartAcquisitionMeankVp', 'name', chartSortingDirection);
             break;
         default:
-            seriesSort('#chartAcquisitionMeankVp', seriesMediankVpData, 'name', 1);
+            seriesSort('#chartAcquisitionMeankVp', 'name', 1);
     }
 
 });

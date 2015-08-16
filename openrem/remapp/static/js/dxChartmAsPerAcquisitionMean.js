@@ -47,7 +47,7 @@ $(function () {
             enabled: false
         },
         xAxis: {
-            categories: [], //protocolmAsNames,
+            categories: [],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -77,25 +77,25 @@ $(function () {
         },
         series: [{
             name: 'Mean mAs',
-            data: [] //$.extend(true, [], seriesmAsData)
+            data: []
         }],
         drilldown: {
-            series: [] //seriesmAsDrilldown
+            series: []
         }
     });
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'freq', chartSortingDirection);
+            seriesSort('#chartAcquisitionMeanmAs', 'freq', chartSortingDirection);
             break;
         case 'dap':
-            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'y', chartSortingDirection);
+            seriesSort('#chartAcquisitionMeanmAs', 'y', chartSortingDirection);
             break;
         case 'name':
-            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'name', chartSortingDirection);
+            seriesSort('#chartAcquisitionMeanmAs', 'name', chartSortingDirection);
             break;
         default:
-            seriesSort('#chartAcquisitionMeanmAs', seriesmAsData, 'name', 1);
+            seriesSort('#chartAcquisitionMeanmAs', 'name', 1);
     }
 
 });
