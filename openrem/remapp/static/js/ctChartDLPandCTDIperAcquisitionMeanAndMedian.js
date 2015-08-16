@@ -3,14 +3,14 @@ $(function () {
     var defaultTitle = 'DLP and CTDI<sub>vol</sub> per acquisition protocol';
     var bins = [];
     var name = '';
-
+/*
     var index;
     for (index = 0; index < seriesDrilldownCTDI.length; ++index) {
         seriesDrilldownCTDI[index].xAxis = 1;
         seriesDrilldownCTDI[index].name = seriesDrilldownCTDI[index].name + ' CTDI';
         seriesDrilldown[index].name = seriesDrilldown[index].name + ' DLP';
     }
-
+*/
     var chartAcqDLPandCTDI = new Highcharts.Chart({
         chart: {
             type: 'column',
@@ -83,7 +83,7 @@ $(function () {
             text: 'DLP and CTDI<sub>vol</sub> per acquisition protocol'
         },
         xAxis: [{
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true
             },
@@ -129,29 +129,29 @@ $(function () {
         },
         series: [{
             name: 'Mean DLP',
-            data: $.extend(true, [], seriesData),
+            data: [],
             color: '#2b8cbe',
             pointPlacement: -0.02
         }, {
             name: 'Median DLP',
-            data: $.extend(true, [], seriesMedianData),
+            data: [],
             color: '#7bccc4',
             pointPlacement: -0.02,
         }, {
             name: 'Mean CTDI<sub>vol</sub>',
-            data: $.extend(true, [], seriesDataCTDI),
+            data: [],
             color: '#d7301f',
             pointPlacement: 0.02,
             yAxis: 1
         }, {
             name: 'Median CTDI<sub>vol</sub>',
-            data: $.extend(true, [], seriesMedianDataCTDI),
+            data: [],
             color: '#fdcc8a',
             pointPlacement: 0.02,
             yAxis: 1
         }],
         drilldown: {
-            series: (seriesDrilldown).concat(seriesDrilldownCTDI),
+            series: [],//(seriesDrilldown).concat(seriesDrilldownCTDI),
             activeAxisLabelStyle: null
         },
         legend: {
@@ -172,19 +172,19 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'freq', chartSortingDirection, [0,1,2,3]);
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', chartSortingDirection, [0,1,2,3]);
             break;
         case 'dlp':
-            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'y', chartSortingDirection, [0,1,2,3]);
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', chartSortingDirection, [0,1,2,3]);
             break;
         case 'ctdi':
-            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesDataCTDI, seriesMedianDataCTDI, seriesData, seriesMedianData, 'y', chartSortingDirection, [2,3,0,1]);
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', chartSortingDirection, [2,3,0,1]);
             break;
         case 'name':
-            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'name', chartSortingDirection, [0,1,2,3]);
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', chartSortingDirection, [0,1,2,3]);
             break;
         default:
-            fourSeriesSort('#histogramPlotDLPandCTDIdiv', seriesData, seriesMedianData, seriesDataCTDI, seriesMedianDataCTDI, 'name', chartSortingDirection, [0,1,2,3]);
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', chartSortingDirection, [0,1,2,3]);
     }
 
 });

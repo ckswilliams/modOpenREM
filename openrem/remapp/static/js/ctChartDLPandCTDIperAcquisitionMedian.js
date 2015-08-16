@@ -3,14 +3,14 @@ $(function () {
     var defaultTitle = 'Median DLP and CTDI<sub>vol</sub> per acquisition protocol';
     var bins = [];
     var name = '';
-
+/*
     var index;
     for (index = 0; index < seriesDrilldownCTDI.length; ++index) {
         seriesDrilldownCTDI[index].xAxis = 1;
         seriesDrilldownCTDI[index].name = seriesDrilldownCTDI[index].name + ' CTDI';
         seriesDrilldown[index].name = seriesDrilldown[index].name + ' DLP';
     }
-
+*/
     var chartAcqDLPandCTDI = new Highcharts.Chart({
         chart: {
             type: 'column',
@@ -83,7 +83,7 @@ $(function () {
             text: 'Median DLP and CTDI<sub>vol</sub> per acquisition protocol'
         },
         xAxis: [{
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true
             },
@@ -128,14 +128,14 @@ $(function () {
         },
         series: [{
             name: 'Median DLP',
-            data: $.extend(true, [], seriesMedianData)
+            data: []
         }, {
             name: 'Median CTDI<sub>vol</sub>',
-            data: $.extend(true, [], seriesMedianDataCTDI),
+            data: [],
             yAxis: 1
         }],
         drilldown: {
-            series: (seriesDrilldown).concat(seriesDrilldownCTDI),
+            series: [],//(seriesDrilldown).concat(seriesDrilldownCTDI),
             activeAxisLabelStyle: null
         },
         legend: {
