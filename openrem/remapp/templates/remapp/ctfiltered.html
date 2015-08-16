@@ -834,47 +834,6 @@
 
     {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
       <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-      <script>
-/*        var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-        var studiesPerHourEachWeekday = [
-          {% for dayCounts in studiesPerHourInWeekdays %}
-            [
-              {% for hourCounts in dayCounts %}
-                {{hourCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var studiesPerWeekday = new Array(7);
-        for(var i=0; i<7; i++) {
-          var tempTotal = 0;
-          for(var j=0; j<24; j++) {
-            tempTotal = tempTotal + studiesPerHourEachWeekday[i][j];
-          }
-          studiesPerWeekday[i] = tempTotal;
-        }
-
-        var hourColours = getColours(24);
-        var seriesDrillDownPieChart   = [
-          {% for dayCounts in studiesPerHourInWeekdays %}
-            {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
-              {% for hourCounts in dayCounts %}
-                {{'{'}}name:'{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', y:studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1],color:hourColours[{{forloop.counter}}]{{'}'}}{% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var dayColours = getColours(7);
-        var studyWorkloadPieChartData= new Array(7);
-        for(var i=0; i<7; i++) {
-          studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
-        }*/
-      </script>
-
       <script src="{{ STATIC_URL }}js/ctChartStudyWorkload.js"></script>
       <!-- End of JavaScript for studies per week day pie chart -->
     {% endif %}
@@ -883,7 +842,7 @@
     {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for mean DLP per study description -->
       <script>
-        dateAxis = [
+/*        dateAxis = [
         {% if request.user.userprofile.plotAverageChoice == 'mean' %}
           {% for dateEntries in studyMeanDLPoverTime.0 %}
             "{{ dateEntries.0.date|date:"d/m/Y" }}"
@@ -905,11 +864,11 @@
           studyLineColours[i] = studyPiechartData[i].color;
         }
         studyPiechartData.sort(sort_by_y);
-
+*/
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
 
         {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-        meanDLPOverTime = [
+/*        meanDLPOverTime = [
           {% for studyData in studyMeanDLPoverTime %}
             {{'{'}}name:studyNames[{{forloop.counter}}-1],
                   color:studyLineColours[{{forloop.counter}}-1],
@@ -930,9 +889,9 @@
             ]{{'}'}}
             {% if not forloop.last %},{% endif %}
           {% endfor %}
-        ];
+        ];*/
         {% else %}
-        medianDLPOverTime = [
+/*        medianDLPOverTime = [
           {% for studyData in studyMedianDLPoverTime %}
             {{'{'}}name:studyNames[{{forloop.counter}}-1],
                   color:studyLineColours[{{forloop.counter}}-1],
@@ -953,7 +912,7 @@
             ]{{'}'}}
             {% if not forloop.last %},{% endif %}
           {% endfor %}
-        ];
+        ];*/
         {% endif %}
       </script>
 

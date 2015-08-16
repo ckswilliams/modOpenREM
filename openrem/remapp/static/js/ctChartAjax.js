@@ -213,7 +213,7 @@ $(document).ready(function() {
 
             //-------------------------------------------------------------------------------------
             // Acquisition frequency chart data start
-            if(typeof plotCTAcquisitionFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+            if(typeof plotCTAcquisitionFreq !== 'undefined') {
                 //var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
                 var protocolPiechartData = new Array(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
@@ -442,7 +442,7 @@ $(document).ready(function() {
 
             //-------------------------------------------------------------------------------------
             // Request frequency chart data start
-            if(typeof plotCTRequestFreq !== 'undefined' || typeof plotCTRequestMeanDLPOverTime !== 'undefined') {
+            if(typeof plotCTRequestFreq !== 'undefined') {
                 //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'request_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&request_description=';
                 var request_piechart_data = new Array(request_names.length);
                 for(i=0; i<request_names.length; i++) {
@@ -523,6 +523,55 @@ $(document).ready(function() {
                 chartplotDXStudyPerDayAndHour.redraw({duration: 1000});
             }
             // Study workload chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // DLP over time chart data start
+            // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average DAP values
+            if(typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+                var DLPOverTime, study_dlp_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
+                var chartCTStudyMeanDLPOverTime = $('#studyMeanDLPOverTimeDIV').highcharts();
+
+                var study_line_colours =  new Array(study_names.length);
+                study_piechart_data.sort(sort_by_name);
+                for(i=0; i<study_names.length; i++) {
+                    study_line_colours[i] = study_piechart_data[i].color;
+                }
+                study_piechart_data.sort(sort_by_y);
+
+                study_dlp_over_time = (plotAverageChoice == "mean") ? json.studyMeanDLPoverTime : json.studyMedianDLPoverTime;
+
+                dateAxis = [];
+                for(i=0; i<study_dlp_over_time[0].length; i++) {
+                    tempDate = new Date(Date.parse(study_dlp_over_time[0][i][0]));
+                    tempDate = formatDate(tempDate);
+                    dateAxis.push(tempDate);
+                }
+
+                DLPOverTime = [];
+                for(i=0; i<study_dlp_over_time.length; i++) {
+                    temp = [];
+                    for(j=0; j<study_dlp_over_time[0].length; j++) {
+                        tempDate = new Date(Date.parse(study_dlp_over_time[i][j][0]));
+                        date_after = formatDate(tempDate);
+                        date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+
+                        currentValue = parseFloat(study_dlp_over_time[i][j][1]);
+                        if(currentValue == 0) currentValue = null;
+
+                        temp.push({y:currentValue, url: urlStart+study_names[i]+'&date_after='+date_after+'&date_before='+date_before});
+                    }
+                    DLPOverTime.push({name: study_names[i], color: study_line_colours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                }
+
+                chartCTStudyMeanDLPOverTime.xAxis[0].setCategories(dateAxis);
+                for(i=0; i<DLPOverTime.length; i++) {
+                    chartCTStudyMeanDLPOverTime.addSeries(DLPOverTime[i]);
+                }
+                chartCTStudyMeanDLPOverTime.redraw({duration: 1000});
+            }
+            // DLP over time chart data end
             //-------------------------------------------------------------------------------------
         },
         error: function( xhr, status, errorThrown ) {

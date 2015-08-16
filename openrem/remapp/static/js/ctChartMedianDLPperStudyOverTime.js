@@ -11,7 +11,7 @@ $(function () {
             pointFormat: '{series.name}<br/>{point.y:.0f} mGy.cm'
         },
         xAxis: {
-            categories: dateAxis,
+            categories: [1,2,3,4,5],
             labels: {
                 useHTML: true,
                 rotation:90
@@ -35,6 +35,6 @@ $(function () {
             borderWidth: 0,
             useHTML: true
         },
-        series: medianDLPOverTime
+        series: []
     });
 });
