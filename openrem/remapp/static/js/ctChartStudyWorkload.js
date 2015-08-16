@@ -3,11 +3,11 @@ $(function () {
         chart: {
             renderTo: 'piechartStudyWorkloadDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,//null,
+            plotBorderWidth: 1,
             plotShadow: false,
             events: {
                 drilldown: function(e) {
-                    chartStudyWorkload.setTitle({ text: 'Studies per hour,<br>'+dayNames[e.point.x], align:'left', verticalAlign:'top', y:50, x:50 });
+                    chartStudyWorkload.setTitle({ text: 'Studies per hour,<br>'+e.point.name, align:'left', verticalAlign:'top', y:50, x:50 });
                 },
                 drillup: function(e) {
                     chartStudyWorkload.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
@@ -43,10 +43,10 @@ $(function () {
             endAngle:90,
             center: ['50%','75%'],
             innerSize: '50%',
-            data: studyWorkloadPieChartData
+            data: []
         }],
         drilldown: {
-            series:seriesDrillDownPieChart
+            series:[]
         }
     });
 });

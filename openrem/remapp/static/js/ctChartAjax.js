@@ -472,6 +472,58 @@ $(document).ready(function() {
             // Request frequency chart data end
             //-------------------------------------------------------------------------------------
 
+
+            //-------------------------------------------------------------------------------------
+            // Study workload chart data start
+            if(typeof plotCTStudyPerDayAndHour !== 'undefined') {
+                var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+                // A [7][24] list of integer values
+                var studies_per_hour_in_weekdays = json.studiesPerHourInWeekdays;
+                var studiesPerWeekday = [];
+                var dayTotal = 0;
+                for (i = 0; i < 7; i++) {
+                    dayTotal = 0;
+                    for (j = 0; j < 24; j++) {
+                        dayTotal = dayTotal + studies_per_hour_in_weekdays[i][j];
+                    }
+                    studiesPerWeekday[i] = dayTotal;
+                }
+
+                var hourColours = getColours(24);
+                var dayColours = getColours(7);
+                var studyWorkloadPieChartData = [];
+                var seriesDrillDownPieChart = [];
+                var tempTime;
+                for (i = 0; i < 7; i++) {
+                    temp = [];
+                    for (j = 0; j < 24; j++) {
+                        tempTime = "0" + j;
+                        tempTime = tempTime.substr(tempTime.length-2);
+                        temp.push({name: tempTime + ':00', y: studies_per_hour_in_weekdays[i][j], color: hourColours[j]});
+                    }
+                    studyWorkloadPieChartData.push({
+                        name: dayNames[i],
+                        y: studiesPerWeekday[i],
+                        color: dayColours[i],
+                        drilldown: dayNames[i]
+                    });
+                    seriesDrillDownPieChart.push({
+                        id: dayNames[i],
+                        name: dayNames[i],
+                        useHTML: true,
+                        type: 'pie',
+                        data: temp
+                    });
+                }
+
+                var chartplotDXStudyPerDayAndHour = $('#piechartStudyWorkloadDIV').highcharts();
+                chartplotDXStudyPerDayAndHour.options.drilldown.series = seriesDrillDownPieChart;
+                chartplotDXStudyPerDayAndHour.series[0].setData(studyWorkloadPieChartData);
+                chartplotDXStudyPerDayAndHour.redraw({duration: 1000});
+            }
+            // Study workload chart data end
+            //-------------------------------------------------------------------------------------
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );

@@ -835,7 +835,7 @@
     {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
       <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
       <script>
-        var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+/*        var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
         var studiesPerHourEachWeekday = [
           {% for dayCounts in studiesPerHourInWeekdays %}
@@ -872,7 +872,7 @@
         var studyWorkloadPieChartData= new Array(7);
         for(var i=0; i<7; i++) {
           studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
-        }
+        }*/
       </script>
 
       <script src="{{ STATIC_URL }}js/ctChartStudyWorkload.js"></script>

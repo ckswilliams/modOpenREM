@@ -309,13 +309,11 @@ $(document).ready(function() {
 
                 // A [7][24] list of integer values
                 var studies_per_hour_in_weekdays = json.studiesPerHourInWeekdays;
-                //var studiesPerHourEachWeekday = [];
                 var studiesPerWeekday = [];
                 var dayTotal = 0;
                 for (i = 0; i < 7; i++) {
                     dayTotal = 0;
                     for (j = 0; j < 24; j++) {
-                        //studiesPerHourEachWeekday.push(studies_per_hour_in_weekdays[i][j]);
                         dayTotal = dayTotal + studies_per_hour_in_weekdays[i][j];
                     }
                     studiesPerWeekday[i] = dayTotal;
