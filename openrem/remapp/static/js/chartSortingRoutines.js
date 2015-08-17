@@ -73,14 +73,68 @@ function twoSeriesSort(chartContainer, p, d, s) {
 
 // chartContainer is the div that holds the HighChart; p is the property to sort on; d is the direction of sort: 1 for
 // ascending, anything else for descending; s is the index of the series to sort.
-function fourSeriesSort(chartContainer, chartData, chartData2, chartData3, chartData4, p, d, s) {
+function fourSeriesSort(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
     if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
-        bubbleSort(chartData, p, d);
-        rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, chartData4, s);
-        bubbleSort(chartData2, 'x', 1);
-        bubbleSort(chartData3, 'x', 1);
-        bubbleSort(chartData4, 'x', 1);
+
+        var chartDataNew0 = [];
+        for (var i = 0; i < chart.series[s[0]].data.length; i++) {
+            chartDataNew0.push({
+                name: chart.series[s[0]].data[i].name,
+                y: chart.series[s[0]].data[i].y,
+                x: chart.series[s[0]].data[i].i,
+                freq: chart.series[s[0]].data[i].freq,
+                drilldown: chart.series[s[0]].data[i].drilldown,
+                category: chart.series[s[0]].data[i].name,
+                tooltip: chart.series[s[0]].data[i].tooltip,
+                bins: chart.series[s[0]].data[i].bins
+            });
+        }
+        var chartDataNew1 = [];
+        for (var i = 0; i < chart.series[s[1]].data.length; i++) {
+            chartDataNew1.push({
+                name: chart.series[s[1]].data[i].name,
+                y: chart.series[s[1]].data[i].y,
+                x: chart.series[s[1]].data[i].i,
+                freq: chart.series[s[1]].data[i].freq,
+                drilldown: chart.series[s[1]].data[i].drilldown,
+                category: chart.series[s[1]].data[i].name,
+                tooltip: chart.series[s[1]].data[i].tooltip,
+                bins: chart.series[s[1]].data[i].bins
+            });
+        }
+        var chartDataNew2 = [];
+        for (var i = 0; i < chart.series[s[2]].data.length; i++) {
+            chartDataNew2.push({
+                name: chart.series[s[2]].data[i].name,
+                y: chart.series[s[2]].data[i].y,
+                x: chart.series[s[2]].data[i].i,
+                freq: chart.series[s[2]].data[i].freq,
+                drilldown: chart.series[s[2]].data[i].drilldown,
+                category: chart.series[s[2]].data[i].name,
+                tooltip: chart.series[s[2]].data[i].tooltip,
+                bins: chart.series[s[2]].data[i].bins
+            });
+        }
+        var chartDataNew3 = [];
+        for (var i = 0; i < chart.series[s[3]].data.length; i++) {
+            chartDataNew3.push({
+                name: chart.series[s[3]].data[i].name,
+                y: chart.series[s[3]].data[i].y,
+                x: chart.series[s[3]].data[i].i,
+                freq: chart.series[s[3]].data[i].freq,
+                drilldown: chart.series[s[3]].data[i].drilldown,
+                category: chart.series[s[3]].data[i].name,
+                tooltip: chart.series[s[3]].data[i].tooltip,
+                bins: chart.series[s[3]].data[i].bins
+            });
+        }
+
+        bubbleSort(chartDataNew0, p, d);
+        rebuildFourSeries(chartContainer, chartDataNew0, chartDataNew1, chartDataNew2, chartDataNew3, s);
+        bubbleSort(chartDataNew1, 'x', 1);
+        bubbleSort(chartDataNew2, 'x', 1);
+        bubbleSort(chartDataNew3, 'x', 1);
         chart.yAxis[0].isDirty = true;
         chart.redraw({ duration: 1000 });
     }
@@ -158,47 +212,40 @@ function rebuildTwoSeries(chartContainer, chartData, chartData2, s) {
 function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, chartData4, s) {
     var chart = $(chartContainer).highcharts();
     var newCategories = [];
-    var data = $.extend(true, [], chartData);
-    var data2 = $.extend(true, [], chartData2);
-    var data3 = $.extend(true, [], chartData3);
-    var data4 = $.extend(true, [], chartData4);
-    var point;
     var i = 0;
 
-    for (i = 0; i < data.length; i++) {
-        point = data[i];
-        newCategories.push(point.name);
+    for (i = 0; i < chartData.length; i++) {
+        newCategories.push(chartData[i].name);
         chart.series[s[0]].data[i].update({
-            name: point.name,
-            y: point.y,
+            name: chartData[i].name,
+            y: chartData[i].y,
             x: i,
-            freq: point.freq,
-            drilldown: point.drilldown,
-            category: point.name,
-            tooltip: point.tooltip,
-            bins: point.bins
+            freq: chartData[i].freq,
+            drilldown: chartData[i].drilldown,
+            category: chartData[i].name,
+            tooltip: chartData[i].tooltip,
+            bins: chartData[i].bins
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
 
 
 
-    for (i = 0; i < data.length; i++) {
+    for (i = 0; i < chartData2.length; i++) {
         var found = false;
         var j = 0;
         while (found == false) {
-            if (data2[i].name == data[j].name) {
-                point = data2[i];
+            if (chartData2[i].name == chartData[j].name) {
                 chart.series[s[1]].data[j].update({
                     index: j,
-                    name: point.name,
-                    y: point.y,
+                    name: chartData2[i].name,
+                    y: chartData2[i].y,
                     x: j,
-                    freq: point.freq,
-                    drilldown: point.drilldown,
-                    category: point.category,
-                    tooltip: point.tooltip,
-                    bins: point.bins
+                    freq: chartData2[i].freq,
+                    drilldown: chartData2[i].drilldown,
+                    category: chartData2[i].category,
+                    tooltip: chartData2[i].tooltip,
+                    bins: chartData2[i].bins
                 }, false);
                 found = true;
             }
@@ -210,18 +257,17 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
         var found = false;
         var j = 0;
         while (found == false) {
-            if (data3[i].name == data[j].name) {
-                point = data3[i];
+            if (chartData3[i].name == chartData[j].name) {
                 chart.series[s[2]].data[j].update({
                     index: j,
-                    name: point.name,
-                    y: point.y,
+                    name: chartData3[i].name,
+                    y: chartData3[i].y,
                     x: j,
-                    freq: point.freq,
-                    drilldown: point.drilldown,
-                    category: point.category,
-                    tooltip: point.tooltip,
-                    bins: point.bins
+                    freq: chartData3[i].freq,
+                    drilldown: chartData3[i].drilldown,
+                    category: chartData3[i].category,
+                    tooltip: chartData3[i].tooltip,
+                    bins: chartData3[i].bins
                 }, false);
                 found = true;
             }
@@ -233,18 +279,17 @@ function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, ch
         var found = false;
         var j = 0;
         while (found == false) {
-            if (data4[i].name == data[j].name) {
-                point = data4[i];
+            if (chartData4[i].name == chartData[j].name) {
                 chart.series[s[3]].data[j].update({
                     index: j,
-                    name: point.name,
-                    y: point.y,
+                    name: chartData4[i].name,
+                    y: chartData4[i].y,
                     x: j,
-                    freq: point.freq,
-                    drilldown: point.drilldown,
-                    category: point.category,
-                    tooltip: point.tooltip,
-                    bins: point.bins
+                    freq: chartData4[i].freq,
+                    drilldown: chartData4[i].drilldown,
+                    category: chartData4[i].category,
+                    tooltip: chartData4[i].tooltip,
+                    bins: chartData4[i].bins
                 }, false);
                 found = true;
             }
