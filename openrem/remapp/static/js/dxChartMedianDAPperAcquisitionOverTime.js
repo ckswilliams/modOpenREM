@@ -1,5 +1,5 @@
 $(function () {
-var chartAcquisitionMedianDAPOverTime = new Highcharts.Chart({
+    var chartAcquisitionMedianDAPOverTime = new Highcharts.Chart({
         chart: {
             renderTo: 'AcquisitionMeanDAPOverTimeDIV',
             zoomType: 'x'
@@ -12,7 +12,7 @@ var chartAcquisitionMedianDAPOverTime = new Highcharts.Chart({
             useHTML: true
         },
         xAxis: {
-            categories: dateAxis,
+            categories: [1,2,3,4,5],
             labels: {
                 rotation:90
             }
@@ -33,9 +33,9 @@ var chartAcquisitionMedianDAPOverTime = new Highcharts.Chart({
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle',
-            borderWidth: 0
+            borderWidth: 0,
+            useHTML: true
         },
-        series: medianDAPOverTime
+        series: []
     });
 });
-

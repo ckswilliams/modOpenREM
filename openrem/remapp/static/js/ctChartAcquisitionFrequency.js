@@ -1,5 +1,4 @@
 $(function () {
-
 var chartAcqFreq = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartProtocolDIV',
@@ -38,7 +37,7 @@ var chartAcqFreq = new Highcharts.Chart({
                     }
                 }
             },
-            data: protocolPiechartData
+            data: []
         }]
     });
 });

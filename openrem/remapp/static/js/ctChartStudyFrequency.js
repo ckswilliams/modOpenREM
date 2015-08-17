@@ -1,10 +1,9 @@
 $(function () {
-
-var chartStudyFreq = new Highcharts.Chart({
+    var chartStudyFreq = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartStudyDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,//null,
+            plotBorderWidth: 1,
             plotShadow: false
         },
         title: {
@@ -38,8 +37,7 @@ var chartStudyFreq = new Highcharts.Chart({
                     }
                 }
             },
-            data: studyPiechartData
+            data: []
         }]
     });
 });
-

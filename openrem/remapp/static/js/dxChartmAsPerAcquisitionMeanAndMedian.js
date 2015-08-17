@@ -1,23 +1,23 @@
 $(function () {
+    var drilldownmAsTitle = 'Histogram of ';
+    var defaultmAsTitle   = 'mAs per acquisition protocol';
+    var bins = [];
+    var name = '';
 
-var drilldownmAsTitle = 'Histogram of ';
-var defaultmAsTitle   = 'mAs per acquisition protocol';
-var tooltipmAsData = [2];
-
-var chartmAsPerAcquisition = new Highcharts.Chart({
+    var chartmAsPerAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'chartAcquisitionMeanmAs',
             events: {
                 drilldown: function(ee) {
-                    tooltipmAsData[0] = (protocolmAsNames[ee.point.x]).replace('&amp;', '%26');
-                    tooltipmAsData[1] = ee.point.x;
-                    chartmAsPerAcquisition.setTitle({ text: drilldownmAsTitle + ee.point.name + ' mAs values' }, { text: '(n = ' + seriesmAsDataN[ee.point.x] +')' });
+                    bins = ee.point.bins;
+                    name = (ee.point.name).replace('&amp;', '%26');
+                    chartmAsPerAcquisition.setTitle({ text: drilldownmAsTitle + ee.point.name + ' mAs values' }, { text: '(n = ' + ee.point.freq +')' });
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'mAs range'});
                     chartmAsPerAcquisition.xAxis[0].setCategories([], true);
-                    chartmAsPerAcquisition.tooltip.options.formatter = function(args) {
-                        var linkText = 'acquisition_mas_min=' + (protocolmAsBins[tooltipmAsData[1]][this.x])*1000 + '&acquisition_mas_max=' + (protocolmAsBins[tooltipmAsData[1]][this.x+1])*1000 + '&acquisition_protocol=' + tooltipmAsData[0];
+                    chartmAsPerAcquisition.tooltip.options.formatter = function(e) {
+                        var linkText = 'acquisition_mas_min=' + ([this.x])*1000 + '&acquisition_mas_max=' + ([this.x+1])*1000 + '&acquisition_protocol=' + name;
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
@@ -26,32 +26,28 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
                     chartmAsPerAcquisition.setTitle({ text: defaultmAsTitle }, { text: '' });
                     chartmAsPerAcquisition.yAxis[0].setTitle({text:'mAs'});
                     chartmAsPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartmAsPerAcquisition.xAxis[0].setCategories(protocolmAsNames, true);
-                    chartmAsPerAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartmAsPerAcquisition.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartmAsPerAcquisition.tooltip.options.formatter = function(args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('Mean') != -1) {
-                            var this_series_label = ' mean mAs';
-                            var this_series = args.chart.series[0];
-                        }
-                        else {
-                            var this_series_label = ' median mAs';
-                            var this_series = args.chart.series[1];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesmAsDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     }
                 }
             }
         },
         title: {
-            text: 'mAs per acquisition protocol'
+            text: 'mAs per acquisition protocol',
+            useHTML: true
         },
         legend: {
             enabled: true
         },
         xAxis: {
-            categories: protocolmAsNames,
+            categories: [],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -70,17 +66,7 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('Mean') != -1) {
-                    var this_series_label = ' mean mAs';
-                    var this_series = args.chart.series[0];
-                }
-                else {
-                    var this_series_label = ' median mAs';
-                    var this_series = args.chart.series[1];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesmAsDataN[this_point_index] + ')';
+                return this.point.tooltip;
             },
             useHTML: true
         },
@@ -92,14 +78,26 @@ var chartmAsPerAcquisition = new Highcharts.Chart({
         },
         series: [{
             name: 'Mean mAs',
-            data: seriesmAsData
+            data: []
         }, {
             name: 'Median mAs',
-            data: seriesMedianmAsData
+            data: []
         }],
         drilldown: {
-            series: seriesmAsDrilldown
+            series: []
         }
     });
+    switch(chartSorting) {
+        case 'freq':
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'freq', chartSortingDirection, 0);
+            break;
+        case 'dap':
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'y', chartSortingDirection, 0);
+            break;
+        case 'name':
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'name', chartSortingDirection, 0);
+            break;
+        default:
+            twoSeriesSort('#chartAcquisitionMeanmAs', 'name', chartSortingDirection, 0);
+    }
 });
-

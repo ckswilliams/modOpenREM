@@ -1,24 +1,24 @@
 $(function () {
-
     var drilldownTitle = 'Histogram of ';
     var defaultTitle = 'DLP and CTDI<sub>vol</sub> per acquisition protocol';
-    var tooltipData = [2];
-
+    var bins = [];
+    var name = '';
+/*
     var index;
     for (index = 0; index < seriesDrilldownCTDI.length; ++index) {
         seriesDrilldownCTDI[index].xAxis = 1;
         seriesDrilldownCTDI[index].name = seriesDrilldownCTDI[index].name + ' CTDI';
         seriesDrilldown[index].name = seriesDrilldown[index].name + ' DLP';
     }
-
+*/
     var chartAcqDLPandCTDI = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'histogramPlotDLPandCTDIdiv',
             events: {
                 drilldown: function (e) {
-                    tooltipData[0] = protocolNames[e.point.x];
-                    tooltipData[1] = e.point.x;
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
                     var parentSeriesName = e.point.series.name;
                     var this_series_title = parentSeriesName.indexOf('DLP') != -1 ? ' DLP' : ' CTDI<sub>vol</sub>';
                     chartAcqDLPandCTDI.setTitle({text: ''});
@@ -30,14 +30,14 @@ $(function () {
                         chartAcqDLPandCTDI.xAxis[1].setTitle({text: 'CTDI<sub>vol</sub> range (mGy)'});
                     }
                     chartAcqDLPandCTDI.xAxis[0].setCategories([], true);
-                    chartAcqDLPandCTDI.tooltip.options.formatter = function (args) {
+                    chartAcqDLPandCTDI.tooltip.options.formatter = function (e) {
                         if (this.series.name.indexOf('DLP') != -1) {
-                            var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x + 1] + '&acquisition_protocol=' + tooltipData[0];
-                            var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
+                            var linkText = 'acquisition_dlp_min=' + bins[this.x] + '&acquisition_dlp_max=' + bins[this.x + 1] + '&acquisition_protocol=' + name;
+                            var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
                         }
                         else {
-                            var linkText = 'acquisition_ctdi_min=' + protocolBinsCTDI[tooltipData[1]][this.x] + '&acquisition_ctdi_max=' + protocolBinsCTDI[tooltipData[1]][this.x + 1] + '&acquisition_protocol=' + tooltipData[0];
-                            var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/hist/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>';
+                            var linkText = 'acquisition_ctdi_min=' + bins[this.x] + '&acquisition_ctdi_max=' + bins[this.x + 1] + '&acquisition_protocol=' + name;
+                            var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>';
                         }
                         return returnValue;
                     };
@@ -56,28 +56,15 @@ $(function () {
                     chartAcqDLPandCTDI.yAxis[1].setTitle({text: 'CTDI<sub>vol</sub> (mGy)'});
                     chartAcqDLPandCTDI.xAxis[0].setTitle({text: ''});
                     chartAcqDLPandCTDI.xAxis[1].setTitle({text: ''});
-                    chartAcqDLPandCTDI.xAxis[0].setCategories(protocolNames, true);
-                    chartAcqDLPandCTDI.xAxis[0].update({labels: {rotation: 90}});
+                    chartAcqDLPandCTDI.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.value;
+                            }
+                        }
+                    });
                     chartAcqDLPandCTDI.tooltip.options.formatter = function (args) {
-                        var this_point_index = this.series.data.indexOf(this.point);
-                        if (this.series.name.indexOf('Mean DLP') != -1) {
-                            var this_series_label = ' mGy.cm mean DLP';
-                            var this_series = args.chart.series[0];
-                        }
-                        else if (this.series.name.indexOf('Median DLP') != -1) {
-                            var this_series_label = ' mGy.cm median DLP';
-                            var this_series = args.chart.series[1];
-                        }
-                        else if (this.series.name.indexOf('Mean CTDI') != -1) {
-                            var this_series_label = ' mGy mean CTDI<sub>vol</sub>';
-                            var this_series = args.chart.series[2];
-                        }
-                        else {
-                            var this_series_label = ' mGy median CTDI<sub>vol</sub>';
-                            var this_series = args.chart.series[3];
-                        }
-                        var this_point = this_series.data[this_point_index];
-                        return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                        return this.point.tooltip;
                     };
                     chartAcqDLPandCTDI.yAxis[1].update({
                         labels: {
@@ -96,6 +83,7 @@ $(function () {
             text: 'DLP and CTDI<sub>vol</sub> per acquisition protocol'
         },
         xAxis: [{
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true
             },
@@ -130,25 +118,7 @@ $(function () {
         tooltip: {
             useHTML: true,
             formatter: function (args) {
-                var this_point_index = this.series.data.indexOf(this.point);
-                if (this.series.name.indexOf('Mean DLP') != -1) {
-                    var this_series_label = ' mGy.cm mean DLP';
-                    var this_series = args.chart.series[0];
-                }
-                else if (this.series.name.indexOf('Median DLP') != -1) {
-                    var this_series_label = ' mGy.cm median DLP';
-                    var this_series = args.chart.series[1];
-                }
-                else if (this.series.name.indexOf('Mean CTDI') != -1) {
-                    var this_series_label = ' mGy mean CTDI<sub>vol</sub>';
-                    var this_series = args.chart.series[2];
-                }
-                else {
-                    var this_series_label = ' mGy median CTDI<sub>vol</sub>';
-                    var this_series = args.chart.series[3];
-                }
-                var this_point = this_series.data[this_point_index];
-                return this.point.name + '<br/>' + this_point.y.toFixed(1) + this_series_label + '<br/>(n = ' + seriesDataN[this_point_index] + ')';
+                return this.point.tooltip;
             }
         },
         plotOptions: {
@@ -159,29 +129,29 @@ $(function () {
         },
         series: [{
             name: 'Mean DLP',
-            data: seriesData,
+            data: [],
             color: '#2b8cbe',
             pointPlacement: -0.02
         }, {
             name: 'Median DLP',
-            data: seriesMedianData,
+            data: [],
             color: '#7bccc4',
             pointPlacement: -0.02,
         }, {
             name: 'Mean CTDI<sub>vol</sub>',
-            data: seriesDataCTDI,
+            data: [],
             color: '#d7301f',
             pointPlacement: 0.02,
             yAxis: 1
         }, {
             name: 'Median CTDI<sub>vol</sub>',
-            data: seriesMedianDataCTDI,
+            data: [],
             color: '#fdcc8a',
             pointPlacement: 0.02,
             yAxis: 1
         }],
         drilldown: {
-            series: (seriesDrilldown).concat(seriesDrilldownCTDI),
+            series: [],//(seriesDrilldown).concat(seriesDrilldownCTDI),
             activeAxisLabelStyle: null
         },
         legend: {
@@ -199,4 +169,22 @@ $(function () {
             }
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', chartSortingDirection, [0,1,2,3]);
+            break;
+        case 'dlp':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', chartSortingDirection, [0,1,2,3]);
+            break;
+        case 'ctdi':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', chartSortingDirection, [2,3,0,1]);
+            break;
+        case 'name':
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', chartSortingDirection, [0,1,2,3]);
+            break;
+        default:
+            fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', chartSortingDirection, [0,1,2,3]);
+    }
+
 });

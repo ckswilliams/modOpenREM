@@ -1,43 +1,40 @@
 $(function () {
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle = 'Mean DLP per acquisition protocol';
+    var bins = [];
+    var name = '';
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Mean DLP per acquisition protocol';
-var tooltipData = [2];
-
-var chartAcqDLP = new Highcharts.Chart({
+    var chartAcqDLP = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'histogramPlotDIV',
             events: {
-                drilldown: function(e) {
-                    tooltipData[0] = (protocolNames[e.point.x]).replace('&amp;', '%26');
-                    tooltipData[1] = e.point.x;
-                    chartAcqDLP.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + seriesDataN[e.point.x] +')' });
-                    chartAcqDLP.yAxis[0].setTitle({text:'Number'});
-                    chartAcqDLP.xAxis[0].setTitle({text:'DLP range (mGy.cm)'});
+                drilldown: function (e) {
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartAcqDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + e.point.freq + ')'});
+                    chartAcqDLP.yAxis[0].setTitle({text: 'Number'});
+                    chartAcqDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
                     chartAcqDLP.xAxis[0].setCategories([], true);
-                    chartAcqDLP.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var linkText = 'acquisition_dlp_min=' + protocolBins[tooltipData[1]][this.x] + '&acquisition_dlp_max=' + protocolBins[tooltipData[1]][this.x+1] + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
+                    chartAcqDLP.tooltip.options.formatter = function (e) {
+                        var linkText = 'acquisition_dlp_min=' + bins[this.x] + '&acquisition_dlp_max=' + bins[this.x + 1] + '&acquisition_protocol=' + name;
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
+                        return returnValue;
                     }
                 },
-                drillup: function(e) {
-                    chartAcqDLP.setTitle({ text: defaultTitle }, { text: '' });
-                    chartAcqDLP.yAxis[0].setTitle({text:'Mean DLP (mGy.cm)'});
-                    chartAcqDLP.xAxis[0].setTitle({text:'Protocol name'});
-                    chartAcqDLP.xAxis[0].setCategories(protocolNames, true);
-                    chartAcqDLP.xAxis[0].update({labels:{rotation:90}});
-                    chartAcqDLP.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var index = protocolNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + seriesDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
+                drillup: function (e) {
+                    chartAcqDLP.setTitle({text: defaultTitle}, {text: ''});
+                    chartAcqDLP.yAxis[0].setTitle({text: 'Mean DLP (mGy.cm)'});
+                    chartAcqDLP.xAxis[0].setTitle({text: 'Protocol name'});
+                    chartAcqDLP.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.point.category;
+                            }
+                        }
+                    }, true);
+                    chartAcqDLP.tooltip.options.formatter = function () {
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -50,14 +47,14 @@ var chartAcqDLP = new Highcharts.Chart({
             enabled: false
         },
         xAxis: {
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
             },
             labels: {
                 useHTML: true,
-                rotation:90
+                rotation: 90
             }
         },
         yAxis: {
@@ -69,11 +66,8 @@ var chartAcqDLP = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function () {
-                var index = protocolNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' mGy.cm' + '<br/>(n=' + seriesDataN[index] + ')';
-                return comment;
+                return this.point.tooltip;
             },
-            shared: true,
             useHTML: true
         },
         plotOptions: {
@@ -85,11 +79,25 @@ var chartAcqDLP = new Highcharts.Chart({
         series: [{
             useHTML: true,
             name: 'Mean DLP',
-            data: seriesData
+            data: []
         }],
         drilldown: {
-            series: seriesDrilldown
+            series: []
         }
     });
-});
 
+    switch(chartSorting) {
+        case 'freq':
+            seriesSort('#histogramPlotDIV', 'freq', chartSortingDirection);
+            break;
+        case 'dlp':
+            seriesSort('#histogramPlotDIV', 'y', chartSortingDirection);
+            break;
+        case 'name':
+            seriesSort('#histogramPlotDIV', 'name', chartSortingDirection);
+            break;
+        default:
+            seriesSort('#histogramPlotDIV', 'name', 1);
+    }
+
+});
