@@ -24,119 +24,8 @@
       Sorry, you don't have enough permissions to enable study export.
     </p>
   {% endif %}
-{% endblock %}
 
-{% block col2 %}
-
-
-  {{ studyfilter }}
-
-  <form action="{% url "dx_summary" %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title">Exam filter</h3>
-      </div>
-      <div class="panel-body">
-        <i>Date format yyyy-mm-dd</i>
-        {% for field in filter.form.visible_fields %}
-          <div class="form-group">
-            <div class="col-xs-4">
-              <label>{{ field.label_tag }}</label>
-            </div>
-            <div class="col-xs-8">
-              {{ field.errors }}
-              {{ field }}
-            </div>
-          </div>
-        {% endfor %}
-        {% for field in filter.form.hidden_fields %}
-          <div style="display:none">{{ field }}</div>
-        {% endfor %}
-        <input name="submit" type="submit" />
-      <!--<input type="button" value="post" id="postData">-->
-      </div>
-      <div class="panel-heading">
-        <h3 class="panel-title">Chart options</h3>
-      </div>
-      <div class="panel-body">
-        <table>
-          {% csrf_token %}
-          {{ chartOptionsForm }}
-        </table>
-        <input name="submit" type="submit" id="examFilterFormSubmit" />
-        <!--<input type="button" value="post" id="postData">-->
-
-      </div>
-    </div>
-  </form>
-
-  <script src="{{ STATIC_URL }}js/datepicker.js"></script>
-  <script src="{{ STATIC_URL }}js/formatDate.js"></script>
-  <script src="{{ STATIC_URL }}js/getColours.js"></script>
-
-{% endblock %}
-
-
-{% block col1 %}
-  {% autopaginate filter.qs 50 as filter_list %}
-  {% paginate %}
-
-  <table class="table table-bordered table-hover row-clickable">
-    <row>
-      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
-      {% if admin.adminperm %}
-        <th>Delete?</th>
-      {% endif %}
-    </row>
-    {% for exam in filter_list %}
-      <tr>
-        <td>
-          <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-            {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-            {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.procedure_code_meaning }} |
-            {{ exam.accession_number }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}
-          </a>
-        </td>
-        {% if admin.adminperm %}
-          <td>
-            <a href="{% url 'study_delete' exam.id %}">Delete</a>
-          </td>
-        {% endif %}
-      </tr>
-    {% endfor %}
-  </table>
-
-  {% paginate %}
-{% endblock %}
-
-
-{% block plotdata %}
+    {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}
 
       <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
@@ -548,3 +437,117 @@
 
   {% endif %}
 {% endblock %}
+
+{% endblock %}
+
+{% block col2 %}
+
+
+  {{ studyfilter }}
+
+  <form action="{% url "dx_summary" %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Exam filter</h3>
+      </div>
+      <div class="panel-body">
+        <i>Date format yyyy-mm-dd</i>
+        {% for field in filter.form.visible_fields %}
+          <div class="form-group">
+            <div class="col-xs-4">
+              <label>{{ field.label_tag }}</label>
+            </div>
+            <div class="col-xs-8">
+              {{ field.errors }}
+              {{ field }}
+            </div>
+          </div>
+        {% endfor %}
+        {% for field in filter.form.hidden_fields %}
+          <div style="display:none">{{ field }}</div>
+        {% endfor %}
+        <input name="submit" type="submit" />
+      <!--<input type="button" value="post" id="postData">-->
+      </div>
+      <div class="panel-heading">
+        <h3 class="panel-title">Chart options</h3>
+      </div>
+      <div class="panel-body">
+        <table>
+          {% csrf_token %}
+          {{ chartOptionsForm }}
+        </table>
+        <input name="submit" type="submit" id="examFilterFormSubmit" />
+        <!--<input type="button" value="post" id="postData">-->
+
+      </div>
+    </div>
+  </form>
+
+  <script src="{{ STATIC_URL }}js/datepicker.js"></script>
+  <script src="{{ STATIC_URL }}js/formatDate.js"></script>
+  <script src="{{ STATIC_URL }}js/getColours.js"></script>
+
+{% endblock %}
+
+
+{% block col1 %}
+  {% autopaginate filter.qs 50 as filter_list %}
+  {% paginate %}
+
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+      {% if admin.adminperm %}
+        <th>Delete?</th>
+      {% endif %}
+    </row>
+    {% for exam in filter_list %}
+      <tr>
+        <td>
+          <a href="/openrem/dx/{{ exam.id }}/">
+            {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+          </a>
+        </td>
+        <td>
+          <a href="/openrem/dx/{{ exam.id }}/">
+            {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
+            {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+            {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+          </a>
+        </td>
+        <td>
+          <a href="/openrem/dx/{{ exam.id }}/">
+            {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}
+          </a>
+        </td>
+        <td>
+          <a href="/openrem/dx/{{ exam.id }}/">
+            {{ exam.procedure_code_meaning }} |
+            {{ exam.accession_number }}
+          </a>
+        </td>
+        <td>
+          <a href="/openrem/dx/{{ exam.id }}/">
+            {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames }}
+          </a>
+        </td>
+        <td>
+          <a href="/openrem/dx/{{ exam.id }}/">
+            {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}
+          </a>
+        </td>
+        {% if admin.adminperm %}
+          <td>
+            <a href="{% url 'study_delete' exam.id %}">Delete</a>
+          </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+
+  {% paginate %}
+{% endblock %}
+
+
+
