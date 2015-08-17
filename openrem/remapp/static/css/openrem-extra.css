@@ -35,11 +35,5 @@ div.ajax-progress {
   height: 50px;
   top: 50%;
   left: 50%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: white;
   border: none;
-  -moz-border-radius:    10px;
-  -webkit-border-radius: 10px;
-  border-radius:         10px;
 }
