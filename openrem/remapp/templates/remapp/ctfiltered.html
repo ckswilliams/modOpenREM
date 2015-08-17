@@ -143,6 +143,9 @@
 {% block plotdata %}
 
   {% if request.user.userprofile.plotCharts %}
+
+    <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
     <!-- Include JavaScript to enable highcharts plots -->
     <script src="{{ STATIC_URL }}js/highcharts.js"></script>
     <script src="{{ STATIC_URL }}js/exporting.js"></script>

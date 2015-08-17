@@ -24,6 +24,8 @@ $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
     var i, j, temp;
 
+    $(".ajax-progress").show();
+
     $.ajax({
         type: "GET",
         url: "/openrem/dx/chart/",
@@ -47,6 +49,7 @@ $(document).ready(function() {
             }
 
             if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
+                //var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 var acq_histogram_data = json.acquisitionHistogramData;
 
                 var protocolCounts = [];
@@ -402,6 +405,8 @@ $(document).ready(function() {
             }
             // DAP over time chart data end
             //-------------------------------------------------------------------------------------
+
+            $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );

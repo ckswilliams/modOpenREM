@@ -139,6 +139,8 @@
 {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}
 
+      <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
       <!-- HTML to include div container for acquisition plot -->
       <div class="panel-group" id="accordion">

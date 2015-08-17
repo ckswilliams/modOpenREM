@@ -24,6 +24,8 @@ $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
     var i, j, temp;
 
+    $(".ajax-progress").show();
+
     $.ajax({
         type: "GET",
         url: "/openrem/ct/chart/",
@@ -573,6 +575,8 @@ $(document).ready(function() {
             }
             // DLP over time chart data end
             //-------------------------------------------------------------------------------------
+
+            $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {
             alert( "Sorry, there was a problem getting the chart data for initial page view" );
