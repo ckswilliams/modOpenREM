@@ -28,7 +28,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b2
+    pip install openrem==0.7.0b3
 
     # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
