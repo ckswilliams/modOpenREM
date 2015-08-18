@@ -89,7 +89,7 @@ $('.datepicker').datepicker({
                 <a href="/openrem/rf/{{ exam.id }}/">
                     {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
                     {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                    {{ exam.generalequipmentmoduleattr_set.get.station_name }}
+                    {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
                 </a>
             </td>
             <td>

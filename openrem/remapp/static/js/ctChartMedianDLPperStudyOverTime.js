@@ -1,0 +1,40 @@
+$(function () {
+    var chartStudyMedianDLPOverTime = new Highcharts.Chart({
+        chart: {
+            renderTo: 'studyMeanDLPOverTimeDIV',
+            zoomType: 'x'
+        },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            pointFormat: '{series.name}<br/>{point.y:.0f} mGy.cm'
+        },
+        xAxis: {
+            categories: [1,2,3,4,5],
+            labels: {
+                useHTML: true,
+                rotation:90
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Median DLP (mGy.cm)'
+            },
+            floor: 0,
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0,
+            useHTML: true
+        },
+        series: []
+    });
+});

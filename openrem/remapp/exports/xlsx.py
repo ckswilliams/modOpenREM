@@ -104,6 +104,7 @@ def ctxlsx(filterdict):
         'Manufacturer', 
         'Model',
         'Station name',
+        'Display name',
         'Accession number',
         'Operator',
         'Date',
@@ -229,6 +230,7 @@ def ctxlsx(filterdict):
 			exams.generalequipmentmoduleattr_set.get().manufacturer,
 			exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
 			exams.generalequipmentmoduleattr_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
@@ -303,6 +305,7 @@ def ctxlsx(filterdict):
                 exams.generalequipmentmoduleattr_set.get().manufacturer,
                 exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
                 exams.generalequipmentmoduleattr_set.get().station_name,
+                exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting

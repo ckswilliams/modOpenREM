@@ -21,3 +21,19 @@ table.row-clickable tbody tr td a:focus {
 table.row-clickable tbody tr th {
     background-color: #d9edf7;
 }
+
+a.sorting-option {
+    text-decoration: none;
+    cursor: pointer;
+    cursor: hand;
+}
+
+div.ajax-progress {
+  position: fixed;
+  display: none;
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  left: 50%;
+  border: none;
+}

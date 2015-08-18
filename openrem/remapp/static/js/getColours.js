@@ -1,6 +1,6 @@
 function getColours(noOfColours) {
     var colours = [];
-    frequency = 5 / noOfColours; 
+    frequency = 5 / noOfColours;
     for (var i = 0; i < noOfColours;++i) {
         if (noOfColours > 24) {
             r = Math.sin(frequency * i * 2 + 0) * (127) + 128;
@@ -19,4 +19,3 @@ function getColours(noOfColours) {
     }
     return colours;
 }
-

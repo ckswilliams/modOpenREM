@@ -58,6 +58,31 @@ class UserProfile(models.Model):
         (BOTH, 'both'),
     )
 
+    DLP = 'dlp'
+    CTDI = 'ctdi'
+    FREQ = 'freq'
+    NAME = 'name'
+    SORTING_CHOICES_CT = (
+        (DLP, 'DLP'),
+        (CTDI, 'CTDI'),
+        (FREQ, 'Frequency'),
+        (NAME, 'Name'),
+    )
+
+    DAP = 'dap'
+    SORTING_CHOICES_DX = (
+        (DAP, 'DAP'),
+        (FREQ, 'Frequency'),
+        (NAME, 'Name'),
+    )
+
+    ASCENDING = 1
+    DESCENDING = -1
+    SORTING_DIRECTION = (
+        (ASCENDING, 'Ascending'),
+        (DESCENDING, 'Descending'),
+    )
+
     # This field is required.
     user = models.OneToOneField(User)
 
@@ -68,6 +93,10 @@ class UserProfile(models.Model):
     plotAverageChoice = models.CharField(max_length=6,
                                          choices=AVERAGES,
                                          default=MEAN)
+
+    plotInitialSortingDirection = models.IntegerField(null=True,
+                                                      choices=SORTING_DIRECTION,
+                                                      default=DESCENDING)
 
     # Plotting controls
     plotCharts = models.BooleanField(default=False)
@@ -80,6 +109,9 @@ class UserProfile(models.Model):
     plotDXAcquisitionMeanDAPOverTimePeriod = models.CharField(max_length=6,
                                                               choices=TIME_PERIOD,
                                                               default=MONTHS)
+    plotDXInitialSortingChoice = models.CharField(max_length=4,
+                                                  choices=SORTING_CHOICES_DX,
+                                                  default=FREQ)
 
     plotCTAcquisitionMeanDLP = models.BooleanField(default=True)
     plotCTAcquisitionMeanCTDI = models.BooleanField(default=True)
@@ -93,6 +125,9 @@ class UserProfile(models.Model):
     plotCTStudyMeanDLPOverTimePeriod = models.CharField(max_length=6,
                                                         choices=TIME_PERIOD,
                                                         default=MONTHS)
+    plotCTInitialSortingChoice = models.CharField(max_length=4,
+                                                  choices=SORTING_CHOICES_CT,
+                                                  default=FREQ)
 
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)
@@ -106,6 +141,21 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
+
+class UniqueEquipmentNames(models.Model):
+    manufacturer = models.TextField(blank=True, null=True)
+    institution_name = models.TextField(blank=True, null=True)
+    station_name = models.CharField(max_length=32, blank=True, null=True)
+    institutional_department_name = models.TextField(blank=True, null=True)
+    manufacturer_model_name = models.TextField(blank=True, null=True)
+    device_serial_number = models.TextField(blank=True, null=True)
+    software_versions = models.TextField(blank=True, null=True)
+    gantry_id = models.TextField(blank=True, null=True)
+    display_name = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('manufacturer', 'institution_name', 'station_name', 'institutional_department_name',
+                           'manufacturer_model_name', 'device_serial_number', 'software_versions', 'gantry_id')
 
 class SizeUpload(models.Model):
     sizefile = models.FileField(upload_to='sizeupload')
@@ -629,6 +679,7 @@ class GeneralEquipmentModuleAttr(models.Model):  # C.7.5.1
     spatial_resolution = models.DecimalField(max_digits=8, decimal_places=4, blank=True, null=True)
     date_of_last_calibration = models.DateTimeField(blank=True, null=True)
     time_of_last_calibration = models.DateTimeField(blank=True, null=True)
+    unique_equipment_name = models.ForeignKey(UniqueEquipmentNames, null=True)
 
     def __unicode__(self):
         return self.station_name

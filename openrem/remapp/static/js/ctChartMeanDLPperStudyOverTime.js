@@ -1,5 +1,5 @@
 $(function () {
-var chartStudyMeanDLPOverTime = new Highcharts.Chart({
+    var chartStudyMeanDLPOverTime = new Highcharts.Chart({
         chart: {
             renderTo: 'studyMeanDLPOverTimeDIV',
             zoomType: 'x'
@@ -11,7 +11,7 @@ var chartStudyMeanDLPOverTime = new Highcharts.Chart({
             pointFormat: '{series.name}<br/>{point.y:.0f} mGy.cm'
         },
         xAxis: {
-            categories: dateAxis,
+            categories: [1,2,3,4,5],
             labels: {
                 useHTML: true,
                 rotation:90
@@ -32,9 +32,9 @@ var chartStudyMeanDLPOverTime = new Highcharts.Chart({
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle',
-            borderWidth: 0
+            borderWidth: 0,
+            useHTML: true
         },
-        series: meanDLPOverTime
+        series: []
     });
 });
-

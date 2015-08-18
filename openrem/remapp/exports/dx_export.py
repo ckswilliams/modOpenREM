@@ -90,7 +90,7 @@ def exportDX2excel(filterdict):
                 e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
 
     # Remove duplicate entries from the results
-    e = e.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
+    e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -106,6 +106,7 @@ def exportDX2excel(filterdict):
         'Manufacturer', 
         'Model name',
         'Station name',
+        'Display name',
         'Accession number',
         'Operator',
         'Study date',
@@ -144,6 +145,7 @@ def exportDX2excel(filterdict):
             exams.generalequipmentmoduleattr_set.get().manufacturer,
             exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
             exams.generalequipmentmoduleattr_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -268,6 +270,7 @@ def dxxlsx(filterdict):
         'Manufacturer', 
         'Model name',
         'Station name',
+        'Display name',
         'Accession number',
         'Operator',
         'Study date',
@@ -293,6 +296,10 @@ def dxxlsx(filterdict):
         'Relative x-ray exposure',
         'DAP (cGy.cm^2)',
         'Entrance exposure at RP',
+        'SDD Detector Dist',
+        'SPD Patient Dist',
+        'SIsoD Isocentre Dist',
+        'Table Height',
         'Comment'
         ]
         
@@ -358,14 +365,18 @@ def dxxlsx(filterdict):
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
             'E' + str(h+1) + ' Entrance Exposure at RP (mGy)',
+            'E' + str(h+1) + ' SDD Detector Dist',
+            'E' + str(h+1) + ' SPD Patient Dist',
+            'E' + str(h+1) + ' SIsoD Isocentre Dist',
+            'E' + str(h+1) + ' Table Height',
             'E' + str(h+1) + ' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (25 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
+    numcolumns = (29 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
-    for row,exams in enumerate(e):
+    for row, exams in enumerate(e):
 
         tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
@@ -375,6 +386,7 @@ def dxxlsx(filterdict):
             exams.generalequipmentmoduleattr_set.get().manufacturer,
             exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
             exams.generalequipmentmoduleattr_set.get().station_name,
+            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
@@ -386,7 +398,7 @@ def dxxlsx(filterdict):
             exams.requested_procedure_code_meaning,
             str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames),
             str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()),
-			]
+        ]
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             examdata += [
                 s.acquisition_protocol,
@@ -401,6 +413,10 @@ def dxxlsx(filterdict):
                 str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
                 str(s.entrance_exposure_at_rp),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position),
                 s.comment,
             ]
 
@@ -423,6 +439,7 @@ def dxxlsx(filterdict):
                 exams.generalequipmentmoduleattr_set.get().manufacturer,
                 exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
                 exams.generalequipmentmoduleattr_set.get().station_name,
+                exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
@@ -448,6 +465,10 @@ def dxxlsx(filterdict):
                 str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
                 str(s.convert_gym2_to_cgycm2()),
                 str(s.entrance_exposure_at_rp),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter),
+                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position),
                 s.comment,
             ]
 

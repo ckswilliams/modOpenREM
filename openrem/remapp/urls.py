@@ -49,13 +49,17 @@ urlpatterns = patterns('remapp.views',
 
     url(r'^ct/$',
         'ct_summary_list_filter'),
+    url(r'^ct/chart/$',
+        'ct_summary_chart_data', name='ct_summary_chart_data'),
     url(r'^ct/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
             model=GeneralStudyModuleAttr,
             template_name='remapp/ctdetail.html'))),
 
     url(r'^dx/$',
-        'dx_summary_list_filter'),
+        'dx_summary_list_filter', name='dx_summary'),
+    url(r'^dx/chart/$',
+        'dx_summary_chart_data', name='dx_summary_chart_data'),
     url(r'^dx/(?P<pk>\d+)/$',
         login_required(DetailView.as_view(
             model=GeneralStudyModuleAttr,
@@ -68,12 +72,18 @@ urlpatterns = patterns('remapp.views',
             model=GeneralStudyModuleAttr,
             template_name='remapp/mgdetail.html'))),
 
+    url(r'^viewdisplaynames/$',
+        'display_names_view'),
+
     url(r'^delete/(?P<pk>\d+)$', 'study_delete', name='study_delete'),
     url(r'^admin/sizeupload$', 'size_upload', name='size_upload'),
     url(r'^admin/sizeprocess/(?P<pk>\d+)/$', 'size_process', name='size_process'),
     url(r'^admin/sizeimports', 'size_imports', name='size_imports'),
     url(r'^admin/sizedelete', 'size_delete', name='size_delete'),
     url(r'^admin/sizeimport/abort/(?P<pk>\d+)$', 'size_abort'),
+    url(r'^updatedisplayname/$', 'display_names_view', name='display_names_view'),
+    url(r'^updatedisplayname/(?P<pk>\d+)$', 'display_name_update', name='display_name_update'),
+    url(r'^chartoptions/$', 'chart_options_view', name='chart_options_view'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

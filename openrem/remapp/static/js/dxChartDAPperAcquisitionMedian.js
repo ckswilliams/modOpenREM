@@ -1,43 +1,41 @@
 $(function () {
+    var drilldownTitle = 'Histogram of ';
+    var defaultTitle   = 'Median DAP per acquisition protocol';
+    var bins = [];
+    var name = '';
 
-var drilldownTitle = 'Histogram of ';
-var defaultTitle   = 'Median DAP per acquisition protocol';
-var tooltipData = [2];
 
-var chartDAPperAcquisition = new Highcharts.Chart({
+    var chartDAPperAcquisition = new Highcharts.Chart({
         chart: {
             type: 'column',
             renderTo: 'container',
             events: {
                 drilldown: function(e) {
-                    tooltipData[0] = (protocolNames[e.point.x]).replace('&amp;', '%26');
-                    tooltipData[1] = e.point.x;
-                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name + ' DAP values' }, { text: '(n = ' + seriesDataN[e.point.x] +')' });
+                    bins = e.point.bins;
+                    name = (e.point.name).replace('&amp;', '%26');
+                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name + ' DAP values' }, { text: '(n = ' + e.point.freq +')' });
                     chartDAPperAcquisition.yAxis[0].setTitle({text:'Number'});
                     chartDAPperAcquisition.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
                     chartDAPperAcquisition.xAxis[0].setCategories([], true);
-                    chartDAPperAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var linkText = 'acquisition_dap_min=' + (protocolBins[tooltipData[1]][this.x])/1000000 + '&acquisition_dap_max=' + (protocolBins[tooltipData[1]][this.x+1])/1000000 + '&acquisition_protocol=' + tooltipData[0];
-                            xyArr.push('<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>');
-                        });
-                        return xyArr.join('<br/>');
+                    chartDAPperAcquisition.tooltip.options.formatter = function(e) {
+                        var linkText = 'acquisition_dap_min=' + (bins[this.x])/1000000 + '&acquisition_dap_max=' + (bins[this.x+1])/1000000 + '&acquisition_protocol=' + name;
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>';
+                        return returnValue;
                     }
                 },
                 drillup: function(e) {
                     chartDAPperAcquisition.setTitle({ text: defaultTitle }, { text: '' });
                     chartDAPperAcquisition.yAxis[0].setTitle({text:'Median DAP (cGy.cm<sup>2</sup>)'});
                     chartDAPperAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartDAPperAcquisition.xAxis[0].setCategories(protocolNames, true);
-                    chartDAPperAcquisition.xAxis[0].update({labels:{rotation:90}});
+                    chartDAPperAcquisition.xAxis[0].update({
+                        categories: {
+                            formatter: function (args) {
+                                return this.point.category;
+                            }
+                        }
+                    }, true);
                     chartDAPperAcquisition.tooltip.options.formatter = function() {
-                        var xyArr=[];
-                        $.each(this.points,function(){
-                            var index = protocolNames.indexOf(this.x);
-                            xyArr.push(this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>' + '<br/>(n=' + seriesDataN[index] + ')');
-                        });
-                        return xyArr.join('<br/>');
+                        return this.point.tooltip;
                     }
                 }
             }
@@ -49,7 +47,7 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             enabled: false
         },
         xAxis: {
-            categories: protocolNames,
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -68,11 +66,8 @@ var chartDAPperAcquisition = new Highcharts.Chart({
         },
         tooltip: {
             formatter: function () {
-                var index = protocolNames.indexOf(this.x);
-                var comment = this.x + '<br/>' + this.y.toFixed(1) + ' cGy.cm<sup>2</sup>' + '<br/>(n=' + seriesDataN[index] + ')';
-                return comment;
+                return this.point.tooltip;
             },
-            shared: true,
             useHTML: true
         },
         plotOptions: {
@@ -82,12 +77,27 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             }
         },
         series: [{
-            name: 'Median DAP per acquisition protocol',
-            data: seriesMedianData
+            name: 'Median DAP',
+            data: []
         }],
         drilldown: {
-            series: seriesDrilldown
+            series: []
         }
     });
+
+    switch(chartSorting) {
+        case 'freq':
+            seriesSort('#container', 'freq', chartSortingDirection);
+            break;
+        case 'dap':
+            seriesSort('#container', 'y', chartSortingDirection);
+            break;
+        case 'name':
+            seriesSort('#container', 'name', chartSortingDirection);
+            break;
+        default:
+            seriesSort('#container', 'name', 1);
+    }
+
 });
 
