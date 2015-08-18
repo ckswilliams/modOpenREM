@@ -3,7 +3,6 @@ $(function () {
         chart: {
             renderTo: 'piechartRequestDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,
             plotShadow: false
         },
         title: {

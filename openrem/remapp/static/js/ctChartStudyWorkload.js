@@ -3,7 +3,6 @@ $(function () {
         chart: {
             renderTo: 'piechartStudyWorkloadDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,
             plotShadow: false,
             events: {
                 drilldown: function(e) {

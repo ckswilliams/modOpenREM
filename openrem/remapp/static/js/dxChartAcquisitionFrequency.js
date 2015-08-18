@@ -4,7 +4,6 @@ var chartAcqFrequency = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartProtocolDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,
             plotShadow: false
         },
         title: {
