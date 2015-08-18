@@ -29,6 +29,12 @@
 
       {% block mainblock %}
       <div class="row">
+        <div class="col-md-12">
+            {% block plotdata %}
+            {% endblock %}
+        </div>
+      </div>
+      <div class="row">
         <div class="col-md-9">
           {% block col1 %}
           {% endblock %}
@@ -36,12 +42,6 @@
         <div class="col-md-3">
           {% block col2 %}
           {% endblock %}
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-            {% block plotdata %}
-            {% endblock %}
         </div>
       </div>
       {% endblock %}
