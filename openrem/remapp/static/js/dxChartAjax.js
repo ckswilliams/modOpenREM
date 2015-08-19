@@ -409,6 +409,7 @@ $(document).ready(function() {
             $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {
+            $(".ajax-progress").hide();
             alert( "Sorry, there was a problem getting the chart data for initial page view" );
             console.log( "Error: " + errorThrown );
             console.log( "Status: " + status );
