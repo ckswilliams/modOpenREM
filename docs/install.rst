@@ -228,24 +228,32 @@ Linux::
 
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py syncdb
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate auth
+	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
 
-Answer each question as it is asked, do setup a superuser. This username and
-password wil be used to log into the admin interface to create the usernames
-for using the web interface. See the `Start using it!`_ section below.
+The first command will result in an error, saying "django_site" does not
+exist. Ignore this, and continue with the second command. Answer each
+question as it is asked. Do setup a superuser. This username and
+password will be used to log into the admin interface to create the
+usernames for using the web interface. See the `Start using it!`_
+section below.
 
+If using PostgreSQL you must add the median database function
+-------------------------------------------------------------
 
-For production installs, convert to South
-`````````````````````````````````````````
-`(What is south?)`_
-
-Linux::
-
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py convert_to_south remapp
+Rename the `0002_fresh_openrem_install_add_median_function.py.inactive` file
+in the `migrations` folder to `0002_fresh_openrem_install_add_median_function.py`
+then do the following:
 
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py convert_to_south remapp
+	python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations --empty remapp
+	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
+
+The first command will create a skeleton `0001_initial.py` migration file. The
+second command runs the migration files, and will include the line
+`Applying remapp.0002_fresh__openrem_install_add_median_function... OK`, indicating
+that the median function has been added.
 
 
 Start all the services
