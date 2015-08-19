@@ -26,7 +26,7 @@
         {% if homedata.CT %}<th><a href="/openrem/ct/">CT</a></th>{% endif %}{% if homedata.RF %}<th><a href="/openrem/rf/">Fluoroscopy</a></th>{% endif %}{% if homedata.MG %}<th><a href="/openrem/mg/">Mammography</a></th>{% endif %}{% if homedata.DX %}<th><a href="/openrem/dx/">Radiography</a></th>{% endif %}
     </tr>
     <tr>
-        {% if homedata.CT %}<td>{{ homedata.ct }}</td>{% endif %}{% if homedata.RF %}<td>{{ homedata.rf }}</td>{% endif %}{% if homedata.MG %}<td>{{ homedata.mg }}</td>{% endif %}{% if homedata.DX %}<td>{{ homedata.dx }}</td>{% endif %}
+        {% if homedata.CT %}<td style="width:25%">{{ homedata.ct }}</td>{% endif %}{% if homedata.RF %}<td style="width:25%">{{ homedata.rf }}</td>{% endif %}{% if homedata.MG %}<td style="width:25%">{{ homedata.mg }}</td>{% endif %}{% if homedata.DX %}<td style="width:25%">{{ homedata.dx }}</td>{% endif %}
     </tr>
 </table>
 
@@ -34,22 +34,22 @@
 <h4>CT summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Scanner</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.CT.items %}
         <tr>
-            <td>
-                <a href="/openrem/ct/?station_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+            <td style="width:33%">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
+                    {{ value.displayname }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/ct/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
                 {{ value.total }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/ct/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/ct/?display_name={{ key }}&o=-study_date">
                 {{ value.latest|naturaltime }}
                 </a>
             </td>
@@ -62,22 +62,22 @@
 <h4>Fluoroscopy summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Room</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.RF.items %}
         <tr>
-            <td>
-                <a href="/openrem/rf/?station_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+            <td style="width:33%">
+                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
+                    {{ value.displayname }}
                 </a>
-            </td>
+            </td style="width:33%">
             <td>
-                <a href="/openrem/rf/?station_name={{ key }}&o=-study_date">
+                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
                     {{ value.total }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/rf/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/rf/?display_name={{ key }}&o=-study_date">
                     {{ value.latest|naturaltime }}
                 </a>
             </td>
@@ -90,22 +90,22 @@
 <h4>Mammography summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Room</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.MG.items %}
         <tr>
-            <td>
-                <a href="/openrem/mg/?station_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+            <td style="width:33%">
+                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
+                    {{ value.displayname }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/mg/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
                     {{ value.total }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/mg/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/mg/?display_name={{ key }}&o=-study_date">
                     {{ value.latest|naturaltime }}
                 </a>
             </td>
@@ -118,22 +118,22 @@
 <h4>Radiography summary table</h4>
 <table class="table table-bordered table-hover row-clickable">
     <tr>
-        <th>Station name</th><th>Number of studies</th><th>Latest study</th>
+        <th>Room</th><th>Number of studies</th><th>Latest study</th>
     </tr>
     {% for key,value in homedata.DX.items %}
         <tr>
-            <td>
-                <a href="/openrem/dx/?station_name={{ key }}&o=-study_date">
-                    {{ value.institution }} ({{ key }})
+            <td style="width:33%">
+                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
+                    {{ value.displayname }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/dx/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
                     {{ value.total }}
                 </a>
             </td>
-            <td>
-                <a href="/openrem/dx/?station_name={{ key }}&o=-study_date">
+            <td style="width:33%">
+                <a href="/openrem/dx/?display_name={{ key }}&o=-study_date">
                     {{ value.latest|naturaltime }}
                 </a>
             </td>

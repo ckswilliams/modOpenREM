@@ -1,26 +1,25 @@
 $(function () {
-var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
+    var chartStudyMeanDLPOverTime = new Highcharts.Chart({
         chart: {
-            renderTo: 'AcquisitionMeanDAPOverTimeDIV',
+            renderTo: 'studyMeanDLPOverTimeDIV',
             zoomType: 'x'
         },
         title: {
             text: ''
         },
         tooltip: {
-            pointFormat: '{series.name}<br/>{point.y:.1f} cGy.cm<sup>2</sup>',
-            useHTML: true
+            pointFormat: '{series.name}<br/>{point.y:.0f} mGy.cm'
         },
         xAxis: {
-            categories: dateAxis,
+            categories: [1,2,3,4,5],
             labels: {
+                useHTML: true,
                 rotation:90
             }
         },
         yAxis: {
             title: {
-                text: 'Mean DAP (cGy.cm<sup>2</sup>)',
-                useHTML: true
+                text: 'Mean DLP (mGy.cm)'
             },
             floor: 0,
             plotLines: [{
@@ -33,9 +32,9 @@ var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle',
-            borderWidth: 0
+            borderWidth: 0,
+            useHTML: true
         },
-        series: meanDAPOverTime
+        series: []
     });
 });
-

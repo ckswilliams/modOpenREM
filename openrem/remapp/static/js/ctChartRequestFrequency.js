@@ -1,10 +1,8 @@
 $(function () {
-
-var chartRequestFreq = new Highcharts.Chart({
+    var chartRequestFreq = new Highcharts.Chart({
         chart: {
             renderTo: 'piechartRequestDIV',
             plotBackgroundColor: null,
-            plotBorderWidth: 1,
             plotShadow: false
         },
         title: {
@@ -39,7 +37,7 @@ var chartRequestFreq = new Highcharts.Chart({
                     }
                 }
             },
-            data: requestPiechartData
+            data: []
         }]
     });
 });

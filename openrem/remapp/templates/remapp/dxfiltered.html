@@ -9,6 +9,7 @@
 
 {% block toprow %}
   {% load pagination_tags %}
+
   <p>
     There are {{ filter.count }} studies in this list.
   </p>
@@ -23,6 +24,7 @@
       Sorry, you don't have enough permissions to enable study export.
     </p>
   {% endif %}
+
 {% endblock %}
 
 {% block col2 %}
@@ -30,7 +32,7 @@
 
   {{ studyfilter }}
 
-  <form action="" method="get" class="form-horizontal" role="form">
+  <form action="{% url "dx_summary" %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
     <div class="panel panel-info">
       <div class="panel-heading">
         <h3 class="panel-title">Exam filter</h3>
@@ -52,6 +54,7 @@
           <div style="display:none">{{ field }}</div>
         {% endfor %}
         <input name="submit" type="submit" />
+      <!--<input type="button" value="post" id="postData">-->
       </div>
       <div class="panel-heading">
         <h3 class="panel-title">Chart options</h3>
@@ -61,7 +64,8 @@
           {% csrf_token %}
           {{ chartOptionsForm }}
         </table>
-        <input name="submit" type="submit" />
+        <input name="submit" type="submit" id="examFilterFormSubmit" />
+        <!--<input type="button" value="post" id="postData">-->
 
       </div>
     </div>
@@ -73,13 +77,14 @@
 
 {% endblock %}
 
+
 {% block col1 %}
   {% autopaginate filter.qs 50 as filter_list %}
   {% paginate %}
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Institution</th><th>Make | Model | Station name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
       {% if admin.adminperm %}
         <th>Delete?</th>
       {% endif %}
@@ -95,7 +100,7 @@
           <a href="/openrem/dx/{{ exam.id }}/">
             {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
             {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-            {{ exam.generalequipmentmoduleattr_set.get.station_name }}
+            {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
           </a>
         </td>
         <td>
@@ -129,11 +134,12 @@
   </table>
 
   {% paginate %}
-
 {% endblock %}
 
 {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}
+
+      <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
       <!-- HTML to include div container for acquisition plot -->
@@ -141,18 +147,61 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DAP for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median DAP for each acquisition protocol.
+                {% else %}
+                Plot of mean and median DAP for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
           <div id="collapseOne" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="container" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
-              <p>Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                more data than shown in the histogram bin.</p>
+              <div id="container" style="height: 600px; margin: 0 0"></div>
+
+              <table style="border:none">
+                  <tr>
+                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                      <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                          this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                          shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#container', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#container', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% endif %}
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#container', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#container', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#container', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#container', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% endif %}
+                  </tr>
+              </table>
+
             </div>
           </div>
         </div>
@@ -166,14 +215,14 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of acquisition protocol frequency.
               </a>
             </h4>
           </div>
           <div id="collapseProtocolPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartProtocolDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <div id="piechartProtocolDIV" style="height: 600px; margin: 0 0"></div>
             </div>
           </div>
         </div>
@@ -187,15 +236,58 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpChart">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean kVp for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median kVp for each acquisition protocol.
+                {% else %}
+                Plot of mean and median kVp for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
           <div id="collapseAcquisitionMeankVpChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="chartAcquisitionMeankVp" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+              <div id="chartAcquisitionMeankVp" style="height: 600px; margin: 0 0"></div>
+
+              <table style="border:none">
+                  <tr>
+                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                      <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'y', 1,0 )" class="sorting-option" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% endif %}
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeankVp', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'y', -1,0 )" class="sorting-option" data-toggle="tooltip" title="Sort by descending kVp">&darr;kVp</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeankVp', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% endif %}
+                  </tr>
+              </table>
+
             </div>
           </div>
         </div>
@@ -209,15 +301,58 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsChart">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean mAs for each acquisition protocol.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median mAs for each acquisition protocol.
+                {% else %}
+                Plot of mean and median mAs for each acquisition protocol.
+                {% endif %}
               </a>
             </h4>
           </div>
           <div id="collapseAcquisitionMeanmAsChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="chartAcquisitionMeanmAs" style="width: 95%; height: 600px; margin: 0 0"></div>
-              <p>Click on an individual column to show a histogram of data for that acquisition protocol.</p>
+              <div id="chartAcquisitionMeanmAs" style="height: 600px; margin: 0 0"></div>
+
+              <table style="border:none">
+                  <tr>
+                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                      <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% endif %}
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#chartAcquisitionMeanmAs', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending mAs">&darr;mAs</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#chartAcquisitionMeanmAs', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% endif %}
+                  </tr>
+              </table>
+
             </div>
           </div>
         </div>
@@ -231,14 +366,14 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyWorkloadPieChart">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of number of studies per weekday.
               </a>
             </h4>
           </div>
           <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartStudyWorkloadDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <div id="piechartStudyWorkloadDIV" style="height: 600px; margin: 0 0"></div>
               <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
             </div>
           </div>
@@ -253,14 +388,18 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
               </a>
             </h4>
           </div>
           <div id="collapseAcquisitionMeanDAPOverTime" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="AcquisitionMeanDAPOverTimeDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <div id="AcquisitionMeanDAPOverTimeDIV" style="height: 600px; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
             </div>
           </div>
@@ -274,105 +413,78 @@
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
     <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+    <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+    <script>
+        var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
+        var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
+    </script>
     <!-- End of include JavaScript for the plots -->
 
+    <!-- JavaScript to enable bootstrap tooltips -->
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    <!-- End of JavaScript to enable bootstrap tooltips -->
 
     <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
     <script src="{{ STATIC_URL }}js/sorting.js"></script>
     <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
 
+    <!-- JavaScript chart AJAX code. -->
+    <script src="{{ STATIC_URL }}js/dxChartAjax.js"></script>
+    <!-- End of JavaScript chart AJAX code. -->
 
-    {% if request.user.userprofile.plotDXAcquisitionMeanDAP or request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
-      <!-- JavaScript for acquisition plot that is also required by some other plots -->
-      <script>
-        var protocolNames     = [
-          {% for name in acquisition_names %}
-            "{{name.acquisition_protocol}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% if request.user.userprofile.plotDXAcquisitionMeanDAP or request.user.userprofile.plotDXAcquisitionFreq %}
-        var seriesDataN       = [
-          {% for testData in acquisitionSummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        {% endif %}
-      </script>
-    {% endif %}
-
+    <!-- Flags to determine if charts should be plotted -->
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
-      <!-- JavaScript for acquisition plot -->
-      <script>
-        var protocolCounts    = [
-          {% for protocol in acquisitionHistogramData %}
-            [
-              {% for dataCounts in protocol.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolBins      = [
-          {% for protocolEdges in acquisitionHistogramData %}
-            [
-              {% for edges in protocolEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var seriesData        = [
-          {% for testData in acquisitionSummary %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],y: {{testData.mean_dap}}*1000000,drilldown:protocolNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var seriesDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogramData %}
-            {id: protocolNames[{{forloop.counter}}-1],name: protocolNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in protocolCountsArray.0 %}
-                [protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-
-      <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisition.js"></script>
-      <!-- End of JavaScript for acquisition plot -->
+    <script>var plotDXAcquisitionMeanDAP = true;</script>
     {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionFreq %}
+    <script>var plotDXAcquisitionFreq = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
+    <script>var plotDXAcquisitionMeanDAPOverTime = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
+    <script>var plotDXAcquisitionMeankVp = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
+    <script>var plotDXAcquisitionMeanmAs = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
+    <script>var plotDXStudyPerDayAndHour = true;</script>
+    {% endif %}
+
+    <script>var plotDXAcquisitionMeanDAPOverTimePeriod = '{{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}';</script>
+
+    <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
+      {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
+          <script>
+              var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          </script>
+
+          {% if request.user.userprofile.plotAverageChoice == 'both' %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
+          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMean.js"></script>
+          {% else %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMedian.js"></script>
+          {% endif %}
+          <!-- End of JavaScript for acquisition plot -->
+      {% endif %}
 
 
     {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
       <script>
         var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-        var protocolPiechartData = new Array(protocolNames.length);
-        for(var i=0; i<protocolNames.length; i++) {
-          {% if request.user.userprofile.plotDXAcquisitionFreq %}
-          protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(seriesDataN[i]), url:urlStart+protocolNames[i]};
-          {% else %}
-          protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
-          {% endif %}
-        }
-
-        {% if request.user.userprofile.plotDXAcquisitionFreq %}
-        protocolPiechartData.sort(sort_by_y);
-        {% endif %}
-
-        protocolColours = getColours(protocolNames.length);
-        for(var i=0; i<protocolNames.length; i++) {
-          protocolPiechartData[i].color = protocolColours[i];
-        }
       </script>
     {% endif %}
 
@@ -383,63 +495,18 @@
 
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
-      <!-- JavaScript for acquisition mean kVp plot -->
-      <script>
-        var protocolkVpNames     = [
-          {% for name in acquisitionkVpSummary %}
-            "{{name.acquisition_protocol}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var serieskVpDataN       = [
-          {% for testData in acquisitionkVpSummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolkVpCounts    = [
-          {% for protocol in acquisitionHistogramkVpData %}
-            [
-              {% for dataCounts in protocol.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolkVpBins      = [
-          {% for protocolEdges in acquisitionHistogramkVpData %}
-            [
-              {% for edges in protocolEdges.1 %}
-                {{edges}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var serieskVpData        = [
-          {% for testData in acquisitionkVpSummary %}
-            {{'{'}}name:protocolkVpNames[{{forloop.counter}}-1],y: {{testData.mean_kVp}},drilldown:protocolkVpNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var serieskVpDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogramkVpData %}
-            {id: protocolkVpNames[{{forloop.counter}}-1],name: protocolkVpNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in protocolCountsArray.0 %}
-                [protocolkVpBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolkVpBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
+        <!-- JavaScript for acquisition mean kVp plot -->
+        <script>
+            var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+        </script>
 
-        var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-
-      <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition mean kVp plot -->
     {% endif %}
 
@@ -447,109 +514,22 @@
     {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
       <!-- JavaScript for acquisition mean mAs plot -->
       <script>
-        var protocolmAsNames     = [
-          {% for name in acquisitionuAsSummary %}
-            "{{name.acquisition_protocol}}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var seriesmAsDataN       = [
-          {% for testData in acquisitionuAsSummary %}
-            '{{testData.num_acq}}'
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolmAsCounts    = [
-          {% for protocol in acquisitionHistogramuAsData %}
-            [
-              {% for dataCounts in protocol.0 %}
-                {{dataCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var protocolmAsBins      = [
-          {% for protocolEdges in acquisitionHistogramuAsData %}
-            [
-              {% for edges in protocolEdges.1 %}
-                {{edges}}/1000
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var seriesmAsData        = [
-          {% for testData in acquisitionuAsSummary %}
-            {{'{'}}name:protocolmAsNames[{{forloop.counter}}-1],y: {{testData.mean_uAs}}/1000,drilldown:protocolmAsNames[{{forloop.counter}}-1]{{'}'}}
-                  {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-        var seriesmAsDrilldown   = [
-          {% for protocolCountsArray in acquisitionHistogramuAsData %}
-            {id: protocolmAsNames[{{forloop.counter}}-1],name: protocolmAsNames[{{forloop.counter}}-1],useHTML: true,data: [
-              {% for dataCounts in protocolCountsArray.0 %}
-                [protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1].toFixed(1).toString() + ' \u2264 x {% if not forloop.last %}<{% else %}\u2264{% endif %} ' + protocolmAsBins[{{forloop.parentloop.counter}}-1][{{forloop.counter}}].toFixed(1).toString(),{{dataCounts}}]
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
         var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
       </script>
 
-      <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisition.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'both' %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMeanAndMedian.js"></script>
+      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMean.js"></script>
+      {% else %}
+          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMedian.js"></script>
+      {% endif %}
       <!-- End of JavaScript for acquisition mean mAs plot -->
     {% endif %}
 
 
     {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
       <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-      <script>
-        var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-        var studiesPerHourEachWeekday = [
-          {% for dayCounts in studiesPerHourInWeekdays %}
-            [
-              {% for hourCounts in dayCounts %}
-                {{hourCounts}}
-                {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var studiesPerWeekday = new Array(7);
-        for(var i=0; i<7; i++) {
-          var tempTotal = 0;
-          for(var j=0; j<24; j++) {
-            tempTotal = tempTotal + studiesPerHourEachWeekday[i][j];
-          }
-          studiesPerWeekday[i] = tempTotal;
-        }
-
-        var hourColours = getColours(24);
-        var seriesDrillDownPieChart   = [
-          {% for dayCounts in studiesPerHourInWeekdays %}
-            {id:dayNames[{{forloop.counter}}-1], name:dayNames[{{forloop.counter}}-1], useHTML:true, type:'pie', data: [
-              {% for hourCounts in dayCounts %}
-                {{'{'}}name:'{{forloop.counter|add:"-1"|stringformat:"02d"}}:00', y:studiesPerHourEachWeekday[{{forloop.parentloop.counter}}-1][{{forloop.counter}}-1],color:hourColours[{{forloop.counter}}]{{'}'}}{% if not forloop.last %},{% endif %}
-              {% endfor %}]}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        var dayColours = getColours(7);
-        var studyWorkloadPieChartData= new Array(7);
-        for(var i=0; i<7; i++) {
-          studyWorkloadPieChartData[i] = {name:dayNames[i], y:studiesPerWeekday[i], color:dayColours[i], drilldown:dayNames[i]};
-        }
-      </script>
-
       <script src="{{ STATIC_URL }}js/dxChartStudyWorkload.js"></script>
       <!-- End of JavaScript for studies per week day pie chart -->
     {% endif %}
@@ -557,50 +537,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- JavaScript for mean DAP per acquisition protocol per time period -->
-      <script>
-        dateAxis = [
-          {% for dateEntries in acquisitionDAPoverTime.0 %}
-            "{{ dateEntries.0.date|date:"d/m/Y" }}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        // Create the same colours as for the study pie chart, so that the colours
-        // are the same for the studies in the pie chart and this plot.
-        var protocolLineColours =  new Array(protocolNames.length);
-        protocolPiechartData.sort(sort_by_name);
-        for(var i=0; i<protocolNames.length; i++) {
-          protocolLineColours[i] = protocolPiechartData[i].color;
-        }
-        protocolPiechartData.sort(sort_by_y);
-
-        var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-
-        meanDAPOverTime = [
-          {% for protocolData in acquisitionDAPoverTime %}
-            {{'{'}}name:protocolNames[{{forloop.counter}}-1],
-                  color:protocolLineColours[{{forloop.counter}}-1],
-                  marker:{{'{'}}enabled:true{{'}'}},
-                  point: {{'{'}}
-            events: {{'{'}}
-                    click: function(e) {{'{'}}
-            location.href = e.point.url;
-            e.preventDefault();
-            {{'}'}}
-            {{'}'}}
-            {{'}'}},
-            data:[
-              {% for dateEntries in protocolData %}
-                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}*1000000{% else %}null{% endif %},url:urlStart+protocolNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).setDate((new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setMonth((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getMonth()+1))).getDate()-1))){{'}'}}
-                      {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]{{'}'}}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-      </script>
-
-      <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionOverTime.js"></script>
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeanDAPperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMedianDAPperAcquisitionOverTime.js"></script>
+      {% endif %}
       <!-- End of JavaScript for mean DAP per acquisition protocol per time period -->
     {% endif %}
 

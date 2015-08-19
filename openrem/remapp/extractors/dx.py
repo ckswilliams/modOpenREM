@@ -36,6 +36,7 @@
 
 import os
 import sys
+import django
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -43,6 +44,7 @@ projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
 if projectpath not in sys.path:
     sys.path.insert(1,projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
 
 from celery import shared_task
 
@@ -265,16 +267,20 @@ def _doserelateddistancemeasurements(dataset,mech):
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
+    model_name = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name.lower()
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
-    if dist.distance_source_to_detector and "kodak" in manufacturer:
+    if dist.distance_source_to_detector and "kodak" in manufacturer and "dr 7500" in model_name:
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
-    dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToEntrance',dataset)
+    dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToPatient',dataset)
     dist.distance_source_to_isocenter = get_value_kw('DistanceSourceToIsocenter',dataset)
-    dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
-    dist.table_longitudinal_position = get_value_kw('TableLongitudinalPosition',dataset)
-    dist.table_lateral_position = get_value_kw('TableLateralPosition',dataset)
-    dist.table_height_position = get_value_kw('TableHeightPosition',dataset)
-    dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
+    # DistanceSourceToReferencePoint isn't a DICOM tag. Same as DistanceSourceToPatient?
+#    dist.distance_source_to_reference_point = get_value_kw('DistanceSourceToReferencePoint',dataset)
+    # Table longitudinal and lateral positions not DICOM elements.
+#    dist.table_longitudinal_position = get_value_kw('TableLongitudinalPosition',dataset)
+#    dist.table_lateral_position = get_value_kw('TableLateralPosition',dataset)
+    dist.table_height_position = get_value_kw('TableHeight',dataset)
+    # DistanceSourceToTablePlane not a DICOM tag.
+#    dist.distance_source_to_table_plane = get_value_kw('DistanceSourceToTablePlane',dataset)
     dist.radiological_thickness = get_value_num(0x00451049,dataset)
     dist.save()        
 
@@ -403,7 +409,7 @@ def _projectionxrayradiationdose(dataset,g):
 
 
 def _generalequipmentmoduleattributes(dataset,study):
-    from remapp.models import GeneralEquipmentModuleAttr
+    from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
@@ -419,6 +425,29 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.spatial_resolution = get_value_kw("SpatialResolution",dataset)
     equip.date_of_last_calibration = get_date("DateOfLastCalibration",dataset)
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration",dataset)
+
+    equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
+                                                                             institution_name=equip.institution_name,
+                                                                             station_name=equip.station_name,
+                                                                             institutional_department_name=equip.institutional_department_name,
+                                                                             manufacturer_model_name=equip.manufacturer_model_name,
+                                                                             device_serial_number=equip.device_serial_number,
+                                                                             software_versions=equip.software_versions,
+                                                                             gantry_id=equip.gantry_id
+                                                                             )
+    if created:
+        if equip.institution_name and equip.station_name:
+            equip_display_name.display_name = equip.institution_name + ' ' + equip.station_name
+        elif equip.institution_name:
+            equip_display_name.display_name = equip.institution_name
+        elif equip.station_name:
+            equip_display_name.display_name = equip.station_name
+        else:
+            equip_display_name.display_name = 'Blank'
+        equip_display_name.save()
+
+    equip.unique_equipment_name = UniqueEquipmentNames(pk=equip_display_name.pk)
+
     equip.save()
 
 

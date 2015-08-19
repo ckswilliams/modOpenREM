@@ -6,4 +6,3 @@ function formatDate(d) {
   var yyyy = d.getFullYear();
   return yyyy+'-'+mm+'-'+dd;
 }
-

@@ -1,6 +1,11 @@
-###################################
-OpenREM Release Notes version 0.7.0
-###################################
+########################################
+OpenREM Release Notes version 0.7.0 beta
+########################################
+
+.. Warning::
+
+    This is a beta version for developer testing. It is not suitable for general use, and the instructions below are
+    likely to be incorrect.
 
 ****************
 Headline changes
@@ -23,7 +28,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0
+    pip install openrem==0.7.0b3
 
     # Linux: Debian/Ubuntu and derivatives
     python /usr/local/lib/python2.7/dist-packages/openrem/manage.py schemamigration --auto remapp
