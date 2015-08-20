@@ -12,6 +12,7 @@ Headline changes
 ****************
 
 * NB: I haven't checked if the following method works. In particular, need to ensure that the first schema migration and migration don't include the new data migration
+* Median function added for chart data if using PostgreSQL
 * Database modification to add study time in datetime format for use with workload charts
 * Addition of some new charts
 
@@ -32,12 +33,17 @@ Upgrading from version 0.6.0
 
     # Windows:
     python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
-	python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp --fake
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp --fake
 
-* Now rename the `0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py.inactive` file
-to `0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py` and then run:
+* Now rename the file::
 
-.. sourcecode:: bash
+    0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py.inactive
+
+  to::
+
+    0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py
+
+  and then run::
 
     # Windows:
     python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
