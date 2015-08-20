@@ -33,6 +33,8 @@ from django_filters.views import FilterView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
+from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
+from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
 
 
 urlpatterns = patterns('remapp.views',
@@ -84,6 +86,13 @@ urlpatterns = patterns('remapp.views',
     url(r'^updatedisplayname/$', 'display_names_view', name='display_names_view'),
     url(r'^updatedisplayname/(?P<pk>\d+)$', 'display_name_update', name='display_name_update'),
     url(r'^chartoptions/$', 'chart_options_view', name='chart_options_view'),
+    url(r'^admin/dicomsummary', 'dicom_summary', name='dicom_summary'),
+    url(r'^admin/dicomstore/add/$', DicomStoreCreate.as_view(), name='dicomstore_add'),
+    url(r'^admin/dicomstore/(?P<pk>\d+)/$', DicomStoreUpdate.as_view(), name='dicomstore_update'),
+    url(r'^admin/dicomstore/(?P<pk>\d+)/delete/$', DicomStoreDelete.as_view(), name='dicomstore_delete'),
+    url(r'^admin/dicomqr/add/$', DicomQRCreate.as_view(), name='dicomqr_add'),
+    url(r'^admin/dicomqr/(?P<pk>\d+)/$', DicomQRUpdate.as_view(), name='dicomqr_update'),
+    url(r'^admin/dicomqr/(?P<pk>\d+)/delete/$', DicomQRDelete.as_view(), name='dicomqr_delete'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',
@@ -110,4 +119,15 @@ urlpatterns += patterns('remapp.exports',
 urlpatterns += patterns('remapp.views',
     url(r'^charts_off/$',
         'charts_off'),
+)
+
+
+urlpatterns += patterns('remapp.netdicom.dicomviews',
+    url(r'admin/dicomstore/(?P<pk>\d+)/start/$', 'run_store'),
+    url(r'admin/dicomstore/(?P<pk>\d+)/stop/$', 'stop_store'),
+    url(r'admin/queryupdate$', 'q_update', name='q_update'),
+    url(r'admin/queryprocess$', 'q_process', name='q_process'),
+    url(r'admin/queryremote$', 'dicom_qr_page', name='dicom_qr_page'),
+    url(r'admin/queryretrieve$', 'r_start', name='r_start'),
+    url(r'admin/moveupdate$', 'r_update', name='r_update'),
 )

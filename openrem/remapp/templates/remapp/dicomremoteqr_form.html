@@ -1,0 +1,46 @@
+{% extends "remapp/base.html" %}
+
+
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+            <li><a href="/openrem/dx">Radiography</a></li>
+{% endblock %}
+
+{% block adminnav %}
+    <li class="dropdown active">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-blank fa-fw"></i>Admin <b class="caret"></b>
+        </a>
+{% endblock %}
+
+
+
+{% block mainblock %}		
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {% if message.level == 40 %}
+                    <strong>Warning!</strong>
+                {% endif %}
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+      <div class="row col-md-offset-2">
+        <h3>Create or modify remote DICOM Query Retrieve Service Class Providers</h3>
+        {% if admin.adminperm %}
+            <form action="" method="post">
+                {% csrf_token %}{{ form.as_p }}
+            <input type="submit" value="Submit" /> </form>
+        {% else %}
+            <p>Only users in the Admin group can create or modify DICOM QR SCP entries.</p>
+        {% endif %}
+      </div>
+
+{% endblock %}	

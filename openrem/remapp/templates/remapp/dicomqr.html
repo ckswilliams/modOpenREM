@@ -1,0 +1,109 @@
+{% extends "remapp/base.html" %}
+
+    {% block headextras %}
+    <!-- Bootstrap-datepicker CSS -->
+    <!-- Bootstrap-datepicker JavaScript
+    ================================================== -->
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/datepicker3.css">
+
+    <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
+
+    <!-- Internet Explorer (up to version 8) doesn't support array indexOf. The script
+    below adds the functionality if it is missing. -->
+    <script>
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function(obj, start) {
+            for (var i = (start || 0), j = this.length; i < j; i++) {
+                if (this[i] === obj) { return i; }
+            }
+            return -1;
+        }
+    }
+    </script>
+
+    {% block headscript %}
+    {% endblock %}
+    {% endblock %}
+
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+            <li><a href="/openrem/dx">Radiography</a></li>
+{% endblock %}
+
+{% block adminnav %}
+    <li class="dropdown active">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-blank fa-fw"></i>Admin <b class="caret"></b>
+        </a>
+{% endblock %}
+
+
+
+{% block mainblock %}
+
+ <script src="{{ STATIC_URL }}js/dicom.js"></script>
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-1">
+    <form action="{% url "q_process" %}" method="post" enctype="multipart/form-data" role="form"  id="post-form">
+			{% csrf_token %}
+            <div class="row">
+                <p>{{ form.non_field_errors }}</p>
+                <div class="form-group">
+                    {{ form.remote_host_field.label_tag }}
+                    {{ form.remote_host_field.errors }}
+                    {{ form.remote_host_field }}
+                    {{ form.store_scp_field.label_tag }}
+                    {{ form.store_scp_field.errors }}
+                    {{ form.store_scp_field }}
+                    {{ form.date_from_field.label_tag }}
+                    {{ form.date_from_field.errors }}
+                    {{ form.date_from_field }}
+                    {{ form.date_until_field.label_tag }}
+                    {{ form.date_until_field.errors }}
+                    {{ form.date_until_field }}
+                    {{ form.modality_field.label_tag }}
+                    {{ form.modality_field.errors }}
+                    {{ form.modality_field }}
+                    {{ form.inc_sr_field.label_tag }}
+                    {{ form.inc_sr_field.errors }}
+                    {{ form.inc_sr_field }}
+                    {{ form.duplicates_field.label_tag }}
+                    {{ form.duplicates_field.errors }}
+                    {{ form.duplicates_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <button type="submit" class="btn btn-default">
+                      launch the query
+                    </button>
+                </div>
+            </div>
+		</form>
+    </div>
+
+
+   <div class="col-md-5 col-md-offset-1">
+       <div class="row">
+          <div id="qr-status"></div>
+          <div id="move-button"></div>
+       </div>
+       <div class="row">
+           <div id="move-status"></div>
+       </div>
+  </div>
+  </div>
+<script>
+$('.datepicker').datepicker({
+    format: "yyyy-mm-dd",
+    autoclose: true,
+    todayHighlight: true
+    });
+</script>
+
+
+{% endblock %}

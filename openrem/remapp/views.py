@@ -1664,3 +1664,156 @@ def chart_options_view(request):
         return_structure,
         context_instance=RequestContext(request)
     )
+
+from remapp.models import DicomStoreSCP, DicomRemoteQR
+
+@login_required
+def dicom_summary(request):
+    """Displays current DICOM configuration
+    """
+    store = DicomStoreSCP.objects.all()
+    remoteqr = DicomRemoteQR.objects.all()
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/dicomsummary.html',
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.core.urlresolvers import reverse_lazy
+
+
+class DicomStoreCreate(CreateView):
+    model = DicomStoreSCP
+    fields = ['name', 'aetitle', 'port']
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+
+class DicomStoreUpdate(UpdateView):
+    model = DicomStoreSCP
+    fields = ['name', 'aetitle', 'port',]
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+
+class DicomStoreDelete(DeleteView):
+    model = DicomStoreSCP
+    success_url = reverse_lazy('dicom_summary')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+
+class DicomQRCreate(CreateView):
+    model = DicomRemoteQR
+    fields = ['name', 'aetitle', 'port', 'ip', 'hostname']
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+
+class DicomQRUpdate(UpdateView):
+    model = DicomRemoteQR
+    fields = ['name', 'aetitle', 'port', 'ip', 'hostname']
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+
+class DicomQRDelete(DeleteView):
+    model = DicomRemoteQR
+    success_url = reverse_lazy('dicom_summary')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+@login_required
+def dicom_ajax(request):
+    """Displays current DICOM configuration
+    """
+    store = DicomStoreSCP.objects.all()
+    remoteqr = DicomRemoteQR.objects.all()
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    if request.user.groups.filter(name="admingroup"):
+        admin['adminperm'] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/ajaxtest.html',
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
+        context_instance=RequestContext(request)
+    )

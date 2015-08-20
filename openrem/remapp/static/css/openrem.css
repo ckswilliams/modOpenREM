@@ -84,3 +84,10 @@ body {
     text-decoration: none !important;
     font-weight: normal !important;
 }
+
+.nb {
+    display: none;
+    padding: 5px;
+    background-color: #C2F9FF;
+    border: 1px solid #000;
+}
