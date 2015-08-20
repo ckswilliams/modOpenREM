@@ -33,7 +33,7 @@ from dicom.dataset import Dataset, FileDataset
 import tempfile
 from django.views.decorators.csrf import csrf_exempt
 
-debug(True)
+debug(False)
 
 # callbacks
 def OnAssociateRequest(association):
@@ -120,9 +120,9 @@ def OnReceiveStore(SOPClass, DS):
     # must return appropriate status
     return SOPClass.Success
 
-
 def store(*args, **kwargs):
 
+    import sys
     import argparse
 
     try:
@@ -156,6 +156,48 @@ def store(*args, **kwargs):
     MyAE.start()
     print "done"
     MyAE.QuitOnKeyboardInterrupt()
+
+from celery import shared_task
+
+@shared_task
+def web_store(store_pk=None):
+    import time
+    from remapp.models import DicomStoreSCP
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        conf = DicomStoreSCP.objects.get(pk__exact=store_pk)
+        aet = conf.aetitle
+        port = conf.port
+        conf.task_id = web_store.request.id
+        conf.save()
+    except ObjectDoesNotExist:
+        sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
+
+    # setup AE
+    MyAE = AE(
+        aet, port, [],
+        [StorageSOPClass, VerificationSOPClass],
+        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
+    )
+    MyAE.OnAssociateRequest = OnAssociateRequest
+    MyAE.OnAssociateResponse = OnAssociateResponse
+    MyAE.OnReceiveStore = OnReceiveStore
+    MyAE.OnReceiveEcho = OnReceiveEcho
+
+    # start AE
+    conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
+    conf.save()
+    MyAE.start()
+    conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
+    conf.save()
+
+    while 1:
+        time.sleep(1)
+        stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
+        if not stay_alive.run:
+            MyAE.Quit()
+            break
 
 
 if __name__ == "__main__":

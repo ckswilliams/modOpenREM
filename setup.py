@@ -14,18 +14,15 @@ requires = [
     'pydicom >= 0.9.7',
     'django-pagination',
     'xlsxwriter',
-#    'south',
     'celery >= 3.1',
     'argparse >= 1.2.1',
     'django-qsstats-magic',
     'python-dateutil',
-#    'numpy',
-#    'https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2'
     ]
 
 setup(
     name='OpenREM',
-    version='0.7.0b3',
+    version='0.7.0b4',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,

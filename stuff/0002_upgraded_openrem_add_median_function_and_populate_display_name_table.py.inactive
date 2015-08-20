@@ -93,6 +93,9 @@ class Migration(migrations.Migration):
             migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
             migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
             migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotInitialSortingDirection', models.IntegerField(default=-1)),
+            migrations.AddField('userprofile', 'plotDXInitialSortingChoice', models.CharField(default='freq', max_length=4)),
+            migrations.AddField('userprofile', 'plotCTInitialSortingChoice', models.CharField(default='freq', max_length=4)),
             migrations.RunSQL(
                 "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
                 "  WITH q AS"
@@ -123,6 +126,11 @@ class Migration(migrations.Migration):
                 "DROP AGGREGATE median(anyelement);"
                 "DROP FUNCTION _final_median(anyarray);"
             ),
+            migrations.AddField(
+                model_name='generalequipmentmoduleattr',
+                name='unique_equipment_name',
+                field=models.ForeignKey(to='remapp.UniqueEquipmentNames', null=True),
+            ),
             migrations.RunPython(populate_unique_equipment_names),
         ]
     else:
@@ -133,5 +141,18 @@ class Migration(migrations.Migration):
             migrations.AddField('userprofile', 'plotAverageChoice', models.CharField(default='mean', max_length=6)),
             migrations.AddField('userprofile', 'plotCTRequestMeanDLP', models.BooleanField(default=False)),
             migrations.AddField('userprofile', 'plotCTRequestFreq', models.BooleanField(default=False)),
+            migrations.AddField('userprofile', 'plotInitialSortingDirection', models.IntegerField(default=-1)),
+            migrations.AddField('userprofile', 'plotDXInitialSortingChoice', models.CharField(default='freq', max_length=4)),
+            migrations.AddField('userprofile', 'plotCTInitialSortingChoice', models.CharField(default='freq', max_length=4)),
+            migrations.AddField(
+                model_name='generalequipmentmoduleattr',
+                name='general_study_module_attributes',
+                field=models.ForeignKey(to='remapp.GeneralStudyModuleAttr'),
+            ),
+            migrations.AddField(
+                model_name='generalequipmentmoduleattr',
+                name='unique_equipment_name',
+                field=models.ForeignKey(to='remapp.UniqueEquipmentNames', null=True),
+            ),
             migrations.RunPython(populate_unique_equipment_names),
         ]

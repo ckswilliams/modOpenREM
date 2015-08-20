@@ -1,0 +1,146 @@
+{% extends "remapp/base.html" %}
+
+
+
+{% block navbar %}
+            <li><a href="/openrem/ct">CT</a></li>
+            <li><a href="/openrem/rf">Fluoroscopy</a></li>
+            <li><a href="/openrem/mg">Mammography</a></li>
+            <li><a href="/openrem/dx">Radiography</a></li>
+{% endblock %}
+
+{% block adminnav %}
+    <li class="dropdown active">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-blank fa-fw"></i>Admin <b class="caret"></b>
+        </a>
+{% endblock %}
+
+
+
+{% block mainblock %}		
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {% if message.level == 40 %}
+                    <strong>Warning!</strong>
+                {% endif %}
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+{% if admin.adminperm %}
+
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <h1>DICOM Network configuration</h1>
+      </div>
+      <div class="col-md-5 col-md-offset-1">
+          <h2>DICOM Store SCP settings</h2>
+          <a href="/openrem/admin/dicomstore/add/">Add new store</a>
+
+
+          {% for scp in store %}
+          <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ scp.name }}</h3>
+              </div>
+              <div class="panel-body">
+                  <table>
+                      <tr>
+                          <th>AE Title</th>
+                          <td>{{ scp.aetitle }}</td>
+                      </tr>
+                      <tr>
+                          <th>Port</th>
+                          <td>{{ scp.port }}</td>
+                      </tr>
+                      <tr>
+                          <th>Last known status</th>
+                          <td>{{ scp.status }}</td>
+                      </tr>
+                  </table>
+
+                  <hr>
+                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
+                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a> |
+                  <br>
+                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/start/">Start server</a> |
+                    <a href="/openrem/admin/dicomstore/{{ scp.id }}/stop/">Stop server</a> |
+
+              </div>
+          </div>
+          {% endfor %}
+
+          <hr>
+
+      </div>
+      <div class="col-md-5">
+
+          <h2>
+            Remote DICOM Query Retrieve nodes
+          </h2>
+
+          <a href="/openrem/admin/dicomqr/add/">Add new QR Node</a>
+
+          {% for qr in remoteqr %}
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">{{ qr.name }}</h3>
+                  </div>
+                  <div class="panel-body">
+                      <table>
+                          <tr>
+                              <th>AE Title</th>
+                              <td>{{ qr.aetitle }}</td>
+                          </tr>
+                          <tr>
+                              <th>Port</th>
+                              <td>{{ qr.port }}</td>
+                          </tr>
+                          <tr>
+                              <th>Hostname</th>
+                              <td>{{ qr.hostname }}</td>
+                          </tr>
+                          <tr>
+                              <th>IP Address</th>
+                              <td>{{ qr.ip }}</td>
+                          </tr>
+                      </table>
+
+                      <hr>
+
+                      | <a href="/openrem/admin/dicomqr/{{ qr.id }}/">Modify</a>
+                      | <a href="/openrem/admin/dicomqr/{{ qr.id }}/delete/">Delete</a> |
+                  </div>
+              </div>
+          {% endfor %}
+          </div>
+      </div>
+
+{% else %}
+
+      <div class="row col-md-offset-2">
+        <h3>DICOM networking configuration </h3>
+      </div>
+
+      <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+      <p>
+        This function can only be accessed if you are logged in to OpenREM with admin
+        permissions.
+      </p>
+      </div>
+      </div>
+      
+{% endif %}
+
+
+
+
+{% endblock %}	
+
+
