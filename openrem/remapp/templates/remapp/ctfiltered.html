@@ -145,6 +145,7 @@
   {% if request.user.userprofile.plotCharts %}
 
     <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+    <div class="ajax-error">Sorry, there was a problem loading the chart data.<br><button onclick="$('.ajax-error').hide();">OK</button></div>
 
     <!-- Include JavaScript to enable highcharts plots -->
     <script src="{{ STATIC_URL }}js/highcharts.js"></script>
