@@ -31,11 +31,85 @@
 # Following two lines added so that sphinx autodocumentation works. 
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+import json
 from django.db import models
+from django.core.urlresolvers import reverse
+
+class DicomStoreSCP(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+    aetitle = models.CharField(max_length=16, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    task_id = models.CharField(max_length=64, blank=True, null=True)
+    status = models.CharField(max_length=64, blank=True, null=True)
+    run = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
+
+class DicomRemoteQR(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+    aetitle = models.CharField(max_length=16, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    ip = models.GenericIPAddressField(blank=True, null=True)
+    hostname = models.CharField(max_length=32, blank=True, null=True)
+    enabled = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
+    def __unicode__(self):
+        return self.name
+
+
+class DicomQuery(models.Model):
+    complete = models.BooleanField(default=False)
+    query_id = models.CharField(max_length=64)
+    failed = models.BooleanField(default=False)
+    message = models.TextField(blank=True, null=True)
+    stage = models.TextField(blank=True, null=True)
+    qr_scp_fk = models.ForeignKey(DicomRemoteQR, blank=True, null=True)
+    store_scp_fk = models.ForeignKey(DicomStoreSCP, blank=True, null=True)
+    move_complete = models.BooleanField(default=False)
+
+
+class DicomQRRspStudy(models.Model):
+    dicom_query = models.ForeignKey(DicomQuery)
+    query_id = models.CharField(max_length=64)
+    study_instance_uid = models.TextField(blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
+    modalities_in_study = models.CharField(max_length=100, blank=True, null=True)
+    study_description = models.TextField(blank=True, null=True)
+    number_of_study_related_series = models.IntegerField(blank=True, null=True)
+
+    def set_modalities_in_study(self, x):
+        self.modalities_in_study = json.dumps(x)
+
+    def get_modalities_in_study(self):
+        return json.loads(self.modalities_in_study)
+
+
+class DicomQRRspSeries(models.Model):
+    dicom_qr_rsp_study = models.ForeignKey(DicomQRRspStudy)
+    query_id = models.CharField(max_length=64)
+    series_instance_uid = models.TextField(blank=True, null=True)
+    series_number = models.IntegerField(blank=True, null=True)
+    modality = models.CharField(max_length=16, blank=True, null=True)
+    series_description = models.TextField(blank=True, null=True)
+    number_of_series_related_instances = models.IntegerField(blank=True, null=True)
+
+
+class DicomQRRspImage(models.Model):
+    dicom_qr_rsp_series = models.ForeignKey(DicomQRRspSeries)
+    query_id = models.CharField(max_length=64)
+    sop_instance_uid = models.TextField(blank=True, null=True)
+    instance_number = models.IntegerField(blank=True, null=True)
+    sop_class_uid = models.TextField(blank=True, null=True)
 
 
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+
 
 class UserProfile(models.Model):
     DAYS = 'days'

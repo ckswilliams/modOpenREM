@@ -67,11 +67,16 @@ class SizeHeadersForm(forms.Form):
         super(SizeHeadersForm, self).__init__(**kwargs)
         if my_choice:
 
-            self.fields['height_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
-            self.fields['weight_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
-            self.fields['id_field'] = forms.ChoiceField(choices=my_choice, widget=forms.Select(attrs={"class":"form-control"}))
-            ID_TYPES = (("acc-no", "Accession Number"),("si-uid", "Study instance UID"))
-            self.fields['id_type'] = forms.ChoiceField(choices=ID_TYPES, widget=forms.Select(attrs={"class":"form-control"}))
+            self.fields['height_field'] = forms.ChoiceField(
+                choices=my_choice, widget=forms.Select(attrs={"class": "form-control"}))
+            self.fields['weight_field'] = forms.ChoiceField(
+                choices=my_choice, widget=forms.Select(attrs={"class": "form-control"}))
+            self.fields['id_field'] = forms.ChoiceField(
+                choices=my_choice, widget=forms.Select(attrs={"class": "form-control"}))
+            ID_TYPES = (("acc-no", "Accession Number"), ("si-uid", "Study instance UID"))
+            self.fields['id_type'] = forms.ChoiceField(
+                choices=ID_TYPES, widget=forms.Select(attrs={"class": "form-control"}))
+
 
 class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?',required=False)
@@ -136,3 +141,31 @@ class GeneralChartOptionsDisplayForm(forms.Form):
 
 class UpdateDisplayNameForm(forms.Form):
         display_name = forms.CharField()
+
+
+class DicomQueryForm(forms.Form):
+    """Form for launching DICOM Query
+    """
+
+    MODALITIES = (
+        ('CT', 'CT'),
+        ('FL', 'Fluoroscopy'),
+        ('DX', 'DX, including CR'),
+        ('MG', 'Mammography'),
+    )
+
+    remote_host_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
+    store_scp_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
+    date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
+    date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
+    modality_field = forms.MultipleChoiceField(
+        choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
+        attrs={"checked": ""}), required=True)
+    inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=True)
+    duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True)
+
+    def __init__(self, *args, **kwargs):
+        super(DicomQueryForm, self).__init__(*args, **kwargs)
+        from remapp.models import DicomRemoteQR, DicomStoreSCP
+        self.fields['remote_host_field'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
+        self.fields['store_scp_field'].choices = [(x.pk, x.name) for x in DicomStoreSCP.objects.all()]
