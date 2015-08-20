@@ -17,3 +17,6 @@ For fresh installs, please look at the `install docs <http://docs.openrem.org/pa
 Contribution of code, ideas, bug reports documentation is all welcome.
 Please feel free to fork the repository and send me pull requests. See
 `the website <http://openrem.org/getinvolved>`_ for more information.
+
+There is a developer demo site, which at times has a working demo of recent code, but might not, and 
+might be broken. It can be found at http://djp-openremdemo.rhcloud.com/openrem/
