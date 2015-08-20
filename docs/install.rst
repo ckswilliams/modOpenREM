@@ -222,21 +222,44 @@ See :doc:`netdicom`
 Create the database
 -------------------
 
-Linux::
-
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py syncdb
-
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py createsuperuser
-	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate sites
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate admin
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate auth
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate
+    python C:\Python27\Lib\site-packages\openrem\manage.py showmigrations
 
-The first command will result in an error, saying "django_site" does not
-exist. Ignore this, and continue with the second command. Answer each
-question as it is asked. Do setup a superuser: this username and
-password will be used to log into the admin interface to create the
-usernames for using the web interface. See the `Start using it!`_
-section below.
+Some of the commands will result in error messages, saying "django_site" does not
+exist, for example. Ignore these, and continue with the remaining commands. The
+last command will list each Django app migrations. Each should have a cross inside
+a pair of square brackets something like below::
+
+    admin
+     [X] 0001_initial
+    auth
+     [X] 0001_initial
+     [X] 0002_alter_permission_name_max_length
+     [X] 0003_alter_user_email_max_length
+     [X] 0004_alter_user_username_opts
+     [X] 0005_alter_user_last_login_null
+     [X] 0006_require_contenttypes_0002
+    contenttypes
+     [X] 0001_initial
+     [X] 0002_remove_content_type_name
+    sessions
+     [X] 0001_initial
+    sites
+     [X] 0001_initial
+
+Finally, create a Django super user::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py createsuperuser
+
+Answer each question as it is asked. This username and password will be used
+to log into the admin interface to create the usernames for using the web
+interface. See the `Start using it!`_ section below.
+
 
 If using PostgreSQL you must add the median database function
 -------------------------------------------------------------
@@ -251,7 +274,7 @@ Windows::
 	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
 
 The first command will create a skeleton `0001_initial.py` migration file. The
-second command runs the migration files, and will include the line
+second command runs the migration files, and will display the text
 `Applying remapp.0002_fresh__openrem_install_add_median_function... OK`, indicating
 that the median function has been added.
 
