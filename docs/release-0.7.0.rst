@@ -27,11 +27,14 @@ Upgrading from version 0.6.0
 
 * The 0.7.0 upgrade must be made from a 0.6.0 (or later) database, and a schema migration is required:
 
+    Delete all numbered migration files in openrem's `migrations` folder.
+
 .. sourcecode:: bash
 
     pip install openrem==0.7.0b3
 
     # Windows:
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate --fake-initial
     python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp --fake
 

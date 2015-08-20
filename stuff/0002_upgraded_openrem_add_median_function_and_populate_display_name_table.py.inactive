@@ -126,25 +126,6 @@ class Migration(migrations.Migration):
                 "DROP AGGREGATE median(anyelement);"
                 "DROP FUNCTION _final_median(anyarray);"
             ),
-            migrations.CreateModel(
-                name='UniqueEquipmentNames',
-                fields=[
-                    ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                    ('manufacturer', models.TextField(null=True, blank=True)),
-                    ('institution_name', models.TextField(null=True, blank=True)),
-                    ('station_name', models.CharField(max_length=32, null=True, blank=True)),
-                    ('institutional_department_name', models.TextField(null=True, blank=True)),
-                    ('manufacturer_model_name', models.TextField(null=True, blank=True)),
-                    ('device_serial_number', models.TextField(null=True, blank=True)),
-                    ('software_versions', models.TextField(null=True, blank=True)),
-                    ('gantry_id', models.TextField(null=True, blank=True)),
-                    ('display_name', models.TextField(null=True, blank=True)),
-                ],
-            ),
-            migrations.AlterUniqueTogether(
-                name='uniqueequipmentnames',
-                unique_together=set([('manufacturer', 'institution_name', 'station_name', 'institutional_department_name', 'manufacturer_model_name', 'device_serial_number', 'software_versions', 'gantry_id')]),
-            ),
             migrations.AddField(
                 model_name='generalequipmentmoduleattr',
                 name='unique_equipment_name',
@@ -163,25 +144,6 @@ class Migration(migrations.Migration):
             migrations.AddField('userprofile', 'plotInitialSortingDirection', models.IntegerField(default=-1)),
             migrations.AddField('userprofile', 'plotDXInitialSortingChoice', models.CharField(default='freq', max_length=4)),
             migrations.AddField('userprofile', 'plotCTInitialSortingChoice', models.CharField(default='freq', max_length=4)),
-            migrations.CreateModel(
-                name='UniqueEquipmentNames',
-                fields=[
-                    ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                    ('manufacturer', models.TextField(null=True, blank=True)),
-                    ('institution_name', models.TextField(null=True, blank=True)),
-                    ('station_name', models.CharField(max_length=32, null=True, blank=True)),
-                    ('institutional_department_name', models.TextField(null=True, blank=True)),
-                    ('manufacturer_model_name', models.TextField(null=True, blank=True)),
-                    ('device_serial_number', models.TextField(null=True, blank=True)),
-                    ('software_versions', models.TextField(null=True, blank=True)),
-                    ('gantry_id', models.TextField(null=True, blank=True)),
-                    ('display_name', models.TextField(null=True, blank=True)),
-                ],
-            ),
-            migrations.AlterUniqueTogether(
-                name='uniqueequipmentnames',
-                unique_together=set([('manufacturer', 'institution_name', 'station_name', 'institutional_department_name', 'manufacturer_model_name', 'device_serial_number', 'software_versions', 'gantry_id')]),
-            ),
             migrations.AddField(
                 model_name='generalequipmentmoduleattr',
                 name='general_study_module_attributes',
