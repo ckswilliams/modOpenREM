@@ -228,12 +228,12 @@ Linux::
 
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate auth
+    python C:\Python27\Lib\site-packages\openrem\manage.py createsuperuser
 	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
 
 The first command will result in an error, saying "django_site" does not
 exist. Ignore this, and continue with the second command. Answer each
-question as it is asked. Do setup a superuser. This username and
+question as it is asked. Do setup a superuser: this username and
 password will be used to log into the admin interface to create the
 usernames for using the web interface. See the `Start using it!`_
 section below.
