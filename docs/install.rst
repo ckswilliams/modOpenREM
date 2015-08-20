@@ -224,15 +224,13 @@ Create the database
 
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate sites
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate admin
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate auth
+    python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate
     python C:\Python27\Lib\site-packages\openrem\manage.py showmigrations
 
-Some of the commands will result in error messages, saying "django_site" does not
-exist, for example. Ignore these, and continue with the remaining commands. The
-last command will list each Django app migrations. Each should have a cross inside
+The `makemigrations remapp` should fix the `auth_user` relation error.
+
+The last command will list each Django app migrations. Each should have a cross inside
 a pair of square brackets something like below::
 
     admin
