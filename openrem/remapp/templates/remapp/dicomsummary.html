@@ -35,49 +35,48 @@
 {% if admin.adminperm %}
 
     <div class="row">
-      <div class="col-md-5 col-md-offset-1">
+      <div class="col-md-10 col-md-offset-1">
         <h1>DICOM Network configuration</h1>
+      </div>
+      <div class="col-md-5 col-md-offset-1">
+          <h2>DICOM Store SCP settings</h2>
+          <a href="/openrem/admin/dicomstore/add/">Add new store</a>
 
-          <div class="panel panel-info">
-          <div class="panel-heading">
-              <h3 class="panel-title">DICOM Store SCP settings</h3>
-          </div>
-          <div class="panel-body">
 
           {% for scp in store %}
-              <table>
-                  <tr>
-                      <th>Store Name</th>
-                      <td>{{ scp.name }}</td>
-                  </tr>
-                  <tr>
-                      <th>AE Title</th>
-                      <td>{{ scp.aetitle }}</td>
-                  </tr>
-                  <tr>
-                      <th>Port</th>
-                      <td>{{ scp.port }}</td>
-                  </tr>
-                  <tr>
-                      <th>Current status</th>
-                      <td>{{ scp.status }}</td>
-                  </tr>
-              </table>
+          <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ scp.name }}</h3>
+              </div>
+              <div class="panel-body">
+                  <table>
+                      <tr>
+                          <th>AE Title</th>
+                          <td>{{ scp.aetitle }}</td>
+                      </tr>
+                      <tr>
+                          <th>Port</th>
+                          <td>{{ scp.port }}</td>
+                      </tr>
+                      <tr>
+                          <th>Last known status</th>
+                          <td>{{ scp.status }}</td>
+                      </tr>
+                  </table>
 
-          | <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
-          | <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a> |
-          <br>
-          | <a href="/openrem/admin/dicomstore/{{ scp.id }}/start/">Start server</a> |
-            <a href="/openrem/admin/dicomstore/{{ scp.id }}/stop/">Stop server</a> |
-          <hr>
+                  <hr>
+                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
+                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a> |
+                  <br>
+                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/start/">Start server</a> |
+                    <a href="/openrem/admin/dicomstore/{{ scp.id }}/stop/">Stop server</a> |
 
+              </div>
+          </div>
           {% endfor %}
 
           <hr>
 
-          <a href="/openrem/admin/dicomstore/add/">Add new store</a>
-          </div>
-          </div>
       </div>
       <div class="col-md-5">
 
@@ -90,14 +89,7 @@
           {% for qr in remoteqr %}
               <div class="panel panel-info">
                   <div class="panel-heading">
-                      <h3 class="panel-title">{{ qr.name }}
-                      <small>
-                      {% if qr.enabled %}
-                        (active)
-                      {% else %}
-                        (disabled)
-                      {% endif %}</small>
-                      </h3>
+                      <h3 class="panel-title">{{ qr.name }}</h3>
                   </div>
                   <div class="panel-body">
                       <table>
@@ -117,11 +109,9 @@
                               <th>IP Address</th>
                               <td>{{ qr.ip }}</td>
                           </tr>
-                          <tr>
-                              <th>Currently enabled?</th>
-                              <td>{{ qr.enabled }}</td>
-                          </tr>
                       </table>
+
+                      <hr>
 
                       | <a href="/openrem/admin/dicomqr/{{ qr.id }}/">Modify</a>
                       | <a href="/openrem/admin/dicomqr/{{ qr.id }}/delete/">Delete</a> |
