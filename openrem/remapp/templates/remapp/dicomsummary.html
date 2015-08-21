@@ -40,6 +40,18 @@
       </div>
       <div class="col-md-5 col-md-offset-1">
           <h2>DICOM Store SCP settings</h2>
+          <p>
+              Set up and manage DICOM Store nodes here. Once started, remote systems can send DICOM objects to this
+              server where they will be automatically processed by OpenREM.
+          </p>
+          <p>
+              Depending on the settings in local_setting.py, the objects will be deleted once they have been processed.
+          </p>
+          <p>
+              You need to have a store node configured here in order to use the query retrieve function. If you have
+              another store service running, then set up the details of the other node here, just don't set the
+              server to start.
+          </p>
           <a href="/openrem/admin/dicomstore/add/">Add new store</a>
 
 
@@ -75,14 +87,19 @@
           </div>
           {% endfor %}
 
-          <hr>
-
       </div>
       <div class="col-md-5">
 
           <h2>
-            Remote DICOM Query Retrieve nodes
+            Remote Query Retrieve nodes
           </h2>
+          <p>
+              Set up remote query retrieve DICOM nodes here.You can then make use of them on the
+              <a href="openrem/admin/queryremote">query page</a>.
+          </p>
+          <p>
+              You can either enter a hostname or an IP address - if you enter both, the hostname will be used.
+          </p>
 
           <a href="/openrem/admin/dicomqr/add/">Add new QR Node</a>
 

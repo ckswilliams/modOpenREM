@@ -422,9 +422,12 @@ def mam(mg_file):
     except ImportError:
         RM_DCM_MG = False
 
+
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
+        if RM_DCM_MG:
+            os.remove(mg_file)
         return '{0} is not a mammography DICOM image'.format(mg_file)
 
     _mammo2db(dataset)
