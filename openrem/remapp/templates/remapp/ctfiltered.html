@@ -145,7 +145,6 @@
   {% if request.user.userprofile.plotCharts %}
 
     <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
-    <div class="ajax-error">Sorry, there was a problem loading the chart data.<br><button onclick="$('.ajax-error').hide();">OK</button></div>
 
     <!-- Include JavaScript to enable highcharts plots -->
     <script src="{{ STATIC_URL }}js/highcharts.js"></script>
@@ -236,7 +235,7 @@
           </div>
           <div id="collapseDLPandCTDI" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="histogramPlotDLPandCTDIdiv" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <div id="histogramPlotDLPandCTDIdiv" style="height: auto; margin: 0 0"></div>
               {% if request.user.userprofile.plotAverageChoice == 'mean' %}
               <table style="border:none">
                   <tr>
@@ -329,7 +328,7 @@
           </div>
           <div id="collapseTwo" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="histogramPlotDIV" style="width: 95%; height: 600px; margin: 0 0"></div>
+              <div id="histogramPlotDIV" style="height: auto; margin: 0 0"></div>
 
               <table style="border:none">
                   <tr>
@@ -398,7 +397,7 @@
           </div>
           <div id="collapseCTDI" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="histogramPlotCTDIdiv" style="height: 600px; margin: 0 0"></div>
+              <div id="histogramPlotCTDIdiv" style="height: auto; margin: 0 0"></div>
 
               <table style="border:none">
                   <tr>
@@ -461,7 +460,7 @@
           </div>
           <div id="collapseProtocolPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartProtocolDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
             </div>
           </div>
         </div>
@@ -555,7 +554,7 @@
           </div>
           <div id="collapseThree" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="histogramStudyPlotDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="histogramStudyPlotDIV" style="height: auto; margin: 0 0"></div>
 
 
 
@@ -620,7 +619,7 @@
           </div>
           <div id="collapseStudyPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartStudyDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
             </div>
           </div>
         </div>
@@ -648,7 +647,7 @@
           </div>
           <div id="collapseRequestMeanDLP" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="histogramRequestPlotDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="histogramRequestPlotDIV" style="height: auto; margin: 0 0"></div>
 
 
 
@@ -713,7 +712,7 @@
           </div>
           <div id="collapseRequestPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartRequestDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
             </div>
           </div>
         </div>
@@ -735,7 +734,7 @@
           </div>
           <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartStudyWorkloadDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
             </div>
           </div>
@@ -762,7 +761,7 @@
           </div>
           <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="studyMeanDLPOverTimeDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="studyMeanDLPOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
             </div>
           </div>
@@ -846,78 +845,7 @@
     {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for mean DLP per study description -->
       <script>
-/*        dateAxis = [
-        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-          {% for dateEntries in studyMeanDLPoverTime.0 %}
-            "{{ dateEntries.0.date|date:"d/m/Y" }}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        {% else %}
-          {% for dateEntries in studyMedianDLPoverTime.0 %}
-            "{{ dateEntries.0.date|date:"d/m/Y" }}"
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        {% endif %}
-        ];
-
-        // Create the same colours as for the study pie chart, so that the colours
-        // are the same for the studies in the pie chart and this plot.
-        var studyLineColours =  new Array(studyNames.length);
-        studyPiechartData.sort(sort_by_name);
-        for(var i=0; i<studyNames.length; i++) {
-          studyLineColours[i] = studyPiechartData[i].color;
-        }
-        studyPiechartData.sort(sort_by_y);
-*/
         var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-
-        {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-/*        meanDLPOverTime = [
-          {% for studyData in studyMeanDLPoverTime %}
-            {{'{'}}name:studyNames[{{forloop.counter}}-1],
-                  color:studyLineColours[{{forloop.counter}}-1],
-                  marker:{{'{'}}enabled:true{{'}'}},
-                  point: {{'{'}}
-            events: {{'{'}}
-                    click: function(e) {{'{'}}
-            location.href = e.point.url;
-            e.preventDefault();
-            {{'}'}}
-            {{'}'}}
-            {{'}'}},
-            data:[
-              {% for dateEntries in studyData %}
-                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setDate((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getDate()+6))){{'}'}}
-                      {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]{{'}'}}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-        {% else %}
-/*        medianDLPOverTime = [
-          {% for studyData in studyMedianDLPoverTime %}
-            {{'{'}}name:studyNames[{{forloop.counter}}-1],
-                  color:studyLineColours[{{forloop.counter}}-1],
-                  marker:{{'{'}}enabled:true{{'}'}},
-                  point: {{'{'}}
-            events: {{'{'}}
-                    click: function(e) {{'{'}}
-            location.href = e.point.url;
-            e.preventDefault();
-            {{'}'}}
-            {{'}'}}
-            {{'}'}},
-            data:[
-              {% for dateEntries in studyData %}
-                {{'{'}}y:{% if dateEntries.1 %}{{ dateEntries.1 }}{% else %}null{% endif %},url:urlStart+studyNames[{{forloop.parentloop.counter}}-1]+'&date_after='+formatDate(new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}}))+'&date_before='+ formatDate(new Date ((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).setDate((new Date({{dateEntries.0.year}},{{dateEntries.0.month}}-1,{{dateEntries.0.day}})).getDate()+6))){{'}'}}
-                      {% if not forloop.last %},{% endif %}
-              {% endfor %}
-            ]{{'}'}}
-            {% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];*/
-        {% endif %}
       </script>
 
       {% if request.user.userprofile.plotAverageChoice == 'mean' %}

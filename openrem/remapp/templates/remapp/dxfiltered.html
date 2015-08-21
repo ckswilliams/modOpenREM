@@ -140,7 +140,6 @@
   {% if request.user.userprofile.plotCharts %}
 
       <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
-      <div class="ajax-error">Sorry, there was a problem loading the chart data.<br><button onclick="$('.ajax-error').hide();">OK</button></div>
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
       <!-- HTML to include div container for acquisition plot -->
@@ -161,7 +160,7 @@
           </div>
           <div id="collapseOne" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="container" style="height: 600px; margin: 0 0"></div>
+              <div id="container" style="height: auto; margin: 0 0"></div>
 
               <table style="border:none">
                   <tr>
@@ -223,7 +222,7 @@
           </div>
           <div id="collapseProtocolPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartProtocolDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
             </div>
           </div>
         </div>
@@ -250,7 +249,7 @@
           </div>
           <div id="collapseAcquisitionMeankVpChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="chartAcquisitionMeankVp" style="height: 600px; margin: 0 0"></div>
+              <div id="chartAcquisitionMeankVp" style="height: auto; margin: 0 0"></div>
 
               <table style="border:none">
                   <tr>
@@ -315,7 +314,7 @@
           </div>
           <div id="collapseAcquisitionMeanmAsChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="chartAcquisitionMeanmAs" style="height: 600px; margin: 0 0"></div>
+              <div id="chartAcquisitionMeanmAs" style="height: auto; margin: 0 0"></div>
 
               <table style="border:none">
                   <tr>
@@ -374,7 +373,7 @@
           </div>
           <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="piechartStudyWorkloadDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
             </div>
           </div>
@@ -400,7 +399,7 @@
           </div>
           <div id="collapseAcquisitionMeanDAPOverTime" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="AcquisitionMeanDAPOverTimeDIV" style="height: 600px; margin: 0 0"></div>
+              <div id="AcquisitionMeanDAPOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
             </div>
           </div>
