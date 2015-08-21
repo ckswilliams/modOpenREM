@@ -6,6 +6,7 @@ OpenREM version history
 --------------------
 *This list is not up to date*
 
+* `#258`_  Fixed DX import error where manufacturer or model name was not provided
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 
 0.6.0 (2015-05-14)
