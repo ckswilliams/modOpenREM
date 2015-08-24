@@ -324,7 +324,9 @@ In a new shell:
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openremproject worker -l info
+    celery multi start stores default -A openremproject -c:stores 2 -c 3 -Q:stores stores -Q default
+
+`To be explained!`
 
 Windows::
 
