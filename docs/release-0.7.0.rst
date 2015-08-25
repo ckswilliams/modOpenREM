@@ -67,17 +67,36 @@ Restart the Celery task queue
 
 For testing, in a new shell:
 
-.. sourcecode:: bash
+Linux::
 
     # Linux: Debian/Ubuntu and derivatives
     cd /usr/local/lib/python2.7/dist-packages/openrem/
     # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
     cd /usr/local/lib/python2.7/site-packages/openrem/
-    # Windows
-    cd C:\Python27\Lib\site-packages\openrem\
 
-    # All
-    celery -A openremproject worker -l info
+    celery multi start stores default -A openremproject -c:stores 2 -c 3 \
+    -Q:stores stores -Q default \
+    --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
+
+If you intend to use OpenREM to provide a DICOM Store SCP (ie you can DICOM send things to OpenREM without using
+any other program, such as Conquest), then we need a Celery Queue just for the store. The node (and queue) created for
+this is called ``stores`` and it needs to have a concurrency equal or greater than the number of store SCPs. This would
+normally be just one. So set ``-c:stores 1`` or ``-c:stores 2`` etc as you see fit. The ``-c 3`` specifies how many
+workers should be available for all the other jobs - exports; and imports when using the OpenREM Store SCP.
+
+You must also specify the location for the pid file and for the log file. You might put these in the media folder, or
+the logs might go in ``/var/log/``.
+
+The ``\`` is added in to allow the single command to go over several lines.
+
+Windows::
+
+    cd C:\Python27\Lib\site-packages\openrem\
+    celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
+    -Q:stores stores -Q default ^
+    --pidfile=\path\to\media\celery\%N.pid --logfile=\path\to\media\celery\%N.log
+
+This is the same as for Linux, but this time the line continuation character is ``^``.
 
 For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
 
