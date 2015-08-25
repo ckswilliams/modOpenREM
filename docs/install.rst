@@ -324,7 +324,7 @@ In a new shell:
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 -Q:stores stores -Q default
+    celery multi start stores default -A openremproject -c:stores 2 -c 3 -Q:stores stores -Q default --pidfile=/home/mcdonaghe/research/media/celery/%N.pid --logfile=/home/mcdonaghe/research/media/celery/%N.log
 
 `To be explained!`
 

@@ -27,13 +27,13 @@ try:
         sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
-from netdicom import AE, StorageSOPClass, VerificationSOPClass, debug
+from netdicom import AE, StorageSOPClass, VerificationSOPClass
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
 import tempfile
 from django.views.decorators.csrf import csrf_exempt
 
-debug(False)
+# netdicom.debug()
 
 # callbacks
 def OnAssociateRequest(association):
@@ -192,12 +192,14 @@ def web_store(store_pk=None):
     MyAE.start()
     conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
+    print "Started AE... AET:{0}, port:{1}".format(aet, port)
 
     while 1:
         time.sleep(1)
         stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
         if not stay_alive.run:
             MyAE.Quit()
+            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
 
 
