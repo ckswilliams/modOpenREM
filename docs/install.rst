@@ -224,10 +224,10 @@ Should DICOM files be kept or deleted when they have been processed?
 * The default setting is False, to preserve behaviour from previous versions::
 
     RM_DCM_NOMATCH = True
-    RM_DCM_RDSR = False
-    RM_DCM_MG = False
-    RM_DCM_DX = False
-    RM_DCM_CTPHIL = False
+    RM_DCM_RDSR = True
+    RM_DCM_MG = True
+    RM_DCM_DX = True
+    RM_DCM_CTPHIL = True
 
 .. Note::
 
