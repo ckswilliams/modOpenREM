@@ -166,6 +166,3 @@ def web_store(store_pk=None):
             break
 
 
-if __name__ == "__main__":
-    import sys
-    sys.exit(store())
