@@ -61,57 +61,27 @@
                 <h3 class="panel-title">{{ scp.name }}</h3>
               </div>
               <div class="panel-body">
-                  <div class="row">
-                      <div class="col-md-6">
-                          <h4>Server details</h4>
-                          <table>
-                              <tr>
-                                  <th>AE Title</th>
-                                  <td>{{ scp.aetitle }}</td>
-                              </tr>
-                              <tr>
-                                  <th>Port</th>
-                                  <td>{{ scp.port }}</td>
-                              </tr>
-                              <tr>
-                                  <th>Last known status</th>
-                                  <td>{{ scp.status }}</td>
-                              </tr>
-                          </table>
-                      </div>
-                      <div class="col-md-6">
-                          <h4>After processing, delete...</h4>
-                          <table>
-                              <tr>
-                                  <th>unmatched studies?</th>
-                                  <td>{{ scp.rm_no_match }}</td>
-                              </tr>
-                              <tr>
-                                  <th>RDSReports?</th>
-                                  <td>{{ scp.rm_rdsr }}</td>
-                              </tr>
-                              <tr>
-                                  <th>mammo images?</th>
-                                  <td>{{ scp.rm_mg }}</td>
-                              </tr>
-                              <tr>
-                                  <th>DX images?</th>
-                                  <td>{{ scp.rm_dx }}</td>
-                              </tr>
-                              <tr>
-                                  <th>Philips CT dose info?</th>
-                                  <td>{{ scp.rm_ct_phil }}</td>
-                              </tr>
-                          </table>
-                      </div>
-                  </div>
+                  <h4>Server details</h4>
+                  <table class="table">
+                      <tr>
+                          <th>AE Title</th>
+                          <td>{{ scp.aetitle }}</td>
+                      </tr>
+                      <tr>
+                          <th>Port</th>
+                          <td>{{ scp.port }}</td>
+                      </tr>
+                      <tr>
+                          <th>Last known status</th>
+                          <td>{{ scp.status }}</td>
+                      </tr>
+                  </table>
 
                   <hr>
-                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
-                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a> |
-                  <br>
-                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/start/">Start server</a> |
-                    <a href="/openrem/admin/dicomstore/{{ scp.id }}/stop/">Stop server</a> |
+                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
+                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/delete/" role="button">Delete</a>
+                  <a class="btn btn-success" href="/openrem/admin/dicomstore/{{ scp.id }}/start/" role="button">Start server</a>
+                  <a class="btn btn-danger" href="/openrem/admin/dicomstore/{{ scp.id }}/stop/" role="button">Stop server</a>
 
               </div>
           </div>
@@ -139,7 +109,7 @@
                       <h3 class="panel-title">{{ qr.name }}</h3>
                   </div>
                   <div class="panel-body">
-                      <table>
+                      <table class="table">
                           <tr>
                               <th>AE Title</th>
                               <td>{{ qr.aetitle }}</td>
@@ -165,6 +135,43 @@
                   </div>
               </div>
           {% endfor %}
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-5 col-md-offset-1">
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">Settings for all Store SCPs</h3>
+                  </div>
+                  <div class="panel-body">
+                      <h4>After processing incoming objects, delete...</h4>
+                      <table class="table">
+                          <tr>
+                              <th>unmatched studies?</th>
+                              <td>{{ rm_settings.no_match }}</td>
+                          </tr>
+                          <tr>
+                              <th>Radiation Dose Structured Reports?</th>
+                              <td>{{ rm_settings.rdsr }}</td>
+                          </tr>
+                          <tr>
+                              <th>Mammography images?</th>
+                              <td>{{ rm_settings.mg }}</td>
+                          </tr>
+                          <tr>
+                              <th>Radiology images?</th>
+                              <td>{{ rm_settings.dx }}</td>
+                          </tr>
+                          <tr>
+                              <th>Philips CT dose info images?</th>
+                              <td>{{ rm_settings.ct_phil }}</td>
+                          </tr>
+                      </table>
+                      <p>
+                          These settings can be changed in the local_settings.py file.
+                      </p>
+                  </div>
+              </div>
           </div>
       </div>
 

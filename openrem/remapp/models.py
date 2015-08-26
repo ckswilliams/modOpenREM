@@ -47,14 +47,6 @@ class DicomStoreSCP(models.Model):
         return reverse('dicom_summary')
 
 
-class DICOMStoreGlobal(models.Model):
-    rm_no_match = models.BooleanField(default=True)
-    rm_rdsr = models.BooleanField(default=True)
-    rm_mg = models.BooleanField(default=True)
-    rm_dx = models.BooleanField(default=True)
-    rm_ct_phil = models.BooleanField(default=True)
-
-
 class DicomRemoteQR(models.Model):
     name = models.CharField(max_length=64, unique=True)
     aetitle = models.CharField(max_length=16, blank=True, null=True)
