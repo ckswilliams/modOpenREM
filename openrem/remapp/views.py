@@ -1671,8 +1671,17 @@ from remapp.models import DicomStoreSCP, DicomRemoteQR
 def dicom_summary(request):
     """Displays current DICOM configuration
     """
+    from openremproject.settings import RM_DCM_NOMATCH
+    from openremproject.settings import RM_DCM_RDSR
+    from openremproject.settings import RM_DCM_MG
+    from openremproject.settings import RM_DCM_DX
+    from openremproject.settings import RM_DCM_CTPHIL
+
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
+
+    rm_settings = {
+        'no_match': RM_DCM_NOMATCH, 'rdsr': RM_DCM_RDSR, 'mg': RM_DCM_MG, 'dx': RM_DCM_DX, 'ct_phil': RM_DCM_CTPHIL}
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1686,7 +1695,7 @@ def dicom_summary(request):
     # Render list page with the documents and the form
     return render_to_response(
         'remapp/dicomsummary.html',
-        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin, 'rm_settings': rm_settings},
         context_instance=RequestContext(request)
     )
 
@@ -1713,7 +1722,7 @@ class DicomStoreCreate(CreateView):
 
 class DicomStoreUpdate(UpdateView):
     model = DicomStoreSCP
-    fields = ['name', 'aetitle', 'port',]
+    fields = ['name', 'aetitle', 'port']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object

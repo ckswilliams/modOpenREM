@@ -147,16 +147,14 @@ There are two files that need renaming:
 + ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
 + ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
 
-In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path, the secret key and the ``ALLOWED_HOSTS``.
-
 ..  Note::
 
     Windows notepad will not recognise the Unix style line endings.
     Please use an editor such as Notepad++ or Notepad2 if you can, else use WordPad –
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
-Database settings
-`````````````````
+local_settings.py: Database
+```````````````````````````
 
 For testing you can use the SQLite3 database
 
@@ -170,8 +168,8 @@ For testing you can use the SQLite3 database
 
 For production use, see `Database options`_ below
 
-Location setting for imports and exports
-````````````````````````````````````````
+local_settings.py: Location for imports and exports
+```````````````````````````````````````````````````
 
 Csv and xlsx study information exports and patient size csv imports are
 written to disk at a location defined by ``MEDIA_ROOT``.
@@ -191,14 +189,14 @@ Windows example::
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
-Secret key
-``````````
+local_settings.py: Secret key
+`````````````````````````````
 
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
 
-Allowed hosts
-`````````````
+local_settings.py: Allowed hosts
+````````````````````````````````
 
 The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
 set to ``False``. This needs to contain the server name or IP address that
@@ -215,8 +213,27 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
-DICOM networking
-````````````````
+local_settings.py: Keep or delete processed DICOM files
+```````````````````````````````````````````````````````
+
+Should DICOM files be kept or deleted when they have been processed?
+
+* ``RM_DCM_NOMATCH`` is only applicable if you use the DICOM Store SCP built into OpenREM
+* The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
+  Philips CT images are kept (``False``) or deleted (``True``) when they have been processed
+* The default setting is False, to preserve behaviour from previous versions::
+
+    RM_DCM_NOMATCH = True
+    RM_DCM_RDSR = True
+    RM_DCM_MG = True
+    RM_DCM_DX = True
+    RM_DCM_CTPHIL = True
+
+.. Note::
+
+    It is recommended that the image file types and ``RM_DCM_NOMATCH`` are set to ``True``, as they can fill the disk
+    quickly if they are allowed to build up!
+
 See :doc:`netdicom`
 
 Create the database

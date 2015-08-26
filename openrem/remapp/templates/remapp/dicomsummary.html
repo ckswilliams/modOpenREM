@@ -45,9 +45,6 @@
               server where they will be automatically processed by OpenREM.
           </p>
           <p>
-              Depending on the settings in local_setting.py, the objects will be deleted once they have been processed.
-          </p>
-          <p>
               You need to have a store node configured here in order to use the query retrieve function. If you have
               another store service running, then set up the details of the other node here, just don't set the
               server to start.
@@ -61,7 +58,8 @@
                 <h3 class="panel-title">{{ scp.name }}</h3>
               </div>
               <div class="panel-body">
-                  <table>
+                  <h4>Server details</h4>
+                  <table class="table">
                       <tr>
                           <th>AE Title</th>
                           <td>{{ scp.aetitle }}</td>
@@ -77,11 +75,10 @@
                   </table>
 
                   <hr>
-                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/">Modify</a>
-                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/delete/">Delete</a> |
-                  <br>
-                  | <a href="/openrem/admin/dicomstore/{{ scp.id }}/start/">Start server</a> |
-                    <a href="/openrem/admin/dicomstore/{{ scp.id }}/stop/">Stop server</a> |
+                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
+                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/delete/" role="button">Delete</a>
+                  <a class="btn btn-success" href="/openrem/admin/dicomstore/{{ scp.id }}/start/" role="button">Start server</a>
+                  <a class="btn btn-danger" href="/openrem/admin/dicomstore/{{ scp.id }}/stop/" role="button">Stop server</a>
 
               </div>
           </div>
@@ -109,7 +106,7 @@
                       <h3 class="panel-title">{{ qr.name }}</h3>
                   </div>
                   <div class="panel-body">
-                      <table>
+                      <table class="table">
                           <tr>
                               <th>AE Title</th>
                               <td>{{ qr.aetitle }}</td>
@@ -135,6 +132,45 @@
                   </div>
               </div>
           {% endfor %}
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-5 col-md-offset-1">
+          <p>
+              Depending on the settings in local_setting.py, the objects will be deleted once they have been processed.
+              You can check the current settings in the table at the bottom. However, they must be changed in the
+              local_settings.py file.
+          </p>
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <h3 class="panel-title">Settings for all Store SCPs</h3>
+                  </div>
+                  <div class="panel-body">
+                      <h4>After processing incoming objects, delete...</h4>
+                      <table class="table">
+                          <tr>
+                              <th>unmatched studies?</th>
+                              <td>{{ rm_settings.no_match }}</td>
+                          </tr>
+                          <tr>
+                              <th>Radiation Dose Structured Reports?</th>
+                              <td>{{ rm_settings.rdsr }}</td>
+                          </tr>
+                          <tr>
+                              <th>Mammography images?</th>
+                              <td>{{ rm_settings.mg }}</td>
+                          </tr>
+                          <tr>
+                              <th>Radiology images?</th>
+                              <td>{{ rm_settings.dx }}</td>
+                          </tr>
+                          <tr>
+                              <th>Philips CT dose info images?</th>
+                              <td>{{ rm_settings.ct_phil }}</td>
+                          </tr>
+                      </table>
+                  </div>
+              </div>
           </div>
       </div>
 
