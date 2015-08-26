@@ -45,9 +45,6 @@
               server where they will be automatically processed by OpenREM.
           </p>
           <p>
-              Depending on the settings in local_setting.py, the objects will be deleted once they have been processed.
-          </p>
-          <p>
               You need to have a store node configured here in order to use the query retrieve function. If you have
               another store service running, then set up the details of the other node here, just don't set the
               server to start.
@@ -139,6 +136,11 @@
       </div>
       <div class="row">
           <div class="col-md-5 col-md-offset-1">
+          <p>
+              Depending on the settings in local_setting.py, the objects will be deleted once they have been processed.
+              You can check the current settings in the table at the bottom. However, they must be changed in the
+              local_settings.py file.
+          </p>
               <div class="panel panel-info">
                   <div class="panel-heading">
                       <h3 class="panel-title">Settings for all Store SCPs</h3>
@@ -167,9 +169,6 @@
                               <td>{{ rm_settings.ct_phil }}</td>
                           </tr>
                       </table>
-                      <p>
-                          These settings can be changed in the local_settings.py file.
-                      </p>
                   </div>
               </div>
           </div>
