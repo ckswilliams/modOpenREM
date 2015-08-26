@@ -120,43 +120,6 @@ def OnReceiveStore(SOPClass, DS):
     # must return appropriate status
     return SOPClass.Success
 
-def store(*args, **kwargs):
-
-    import sys
-    import argparse
-
-    try:
-        from openremproject.settings import STORE_AET
-    except ImportError:
-        STORE_AET = "OPENREM"
-    try:
-        from openremproject.settings import STORE_PORT
-    except ImportError:
-        STORE_PORT = 8104
-
-    # parse commandline
-    parser = argparse.ArgumentParser(description='OpenREM Store SCP')
-    parser.add_argument('-port', help='Override local_settings port used by this server', type=int, default=STORE_PORT)
-    parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
-    args = parser.parse_args()
-
-    # setup AE
-    MyAE = AE(
-        args.aet, args.port, [],
-        [StorageSOPClass, VerificationSOPClass],
-        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
-    )
-    MyAE.OnAssociateRequest = OnAssociateRequest
-    MyAE.OnAssociateResponse = OnAssociateResponse
-    MyAE.OnReceiveStore = OnReceiveStore
-    MyAE.OnReceiveEcho = OnReceiveEcho
-
-    # start AE
-    print "starting AE... AET:{0}, port:{1}".format(args.aet, args.port),
-    MyAE.start()
-    print "done"
-    MyAE.QuitOnKeyboardInterrupt()
-
 from celery import shared_task
 
 
