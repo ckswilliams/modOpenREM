@@ -52,6 +52,28 @@ Upgrading from version 0.6.0
     python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
 
+* Check/add the DICOM delete rules to the local_settings.py file
+
+Should DICOM files be kept or deleted when they have been processed?
+
+* ``RM_DCM_NOMATCH`` is only applicable if you use the DICOM Store SCP built into OpenREM
+* The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
+  Philips CT images are kept (``False``) or deleted (``True``) when they have been processed
+* The default setting is False, to preserve behaviour from previous versions::
+
+    RM_DCM_NOMATCH = True
+    RM_DCM_RDSR = True
+    RM_DCM_MG = True
+    RM_DCM_DX = True
+    RM_DCM_CTPHIL = True
+
+.. Note::
+
+    It is recommended that the image file types and ``RM_DCM_NOMATCH`` are set to ``True``, as they can fill the disk
+    quickly if they are allowed to build up!
+
+See :doc:`netdicom`
+
 
 Restart the web server
 ======================
