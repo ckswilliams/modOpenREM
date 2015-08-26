@@ -42,14 +42,17 @@ class DicomStoreSCP(models.Model):
     task_id = models.CharField(max_length=64, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
+
+class DICOMStoreGlobal(models.Model):
     rm_no_match = models.BooleanField(default=True)
     rm_rdsr = models.BooleanField(default=True)
     rm_mg = models.BooleanField(default=True)
     rm_dx = models.BooleanField(default=True)
     rm_ct_phil = models.BooleanField(default=True)
-
-    def get_absolute_url(self):
-        return reverse('dicom_summary')
 
 
 class DicomRemoteQR(models.Model):
