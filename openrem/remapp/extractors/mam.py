@@ -359,6 +359,8 @@ def _test_if_mammo(dataset):
 def _mammo2db(dataset):
     import os, sys
     import openrem_settings
+    from time import sleep
+    from random import random
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     from django.db import models
@@ -373,6 +375,45 @@ def _mammo2db(dataset):
     if not study_uid:
         sys.exit('No UID returned')  
     study_in_db = check_uid.check_uid(study_uid)
+
+    if not study_in_db:
+        # study doesn't exist, start from scratch
+        g = GeneralStudyModuleAttr.objects.create()
+        g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+        g.save()
+        # check again
+        study_in_db = check_uid.check_uid(study_uid)
+        if study_in_db == 1:
+            _generalstudymoduleattributes(dataset,g)
+        elif not study_in_db:
+            sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
+        elif study_in_db > 1:
+            sleep(random)
+            # Check if other instance(s) has deleted the study yet
+            study_in_db = check_uid.check_uid(study_uid)
+            if study_in_db == 1:
+                _generalstudymoduleattributes(dataset,g)
+            elif study_in_db > 1:
+                g.delete()
+            study_in_db = check_uid.check_uid(study_uid)
+            if not study_in_db:
+                # both must have been deleted simultaneously!
+                sleep(random)
+                # Check if other instance has created the study again yet
+                study_in_db = check_uid.check_uid(study_uid)
+                while not study_in_db:
+                    g = GeneralStudyModuleAttr.objects.create()
+                    g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+                    g.save()
+                    # check again
+                    study_in_db = check_uid.check_uid(study_uid)
+                    if study_in_db == 1:
+                        _generalstudymoduleattributes(dataset,g)
+                    if study_in_db > 1:
+                        g.delete()
+                        sleep(random)
+
+
     if study_in_db:
         event_uid = get_value_kw('SOPInstanceUID',dataset)
         inst_in_db = check_uid.check_uid(event_uid,'Event')
@@ -393,11 +434,6 @@ def _mammo2db(dataset):
         _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
         # update the accumulated tables
         return 0
-
-    # study doesn't exist, start from scratch
-    g = GeneralStudyModuleAttr.objects.create()
-    _generalstudymoduleattributes(dataset,g)
-    
 
 
 @shared_task
