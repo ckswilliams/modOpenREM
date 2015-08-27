@@ -44,7 +44,7 @@ def check_uid(uid, level='Study'):
     elif level == 'Event':
         existing = GeneralStudyModuleAttr.objects.filter(projectionxrayradiationdose__irradeventxraydata__irradiation_event_uid__exact = uid)
     if existing:
-        return 1
+        return existing.count()
 
     return 0
 
