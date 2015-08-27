@@ -54,7 +54,7 @@ Upgrading from version 0.6.0
 
 * Check/add the DICOM delete rules to the local_settings.py file
 
-Should DICOM files be kept or deleted when they have been processed?
+    Should DICOM files be kept or deleted when they have been processed?
 
 * ``RM_DCM_NOMATCH`` is only applicable if you use the DICOM Store SCP built into OpenREM
 * The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
