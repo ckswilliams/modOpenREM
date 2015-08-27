@@ -49,7 +49,9 @@
               another store service running, then set up the details of the other node here, just don't set the
               server to start.
           </p>
-          <a href="/openrem/admin/dicomstore/add/">Add new store</a>
+          <p>
+              <a class="btn btn-primary" href="/openrem/admin/dicomstore/add/" role="button">Add new Store</a>
+          </p>
 
 
           {% for scp in store %}
@@ -97,8 +99,10 @@
           <p>
               You can either enter a hostname or an IP address - if you enter both, the hostname will be used.
           </p>
+          <p>
+              <a class="btn btn-primary" href="/openrem/admin/dicomqr/add/" role="button">Add new QR Node</a>
+          </p>
 
-          <a href="/openrem/admin/dicomqr/add/">Add new QR Node</a>
 
           {% for qr in remoteqr %}
               <div class="panel panel-info">
@@ -126,9 +130,9 @@
                       </table>
 
                       <hr>
+                      <a class="btn btn-primary" href="/openrem/admin/dicomqr/{{ qr.id }}/" role="button">Modify</a>
+                      <a class="btn btn-primary" href="/openrem/admin/dicomqr/{{ qr.id }}/delete/" role="button">Delete</a>
 
-                      | <a href="/openrem/admin/dicomqr/{{ qr.id }}/">Modify</a>
-                      | <a href="/openrem/admin/dicomqr/{{ qr.id }}/delete/">Delete</a> |
                   </div>
               </div>
           {% endfor %}
