@@ -28,8 +28,8 @@ def _move_req(my_ae, remote_ae, d):
     print "Move association requested"
 #    print "d is {0}".format(d)
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, 'STOREOPENREM', 1)
-#    for gg in gen:
-#        print "gg is {0}".format(gg)
+    for gg in gen:
+        print "gg is {0}".format(gg)
     assocMove.Release(0)
     print "Move association released"
 
