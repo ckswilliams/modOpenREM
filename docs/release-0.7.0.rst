@@ -56,13 +56,13 @@ Upgrading from version 0.6.0
   been processed?
 
     ``RM_DCM_NOMATCH`` determines whether files that are not of any of the types we can get information from are deleted.
-    This is only applicable if you use the DICOM Store SCP built into OpenREM, and for example it receives a while CT
-    study instead of just the RDSR
+    This is only applicable if you use the DICOM Store SCP built into OpenREM. For example, if it receives a whole CT
+    study instead of just the RDSR, with the setting as ``True``, the image series are deleted straight away.
 
     The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
-    Philips CT images are kept (``False``) or deleted (``True``) when they have been processed
+    Philips CT images are kept (``False``) or deleted (``True``) when they have been processed.
 
-    The default setting is False, but it is recommended that at least the image types and ``NOMATCH`` are set to ``True``
+    The initial setting is False, but it is recommended that at least the image types and ``NOMATCH`` are set to ``True``
     as they can fill the disk quickly if they are allowed to build up::
 
         RM_DCM_NOMATCH = True
