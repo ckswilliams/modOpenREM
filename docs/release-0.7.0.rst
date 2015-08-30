@@ -24,7 +24,6 @@ Headline changes
 * Charts
 
     * Chart plotting status shown on the home page when a user is logged in
-    * Export of chart data to csv or xlsx
     * Bar chart data points sorted by frequency, value or name in ascending or descending order
     * New chart of DLP per requested procedure type and requested procedure frequency
     * Chart data returned using AJAX to make pages more responsive
@@ -135,3 +134,11 @@ This is the same as for Linux, but this time the line continuation character is 
 
 For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
 
+***********************
+Summary of new features
+***********************
+
+Charts
+======
+
+Release 0.7.0 has several additions to the charts available in OpenREM. For detailed information, please see :doc:`charts`.
