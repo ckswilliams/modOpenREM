@@ -11,15 +11,24 @@ OpenREM Release Notes version 0.7.0 beta
 Headline changes
 ****************
 
-* Each unique system has a user-defined display name so that systems with the same DICOM station name are displayed separately
-* Median function added for chart data if using PostgreSQL
-* Bar chart data points can be sorted by frequency, value or name in ascending or descending order
-* Database modification to add study time in datetime format for use with workload charts
-* Chart data now returned using AJAX to make pages more responsive
-* Chart plotting status shown on the home page when a user is logged in
-* Chart data can be exported to a csv or xlsx file
-* New chart of DLP per requested procedure type and requested procedure freqency
-* Django upgraded to version 1.8
+* System
+
+    * Django upgraded to version 1.8
+    * Median function added to the database if using PostgreSQL
+    * Database modification to add study time in datetime format for use with workload charts
+    * New user-defined display name for each unique system so that rooms with the same DICOM station name are displayed separately
+
+        * Display names can be viewed via user options menu
+        * Display names can be edited via the admin options menu
+
+* Charts
+
+    * Chart plotting status shown on the home page when a user is logged in
+    * Export of chart data to csv or xlsx
+    * Bar chart data points sorted by frequency, value or name in ascending or descending order
+    * New chart of DLP per requested procedure type and requested procedure frequency
+    * Chart data returned using AJAX to make pages more responsive
+    * Chart plotting options available via user options menu
 
 ****************************
 Upgrading from version 0.6.0
