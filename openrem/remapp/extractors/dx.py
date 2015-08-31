@@ -37,6 +37,7 @@
 import os
 import sys
 import django
+import logging
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -557,9 +558,13 @@ def _create_event(dataset):
     event_time = get_value_kw('AcquisitionTime',dataset)
     event_date = get_value_kw('AcquisitionDate',dataset)
     event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-    for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-        if event_date_time == events.date_time_started:
-            return 0
+    try:
+        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+            if event_date_time == events.date_time_started:
+                return 0
+    except Exception as e:
+        logging.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
+                         study_uid, event_uid, e)
     # study exists, but event doesn't
     _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
     # update the accumulated tables
