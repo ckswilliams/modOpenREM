@@ -35,21 +35,21 @@ The default text for ``display name`` is set to a combination of
 Viewing x-ray system display names
 ==================================
 
-If you log in as a normal user then the ``User options`` menu becomes available
-at the right-hand end of the navigation bar at the top of the screen:
-
 .. image:: img/UserOptionsMenu.png
     :align: right
     :alt: User options menu
     :width: 177px
     :height: 154px
 
+If you log in as a normal user then the ``User options`` menu becomes available
+at the right-hand end of the navigation bar at the top of the screen:
+
 The third option, ``View display names``, takes you to a page where you can
 view the list of x-ray systems with data in OpenREM together with their
 current display name.
 
 .. image:: img/DisplayNameList.png
-    :align: right
+    :align: center
     :alt: List of current display names
     :width: 1065px
     :height: 611px
@@ -57,15 +57,15 @@ current display name.
 Changing x-ray system display names
 ===================================
 
-If you wish to make changes to a display name then you must log in as a user
-that is in the ``admingroup``. You will then be able to use the
-``View and edit display names`` item under the ``Admin`` menu:
-
 .. image:: img/AdminMenu.png
     :align: right
     :alt: Admin menu
     :width: 284px
     :height: 153px
+
+If you wish to make changes to a display name then you must log in as a user
+that is in the ``admingroup``. You will then be able to use the
+``View and edit display names`` item under the ``Admin`` menu:
 
 This will take you to a page where you can view the list of x-ray systems with
 data in OpenREM. If you wish to change a display name then click on the
@@ -73,7 +73,7 @@ corresponding row. The resulting page will allow you to edit the display name.
 Click on the ``Update`` button to confirm your changes:
 
 .. image:: img/UpdateDisplayName.png
-    :align: right
+    :align: center
     :alt: Update a display name
     :width: 1080px
     :height: 193px
