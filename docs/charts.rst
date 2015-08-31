@@ -6,13 +6,13 @@ Charts of the currently filtered data can now be shown for CT and radiographic
 data. The user can configure which plots are shown using the ``Chart options``
 on the CT and radiographic pages.
 
-New in 0.7.0: Chart plotting options can also be configured by choosing the
+*New in 0.7.0* Chart plotting options can also be configured by choosing the
 ``Chart options`` item on the ``User options`` menu at the top of the OpenREM
 homepage.
 
-New in 0.7.0: The chart plotting status is displayed on the OpenREM homepage.
+*New in 0.7.0* The chart plotting status is displayed on the OpenREM homepage.
 
-New in 0.7.0: The data in many of the charts can now be sorted interactively
+*New in 0.7.0* The data in many of the charts can now be sorted interactively
 by the user by clicking on one of the sorting options below the individual chart:
 
 .. image:: img/ChartCTSortingOptions.png
@@ -31,7 +31,7 @@ applies to the data.
 Chart options
 *************
 
-New in 0.7.0: Chart options can now be configured by choosing the
+*New in 0.7.0* Chart options can now be configured by choosing the
 ``Chart options`` item from the ``User options`` menu on the OpenREM homepage:
 
 .. image:: img/ChartOptions.png
@@ -118,12 +118,12 @@ The available charts for CT data are as follows:
       the pie chart takes the user to the list of studies that correspond to
       the data in that segment.
 
-    * New in 0.7.0: Bar chart of mean DLP for each requested procedure. Clicking
+    * *New in 0.7.0* Bar chart of mean DLP for each requested procedure. Clicking
       on a bar takes the user to a histogram of DLP for that procedure. Clicking
       on a histogram bar tooltip link takes the user to the list of procedures
       that correspond to the data represented by that bar.
 
-    * New in 0.7.0: Pie chart of the frequency of each requested procedure.
+    * *New in 0.7.0* Pie chart of the frequency of each requested procedure.
       Clicking on a segment of the pie chart takes the user to the list of
       procedures that correspond to the data in that segment.
 
@@ -157,7 +157,7 @@ The available charts for CT data are as follows:
          :height: 716px
          :alt: OpenREM line chart of mean DLP per study type over time screenshot
 
-    * New in 0.7.0: The user can choose whether the data displayed on the charts
+    * *New in 0.7.0* The user can choose whether the data displayed on the charts
       is the mean, the median or both by using the drop-down `Average to use`
       selection.
       
@@ -194,7 +194,7 @@ The available charts for radiographic data are as follows:
       and dragging the mouse to select a date range. The user can also click on
       items in the legend to show or hide individual lines.
 
-    * New in 0.7.0: The user can choose whether the data displayed on the charts
+    * *New in 0.7.0* The user can choose whether the data displayed on the charts
       is the mean, the median or both by using the drop-down `Average to use`
       selection.
 
