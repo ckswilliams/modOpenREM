@@ -35,33 +35,39 @@ The default text for ``display name`` is set to a combination of
 Viewing x-ray system display names
 ==================================
 
-.. image:: img/UserOptionsMenu.png
-    :align: right
-    :alt: User options menu
-    :width: 177px
-    :height: 154px
+.. figure:: img/UserOptionsMenu.png
+   :align: right
+   :alt: User options menu
+   :width: 177px
+   :height: 154px
+
+   The ``User options`` menu
 
 If you log in as a normal user then the ``User options`` menu becomes available
-at the right-hand end of the navigation bar at the top of the screen:
+at the right-hand end of the navigation bar at the top of the screen.
 
 The third option, ``View display names``, takes you to a page where you can
 view the list of x-ray systems with data in OpenREM together with their
 current display name.
 
-.. image:: img/DisplayNameList.png
-    :align: center
-    :alt: List of current display names
-    :width: 1065px
-    :height: 611px
+.. figure:: img/DisplayNameList.png
+   :align: center
+   :alt: List of current display names
+   :width: 1065px
+   :height: 611px
+
+   Example list of display names
 
 Changing x-ray system display names
 ===================================
 
-.. image:: img/AdminMenu.png
-    :align: right
-    :alt: Admin menu
-    :width: 284px
-    :height: 153px
+.. figure:: img/AdminMenu.png
+   :align: right
+   :alt: Admin menu
+   :width: 284px
+   :height: 153px
+
+   The ``Admin`` menu
 
 If you wish to make changes to a display name then you must log in as a user
 that is in the ``admingroup``. You will then be able to use the
@@ -72,11 +78,13 @@ data in OpenREM. If you wish to change a display name then click on the
 corresponding row. The resulting page will allow you to edit the display name.
 Click on the ``Update`` button to confirm your changes:
 
-.. image:: img/UpdateDisplayName.png
-    :align: center
-    :alt: Update a display name
-    :width: 1080px
-    :height: 193px
+.. figure:: img/UpdateDisplayName.png
+   :align: center
+   :alt: Update a display name
+   :width: 1080px
+   :height: 193px
+
+   Example of the page for updating a display name
 
 You can set multiple rows to the same display name. You may wish to do this if
 a system has a software upgrade, for example, as this will generate a new
