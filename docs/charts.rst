@@ -12,14 +12,16 @@ homepage.
 
 *New in 0.7.0* The chart plotting status is displayed on the OpenREM homepage.
 
-*New in 0.7.0* The data in many of the charts can now be sorted interactively
-by the user by clicking on one of the sorting options below the individual chart:
-
-.. image:: img/ChartCTSortingOptions.png
+.. figure:: img/ChartCTSortingOptions.png
    :width: 185px
-   :align: center
+   :align: right
    :height: 95px
    :alt: OpenREM CT chart sorting options screenshot
+
+   CT chart sorting options
+
+*New in 0.7.0* The data in many of the charts can now be sorted interactively
+by the user by clicking on one of the sorting options below the individual chart:
 
 The user can set the default sorting type and direction by choosing the 
 ``Chart options`` item from the ``User options`` menu on the OpenREM homepage.
