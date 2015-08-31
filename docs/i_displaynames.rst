@@ -77,3 +77,9 @@ Click on the ``Update`` button to confirm your changes:
     :alt: Update a display name
     :width: 1080px
     :height: 193px
+
+You can set multiple rows to the same display name. You may wish to do this if
+a system has a software upgrade, for example, as this will generate a new
+default display name for studies carried out after the software upgrade has
+taken place. The studies from these will be grouped together as a single entry
+on the OpenREM homepage and individual modality pages.
