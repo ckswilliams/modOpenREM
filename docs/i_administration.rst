@@ -8,5 +8,5 @@ Contents:
     
     i_deletestudies
     i_patientsize
-    
+    i_displaynames
 
