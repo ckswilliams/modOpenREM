@@ -328,8 +328,11 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
         event.comment = series_description
     try:
         event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
-    except:
-        print "Error creating AnatomicRegionSequence. Continuing."
+    except Exception as e:
+        logging.warning("Error creating AnatomicRegionSequence. Continuin. Value %s, meaning %s. %s",
+                        get_seq_code_value('AnatomicRegionSequence',dataset),
+                        get_seq_code_meaning('AnatomicRegionSequence',dataset),
+                        e)
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
         if laterality.strip() == 'R':
@@ -592,6 +595,7 @@ def _dx2db(dataset):
     study_in_db = check_uid.check_uid(study_uid)
 
     if study_in_db == 1:
+        sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
         _create_event(dataset)
 
     if not study_in_db:
@@ -620,6 +624,7 @@ def _dx2db(dataset):
                     # Check if other instance has created the study again yet
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
+                        sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                         _create_event(dataset)
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
@@ -634,8 +639,10 @@ def _dx2db(dataset):
                             sleep(random)
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
+                                sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                                 _create_event(dataset)
                 elif study_in_db == 1:
+                    sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                     _create_event(dataset)
     
 

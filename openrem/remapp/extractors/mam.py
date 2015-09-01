@@ -423,6 +423,7 @@ def _mammo2db(dataset):
     logging.info("In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
 
     if study_in_db == 1:
+        sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
         _create_event(dataset)
 
     if not study_in_db:
@@ -453,6 +454,7 @@ def _mammo2db(dataset):
                     # Check if other instance has created the study again yet
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
+                        sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                         _create_event(dataset)
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
@@ -467,8 +469,10 @@ def _mammo2db(dataset):
                             sleep(random)
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
+                                sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                                 _create_event(dataset)
                 elif study_in_db == 1:
+                    sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                     _create_event(dataset)
 
 
