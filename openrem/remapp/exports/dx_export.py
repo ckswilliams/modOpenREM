@@ -140,6 +140,22 @@ def exportDX2excel(filterdict):
     tsk.save()
 
     for i, exams in enumerate(e):
+
+        try:
+            patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
+        except:
+            patient_age = None
+
+        try:
+            patient_size = exams.patientstudymoduleattr_set.get().patient_size
+        except:
+            patient_size = None
+
+        try:
+            patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
+        except:
+            patient_weight = None
+
         examdata = [
             exams.generalequipmentmoduleattr_set.get().institution_name,
             exams.generalequipmentmoduleattr_set.get().manufacturer,
@@ -149,9 +165,9 @@ def exportDX2excel(filterdict):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
-            exams.patientstudymoduleattr_set.get().patient_age_decimal,
-            exams.patientstudymoduleattr_set.get().patient_size,
-            exams.patientstudymoduleattr_set.get().patient_weight,
+            patient_age,
+            patient_size,
+            patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
             exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames,
@@ -159,17 +175,57 @@ def exportDX2excel(filterdict):
             ]
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+            try:
+                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
+            except:
+                exposure_control_mode = None
+
+            try:
+                kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
+            except:
+                kvp = None
+
+            try:
+                mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+            except:
+                mas = None
+
+            try:
+                average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
+            except:
+                average_xray_tube_current = None
+
+            try:
+                exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
+            except:
+                exposure_time = None
+
+            try:
+                exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
+            except:
+                exposure_index = None
+
+            try:
+                relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
+            except:
+                relative_xray_exposure = None
+
+            try:
+                cgycm2 = s.convert_gym2_to_cgycm2()
+            except:
+                cgycm2 = None
+
             examdata += [
                 s.acquisition_protocol,
                 s.image_view,
-                s.irradeventxraysourcedata_set.get().exposure_control_mode,
-                s.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
-                s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs(),
-                s.irradeventxraysourcedata_set.get().average_xray_tube_current,
-                s.irradeventxraysourcedata_set.get().exposure_time,
-                s.irradeventxraydetectordata_set.get().exposure_index,
-                s.irradeventxraydetectordata_set.get().relative_xray_exposure,
-                s.convert_gym2_to_cgycm2(),
+                exposure_control_mode,
+                kvp,
+                mas,
+                average_xray_tube_current,
+                exposure_time,
+                exposure_index,
+                relative_xray_exposure,
+                cgycm2,
                 ]
 
         writer.writerow(examdata)
@@ -381,6 +437,26 @@ def dxxlsx(filterdict):
         tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
 
+        try:
+            patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+        except:
+            patient_age = None
+
+        try:
+            patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
+        except:
+            patient_size = None
+
+        try:
+            patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
+        except:
+            patient_weight = None
+
+        try:
+            not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+        except:
+            not_patient_indicator = None
+
         examdata = [
             exams.generalequipmentmoduleattr_set.get().institution_name,
             exams.generalequipmentmoduleattr_set.get().manufacturer,
@@ -390,33 +466,98 @@ def dxxlsx(filterdict):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
-            str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
-            str(exams.patientstudymoduleattr_set.get().patient_size),
-            str(exams.patientstudymoduleattr_set.get().patient_weight),
-            exams.patientmoduleattr_set.get().not_patient_indicator,
+            patient_age,
+            patient_size,
+            patient_weight,
+            not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
             str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames),
             str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()),
         ]
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+            try:
+                exposure_control_mode = str(s.irradeventxraysourcedata_set.get().exposure_control_mode)
+            except:
+                exposure_control_mode = None
+
+            try:
+                kvp = str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
+            except:
+                kvp = None
+
+            try:
+                mas = str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
+            except:
+                mas = None
+
+            try:
+                average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
+            except:
+                average_xray_tube_current = None
+
+            try:
+                exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
+            except:
+                exposure_time = None
+
+            try:
+                exposure_index = str(s.irradeventxraydetectordata_set.get().exposure_index)
+            except:
+                exposure_index = None
+
+            try:
+                relative_xray_exposure = str(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
+            except:
+                relative_xray_exposure = None
+
+            try:
+                cgycm2 = str(s.convert_gym2_to_cgycm2())
+            except:
+                cgycm2 = None
+
+            try:
+                entrance_exposure_at_rp = str(s.entrance_exposure_at_rp)
+            except:
+                entrance_exposure_at_rp = None
+
+            try:
+                distance_source_to_detector = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector)
+            except:
+                distance_source_to_detector = None
+
+            try:
+                distance_source_to_entrance_surface = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface)
+            except:
+                distance_source_to_entrance_surface = None
+
+            try:
+                distance_source_to_isocenter = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter)
+            except:
+                distance_source_to_isocenter = None
+
+            try:
+                table_height_position = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position)
+            except:
+                table_height_position = None
+
             examdata += [
                 s.acquisition_protocol,
                 str(s.anatomical_structure),
                 str(s.image_view),
-                str(s.irradeventxraysourcedata_set.get().exposure_control_mode),
-                str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
-                str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()),
-                str(s.irradeventxraysourcedata_set.get().average_xray_tube_current),
-                str(s.irradeventxraysourcedata_set.get().exposure_time),
-                str(s.irradeventxraydetectordata_set.get().exposure_index),
-                str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
-                str(s.convert_gym2_to_cgycm2()),
-                str(s.entrance_exposure_at_rp),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position),
+                exposure_control_mode,
+                kvp,
+                mas,
+                average_xray_tube_current,
+                exposure_time,
+                exposure_index,
+                relative_xray_exposure,
+                cgycm2,
+                entrance_exposure_at_rp,
+                distance_source_to_detector,
+                distance_source_to_entrance_surface,
+                distance_source_to_isocenter,
+                table_height_position,
                 s.comment,
             ]
 
@@ -433,7 +574,27 @@ def dxxlsx(filterdict):
             tabtext = tabtext.translate(translation_table) # remove illegal characters
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
-            
+
+            try:
+                patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+            except:
+                patient_age = None
+
+            try:
+                patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
+            except:
+                patient_size = None
+
+            try:
+                patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
+            except:
+                patient_weight = None
+
+            try:
+                not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+            except:
+                not_patient_indicator = None
+
             examdata = [
                 exams.generalequipmentmoduleattr_set.get().institution_name,
                 exams.generalequipmentmoduleattr_set.get().manufacturer,
@@ -443,32 +604,98 @@ def dxxlsx(filterdict):
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
-                str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
-                str(exams.patientstudymoduleattr_set.get().patient_size),
-                str(exams.patientstudymoduleattr_set.get().patient_weight),
-                exams.patientmoduleattr_set.get().not_patient_indicator,
+                patient_age,
+                patient_size,
+                patient_weight,
+                not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
                 str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames),
                 str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()),
                 ]
+
+            try:
+                exposure_control_mode = str(s.irradeventxraysourcedata_set.get().exposure_control_mode)
+            except:
+                exposure_control_mode = None
+
+            try:
+                kvp = str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
+            except:
+                kvp = None
+
+            try:
+                mas = str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
+            except:
+                mas = None
+
+            try:
+                average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
+            except:
+                average_xray_tube_current = None
+
+            try:
+                exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
+            except:
+                exposure_time = None
+
+            try:
+                exposure_index = str(s.irradeventxraydetectordata_set.get().exposure_index)
+            except:
+                exposure_index = None
+
+            try:
+                relative_xray_exposure = str(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
+            except:
+                relative_xray_exposure = None
+
+            try:
+                cgycm2 = str(s.convert_gym2_to_cgycm2())
+            except:
+                cgycm2 = None
+
+            try:
+                entrance_exposure_at_rp = str(s.entrance_exposure_at_rp)
+            except:
+                entrance_exposure_at_rp = None
+
+            try:
+                distance_source_to_detector = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector)
+            except:
+                distance_source_to_detector = None
+
+            try:
+                distance_source_to_entrance_surface = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface)
+            except:
+                distance_source_to_entrance_surface = None
+
+            try:
+                distance_source_to_isocenter = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter)
+            except:
+                distance_source_to_isocenter = None
+
+            try:
+                table_height_position = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position)
+            except:
+                table_height_position = None
+
             examdata += [
                 s.acquisition_protocol,
                 str(s.anatomical_structure),
                 str(s.image_view),
-                str(s.irradeventxraysourcedata_set.get().exposure_control_mode),
-                str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
-                str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()),
-                str(s.irradeventxraysourcedata_set.get().average_xray_tube_current),
-                str(s.irradeventxraysourcedata_set.get().exposure_time),
-                str(s.irradeventxraydetectordata_set.get().exposure_index),
-                str(s.irradeventxraydetectordata_set.get().relative_xray_exposure),
-                str(s.convert_gym2_to_cgycm2()),
-                str(s.entrance_exposure_at_rp),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter),
-                str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position),
+                exposure_control_mode,
+                kvp,
+                mas,
+                average_xray_tube_current,
+                exposure_time,
+                exposure_index,
+                relative_xray_exposure,
+                cgycm2,
+                entrance_exposure_at_rp,
+                distance_source_to_detector,
+                distance_source_to_entrance_surface,
+                distance_source_to_isocenter,
+                table_height_position,
                 s.comment,
             ]
 
