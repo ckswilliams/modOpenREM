@@ -52,6 +52,7 @@ def exportDX2excel(filterdict):
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q # For the Q "OR" query used for DX and CR
+    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -143,17 +144,17 @@ def exportDX2excel(filterdict):
 
         try:
             patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
-        except:
+        except ObjectDoesNotExist:
             patient_age = None
 
         try:
             patient_size = exams.patientstudymoduleattr_set.get().patient_size
-        except:
+        except ObjectDoesNotExist:
             patient_size = None
 
         try:
             patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
-        except:
+        except ObjectDoesNotExist:
             patient_weight = None
 
         examdata = [
@@ -177,42 +178,42 @@ def exportDX2excel(filterdict):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             try:
                 exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
-            except:
+            except ObjectDoesNotExist:
                 exposure_control_mode = None
 
             try:
                 kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
-            except:
+            except ObjectDoesNotExist:
                 kvp = None
 
             try:
                 mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
-            except:
+            except ObjectDoesNotExist:
                 mas = None
 
             try:
                 average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
-            except:
+            except ObjectDoesNotExist:
                 average_xray_tube_current = None
 
             try:
                 exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
-            except:
+            except ObjectDoesNotExist:
                 exposure_time = None
 
             try:
                 exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
-            except:
+            except ObjectDoesNotExist:
                 exposure_index = None
 
             try:
                 relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
-            except:
+            except ObjectDoesNotExist:
                 relative_xray_exposure = None
 
             try:
                 cgycm2 = s.convert_gym2_to_cgycm2()
-            except:
+            except ObjectDoesNotExist:
                 cgycm2 = None
 
             examdata += [
@@ -271,6 +272,7 @@ def dxxlsx(filterdict):
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
     from django.db.models import Q # For the Q "OR" query used for DX and CR
+    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -439,22 +441,22 @@ def dxxlsx(filterdict):
 
         try:
             patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
-        except:
+        except ObjectDoesNotExist:
             patient_age = None
 
         try:
             patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
-        except:
+        except ObjectDoesNotExist:
             patient_size = None
 
         try:
             patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
-        except:
+        except ObjectDoesNotExist:
             patient_weight = None
 
         try:
             not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
-        except:
+        except ObjectDoesNotExist:
             not_patient_indicator = None
 
         examdata = [
@@ -478,67 +480,67 @@ def dxxlsx(filterdict):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             try:
                 exposure_control_mode = str(s.irradeventxraysourcedata_set.get().exposure_control_mode)
-            except:
+            except ObjectDoesNotExist:
                 exposure_control_mode = None
 
             try:
                 kvp = str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
-            except:
+            except ObjectDoesNotExist:
                 kvp = None
 
             try:
                 mas = str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-            except:
+            except ObjectDoesNotExist:
                 mas = None
 
             try:
                 average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-            except:
+            except ObjectDoesNotExist:
                 average_xray_tube_current = None
 
             try:
                 exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
-            except:
+            except ObjectDoesNotExist:
                 exposure_time = None
 
             try:
                 exposure_index = str(s.irradeventxraydetectordata_set.get().exposure_index)
-            except:
+            except ObjectDoesNotExist:
                 exposure_index = None
 
             try:
                 relative_xray_exposure = str(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
-            except:
+            except ObjectDoesNotExist:
                 relative_xray_exposure = None
 
             try:
                 cgycm2 = str(s.convert_gym2_to_cgycm2())
-            except:
+            except ObjectDoesNotExist:
                 cgycm2 = None
 
             try:
                 entrance_exposure_at_rp = str(s.entrance_exposure_at_rp)
-            except:
+            except ObjectDoesNotExist:
                 entrance_exposure_at_rp = None
 
             try:
                 distance_source_to_detector = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector)
-            except:
+            except ObjectDoesNotExist:
                 distance_source_to_detector = None
 
             try:
                 distance_source_to_entrance_surface = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface)
-            except:
+            except ObjectDoesNotExist:
                 distance_source_to_entrance_surface = None
 
             try:
                 distance_source_to_isocenter = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter)
-            except:
+            except ObjectDoesNotExist:
                 distance_source_to_isocenter = None
 
             try:
                 table_height_position = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position)
-            except:
+            except ObjectDoesNotExist:
                 table_height_position = None
 
             examdata += [
@@ -577,22 +579,22 @@ def dxxlsx(filterdict):
 
             try:
                 patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
-            except:
+            except ObjectDoesNotExist:
                 patient_age = None
 
             try:
                 patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
-            except:
+            except ObjectDoesNotExist:
                 patient_size = None
 
             try:
                 patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
-            except:
+            except ObjectDoesNotExist:
                 patient_weight = None
 
             try:
                 not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
-            except:
+            except ObjectDoesNotExist:
                 not_patient_indicator = None
 
             examdata = [
@@ -616,67 +618,67 @@ def dxxlsx(filterdict):
 
             try:
                 exposure_control_mode = str(s.irradeventxraysourcedata_set.get().exposure_control_mode)
-            except:
+            except ObjectDoesNotExist:
                 exposure_control_mode = None
 
             try:
                 kvp = str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
-            except:
+            except ObjectDoesNotExist:
                 kvp = None
 
             try:
                 mas = str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-            except:
+            except ObjectDoesNotExist:
                 mas = None
 
             try:
                 average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-            except:
+            except ObjectDoesNotExist:
                 average_xray_tube_current = None
 
             try:
                 exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
-            except:
+            except ObjectDoesNotExist:
                 exposure_time = None
 
             try:
                 exposure_index = str(s.irradeventxraydetectordata_set.get().exposure_index)
-            except:
+            except ObjectDoesNotExist:
                 exposure_index = None
 
             try:
                 relative_xray_exposure = str(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
-            except:
+            except ObjectDoesNotExist:
                 relative_xray_exposure = None
 
             try:
                 cgycm2 = str(s.convert_gym2_to_cgycm2())
-            except:
+            except ObjectDoesNotExist:
                 cgycm2 = None
 
             try:
                 entrance_exposure_at_rp = str(s.entrance_exposure_at_rp)
-            except:
+            except ObjectDoesNotExist:
                 entrance_exposure_at_rp = None
 
             try:
                 distance_source_to_detector = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector)
-            except:
+            except ObjectDoesNotExist:
                 distance_source_to_detector = None
 
             try:
                 distance_source_to_entrance_surface = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface)
-            except:
+            except ObjectDoesNotExist:
                 distance_source_to_entrance_surface = None
 
             try:
                 distance_source_to_isocenter = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter)
-            except:
+            except ObjectDoesNotExist:
                 distance_source_to_isocenter = None
 
             try:
                 table_height_position = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position)
-            except:
+            except ObjectDoesNotExist:
                 table_height_position = None
 
             examdata += [
