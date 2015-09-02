@@ -326,13 +326,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     series_description = get_value_kw('SeriesDescription',dataset)
     if series_description:
         event.comment = series_description
-    try:
-        event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
-    except Exception as e:
-        logging.warning("Error creating AnatomicRegionSequence. Continuin. Value %s, meaning %s. %s",
-                        get_seq_code_value('AnatomicRegionSequence',dataset),
-                        get_seq_code_meaning('AnatomicRegionSequence',dataset),
-                        e)
+    event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
         if laterality.strip() == 'R':
