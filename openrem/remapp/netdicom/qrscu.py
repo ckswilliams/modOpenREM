@@ -335,6 +335,7 @@ def qrscu(
     # done
     MyAE.Quit()
     query.complete = True
+    query.stage = "Query complete"
     query.save()
 
 

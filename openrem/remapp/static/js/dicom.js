@@ -4,6 +4,7 @@ $(document).ready(function(){
     form.submit(function(event) {
         event.preventDefault();
         console.log('ajax form submission function called successfully.');
+        $( '#move-status' ).html( '' );
         form = $(this);
         console.log(form)
         var serialized_form = form.serialize();
