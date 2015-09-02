@@ -29,6 +29,11 @@ Headline changes
     * Chart data returned using AJAX to make pages more responsive
     * Chart plotting options available via user options menu
 
+* DICOM Networking
+
+    * Configuring and running DICOM Store SCP is now managed in the web interface
+    * Query retrieve function is now built in to query PACS systems or modalities
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
@@ -84,7 +89,7 @@ Upgrading from version 0.6.0
         RM_DCM_DX = True
         RM_DCM_CTPHIL = True
 
-    See :doc:`netdicom` for information about how to make use of the new functionality.
+    See :doc:`netdicom` for information about how to make use of the new functionality (docs not yet ready)
 
 
 Restart the web server
@@ -133,6 +138,10 @@ Windows::
 This is the same as for Linux, but this time the line continuation character is ``^``.
 
 For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
+
+To stop the celery queues::
+
+    celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
 ***********************
 Summary of new features

@@ -234,7 +234,7 @@ Should DICOM files be kept or deleted when they have been processed?
     It is recommended that the image file types and ``RM_DCM_NOMATCH`` are set to ``True``, as they can fill the disk
     quickly if they are allowed to build up!
 
-See :doc:`netdicom`
+See :doc:`netdicom` (docs not yet up to date with features)
 
 Create the database
 -------------------
@@ -363,16 +363,21 @@ Windows::
     cd C:\Python27\Lib\site-packages\openrem\
     celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
     -Q:stores stores -Q default ^
-    --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
+    --pidfile=C:\path\to\media\celery\%N.pid --logfile=C:\path\to\media\celery\%N.log
 
 This is the same as for Linux, but this time the line continuation character is ``^``.
 
 For production use, see `Daemonising Celery`_ below
 
-Preview feature: Start the DICOM Store SCP
-------------------------------------------
+To stop the celery queues::
 
-See :doc:`netdicom`
+    celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
+
+
+Start the DICOM Store SCP
+-------------------------
+
+See :doc:`netdicom` - documentation not yet up to date with features.
 
 Start using it!
 ---------------
