@@ -1153,7 +1153,12 @@ def openrem_home(request):
     if not Group.objects.filter(name="admingroup"):
         ag = Group(name="admingroup")
         ag.save()
-    
+
+    users_in_groups = False
+    for g in Group.objects.all():
+        if Group.objects.get(name=g).user_set.all():
+            users_in_groups = True
+
     allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = { 
         'total' : allstudies.count(),
@@ -1239,7 +1244,7 @@ def openrem_home(request):
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
 
-    return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
+    return render(request,"remapp/home.html",{'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
 
 @login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
