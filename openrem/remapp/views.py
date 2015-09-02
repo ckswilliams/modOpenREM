@@ -30,6 +30,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+#from __future__ import unicode_literals
 # Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
@@ -1226,7 +1227,7 @@ def openrem_home(request):
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
-            displayname = str(display_name[0])
+            displayname = (display_name[0]).encode('utf-8')
                        
             modalitydata[display_name[0]] = {
                 'total' : studies.filter(
@@ -1539,7 +1540,7 @@ def display_name_update(request, pk):
         else:
             return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
-        form = UpdateDisplayNameForm(initial={'display_name': str(f.values_list('display_name')[0][0])}, auto_id=False)
+        form = UpdateDisplayNameForm(initial={'display_name': (f.values_list('display_name')[0][0]).encode('utf-8')}, auto_id=False)
 
         try:
             vers = pkg_resources.require("openrem")[0].version
