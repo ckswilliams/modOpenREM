@@ -245,7 +245,7 @@ Windows::
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate
     python C:\Python27\Lib\site-packages\openrem\manage.py showmigrations
 
-The `makemigrations remapp` should fix the `auth_user` relation error.
+The ``makemigrations remapp`` should fix the ``auth_user`` relation error.
 
 The last command will list each Django app migrations. Each should have a cross inside
 a pair of square brackets something like below::
@@ -279,8 +279,8 @@ interface. See the `Start using it!`_ section below.
 If using PostgreSQL you must add the median database function
 -------------------------------------------------------------
 
-Rename the `0002_fresh_openrem_install_add_median_function.py.inactive` file
-in the `migrations` folder to `0002_fresh_openrem_install_add_median_function.py`
+Rename the ``0002_fresh_openrem_install_add_median_function.py.inactive`` file
+in the ``migrations`` folder to ``0002_fresh_openrem_install_add_median_function.py``
 then do the following:
 
 Windows::
@@ -288,9 +288,9 @@ Windows::
 	python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations --empty remapp
 	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
 
-The first command will create a skeleton `0001_initial.py` migration file. The
+The first command will create a skeleton ``0001_initial.py`` migration file. The
 second command runs the migration files, and will display the text
-`Applying remapp.0002_fresh__openrem_install_add_median_function... OK`, indicating
+``Applying remapp.0002_fresh__openrem_install_add_median_function... OK``, indicating
 that the median function has been added.
 
 

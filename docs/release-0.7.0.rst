@@ -45,7 +45,7 @@ Upgrading from version 0.6.0
 
 * The 0.7.0 upgrade must be made from a 0.6.0 (or later) database, and a schema migration is required:
 
-    Delete all numbered migration files in openrem's `migrations` folder.
+    Delete all numbered migration files in openrem's ``migrations`` folder.
 
 .. sourcecode:: bash
 
