@@ -11,7 +11,7 @@ requires = [
     'django-filter >= 0.10',
     'pytz >= 0a',
     'humanize',
-    'pydicom >= 0.9.7',
+    'pydicom >= 0.9.8',
     'django-pagination',
     'xlsxwriter',
     'celery >= 3.1',
@@ -22,7 +22,7 @@ requires = [
 
 setup(
     name='OpenREM',
-    version='0.7.0b4',
+    version='0.7.0b5',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,

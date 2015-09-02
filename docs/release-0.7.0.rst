@@ -49,7 +49,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b4
+    pip install openrem==0.7.0b5
 
     # Windows:
     python C:\Python27\Lib\site-packages\openrem\manage.py migrate --fake-initial
