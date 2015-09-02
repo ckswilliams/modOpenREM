@@ -231,6 +231,10 @@ class UniqueEquipmentNames(models.Model):
         unique_together = ('manufacturer', 'institution_name', 'station_name', 'institutional_department_name',
                            'manufacturer_model_name', 'device_serial_number', 'software_versions', 'gantry_id')
 
+    def __unicode__(self):
+        return self.display_name
+
+
 class SizeUpload(models.Model):
     sizefile = models.FileField(upload_to='sizeupload')
     height_field = models.TextField(blank=True, null=True)

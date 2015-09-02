@@ -37,6 +37,7 @@
 import os
 import sys
 import django
+import logging
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -266,10 +267,10 @@ def _doserelateddistancemeasurements(dataset,mech):
     from remapp.models import DoseRelatedDistanceMeasurements
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
-    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer.lower()
-    model_name = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name.lower()
+    manufacturer = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer
+    model_name = dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[0].manufacturer_model_name
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector',dataset)
-    if dist.distance_source_to_detector and "kodak" in manufacturer and "dr 7500" in model_name:
+    if dist.distance_source_to_detector and manufacturer and model_name and "kodak" in manufacturer.lower() and "dr 7500" in model_name.lower():
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100 # convert dm to mm
     dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToPatient',dataset)
     dist.distance_source_to_isocenter = get_value_kw('DistanceSourceToIsocenter',dataset)
@@ -325,10 +326,7 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
     series_description = get_value_kw('SeriesDescription',dataset)
     if series_description:
         event.comment = series_description
-    try:
-        event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
-    except:
-        print "Error creating AnatomicRegionSequence. Continuing."
+    event.anatomical_structure = get_or_create_cid(get_seq_code_value('AnatomicRegionSequence',dataset),get_seq_code_meaning('AnatomicRegionSequence',dataset))
     laterality = get_value_kw('ImageLaterality',dataset)
     if laterality:
         if laterality.strip() == 'R':
@@ -492,7 +490,6 @@ def _generalstudymoduleattributes(dataset,g):
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
     from datetime import datetime
-    g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), datetime.time(g.study_time))
@@ -508,6 +505,7 @@ def _generalstudymoduleattributes(dataset,g):
     g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
     g.operator_name = get_value_kw('OperatorsName',dataset)
     g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription',dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
@@ -530,10 +528,52 @@ def _test_if_dx(dataset):
         return 0
     return 1
 
+def _create_event(dataset):
+    """
+    If study exists, create new event
+    :param dataset: DICOM object
+    :return: Nothing
+    """
+    from remapp.models import GeneralStudyModuleAttr
+    from remapp.tools import check_uid
+    from remapp.tools.get_values import get_value_kw
+    from remapp.tools.dcmdatetime import make_date_time
+
+    study_uid = get_value_kw('StudyInstanceUID',dataset)
+    event_uid = get_value_kw('SOPInstanceUID',dataset)
+    inst_in_db = check_uid.check_uid(event_uid,'Event')
+    if inst_in_db:
+        return 0
+    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
+    if same_study_uid.count() != 1:
+        print "Duplicate study UIDs in database! Could be a problem."
+        for dup in same_study_uid:
+            if dup.modality_type:
+                same_study_uid = dup
+                continue
+    # further check required to ensure 'for processing' and 'for presentation'
+    # versions of the same irradiation event don't get imported twice
+    event_time = get_value_kw('AcquisitionTime',dataset)
+    event_date = get_value_kw('AcquisitionDate',dataset)
+    event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
+    try:
+        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+            if event_date_time == events.date_time_started:
+                return 0
+    except Exception as e:
+        logging.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
+                         study_uid, event_uid, e)
+    # study exists, but event doesn't
+    _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
+    # update the accumulated tables
+    return 0
+
 
 def _dx2db(dataset):
     import os, sys
     import openrem_settings
+    from time import sleep
+    from random import random
     
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     from django.db import models
@@ -548,30 +588,60 @@ def _dx2db(dataset):
     if not study_uid:
         sys.exit('No UID returned')  
     study_in_db = check_uid.check_uid(study_uid)
-    if study_in_db:
-        event_uid = get_value_kw('SOPInstanceUID',dataset)
-        inst_in_db = check_uid.check_uid(event_uid,'Event')
-        if inst_in_db:
-            return 0
-        # further check required to ensure 'for processing' and 'for presentation' 
-        # versions of the same irradiation event don't get imported twice
-        same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
-        event_time = get_value_kw('AcquisitionTime',dataset)
-        if not event_time: event_time = get_value_kw('StudyTime',dataset)
-        event_date = get_value_kw('AcquisitionDate',dataset)
-        if not event_date: event_date = get_value_kw('StudyDate',dataset)
-        event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
-        for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            if event_date_time == events.date_time_started:
-                return 0
-        # study exists, but event doesn't
-        _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
-        # update the accumulated tables
-        return 0
+
+    if study_in_db == 1:
+        sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
+        _create_event(dataset)
+
+    if not study_in_db:
+        # study doesn't exist, start from scratch
+        g = GeneralStudyModuleAttr.objects.create()
+        g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+        g.save()
+        # check again
+        study_in_db = check_uid.check_uid(study_uid)
+        if study_in_db == 1:
+            _generalstudymoduleattributes(dataset,g)
+        elif not study_in_db:
+            sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
+        elif study_in_db > 1:
+            sleep(random)
+            # Check if other instance(s) has deleted the study yet
+            study_in_db = check_uid.check_uid(study_uid)
+            if study_in_db == 1:
+                _generalstudymoduleattributes(dataset,g)
+            elif study_in_db > 1:
+                g.delete()
+                study_in_db = check_uid.check_uid(study_uid)
+                if not study_in_db:
+                    # both must have been deleted simultaneously!
+                    sleep(random)
+                    # Check if other instance has created the study again yet
+                    study_in_db = check_uid.check_uid(study_uid)
+                    if study_in_db == 1:
+                        sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
+                        _create_event(dataset)
+                    while not study_in_db:
+                        g = GeneralStudyModuleAttr.objects.create()
+                        g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+                        g.save()
+                        # check again
+                        study_in_db = check_uid.check_uid(study_uid)
+                        if study_in_db == 1:
+                            _generalstudymoduleattributes(dataset,g)
+                        elif study_in_db > 1:
+                            g.delete()
+                            sleep(random)
+                            study_in_db = check_uid.check_uid(study_uid)
+                            if study_in_db == 1:
+                                sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
+                                _create_event(dataset)
+                elif study_in_db == 1:
+                    sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
+                    _create_event(dataset)
     
-    # study doesn't exist, start from scratch
-    g = GeneralStudyModuleAttr.objects.create()
-    _generalstudymoduleattributes(dataset,g)
+
+
 
 
 @shared_task

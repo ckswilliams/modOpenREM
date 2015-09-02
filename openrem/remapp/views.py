@@ -30,6 +30,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+#from __future__ import unicode_literals
 # Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
@@ -1152,7 +1153,12 @@ def openrem_home(request):
     if not Group.objects.filter(name="admingroup"):
         ag = Group(name="admingroup")
         ag.save()
-    
+
+    users_in_groups = False
+    for g in Group.objects.all():
+        if Group.objects.get(name=g).user_set.all():
+            users_in_groups = True
+
     allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = { 
         'total' : allstudies.count(),
@@ -1226,7 +1232,7 @@ def openrem_home(request):
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
             
-            displayname = str(display_name[0])
+            displayname = (display_name[0]).encode('utf-8')
                        
             modalitydata[display_name[0]] = {
                 'total' : studies.filter(
@@ -1238,7 +1244,7 @@ def openrem_home(request):
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
 
-    return render(request,"remapp/home.html",{'homedata':homedata, 'admin':admin})
+    return render(request,"remapp/home.html",{'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
 
 @login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
@@ -1539,7 +1545,7 @@ def display_name_update(request, pk):
         else:
             return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
-        form = UpdateDisplayNameForm(initial={'display_name': str(f.values_list('display_name')[0][0])}, auto_id=False)
+        form = UpdateDisplayNameForm(initial={'display_name': (f.values_list('display_name')[0][0]).encode('utf-8')}, auto_id=False)
 
         try:
             vers = pkg_resources.require("openrem")[0].version
@@ -1671,8 +1677,17 @@ from remapp.models import DicomStoreSCP, DicomRemoteQR
 def dicom_summary(request):
     """Displays current DICOM configuration
     """
+    from openremproject.settings import RM_DCM_NOMATCH
+    from openremproject.settings import RM_DCM_RDSR
+    from openremproject.settings import RM_DCM_MG
+    from openremproject.settings import RM_DCM_DX
+    from openremproject.settings import RM_DCM_CTPHIL
+
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
+
+    rm_settings = {
+        'no_match': RM_DCM_NOMATCH, 'rdsr': RM_DCM_RDSR, 'mg': RM_DCM_MG, 'dx': RM_DCM_DX, 'ct_phil': RM_DCM_CTPHIL}
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1686,7 +1701,7 @@ def dicom_summary(request):
     # Render list page with the documents and the form
     return render_to_response(
         'remapp/dicomsummary.html',
-        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin, 'rm_settings': rm_settings},
         context_instance=RequestContext(request)
     )
 
@@ -1713,7 +1728,7 @@ class DicomStoreCreate(CreateView):
 
 class DicomStoreUpdate(UpdateView):
     model = DicomStoreSCP
-    fields = ['name', 'aetitle', 'port',]
+    fields = ['name', 'aetitle', 'port']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object

@@ -2,10 +2,12 @@
 OpenREM version history
 =======================
 
-0.7.0b4 (2015-08-20)
+0.7.0b5 (2015-09-02)
 --------------------
 *This list is not up to date*
 
+* `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
+* `#258`_  Fixed DX import error where manufacturer or model name was not provided
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 
 0.6.0 (2015-05-14)

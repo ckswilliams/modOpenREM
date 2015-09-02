@@ -130,7 +130,7 @@ Install and configure OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b4
+    pip install openrem==0.7.0b5
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -147,16 +147,14 @@ There are two files that need renaming:
 + ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
 + ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
 
-In the ``local_settings.py`` file, set the database details, the ``MEDIA_ROOT`` path, the secret key and the ``ALLOWED_HOSTS``.
-
 ..  Note::
 
     Windows notepad will not recognise the Unix style line endings.
     Please use an editor such as Notepad++ or Notepad2 if you can, else use WordPad –
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
-Database settings
-`````````````````
+local_settings.py: Database
+```````````````````````````
 
 For testing you can use the SQLite3 database
 
@@ -170,8 +168,8 @@ For testing you can use the SQLite3 database
 
 For production use, see `Database options`_ below
 
-Location setting for imports and exports
-````````````````````````````````````````
+local_settings.py: Location for imports and exports
+```````````````````````````````````````````````````
 
 Csv and xlsx study information exports and patient size csv imports are
 written to disk at a location defined by ``MEDIA_ROOT``.
@@ -191,14 +189,14 @@ Windows example::
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
-Secret key
-``````````
+local_settings.py: Secret key
+`````````````````````````````
 
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
 
-Allowed hosts
-`````````````
+local_settings.py: Allowed hosts
+````````````````````````````````
 
 The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
 set to ``False``. This needs to contain the server name or IP address that
@@ -215,28 +213,68 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
-DICOM networking
-````````````````
-See :doc:`netdicom`
+local_settings.py: Keep or delete processed DICOM files
+```````````````````````````````````````````````````````
+
+Should DICOM files be kept or deleted when they have been processed?
+
+* ``RM_DCM_NOMATCH`` is only applicable if you use the DICOM Store SCP built into OpenREM
+* The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
+  Philips CT images are kept (``False``) or deleted (``True``) when they have been processed
+* The default setting is False, to preserve behaviour from previous versions::
+
+    RM_DCM_NOMATCH = True
+    RM_DCM_RDSR = True
+    RM_DCM_MG = True
+    RM_DCM_DX = True
+    RM_DCM_CTPHIL = True
+
+.. Note::
+
+    It is recommended that the image file types and ``RM_DCM_NOMATCH`` are set to ``True``, as they can fill the disk
+    quickly if they are allowed to build up!
+
+See :doc:`netdicom` (docs not yet up to date with features)
 
 Create the database
 -------------------
 
-Linux::
-
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py syncdb
-
 Windows::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py createsuperuser
-	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
+    python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
+    python C:\Python27\Lib\site-packages\openrem\manage.py migrate
+    python C:\Python27\Lib\site-packages\openrem\manage.py showmigrations
 
-The first command will result in an error, saying "django_site" does not
-exist. Ignore this, and continue with the second command. Answer each
-question as it is asked. Do setup a superuser: this username and
-password will be used to log into the admin interface to create the
-usernames for using the web interface. See the `Start using it!`_
-section below.
+The `makemigrations remapp` should fix the `auth_user` relation error.
+
+The last command will list each Django app migrations. Each should have a cross inside
+a pair of square brackets something like below::
+
+    admin
+     [X] 0001_initial
+    auth
+     [X] 0001_initial
+     [X] 0002_alter_permission_name_max_length
+     [X] 0003_alter_user_email_max_length
+     [X] 0004_alter_user_username_opts
+     [X] 0005_alter_user_last_login_null
+     [X] 0006_require_contenttypes_0002
+    contenttypes
+     [X] 0001_initial
+     [X] 0002_remove_content_type_name
+    sessions
+     [X] 0001_initial
+    sites
+     [X] 0001_initial
+
+Finally, create a Django super user::
+
+    python C:\Python27\Lib\site-packages\openrem\manage.py createsuperuser
+
+Answer each question as it is asked. This username and password will be used
+to log into the admin interface to create the usernames for using the web
+interface. See the `Start using it!`_ section below.
+
 
 If using PostgreSQL you must add the median database function
 -------------------------------------------------------------
@@ -251,7 +289,7 @@ Windows::
 	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
 
 The first command will create a skeleton `0001_initial.py` migration file. The
-second command runs the migration files, and will include the line
+second command runs the migration files, and will display the text
 `Applying remapp.0002_fresh__openrem_install_add_median_function... OK`, indicating
 that the median function has been added.
 
@@ -303,19 +341,43 @@ In a new shell:
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery -A openremproject worker -l info
+    celery multi start stores default -A openremproject -c:stores 2 -c 3 \
+    -Q:stores stores -Q default \
+    --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
+
+If you intend to use OpenREM to provide a DICOM Store SCP (ie you can DICOM send things to OpenREM without using
+any other program, such as Conquest), then we need a Celery Queue just for the store. The node (and queue) created for
+this is called ``stores`` and it needs to have a concurrency equal or greater than the number of store SCPs. This would
+normally be just one. So set ``-c:stores 1`` or ``-c:stores 2`` etc as you see fit. The ``-c 3`` specifies how many
+workers should be available for all the other jobs - exports; and imports when using the OpenREM Store SCP.
+
+You must also specify the location for the pid file and for the log file. You might put these in the media folder, or
+the logs might go in ``/var/log/``.
+
+The ``\`` is added in to allow the single command to go over several lines.
+
+
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
-    celery -A openremproject worker -l info
+    celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
+    -Q:stores stores -Q default ^
+    --pidfile=C:\path\to\media\celery\%N.pid --logfile=C:\path\to\media\celery\%N.log
+
+This is the same as for Linux, but this time the line continuation character is ``^``.
 
 For production use, see `Daemonising Celery`_ below
 
-Preview feature: Start the DICOM Store SCP
-------------------------------------------
+To stop the celery queues::
 
-See :doc:`netdicom`
+    celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
+
+
+Start the DICOM Store SCP
+-------------------------
+
+See :doc:`netdicom` - documentation not yet up to date with features.
 
 Start using it!
 ---------------

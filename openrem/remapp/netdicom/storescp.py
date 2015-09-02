@@ -12,6 +12,7 @@ python storescp.py -h
 import os
 import sys
 import errno
+import logging
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -27,13 +28,13 @@ try:
         sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
-from netdicom import AE, StorageSOPClass, VerificationSOPClass, debug
+from netdicom import AE, StorageSOPClass, VerificationSOPClass
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
 import tempfile
 from django.views.decorators.csrf import csrf_exempt
 
-debug(False)
+# netdicom.debug()
 
 # callbacks
 def OnAssociateRequest(association):
@@ -42,6 +43,7 @@ def OnAssociateRequest(association):
 
 def OnAssociateResponse(association):
     print "Association response received"
+
 
 
 def OnReceiveEcho(self):
@@ -68,7 +70,9 @@ def OnReceiveStore(SOPClass, DS):
     from openremproject.settings import MEDIA_ROOT
     from openremproject.settings import RM_DCM_NOMATCH
 
-    print "Received C-STORE"
+    logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
+                 DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
+
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
@@ -85,18 +89,17 @@ def OnReceiveStore(SOPClass, DS):
     ds.is_little_endian = True
     ds.is_implicit_VR = True
     ds.save_as(filename)
-    print "File %s written" % filename
-    print DS.SOPClassUID
+    logging.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
     ):
-        print "RDSR"
+        logging.info("Processing as RDSR")
         rdsr.delay(filename)
     elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'      # CR Image Storage
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'    # Digital X-Ray Image Storage for Presentation
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
     ):
-        print "DX"
+        logging.info("Processing as DX")
         dx.delay(filename)
     elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'    # Digital Mammography X-Ray Image Storage for Presentation
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1'  # Digital Mammography X-Ray Image Storage for Processing
@@ -105,61 +108,25 @@ def OnReceiveStore(SOPClass, DS):
             and 'ORIGINAL' in DS.ImageType
         )
     ):
-        print "Mammo"
+        logging.info("Processing as MG")
         mam.delay(filename)
     elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'
           and DS.Manufacturer == 'Philips'
           and DS.SeriesDescription == 'Dose Info'
     ):
-        print "Philips CT Dose Info image"
+        logging.info("Processing as Philips Dose Info series")
         ct_philips.delay(filename)
     elif RM_DCM_NOMATCH:
         os.remove(filename)
-        print "DICOM not RDSR, DX, Mammo or Philips CT dose info; file deleted. Modality type was {0}".format(DS.Modality)
+        logging.info("Can't find anything to do with this file - it has been deleted")
 
     # must return appropriate status
     return SOPClass.Success
 
-def store(*args, **kwargs):
-
-    import sys
-    import argparse
-
-    try:
-        from openremproject.settings import STORE_AET
-    except ImportError:
-        STORE_AET = "OPENREM"
-    try:
-        from openremproject.settings import STORE_PORT
-    except ImportError:
-        STORE_PORT = 8104
-
-    # parse commandline
-    parser = argparse.ArgumentParser(description='OpenREM Store SCP')
-    parser.add_argument('-port', help='Override local_settings port used by this server', type=int, default=STORE_PORT)
-    parser.add_argument('-aet', help='Override local_settings AE title of this server', default=STORE_AET)
-    args = parser.parse_args()
-
-    # setup AE
-    MyAE = AE(
-        args.aet, args.port, [],
-        [StorageSOPClass, VerificationSOPClass],
-        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
-    )
-    MyAE.OnAssociateRequest = OnAssociateRequest
-    MyAE.OnAssociateResponse = OnAssociateResponse
-    MyAE.OnReceiveStore = OnReceiveStore
-    MyAE.OnReceiveEcho = OnReceiveEcho
-
-    # start AE
-    print "starting AE... AET:{0}, port:{1}".format(args.aet, args.port),
-    MyAE.start()
-    print "done"
-    MyAE.QuitOnKeyboardInterrupt()
-
 from celery import shared_task
 
-@shared_task
+
+@shared_task(queue='stores')
 def web_store(store_pk=None):
     import time
     from remapp.models import DicomStoreSCP
@@ -173,6 +140,8 @@ def web_store(store_pk=None):
         conf.save()
     except ObjectDoesNotExist:
         sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
+
+    logging.basicConfig(level=logging.INFO)
 
     # setup AE
     MyAE = AE(
@@ -191,15 +160,18 @@ def web_store(store_pk=None):
     MyAE.start()
     conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
+    logging.info("Started AE... AET:%s, port:%s", aet, port)
+#    print "Started AE... AET:{0}, port:{1}".format(aet, port)
 
     while 1:
         time.sleep(1)
         stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
         if not stay_alive.run:
             MyAE.Quit()
+            logging.info("Stopped AE... AET:%s, port:%s", aet, port)
+#            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
 
 
 if __name__ == "__main__":
-    import sys
-    sys.exit(store())
+    web_store(store_pk=1)
