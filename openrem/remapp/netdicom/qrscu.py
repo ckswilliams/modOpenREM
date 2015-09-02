@@ -13,25 +13,26 @@ For help on usage,
 python qrscu.py -h 
 """
 
+import logging
 
 # call back
 def OnAssociateResponse(association):
-    print "Association response received"
+    logging.info("Association response received")
 
 
 def OnAssociateRequest(association):
-    print "Association resquested"
+    logging.info("Association resquested")
     return True
 
 def _move_req(my_ae, remote_ae, d):
     assocMove = my_ae.RequestAssociation(remote_ae)
-    print "Move association requested"
+    logging.info("Move association requested")
 #    print "d is {0}".format(d)
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, 'STOREOPENREM', 1)
-#    for gg in gen:
-#        print "gg is {0}".format(gg)
+    for gg in gen:
+        logging.info("gg is %s", gg)
     assocMove.Release(0)
-    print "Move association released"
+    logging.info("Move association released")
 
 def _try_query_return(rsp, tag):
     try:
@@ -206,14 +207,14 @@ def qrscu(
         query.save()
         MyAE.Quit()
         return
-    print "assoc is ... {0}".format(assoc)
+    logging.info("assoc is ... %s", assoc)
 
     # perform a DICOM ECHO
-    print "DICOM Echo ... ",
+    logging.info("DICOM Echo ... ")
     echo = assoc.VerificationSOPClass.SCU(1)
-    print 'done with status "%s"' % echo
+    logging.info('done with status %s', echo)
 
-    print "DICOM FindSCU ... ",
+    logging.info("DICOM FindSCU ... ")
     d = Dataset()
     d.QueryRetrieveLevel = "STUDY"
     d.PatientName = ''
@@ -328,7 +329,7 @@ def qrscu(
                         if s.series_description != 'Dose Info':
                             s.delete()
 
-    print "Release association"
+    logging.info("Release association")
     assoc.Release(0)
 
     # done
