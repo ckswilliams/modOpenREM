@@ -130,7 +130,7 @@ Install and configure OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b4
+    pip install openrem==0.7.0b5
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
