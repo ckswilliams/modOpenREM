@@ -39,9 +39,11 @@ def get_value_kw(tag,dataset):
     :returns:           str. -- value
     """
     if (tag in dataset):
-        value = getattr(dataset,tag)
-        if value != '': 
-            return value
+        val = getattr(dataset,tag)
+        if val != '':
+            if type(val) is str:
+                value = val.decode('latin-1')
+            return val
 
 def get_value_num(tag,dataset):
     """Get DICOM value by tag group and element number.
@@ -56,7 +58,11 @@ def get_value_num(tag,dataset):
     :returns:           str. -- value
     """
     if (tag in dataset):
-        return dataset[tag].value
+        val = dataset[tag].value
+        if val != '':
+            if type(val) is str:
+                value = val.decode('latin-1')
+            return val
 
 def get_seq_code_value(sequence,dataset):
     """From a DICOM sequence, get the code value.
