@@ -115,3 +115,18 @@ def get_or_create_cid(codevalue, codemeaning):
             logging.warning("Duplicate entry in the ContextID table: %s/%s, import continuing",
                             codevalue, codemeaning)
         return code[0]
+
+def return_for_export(model, field):
+    """
+    Prevent errors due to missing data in models
+    :param val: database field
+    :return: value or None
+    """
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        val = getattr(model, field)
+        if val:
+            val = unicode(val)
+        return val
+    except ObjectDoesNotExist:
+        return None
