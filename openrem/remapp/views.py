@@ -1154,10 +1154,12 @@ def openrem_home(request):
         ag = Group(name="admingroup")
         ag.save()
 
-    users_in_groups = False
+    users_in_groups = {'any': False, 'admin': False}
     for g in Group.objects.all():
         if Group.objects.get(name=g).user_set.all():
-            users_in_groups = True
+            users_in_groups['any'] = True
+            if g.name == 'admingroup':
+                users_in_groups['admin'] = True
 
     allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = { 

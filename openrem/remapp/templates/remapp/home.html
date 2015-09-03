@@ -3,7 +3,7 @@
       {% block toprow %}
       <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database browser and export</h1>
 
-      {% if not users_in_groups %}
+      {% if not users_in_groups.any %}
         <div class="panel panel-danger">
           <div class="panel-heading">
               <h3 class="panel-title">There are no users in any of the groups</h3>
@@ -19,7 +19,24 @@
                   page later by using the 'Manage users' link on the admin menu.
               </p>
           </div>
-      </div>
+        </div>
+      {% elif not users_in_groups.admin %}
+        <div class="panel panel-warning">
+          <div class="panel-heading">
+              <h3 class="panel-title">There are no users in the admin group</h3>
+          </div>
+          <div class="panel-body">
+              <p>
+                  Make sure there is at least one Admin user &mdash; <a href="/admin/auth/user/">you can do this here.</a> You
+                  will need to know the superuser
+                  username and password you used when you installed the database.
+              </p>
+              <p>
+                  You can return to the user config
+                  page later by using the 'Manage users' link on the admin menu.
+              </p>
+          </div>
+        </div>
       {% endif %}
 
       <p>
