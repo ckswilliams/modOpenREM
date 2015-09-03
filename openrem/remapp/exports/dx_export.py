@@ -41,9 +41,11 @@ def return_if_exists(model, field):
     """
     from django.core.exceptions import ObjectDoesNotExist
     try:
-        return getattr(model, field)
+        return_value = getattr(model, field)
     except ObjectDoesNotExist:
-        return None
+        return_value = None
+    
+    return return_value
 
 @shared_task
 def exportDX2excel(filterdict):
@@ -154,10 +156,17 @@ def exportDX2excel(filterdict):
 
     for i, exams in enumerate(e):
 
-        patient_age = return_if_exists(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-        patient_sex = return_if_exists(exams.patientmoduleattr_set.get(), 'patient_sex')
-        patient_size = return_if_exists(exams.patientstudymoduleattr_set.get(), 'patient_size')
-        patient_weight = return_if_exists(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+        try:
+            exams.patientstudymoduleattr_set.get()
+            patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
+            patient_sex = exams.patientmoduleattr_set.get().patient_sex
+            patient_size = exams.patientstudymoduleattr_set.get().patient_size
+            patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
+        except:
+            patient_age = None
+            patient_sex = None
+            patient_size = None
+            patient_weight = None
 
         examdata = [
             exams.generalequipmentmoduleattr_set.get().institution_name,
@@ -179,14 +188,25 @@ def exportDX2excel(filterdict):
             ]
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            exposure_control_mode = return_if_exists(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-            kvp = return_if_exists(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-            mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
-            average_xray_tube_current = return_if_exists(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
-            exposure_time = return_if_exists(s.irradeventxraysourcedata_set.get(), 'exposure_time')
-            exposure_index = return_if_exists(s.irradeventxraydetectordata_set.get(), 'exposure_index')
-            relative_xray_exposure = return_if_exists(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
-            cgycm2 = s.convert_gym2_to_cgycm2()
+            try:
+                s.irradeventxraysourcedata_set.get()
+                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
+                kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
+                mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
+                exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
+                exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
+                relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
+                cgycm2 = s.convert_gym2_to_cgycm2()
+            except:
+                exposure_control_mode = None
+                kvp = None
+                mas = None
+                average_xray_tube_current = None
+                exposure_time = None
+                exposure_index = None
+                relative_xray_exposure = None
+                cgycm2 = None
 
             examdata += [
                 s.acquisition_protocol,
