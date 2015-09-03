@@ -144,10 +144,23 @@ def exportDX2excel(filterdict):
 
     for i, exams in enumerate(e):
 
-        patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-        patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-        patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-        patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+        try:
+            exams.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_sex = None
+        else:
+            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+
+        try:
+            exams.patientstudymoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_age = None
+            patient_size = None
+            patient_weight = None
+        else:
+            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
 
         examdata = [
             exams.generalequipmentmoduleattr_set.get().institution_name,
