@@ -122,7 +122,8 @@ def exportDX2excel(filterdict):
         'Accession number',
         'Operator',
         'Study date',
-        'Patient age', 
+        'Patient age',
+        'Patient sex',
         'Patient height', 
         'Patient mass (kg)', 
         'Study description',
@@ -154,6 +155,7 @@ def exportDX2excel(filterdict):
     for i, exams in enumerate(e):
 
         patient_age = return_if_exists(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+        patient_sex = return_if_exists(exams.patientmoduleattr_set.get(), 'patient_sex')
         patient_size = return_if_exists(exams.patientstudymoduleattr_set.get(), 'patient_size')
         patient_weight = return_if_exists(exams.patientstudymoduleattr_set.get(), 'patient_weight')
 
@@ -167,6 +169,7 @@ def exportDX2excel(filterdict):
             exams.operator_name,
             exams.study_date,
             patient_age,
+            patient_sex,
             patient_size,
             patient_weight,
             exams.study_description,
