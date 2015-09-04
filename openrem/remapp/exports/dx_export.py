@@ -33,6 +33,19 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 
+def return_if_exists(model, field):
+    """
+    Prevent errors due to missing data
+    :param val: database field
+    :return: value or None
+    """
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        return_value = getattr(model, field)
+    except ObjectDoesNotExist:
+        return_value = None
+    
+    return return_value
 
 @shared_task
 def exportDX2excel(filterdict):
@@ -51,7 +64,6 @@ def exportDX2excel(filterdict):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
-    from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -306,7 +318,6 @@ def dxxlsx(filterdict):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
-    from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -368,8 +379,7 @@ def dxxlsx(filterdict):
         'Accession number',
         'Operator',
         'Study date',
-        'Patient age',
-        'Patient sex',
+        'Patient age', 
         'Patient height', 
         'Patient mass (kg)', 
         'Test patient?',
@@ -476,11 +486,25 @@ def dxxlsx(filterdict):
         tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
 
-        patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-        patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-        patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-        patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
-        not_patient_indicator = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
+        try:
+            patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+        except ObjectDoesNotExist:
+            patient_age = None
+
+        try:
+            patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
+        except ObjectDoesNotExist:
+            patient_size = None
+
+        try:
+            patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
+        except ObjectDoesNotExist:
+            patient_weight = None
+
+        try:
+            not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+        except ObjectDoesNotExist:
+            not_patient_indicator = None
 
         examdata = [
             exams.generalequipmentmoduleattr_set.get().institution_name,
@@ -492,7 +516,6 @@ def dxxlsx(filterdict):
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
             patient_age,
-            patient_sex,
             patient_size,
             patient_weight,
             not_patient_indicator,
@@ -601,11 +624,25 @@ def dxxlsx(filterdict):
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
 
-            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
-            not_patient_indicator = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
+            try:
+                patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+            except ObjectDoesNotExist:
+                patient_age = None
+
+            try:
+                patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
+            except ObjectDoesNotExist:
+                patient_size = None
+
+            try:
+                patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
+            except ObjectDoesNotExist:
+                patient_weight = None
+
+            try:
+                not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+            except ObjectDoesNotExist:
+                not_patient_indicator = None
 
             examdata = [
                 exams.generalequipmentmoduleattr_set.get().institution_name,
@@ -617,7 +654,6 @@ def dxxlsx(filterdict):
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
                 patient_age,
-                patient_sex,
                 patient_size,
                 patient_weight,
                 not_patient_indicator,
