@@ -183,9 +183,12 @@ def exportDX2excel(filterdict):
             cgycm2 = None
         else:
             total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
-            # The call below doesn't work, because convert_gym2_to_cgycm2() is a calculated database field. Don't know how to fix it at the moment.
-            #cgycm2 = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'convert_gym2_to_cgycm2()')
-            cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+            if dap_total:
+                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            else:
+                cgycm2 = None
+
         examdata = [
             institution_name,
             manufacturer,
@@ -231,9 +234,11 @@ def exportDX2excel(filterdict):
                 except ObjectDoesNotExist:
                     mas = None
                 else:
-                    # The call below doesn't work, because convert_uAs_to_mAs() is a calculated database field. Don't know how to fix it at the moment.
-                    #mas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'convert_uAs_to_mAs()')
-                    mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+                    if uas:
+                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                    else:
+                        mas = None
 
             try:
                 s.irradeventxraydetectordata_set.get()
