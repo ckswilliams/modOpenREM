@@ -49,6 +49,9 @@ class PatientIDSettings(SingletonModel):
     class Meta:
         verbose_name = "Patient ID Settings"
 
+    def get_absolute_url(self):
+        return reverse('home')
+
 
 class DicomStoreSCP(models.Model):
     name = models.CharField(max_length=64, unique=True)

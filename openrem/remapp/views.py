@@ -1727,7 +1727,6 @@ class DicomStoreCreate(CreateView):
         context['admin'] = admin
         return context
 
-
 class DicomStoreUpdate(UpdateView):
     model = DicomStoreSCP
     fields = ['name', 'aetitle', 'port']
@@ -1834,3 +1833,21 @@ def dicom_ajax(request):
         {'store': store, 'remoteqr': remoteqr, 'admin': admin},
         context_instance=RequestContext(request)
     )
+
+from remapp.models import PatientIDSettings
+
+class PatientIDSettingsUpdate(UpdateView):
+    model = PatientIDSettings
+    fields = ['name_stored', 'name_hashed', 'id_stored', 'id_hashed', 'accession_hashed']
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
