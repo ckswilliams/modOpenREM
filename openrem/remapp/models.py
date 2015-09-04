@@ -34,6 +34,21 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json
 from django.db import models
 from django.core.urlresolvers import reverse
+from solo.models import SingletonModel
+
+class PatientIDSettings(SingletonModel):
+    name_stored = models.BooleanField(default=False)
+    name_hashed = models.BooleanField(default=True)
+    id_stored = models.BooleanField(default=False)
+    id_hashed = models.BooleanField(default=True)
+    accession_hashed = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u"Patient ID Settings"
+
+    class Meta:
+        verbose_name = "Patient ID Settings"
+
 
 class DicomStoreSCP(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -713,7 +728,9 @@ class PatientModuleAttr(models.Model):  # C.7.1.1
     """
     general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     patient_name = models.TextField(blank=True, null=True)
+    name_hashed = models.BooleanField(default=False)
     patient_id = models.TextField(blank=True, null=True)
+    id_hashed = models.BooleanField(default=False)
     patient_birth_date = models.DateField(blank=True, null=True)
     patient_sex = models.CharField(max_length=2, blank=True, null=True)
     other_patient_ids = models.TextField(blank=True, null=True)
