@@ -663,13 +663,17 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     patientatt.save()
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
+    from decimal import Decimal
+    import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
-    from datetime import timedelta
-    from decimal import Decimal
+    from remapp.models import PatientIDSettings
+
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
+    patient_id_settings = PatientIDSettings.objects.get()
+
     patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
@@ -686,6 +690,19 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
+
+    if patient_id_settings.name_stored:
+        name = get_value_kw("PatientName", dataset)
+        if patient_id_settings.name_hashed:
+            name = hashlib.sha256(name).hexdigest()
+            pat.name_hashed = True
+        pat.patient_name = name
+    if patient_id_settings.id_stored:
+        patid = get_value_kw("PatientID", dataset)
+        if patient_id_settings.id_hashed:
+            patid = hashlib.sha256(patid).hexdigest()
+            pat.id_hashed = True
+        pat.patient_id = patid
     pat.save()
 
 def _generalstudymoduleattributes(dataset,g):
