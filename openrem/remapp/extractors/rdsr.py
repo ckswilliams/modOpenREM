@@ -32,6 +32,7 @@
 import os
 import sys
 import django
+import logging
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -672,7 +673,6 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from remapp.models import PatientIDSettings
 
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
-    patient_id_settings = PatientIDSettings.objects.get()
 
     patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
     pat.patient_sex = get_value_kw("PatientSex",dataset)
@@ -691,6 +691,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
 
+    patient_id_settings = PatientIDSettings.objects.get()
     if patient_id_settings.name_stored:
         name = get_value_kw("PatientName", dataset)
         if name and patient_id_settings.name_hashed:
