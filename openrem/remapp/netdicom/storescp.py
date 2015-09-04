@@ -76,7 +76,8 @@ def OnReceiveStore(SOPClass, DS):
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
-    file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.9.5224.1.0.6.0.1"  # Using Medical Connections allocated UID
+    file_meta.ImplementationClassUID = "1.3.6.1.4.1.45593.1.0.7.0.6"
+    file_meta.ImplementationVersionName = "OpenREM_0.7.0b6"
     datestamp = datetime.datetime.now()
     path = os.path.join(
 #        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
