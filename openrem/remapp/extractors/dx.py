@@ -554,7 +554,11 @@ def _create_event(dataset):
     # further check required to ensure 'for processing' and 'for presentation'
     # versions of the same irradiation event don't get imported twice
     event_time = get_value_kw('AcquisitionTime',dataset)
+    if not event_time:
+        event_time = get_value_kw('ContentTime',dataset)
     event_date = get_value_kw('AcquisitionDate',dataset)
+    if not event_date:
+        event_date = get_value_kw('ContentDate',dataset)
     event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
     try:
         for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
