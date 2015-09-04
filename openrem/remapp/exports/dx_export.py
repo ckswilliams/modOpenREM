@@ -145,6 +145,20 @@ def exportDX2excel(filterdict):
     for i, exams in enumerate(e):
 
         try:
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            institution_name = None
+            manufacturer = None
+            manufacturer_model_name = None
+            station_name = None
+            display_name = None
+        else:
+            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+        try:
             exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
             patient_sex = None
@@ -162,12 +176,22 @@ def exportDX2excel(filterdict):
             patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
             patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
 
+        try:
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+        except ObjectDoesNotExist:
+            total_number_of_radiographic_frames = None
+            cgycm2 = None
+        else:
+            total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
+            # The call below doesn't work, because convert_gym2_to_cgycm2() is a calculated database field. Don't know how to fix it at the moment.
+            #cgycm2 = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'convert_gym2_to_cgycm2()')
+            cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
         examdata = [
-            exams.generalequipmentmoduleattr_set.get().institution_name,
-            exams.generalequipmentmoduleattr_set.get().manufacturer,
-            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-            exams.generalequipmentmoduleattr_set.get().station_name,
-            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            institution_name,
+            manufacturer,
+            manufacturer_model_name,
+            station_name,
+            display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -177,18 +201,49 @@ def exportDX2excel(filterdict):
             patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2(),
+            total_number_of_radiographic_frames,
+            cgycm2,
             ]
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-            kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-            mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
-            average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
-            exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
-            exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
-            relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+
+            try:
+                s.irradeventxraysourcedata_set.get()
+            except ObjectDoesNotExist:
+                exposure_control_mode = None
+                kvp = None
+                average_xray_tube_current = None
+                exposure_time = None
+                mas = None
+            else:
+                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
+                average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
+                exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
+                try:
+                    s.irradeventxraysourcedata_set.get().kvp_set.get()
+                except ObjectDoesNotExist:
+                    kvp = None
+                else:
+                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+
+                try:
+                    s.irradeventxraysourcedata_set.get().exposure_set.get()
+                except ObjectDoesNotExist:
+                    mas = None
+                else:
+                    # The call below doesn't work, because convert_uAs_to_mAs() is a calculated database field. Don't know how to fix it at the moment.
+                    #mas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'convert_uAs_to_mAs()')
+                    mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+
+            try:
+                s.irradeventxraydetectordata_set.get()
+            except ObjectDoesNotExist:
+                exposure_index = None
+                relative_xray_exposure = None
+            else:
+                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
+                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+
             cgycm2 = s.convert_gym2_to_cgycm2()
 
             examdata += [
