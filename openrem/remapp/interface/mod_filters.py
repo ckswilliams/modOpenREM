@@ -88,7 +88,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
             return ['study_date', 'study_time']
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
-        return super(CTSummaryListFilter, self).get_order_by(order_value)
+        return super(RFSummaryListFilter, self).get_order_by(order_value)
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
@@ -199,7 +199,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
             return ['study_date', 'study_time']
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
-        return super(CTSummaryListFilter, self).get_order_by(order_value)
+        return super(MGSummaryListFilter, self).get_order_by(order_value)
 
 class DXSummaryListFilter(django_filters.FilterSet):
     """Filter for DX studies to display in web interface.
