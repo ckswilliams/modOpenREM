@@ -1153,6 +1153,9 @@ def openrem_home(request):
     if not Group.objects.filter(name="admingroup"):
         ag = Group(name="admingroup")
         ag.save()
+    if not Group.objects.filter(name="pidgroup"):
+        pg = Group(name="pidgroup")
+        pg.save()
 
     users_in_groups = {'any': False, 'admin': False}
     for g in Group.objects.all():
