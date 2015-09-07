@@ -169,6 +169,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    patient_name = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+    patient_id = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -184,6 +186,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
             'station_name',
             'display_name',
             'accession_number',
+            'patient_name',
+            'patient_id',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
@@ -200,6 +204,10 @@ class MGSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(MGSummaryListFilter, self).get_order_by(order_value)
+
+    def __init__(self, user, *args, **kwargs):
+        super(MGSummaryListFilter, self).__init__(*args, **kwargs)
+        self.patient_name = django_filters.CharFilter
 
 class DXSummaryListFilter(django_filters.FilterSet):
     """Filter for DX studies to display in web interface.
