@@ -33,6 +33,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 from django.db import models
 
+import logging
 import django_filters
 from django import forms
 from remapp.models import GeneralStudyModuleAttr
@@ -172,16 +173,25 @@ class MGSummaryListFilter(django_filters.FilterSet):
     patient_name = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
     patient_id = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
 
+    def __init__(self, pid, *args, **kwargs):
+        super(MGSummaryListFilter, self).__init__(*args, **kwargs)
+        from remapp.interface.mod_filters import MGSummaryListFilter
+        logging.warning("MGsummarylistfilter __init__")
+        self.queryset = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
+        if pid:
+            logging.warning("we have the right group")
+
+
     class Meta:
         model = GeneralStudyModuleAttr
         fields = [
-            'date_after', 
-            'date_before', 
-            'institution_name', 
+            'date_after',
+            'date_before',
+            'institution_name',
             'procedure_code_meaning',
             'patient_age_min',
             'patient_age_max',
-            'manufacturer', 
+            'manufacturer',
             'model_name',
             'station_name',
             'display_name',
@@ -189,6 +199,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
             'patient_name',
             'patient_id',
             ]
+
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
@@ -198,6 +209,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
             ('generalequipmentmoduleattr__station_name', 'Station name'),
             ('procedure_code_meaning', 'Procedure'),
             )
+
     def get_order_by(self, order_value):
         if order_value == 'study_date':
             return ['study_date', 'study_time']
@@ -205,9 +217,6 @@ class MGSummaryListFilter(django_filters.FilterSet):
             return ['-study_date','-study_time']
         return super(MGSummaryListFilter, self).get_order_by(order_value)
 
-    def __init__(self, user, *args, **kwargs):
-        super(MGSummaryListFilter, self).__init__(*args, **kwargs)
-        self.patient_name = django_filters.CharFilter
 
 class DXSummaryListFilter(django_filters.FilterSet):
     """Filter for DX studies to display in web interface.

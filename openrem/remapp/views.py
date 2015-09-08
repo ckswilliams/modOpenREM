@@ -35,6 +35,7 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
+import logging
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group, Permission
@@ -1115,7 +1116,11 @@ def mg_summary_list_filter(request):
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
-    f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+    logging.warning("Request: %s", request)
+    if request.user.groups.filter(name='piduser'):
+        f = MGSummaryListFilter(filter_data, pid=True)
+    else:
+        f = MGSummaryListFilter(filter_data, pid=False)
 
     try:
         vers = pkg_resources.require("openrem")[0].version
