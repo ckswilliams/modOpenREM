@@ -85,6 +85,8 @@ class DXChartOptionsForm(forms.Form):
     plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition',required=False)
     plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition',required=False)
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
+    plotDXAcquisitionMeankVpOverTime = forms.BooleanField(label='Acquisition kVp over time',required=False)
+    plotDXAcquisitionMeanmAsOverTime = forms.BooleanField(label='Acquisition mAs over time',required=False)
     plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
@@ -113,6 +115,8 @@ class DXChartOptionsDisplayForm(forms.Form):
     plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition',required=False)
     plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition',required=False)
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload',required=False)
+    plotDXAcquisitionMeankVpOverTime = forms.BooleanField(label='Acquisition kVp over time',required=False)
+    plotDXAcquisitionMeanmAsOverTime = forms.BooleanField(label='Acquisition mAs over time',required=False)
     plotDXAcquisitionMeanDAPOverTime = forms.BooleanField(label='Acquisition DAP over time',required=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = forms.ChoiceField(label='Time period', choices=TIME_PERIOD, required=False)
     plotDXInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX, required=False)

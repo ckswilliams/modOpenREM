@@ -163,6 +163,8 @@ def dx_summary_list_filter(request):
             userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
             userProfile.plotDXAcquisitionMeanmAs = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAs']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
+            userProfile.plotDXAcquisitionMeankVpOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVpOverTime']
+            userProfile.plotDXAcquisitionMeanmAsOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAsOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
             if median_available:
@@ -177,6 +179,8 @@ def dx_summary_list_filter(request):
                         'plotDXAcquisitionMeankVp': userProfile.plotDXAcquisitionMeankVp,
                         'plotDXAcquisitionMeanmAs': userProfile.plotDXAcquisitionMeanmAs,
                         'plotDXStudyPerDayAndHour': userProfile.plotDXStudyPerDayAndHour,
+                        'plotDXAcquisitionMeankVpOverTime': userProfile.plotDXAcquisitionMeankVpOverTime,
+                        'plotDXAcquisitionMeanmAsOverTime': userProfile.plotDXAcquisitionMeanmAsOverTime,
                         'plotDXAcquisitionMeanDAPOverTime': userProfile.plotDXAcquisitionMeanDAPOverTime,
                         'plotDXAcquisitionMeanDAPOverTimePeriod': userProfile.plotDXAcquisitionMeanDAPOverTimePeriod,
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
@@ -291,14 +295,20 @@ def dx_summary_chart_data(request):
     plotDXAcquisitionMeankVp = userProfile.plotDXAcquisitionMeankVp
     plotDXAcquisitionMeanmAs = userProfile.plotDXAcquisitionMeanmAs
     plotDXStudyPerDayAndHour = userProfile.plotDXStudyPerDayAndHour
+    plotDXAcquisitionMeankVpOverTime = userProfile.plotDXAcquisitionMeankVpOverTime
+    plotDXAcquisitionMeanmAsOverTime = userProfile.plotDXAcquisitionMeanmAsOverTime
     plotDXAcquisitionMeanDAPOverTime = userProfile.plotDXAcquisitionMeanDAPOverTime
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
     plotAverageChoice = userProfile.plotAverageChoice
 
-    acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData, acquisitionHistogramkVpData,\
+    acquisitionMeankVpoverTime, acquisitionMediankVpoverTime,\
+    acquisitionMeanmAsoverTime, acquisitionMedianmAsoverTime,\
+    acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime,\
+    acquisitionHistogramData, acquisitionHistogramkVpData,\
     acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary,\
     studiesPerHourInWeekdays, acquisition_names = \
-        dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
+        dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeankVpOverTime,
+                                plotDXAcquisitionMeanmAsOverTime, plotDXAcquisitionMeanDAPOverTime,
                                 plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
                                 plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
                                 median_available, plotAverageChoice)
@@ -310,12 +320,22 @@ def dx_summary_chart_data(request):
         returnStructure['acquisitionSummary'] = list(acquisitionSummary)
     if plotDXAcquisitionMeanDAP:
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
-    if plotDXAcquisitionMeankVp:
+    if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
         returnStructure['acquisitionkVpSummary'] = list(acquisitionkVpSummary)
         returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
-    if plotDXAcquisitionMeanmAs:
+    if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
         returnStructure['acquisitionmAsSummary'] = list(acquisitionmAsSummary)
         returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
+    if plotDXAcquisitionMeankVpOverTime:
+        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+            returnStructure['acquisitionMeankVpoverTime'] = acquisitionMeankVpoverTime
+        if plotAverageChoice == 'median' or plotAverageChoice == 'both':
+            returnStructure['acquisitionMediankVpoverTime'] = acquisitionMediankVpoverTime
+    if plotDXAcquisitionMeanmAsOverTime:
+        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+            returnStructure['acquisitionMeanmAsoverTime'] = acquisitionMeanmAsoverTime
+        if plotAverageChoice == 'median' or plotAverageChoice == 'both':
+            returnStructure['acquisitionMedianmAsoverTime'] = acquisitionMedianmAsoverTime
     if plotDXAcquisitionMeanDAPOverTime:
         if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
             returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
@@ -327,7 +347,8 @@ def dx_summary_chart_data(request):
     return JsonResponse(returnStructure, safe=False)
 
 
-def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeanDAPOverTime,
+def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeankVpOverTime,
+                         plotDXAcquisitionMeanmAsOverTime, plotDXAcquisitionMeanDAPOverTime,
                          plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp, plotDXAcquisitionMeanmAs,
                          plotDXStudyPerDayAndHour, requestResults, median_available, plotAverageChoice):
 
@@ -423,16 +444,29 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
             num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
     acquisitionHistogrammAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionmAsSummary))]
 
-    if plotDXAcquisitionMeanDAPOverTime:
-        # Required for mean DAP per month plot
-        if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
-            acquisitionMedianDAPoverTime = [None] * len(acquisition_names)
-        if plotAverageChoice=='mean' or plotAverageChoice=='both':
-            acquisitionMeanDAPoverTime = [None] * len(acquisition_names)
+    if plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeanmAsOverTime or plotDXAcquisitionMeanDAPOverTime:
         startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
         today = datetime.date.today()
 
-    if plotDXAcquisitionMeanDAP or plotDXAcquisitionMeankVp or plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanDAPOverTime:
+        if plotDXAcquisitionMeankVpOverTime:
+            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                acquisitionMediankVpoverTime = [None] * len(acquisition_names)
+            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                acquisitionMeankVpoverTime = [None] * len(acquisition_names)
+
+        if plotDXAcquisitionMeanmAsOverTime:
+            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                acquisitionMedianmAsoverTime = [None] * len(acquisition_names)
+            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                acquisitionMeanmAsoverTime = [None] * len(acquisition_names)
+
+        if plotDXAcquisitionMeanDAPOverTime:
+            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                acquisitionMedianDAPoverTime = [None] * len(acquisition_names)
+            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                acquisitionMeanDAPoverTime = [None] * len(acquisition_names)
+
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionMeankVp or plotDXAcquisitionMeanmAs or plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeanmAsOverTime or plotDXAcquisitionMeanDAPOverTime:
         for idx, protocol in enumerate(acquisition_names):
             if plotDXAcquisitionMeanDAP or plotDXAcquisitionMeanDAPOverTime:
                 subqs = acquisition_events.filter(acquisition_protocol__exact=protocol.get('acquisition_protocol'))
@@ -454,6 +488,16 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 acquisitionHistogramkVpData[idx][0] = acquisitionHistogramkVpData[idx][0].tolist()
                 acquisitionHistogramkVpData[idx][1] = acquisitionHistogramkVpData[idx][1].tolist()
 
+            if plotDXAcquisitionMeankVpOverTime:
+                # Required for mean kVp over time
+                subqskvp = acquisition_kvp_events.filter(acquisition_protocol=protocol.get('acquisition_protocol'))
+                if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started', aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
+                    acquisitionMeankVpoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started', aggregate=Median('irradeventxraysourcedata__kvp__kvp')/10000000000)
+                    acquisitionMediankVpoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+
             if plotDXAcquisitionMeanmAs:
                 # Required for mean mAs per acquisition plot
                 subqsmas = acquisition_mas_events.filter(acquisition_protocol=protocol.get('acquisition_protocol'))
@@ -462,6 +506,16 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                     [float(x)/1000 for x in uAsValues], bins=20)
                 acquisitionHistogrammAsData[idx][0] = acquisitionHistogrammAsData[idx][0].tolist()
                 acquisitionHistogrammAsData[idx][1] = acquisitionHistogrammAsData[idx][1].tolist()
+
+            if plotDXAcquisitionMeanmAsOverTime:
+                # Required for mean DAP over time
+                subqsmas = acquisition_mas_events.filter(acquisition_protocol=protocol.get('acquisition_protocol'))
+                if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Avg('irradeventxraysourcedata__exposure__exposure')/1000)
+                    acquisitionMeanmAsoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Median('irradeventxraysourcedata__exposure__exposure')/10000000000000)
+                    acquisitionMedianmAsoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP over time
@@ -484,6 +538,10 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 for hour in range(24):
                     studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
+    if not 'acquisitionMeankVpoverTime' in locals(): acquisitionMeankVpoverTime = 0
+    if not 'acquisitionMediankVpoverTime' in locals(): acquisitionMediankVpoverTime = 0
+    if not 'acquisitionMeanmAsoverTime' in locals(): acquisitionMeanmAsoverTime = 0
+    if not 'acquisitionMedianmAsoverTime' in locals(): acquisitionMedianmAsoverTime = 0
     if not 'acquisitionMeanDAPoverTime' in locals(): acquisitionMeanDAPoverTime = 0
     if not 'acquisitionMedianDAPoverTime' in locals(): acquisitionMedianDAPoverTime = 0
     if not 'acquisitionHistogramData' in locals(): acquisitionHistogramData = 0
@@ -494,7 +552,9 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if not 'acquisitionmAsSummary' in locals(): acquisitionmAsSummary = 0
     if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
 
-    return acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData,\
+    return acquisitionMeankVpoverTime, acquisitionMediankVpoverTime,\
+           acquisitionMeanmAsoverTime, acquisitionMedianmAsoverTime,\
+           acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData,\
            acquisitionHistogramkVpData, acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary,\
            acquisitionmAsSummary, studiesPerHourInWeekdays, acquisition_names
 

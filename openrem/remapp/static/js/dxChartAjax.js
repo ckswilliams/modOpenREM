@@ -118,17 +118,21 @@ $(document).ready(function() {
 
             //-------------------------------------------------------------------------------------
             // kVp chart data start
-            if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
+            if( typeof plotDXAcquisitionMeankVp !== 'undefined' || typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
+
                 var acq_kVp_summary = $.map(json.acquisitionkVpSummary, function (el) {
                     return el;
                 });
-
-                var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
 
                 var protocolkVpNames = [];
                 for (i = 0; i < acq_kVp_summary.length; i++) {
                     protocolkVpNames.push(acq_kVp_summary[i].acquisition_protocol);
                 }
+            }
+
+            if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
+                var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
+
 
                 var protocolkVpCounts = [];
                 var protocolkVpBins = [];
@@ -196,17 +200,20 @@ $(document).ready(function() {
             
             //-------------------------------------------------------------------------------------
             // mAs chart data start
-            if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
+            if( typeof plotDXAcquisitionMeanmAs !== 'undefined' || typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
+
                 var acq_mAs_summary = $.map(json.acquisitionmAsSummary, function (el) {
                     return el;
                 });
-
-                var acq_histogram_mAs_data = json.acquisitionHistogrammAsData;
 
                 var protocolmAsNames = [];
                 for (i = 0; i < acq_mAs_summary.length; i++) {
                     protocolmAsNames.push(acq_mAs_summary[i].acquisition_protocol);
                 }
+            }
+
+            if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
+                var acq_histogram_mAs_data = json.acquisitionHistogrammAsData;
 
                 var protocolmAsCounts = [];
                 var protocolmAsBins = [];
@@ -355,6 +362,96 @@ $(document).ready(function() {
                 chartplotDXStudyPerDayAndHour.redraw({duration: 1000});
             }
             // Study workload chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // kVp over time chart data start
+            // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average kVp values
+            if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
+                var kVpOverTime, acq_kvp_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
+                var chartDXAcquisitionMeankVpOverTime = $('#AcquisitionMeankVpOverTimeDIV').highcharts();
+
+                var protocolkVpLineColours =  new Array(protocolkVpNames.length);
+
+                acq_kvp_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeankVpoverTime : json.acquisitionMediankVpoverTime;
+
+                dateAxis = [];
+                for(i=0; i<acq_kvp_over_time[0].length; i++) {
+                    tempDate = new Date(Date.parse(acq_kvp_over_time[0][i][0]));
+                    tempDate = formatDate(tempDate);
+                    dateAxis.push(tempDate);
+                }
+
+                kVpOverTime = [];
+                urlStart = ''; // NOTE: THIS IS JUNK
+                for(i=0; i<acq_kvp_over_time.length; i++) {
+                    temp = [];
+                    for(j=0; j<acq_kvp_over_time[0].length; j++) {
+                        tempDate = new Date(Date.parse(acq_kvp_over_time[i][j][0]));
+                        date_after = formatDate(tempDate);
+                        date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+
+                        currentValue = parseFloat(acq_kvp_over_time[i][j][1]);
+                        if(currentValue == 0) currentValue = null;
+
+                        temp.push({y:currentValue, url: urlStart+protocolkVpNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                    }
+                    kVpOverTime.push({name: protocolkVpNames[i], color: protocolkVpLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                }
+
+                chartDXAcquisitionMeankVpOverTime.xAxis[0].setCategories(dateAxis);
+                for(i=0; i<kVpOverTime.length; i++) {
+                    chartDXAcquisitionMeankVpOverTime.addSeries(kVpOverTime[i]);
+                }
+                chartDXAcquisitionMeankVpOverTime.redraw({duration: 1000});
+            }
+            // kVp over time chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // mAs over time chart data start
+            // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average mAs values
+            if(typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
+                var mAsOverTime, acq_mas_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
+                var chartDXAcquisitionMeanmAsOverTime = $('#AcquisitionMeanmAsOverTimeDIV').highcharts();
+
+                var protocolmAsLineColours =  new Array(protocolmAsNames.length);
+
+                acq_mas_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeanmAsoverTime : json.acquisitionMedianmAsoverTime;
+
+                dateAxis = [];
+                for(i=0; i<acq_mas_over_time[0].length; i++) {
+                    tempDate = new Date(Date.parse(acq_mas_over_time[0][i][0]));
+                    tempDate = formatDate(tempDate);
+                    dateAxis.push(tempDate);
+                }
+
+                mAsOverTime = [];
+                urlStart = ''; // NOTE: THIS IS JUNK
+                for(i=0; i<acq_mas_over_time.length; i++) {
+                    temp = [];
+                    for(j=0; j<acq_mas_over_time[0].length; j++) {
+                        tempDate = new Date(Date.parse(acq_mas_over_time[i][j][0]));
+                        date_after = formatDate(tempDate);
+                        date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+
+                        currentValue = parseFloat(acq_mas_over_time[i][j][1]);
+                        if(currentValue == 0) currentValue = null;
+
+                        temp.push({y:currentValue, url: urlStart+protocolmAsNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                    }
+                    mAsOverTime.push({name: protocolmAsNames[i], color: protocolmAsLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                }
+
+                chartDXAcquisitionMeanmAsOverTime.xAxis[0].setCategories(dateAxis);
+                for(i=0; i<mAsOverTime.length; i++) {
+                    chartDXAcquisitionMeanmAsOverTime.addSeries(mAsOverTime[i]);
+                }
+                chartDXAcquisitionMeanmAsOverTime.redraw({duration: 1000});
+            }
+            // mAs over time chart data end
             //-------------------------------------------------------------------------------------
 
 
