@@ -179,6 +179,8 @@ class UserProfile(models.Model):
     plotDXAcquisitionMeankVp = models.BooleanField(default=False)
     plotDXAcquisitionMeanmAs = models.BooleanField(default=False)
     plotDXStudyPerDayAndHour = models.BooleanField(default=False)
+    plotDXAcquisitionMeankVpOverTime = models.BooleanField(default=False)
+    plotDXAcquisitionMeanmAsOverTime = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAPOverTime = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAPOverTimePeriod = models.CharField(max_length=6,
                                                               choices=TIME_PERIOD,

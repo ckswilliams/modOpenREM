@@ -84,7 +84,7 @@
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
       {% if admin.adminperm %}
         <th>Delete?</th>
       {% endif %}
@@ -110,7 +110,7 @@
         </td>
         <td>
           <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.procedure_code_meaning }} |
+            {{ exam.study_description }} |
             {{ exam.accession_number }}
           </a>
         </td>
@@ -382,6 +382,58 @@
       <!-- End of HTML to include div container for studies per week day pie chart -->
     {% endif %}
 
+    {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
+      <!-- HTML to include div container for mean acquisition protocol kVp over time -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Line plot showing mean kVp of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median kVp of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
+              </a>
+            </h4>
+          </div>
+          <div id="collapseAcquisitionMeankVpOverTime" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="AcquisitionMeankVpOverTimeDIV" style="height: auto; margin: 0 0"></div>
+              <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for mean acquisition protocol kVp over time -->
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
+      <!-- HTML to include div container for mean acquisition protocol mAs over time -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Line plot showing mean mAs of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median mAs of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
+              </a>
+            </h4>
+          </div>
+          <div id="collapseAcquisitionMeanmAsOverTime" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="AcquisitionMeanmAsOverTimeDIV" style="height: auto; margin: 0 0"></div>
+              <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for mean acquisition protocol mAs over time -->
+    {% endif %}
+
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
       <div class="panel-group" id="accordion">
@@ -447,6 +499,14 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
     <script>var plotDXAcquisitionMeanDAPOverTime = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
+    <script>var plotDXAcquisitionMeankVpOverTime = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
+    <script>var plotDXAcquisitionMeanmAsOverTime = true;</script>
     {% endif %}
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
@@ -532,6 +592,28 @@
       <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
       <script src="{{ STATIC_URL }}js/dxChartStudyWorkload.js"></script>
       <!-- End of JavaScript for studies per week day pie chart -->
+    {% endif %}
+
+
+    {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
+      <!-- JavaScript for mean kvp per acquisition protocol per time period -->
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeankVpperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMediankVpperAcquisitionOverTime.js"></script>
+      {% endif %}
+      <!-- End of JavaScript for mean kVp per acquisition protocol per time period -->
+    {% endif %}
+
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
+      <!-- JavaScript for mean mAs per acquisition protocol per time period -->
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeanmAsperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMedianmAsperAcquisitionOverTime.js"></script>
+      {% endif %}
+      <!-- End of JavaScript for mean mAs per acquisition protocol per time period -->
     {% endif %}
 
 

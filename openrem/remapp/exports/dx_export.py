@@ -33,20 +33,6 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 
-def return_if_exists(model, field):
-    """
-    Prevent errors due to missing data
-    :param val: database field
-    :return: value or None
-    """
-    from django.core.exceptions import ObjectDoesNotExist
-    try:
-        return_value = getattr(model, field)
-    except ObjectDoesNotExist:
-        return_value = None
-    
-    return return_value
-
 @shared_task
 def exportDX2excel(filterdict):
     """Export filtered DX database data to a single-sheet CSV file.
@@ -64,6 +50,7 @@ def exportDX2excel(filterdict):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
+    from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -157,23 +144,56 @@ def exportDX2excel(filterdict):
     for i, exams in enumerate(e):
 
         try:
-            exams.patientstudymoduleattr_set.get()
-            patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
-            patient_sex = exams.patientmoduleattr_set.get().patient_sex
-            patient_size = exams.patientstudymoduleattr_set.get().patient_size
-            patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
-        except:
-            patient_age = None
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            institution_name = None
+            manufacturer = None
+            manufacturer_model_name = None
+            station_name = None
+            display_name = None
+        else:
+            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+        try:
+            exams.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
             patient_sex = None
+        else:
+            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+
+        try:
+            exams.patientstudymoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_age = None
             patient_size = None
             patient_weight = None
+        else:
+            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+        except ObjectDoesNotExist:
+            total_number_of_radiographic_frames = None
+            cgycm2 = None
+        else:
+            total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
+            dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+            if dap_total:
+                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            else:
+                cgycm2 = None
 
         examdata = [
-            exams.generalequipmentmoduleattr_set.get().institution_name,
-            exams.generalequipmentmoduleattr_set.get().manufacturer,
-            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-            exams.generalequipmentmoduleattr_set.get().station_name,
-            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            institution_name,
+            manufacturer,
+            manufacturer_model_name,
+            station_name,
+            display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
@@ -183,30 +203,52 @@ def exportDX2excel(filterdict):
             patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2(),
+            total_number_of_radiographic_frames,
+            cgycm2,
             ]
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+
             try:
                 s.irradeventxraysourcedata_set.get()
-                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
-                kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
-                mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
-                average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
-                exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
-                exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
-                relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
-                cgycm2 = s.convert_gym2_to_cgycm2()
-            except:
+            except ObjectDoesNotExist:
                 exposure_control_mode = None
                 kvp = None
-                mas = None
                 average_xray_tube_current = None
                 exposure_time = None
+                mas = None
+            else:
+                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
+                average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
+                exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
+                try:
+                    s.irradeventxraysourcedata_set.get().kvp_set.get()
+                except ObjectDoesNotExist:
+                    kvp = None
+                else:
+                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+
+                try:
+                    s.irradeventxraysourcedata_set.get().exposure_set.get()
+                except ObjectDoesNotExist:
+                    mas = None
+                else:
+                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+                    if uas:
+                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                    else:
+                        mas = None
+
+            try:
+                s.irradeventxraydetectordata_set.get()
+            except ObjectDoesNotExist:
                 exposure_index = None
                 relative_xray_exposure = None
-                cgycm2 = None
+            else:
+                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
+                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+
+            cgycm2 = s.convert_gym2_to_cgycm2()
 
             examdata += [
                 s.acquisition_protocol,
@@ -263,6 +305,7 @@ def dxxlsx(filterdict):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import DXSummaryListFilter
+    from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -324,7 +367,8 @@ def dxxlsx(filterdict):
         'Accession number',
         'Operator',
         'Study date',
-        'Patient age', 
+        'Patient age',
+        'Patient sex',
         'Patient height', 
         'Patient mass (kg)', 
         'Test patient?',
@@ -432,108 +476,135 @@ def dxxlsx(filterdict):
         tsk.save()
 
         try:
-            patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+            exams.generalequipmentmoduleattr_set.get()
         except ObjectDoesNotExist:
-            patient_age = None
+            institution_name = None
+            manufacturer = None
+            manufacturer_model_name = None
+            station_name = None
+            display_name = None
+        else:
+            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
 
         try:
-            patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
+            exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
+            patient_sex = None
+        else:
+            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+
+        try:
+            exams.patientstudymoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_age  = None
             patient_size = None
-
-        try:
-            patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
-        except ObjectDoesNotExist:
             patient_weight = None
+        else:
+            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
 
         try:
-            not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+            exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
             not_patient_indicator = None
+        else:
+            not_patient_indicator = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+        except ObjectDoesNotExist:
+            total_number_of_radiographic_frames = None
+            cgycm2 = None
+        else:
+            total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
+            dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+            if dap_total:
+                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            else:
+                cgycm2 = None
 
         examdata = [
-            exams.generalequipmentmoduleattr_set.get().institution_name,
-            exams.generalequipmentmoduleattr_set.get().manufacturer,
-            exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-            exams.generalequipmentmoduleattr_set.get().station_name,
-            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            institution_name,
+            manufacturer,
+            manufacturer_model_name,
+            station_name,
+            display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
             patient_age,
+            patient_sex,
             patient_size,
             patient_weight,
             not_patient_indicator,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames),
-            str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()),
+            total_number_of_radiographic_frames,
+            cgycm2,
         ]
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+
             try:
-                exposure_control_mode = str(s.irradeventxraysourcedata_set.get().exposure_control_mode)
+                s.irradeventxraysourcedata_set.get()
             except ObjectDoesNotExist:
                 exposure_control_mode = None
-
-            try:
-                kvp = str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
-            except ObjectDoesNotExist:
                 kvp = None
-
-            try:
-                mas = str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-            except ObjectDoesNotExist:
-                mas = None
-
-            try:
-                average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-            except ObjectDoesNotExist:
                 average_xray_tube_current = None
-
-            try:
-                exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
-            except ObjectDoesNotExist:
                 exposure_time = None
+                mas = None
+            else:
+                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
+                average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
+                exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
+                try:
+                    s.irradeventxraysourcedata_set.get().kvp_set.get()
+                except ObjectDoesNotExist:
+                    kvp = None
+                else:
+                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+
+                try:
+                    s.irradeventxraysourcedata_set.get().exposure_set.get()
+                except ObjectDoesNotExist:
+                    mas = None
+                else:
+                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+                    if uas:
+                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                    else:
+                        mas = None
 
             try:
-                exposure_index = str(s.irradeventxraydetectordata_set.get().exposure_index)
+                s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:
                 exposure_index = None
-
-            try:
-                relative_xray_exposure = str(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
-            except ObjectDoesNotExist:
                 relative_xray_exposure = None
+            else:
+                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
+                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+
+            cgycm2 = str(s.convert_gym2_to_cgycm2())
+
+
+            entrance_exposure_at_rp = return_for_export(s, 'entrance_exposure_at_rp')
 
             try:
-                cgycm2 = str(s.convert_gym2_to_cgycm2())
-            except ObjectDoesNotExist:
-                cgycm2 = None
-
-            try:
-                entrance_exposure_at_rp = str(s.entrance_exposure_at_rp)
-            except ObjectDoesNotExist:
-                entrance_exposure_at_rp = None
-
-            try:
-                distance_source_to_detector = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector)
-            except ObjectDoesNotExist:
+                s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+            except:
                 distance_source_to_detector = None
-
-            try:
-                distance_source_to_entrance_surface = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface)
-            except ObjectDoesNotExist:
                 distance_source_to_entrance_surface = None
-
-            try:
-                distance_source_to_isocenter = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter)
-            except ObjectDoesNotExist:
                 distance_source_to_isocenter = None
-
-            try:
-                table_height_position = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position)
-            except ObjectDoesNotExist:
                 table_height_position = None
+            else:
+                distance_source_to_detector = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_detector')
+                distance_source_to_entrance_surface = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_entrance_surface')
+                distance_source_to_isocenter = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_isocenter')
+                table_height_position = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'table_height_position')
 
             examdata += [
                 s.acquisition_protocol,
@@ -570,108 +641,133 @@ def dxxlsx(filterdict):
             sheetlist[tabtext]['count'] += 1
 
             try:
-                patient_age = str(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+                exams.generalequipmentmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                institution_name = None
+                manufacturer = None
+                manufacturer_model_name = None
+                station_name = None
+                display_name = None
+            else:
+                institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+                manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+                manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+                station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
+                display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                patient_sex = None
+            else:
+                patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+
+            try:
+                exams.patientstudymoduleattr_set.get()
             except ObjectDoesNotExist:
                 patient_age = None
-
-            try:
-                patient_size = str(exams.patientstudymoduleattr_set.get().patient_size)
-            except ObjectDoesNotExist:
                 patient_size = None
-
-            try:
-                patient_weight = str(exams.patientstudymoduleattr_set.get().patient_weight)
-            except ObjectDoesNotExist:
                 patient_weight = None
+            else:
+                patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+                patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+                patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
 
             try:
-                not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
+                exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
                 not_patient_indicator = None
+            else:
+                not_patient_indicator = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
+
+            try:
+                exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+            except ObjectDoesNotExist:
+                total_number_of_radiographic_frames = None
+                cgycm2 = None
+            else:
+                total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
+                dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+                if dap_total:
+                    cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+                else:
+                    cgycm2 = None
 
             examdata = [
-                exams.generalequipmentmoduleattr_set.get().institution_name,
-                exams.generalequipmentmoduleattr_set.get().manufacturer,
-                exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-                exams.generalequipmentmoduleattr_set.get().station_name,
-                exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+                institution_name,
+                manufacturer,
+                manufacturer_model_name,
+                station_name,
+                display_name,
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
                 patient_age,
+                patient_sex,
                 patient_size,
                 patient_weight,
                 not_patient_indicator,
                 exams.study_description,
                 exams.requested_procedure_code_meaning,
-                str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames),
-                str(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()),
+                total_number_of_radiographic_frames,
+                cgycm2,
                 ]
 
             try:
-                exposure_control_mode = str(s.irradeventxraysourcedata_set.get().exposure_control_mode)
+                s.irradeventxraysourcedata_set.get()
             except ObjectDoesNotExist:
                 exposure_control_mode = None
-
-            try:
-                kvp = str(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
-            except ObjectDoesNotExist:
                 kvp = None
-
-            try:
-                mas = str(s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-            except ObjectDoesNotExist:
-                mas = None
-
-            try:
-                average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-            except ObjectDoesNotExist:
                 average_xray_tube_current = None
-
-            try:
-                exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
-            except ObjectDoesNotExist:
                 exposure_time = None
+                mas = None
+            else:
+                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
+                average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
+                exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
+                try:
+                    s.irradeventxraysourcedata_set.get().kvp_set.get()
+                except ObjectDoesNotExist:
+                    kvp = None
+                else:
+                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+
+                try:
+                    s.irradeventxraysourcedata_set.get().exposure_set.get()
+                except ObjectDoesNotExist:
+                    mas = None
+                else:
+                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+                    if uas:
+                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                    else:
+                        mas = None
 
             try:
-                exposure_index = str(s.irradeventxraydetectordata_set.get().exposure_index)
+                s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:
                 exposure_index = None
-
-            try:
-                relative_xray_exposure = str(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
-            except ObjectDoesNotExist:
                 relative_xray_exposure = None
+            else:
+                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
+                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+
+            cgycm2 = s.convert_gym2_to_cgycm2()
+
+            entrance_exposure_at_rp = return_for_export(s, 'entrance_exposure_at_rp')
 
             try:
-                cgycm2 = str(s.convert_gym2_to_cgycm2())
-            except ObjectDoesNotExist:
-                cgycm2 = None
-
-            try:
-                entrance_exposure_at_rp = str(s.entrance_exposure_at_rp)
-            except ObjectDoesNotExist:
-                entrance_exposure_at_rp = None
-
-            try:
-                distance_source_to_detector = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector)
-            except ObjectDoesNotExist:
+                s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+            except:
                 distance_source_to_detector = None
-
-            try:
-                distance_source_to_entrance_surface = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_entrance_surface)
-            except ObjectDoesNotExist:
                 distance_source_to_entrance_surface = None
-
-            try:
-                distance_source_to_isocenter = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter)
-            except ObjectDoesNotExist:
                 distance_source_to_isocenter = None
-
-            try:
-                table_height_position = str(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position)
-            except ObjectDoesNotExist:
                 table_height_position = None
+            else:
+                distance_source_to_detector = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_detector')
+                distance_source_to_entrance_surface = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_entrance_surface')
+                distance_source_to_isocenter = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_isocenter')
+                table_height_position = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'table_height_position')
 
             examdata += [
                 s.acquisition_protocol,
