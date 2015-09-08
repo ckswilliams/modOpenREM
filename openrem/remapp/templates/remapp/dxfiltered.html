@@ -84,7 +84,7 @@
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
       {% if admin.adminperm %}
         <th>Delete?</th>
       {% endif %}
@@ -110,7 +110,7 @@
         </td>
         <td>
           <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.procedure_code_meaning }} |
+            {{ exam.study_description }} |
             {{ exam.accession_number }}
           </a>
         </td>
