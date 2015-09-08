@@ -28,7 +28,8 @@ try:
         sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
-from netdicom import AE, StorageSOPClass, VerificationSOPClass
+from netdicom import AE
+from netdicom.SOPclass import StorageSOPClass, VerificationSOPClass
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
 import tempfile
