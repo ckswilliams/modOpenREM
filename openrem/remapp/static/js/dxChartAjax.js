@@ -384,7 +384,6 @@ $(document).ready(function() {
                 }
 
                 kVpOverTime = [];
-                urlStart = ''; // NOTE: THIS IS JUNK
                 for(i=0; i<acq_kvp_over_time.length; i++) {
                     temp = [];
                     for(j=0; j<acq_kvp_over_time[0].length; j++) {
@@ -429,7 +428,6 @@ $(document).ready(function() {
                 }
 
                 mAsOverTime = [];
-                urlStart = ''; // NOTE: THIS IS JUNK
                 for(i=0; i<acq_mas_over_time.length; i++) {
                     temp = [];
                     for(j=0; j<acq_mas_over_time[0].length; j++) {
