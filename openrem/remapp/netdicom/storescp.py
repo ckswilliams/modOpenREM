@@ -13,6 +13,7 @@ import os
 import sys
 import errno
 import logging
+import django
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -20,6 +21,7 @@ projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
 if projectpath not in sys.path:
     sys.path.insert(1,projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
 
 try:
     import netdicom
