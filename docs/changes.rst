@@ -7,7 +7,13 @@ OpenREM version history
 *This list is not up to date*
 
 * `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
+* `#259`_  Link to manage users added to Admin menu
 * `#258`_  Fixed DX import error where manufacturer or model name was not provided
+* `#252`_  Fixed duplicate entries in DX filtered data for studies with multiple exposures
+* `#247`_  Fixed incorrect reference to manufacturer_model_name
+* `#246`_  Charts: Added median data for PostgreSQL users
+* `#245`_  Fixed error in csv DX export
+* `#244`_  Fixed issue where scripts wouldn't function after upgrade to Django 1.8
 * `#243`_  Added distance related data to DX exports
 * `#242`_  Distance source to patient now extracted from DX images
 * `#240`_  Charts: Improved DAP over time calculations
@@ -16,10 +22,10 @@ OpenREM version history
 * `#234`_  Charts: Fixed error with datetime combine
 * `#232`_  Charts: on or off displayed on the home page
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
-* `#207`_  DICOM QR SCU now available from web interface
+* `#207`_  DICOM QR SCU now available from web interface, plus improve control and config of Store SCP
 * `#171`_  Root URL now resolves so ``/openrem`` is not necessary
 * `#151`_  Suspected non-patient studies can now be filtered out
-* `#118`_  Upgraded to django 1.8
+* `#118`_  Upgraded to Django 1.8
 
 
 0.6.0 (2015-05-14)
