@@ -14,4 +14,4 @@ from openrem.remapp.netdicom import storescp
 if len(sys.argv) != 2:
     sys.exit('Error: Supply at one argument - the ID of the SCP configuration from the web interface')
 
-sys.exit(storescp.web_store(store_pk=sys.argv))
+sys.exit(storescp.web_store(store_pk=sys.argv[1]))
