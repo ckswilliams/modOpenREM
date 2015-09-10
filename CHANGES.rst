@@ -10,11 +10,14 @@ OpenREM version history
 * `#272`_  Tweak to display of exam description for DX
 * `#271`_  Fixed DX import failure where ``AcquisitionDate`` or ``AcquisitionTime`` are ``None``
 * `#270`_  Django 1.8 Admin site has a 'view site' link. Pointed it back to OpenREM
+* `#268`_  Improved population of procedure_code_meaning for DX imports
 * `#266`_  DICOM C-Store script added back in - largely redundant with web interface
 * `#262`_  Dealt with issue where two exposures from the same study would race on import
 * `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
 * `#259`_  Link to manage users added to Admin menu
 * `#258`_  Fixed DX import error where manufacturer or model name was not provided
+* `#254`_  Charts: Simplified chart data processing in the templates
+* `#253`_  Charts: AJAX used to make pages responsive with large datasets when charts enabled
 * `#252`_  Fixed duplicate entries in DX filtered data for studies with multiple exposures
 * `#247`_  Fixed incorrect reference to manufacturer_model_name
 * `#246`_  Charts: Added median data for PostgreSQL users
@@ -28,6 +31,7 @@ OpenREM version history
 * `#234`_  Charts: Fixed error with datetime combine
 * `#232`_  Charts: on or off displayed on the home page
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
+* `#229`_  Charts: Added chart of DLP per requested procedure
 * `#207`_  DICOM QR SCU now available from web interface, plus improve control and config of Store SCP
 * `#171`_  Root URL now resolves so ``/openrem`` is not necessary
 * `#151`_  Suspected non-patient studies can now be filtered out
