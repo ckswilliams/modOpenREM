@@ -1171,16 +1171,17 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
 @login_required
 def mg_summary_list_filter(request):
-    from remapp.interface.mod_filters import MGSummaryListFilter
+    from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterNoPid
     import pkg_resources # part of setuptools
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
     logging.warning("Request: %s", request)
-    if request.user.groups.filter(name='piduser'):
-        f = MGSummaryListFilter(filter_data, pid=True)
+
+    if request.user.groups.filter(name='pidgroup'):
+        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
     else:
-        f = MGSummaryListFilter(filter_data, pid=False)
+        f = MGFilterNoPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version

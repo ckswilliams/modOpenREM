@@ -170,17 +170,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
-    patient_name = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+#    patient_name = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
     patient_id = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
-
-    def __init__(self, pid, *args, **kwargs):
-        super(MGSummaryListFilter, self).__init__(*args, **kwargs)
-        from remapp.interface.mod_filters import MGSummaryListFilter
-        logging.warning("MGsummarylistfilter __init__")
-        self.queryset = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
-        if pid:
-            logging.warning("we have the right group")
-
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -196,8 +187,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
             'station_name',
             'display_name',
             'accession_number',
-            'patient_name',
-            'patient_id',
+#            'patient_name',
+#            'patient_id',
             ]
 
         order_by = (
@@ -216,6 +207,20 @@ class MGSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(MGSummaryListFilter, self).get_order_by(order_value)
+
+
+class MGFilterNoPid(MGSummaryListFilter):
+    def __init__(self, *args, **kwargs):
+        logging.warning("In nopid filter")
+        self.patient_name = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+        super(MGFilterNoPid, self).__init__(*args, **kwargs)
+        logging.warning("self in nopid is %s", dir(self))
+
+#    class Meta(MGSummaryListFilter):
+#        fields = ['patient_name', 'patient_id']
+#        exclude = ('patient_name', 'patient_id')
+
+
 
 
 class DXSummaryListFilter(django_filters.FilterSet):
