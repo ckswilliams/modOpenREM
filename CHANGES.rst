@@ -4,9 +4,34 @@ OpenREM version history
 
 0.7.0b5 (2015-09-02)
 --------------------
-*This list is not up to date*
 
+* `#274`_  Charts: Fixed legend display issue
+* `#273`_  Charts: Added plots of average kVp and mAs over time for DX
+* `#272`_  Tweak to display of exam description for DX
+* `#271`_  Fixed DX import failure where ``AcquisitionDate`` or ``AcquisitionTime`` are ``None``
+* `#270`_  Django 1.8 Admin site has a 'view site' link. Pointed it back to OpenREM
+* `#266`_  DICOM C-Store script added back in - largely redundant with web interface
+* `#262`_  Dealt with issue where two exposures from the same study would race on import
+* `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
+* `#259`_  Link to manage users added to Admin menu
+* `#258`_  Fixed DX import error where manufacturer or model name was not provided
+* `#252`_  Fixed duplicate entries in DX filtered data for studies with multiple exposures
+* `#247`_  Fixed incorrect reference to manufacturer_model_name
+* `#246`_  Charts: Added median data for PostgreSQL users
+* `#245`_  Fixed error in csv DX export
+* `#244`_  Fixed issue where scripts wouldn't function after upgrade to Django 1.8
+* `#243`_  Added distance related data to DX exports
+* `#242`_  Distance source to patient now extracted from DX images
+* `#240`_  Charts: Improved DAP over time calculations
+* `#239`_  Configurable equipment names to fix multiple sources withe the same station name
+* `#237`_  Charts: Tidied up plot data calculations in ``views.py``
+* `#234`_  Charts: Fixed error with datetime combine
+* `#232`_  Charts: on or off displayed on the home page
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
+* `#207`_  DICOM QR SCU now available from web interface, plus improve control and config of Store SCP
+* `#171`_  Root URL now resolves so ``/openrem`` is not necessary
+* `#151`_  Suspected non-patient studies can now be filtered out
+* `#118`_  Upgraded to Django 1.8
 
 
 0.6.0 (2015-05-14)
@@ -271,7 +296,7 @@ Reopened issue
 ------------------
 
 ..      Note::
-        
+
         Installs of OpenREM earlier than 0.3.3 will break on upgrade if the scripts are called from other programs.
         For example openrem_rdsr is now called openrem_rdsr.py
 
@@ -279,7 +304,7 @@ Reopened issue
 * `#10`_   Added .py suffix to the scripts to allow them to be executed on Windows (thanks to DJ Platten)
 * `#8`_    Removed superfluous '/' in base html file, harmless on linux, prevented Windows loading stylesheets (thanks to DJ Platten)
 * `#7`_    Added windows and linux path examples for test SQLite database creation
-* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten) 
+* `#6`_    Corrected renaming of example files installation instruction (thanks to DJ Platten)
 * `#4`_    Added some text to the documentation relating to importing files to OpenREM
 * `#3`_    Corrected copyright notice in documentation
 
@@ -289,6 +314,36 @@ Reopened issue
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#299`: https://bitbucket.org/openrem/openrem/issue/299/
+..  _`#298`: https://bitbucket.org/openrem/openrem/issue/298/
+..  _`#297`: https://bitbucket.org/openrem/openrem/issue/297/
+..  _`#296`: https://bitbucket.org/openrem/openrem/issue/296/
+..  _`#295`: https://bitbucket.org/openrem/openrem/issue/295/
+..  _`#294`: https://bitbucket.org/openrem/openrem/issue/294/
+..  _`#293`: https://bitbucket.org/openrem/openrem/issue/293/
+..  _`#292`: https://bitbucket.org/openrem/openrem/issue/292/
+..  _`#291`: https://bitbucket.org/openrem/openrem/issue/291/
+..  _`#290`: https://bitbucket.org/openrem/openrem/issue/290/
+..  _`#289`: https://bitbucket.org/openrem/openrem/issue/289/
+..  _`#288`: https://bitbucket.org/openrem/openrem/issue/288/
+..  _`#287`: https://bitbucket.org/openrem/openrem/issue/287/
+..  _`#286`: https://bitbucket.org/openrem/openrem/issue/286/
+..  _`#285`: https://bitbucket.org/openrem/openrem/issue/285/
+..  _`#284`: https://bitbucket.org/openrem/openrem/issue/284/
+..  _`#283`: https://bitbucket.org/openrem/openrem/issue/283/
+..  _`#282`: https://bitbucket.org/openrem/openrem/issue/282/
+..  _`#281`: https://bitbucket.org/openrem/openrem/issue/281/
+..  _`#280`: https://bitbucket.org/openrem/openrem/issue/280/
+..  _`#279`: https://bitbucket.org/openrem/openrem/issue/279/
+..  _`#278`: https://bitbucket.org/openrem/openrem/issue/278/
+..  _`#277`: https://bitbucket.org/openrem/openrem/issue/277/
+..  _`#276`: https://bitbucket.org/openrem/openrem/issue/276/
+..  _`#275`: https://bitbucket.org/openrem/openrem/issue/275/
+..  _`#274`: https://bitbucket.org/openrem/openrem/issue/274/
+..  _`#273`: https://bitbucket.org/openrem/openrem/issue/273/
+..  _`#272`: https://bitbucket.org/openrem/openrem/issue/272/
+..  _`#271`: https://bitbucket.org/openrem/openrem/issue/271/
+..  _`#270`: https://bitbucket.org/openrem/openrem/issue/270/
 ..  _`#269`: https://bitbucket.org/openrem/openrem/issue/269/
 ..  _`#268`: https://bitbucket.org/openrem/openrem/issue/268/
 ..  _`#267`: https://bitbucket.org/openrem/openrem/issue/267/

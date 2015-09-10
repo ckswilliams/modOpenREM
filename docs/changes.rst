@@ -4,7 +4,6 @@ OpenREM version history
 
 0.7.0b5 (2015-09-02)
 --------------------
-*This list is not up to date*
 
 * `#274`_  Charts: Fixed legend display issue
 * `#273`_  Charts: Added plots of average kVp and mAs over time for DX
