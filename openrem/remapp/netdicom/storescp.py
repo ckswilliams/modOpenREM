@@ -175,7 +175,3 @@ def web_store(store_pk=None):
             logging.info("Stopped AE... AET:%s, port:%s", aet, port)
 #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
-
-
-if __name__ == "__main__":
-    web_store(store_pk=1)
