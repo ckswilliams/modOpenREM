@@ -14,4 +14,10 @@ from openrem.remapp.netdicom import storescp
 if len(sys.argv) != 2:
     sys.exit('Error: Supply at one argument - the ID of the SCP configuration from the web interface')
 
-sys.exit(storescp.web_store(store_pk=sys.argv[1]))
+try:
+    print "Starting OpenREM Store SCP. Kill with control-c"
+    storescp.web_store(store_pk=sys.argv[1])
+except KeyboardInterrupt:
+    storescp._interrupt(store_pk=sys.argv[1])
+except:
+    sys.exit(0)

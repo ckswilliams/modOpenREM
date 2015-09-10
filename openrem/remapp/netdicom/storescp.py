@@ -141,6 +141,7 @@ def web_store(store_pk=None):
         aet = conf.aetitle
         port = conf.port
         conf.task_id = web_store.request.id
+        conf.run = True
         conf.save()
     except ObjectDoesNotExist:
         sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
@@ -175,3 +176,10 @@ def web_store(store_pk=None):
             logging.info("Stopped AE... AET:%s, port:%s", aet, port)
 #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
+
+def _interrupt(store_pk=None):
+    from remapp.models import DicomStoreSCP
+    stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
+    stay_alive.run = False
+    stay_alive.status = "Store interrupted from the shell"
+    stay_alive.save()
