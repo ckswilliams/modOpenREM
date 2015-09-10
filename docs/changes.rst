@@ -6,6 +6,13 @@ OpenREM version history
 --------------------
 *This list is not up to date*
 
+* `#274`_  Charts: Fixed legend display issue
+* `#273`_  Charts: Added plots of average kVp and mAs over time for DX
+* `#272`_  Tweak to display of exam description for DX
+* `#271`_  Fixed DX import failure where ``AcquisitionDate`` or ``AcquisitionTime`` are ``None``
+* `#270`_  Django 1.8 Admin site has a 'view site' link. Pointed it back to OpenREM
+* `#266`_  DICOM C-Store script added back in - largely redundant with web interface
+* `#262`_  Dealt with issue where two exposures from the same study would race on import
 * `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
 * `#259`_  Link to manage users added to Admin menu
 * `#258`_  Fixed DX import error where manufacturer or model name was not provided
