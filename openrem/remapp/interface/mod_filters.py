@@ -91,6 +91,10 @@ class RFSummaryListFilter(django_filters.FilterSet):
         return super(RFSummaryListFilter, self).get_order_by(order_value)
 
 
+from distutils.util import strtobool
+TEST_CHOICES = (('', 'True'), (2, 'False'),)
+
+
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
@@ -114,6 +118,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     acquisition_ctdi_min = django_filters.NumberFilter(lookup_type='gte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
     acquisition_ctdi_max = django_filters.NumberFilter(lookup_type='lte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -135,6 +140,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
             'study_dlp_max',
             'acquisition_dlp_min',
             'acquisition_dlp_max',
+            'test_data'
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
