@@ -38,6 +38,7 @@ from django import forms
 from remapp.models import GeneralStudyModuleAttr
 from django.utils.safestring import mark_safe
 
+TEST_CHOICES = (('', 'Yes (default)'), (2, 'No (might hide real data)'),)
 
 class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
@@ -55,6 +56,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
     performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -71,6 +73,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
             'display_name',
             'performing_physician_name',
             'accession_number',
+            'test_data',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
@@ -114,6 +117,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     acquisition_ctdi_min = django_filters.NumberFilter(lookup_type='gte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
     acquisition_ctdi_max = django_filters.NumberFilter(lookup_type='lte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -135,6 +139,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
             'study_dlp_max',
             'acquisition_dlp_min',
             'acquisition_dlp_max',
+            'test_data'
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
@@ -169,6 +174,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -184,6 +190,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
             'station_name',
             'display_name',
             'accession_number',
+            'test_data',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
@@ -225,6 +232,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
     acquisition_mas_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
     acquisition_mas_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
         model = GeneralStudyModuleAttr
@@ -243,6 +251,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'accession_number',
             #'study_dap_min',
             #'study_dap_max',
+            'test_data',
             ]
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
