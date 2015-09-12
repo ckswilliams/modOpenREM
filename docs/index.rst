@@ -22,6 +22,7 @@ Contents:
 ..  toctree::
     :maxdepth: 2
 
+    install-prep
     install
     release-0.7.0
     releasenotes
