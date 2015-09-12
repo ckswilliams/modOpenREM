@@ -2,8 +2,8 @@
 Before you install OpenREM
 **************************
 
-Install Python 2.7.x
-====================
+Install Python 2.7.x and pip
+============================
 
 * Linux – likely to be installed already
 * Windows – instructions and downloads are available at `python.org <https://www.python.org/downloads>`_
@@ -17,7 +17,7 @@ During the Windows Python 2.7 installation, you can choose to add Python.exe to 
 .. figure:: img/PythonWindowsPath.png
     :alt: Add Python to Path image
 
-    Add Python to Path – install this option
+    Python installation customisation dialogue
 
 If Python is already installed, you can add Python to Path yourself:
 
@@ -42,7 +42,8 @@ Linux
 
 Windows
 
-    Download the installer script `get-pip.py <https://bootstrap.pypa.io/get-pip.py>`_
+    Pip is normally installed with Python. If it hasn't been, download the installer script
+    `get-pip.py <https://bootstrap.pypa.io/get-pip.py>`_
     and save it locally – right click and *Save link as...* or equivalent.
 
     Open a command window (Start menu, cmd.exe) and navigate to the place
@@ -50,10 +51,8 @@ Windows
 
         python get-pip.py
 
-
-
 Quick check of python and pip
-`````````````````````````````
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To check everything is installed correctly so far, type the following in a 
 command window/shell. You should have the version number of pip returned to 
@@ -75,7 +74,6 @@ For either install, just follow the defaults – no special configurations requi
 
 Install NumPy
 -------------
-*(New for version 0.6.0)*
 
 Numpy is required for charts. OpenREM will work without NumPy, but charts will not be displayed.
 
@@ -106,10 +104,8 @@ For Windows, there are various options:
 
 Install pynetdicom
 ------------------
-*(New for version 0.6.0)*
 
-Pynetdicom is used for the new DICOM store SCP function that is available as a preview in this release. See
-:doc:`netdicom` for details.
+Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
 
 .. sourcecode:: bash
 
