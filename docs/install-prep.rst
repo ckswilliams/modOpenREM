@@ -61,7 +61,7 @@ you::
     pip -V
 
 Install RabbitMQ
-----------------
+================
 
 * Linux - Follow the guide at http://www.rabbitmq.com/install-debian.html
 * Windows - Follow the guide at http://www.rabbitmq.com/install-windows.html
@@ -73,7 +73,7 @@ For either install, just follow the defaults – no special configurations requi
     Before continuing, `consider virtualenv`_
 
 Install NumPy
--------------
+=============
 
 Numpy is required for charts. OpenREM will work without NumPy, but charts will not be displayed.
 
@@ -103,7 +103,7 @@ For Windows, there are various options:
         pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
 
 Install pynetdicom
-------------------
+==================
 
 Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
 
