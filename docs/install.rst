@@ -42,6 +42,7 @@ Edit local_settings.py
     Please use an editor such as Notepad++ or Notepad2 if you can, else use WordPad –
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
+..  Important::
     In local_settings.py, always use forward slashes and not backslashes, even for paths on
     Windows systems.
 
@@ -181,8 +182,8 @@ Finally, create a Django super user::
 Answer each question as it is asked – this user is needed to set up the other users and the
 permissions.
 
-Add the median database function **PostgreSQL database only**
--------------------------------------------------------------
+Add the median database function: PostgreSQL database only
+----------------------------------------------------------
 
 Rename the ``0002_fresh_openrem_install_add_median_function.py.inactive`` file
 in the ``migrations`` folder to ``0002_fresh_openrem_install_add_median_function.py``
