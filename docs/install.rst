@@ -1,8 +1,9 @@
+*************************
 Installation instructions
 *************************
 
-Install and configure OpenREM 0.7 beta version
-==============================================
+Install OpenREM 0.7 beta version
+================================
 
 .. Warning::
 
@@ -15,18 +16,25 @@ Install and configure OpenREM 0.7 beta version
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
-Configure
----------
+Configuration
+=============
 
 Locate install location
+-----------------------
 
-* Linux: ``/usr/local/lib/python2.7/dist-packages/openrem/`` or ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux Ubuntu: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Virtualenv: ``lib/python2.7/site-packages/openrem/``
 
 There are two files that need renaming:
 
 + ``openremproject/local_settings.py.example`` to ``openremproject/local_settings.py``
 + ``openremproject/wsgi.py.example`` to ``openremproject/wsgi.py``
+
+
+Edit local_settings.py
+----------------------
 
 ..  Note::
 
@@ -34,8 +42,11 @@ There are two files that need renaming:
     Please use an editor such as Notepad++ or Notepad2 if you can, else use WordPad –
     on the View tab you may wish to set the Word wrap to 'No wrap'
 
-local_settings.py: Database
-```````````````````````````
+    In local_settings.py, always use forward slashes and not backslashes, even for paths on
+    Windows systems.
+
+Database
+^^^^^^^^
 
 For testing you can use the SQLite3 database
 
@@ -45,12 +56,22 @@ For testing you can use the SQLite3 database
     'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
 
 * Linux example: ``'NAME': '/home/user/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:/Users/myusername/Documents/OpenREM/openrem.db',`` *Note use of forward slash in configuration files*
+* Windows example: ``'NAME': 'C:/Users/myusername/Documents/OpenREM/openrem.db',``
 
-For production use, see `Database options`_ below
+.. Note::
 
-local_settings.py: Location for imports and exports
-```````````````````````````````````````````````````
+    SQLite is great for getting things running quickly and testing if the setup works,
+    but is not recommended for production use.
+
+    We recommend using `PostgreSQL <http://www.postgresql.org>`_ as it is the best supported
+    database for Django, **and the only one for which the median value will be calculated and
+    displayed in OpenREM charts.** Alternatively, other databases such as MySQL/MariaDB, Oracle, and
+    some others with lower levels of support can be used.
+
+    There are some further guides to setting up PostgreSQL – see `Database options`_ below
+
+Location for imports and exports
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Csv and xlsx study information exports and patient size csv imports are
 written to disk at a location defined by ``MEDIA_ROOT``.
@@ -70,14 +91,14 @@ Windows example::
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
-local_settings.py: Secret key
-`````````````````````````````
+Secret key
+^^^^^^^^^^
 
 Generate a new secret key and replace the one in the ``local_settings.py`` file. You can use
 http://www.miniwebtool.com/django-secret-key-generator/ for this.
 
-local_settings.py: Allowed hosts
-````````````````````````````````
+Allowed hosts
+^^^^^^^^^^^^^
 
 The ``ALLOWED_HOSTS`` needs to be defined, as the ``DEBUG`` mode is now
 set to ``False``. This needs to contain the server name or IP address that
@@ -94,8 +115,8 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
-local_settings.py: Keep or delete processed DICOM files
-```````````````````````````````````````````````````````
+Keep or delete processed DICOM files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Should DICOM files be kept or deleted when they have been processed?
 
@@ -120,13 +141,18 @@ See :doc:`netdicom` (docs not yet up to date with features)
 Create the database
 -------------------
 
-Windows::
+In a shell/command window, move into the openrem folder:
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate
-    python C:\Python27\Lib\site-packages\openrem\manage.py showmigrations
+* Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
+* Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
+* Virtualenv: ``cd lib/python2.7/site-packages/openrem/``
 
-The ``makemigrations remapp`` should fix the ``auth_user`` relation error.
+Create the database::
+
+    python manage.py makemigrations remapp
+    python manage.py migrate
+    python manage.py showmigrations
 
 The last command will list each Django app migrations. Each should have a cross inside
 a pair of square brackets something like below::
@@ -150,14 +176,12 @@ a pair of square brackets something like below::
 
 Finally, create a Django super user::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py createsuperuser
+    python manage.py createsuperuser
 
-Answer each question as it is asked. This username and password will be used
-to log into the admin interface to create the usernames for using the web
-interface. See the `Start using it!`_ section below.
+Answer each question as it is asked – this user is needed to set up the other users and the
+permissions.
 
-
-If using PostgreSQL you must add the median database function
+Add the median database function **PostgreSQL database only**
 -------------------------------------------------------------
 
 Rename the ``0002_fresh_openrem_install_add_median_function.py.inactive`` file
@@ -166,8 +190,8 @@ then do the following:
 
 Windows::
 
-	python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations --empty remapp
-	python C:\Python27\Lib\site-packages\openrem\manage.py migrate
+	python manage.py makemigrations --empty remapp
+	python manage.py migrate
 
 The first command will create a skeleton ``0001_initial.py`` migration file. The
 second command runs the migration files, and will display the text
