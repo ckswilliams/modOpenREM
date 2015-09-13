@@ -1,6 +1,6 @@
-*************************
-Installation instructions
-*************************
+******************
+Installing OpenREM
+******************
 
 Install OpenREM 0.7 beta version
 ================================
