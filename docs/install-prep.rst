@@ -1,6 +1,6 @@
-**************************
-Before you install OpenREM
-**************************
+*****************************
+Pre-installation preparations
+*****************************
 
 Install Python 2.7.x and pip
 ============================
@@ -12,7 +12,7 @@ Add Python and the scripts folder to the path
 ---------------------------------------------
 *Windows only – this is usually automatic in linux*
 
-During the Windows Python 2.7 installation, you can choose to add Python.exe to Path – choose this option:
+During the Windows Python 2.7 installation, 'install' Add Python.exe to Path:
 
 .. figure:: img/PythonWindowsPath.png
     :alt: Add Python to Path image
