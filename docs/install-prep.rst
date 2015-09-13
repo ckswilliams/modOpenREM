@@ -102,8 +102,8 @@ For Windows, there are various options:
 
         pip install numpy‑1.9.2+mkl‑cp27‑none‑win32.whl
 
-Install pynetdicom
-==================
+Install pynetdicom (edited version)
+===================================
 
 Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See :doc:`netdicom` for details.
 
