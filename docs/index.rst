@@ -22,11 +22,9 @@ Contents:
 ..  toctree::
     :maxdepth: 2
 
-    install-prep
-    install
-    install-startservices
+    install-firsttime
     release-0.7.0
-    releasenotes
+    startservices
     import
     netdicom
     i_navigate
@@ -35,6 +33,7 @@ Contents:
     openskin
     i_administration
     code
+    releasenotes
 
 ******************
 Indices and tables
