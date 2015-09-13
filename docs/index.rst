@@ -24,6 +24,7 @@ Contents:
 
     install-prep
     install
+    install-startservices
     release-0.7.0
     releasenotes
     import
