@@ -209,13 +209,15 @@ Further instructions
 Database guides
 ---------------
 
-Here are instructions for installing PostgreSQL on linux and on Windows:
+Here are instructions for installing PostgreSQL on linux and on Windows, and guides to backup up PostgreSQL and MySQL:
 
 ..  toctree::
     :maxdepth: 1
     
     postgresql
     postgresql_windows
+    backupRestorePostgreSQL
+    backupMySQLWindows
 
 
 Production webservers
@@ -231,25 +233,19 @@ do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/djang
 The `django website <https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/>`_
 has instructions and links to get you set up with Apache.
 
+An advanced guide using Apache, including auto-restarting the server when the code changes, has been contributed
+here: `apache_on_windows`_
 
-Related guides
-==============
+Conquest related guides
+-----------------------
 
-    ..  toctree::
-        :maxdepth: 1
-        
-        conquestAsWindowsService
-        backupMySQLWindows
-        backupRestorePostgreSQL
-        conquestImportConfig
-        conquestAddRDSR
+Previous releases of OpenREM have not had a DICOM Store SCP, and we have recommended using Conquest for this job.
+OpenREM now has this functionality built-in, so hopefully the guides below will not be needed!
 
-Advanced guides for developers
-------------------------------
+..  toctree::
+    :maxdepth: 1
 
-    ..  toctree::
-        :maxdepth: 1
-        
-        apache_on_windows
-
+    conquestAsWindowsService
+    conquestImportConfig
+    conquestAddRDSR
 
