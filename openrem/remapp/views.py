@@ -1202,7 +1202,7 @@ def mg_summary_list_filter(request):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr
+    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -1222,6 +1222,9 @@ def openrem_home(request):
     if not Group.objects.filter(name="pidgroup"):
         pg = Group(name="pidgroup")
         pg.save()
+    id_settings = PatientIDSettings.objects.all()
+    if not id_settings:
+        PatientIDSettings.objects.create()
 
     users_in_groups = {'any': False, 'admin': False}
     for g in Group.objects.all():
