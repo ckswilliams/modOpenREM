@@ -111,8 +111,30 @@ Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See
 
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+Further instructions
+====================
+
+Virtualenv and virtualenvwrapper
+--------------------------------
+
+If the server is to be used for more than one python application, or you
+wish to be able to test different versions of OpenREM or do any development,
+it is highly recommended that you use `virtualenv`_ or maybe `virtualenvwrapper`_
+
+Virtualenv sets up an isolated python environment and is relatively easy to use.
+
+If you do use virtualenv, all the paths referred to in the documentation will
+be changed to:
+
+* Linux: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``Lib\site-packages\openrem``
+
+In Windows, even when the virtualenv is activated you will need to call `python`
+and provide the full path to script in the `Scripts` folder. If you call the
+script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
+system wide Python will be used instead. This doesn't apply to Linux, where
+once activated, the scripts can be called without a `python` prefix from anywhere.
 
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
-.. _(What is south?): `Database migrations`_
 .. _consider virtualenv: `Virtualenv and virtualenvwrapper`_

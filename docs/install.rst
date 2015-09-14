@@ -22,10 +22,12 @@ Configuration
 Locate install location
 -----------------------
 
-* Linux Ubuntu: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows virtualenv: ``Lib\site-packages\openrem``
+
 
 There are two files that need renaming:
 
@@ -204,13 +206,8 @@ that the median function has been added.
 Further instructions
 ====================
 
-Database options
-----------------
-
-SQLite is great for getting things running quickly and testing if the setup works,
-but is really not recommended for production use on any scale. Therefore it is
-recommended to use a different database such as `PostgreSQL <http://www.postgresql.org>`_ or 
-`MySQL <http://www.mysql.com>`_.
+Database guides
+---------------
 
 Here are instructions for installing PostgreSQL on linux and on Windows:
 
@@ -220,14 +217,6 @@ Here are instructions for installing PostgreSQL on linux and on Windows:
     postgresql
     postgresql_windows
 
-..  _convert-to-south:
-
-Database migrations
--------------------
-
-South is a django application to manage database migrations. Using
-South means that future changes to the database model can be calculated
-and executed automatically with simple commands when OpenREM is upgraded.
 
 Production webservers
 ---------------------
@@ -239,37 +228,8 @@ For performance it is recommended that a production webserver is used instead of
 Popular choices would be either `Apache <http://httpd.apache.org>`_ or you can do as the cool kids
 do and use `Gunicorn with nginx <http://www.robgolding.com/blog/2011/11/12/django-in-production-part-1---the-stack/>`_.
 
-The `django website <https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/modwsgi/>`_ 
+The `django website <https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/>`_
 has instructions and links to get you set up with Apache.
-
-Daemonising Celery
-------------------
-
-In a production environment, Celery will need to start automatically and
-not depend on a particular user being logged in. Therefore, much like
-the webserver, it will need to be daemonised. For now, please refer to the
-instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
-
-Virtualenv and virtualenvwrapper
---------------------------------
-
-If the server is to be used for more than one python application, or you 
-wish to be able to test different versions of OpenREM or do any development,
-it is highly recommended that you use `virtualenv`_ or maybe `virtualenvwrapper`_
-
-Virtualenv sets up an isolated python environment and is relatively easy to use.
-
-If you do use virtualenv, all the paths referred to in the documentation will
-be changed to:
-
-* Linux: ``lib/python2.7/site-packages/openrem/``
-* Windows: ``Lib\site-packages\openrem``
-
-In Windows, even when the virtualenv is activated you will need to call `python`
-and provide the full path to script in the `Scripts` folder. If you call the
-script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
-system wide Python will be used instead. This doesn't apply to Linux, where
-once activated, the scripts can be called without a `python` prefix from anywhere. 
 
 
 Related guides
@@ -293,7 +253,3 @@ Advanced guides for developers
         apache_on_windows
 
 
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
-.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
-.. _(What is south?): `Database migrations`_
-.. _consider virtualenv: `Virtualenv and virtualenvwrapper`_
