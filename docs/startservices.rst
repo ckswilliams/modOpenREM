@@ -46,7 +46,7 @@ In a new shell:
 Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 \
+    celery multi start stores default -A openremproject -c:stores 1 -c 3 \
     -Q:stores stores -Q default \
     --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
 
@@ -61,11 +61,14 @@ the logs might go in ``/var/log/``.
 
 The ``\`` is added in to allow the single command to go over several lines.
 
-
+The command above doesn't work on Windows, so we have to use two separate commands that stay running in the command
+window - see `Daemonising Celery`_ below and follow the link to see a guide to running Celery as a Windows service.
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
+
+
     celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
     -Q:stores stores -Q default ^
     --pidfile=C:\path\to\media\celery\%N.pid --logfile=C:\path\to\media\celery\%N.log
