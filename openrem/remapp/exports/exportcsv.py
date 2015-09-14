@@ -50,6 +50,8 @@ def exportFL2excel(filterdict):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter
+    from remapp.tools.get_values import return_for_export
+    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -119,27 +121,96 @@ def exportFL2excel(filterdict):
         'Physician',
         'Operator'])
     for i, exams in enumerate(e):
+
+        try:
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            manufacturer = None
+        else:
+            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().observercontext_set.get()
+        except ObjectDoesNotExist:
+            device_observer_name = None
+        else:
+            device_observer_name = return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name')
+
+        try:
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            institution_name = None
+            display_name = None
+        else:
+            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'unique_equipment_name.display_name')
+
+        try:
+            exams.patientstudymoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_age_decimal = None
+            patient_size = None
+            patient_weight = None
+        else:
+            patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
+        except ObjectDoesNotExist:
+            count = None
+        else:
+            count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
+
+        try:
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+        except ObjectDoesNotExist:
+            dose_area_product_total = None
+            dose_rp_total = None
+        else:
+            dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+            dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_rp_total')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
+        except ObjectDoesNotExist:
+            fluoro_dose_area_product_total = None
+            fluoro_dose_rp_total = None
+            total_fluoro_time = None
+            acquisition_dose_area_product_total = None
+            acquisition_dose_rp_total = None
+            total_acquisition_time = None
+        else:
+            fluoro_dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'fluoro_dose_area_product_total')
+            fluoro_dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'fluoro_dose_rp_total')
+            total_fluoro_time = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'total_fluoro_time')
+            acquisition_dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'acquisition_dose_area_product_total')
+            acquisition_dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'acquisition_dose_rp_total')
+            total_acquisition_time = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'total_acquisition_time')
+            reference_point_definition_code = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+
         writer.writerow([
-            exams.generalequipmentmoduleattr_set.get().manufacturer,
-            exams.projectionxrayradiationdose_set.get().observercontext_set.get().device_observer_name,
-            exams.generalequipmentmoduleattr_set.get().institution_name,
-            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            manufacturer,
+            device_observer_name,
+            institution_name,
+            display_name,
             exams.study_date,
             exams.accession_number, 
-            exams.patientstudymoduleattr_set.get().patient_age_decimal,
-            exams.patientstudymoduleattr_set.get().patient_size,
-            exams.patientstudymoduleattr_set.get().patient_weight,
+            patient_age_decimal,
+            patient_size,
+            patient_weight,
             exams.study_description,
-            exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count(),
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_rp_total,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_fluoro_time,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_acquisition_time,
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().reference_point_definition_code,
+            count,
+            dose_area_product_total,
+            dose_rp_total,
+            fluoro_dose_area_product_total,
+            fluoro_dose_rp_total,
+            total_fluoro_time,
+            acquisition_dose_area_product_total,
+            acquisition_dose_rp_total,
+            total_acquisition_time,
+            reference_point_definition_code,
             exams.performing_physician_name,
             exams.operator_name,
             ])
@@ -187,6 +258,8 @@ def exportCT2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
+    from remapp.tools.get_values import return_for_export
+    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -286,29 +359,74 @@ def exportCT2excel(filterdict):
     tsk.save()
 
     for i, exams in enumerate(e):
+
+        try:
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            institution_name = None
+            manufacturer = None
+            manufacturer_model_name = None
+            station_name = None
+            display_name = None
+        else:
+            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'unique_equipment_name.display_name')
+
+        try:
+            exams.patientstudymoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_age_decimal = None
+            patient_size = None
+            patient_weight = None
+        else:
+            patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+
+        try:
+            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+        except ObjectDoesNotExist:
+            total_number_of_irradiation_events = None
+            ct_dose_length_product_total = None
+        else:
+            total_number_of_irradiation_events = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events')
+            ct_dose_length_product_total = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total')
+
         examdata = [
-			exams.generalequipmentmoduleattr_set.get().institution_name,
-			exams.generalequipmentmoduleattr_set.get().manufacturer,
-			exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-			exams.generalequipmentmoduleattr_set.get().station_name,
-            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+            institution_name,
+            manufacturer,
+            manufacturer_model_name,
+            station_name,
+            display_name,
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
-            exams.patientstudymoduleattr_set.get().patient_age_decimal,
-            exams.patientstudymoduleattr_set.get().patient_size,
-            exams.patientstudymoduleattr_set.get().patient_weight,
+            patient_age_decimal,
+            patient_size,
+            patient_weight,
             exams.study_description,
             exams.requested_procedure_code_meaning,
-            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events,
-            exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total,
-			]
+            total_number_of_irradiation_events,
+            ct_dose_length_product_total,
+            ]
+
         for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
+
+            try:
+                s.scanninglength_set.get()
+            except ObjectDoesNotExist:
+                scanning_length = None
+            else:
+                scanning_length = s.scanninglength_set.get().scanning_length
+
             examdata += [
                 s.acquisition_protocol,
                 s.ct_acquisition_type,
                 s.exposure_time,
-                s.scanninglength_set.get().scanning_length,
+                scanning_length,
                 s.nominal_single_collimation_width,
                 s.nominal_total_collimation_width,
                 s.pitch_factor,
@@ -327,12 +445,28 @@ def exportCT2excel(filterdict):
                         ]
             else:
                 try:
+
+                    try:
+                        s.ctxraysourceparameters_set.get()
+                    except ObjectDoesNotExist:
+                        identification_of_the_xray_source = None
+                        kvp = None
+                        maximum_xray_tube_current = None
+                        xray_tube_current = None
+                        exposure_time_per_rotation = None
+                    else:
+                        identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(), 'identification_of_the_xray_source')
+                        kvp = return_for_export(s.ctxraysourceparameters_set.get(), 'kvp')
+                        maximum_xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current')
+                        xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current')
+                        exposure_time_per_rotation = return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation')
+
                     examdata += [
-                        s.ctxraysourceparameters_set.get().identification_of_the_xray_source,
-                        s.ctxraysourceparameters_set.get().kvp,
-                        s.ctxraysourceparameters_set.get().maximum_xray_tube_current,
-                        s.ctxraysourceparameters_set.get().xray_tube_current,
-                        s.ctxraysourceparameters_set.get().exposure_time_per_rotation,
+                        identification_of_the_xray_source,
+                        kvp,
+                        maximum_xray_tube_current,
+                        xray_tube_current,
+                        exposure_time_per_rotation,
                         'n/a',
                         'n/a',
                         'n/a',
@@ -385,6 +519,8 @@ def exportMG2excel(filterdict):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter
+    from remapp.tools.get_values import return_for_export
+    from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
 
@@ -466,35 +602,121 @@ def exportMG2excel(filterdict):
     for i, study in enumerate(s):
         e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
         for exp in e:
+
+            try:
+                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                institution_name = None
+                manufacturer = None
+                station_name = None
+                display_name = None
+            else:
+                institution_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name')
+                manufacturer = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer')
+                station_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name')
+                display_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'unique_equipment_name.display_name')
+
+            try:
+                exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get()
+            except ObjectDoesNotExist:
+                patient_age_decimal = None
+            else:
+                patient_age_decimal = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+
+            try:
+                exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                patient_sex = None
+            else:
+                patient_sex = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_sex')
+
+            try:
+                exp.irradeventxraymechanicaldata_set.get()
+            except ObjectDoesNotExist:
+                compression_thickness = None
+                compression_force = None
+                magnification_factor = None
+            else:
+                compression_thickness = return_for_export(exp.irradeventxraymechanicaldata_set.get(), 'compression_thickness')
+                compression_force = return_for_export(exp.irradeventxraymechanicaldata_set.get(), 'compression_force')
+                magnification_factor = return_for_export(exp.irradeventxraymechanicaldata_set.get(), 'magnification_factor')
+
+            try:
+                exp.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+            except ObjectDoesNotExist:
+                radiological_thickness = None
+            else:
+                radiological_thickness = return_for_export(exp.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'radiological_thickness')
+
+            try:
+                exp.irradeventxraysourcedata_set.get()
+            except ObjectDoesNotExist:
+                collimated_field_area = None
+                exposure_control_mode = None
+                anode_target_material = None
+                focal_spot_size = None
+                average_xray_tube_current = None
+                exposure_time = None
+                average_glandular_dose = None
+            else:
+                collimated_field_area = return_for_export(exp.irradeventxraysourcedata_set.get(), 'collimated_field_area')
+                exposure_control_mode = return_for_export(exp.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
+                anode_target_material = return_for_export(exp.irradeventxraysourcedata_set.get(), 'anode_target_material')
+                focal_spot_size = return_for_export(exp.irradeventxraysourcedata_set.get(), 'focal_spot_size')
+                average_xray_tube_current = return_for_export(exp.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
+                exposure_time = return_for_export(exp.irradeventxraysourcedata_set.get(), 'exposure_time')
+                average_glandular_dose = return_for_export(exp.irradeventxraysourcedata_set.get(), 'average_glandular_dose')
+
+            try:
+                exp.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+            except ObjectDoesNotExist:
+                xray_filter_material = None
+            else:
+                xray_filter_material = return_for_export(exp.irradeventxraysourcedata_set.get().xrayfilters_set.get(), 'xray_filter_material')
+
+            try:
+                exp.irradeventxraysourcedata_set.get().kvp_set.get()
+            except ObjectDoesNotExist:
+                kvp = None
+            else:
+                kvp = return_for_export(exp.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+
+            try:
+                exp.irradeventxraysourcedata_set.get().exposure_set.get()
+            except ObjectDoesNotExist:
+                exposure = None
+            else:
+                exposure = return_for_export(exp.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+
             writer.writerow([
-                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().institution_name,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().manufacturer,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
+                institution_name,
+                manufacturer,
+                station_name,
+                display_name,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number, 
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
                 exp.date_time_started,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get().patient_sex,
+                patient_age_decimal,
+                patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
                 exp.image_view,
                 exp.acquisition_protocol,
-                exp.irradeventxraymechanicaldata_set.get().compression_thickness,
-                exp.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().radiological_thickness,
-                exp.irradeventxraymechanicaldata_set.get().compression_force,
-                exp.irradeventxraymechanicaldata_set.get().magnification_factor,
-                exp.irradeventxraysourcedata_set.get().collimated_field_area,
-                exp.irradeventxraysourcedata_set.get().exposure_control_mode,
-                exp.irradeventxraysourcedata_set.get().anode_target_material,
-                exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material,
-                exp.irradeventxraysourcedata_set.get().focal_spot_size,
-                exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
-                exp.irradeventxraysourcedata_set.get().average_xray_tube_current,
-                exp.irradeventxraysourcedata_set.get().exposure_time,
-                exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure,
+                compression_thickness,
+                radiological_thickness,
+                compression_force,
+                magnification_factor,
+                collimated_field_area,
+                exposure_control_mode,
+                anode_target_material,
+                xray_filter_material,
+                focal_spot_size,
+                kvp,
+                average_xray_tube_current,
+                exposure_time,
+                exposure,
                 exp.entrance_exposure_at_rp,
-                exp.irradeventxraysourcedata_set.get().average_glandular_dose,
+                average_glandular_dose,
                 exp.percent_fibroglandular_tissue,
                 exp.comment,
                 ])

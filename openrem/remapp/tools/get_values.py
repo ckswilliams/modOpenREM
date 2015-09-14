@@ -42,7 +42,7 @@ def get_value_kw(tag,dataset):
         val = getattr(dataset,tag)
         if val != '':
             if type(val) is str:
-                value = val.decode('latin-1')
+                val = val.decode('latin-1', 'replace')
             return val
 
 def get_value_num(tag,dataset):
@@ -61,7 +61,7 @@ def get_value_num(tag,dataset):
         val = dataset[tag].value
         if val != '':
             if type(val) is str:
-                value = val.decode('latin-1')
+                val = val.decode('latin-1', 'replace')
             return val
 
 def get_seq_code_value(sequence,dataset):
