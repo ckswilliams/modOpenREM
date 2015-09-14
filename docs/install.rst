@@ -234,7 +234,7 @@ The `django website <https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi
 has instructions and links to get you set up with Apache.
 
 An advanced guide using Apache, including auto-restarting the server when the code changes, has been contributed
-here: `apache_on_windows`_
+here: :doc:`apache_on_windows`
 
 Conquest related guides
 -----------------------
