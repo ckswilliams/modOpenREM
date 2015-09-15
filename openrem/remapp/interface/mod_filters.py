@@ -95,6 +95,13 @@ class RFSummaryListFilter(django_filters.FilterSet):
         return super(RFSummaryListFilter, self).get_order_by(order_value)
 
 
+class RFFilterPlusPid(RFSummaryListFilter):
+    def __init__(self, *args, **kwargs):
+        super(RFFilterPlusPid, self).__init__(*args, **kwargs)
+        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
+
+
 class CTSummaryListFilter(django_filters.FilterSet):
     """Filter for CT studies to display in web interface.
 
@@ -159,6 +166,14 @@ class CTSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(CTSummaryListFilter, self).get_order_by(order_value)
+
+
+class CTFilterPlusPid(CTSummaryListFilter):
+    def __init__(self, *args, **kwargs):
+        super(CTFilterPlusPid, self).__init__(*args, **kwargs)
+        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
+
 
 class MGSummaryListFilter(django_filters.FilterSet):
     """Filter for mammography studies to display in web interface.
@@ -269,3 +284,9 @@ class DXSummaryListFilter(django_filters.FilterSet):
         elif order_value == '-study_date':
             return ['-study_date','-study_time']
         return super(DXSummaryListFilter, self).get_order_by(order_value)
+
+class DXFilterPlusPid(DXSummaryListFilter):
+    def __init__(self, *args, **kwargs):
+        super(DXFilterPlusPid, self).__init__(*args, **kwargs)
+        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')

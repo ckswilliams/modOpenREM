@@ -562,9 +562,12 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
 @login_required
 def rf_summary_list_filter(request):
-    from remapp.interface.mod_filters import RFSummaryListFilter
+    from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     import pkg_resources # part of setuptools
-    f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__contains = 'RF'))
+    if request.user.groups.filter(name='pidgroup'):
+        f = RFFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    else:
+        f = RFSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
