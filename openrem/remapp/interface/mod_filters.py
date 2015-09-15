@@ -61,21 +61,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
 
     class Meta:
         model = GeneralStudyModuleAttr
-        fields = [
-            'date_after', 
-            'date_before', 
-            'institution_name', 
-            'study_description',
-            'patient_age_min',
-            'patient_age_max',
-            'manufacturer', 
-            'model_name',
-            'station_name',
-            'display_name',
-            'performing_physician_name',
-            'accession_number',
-            'test_data',
-            ]
+        fields = []
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
