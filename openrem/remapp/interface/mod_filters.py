@@ -115,8 +115,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
 class RFFilterPlusPid(RFSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(RFFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
-        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
 
 
 class CTSummaryListFilter(django_filters.FilterSet):
@@ -188,8 +188,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
 class CTFilterPlusPid(CTSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(CTFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
-        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
 
 
 class MGSummaryListFilter(django_filters.FilterSet):
@@ -304,5 +304,5 @@ class DXSummaryListFilter(django_filters.FilterSet):
 class DXFilterPlusPid(DXSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(DXFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
-        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
