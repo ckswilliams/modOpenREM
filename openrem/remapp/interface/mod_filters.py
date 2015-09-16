@@ -71,6 +71,21 @@ def custom_id_filter(queryset, value):
     )
     return filtered
 
+def custom_acc_filter(queryset, value):
+    if not value:
+        return queryset
+
+    from django.db.models import Q
+    from remapp.tools.hash_id import hash_id
+    filtered = queryset.filter(
+        (
+            Q(accession_hashed = False) & Q(accession_number__icontains = value)
+         ) | (
+            Q(accession_hashed = True) & Q(accession_number__exact = hash_id(value))
+        )
+    )
+    return filtered
+
 
 class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
@@ -86,7 +101,7 @@ class RFSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
-    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
@@ -134,7 +149,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
     manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='generalequipmentmoduleattr__manufacturer')
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
     study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
@@ -205,7 +220,7 @@ class MGSummaryListFilter(django_filters.FilterSet):
     manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Manufacturer', name='generalequipmentmoduleattr__manufacturer')
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
@@ -252,7 +267,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
     manufacturer = django_filters.CharFilter(lookup_type='icontains', label='Make', name='generalequipmentmoduleattr__manufacturer')
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
-    accession_number = django_filters.CharFilter(lookup_type='icontains', label='Accession number')
+    accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
     #study_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
     #study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
     acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
