@@ -461,12 +461,12 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
     from decimal import Decimal
-    import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
+    from remapp.tools.hash_id import hash_id
 
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex',dataset)
@@ -490,13 +490,13 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     if patient_id_settings.name_stored:
         name = get_value_kw("PatientName", dataset)
         if name and patient_id_settings.name_hashed:
-            name = hashlib.sha256(name).hexdigest()
+            name = hash_id(name)
             pat.name_hashed = True
         pat.patient_name = name
     if patient_id_settings.id_stored:
         patid = get_value_kw("PatientID", dataset)
         if patid and patient_id_settings.id_hashed:
-            patid = hashlib.sha256(patid).hexdigest()
+            patid = hash_id(patid)
             pat.id_hashed = True
         pat.patient_id = patid
     pat.save()

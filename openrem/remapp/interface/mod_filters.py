@@ -41,6 +41,37 @@ from django.utils.safestring import mark_safe
 
 TEST_CHOICES = (('', 'Yes (default)'), (2, 'No (might hide real data)'),)
 
+def custom_name_filter(queryset, value):
+    if not value:
+        return queryset
+
+    from django.db.models import Q
+    from remapp.tools.hash_id import hash_id
+    filtered = queryset.filter(
+        (
+            Q(patientmoduleattr__name_hashed = False) & Q(patientmoduleattr__patient_name__icontains = value)
+         ) | (
+            Q(patientmoduleattr__name_hashed = True) & Q(patientmoduleattr__patient_name__exact = hash_id(value))
+        )
+    )
+    return filtered
+
+def custom_id_filter(queryset, value):
+    if not value:
+        return queryset
+
+    from django.db.models import Q
+    from remapp.tools.hash_id import hash_id
+    filtered = queryset.filter(
+        (
+            Q(patientmoduleattr__id_hashed = False) & Q(patientmoduleattr__patient_id__icontains = value)
+         ) | (
+            Q(patientmoduleattr__id_hashed = True) & Q(patientmoduleattr__patient_id__exact = hash_id(value))
+        )
+    )
+    return filtered
+
+
 class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
 
@@ -200,34 +231,11 @@ class MGSummaryListFilter(django_filters.FilterSet):
             return ['-study_date','-study_time']
         return super(MGSummaryListFilter, self).get_order_by(order_value)
 
-
-def custom_name_filter(queryset, value):
-    if not value:
-        return queryset
-
-    import hashlib
-    from django.db.models import Q
-    filtered = queryset.filter(
-        (
-            Q(patientmoduleattr__name_hashed = False) & Q(patientmoduleattr__patient_name__icontains = value)
-         ) | (
-            Q(patientmoduleattr__name_hashed = True) & Q(patientmoduleattr__patient_name__exact = hashlib.sha256(value).hexdigest())
-        )
-    )
-    return filtered
-
-
 class MGFilterPlusPid(MGSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(MGFilterPlusPid, self).__init__(*args, **kwargs)
         self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
-        self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
-
-
-
-
-
-
+        self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
 
 
 class DXSummaryListFilter(django_filters.FilterSet):
