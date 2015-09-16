@@ -505,11 +505,11 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 
 
 def _generalstudymoduleattributes(dataset,g):
-    import hashlib
     from datetime import datetime
     from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
+    from remapp.tools.hash_id import hash_id
 
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
@@ -520,7 +520,7 @@ def _generalstudymoduleattributes(dataset,g):
     accession_number = get_value_kw('AccessionNumber',dataset)
     patient_id_settings = PatientIDSettings.objects.get()
     if accession_number and patient_id_settings.accession_hashed:
-        accession_number = hashlib.sha256(accession_number).hexdigest()
+        accession_number = hash_id(accession_number)
         g.accession_hashed = True
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription',dataset)
