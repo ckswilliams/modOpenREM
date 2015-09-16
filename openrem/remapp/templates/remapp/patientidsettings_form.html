@@ -71,6 +71,17 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>
+                            {{ form.dob_stored.errors }}
+                            <label for="{{ form.dob_stored.id_for_label }}">Patient date of birth</label>
+                        </td>
+                        <td>
+                            {{ form.dob_stored }}
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan="2">
                             <label for="{{ form.accession_hashed.id_for_label }}">Accession number</label>
                         </td>

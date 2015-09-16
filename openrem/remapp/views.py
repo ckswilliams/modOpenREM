@@ -1913,7 +1913,7 @@ from remapp.models import PatientIDSettings
 
 class PatientIDSettingsUpdate(UpdateView):
     model = PatientIDSettings
-    fields = ['name_stored', 'name_hashed', 'id_stored', 'id_hashed', 'accession_hashed']
+    fields = ['name_stored', 'name_hashed', 'id_stored', 'id_hashed', 'accession_hashed', 'dob_stored']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
