@@ -201,11 +201,33 @@ class MGSummaryListFilter(django_filters.FilterSet):
         return super(MGSummaryListFilter, self).get_order_by(order_value)
 
 
+def custom_name_filter(queryset, value):
+    if not value:
+        return queryset
+
+    import hashlib
+    from django.db.models import Q
+    filtered = queryset.filter(
+        (
+            Q(patientmoduleattr__name_hashed = False) & Q(patientmoduleattr__patient_name__icontains = value)
+         ) | (
+            Q(patientmoduleattr__name_hashed = True) & Q(patientmoduleattr__patient_name__exact = hashlib.sha256(value).hexdigest())
+        )
+    )
+    return filtered
+
+
 class MGFilterPlusPid(MGSummaryListFilter):
     def __init__(self, *args, **kwargs):
         super(MGFilterPlusPid, self).__init__(*args, **kwargs)
-        self.filters['patient_name'] = django_filters.CharFilter(lookup_type='icontains', label='Patient name', name='patientmoduleattr__patient_name')
+        self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
         self.filters['patient_id'] = django_filters.CharFilter(lookup_type='icontains', label='Patient ID', name='patientmoduleattr__patient_id')
+
+
+
+
+
+
 
 
 class DXSummaryListFilter(django_filters.FilterSet):
