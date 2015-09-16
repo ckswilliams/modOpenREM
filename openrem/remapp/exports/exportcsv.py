@@ -143,7 +143,7 @@ def exportFL2excel(filterdict):
             display_name = None
         else:
             institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'unique_equipment_name.display_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
 
         try:
             exams.patientstudymoduleattr_set.get()
@@ -373,7 +373,7 @@ def exportCT2excel(filterdict):
             manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
             manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
             station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'unique_equipment_name.display_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
 
         try:
             exams.patientstudymoduleattr_set.get()
@@ -614,7 +614,7 @@ def exportMG2excel(filterdict):
                 institution_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name')
                 manufacturer = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer')
                 station_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name')
-                display_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'unique_equipment_name.display_name')
+                display_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
 
             try:
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get()
