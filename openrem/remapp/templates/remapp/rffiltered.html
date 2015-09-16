@@ -100,7 +100,9 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
                     {{ exam.study_description }} |
+                  {% if not exam.accession_hashed %}
                     {{ exam.accession_number }}
+                  {% endif %}
                 </a>
             </td>
             <td>

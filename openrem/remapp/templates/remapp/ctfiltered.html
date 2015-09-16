@@ -111,7 +111,9 @@
           <a href="/openrem/ct/{{ exam.id }}/">
             {{ exam.study_description }}</a> |
           {{ exam.requested_procedure_code_meaning }} |
-          {{ exam.accession_number }}
+          {% if not exam.accession_hashed %}
+            {{ exam.accession_number }}
+          {% endif %}
           </a>
         </td>
         <td>

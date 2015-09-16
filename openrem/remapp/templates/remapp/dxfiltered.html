@@ -111,7 +111,9 @@
         <td>
           <a href="/openrem/dx/{{ exam.id }}/">
             {{ exam.study_description }} |
-            {{ exam.accession_number }}
+              {% if not exam.accession_hashed %}
+                {{ exam.accession_number }}
+              {% endif %}
           </a>
         </td>
         <td>
