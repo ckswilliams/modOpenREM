@@ -42,6 +42,7 @@ class PatientIDSettings(SingletonModel):
     id_stored = models.BooleanField(default=False)
     id_hashed = models.BooleanField(default=True)
     accession_hashed = models.BooleanField(default=False)
+    dob_stored = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u"Patient ID Settings"
