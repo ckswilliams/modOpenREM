@@ -675,7 +675,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
 
-    patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
+    patient_birth_date = get_date("PatientBirthDate",dataset)
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
@@ -705,6 +705,8 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
             patid = hashlib.sha256(patid).hexdigest()
             pat.id_hashed = True
         pat.patient_id = patid
+    if patient_id_settings.dob_stored and patient_birth_date:
+        pat.patient_birth_date = patient_birth_date
     pat.save()
 
 def _generalstudymoduleattributes(dataset,g):

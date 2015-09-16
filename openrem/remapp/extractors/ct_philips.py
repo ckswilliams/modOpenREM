@@ -246,6 +246,8 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
             patid = hashlib.sha256(patid).hexdigest()
             pat.id_hashed = True
         pat.patient_id = patid
+    if patient_id_settings.dob_stored and patient_birth_date:
+        pat.patient_birth_date = patient_birth_date
     pat.save()
 
 
