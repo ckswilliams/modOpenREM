@@ -173,6 +173,31 @@ def mgcsv1(request):
 
 @csrf_exempt
 @login_required
+def mgcsv2(request, name=None, patid=None):
+    from django.shortcuts import redirect
+    from remapp.exports.exportcsv import exportMG2excel
+
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
+    try:
+        name = int(name)
+    except:
+        name = None
+    try:
+        patid = int(patid)
+    except:
+        patid = None
+    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+        job = exportMG2excel.delay(request.GET, pid, name, patid)
+
+    return redirect('/openrem/export/')
+
+
+@csrf_exempt
+@login_required
 def mgnhsbsp(request):
     """View to launch celery task to export mammography studies to csv file using a NHSBSP template
 

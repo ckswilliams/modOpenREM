@@ -504,7 +504,7 @@ def exportCT2excel(filterdict):
     tsk.save()
 
 @shared_task
-def exportMG2excel(filterdict, pid):
+def exportMG2excel(filterdict, pid, name, patid):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param filterdict: Query parameters from the mammo filtered page URL.
@@ -561,18 +561,23 @@ def exportMG2excel(filterdict, pid):
 
     tsk.num_records = numresults
     tsk.save()
-    
-    writer.writerow([
-        'Institution name', 
-        'Manufacturer', 
+
+    headings = []
+    if pid and name:
+        headings += ['Patient name']
+    if pid and patid:
+        headings += ['Patient ID']
+    headings += [
+        'Institution name',
+        'Manufacturer',
         'Station name',
         'Display name',
         'Accession number',
         'Study UID',
         'Study date',
         'Study time',
-        'Patient age', 
-        'Patient sex', 
+        'Patient age',
+        'Patient sex',
         'Number of events',
         'View',
         'Aquisition',
@@ -593,11 +598,27 @@ def exportMG2excel(filterdict, pid):
         'AGD',
         '% Fibroglandular Tissue'
         'Exposure Mode Description'
-        ])
+        ]
+
+    writer.writerow(headings)
     
     for i, study in enumerate(s):
         e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
         for exp in e:
+
+            if pid and (name or patid):
+                try:
+                    exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get()
+                except ObjectDoesNotExist:
+                    if name:
+                        patient_name = None
+                    if patid:
+                        patient_id = None
+                else:
+                    if name:
+                        patient_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_name')
+                    if patid:
+                        patient_id = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_id')
 
             try:
                 exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get()
@@ -684,12 +705,17 @@ def exportMG2excel(filterdict, pid):
             else:
                 exposure = return_for_export(exp.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
 
-            writer.writerow([
+            row = []
+            if pid and name:
+                row += [patient_name]
+            if pid and patid:
+                row += [patient_id]
+            row += [
                 institution_name,
                 manufacturer,
                 station_name,
                 display_name,
-                exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number, 
+                exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
                 exp.date_time_started,
@@ -715,7 +741,8 @@ def exportMG2excel(filterdict, pid):
                 average_glandular_dose,
                 exp.percent_fibroglandular_tissue,
                 exp.comment,
-                ])
+                ]
+            writer.writerow(row)
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
 

@@ -14,7 +14,14 @@
       </p>
         {% if admin.exportperm or admin.adminperm %}
         <ul>
-          <li><a href="/openrem/exportmgcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
+          <li>
+              <a href="/openrem/exportmgcsv1/?{{ request.GET.urlencode }}">Export to CSV</a>
+              {% if admin.pidperm %}
+                  <a href="/openrem/exportmgcsv2/1/0/?{{ request.GET.urlencode }}">With names,</a>
+                  <a href="/openrem/exportmgcsv2/0/1/?{{ request.GET.urlencode }}">with id,</a>
+                  <a href="/openrem/exportmgcsv2/1/1/?{{ request.GET.urlencode }}">or with both.</a>
+              {% endif %}
+          </li>
           <li><a href="/openrem/exportmgnhsbsp/?{{ request.GET.urlencode }}">Export to CSV using the NHSBSP format</a> </li>
         </ul>
         {% else %}
