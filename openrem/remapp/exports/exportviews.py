@@ -33,6 +33,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import json
+import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -160,8 +161,13 @@ def mgcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportMG2excel
 
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = exportMG2excel.delay(request.GET)
+        job = exportMG2excel.delay(request.GET, pid)
     
     return redirect('/openrem/export/')
 

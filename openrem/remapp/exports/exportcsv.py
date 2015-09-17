@@ -29,6 +29,7 @@
 """
 
 import csv
+import logging
 from celery import shared_task
 from django.conf import settings
 
@@ -503,11 +504,13 @@ def exportCT2excel(filterdict):
     tsk.save()
 
 @shared_task
-def exportMG2excel(filterdict):
+def exportMG2excel(filterdict, pid):
     """Export filtered mammography database data to a single-sheet CSV file.
 
-    :param request: Query parameters from the mammo filtered page URL.
-    :type request: HTTP get
+    :param filterdict: Query parameters from the mammo filtered page URL.
+    :type filterdict: HTTP get
+    :param pid: True if user in pidgroup
+    :type pid: bool
     
     """
 
@@ -518,7 +521,7 @@ def exportMG2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import MGSummaryListFilter
+    from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from remapp.tools.get_values import return_for_export
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -544,19 +547,12 @@ def exportMG2excel(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    
-    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
-    f = MGSummaryListFilter.base_filters
 
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    if pid:
+        df_filtered_qs = MGFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+    else:
+        df_filtered_qs = MGSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+    s = df_filtered_qs.qs
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()

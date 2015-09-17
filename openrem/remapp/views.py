@@ -1179,7 +1179,6 @@ def mg_summary_list_filter(request):
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
-    logging.warning("Request: %s", request)
 
     if request.user.groups.filter(name='pidgroup'):
         f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
