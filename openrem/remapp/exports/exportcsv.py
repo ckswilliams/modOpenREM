@@ -182,6 +182,7 @@ def exportFL2excel(filterdict):
             acquisition_dose_area_product_total = None
             acquisition_dose_rp_total = None
             total_acquisition_time = None
+            reference_point_definition_code = None
         else:
             fluoro_dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'fluoro_dose_area_product_total')
             fluoro_dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'fluoro_dose_rp_total')
