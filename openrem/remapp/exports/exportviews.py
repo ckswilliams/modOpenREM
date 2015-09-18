@@ -190,8 +190,10 @@ def mgcsv2(request, name=None, patid=None):
         patid = int(patid)
     except:
         patid = None
+
+    logging.warning("User hss %s", dir(request.user))
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = exportMG2excel.delay(request.GET, pid, name, patid)
+        job = exportMG2excel.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
 
@@ -241,6 +243,8 @@ def export(request):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
+    if request.user.groups.filter(name="pidgroup"):
+        admin['pidperm'] = True
 
 
     if 'task_id' in request.session.keys() and request.session['task_id']:

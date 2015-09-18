@@ -504,7 +504,7 @@ def exportCT2excel(filterdict):
     tsk.save()
 
 @shared_task
-def exportMG2excel(filterdict, pid, name, patid):
+def exportMG2excel(filterdict, pid, name, patid, user):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param filterdict: Query parameters from the mammo filtered page URL.
@@ -534,6 +534,11 @@ def exportMG2excel(filterdict, pid, name, patid):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:

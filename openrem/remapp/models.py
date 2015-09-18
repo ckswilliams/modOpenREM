@@ -283,6 +283,8 @@ class Exports(models.Model):
     export_type = models.TextField(blank=True, null=True)
     export_date = models.DateTimeField(blank=True, null=True)
     processtime = models.DecimalField(max_digits=30, decimal_places=10, blank=True, null=True)
+    includes_pid = models.BooleanField(default=False)
+    export_user = models.ForeignKey(User, blank=True, null=True)
 
 
 class ContextID(models.Model):
