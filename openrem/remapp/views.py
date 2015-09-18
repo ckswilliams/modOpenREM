@@ -564,10 +564,11 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     import pkg_resources # part of setuptools
+
     if request.user.groups.filter(name='pidgroup'):
-        f = RFFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
     else:
-        f = RFSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -579,6 +580,8 @@ def rf_summary_list_filter(request):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
+    if request.user.groups.filter(name="pidgroup"):
+        admin['pidperm'] = True
 
     return render_to_response(
         'remapp/rffiltered.html',

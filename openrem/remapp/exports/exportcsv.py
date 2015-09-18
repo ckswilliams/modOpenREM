@@ -35,7 +35,7 @@ from django.conf import settings
 
 
 @shared_task
-def exportFL2excel(filterdict):
+def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered fluoro database data to a single-sheet CSV file.
 
     :param request: Query parameters from the fluoro filtered page URL.
@@ -50,7 +50,7 @@ def exportFL2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import RFSummaryListFilter
+    from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     from remapp.tools.get_values import return_for_export
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -63,6 +63,11 @@ def exportFL2excel(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -77,18 +82,11 @@ def exportFL2excel(filterdict):
         
     # Get the data!
     
-    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF')
-    f = RFSummaryListFilter.base_filters
-
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    if pid:
+        df_filtered_qs = RFFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    else:
+        df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    e = df_filtered_qs.qs
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -98,14 +96,20 @@ def exportFL2excel(filterdict):
     tsk.num_records = numresults
     tsk.save()
 
-    writer.writerow([
-        'Manufacturer', 
+    headings = []
+    if pid and name:
+        headings += ['Patient name']
+    if pid and patid:
+        headings += ['Patient ID']
+    headings += [
+        'Manufacturer',
         'Model name',
         'Institution name',
         'Display name',
         'Study date',
         'Accession number',
-        'Patient age', 
+        'Patient age',
+        'Patient sex'
         'Patient height', 
         'Patient mass (kg)', 
         'Study description',
@@ -120,8 +124,23 @@ def exportFL2excel(filterdict):
         'Total acquisition time (ms)',
         'RP definition',
         'Physician',
-        'Operator'])
+        'Operator']
+    writer.writerow(headings)
     for i, exams in enumerate(e):
+
+        if pid and (name or patid):
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                if name:
+                    patient_name = None
+                if patid:
+                    patient_id = None
+            else:
+                if name:
+                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                if patid:
+                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -145,6 +164,13 @@ def exportFL2excel(filterdict):
         else:
             institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
             display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+
+        try:
+            exams.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_sex = None
+        else:
+            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
 
         try:
             exams.patientstudymoduleattr_set.get()
@@ -192,7 +218,12 @@ def exportFL2excel(filterdict):
             total_acquisition_time = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'total_acquisition_time')
             reference_point_definition_code = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
 
-        writer.writerow([
+        row = []
+        if pid and name:
+            row += [patient_name]
+        if pid and patid:
+            row += [patient_id]
+        row += [
             manufacturer,
             device_observer_name,
             institution_name,
@@ -200,6 +231,7 @@ def exportFL2excel(filterdict):
             exams.study_date,
             exams.accession_number, 
             patient_age_decimal,
+            patient_sex,
             patient_size,
             patient_weight,
             exams.study_description,
@@ -215,7 +247,8 @@ def exportFL2excel(filterdict):
             reference_point_definition_code,
             exams.performing_physician_name,
             exams.operator_name,
-            ])
+            ]
+        writer.writerow(row)
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
 
@@ -258,10 +291,11 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
-    from remapp.models import GeneralStudyModuleAttr
+    from django.core.exceptions import ObjectDoesNotExist
     from remapp.models import Exports
     from remapp.tools.get_values import return_for_export
-    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import GeneralStudyModuleAttr
+    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
 
     tsk = Exports.objects.create()
 
@@ -290,10 +324,11 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         return redirect('/openrem/export/')
         
     # Get the data!
-    from remapp.models import GeneralStudyModuleAttr
-    from remapp.interface.mod_filters import CTSummaryListFilter
 
-    df_filtered_qs = CTSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT'))
+    if pid:
+        df_filtered_qs = CTFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+    else:
+        df_filtered_qs = CTSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
     e = df_filtered_qs.qs
 
     tsk.progress = 'Required study filter complete.'
