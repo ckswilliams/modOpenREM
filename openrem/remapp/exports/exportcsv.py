@@ -245,7 +245,7 @@ def exportFL2excel(filterdict):
 
 
 @shared_task
-def exportCT2excel(filterdict):
+def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered CT database data to a single-sheet CSV file.
 
     :param request: Query parameters from the CT filtered page URL.
@@ -272,6 +272,11 @@ def exportCT2excel(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -287,19 +292,9 @@ def exportCT2excel(filterdict):
     # Get the data!
     from remapp.models import GeneralStudyModuleAttr
     from remapp.interface.mod_filters import CTSummaryListFilter
-    
-    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT')
-    f = CTSummaryListFilter.base_filters
 
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    df_filtered_qs = CTSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT'))
+    e = df_filtered_qs.qs
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -319,7 +314,8 @@ def exportCT2excel(filterdict):
         'Accession number',
         'Operator',
         'Study date',
-        'Patient age', 
+        'Patient age',
+        'Patient sex',
         'Patient height', 
         'Patient mass (kg)', 
         'Study description',
@@ -378,6 +374,13 @@ def exportCT2excel(filterdict):
             display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
 
         try:
+            exams.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_sex = None
+        else:
+            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+
+        try:
             exams.patientstudymoduleattr_set.get()
         except ObjectDoesNotExist:
             patient_age_decimal = None
@@ -407,6 +410,7 @@ def exportCT2excel(filterdict):
             exams.operator_name,
             exams.study_date,
             patient_age_decimal,
+            patient_sex,
             patient_size,
             patient_weight,
             exams.study_description,
@@ -505,7 +509,7 @@ def exportCT2excel(filterdict):
     tsk.save()
 
 @shared_task
-def exportMG2excel(filterdict, pid, name, patid, user):
+def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered mammography database data to a single-sheet CSV file.
 
     :param filterdict: Query parameters from the mammo filtered page URL.
