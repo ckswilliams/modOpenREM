@@ -32,6 +32,9 @@ import csv
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from remapp.tools.get_values import return_for_export
+
 
 def _create_sheets(book, protocolslist, protocolheaders):
     """
@@ -72,33 +75,132 @@ def _get_db_value(qs, location):
         pass
 
 
-def _rf_common_get_data(source):
+def _rf_common_get_data(source, pid=None, name=None, patid=None):
+    if pid and (name or patid):
+        try:
+            source.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            if name:
+                patient_name = None
+            if patid:
+                patient_id = None
+        else:
+            if name:
+                patient_name = return_for_export(source.patientmoduleattr_set.get(), 'patient_name')
+            if patid:
+                patient_id = return_for_export(source.patientmoduleattr_set.get(), 'patient_id')
+    try:
+        source.generalequipmentmoduleattr_set.get()
+    except ObjectDoesNotExist:
+        institution_name = None
+        manufacturer = None
+        manufacturer_model_name = None
+        station_name = None
+        display_name = None
+    else:
+        institution_name = return_for_export(source.generalequipmentmoduleattr_set.get(), 'institution_name')
+        manufacturer = return_for_export(source.generalequipmentmoduleattr_set.get(), 'manufacturer')
+        manufacturer_model_name = return_for_export(source.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+        station_name = return_for_export(source.generalequipmentmoduleattr_set.get(), 'station_name')
+        display_name = return_for_export(source.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+
+    try:
+        source.patientmoduleattr_set.get()
+    except ObjectDoesNotExist:
+        patient_sex = None
+        not_patient_indicator = None
+    else:
+        patient_sex = return_for_export(source.patientmoduleattr_set.get(), 'patient_sex')
+        not_patient_indicator = return_for_export(source.patientmoduleattr_set.get(), 'not_patient_indicator')
+
+    try:
+        source.patientstudymoduleattr_set.get()
+    except ObjectDoesNotExist:
+        patient_age_decimal = None
+        patient_size = None
+        patient_weight = None
+    else:
+        patient_age_decimal = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+        patient_size = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_size')
+        patient_weight = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_weight')
+
+    try:
+        source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+    except ObjectDoesNotExist:
+        dose_area_product_total = None
+        dose_rp_total = None
+    else:
+        dose_area_product_total = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
+            'dose_area_product_total')
+        dose_rp_total = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
+            'dose_rp_total')
+
+    try:
+        source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
+    except ObjectDoesNotExist:
+        fluoro_dose_area_product_total = None
+        fluoro_dose_rp_total = None
+        total_fluoro_time = None
+        acquisition_dose_area_product_total = None
+        acquisition_dose_rp_total = None
+        total_acquisition_time = None
+    else:
+        fluoro_dose_area_product_total = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+            'fluoro_dose_area_product_total')
+        fluoro_dose_rp_total = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+            'fluoro_dose_rp_total')
+        total_fluoro_time = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+            'total_fluoro_time')
+        acquisition_dose_area_product_total = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+            'acquisition_dose_area_product_total')
+        acquisition_dose_rp_total = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+            'acquisition_dose_rp_total')
+        total_acquisition_time = return_for_export(
+            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+            'total_acquisition_time')
+
+    try:
+        source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
+    except ObjectDoesNotExist:
+        eventcount = None
+    else:
+        eventcount = str(source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count())
+
+
+
     examdata = [
-        source.generalequipmentmoduleattr_set.get().institution_name,
-        source.generalequipmentmoduleattr_set.get().manufacturer,
-        source.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-        source.generalequipmentmoduleattr_set.get().station_name,
-        source.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-        source.accession_number,
-        source.operator_name,
-        source.performing_physician_name,
-        source.study_date,  # Is a date - cell needs formatting
-        str(source.patientstudymoduleattr_set.get().patient_age_decimal),
-        source.patientmoduleattr_set.get().patient_sex,
-        str(source.patientstudymoduleattr_set.get().patient_size),
-        str(source.patientstudymoduleattr_set.get().patient_weight),
-        source.patientmoduleattr_set.get().not_patient_indicator,
-        source.study_description,
-        source.requested_procedure_code_meaning,
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_rp_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_area_product_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().fluoro_dose_rp_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_fluoro_time),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().acquisition_dose_area_product_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().acquisition_dose_rp_total),
-        str(source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get().total_acquisition_time),
-        str(source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count()),
+        institution_name,
+        manufacturer,
+        manufacturer_model_name,
+        station_name,
+        display_name,
+        return_for_export(source, 'accession_number'),
+        return_for_export(source, 'operator_name'),
+        return_for_export(source, 'performing_physician_name'),
+        source.study_date,  # Is a date - needs to be a datetime object for formatting
+        patient_age_decimal,
+        patient_sex,
+        patient_size,
+        patient_weight,
+        not_patient_indicator,
+        return_for_export(source, 'study_description'),
+        return_for_export(source, 'requested_procedure_code_meaning'),
+        dose_area_product_total,
+        dose_rp_total,
+        fluoro_dose_area_product_total,
+        fluoro_dose_rp_total,
+        total_fluoro_time,
+        acquisition_dose_area_product_total,
+        acquisition_dose_rp_total,
+        total_acquisition_time,
+        eventcount,
     ]
     return examdata
 
