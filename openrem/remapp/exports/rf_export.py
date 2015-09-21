@@ -709,45 +709,153 @@ def rfopenskin(studyid):
     tsk.save()
 
     for i, event in enumerate(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()):
-#    for event in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        try:
+            study.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_sex = ''
+        else:
+            patient_sex = study.patientmoduleattr_set.get().patient_sex
+
+        try:
+            event.irradeventxraysourcedata_set.get()
+        except ObjectDoesNotExist:
+            reference_point_definition = ''
+            dose_rp = ''
+            fluoro_mode = ''
+            pulse_rate = ''
+            number_of_pulses = ''
+            exposure_time = ''
+            focal_spot_size = ''
+            irradiation_duration = ''
+            average_xray_tube_current = ''
+        else:
+            reference_point_definition = event.irradeventxraysourcedata_set.get().reference_point_definition
+            dose_rp = event.irradeventxraysourcedata_set.get().dose_rp
+            fluoro_mode = event.irradeventxraysourcedata_set.get().fluoro_mode
+            pulse_rate = event.irradeventxraysourcedata_set.get().pulse_rate
+            number_of_pulses = event.irradeventxraysourcedata_set.get().number_of_pulses
+            exposure_time = event.irradeventxraysourcedata_set.get().exposure_time
+            focal_spot_size = event.irradeventxraysourcedata_set.get().focal_spot_size
+            irradiation_duration = event.irradeventxraysourcedata_set.get().irradiation_duration
+            average_xray_tube_current = event.irradeventxraysourcedata_set.get().average_xray_tube_current
+
+        try:
+            event.irradeventxraymechanicaldata_set.get()
+        except ObjectDoesNotExist:
+            positioner_primary_angle = ''
+            positioner_secondary_angle = ''
+            positioner_primary_end_angle = ''
+            positioner_secondary_end_angle = ''
+            column_angulation = ''
+        else:
+            positioner_primary_angle = event.irradeventxraymechanicaldata_set.get().positioner_primary_angle
+            positioner_secondary_angle = event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle
+            positioner_primary_end_angle = event.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle
+            positioner_secondary_end_angle = event.irradeventxraymechanicaldata_set.get().positioner_secondary_end_angle
+            column_angulation = event.irradeventxraymechanicaldata_set.get().column_angulation
+
+        try:
+            event.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+        except ObjectDoesNotExist:
+            xray_filter_type = ''
+            xray_filter_material = ''
+            xray_filter_thickness_minimum = ''
+            xray_filter_thickness_maximum = ''
+        else:
+            xray_filter_type = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_type
+            xray_filter_material = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material
+            xray_filter_thickness_minimum = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum
+            xray_filter_thickness_maximum = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum
+
+        try:
+            event.irradeventxraysourcedata_set.get().kvp_set.get()
+        except ObjectDoesNotExist:
+            kvp = ''
+        else:
+            kvp = event.irradeventxraysourcedata_set.get().kvp_set.get().kvp
+
+        try:
+            event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get()
+        except ObjectDoesNotExist:
+            xray_tube_current = ''
+        else:
+            xray_tube_current = event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current
+
+        try:
+            event.irradeventxraysourcedata_set.get().pulsewidth_set.get()
+        except ObjectDoesNotExist:
+            pulse_width = ''
+        else:
+            pulse_width = event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width
+
+        try:
+            event.irradeventxraysourcedata_set.get().exposure_set.get()
+        except ObjectDoesNotExist:
+            exposure = ''
+        else:
+            exposure = event.irradeventxraysourcedata_set.get().exposure_set.get().exposure
+
+        try:
+            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
+        except ObjectDoesNotExist:
+            distance_source_to_detector = ''
+            distance_source_to_isocenter = ''
+            table_longitudinal_position = ''
+            table_lateral_position = ''
+            table_height_position = ''
+        else:
+            distance_source_to_detector = event.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().distance_source_to_detector
+            distance_source_to_isocenter = event.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().distance_source_to_isocenter
+            table_longitudinal_position = event.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().table_longitudinal_position
+            table_lateral_position = event.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().table_lateral_position
+            table_height_position = event.irradeventxraymechanicaldata_set.get(
+            ).doserelateddistancemeasurements_set.get().table_height_position
+
+        acquisition_protocol = return_for_export(event, 'acquisition_protocol')
+        # sent to return_for_export to ensure a unicode return - probably unnecessary
+
         data = [
             'Anon',
-            study.patientmoduleattr_set.get().patient_sex,
+            patient_sex,
             study.study_instance_uid,
             '',
             event.acquisition_plane,
             event.date_time_started,
             event.irradiation_event_type,
-            event.acquisition_protocol,
-            event.irradeventxraysourcedata_set.get().reference_point_definition,
+            acquisition_protocol,
+            reference_point_definition,
             event.irradiation_event_uid,
             event.dose_area_product,
-            event.irradeventxraysourcedata_set.get().dose_rp,
-            event.irradeventxraymechanicaldata_set.get().positioner_primary_angle,
-            event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle,
-            event.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle,
-            event.irradeventxraymechanicaldata_set.get().positioner_secondary_end_angle,
-            event.irradeventxraymechanicaldata_set.get().column_angulation,
-            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_type,
-            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material,
-            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum,
-            event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum,
-            event.irradeventxraysourcedata_set.get().fluoro_mode,
-            event.irradeventxraysourcedata_set.get().pulse_rate,
-            event.irradeventxraysourcedata_set.get().number_of_pulses,
-            event.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
-            event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current,
-            event.irradeventxraysourcedata_set.get().exposure_time,
-            event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width,
-            event.irradeventxraysourcedata_set.get().exposure_set.get().exposure,
-            event.irradeventxraysourcedata_set.get().focal_spot_size,
-            event.irradeventxraysourcedata_set.get().irradiation_duration,
-            event.irradeventxraysourcedata_set.get().average_xray_tube_current,
-            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_detector,
-            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter,
-            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position,
-            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position,
-            event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position,
+            dose_rp,
+            positioner_primary_angle,
+            positioner_secondary_angle,
+            positioner_primary_end_angle,
+            positioner_secondary_end_angle,
+            column_angulation,
+            xray_filter_type,
+            xray_filter_material,
+            xray_filter_thickness_minimum,
+            xray_filter_thickness_maximum,
+            fluoro_mode,
+            pulse_rate,
+            number_of_pulses,
+            kvp,
+            xray_tube_current,
+            exposure_time,
+            pulse_width,
+            exposure,
+            focal_spot_size,
+            irradiation_duration,
+            average_xray_tube_current,
+            distance_source_to_detector,
+            distance_source_to_isocenter,
+            table_longitudinal_position,
+            table_lateral_position,
+            table_height_position,
             event.target_region,
             event.comment,
         ]
