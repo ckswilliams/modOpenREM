@@ -22,7 +22,14 @@
                   <a href="/openrem/exportflcsv1/1/1/?{{ request.GET.urlencode }}">or with both.</a>
               {% endif %}
           </li>
-          <li><a href="/openrem/exportrfxlsx1/?{{ request.GET.urlencode }}">Export to xlsx</a> </li>
+          <li>
+              <a href="/openrem/exportrfxlsx1/?{{ request.GET.urlencode }}">Export to xlsx</a>
+              {% if admin.pidperm %}
+                  | <a href="/openrem/exportrfxlsx1/1/0/?{{ request.GET.urlencode }}">With names,</a>
+                  <a href="/openrem/exportrfxlsx1/0/1/?{{ request.GET.urlencode }}">with id,</a>
+                  <a href="/openrem/exportrfxlsx1/1/1/?{{ request.GET.urlencode }}">or with both.</a>
+              {% endif %}
+          </li>
         </ul>
         {% else %}
         <p>

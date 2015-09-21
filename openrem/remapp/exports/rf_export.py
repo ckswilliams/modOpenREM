@@ -173,9 +173,13 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
     else:
         eventcount = str(source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count())
 
+    examdata = []
+    if pid and name:
+        examdata += [patient_name]
+    if pid and patid:
+        examdata += [patient_id]
 
-
-    examdata = [
+    examdata += [
         institution_name,
         manufacturer,
         manufacturer_model_name,
@@ -305,7 +309,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = 'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
         tsk.save()
 
-        examdata = _rf_common_get_data(exams)
+        examdata = _rf_common_get_data(exams, pid, name, patid)
 
         angle_range = 5.0 #plus or minus range considered to be the same position
         studyiuid = exams.study_instance_uid
