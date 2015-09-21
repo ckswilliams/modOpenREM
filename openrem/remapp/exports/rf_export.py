@@ -208,6 +208,7 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
     ]
     return examdata
 
+
 def _rf_common_headers(pid=None, name=None, patid=None):
     pidheadings = []
     if pid and name:
@@ -328,14 +329,35 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         num_groups_this_exam = 0
         while inst:
             num_groups_this_exam += 1
-            anglei = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_primary_angle")
-            angleii = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_secondary_angle")
+            try:
+                inst[0].irradeventxraymechanicaldata_set.get()
+            except ObjectDoesNotExist:
+                anglei = None
+                angleii = None
+            else:
+                anglei = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_primary_angle")
+                angleii = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_secondary_angle")
+
+            try:
+                inst[0].irradeventxraysourcedata_set.get()
+            except ObjectDoesNotExist:
+                pulse_rate = None
+                fieldsize = None
+            else:
+                pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
+                fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
+
+            try:
+                inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.get()
+            except ObjectDoesNotExist:
+                filter_material = None
+                filter_thick = None
+            else:
+                filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_material"), "code_meaning")
+                filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_thickness_maximum")
+
             protocol = _get_db_value(inst[0], "acquisition_protocol")
-            pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
-            filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_material"), "code_meaning")
-            filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_thickness_maximum")
-            fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
 
             similarexposures = inst
             if anglei:
@@ -442,7 +464,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    alldataheaders = _rf_common_headers()
+    alldataheaders = _rf_common_headers(pid, name, patid)
 
     for h in xrange(num_groups_max):
         alldataheaders += [
@@ -581,7 +603,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = 'OpenREM is copyright 2014 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    linetwostring = 'OpenREM is copyright 2015 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 
