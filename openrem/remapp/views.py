@@ -592,7 +592,7 @@ def rf_summary_list_filter(request):
 
 @login_required
 def ct_summary_list_filter(request):
-    from remapp.interface.mod_filters import CTSummaryListFilter
+    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
     import pkg_resources # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
@@ -613,9 +613,12 @@ def ct_summary_list_filter(request):
         if requestResults.get('acquisition_ctdi_min'):
             filters['ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte'] = requestResults.get('acquisition_ctdi_min')
 
-        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            **filters
-            ).order_by().distinct())
+        if request.user.groups.filter(name='pidgroup'):
+            f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
+        else:
+            f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
 
         if requestResults.get('study_description')   : f.qs.filter(study_description=requestResults.get('study_description'))
         if requestResults.get('study_dlp_max')       : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
@@ -628,9 +631,12 @@ def ct_summary_list_filter(request):
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
 
-        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            **filters
-            ).order_by().distinct())
+        if request.user.groups.filter(name='pidgroup'):
+            f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
+        else:
+            f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
 
         if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
         if requestResults.get('acquisition_dlp_max')  : f.qs.filter(ctradiationdose__ctirradiationeventdata__dlp__lte=requestResults.get('acquisition_dlp_max'))
@@ -645,9 +651,12 @@ def ct_summary_list_filter(request):
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
 
-        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            **filters
-            ).order_by().distinct())
+        if request.user.groups.filter(name='pidgroup'):
+            f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
+        else:
+            f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
 
         if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
         if requestResults.get('acquisition_protocol') : f.qs.filter(ctradiationdose__ctirradiationeventdata__acquisition_protocol=requestResults.get('acquisition_protocol'))
@@ -660,9 +669,12 @@ def ct_summary_list_filter(request):
         filters = {'modality_type__exact': 'CT'}
         filters['requested_procedure_code_meaning'] = requestResults.get('requested_procedure')
 
-        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            **filters
-            ).order_by().distinct())
+        if request.user.groups.filter(name='pidgroup'):
+            f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
+        else:
+            f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                **filters).order_by().distinct())
 
         if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
         if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
@@ -674,8 +686,12 @@ def ct_summary_list_filter(request):
         if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
 
     else:
-        f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT').order_by().distinct())
+        if request.user.groups.filter(name='pidgroup'):
+            f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT').order_by().distinct())
+        else:
+            f = CTSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
+                modality_type__exact = 'CT').order_by().distinct())
         if requestResults.get('study_description')    : f.qs.filter(study_description=requestResults.get('study_description'))
         if requestResults.get('study_dlp_min')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte=requestResults.get('study_dlp_min'))
         if requestResults.get('study_dlp_max')        : f.qs.filter(ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte=requestResults.get('study_dlp_max'))
@@ -763,6 +779,8 @@ def ct_summary_list_filter(request):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
+    if request.user.groups.filter(name="pidgroup"):
+        admin['pidperm'] = True
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 

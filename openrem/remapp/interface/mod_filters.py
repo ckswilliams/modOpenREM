@@ -161,26 +161,7 @@ class CTSummaryListFilter(django_filters.FilterSet):
 
     class Meta:
         model = GeneralStudyModuleAttr
-        fields = [
-            'date_after', 
-            'date_before', 
-            'institution_name', 
-            'study_description',
-            'acquisition_protocol',
-            'requested_procedure',
-            'patient_age_min',
-            'patient_age_max',
-            'manufacturer', 
-            'model_name',
-            'station_name',
-            'display_name',
-            'accession_number',
-            'study_dlp_min',
-            'study_dlp_max',
-            'acquisition_dlp_min',
-            'acquisition_dlp_max',
-            'test_data'
-            ]
+        fields = []
         order_by = (
             ('-study_date', 'Date of exam (newest first)'),
             ('study_date', 'Date of exam (oldest first)'),
