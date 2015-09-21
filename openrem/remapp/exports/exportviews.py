@@ -135,7 +135,7 @@ def flcsv1(request, name=None, patid=None):
 
 @csrf_exempt
 @login_required
-def rfxlsx1(request):
+def rfxlsx1(request, name=None, patid=None):
     """View to launch celery task to export fluoroscopy studies to xlsx file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
@@ -144,8 +144,22 @@ def rfxlsx1(request):
     from django.shortcuts import redirect
     from remapp.exports.rf_export import rfxlsx
 
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
+    try:
+        name = int(name)
+    except:
+        name = None
+    try:
+        patid = int(patid)
+    except:
+        patid = None
+
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = rfxlsx.delay(request.GET)
+        job = rfxlsx.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
 
