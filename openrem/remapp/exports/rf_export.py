@@ -208,8 +208,13 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
     ]
     return examdata
 
-def _rf_common_headers():
-    commonheaders = [
+def _rf_common_headers(pid=None, name=None, patid=None):
+    pidheadings = []
+    if pid and name:
+        pidheadings += ['Patient name']
+    if pid and patid:
+        pidheadings += ['Patient ID']
+    commonheaders = pidheadings + [
         'Institution',
         'Manufacturer',
         'Model name',
@@ -297,8 +302,13 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
-    wsalldata = book.add_worksheet('All data')       
-    wsalldata.set_column('I:I', 10) # allow date to be displayed.
+    wsalldata = book.add_worksheet('All data')
+    date_column = 8
+    if pid and name:
+        date_column += 1
+    if pid and patid:
+        date_column += 1
+    wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
 
     ##################
     # All data sheet
@@ -432,13 +442,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    pidheadings = []
-    if pid and name:
-        pidheadings += ['Patient name']
-    if pid and patid:
-        pidheadings += ['Patient ID']
-
-    alldataheaders = pidheadings + _rf_common_headers()
+    alldataheaders = _rf_common_headers()
 
     for h in xrange(num_groups_max):
         alldataheaders += [
@@ -498,7 +502,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
-    protocolheaders = _rf_common_headers() + [
+    protocolheaders = _rf_common_headers(pid, name, patid) + [
         'Time',
         'Type',
         'Protocol',
@@ -531,7 +535,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             )
             for event in p_events:
                 sheetlist[tab]['count'] += 1
-                examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes)
+                examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes,
+                                               pid, name, patid)
                 if event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material:
                     filter_material = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
                 else: filter_material = None
@@ -556,6 +561,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tabcolumns = (37)
         tabrows = sheetlist[tab]['count']
         sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
+        sheetlist[tab]['sheet'].set_column(date_column, date_column, 10) # allow date to be displayed.
 
     # Populate summary sheet
     tsk.progress = 'Now populating the summary sheet...'
