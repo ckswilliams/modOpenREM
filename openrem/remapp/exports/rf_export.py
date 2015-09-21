@@ -84,6 +84,7 @@ def _rf_common_get_data(source):
         source.performing_physician_name,
         source.study_date,  # Is a date - cell needs formatting
         str(source.patientstudymoduleattr_set.get().patient_age_decimal),
+        source.patientmoduleattr_set.get().patient_sex,
         str(source.patientstudymoduleattr_set.get().patient_size),
         str(source.patientstudymoduleattr_set.get().patient_weight),
         source.patientmoduleattr_set.get().not_patient_indicator,
@@ -113,6 +114,7 @@ def _rf_common_headers():
         'Physician',
         'Study date',
         'Patient age',
+        'Patient sex',
         'Patient height',
         'Patient mass (kg)',
         'Test patient?',
@@ -132,7 +134,7 @@ def _rf_common_headers():
 
 
 @shared_task
-def rfxlsx(filterdict):
+def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered RF database data to multi-sheet Microsoft XSLX files.
 
     :param filterdict: Query parameters from the RF filtered page URL.
@@ -148,7 +150,7 @@ def rfxlsx(filterdict):
     from django.db.models import Max, Min, Avg
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
-    from remapp.interface.mod_filters import RFSummaryListFilter
+    from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
 
     tsk = Exports.objects.create()
 
@@ -159,6 +161,11 @@ def rfxlsx(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -172,19 +179,11 @@ def rfxlsx(filterdict):
         return redirect('/openrem/export/')
 
     # Get the data
-    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF')
-
-    f = RFSummaryListFilter.base_filters
-
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
+    if pid:
+        df_filtered_qs = RFFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    else:
+        df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    e = df_filtered_qs.qs
     
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
@@ -193,7 +192,7 @@ def rfxlsx(filterdict):
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
-    wsalldata.set_column('G:G', 10) # allow date to be displayed.
+    wsalldata.set_column('I:I', 10) # allow date to be displayed.
 
     ##################
     # All data sheet
@@ -327,7 +326,13 @@ def rfxlsx(filterdict):
     tsk.progress = 'Generating headers for the all data sheet...'
     tsk.save()
 
-    alldataheaders = _rf_common_headers()
+    pidheadings = []
+    if pid and name:
+        pidheadings += ['Patient name']
+    if pid and patid:
+        pidheadings += ['Patient ID']
+
+    alldataheaders = pidheadings + _rf_common_headers()
 
     for h in xrange(num_groups_max):
         alldataheaders += [
