@@ -589,15 +589,8 @@ def rf_summary_list_filter(request):
         context_instance=RequestContext(request)
         )
 
-
-@login_required
-def ct_summary_list_filter(request):
+def ct_filtering(requestResults, pid=False):
     from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
-    import pkg_resources # part of setuptools
-    from remapp.forms import CTChartOptionsForm
-    from openremproject import settings
-
-    requestResults = request.GET
 
     if requestResults.get('acquisitionhist'):
         filters = {'modality_type__exact': 'CT'}
@@ -613,7 +606,7 @@ def ct_summary_list_filter(request):
         if requestResults.get('acquisition_ctdi_min'):
             filters['ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte'] = requestResults.get('acquisition_ctdi_min')
 
-        if request.user.groups.filter(name='pidgroup'):
+        if pid:
             f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
                 **filters).order_by().distinct())
         else:
@@ -631,7 +624,7 @@ def ct_summary_list_filter(request):
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
 
-        if request.user.groups.filter(name='pidgroup'):
+        if pid:
             f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
                 **filters).order_by().distinct())
         else:
@@ -651,7 +644,7 @@ def ct_summary_list_filter(request):
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__gte'] = requestResults.get('study_dlp_min')
         filters['ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__lte'] = requestResults.get('study_dlp_max')
 
-        if request.user.groups.filter(name='pidgroup'):
+        if pid:
             f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
                 **filters).order_by().distinct())
         else:
@@ -669,7 +662,7 @@ def ct_summary_list_filter(request):
         filters = {'modality_type__exact': 'CT'}
         filters['requested_procedure_code_meaning'] = requestResults.get('requested_procedure')
 
-        if request.user.groups.filter(name='pidgroup'):
+        if pid:
             f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
                 **filters).order_by().distinct())
         else:
@@ -686,7 +679,7 @@ def ct_summary_list_filter(request):
         if requestResults.get('acquisition_ctdi_min') : f.qs.filter(ctradiationdose__ctirradiationeventdata__mean_ctdivol__gte=requestResults.get('acquisition_ctdi_min'))
 
     else:
-        if request.user.groups.filter(name='pidgroup'):
+        if pid:
             f = CTFilterPlusPid(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
                 modality_type__exact = 'CT').order_by().distinct())
         else:
@@ -713,6 +706,22 @@ def ct_summary_list_filter(request):
     if requestResults.get('station_name')     : f.qs.filter(generalequipmentmoduleattr__station_name=requestResults.get('station_name'))
     if requestResults.get('display_name')     : f.qs.filter(generalequipmentmoduleattr__unique_equipment_name__display_name=requestResults.get('display_name'))
 
+    return f
+
+@login_required
+def ct_summary_list_filter(request):
+    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
+    import pkg_resources # part of setuptools
+    from remapp.forms import CTChartOptionsForm
+    from openremproject import settings
+
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
+    f = ct_filtering(request.GET, pid)
+
     try:
         # See if the user has plot settings in userprofile
         userProfile = request.user.userprofile
@@ -733,11 +742,11 @@ def ct_summary_list_filter(request):
         median_available = False
 
     # Obtain the chart options from the request
-    chartOptionsForm = CTChartOptionsForm(requestResults)
+    chartOptionsForm = CTChartOptionsForm(request.GET)
     # Check whether the form data is valid
     if chartOptionsForm.is_valid():
         # Use the form data if the user clicked on the submit button
-        if "submit" in requestResults:
+        if "submit" in request.GET:
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotCTAcquisitionMeanDLP = chartOptionsForm.cleaned_data['plotCTAcquisitionMeanDLP']

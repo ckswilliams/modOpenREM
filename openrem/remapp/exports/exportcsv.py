@@ -295,7 +295,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import Exports
     from remapp.tools.get_values import return_for_export
     from remapp.models import GeneralStudyModuleAttr
-    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
+    from remapp.interface.mod_filters import CTSummaryListFilter
+    from remapp.views import ct_filtering
 
     tsk = Exports.objects.create()
 
@@ -325,10 +326,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         
     # Get the data!
 
-    if pid:
-        df_filtered_qs = CTFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
-    else:
-        df_filtered_qs = CTSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+    df_filtered_qs = ct_filtering(filterdict, pid=pid)
+
     e = df_filtered_qs.qs
 
     tsk.progress = 'Required study filter complete.'
