@@ -220,10 +220,10 @@ $(document).ready(function() {
                 var protocolPiechartData = new Array(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
                     if(typeof plotCTAcquisitionFreq !== 'undefined') {
-                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStart + protocolNames[i]};
+                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStartAcq + protocolNames[i]};
                     }
                     else {
-                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
+                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStartAcq+protocolNames[i]};
                     }
                 }
 
@@ -335,10 +335,10 @@ $(document).ready(function() {
                 var study_piechart_data = new Array(study_names.length);
                 for(i=0; i<study_names.length; i++) {
                     if(typeof plotCTStudyFreq !== 'undefined') {
-                        study_piechart_data[i] = {name: study_names[i], y: parseInt(study_summary[i].num_acq), url: urlStart + study_names[i]};
+                        study_piechart_data[i] = {name: study_names[i], y: parseInt(study_summary[i].num_acq), url: urlStartStudy + study_names[i]};
                     }
                     else {
-                        study_piechart_data[i] = {name: study_names[i], y:parseInt(i), url:urlStart+study_names[i]};
+                        study_piechart_data[i] = {name: study_names[i], y:parseInt(i), url:urlStartStudy+study_names[i]};
                     }
                 }
 
@@ -449,10 +449,10 @@ $(document).ready(function() {
                 var request_piechart_data = new Array(request_names.length);
                 for(i=0; i<request_names.length; i++) {
                     if(typeof plotCTRequestFreq !== 'undefined') {
-                        request_piechart_data[i] = {name: request_names[i], y: parseInt(request_summary[i].num_req), url: urlStart + request_names[i]};
+                        request_piechart_data[i] = {name: request_names[i], y: parseInt(request_summary[i].num_req), url: urlStartReq + request_names[i]};
                     }
                     else {
-                        request_piechart_data[i] = {name: request_names[i], y:parseInt(i), url:urlStart+request_names[i]};
+                        request_piechart_data[i] = {name: request_names[i], y:parseInt(i), url:urlStartReq+request_names[i]};
                     }
                 }
 
@@ -562,7 +562,7 @@ $(document).ready(function() {
                         currentValue = parseFloat(study_dlp_over_time[i][j][1]);
                         if(currentValue == 0) currentValue = null;
 
-                        temp.push({y:currentValue, url: urlStart+study_names[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        temp.push({y:currentValue, url: urlStartStudyOverTime+study_names[i]+'&date_after='+date_after+'&date_before='+date_before});
                     }
                     DLPOverTime.push({name: study_names[i], color: study_line_colours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
                 }

@@ -26,7 +26,7 @@ OpenREM version history
 * `#243`_  Added distance related data to DX exports
 * `#242`_  Distance source to patient now extracted from DX images
 * `#240`_  Charts: Improved DAP over time calculations
-* `#239`_  Configurable equipment names to fix multiple sources withe the same station name
+* `#239`_  Configurable equipment names to fix multiple sources with the same station name
 * `#237`_  Charts: Tidied up plot data calculations in ``views.py``
 * `#234`_  Charts: Fixed error with datetime combine
 * `#232`_  Charts: on or off displayed on the home page
@@ -54,7 +54,7 @@ OpenREM version history
 * `#213`_  Fixed admin menu not working
 * `#212`_  Charts: Created off-switch for charts
 * `#210`_  OpenSkin exports documented
-* `#209`_  Charts: Fixed server error when CT plots switched off and filter form submited
+* `#209`_  Charts: Fixed server error when CT plots switched off and filter form submitted
 * `#208`_  Charts: Fixed blank chart plotting options when clicking on histogram tooltip link
 * `#205`_  Charts: Fixed issue of histogram tooltip links to data not working
 * `#204`_  Charts: Fixed issue of not being able to export with the charts features added

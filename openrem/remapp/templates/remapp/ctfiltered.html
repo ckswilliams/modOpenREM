@@ -527,7 +527,7 @@
     {% if request.user.userprofile.plotCTAcquisitionFreq %}
       <!-- JavaScript for acquisition pie chart -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+        var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
       </script>
 
       <script src="{{ STATIC_URL }}js/ctChartAcquisitionFrequency.js"></script>
@@ -790,7 +790,7 @@
     {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+        var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
       </script>
     {% endif %}
 
@@ -825,7 +825,7 @@
     {% if request.user.userprofile.plotCTRequestFreq %}
       <!-- JavaScript for request pie chart. -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
+        var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
       </script>
     {% endif %}
 
@@ -845,7 +845,7 @@
     {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for mean DLP per study description -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+        var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
       </script>
 
       {% if request.user.userprofile.plotAverageChoice == 'mean' %}
