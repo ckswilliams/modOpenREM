@@ -591,7 +591,7 @@ def rf_summary_list_filter(request):
 
 @login_required
 def ct_summary_list_filter(request):
-    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid, ct_acq_filter
+    from remapp.interface.mod_filters import ct_acq_filter
     import pkg_resources # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
