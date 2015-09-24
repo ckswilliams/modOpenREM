@@ -191,7 +191,9 @@ def ct_acq_filter(filters, pid=False):
     from remapp.models import GeneralStudyModuleAttr, CtIrradiationEventData
     filteredInclude = []
     if 'acquisition_protocol' in filters and (
-                    'acquisition_ctdi_min' in filters or 'acquisition_ctdi_max' in filters):
+                    'acquisition_ctdi_min' in filters or 'acquisition_ctdi_max' in filters or
+                        'acquisition_dlp_min' in filters or 'acquisition_dlp_max' in filters
+    ):
         events = CtIrradiationEventData.objects.filter(acquisition_protocol__exact = filters['acquisition_protocol'])
         if 'acquisition_ctdi_min' in filters:
             try:
@@ -203,6 +205,18 @@ def ct_acq_filter(filters, pid=False):
             try:
                 Decimal(filters['acquisition_ctdi_max'])
                 events = events.filter(mean_ctdivol__lte = filters['acquisition_ctdi_max'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_dlp_min' in filters:
+            try:
+                Decimal(filters['acquisition_dlp_min'])
+                events = events.filter(dlp__gte = filters['acquisition_dlp_min'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_dlp_max' in filters:
+            try:
+                Decimal(filters['acquisition_dlp_max'])
+                events = events.filter(dlp__lte = filters['acquisition_dlp_max'])
             except InvalidOperation:
                 pass
         filteredInclude = list(set(
