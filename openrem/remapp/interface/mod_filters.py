@@ -152,8 +152,6 @@ class CTSummaryListFilter(django_filters.FilterSet):
     accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
     study_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
-    acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
-    acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
