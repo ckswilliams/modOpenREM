@@ -154,8 +154,6 @@ class CTSummaryListFilter(django_filters.FilterSet):
     study_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max study DLP', name='ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')
     acquisition_dlp_min = django_filters.NumberFilter(lookup_type='gte', label='Min acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
     acquisition_dlp_max = django_filters.NumberFilter(lookup_type='lte', label='Max acquisition DLP', name='ctradiationdose__ctirradiationeventdata__dlp')
-    acquisition_ctdi_min = django_filters.NumberFilter(lookup_type='gte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
-    acquisition_ctdi_max = django_filters.NumberFilter(lookup_type='lte', name='ctradiationdose__ctirradiationeventdata__mean_ctdivol', widget=forms.HiddenInput())
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
@@ -186,6 +184,35 @@ class CTFilterPlusPid(CTSummaryListFilter):
         super(CTFilterPlusPid, self).__init__(*args, **kwargs)
         self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
         self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+
+
+def ct_acq_filter(filters, pid=False):
+    from decimal import Decimal, InvalidOperation
+    from remapp.models import GeneralStudyModuleAttr, CtIrradiationEventData
+    filteredInclude = []
+    if 'acquisition_protocol' in filters and (
+                    'acquisition_ctdi_min' in filters or 'acquisition_ctdi_max' in filters):
+        events = CtIrradiationEventData.objects.filter(acquisition_protocol__exact = filters['acquisition_protocol'])
+        if 'acquisition_ctdi_min' in filters:
+            try:
+                Decimal(filters['acquisition_ctdi_min'])
+                events = events.filter(mean_ctdivol__gte = filters['acquisition_ctdi_min'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_ctdi_max' in filters:
+            try:
+                Decimal(filters['acquisition_ctdi_max'])
+                events = events.filter(mean_ctdivol__lte = filters['acquisition_ctdi_max'])
+            except InvalidOperation:
+                pass
+        filteredInclude = list(set(
+            [o.ct_radiation_dose.general_study_module_attributes.study_instance_uid for o in events]))
+    studies = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT')
+    if filteredInclude:
+        studies = studies.filter(study_instance_uid__in = filteredInclude)
+    if pid:
+        return CTFilterPlusPid(filters, studies.order_by().distinct())
+    return CTSummaryListFilter(filters, studies.order_by().distinct())
 
 
 class MGSummaryListFilter(django_filters.FilterSet):
