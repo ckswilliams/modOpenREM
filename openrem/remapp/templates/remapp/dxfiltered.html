@@ -546,7 +546,7 @@
     {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeankVpOverTime or request.user.userprofile.plotDXAcquisitionMeanmAsOverTime or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime%}
       <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
       <script>
-        var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+        var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
       </script>
     {% endif %}
 
