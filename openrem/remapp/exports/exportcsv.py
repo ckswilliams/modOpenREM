@@ -323,9 +323,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         return redirect('/openrem/export/')
         
     # Get the data!
-    df_filtered_qs = ct_acq_filter(filterdict, pid=pid)
-
-    e = df_filtered_qs.qs
+    e = ct_acq_filter(filterdict, pid=pid).qs
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
