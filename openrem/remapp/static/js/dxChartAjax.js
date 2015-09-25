@@ -286,10 +286,10 @@ $(document).ready(function() {
                 var protocolPiechartData = new Array(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
                     if(typeof plotDXAcquisitionFreq !== 'undefined') {
-                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStart + protocolNames[i]};
+                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStartAcq + protocolNames[i]};
                     }
                     else {
-                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
+                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStartAcq+protocolNames[i]};
                     }
                 }
 
@@ -448,7 +448,7 @@ $(document).ready(function() {
                         currentValue = parseFloat(acq_kvp_over_time[i][j][1]);
                         if(currentValue == 0) currentValue = null;
 
-                        temp.push({y:currentValue, url: urlStart+protocolkVpNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        temp.push({y:currentValue, url: urlStartAcq+protocolkVpNames[i]+'&date_after='+date_after+'&date_before='+date_before});
                     }
                     kVpOverTime.push({name: protocolkVpNames[i], color: protocolkVpLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
                 }
@@ -490,7 +490,7 @@ $(document).ready(function() {
                         currentValue = parseFloat(acq_mas_over_time[i][j][1]);
                         if(currentValue == 0) currentValue = null;
 
-                        temp.push({y:currentValue, url: urlStart+protocolmAsNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        temp.push({y:currentValue, url: urlStartAcq+protocolmAsNames[i]+'&date_after='+date_after+'&date_before='+date_before});
                     }
                     mAsOverTime.push({name: protocolmAsNames[i], color: protocolmAsLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
                 }
@@ -532,7 +532,7 @@ $(document).ready(function() {
                         currentValue = parseFloat(acq_dap_over_time[i][j][1]);
                         if(currentValue == 0) currentValue = null;
 
-                        temp.push({y:currentValue, url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        temp.push({y:currentValue, url: urlStartAcq+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
                     }
                     DAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
                 }
