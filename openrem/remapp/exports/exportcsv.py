@@ -111,7 +111,8 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Patient age',
         'Patient sex'
         'Patient height', 
-        'Patient mass (kg)', 
+        'Patient mass (kg)',
+        'Not patient?',
         'Study description',
         'Number of events',
         'DAP total (Gy.m2)',
@@ -169,8 +170,10 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
             patient_sex = None
+            not_patient = None
         else:
             patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+            not_patient = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
 
         try:
             exams.patientstudymoduleattr_set.get()
@@ -234,6 +237,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
+            not_patient,
             exams.study_description,
             count,
             dose_area_product_total,
@@ -346,7 +350,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Patient age',
         'Patient sex',
         'Patient height', 
-        'Patient mass (kg)', 
+        'Patient mass (kg)',
+        'Test patient?',
         'Study description',
         'Requested procedure',
         'Number of events',
@@ -406,8 +411,10 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
             patient_sex = None
+            not_patient = None
         else:
             patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+            not_patient = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
 
         try:
             exams.patientstudymoduleattr_set.get()
@@ -442,6 +449,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
+            not_patient,
             exams.study_description,
             exams.requested_procedure_code_meaning,
             total_number_of_irradiation_events,
