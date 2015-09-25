@@ -18,7 +18,14 @@
     <ul>
       <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
       <li><a href="/openrem/exportctcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
-      <li><a href="/openrem/exportctxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
+      <li>
+          <a href="/openrem/exportctxlsx1/0/0/?{{ request.GET.urlencode }}">Export to XLSX</a>
+          {% if admin.pidperm %}
+              | <a href="/openrem/exportctxlsx1/1/0/?{{ request.GET.urlencode }}">With names,</a>
+              <a href="/openrem/exportctxlsx1/0/1/?{{ request.GET.urlencode }}">with id,</a>
+              <a href="/openrem/exportctxlsx1/1/1/?{{ request.GET.urlencode }}">or with both.</a>
+          {% endif %}
+      </li>
     </ul>
 
   {% else %}

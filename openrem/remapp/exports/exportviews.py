@@ -57,7 +57,7 @@ def ctcsv1(request):
 
 @csrf_exempt
 @login_required
-def ctxlsx1(request):
+def ctxlsx1(request, name=None, patid=None):
     """View to launch celery task to export CT studies to xlsx file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
@@ -66,8 +66,22 @@ def ctxlsx1(request):
     from django.shortcuts import redirect
     from remapp.exports.xlsx import ctxlsx
 
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
+    try:
+        name = int(name)
+    except:
+        name = None
+    try:
+        patid = int(patid)
+    except:
+        patid = None
+
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = ctxlsx.delay(request.GET)
+        job = ctxlsx.delay(request.GET, pid, name, patid, request.user.id)
     
     return redirect('/openrem/export/')
 
