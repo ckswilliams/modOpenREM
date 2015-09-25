@@ -579,7 +579,7 @@ def exportMG2excel(filterdict):
         'Patient sex', 
         'Number of events',
         'View',
-        'Aquisition',
+        'Acquisition',
         'Thickness',
         'Radiological Thickness',
         'Force',
