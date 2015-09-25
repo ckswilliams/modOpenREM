@@ -167,7 +167,7 @@ $(document).ready(function() {
                 }
                 else if (plotAverageChoice == "median") {
                     chartplotCTAcquisitionMeanDLPandCTDI.series[0].setData(seriesMedianData);
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[0].setData(series_median_data_ctdi);
+                    chartplotCTAcquisitionMeanDLPandCTDI.series[1].setData(series_median_data_ctdi);
                 }
                 else {
                     chartplotCTAcquisitionMeanDLPandCTDI.series[0].setData(seriesData);

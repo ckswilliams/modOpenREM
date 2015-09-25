@@ -619,7 +619,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Patient sex',
         'Number of events',
         'View',
-        'Aquisition',
+        'Acquisition',
         'Thickness',
         'Radiological Thickness',
         'Force',
