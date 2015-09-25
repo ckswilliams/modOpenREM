@@ -37,7 +37,7 @@ from django.conf import settings
 
 
 @shared_task
-def ctxlsx(filterdict):
+def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered CT database data to multi-sheet Microsoft XSLX files.
 
     :param filterdict: Query parameters from the CT filtered page URL.
@@ -52,7 +52,7 @@ def ctxlsx(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import CTSummaryListFilter
+    from remapp.interface.mod_filters import ct_acq_filter
 
     tsk = Exports.objects.create()
 
@@ -75,20 +75,9 @@ def ctxlsx(filterdict):
         messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
-    # Get the data
-    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT')
-    f = CTSummaryListFilter.base_filters
+    # Get the data!
+    e = ct_acq_filter(filterdict, pid=pid).qs
 
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
     tsk.save()
