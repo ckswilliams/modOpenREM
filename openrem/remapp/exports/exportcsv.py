@@ -48,6 +48,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
+    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
@@ -296,6 +297,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.core.files import File
     from django.shortcuts import redirect
     from django.core.exceptions import ObjectDoesNotExist
+    from django.contrib import messages
     from remapp.models import Exports
     from remapp.tools.get_values import return_for_export
     from remapp.interface.mod_filters import ct_acq_filter
@@ -584,6 +586,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.conf import settings
     from django.core.files import File
     from django.shortcuts import redirect
+    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid

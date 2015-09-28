@@ -260,6 +260,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from django.core.files import File
     from django.shortcuts import redirect
     from django.db.models import Max, Min, Avg
+    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
