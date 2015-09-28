@@ -109,7 +109,7 @@ urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^exportmgcsv1/$', 'mgcsv1'),
     url(r'^exportmgcsv2/(?P<name>\w+)/(?P<patid>\w+)/$', 'mgcsv2'),
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
-    url(r'^download/(?P<file_name>.+)$', 'download'),
+    url(r'^download/(?P<task_id>[a-f0-9-]{36})$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
     url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
 )

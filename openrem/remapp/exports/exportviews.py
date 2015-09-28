@@ -308,7 +308,7 @@ def export(request):
 
 
 @login_required
-def download(request, file_name):
+def download(request, task_id):
     """View to handle downloads of files from the server
 
     Originally used for download of the export spreadsheets, now also used
@@ -324,20 +324,43 @@ def download(request, file_name):
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
     from django.shortcuts import redirect
+    from django.contrib import messages
     from openremproject.settings import MEDIA_ROOT
+    from remapp.models import Exports
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        file_path = os.path.join(MEDIA_ROOT, file_name)
-        file_wrapper = FileWrapper(file(file_path,'rb'))
-        file_mimetype = mimetypes.guess_type(file_path)
-        response = HttpResponse(file_wrapper, content_type=file_mimetype )
-        response['X-Sendfile'] = file_path
-        response['Content-Length'] = os.stat(file_path).st_size
-        response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file_name) 
-        return response
-    else:
+    exportperm = False
+    adminperm = False
+    pidperm = False
+    if request.user.groups.filter(name="exportgroup"):
+        exportperm = True
+    if request.user.groups.filter(name="admingroup"):
+        adminperm = True
+    if request.user.groups.filter(name="pidgroup"):
+        pidperm = True
+    try:
+        exp = Exports.objects.get(task_id__exact = task_id)
+    except:
+        messages.error(request, "Can't match the task ID, export aborted")
         return redirect('/openrem/export/')
-        
+
+    if not exportperm and not adminperm:
+        messages.error(request, "You don't have permission to export data")
+        return redirect('/openrem/export/')
+
+    if exp.includes_pid and not pidperm:
+        messages.error(request,
+                       "You don't have permission to export data that includes patient identifiable information")
+        return redirect('/openrem/export/')
+
+    file_path = os.path.join(MEDIA_ROOT, exp.filename.name)
+    file_wrapper = FileWrapper(file(file_path,'rb'))
+    file_mimetype = mimetypes.guess_type(file_path)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype )
+    response['X-Sendfile'] = file_path
+    response['Content-Length'] = os.stat(file_path).st_size
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(exp.filename)
+    return response
+
 @csrf_exempt
 @login_required
 def deletefile(request):
