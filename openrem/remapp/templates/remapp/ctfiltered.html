@@ -26,14 +26,20 @@
     {% if admin.exportperm or admin.adminperm %}
         <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
     <p>
-      <a href="/openrem/exportctcsv1/?{{ request.GET.urlencode }}"
-             class="btn btn-default btn-sm" role="button">Export to CSV</a>
+      <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
+          {% if admin.pidperm %}
+              <a href="/openrem/exportctcsv1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportctcsv1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportctcsv1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
     </p>
     <p>
           <a href="/openrem/exportctxlsx1/0/0/?{{ request.GET.urlencode }}"
-             class="btn btn-default btn-sm" role="button">
-              Export to XLSX
-          </a>
+             class="btn btn-default btn-sm" role="button">Export to XLSX</a>
           {% if admin.pidperm %}
               <a href="/openrem/exportctxlsx1/1/0/?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>

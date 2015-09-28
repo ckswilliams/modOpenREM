@@ -338,7 +338,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = numresults
     tsk.save()
 
-    headers = [
+    headings = []
+    if pid and name:
+        headings += ['Patient name']
+    if pid and patid:
+        headings += ['Patient ID']
+    headings += [
         'Institution name', 
         'Manufacturer', 
         'Model name',
@@ -362,7 +367,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     max_events = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
 
     for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
-        headers += [
+        headings += [
             'E' + str(h+1) + ' Protocol',
             'E' + str(h+1) + ' Type',
             'E' + str(h+1) + ' Exposure time',
@@ -385,12 +390,25 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' S2 Exposure time/rotation',
             'E' + str(h+1) + ' mA Modulation type',
             ]
-    writer.writerow(headers)
+    writer.writerow(headings)
 
     tsk.progress = 'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
+        if pid and (name or patid):
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                if name:
+                    patient_name = None
+                if patid:
+                    patient_id = None
+            else:
+                if name:
+                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                if patid:
+                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -436,7 +454,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             total_number_of_irradiation_events = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events')
             ct_dose_length_product_total = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total')
 
-        examdata = [
+        examdata = []
+        if pid and name:
+            examdata += [patient_name]
+        if pid and patid:
+            examdata += [patient_id]
+        examdata += [
             institution_name,
             manufacturer,
             manufacturer_model_name,
