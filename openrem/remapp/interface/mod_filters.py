@@ -87,6 +87,36 @@ def custom_acc_filter(queryset, value):
     return filtered
 
 
+def dap_min_filter(queryset, value):
+    if not value:
+        return queryset
+
+    from decimal import Decimal, InvalidOperation
+    try:
+        value_gy_m2 = Decimal(value) / Decimal(1000000)
+    except InvalidOperation:
+        return queryset
+    filtered = queryset.filter(
+        projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__gte=
+        value_gy_m2)
+    return filtered
+
+
+def dap_max_filter(queryset, value):
+    if not value:
+        return queryset
+
+    from decimal import Decimal, InvalidOperation
+    try:
+        value_gy_m2 = Decimal(value) / Decimal(1000000)
+    except InvalidOperation:
+        return queryset
+    filtered = queryset.filter(
+        projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__lte=
+        value_gy_m2)
+    return filtered
+
+
 class RFSummaryListFilter(django_filters.FilterSet):
     """Filter for fluoroscopy studies to display in web interface.
 
@@ -288,14 +318,10 @@ class DXSummaryListFilter(django_filters.FilterSet):
     model_name = django_filters.CharFilter(lookup_type='icontains', label='Model', name='generalequipmentmoduleattr__manufacturer_model_name')
     station_name = django_filters.CharFilter(lookup_type='icontains', label='Station name', name='generalequipmentmoduleattr__station_name')
     accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
-    #study_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
-    #study_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max study DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__accumulatedxraydose__accumulatedprojectionxraydose__dose_area_product_total')
-    acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
-    acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
-    acquisition_kvp_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', widget=forms.HiddenInput())
-    acquisition_kvp_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp', widget=forms.HiddenInput())
-    acquisition_mas_min = django_filters.NumberFilter(lookup_type='gte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
-    acquisition_mas_max = django_filters.NumberFilter(lookup_type='lte', name='projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure', widget=forms.HiddenInput())
+    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe('Min study DAP (cGy.cm<sup>2</sup>)'))
+    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe('Max study DAP (cGy.cm<sup>2</sup>)'))
+    # acquisition_dap_max = django_filters.NumberFilter(lookup_type='lte', label=mark_safe('Max acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
+    # acquisition_dap_min = django_filters.NumberFilter(lookup_type='gte', label=mark_safe('Min acquisition DAP (Gy.m<sup>2</sup>)'), name='projectionxrayradiationdose__irradeventxraydata__dose_area_product')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
@@ -341,3 +367,61 @@ class DXFilterPlusPid(DXSummaryListFilter):
         super(DXFilterPlusPid, self).__init__(*args, **kwargs)
         self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
         self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+
+def dx_acq_filter(filters, pid=False):
+    from decimal import Decimal, InvalidOperation
+    from django.db.models import Q
+    from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
+    filteredInclude = []
+    if 'acquisition_protocol' in filters and (
+        'acquisition_dap_min' in filters or 'acquisition_dap_max' in filters or
+        'acquisition_kvp_min' in filters or 'acquisition_kvp_max' in filters or
+        'acquisition_mas_min' in filters or 'acquisition_mas_max' in filters
+    ):
+        events = IrradEventXRayData.objects.filter(acquisition_protocol__exact = filters['acquisition_protocol'])
+        if 'acquisition_dap_min' in filters:
+            try:
+                Decimal(filters['acquisition_dap_min'])
+                events = events.filter(dose_area_product__gte = filters['acquisition_dap_min'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_dap_max' in filters:
+            try:
+                Decimal(filters['acquisition_dap_max'])
+                events = events.filter(dose_area_product__lte = filters['acquisition_dap_max'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_kvp_min' in filters:
+            try:
+                Decimal(filters['acquisition_kvp_min'])
+                events = events.filter(irradeventxraysourcedata__kvp__kvp__gte = filters['acquisition_kvp_min'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_kvp_max' in filters:
+            try:
+                Decimal(filters['acquisition_kvp_max'])
+                events = events.filter(irradeventxraysourcedata__kvp__kvp__lte = filters['acquisition_kvp_max'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_mas_min' in filters:
+            try:
+                Decimal(filters['acquisition_mas_min'])
+                events = events.filter(irradeventxraysourcedata__exposure__exposure__gte = filters['acquisition_mas_min'])
+            except InvalidOperation:
+                pass
+        if 'acquisition_mas_max' in filters:
+            try:
+                Decimal(filters['acquisition_mas_max'])
+                events = events.filter(irradeventxraysourcedata__exposure__exposure__lte = filters['acquisition_mas_max'])
+            except InvalidOperation:
+                pass
+        filteredInclude = list(set(
+            [o.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid for o in events]
+        ))
+    studies = GeneralStudyModuleAttr.objects.filter(
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR'))
+    if filteredInclude:
+        studies = studies.filter(study_instance_uid__in = filteredInclude)
+    if pid:
+        return DXFilterPlusPid(filters, studies.order_by().distinct())
+    return DXSummaryListFilter(filters, studies.order_by().distinct())

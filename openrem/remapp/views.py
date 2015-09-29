@@ -68,69 +68,18 @@ def logout_page(request):
 
 @login_required
 def dx_summary_list_filter(request):
-    from remapp.interface.mod_filters import DXSummaryListFilter
+    from remapp.interface.mod_filters import dx_acq_filter
     from django.db.models import Q
     import pkg_resources # part of setuptools
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
 
-    requestResults = request.GET
-
-    if requestResults.get('acquisitionhist'):
-        filters = {}
-        if requestResults.get('acquisition_protocol'):
-            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'] = requestResults.get('acquisition_protocol')
-        if requestResults.get('acquisition_dap_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
-        if requestResults.get('acquisition_dap_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
-        if requestResults.get('acquisition_kvp_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__gte'] = requestResults.get('acquisition_kvp_min')
-        if requestResults.get('acquisition_kvp_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get('acquisition_kvp_max')
-        if requestResults.get('acquisition_mas_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get('acquisition_mas_min')
-        if requestResults.get('acquisition_mas_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get('acquisition_mas_max')
-        if requestResults.get('study_description'):
-            filters['study_description__icontains'] = requestResults.get('study_description')
-
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
     else:
-        filters = {}
-        if requestResults.get('study_description'):
-            filters['study_description__icontains'] = requestResults.get('study_description')
-        if requestResults.get('acquisition_protocol'):
-            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
-        if requestResults.get('acquisition_dap_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
-        if requestResults.get('acquisition_dap_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
+        pid = False
 
-    if requestResults.get('accession_number'):
-        filters['accession_number'] = requestResults.get('accession_number')
-    if requestResults.get('date_after'):
-        filters['study_date__gt'] = requestResults.get('date_after')
-    if requestResults.get('date_before'):
-        filters['study_date__lt'] = requestResults.get('date_before')
-    if requestResults.get('institution_name'):
-        filters['generalequipmentmoduleattr__institution_name'] = requestResults.get('institution_name')
-    if requestResults.get('manufacturer'):
-        filters['generalequipmentmoduleattr__manufacturer'] = requestResults.get('manufacturer')
-    if requestResults.get('model_name'):
-        filters['generalequipmentmoduleattr__manufacturer_model_name'] = requestResults.get('model_name')
-    if requestResults.get('patient_age_max'):
-        filters['patientstudymoduleattr__patient_age_decimal__lte'] = requestResults.get('patient_age_max')
-    if requestResults.get('patient_age_min'):
-        filters['patientstudymoduleattr__patient_age_decimal__gte'] = requestResults.get('patient_age_min')
-    if requestResults.get('station_name'):
-        filters['generalequipmentmoduleattr__station_name'] = requestResults.get('station_name')
-    if requestResults.get('display_name'):
-        filters['generalequipmentmoduleattr__unique_equipment_name__display_name'] = requestResults.get('display_name')
-
-    f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-        Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
-        **filters
-    ).order_by().distinct())
+    f = dx_acq_filter(request.GET, pid=pid)
 
     try:
         # See if the user has plot settings in userprofile
@@ -152,11 +101,11 @@ def dx_summary_list_filter(request):
         median_available = False
 
     # Obtain the chart options from the request
-    chartOptionsForm = DXChartOptionsForm(requestResults)
+    chartOptionsForm = DXChartOptionsForm(request.GET)
     # check whether the form data is valid
     if chartOptionsForm.is_valid():
         # Use the form data if the user clicked on the submit button
-        if "submit" in requestResults:
+        if "submit" in request.GET:
             # process the data in form.cleaned_data as required
             userProfile.plotCharts = chartOptionsForm.cleaned_data['plotCharts']
             userProfile.plotDXAcquisitionMeanDAP = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAP']
