@@ -34,7 +34,7 @@ from celery import shared_task
 from django.conf import settings
 
 @shared_task
-def exportDX2excel(filterdict):
+def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered DX database data to a single-sheet CSV file.
 
     :param request: Query parameters from the DX filtered page URL.
@@ -49,7 +49,7 @@ def exportDX2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import DXSummaryListFilter
+    from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
@@ -63,6 +63,11 @@ def exportDX2excel(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -76,22 +81,11 @@ def exportDX2excel(filterdict):
         return redirect('/openrem/export/')
         
     # Get the data!
-    e = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
-    f = DXSummaryListFilter.base_filters
+    e = dx_acq_filter(filterdict, pid=pid).qs
 
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-
-    # Remove duplicate entries from the results
-    e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
+    # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
+    # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
