@@ -12,28 +12,44 @@
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
-        {% if admin.exportperm or admin.adminperm %}
-        <ul>
-          <li>
-              <a href="/openrem/exportmgcsv1/?{{ request.GET.urlencode }}">Export to CSV</a>
-              {% if admin.pidperm %}
-                  <a href="/openrem/exportmgcsv2/1/0/?{{ request.GET.urlencode }}">With names,</a>
-                  <a href="/openrem/exportmgcsv2/0/1/?{{ request.GET.urlencode }}">with id,</a>
-                  <a href="/openrem/exportmgcsv2/1/1/?{{ request.GET.urlencode }}">or with both.</a>
-              {% endif %}
-          </li>
-          <li><a href="/openrem/exportmgnhsbsp/?{{ request.GET.urlencode }}">Export to CSV using the NHSBSP format</a> </li>
-        </ul>
-        {% else %}
-        <p>
-          Sorry, you don't have enough permissions to enable study export.
-        </p>
-        {% endif %}
 {% endblock %}
 
 
 
 {% block col2 %}
+  <div class="panel panel-info">
+  <div class="panel-heading">
+      <h3 class="panel-title">Data export</h3>
+  </div>
+  <div class="panel-body">
+    {% if admin.exportperm or admin.adminperm %}
+        <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
+    <p>
+      <a href="/openrem/exportmgcsv1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
+          {% if admin.pidperm %}
+              <a href="/openrem/exportmgcsv1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportmgcsv1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportmgcsv1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+    <p>
+          <a href="/openrem/exportmgnhsbsp/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to CSV using the NHSBSP format</a>
+    </p>
+
+  {% else %}
+    <p>
+      No export permissions
+    </p>
+  {% endif %}
+
+
+  </div>
+  </div>
 
 
     {{ studyfilter }}
