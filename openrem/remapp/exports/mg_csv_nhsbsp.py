@@ -35,7 +35,7 @@ from django.conf import settings
 
 
 @shared_task
-def mg_csv_nhsbsp(filterdict):
+def mg_csv_nhsbsp(filterdict, user=None):
     """Export filtered mammography database data to a NHSBSP formatted single-sheet CSV file.
 
     :param filterdict: Dictionary of query parameters from the mammo filtered page URL.
@@ -62,6 +62,8 @@ def mg_csv_nhsbsp(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:

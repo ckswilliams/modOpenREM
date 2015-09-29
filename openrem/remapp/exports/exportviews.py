@@ -244,7 +244,7 @@ def mgnhsbsp(request):
     from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = mg_csv_nhsbsp.delay(request.GET)
+        job = mg_csv_nhsbsp.delay(request.GET, request.user.id)
     
     return redirect('/openrem/export/')
 
