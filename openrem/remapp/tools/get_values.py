@@ -75,7 +75,7 @@ def get_seq_code_value(sequence,dataset):
     """
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
-        if hasattr(seq[0],'CodeValue'):  
+        if seq and hasattr(seq[0],'CodeValue'):
             return seq[0].CodeValue
 			
 def get_seq_code_meaning(sequence,dataset):
@@ -89,7 +89,7 @@ def get_seq_code_meaning(sequence,dataset):
     """
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
-        if hasattr(seq[0],'CodeMeaning'): 
+        if seq and hasattr(seq[0],'CodeMeaning'):
             return seq[0].CodeMeaning
 
 def get_or_create_cid(codevalue, codemeaning):
