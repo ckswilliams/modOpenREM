@@ -146,6 +146,8 @@ def dx_summary_list_filter(request):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
+    if request.user.groups.filter(name="pidgroup"):
+        admin['pidperm'] = True
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 

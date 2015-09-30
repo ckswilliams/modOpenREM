@@ -101,7 +101,7 @@ def ctxlsx1(request, name=None, patid=None):
 
 @csrf_exempt
 @login_required
-def dxcsv1(request):
+def dxcsv1(request, name=None, patid=None):
     """View to launch celery task to export DX and CR studies to csv file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
@@ -110,14 +110,28 @@ def dxcsv1(request):
     from django.shortcuts import redirect
     from remapp.exports.dx_export import exportDX2excel
 
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
+    try:
+        name = int(name)
+    except:
+        name = None
+    try:
+        patid = int(patid)
+    except:
+        patid = None
+
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = exportDX2excel.delay(request.GET)
+        job = exportDX2excel.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
 
 @csrf_exempt
 @login_required
-def dxxlsx1(request):
+def dxxlsx1(request, name=None, patid=None):
     """View to launch celery task to export DX and CR studies to xlsx file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
@@ -126,8 +140,22 @@ def dxxlsx1(request):
     from django.shortcuts import redirect
     from remapp.exports.dx_export import dxxlsx
 
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
+    try:
+        name = int(name)
+    except:
+        name = None
+    try:
+        patid = int(patid)
+    except:
+        patid = None
+
     if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
-        job = dxxlsx.delay(request.GET)
+        job = dxxlsx.delay(request.GET, pid, name, patid, request.user.id)
     
     return redirect('/openrem/export/')
 

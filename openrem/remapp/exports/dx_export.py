@@ -96,7 +96,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = numresults
     tsk.save()
 
-    headers = [
+    pidheadings = []
+    if pid and name:
+        pidheadings += ['Patient name']
+    if pid and patid:
+        pidheadings += ['Patient ID']
+    headers = pidheadings + [
         'Institution name', 
         'Manufacturer', 
         'Model name',
@@ -136,7 +141,19 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     for i, exams in enumerate(e):
-
+        if pid and (name or patid):
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                if name:
+                    patient_name = None
+                if patid:
+                    patient_id = None
+            else:
+                if name:
+                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                if patid:
+                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
         try:
             exams.generalequipmentmoduleattr_set.get()
         except ObjectDoesNotExist:
@@ -182,7 +199,13 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 cgycm2 = None
 
-        examdata = [
+        examdata = []
+        if pid and name:
+            examdata += [patient_name]
+        if pid and patid:
+            examdata += [patient_id]
+
+        examdata += [
             institution_name,
             manufacturer,
             manufacturer_model_name,
