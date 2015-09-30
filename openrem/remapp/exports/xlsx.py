@@ -221,7 +221,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
     # Get the data!
