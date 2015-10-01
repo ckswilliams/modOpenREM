@@ -61,7 +61,7 @@ $(function () {
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean kVp'
+                text: 'Mean kVp per acquisition protocol'
             }
         },
         tooltip: {
@@ -77,7 +77,7 @@ $(function () {
             }
         },
         series: [{
-            name: 'Mean kVp',
+            name: 'Mean kVp per acquisition protocol',
             data: []
         }],
         drilldown: {

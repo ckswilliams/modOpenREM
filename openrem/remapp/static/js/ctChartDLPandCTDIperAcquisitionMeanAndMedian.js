@@ -3,14 +3,7 @@ $(function () {
     var defaultTitle = 'DLP and CTDI<sub>vol</sub> per acquisition protocol';
     var bins = [];
     var name = '';
-/*
-    var index;
-    for (index = 0; index < seriesDrilldownCTDI.length; ++index) {
-        seriesDrilldownCTDI[index].xAxis = 1;
-        seriesDrilldownCTDI[index].name = seriesDrilldownCTDI[index].name + ' CTDI';
-        seriesDrilldown[index].name = seriesDrilldown[index].name + ' DLP';
-    }
-*/
+
     var chartAcqDLPandCTDI = new Highcharts.Chart({
         chart: {
             type: 'column',

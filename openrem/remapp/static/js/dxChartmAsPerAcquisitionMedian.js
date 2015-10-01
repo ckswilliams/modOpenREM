@@ -77,7 +77,7 @@ $(function () {
             }
         },
         series: [{
-            name: 'Median mAs',
+            name: 'Median mAs per acquisition protocol',
             data: []
         }],
         drilldown: {

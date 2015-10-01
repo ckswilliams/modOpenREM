@@ -77,7 +77,7 @@ $(function () {
             }
         },
         series: [{
-            name: 'Median kVp',
+            name: 'Median kVp per acquisition protocol',
             data: []
         }],
         drilldown: {
