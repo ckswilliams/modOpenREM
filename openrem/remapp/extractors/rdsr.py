@@ -33,6 +33,7 @@ import os
 import sys
 import logging
 import django
+import logging
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -664,14 +665,17 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     patientatt.save()
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
+    from decimal import Decimal
+    import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
-    from datetime import timedelta
-    from decimal import Decimal
+    from remapp.models import PatientIDSettings
+
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
-    patient_birth_date = get_date("PatientBirthDate",dataset) # Not saved to database
+
+    patient_birth_date = get_date("PatientBirthDate",dataset)
     pat.patient_sex = get_value_kw("PatientSex",dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
@@ -687,12 +691,31 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
+
+    patient_id_settings = PatientIDSettings.objects.get()
+    if patient_id_settings.name_stored:
+        name = get_value_kw("PatientName", dataset)
+        if name and patient_id_settings.name_hashed:
+            name = hashlib.sha256(name).hexdigest()
+            pat.name_hashed = True
+        pat.patient_name = name
+    if patient_id_settings.id_stored:
+        patid = get_value_kw("PatientID", dataset)
+        if patid and patient_id_settings.id_hashed:
+            patid = hashlib.sha256(patid).hexdigest()
+            pat.id_hashed = True
+        pat.patient_id = patid
+    if patient_id_settings.dob_stored and patient_birth_date:
+        pat.patient_birth_date = patient_birth_date
     pat.save()
 
 def _generalstudymoduleattributes(dataset,g):
+    from datetime import datetime
+    from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw, get_seq_code_value, get_seq_code_meaning
     from remapp.tools.dcmdatetime import get_date, get_time
-    from datetime import datetime
+    from remapp.tools.hash_id import hash_id
+
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
@@ -700,7 +723,12 @@ def _generalstudymoduleattributes(dataset,g):
     g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
-    g.accession_number = get_value_kw('AccessionNumber',dataset)
+    accession_number = get_value_kw('AccessionNumber',dataset)
+    patient_id_settings = PatientIDSettings.objects.get()
+    if accession_number and patient_id_settings.accession_hashed:
+        accession_number = hash_id(accession_number)
+        g.accession_hashed = True
+    g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)

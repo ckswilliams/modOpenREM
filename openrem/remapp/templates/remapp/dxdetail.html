@@ -12,7 +12,14 @@
 <h1>Detail list of events</h1>
 
 <ul>
-    <li>Accession number: {{ generalstudymoduleattr.accession_number }}</li>
+    <li>
+        Accession number:
+        {% if not generalstudymoduleattr.accession_hashed %}
+            {{ generalstudymoduleattr.accession_number }}
+        {% else %}
+            <i>hidden</i>
+        {% endif %}
+    </li>
     <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
     <li>Study time: {{ generalstudymoduleattr.study_time }}</li>
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>

@@ -34,6 +34,25 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json
 from django.db import models
 from django.core.urlresolvers import reverse
+from solo.models import SingletonModel
+
+class PatientIDSettings(SingletonModel):
+    name_stored = models.BooleanField(default=False)
+    name_hashed = models.BooleanField(default=True)
+    id_stored = models.BooleanField(default=False)
+    id_hashed = models.BooleanField(default=True)
+    accession_hashed = models.BooleanField(default=False)
+    dob_stored = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u"Patient ID Settings"
+
+    class Meta:
+        verbose_name = "Patient ID Settings"
+
+    def get_absolute_url(self):
+        return reverse('home')
+
 
 class DicomStoreSCP(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -264,6 +283,8 @@ class Exports(models.Model):
     export_type = models.TextField(blank=True, null=True)
     export_date = models.DateTimeField(blank=True, null=True)
     processtime = models.DecimalField(max_digits=30, decimal_places=10, blank=True, null=True)
+    includes_pid = models.BooleanField(default=False)
+    export_user = models.ForeignKey(User, blank=True, null=True)
 
 
 class ContextID(models.Model):
@@ -306,7 +327,8 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     referring_physician_name = models.TextField(blank=True, null=True)
     referring_physician_identification = models.TextField(blank=True, null=True)
     study_id = models.CharField(max_length=16, blank=True, null=True)
-    accession_number = models.CharField(max_length=16, blank=True, null=True)
+    accession_number = models.TextField(blank=True, null=True)
+    accession_hashed = models.BooleanField(default=False)
     study_description = models.TextField(blank=True, null=True)
     physician_of_record = models.TextField(blank=True, null=True)
     name_of_physician_reading_study = models.TextField(blank=True, null=True)
@@ -715,7 +737,9 @@ class PatientModuleAttr(models.Model):  # C.7.1.1
     """
     general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     patient_name = models.TextField(blank=True, null=True)
+    name_hashed = models.BooleanField(default=False)
     patient_id = models.TextField(blank=True, null=True)
+    id_hashed = models.BooleanField(default=False)
     patient_birth_date = models.DateField(blank=True, null=True)
     patient_sex = models.CharField(max_length=2, blank=True, null=True)
     other_patient_ids = models.TextField(blank=True, null=True)

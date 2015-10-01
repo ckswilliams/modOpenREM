@@ -34,7 +34,7 @@ from celery import shared_task
 from django.conf import settings
 
 @shared_task
-def exportDX2excel(filterdict):
+def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered DX database data to a single-sheet CSV file.
 
     :param request: Query parameters from the DX filtered page URL.
@@ -49,7 +49,7 @@ def exportDX2excel(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import DXSummaryListFilter
+    from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
@@ -63,6 +63,11 @@ def exportDX2excel(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -72,26 +77,15 @@ def exportDX2excel(filterdict):
         tsk.progress = 'CSV file created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
         
     # Get the data!
-    e = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
 
-    f = DXSummaryListFilter.base_filters
+    e = dx_acq_filter(filterdict, pid=pid).qs
 
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-
-    # Remove duplicate entries from the results
-    e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
+    # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
+    # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = 'Required study filter complete.'
     tsk.save()
@@ -102,7 +96,12 @@ def exportDX2excel(filterdict):
     tsk.num_records = numresults
     tsk.save()
 
-    headers = [
+    pidheadings = []
+    if pid and name:
+        pidheadings += ['Patient name']
+    if pid and patid:
+        pidheadings += ['Patient ID']
+    headers = pidheadings + [
         'Institution name', 
         'Manufacturer', 
         'Model name',
@@ -142,7 +141,19 @@ def exportDX2excel(filterdict):
     tsk.save()
 
     for i, exams in enumerate(e):
-
+        if pid and (name or patid):
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                if name:
+                    patient_name = None
+                if patid:
+                    patient_id = None
+            else:
+                if name:
+                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                if patid:
+                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
         try:
             exams.generalequipmentmoduleattr_set.get()
         except ObjectDoesNotExist:
@@ -188,7 +199,13 @@ def exportDX2excel(filterdict):
             else:
                 cgycm2 = None
 
-        examdata = [
+        examdata = []
+        if pid and name:
+            examdata += [patient_name]
+        if pid and patid:
+            examdata += [patient_id]
+
+        examdata += [
             institution_name,
             manufacturer,
             manufacturer_model_name,
@@ -289,7 +306,7 @@ def exportDX2excel(filterdict):
     tsk.save()
 
 @shared_task
-def dxxlsx(filterdict):
+def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered DX and CR database data to multi-sheet Microsoft XSLX files.
 
     :param filterdict: Query parameters from the DX and CR filtered page URL.
@@ -304,7 +321,7 @@ def dxxlsx(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import DXSummaryListFilter
+    from remapp.interface.mod_filters import dx_acq_filter
     from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
@@ -318,6 +335,11 @@ def dxxlsx(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -327,26 +349,13 @@ def dxxlsx(filterdict):
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
-    # Get the data
-    e = GeneralStudyModuleAttr.objects.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'))
+    e = dx_acq_filter(filterdict, pid=pid).qs
 
-    f = DXSummaryListFilter.base_filters
-
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-
-    # Remove duplicate entries from the results
-    e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
+    # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
+    # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
@@ -354,11 +363,21 @@ def dxxlsx(filterdict):
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
-    wsalldata = book.add_worksheet('All data')       
-    wsalldata.set_column('G:G', 10) # allow date to be displayed.
+    wsalldata = book.add_worksheet('All data')
+    date_column = 7
+    if pid and name:
+        date_column += 1
+    if pid and patid:
+        date_column += 1
+    wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
 
     # Some prep
-    commonheaders = [
+    pidheadings = []
+    if pid and name:
+        pidheadings += ['Patient name']
+    if pid and patid:
+        pidheadings += ['Patient ID']
+    commonheaders = pidheadings + [
         'Institution', 
         'Manufacturer', 
         'Model name',
@@ -427,7 +446,7 @@ def dxxlsx(filterdict):
                 'count':0,
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
+            sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -466,7 +485,8 @@ def dxxlsx(filterdict):
             'E' + str(h+1) + ' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (29 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + 14 - 1
+    wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
+    numcolumns = (29 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + date_column + 8
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -474,6 +494,20 @@ def dxxlsx(filterdict):
 
         tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
+
+        if pid and (name or patid):
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                if name:
+                    patient_name = None
+                if patid:
+                    patient_id = None
+            else:
+                if name:
+                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                if patid:
+                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -528,7 +562,13 @@ def dxxlsx(filterdict):
             else:
                 cgycm2 = None
 
-        examdata = [
+        examdata = []
+        if pid and name:
+            examdata += [patient_name]
+        if pid and patid:
+            examdata += [patient_id]
+
+        examdata += [
             institution_name,
             manufacturer,
             manufacturer_model_name,
@@ -640,6 +680,19 @@ def dxxlsx(filterdict):
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
 
+            if pid and (name or patid):
+                try:
+                    exams.patientmoduleattr_set.get()
+                except ObjectDoesNotExist:
+                    if name:
+                        patient_name = None
+                    if patid:
+                        patient_id = None
+                else:
+                    if name:
+                        patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                    if patid:
+                        patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
             try:
                 exams.generalequipmentmoduleattr_set.get()
             except ObjectDoesNotExist:
@@ -693,7 +746,13 @@ def dxxlsx(filterdict):
                 else:
                     cgycm2 = None
 
-            examdata = [
+            examdata = []
+            if pid and name:
+                examdata += [patient_name]
+            if pid and patid:
+                examdata += [patient_id]
+
+            examdata += [
                 institution_name,
                 manufacturer,
                 manufacturer_model_name,

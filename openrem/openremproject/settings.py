@@ -142,6 +142,7 @@ INSTALLED_APPS = (
     'pagination',
     'django.contrib.humanize',
     #'south',
+    'solo',
 )
 
 # A sample logging configuration. The only tangible logging

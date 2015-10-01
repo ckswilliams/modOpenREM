@@ -12,21 +12,53 @@
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
-        {% if admin.exportperm or admin.adminperm %}
-        <ul>
-          <li><a href="/openrem/exportflcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
-          <li><a href="/openrem/exportrfxlsx1/?{{ request.GET.urlencode }}">Export to xlsx</a> </li>
-        </ul>
-        {% else %}
-        <p>
-          Sorry, you don't have enough permissions to enable study export.
-        </p>
-        {% endif %}
+
 {% endblock %}
 
 
 
 {% block col2 %}
+  <div class="panel panel-info">
+  <div class="panel-heading">
+      <h3 class="panel-title">Data export</h3>
+  </div>
+  <div class="panel-body">
+    {% if admin.exportperm or admin.adminperm %}
+        <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
+    <p>
+      <a href="/openrem/exportflcsv1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
+          {% if admin.pidperm %}
+              <a href="/openrem/exportflcsv1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportflcsv1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportflcsv1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+    <p>
+          <a href="/openrem/exportrfxlsx1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to XLSX</a>
+          {% if admin.pidperm %}
+              <a href="/openrem/exportrfxlsx1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportrfxlsx1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportrfxlsx1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+
+  {% else %}
+    <p>
+      No export permissions
+    </p>
+  {% endif %}
+
+
+  </div>
+  </div>
 
 
     {{ studyfilter }}
@@ -100,7 +132,9 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
                     {{ exam.study_description }} |
+                  {% if not exam.accession_hashed %}
                     {{ exam.accession_number }}
+                  {% endif %}
                 </a>
             </td>
             <td>

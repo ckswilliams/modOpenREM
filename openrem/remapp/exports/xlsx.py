@@ -33,11 +33,155 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 
+def _ct_common_get_data(exams, pid, name, patid):
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.tools.get_values import return_for_export
 
+    if pid and (name or patid):
+        try:
+            exams.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            if name:
+                patient_name = None
+            if patid:
+                patient_id = None
+        else:
+            if name:
+                patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+            if patid:
+                patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
+
+    try:
+        exams.generalequipmentmoduleattr_set.get()
+    except ObjectDoesNotExist:
+        institution_name = None
+        manufacturer = None
+        manufacturer_model_name = None
+        station_name = None
+        display_name = None
+    else:
+        institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+        manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+        manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
+        station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
+        display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+
+    try:
+        exams.patientmoduleattr_set.get()
+    except ObjectDoesNotExist:
+        patient_sex = None
+        not_patient = None
+    else:
+        patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+        not_patient = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
+
+    try:
+        exams.patientstudymoduleattr_set.get()
+    except ObjectDoesNotExist:
+        patient_age_decimal = None
+        patient_size = None
+        patient_weight = None
+    else:
+        patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+        patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+        patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+
+    try:
+        exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
+    except ObjectDoesNotExist:
+        total_number_of_irradiation_events = None
+        ct_dose_length_product_total = None
+    else:
+        total_number_of_irradiation_events = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events')
+        ct_dose_length_product_total = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total')
+
+    examdata = []
+    if pid and name:
+        examdata += [patient_name]
+    if pid and patid:
+        examdata += [patient_id]
+    examdata += [
+        institution_name,
+        manufacturer,
+        manufacturer_model_name,
+        station_name,
+        display_name,
+        exams.accession_number,
+        exams.operator_name,
+        exams.study_date,
+        patient_age_decimal,
+        patient_sex,
+        patient_size,
+        patient_weight,
+        not_patient,
+        exams.study_description,
+        exams.requested_procedure_code_meaning,
+        total_number_of_irradiation_events,
+        ct_dose_length_product_total,
+    ]
+    for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
+        examdata += [
+            s.acquisition_protocol,
+            str(s.ct_acquisition_type),
+            str(s.exposure_time),
+            str(s.scanninglength_set.get().scanning_length),
+            str(s.nominal_single_collimation_width),
+            str(s.nominal_total_collimation_width),
+            str(s.pitch_factor),
+            str(s.number_of_xray_sources),
+            str(s.mean_ctdivol),
+            str(s.dlp),
+            ]
+        if s.number_of_xray_sources > 1:
+            for source in s.ctxraysourceparameters_set.all():
+                examdata += [
+                    str(source.identification_of_the_xray_source),
+                    str(source.kvp),
+                    str(source.maximum_xray_tube_current),
+                    str(source.xray_tube_current),
+                    str(source.exposure_time_per_rotation),
+                    ]
+        else:
+            try:
+                try:
+                    s.ctxraysourceparameters_set.get()
+                except ObjectDoesNotExist:
+                    identification_of_the_xray_source = None
+                    kvp = None
+                    maximum_xray_tube_current = None
+                    xray_tube_current = None
+                    exposure_time_per_rotation = None
+                else:
+                    identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(), 'identification_of_the_xray_source')
+                    kvp = return_for_export(s.ctxraysourceparameters_set.get(), 'kvp')
+                    maximum_xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current')
+                    xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current')
+                    exposure_time_per_rotation = return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation')
+
+                examdata += [
+                    identification_of_the_xray_source,
+                    kvp,
+                    maximum_xray_tube_current,
+                    xray_tube_current,
+                    exposure_time_per_rotation,
+                    'n/a',
+                    'n/a',
+                    'n/a',
+                    'n/a',
+                    'n/a',
+                    ]
+            except:
+                    examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
+        examdata += [
+            s.xray_modulation_type,
+            str(s.comment),
+            ]
+
+    return examdata
 
 
 @shared_task
-def ctxlsx(filterdict):
+def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered CT database data to multi-sheet Microsoft XSLX files.
 
     :param filterdict: Query parameters from the CT filtered page URL.
@@ -52,7 +196,7 @@ def ctxlsx(filterdict):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
-    from remapp.interface.mod_filters import CTSummaryListFilter
+    from remapp.interface.mod_filters import ct_acq_filter
 
     tsk = Exports.objects.create()
 
@@ -63,6 +207,11 @@ def ctxlsx(filterdict):
     tsk.export_date = datestamp
     tsk.progress = 'Query filters imported, task started'
     tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
     tsk.save()
 
     try:
@@ -72,23 +221,12 @@ def ctxlsx(filterdict):
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
-    # Get the data
-    e = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'CT')
-    f = CTSummaryListFilter.base_filters
+    # Get the data!
+    e = ct_acq_filter(filterdict, pid=pid).qs
 
-    for filt in f:
-        if filt in filterdict and filterdict[filt]:
-            # One Windows user found filterdict[filt] was a list. See https://bitbucket.org/openrem/openrem/issue/123/
-            if isinstance(filterdict[filt], basestring):
-                filterstring = filterdict[filt]
-            else:
-                filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                e = e.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
     tsk.progress = 'Required study filter complete.'
     tsk.num_records = e.count()
     tsk.save()
@@ -96,11 +234,21 @@ def ctxlsx(filterdict):
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
-    wsalldata.set_column('G:G', 10) # allow date to be displayed.
+    date_column = 7
+    if pid and name:
+        date_column += 1
+    if pid and patid:
+        date_column += 1
+    wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
 
     # Some prep
-    commonheaders = [
-        'Institution', 
+    pidheadings = []
+    if pid and name:
+        pidheadings += ['Patient name']
+    if pid and patid:
+        pidheadings += ['Patient ID']
+    commonheaders = pidheadings + [
+        'Institution',
         'Manufacturer', 
         'Model',
         'Station name',
@@ -108,7 +256,8 @@ def ctxlsx(filterdict):
         'Accession number',
         'Operator',
         'Date',
-        'Age', 
+        'Age',
+        'Sex',
         'Height', 
         'Mass (kg)', 
         'Test patient?',
@@ -172,7 +321,7 @@ def ctxlsx(filterdict):
                 'count':0,
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
+            sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -216,7 +365,8 @@ def ctxlsx(filterdict):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + 14 - 1
+    wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
+    numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 8
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -225,66 +375,8 @@ def ctxlsx(filterdict):
         tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
 
-        examdata = [
-			exams.generalequipmentmoduleattr_set.get().institution_name,
-			exams.generalequipmentmoduleattr_set.get().manufacturer,
-			exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-			exams.generalequipmentmoduleattr_set.get().station_name,
-            exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-            exams.accession_number,
-            exams.operator_name,
-            exams.study_date,  # Is a date - cell needs formatting
-            str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
-            str(exams.patientstudymoduleattr_set.get().patient_size),
-            str(exams.patientstudymoduleattr_set.get().patient_weight),
-            exams.patientmoduleattr_set.get().not_patient_indicator,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
-            str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events),
-            str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total),
-			]
-        for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
-            examdata += [
-                s.acquisition_protocol,
-                str(s.ct_acquisition_type),
-                str(s.exposure_time),
-                str(s.scanninglength_set.get().scanning_length),
-                str(s.nominal_single_collimation_width),
-                str(s.nominal_total_collimation_width),
-                str(s.pitch_factor),
-                str(s.number_of_xray_sources),
-                str(s.mean_ctdivol),
-                str(s.dlp),
-                ]
-            if s.number_of_xray_sources > 1:
-                for source in s.ctxraysourceparameters_set.all():
-                    examdata += [
-                        str(source.identification_of_the_xray_source),
-                        str(source.kvp),
-                        str(source.maximum_xray_tube_current),
-                        str(source.xray_tube_current),
-                        str(source.exposure_time_per_rotation),
-                        ]
-            else:
-                try:
-                    examdata += [
-                        str(s.ctxraysourceparameters_set.get().identification_of_the_xray_source),
-                        str(s.ctxraysourceparameters_set.get().kvp),
-                        str(s.ctxraysourceparameters_set.get().maximum_xray_tube_current),
-                        str(s.ctxraysourceparameters_set.get().xray_tube_current),
-                        str(s.ctxraysourceparameters_set.get().exposure_time_per_rotation),
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        ]
-                except:
-                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
-            examdata += [
-                s.xray_modulation_type,
-                str(s.comment),
-                ]
+        examdata = _ct_common_get_data(exams, pid, name, patid)
+
 
         wsalldata.write_row(row+1,0, examdata)
         
@@ -300,24 +392,7 @@ def ctxlsx(filterdict):
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
             
-            examdata = [
-                exams.generalequipmentmoduleattr_set.get().institution_name,
-                exams.generalequipmentmoduleattr_set.get().manufacturer,
-                exams.generalequipmentmoduleattr_set.get().manufacturer_model_name,
-                exams.generalequipmentmoduleattr_set.get().station_name,
-                exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name,
-                exams.accession_number,
-                exams.operator_name,
-                exams.study_date,  # Is a date - cell needs formatting
-                str(exams.patientstudymoduleattr_set.get().patient_age_decimal),
-                str(exams.patientstudymoduleattr_set.get().patient_size),
-                str(exams.patientstudymoduleattr_set.get().patient_weight),
-                exams.patientmoduleattr_set.get().not_patient_indicator,
-                exams.study_description,
-                exams.requested_procedure_code_meaning,
-                str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().total_number_of_irradiation_events),
-                str(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get().ct_dose_length_product_total),
-                ]
+            examdata = _ct_common_get_data(exams, pid, name, patid)
             examdata += [
                 s.acquisition_protocol,
                 str(s.ct_acquisition_type),

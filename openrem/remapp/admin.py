@@ -17,6 +17,10 @@ from remapp.models import (GeneralStudyModuleAttr,
     Exports, SizeUpload, UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR)
 
 from django.contrib import admin
+from solo.admin import SingletonModelAdmin
+from remapp.models import PatientIDSettings
+
+admin.site.register(PatientIDSettings, SingletonModelAdmin)
 
 admin.site.register(GeneralStudyModuleAttr)
 admin.site.register(ProjectionXRayRadiationDose)

@@ -460,15 +460,17 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
+    from decimal import Decimal
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
+    from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
-    from datetime import timedelta
-    from decimal import Decimal
+    from remapp.tools.hash_id import hash_id
+
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex',dataset)
-    patient_birth_date = get_date('PatientBirthDate',dataset) # Not saved to database
+    patient_birth_date = get_date('PatientBirthDate',dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
@@ -483,20 +485,44 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
+
+    patient_id_settings = PatientIDSettings.objects.get()
+    if patient_id_settings.name_stored:
+        name = get_value_kw("PatientName", dataset)
+        if name and patient_id_settings.name_hashed:
+            name = hash_id(name)
+            pat.name_hashed = True
+        pat.patient_name = name
+    if patient_id_settings.id_stored:
+        patid = get_value_kw("PatientID", dataset)
+        if patid and patient_id_settings.id_hashed:
+            patid = hash_id(patid)
+            pat.id_hashed = True
+        pat.patient_id = patid
+    if patient_id_settings.dob_stored and patient_birth_date:
+        pat.patient_birth_date = patient_birth_date
     pat.save()
 
 
 def _generalstudymoduleattributes(dataset,g):
+    from datetime import datetime
+    from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
-    from datetime import datetime
+    from remapp.tools.hash_id import hash_id
+
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), datetime.time(g.study_time))
     g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
-    g.accession_number = get_value_kw('AccessionNumber',dataset)
+    accession_number = get_value_kw('AccessionNumber',dataset)
+    patient_id_settings = PatientIDSettings.objects.get()
+    if accession_number and patient_id_settings.accession_hashed:
+        accession_number = hash_id(accession_number)
+        g.accession_hashed = True
+    g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription',dataset)
     if not g.study_description: g.study_description = get_value_kw('SeriesDescription',dataset)
     g.modality_type = get_value_kw('Modality',dataset)
