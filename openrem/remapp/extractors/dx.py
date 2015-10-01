@@ -687,11 +687,14 @@ def dx(dig_file):
     """
     
     import dicom
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomStoreSettings
     try:
-        from openremproject.settings import RM_DCM_DX
-    except ImportError:
-        RM_DCM_DX = False
-    
+        del_settings = DicomStoreSettings.objects.get()
+        del_dx_im = del_settings.del_dx_im
+    except ObjectDoesNotExist:
+        del_dx_im = False
+
     dataset = dicom.read_file(dig_file)
     isdx = _test_if_dx(dataset)
     if not isdx:
@@ -699,7 +702,7 @@ def dx(dig_file):
     
     _dx2db(dataset)
     
-    if RM_DCM_DX:
+    if del_dx_im:
         os.remove(dig_file)
 
     return 0

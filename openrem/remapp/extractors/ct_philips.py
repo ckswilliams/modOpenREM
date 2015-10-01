@@ -316,10 +316,13 @@ def ct_philips(philips_file):
     """
 
     import dicom
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomStoreSettings
     try:
-        from openremproject.settings import RM_DCM_CTPHIL
-    except ImportError:
-        RM_DCM_CTPHIL = False
+        del_settings = DicomStoreSettings.objects.get()
+        del_ct_phil = del_settings.del_ct_phil
+    except ObjectDoesNotExist:
+        del_ct_phil = False
 
     dataset = dicom.read_file(philips_file)
     if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' or dataset.SeriesDescription != 'Dose Info':
@@ -327,7 +330,7 @@ def ct_philips(philips_file):
 
     _philips_ct2db(dataset)
 
-    if RM_DCM_CTPHIL:
+    if del_ct_phil:
         os.remove(philips_file)
 
     return 0

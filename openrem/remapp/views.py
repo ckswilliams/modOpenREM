@@ -977,7 +977,7 @@ def mg_summary_list_filter(request):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
+    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomStoreSettings
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -985,6 +985,10 @@ def openrem_home(request):
     import pkg_resources # part of setuptools
     utc = pytz.UTC
     
+    test_dicom_store_settings = DicomStoreSettings.objects.all()
+    if not test_dicom_store_settings:
+        DicomStoreSettings.objects.create()
+
     if not Group.objects.filter(name="viewgroup"):
         vg = Group(name="viewgroup")
         vg.save()

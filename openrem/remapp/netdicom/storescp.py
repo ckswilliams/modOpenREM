@@ -70,12 +70,13 @@ def OnReceiveStore(SOPClass, DS):
     from remapp.extractors.mam import mam
     from remapp.extractors.rdsr import rdsr
     from remapp.extractors.ct_philips import ct_philips
+    from remapp.models import DicomStoreSettings
     from openremproject.settings import MEDIA_ROOT
-    from openremproject.settings import RM_DCM_NOMATCH
 
     logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
                  DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
 
+    del_settings = DicomStoreSettings.objects.get()
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
@@ -120,7 +121,7 @@ def OnReceiveStore(SOPClass, DS):
     ):
         logging.info("Processing as Philips Dose Info series")
         ct_philips.delay(filename)
-    elif RM_DCM_NOMATCH:
+    elif del_settings.del_no_match:
         os.remove(filename)
         logging.info("Can't find anything to do with this file - it has been deleted")
 

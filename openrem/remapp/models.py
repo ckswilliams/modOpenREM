@@ -36,6 +36,14 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+class DicomStoreSettings(SingletonModel):
+    del_no_match = models.BooleanField(default=False)
+    del_rdsr = models.BooleanField(default=False)
+    del_mg_im = models.BooleanField(default=False)
+    del_dx_im = models.BooleanField(default=False)
+    del_ct_phil = models.BooleanField(default=False)
+
+
 class PatientIDSettings(SingletonModel):
     name_stored = models.BooleanField(default=False)
     name_hashed = models.BooleanField(default=True)
