@@ -78,7 +78,7 @@ $(function () {
         },
         series: [{
             useHTML: true,
-            name: 'Median DLP',
+            name: 'Median DLP per acquisition protocol',
             data: []
         }],
         drilldown: {

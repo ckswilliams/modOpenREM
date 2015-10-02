@@ -76,7 +76,7 @@ $(function () {
             }
         },
         series: [{
-            name: 'Mean mAs',
+            name: 'Mean mAs per acquisition protocol',
             data: []
         }],
         drilldown: {

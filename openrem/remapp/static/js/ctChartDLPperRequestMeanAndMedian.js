@@ -78,11 +78,11 @@ $(function () {
         },
         series: [{
             useHTML: true,
-            name: 'Mean DLP',
+            name: 'Mean DLP per requested procedure',
             data: []
         }, {
             useHTML: true,
-            name: 'Median DLP',
+            name: 'Median DLP per requested procedure',
             data: []
         }],
         drilldown: {
