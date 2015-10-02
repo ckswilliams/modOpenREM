@@ -43,6 +43,14 @@ class DicomStoreSettings(SingletonModel):
     del_dx_im = models.BooleanField(default=False)
     del_ct_phil = models.BooleanField(default=False)
 
+    def __unicode__(self):
+        return u"Delete DICOM objects settings"
+
+    class Meta:
+        verbose_name = "Delete DICOM objects settings"
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
 
 class PatientIDSettings(SingletonModel):
     name_stored = models.BooleanField(default=False)

@@ -35,7 +35,7 @@ from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate
+from remapp.views import PatientIDSettingsUpdate, DicomStoreSettingsUpdate
 
 
 urlpatterns = patterns('remapp.views',
@@ -94,7 +94,8 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/dicomqr/add/$', DicomQRCreate.as_view(), name='dicomqr_add'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/$', DicomQRUpdate.as_view(), name='dicomqr_update'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/delete/$', DicomQRDelete.as_view(), name='dicomqr_delete'),
-    url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update')
+    url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
+    url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomStoreSettingsUpdate.as_view(), name='dicom_store_settings_update'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',
