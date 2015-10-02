@@ -39,7 +39,7 @@ from django import forms
 from remapp.models import GeneralStudyModuleAttr
 from django.utils.safestring import mark_safe
 
-TEST_CHOICES = (('', 'Yes (default)'), (2, 'No (might hide real data)'),)
+TEST_CHOICES = (('', 'Yes (default)'), (2, 'No (caution)'),)
 
 def custom_name_filter(queryset, value):
     if not value:
@@ -139,8 +139,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
-            ('-study_date', 'Date of exam (newest first)'),
-            ('study_date', 'Date of exam (oldest first)'),
+            ('-study_date', mark_safe('Exam date &darr;')),
+            ('study_date', mark_safe('Exam date &uarr;')),
             ('generalequipmentmoduleattr__institution_name', 'Hospital'),
             ('generalequipmentmoduleattr__manufacturer', 'Make'),
             ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
@@ -189,8 +189,8 @@ class CTSummaryListFilter(django_filters.FilterSet):
         model = GeneralStudyModuleAttr
         fields = []
         order_by = (
-            ('-study_date', 'Date of exam (newest first)'),
-            ('study_date', 'Date of exam (oldest first)'),
+            ('-study_date', mark_safe('Exam date &darr;')),
+            ('study_date', mark_safe('Exam date &uarr;')),
             ('generalequipmentmoduleattr__institution_name', 'Hospital'),
             ('generalequipmentmoduleattr__manufacturer', 'Make'),
             ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
@@ -280,8 +280,8 @@ class MGSummaryListFilter(django_filters.FilterSet):
             ]
 
         order_by = (
-            ('-study_date', 'Date of exam (newest first)'),
-            ('study_date', 'Date of exam (oldest first)'),
+            ('-study_date', mark_safe('Exam date &darr;')),
+            ('study_date', mark_safe('Exam date &uarr;')),
             ('generalequipmentmoduleattr__institution_name', 'Hospital'),
             ('generalequipmentmoduleattr__manufacturer', 'Make'),
             ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
@@ -345,8 +345,8 @@ class DXSummaryListFilter(django_filters.FilterSet):
             'test_data',
             ]
         order_by = (
-            ('-study_date', 'Date of exam (newest first)'),
-            ('study_date', 'Date of exam (oldest first)'),
+            ('-study_date', mark_safe('Exam date &darr;')),
+            ('study_date', mark_safe('Exam date &uarr;')),
             ('generalequipmentmoduleattr__institution_name', 'Hospital'),
             ('generalequipmentmoduleattr__manufacturer', 'Make'),
             ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
