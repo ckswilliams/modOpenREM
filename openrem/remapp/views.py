@@ -1706,9 +1706,10 @@ class PatientIDSettingsUpdate(UpdateView):
 
 
 from remapp.models import DicomStoreSettings
+from remapp.forms import DicomDeleteSettingsForm
 class DicomStoreSettingsUpdate(UpdateView):
     model = DicomStoreSettings
-    fields = ['del_no_match', 'del_rdsr', 'del_mg_im', 'del_dx_im', 'del_ct_phil']
+    form_class = DicomDeleteSettingsForm
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
