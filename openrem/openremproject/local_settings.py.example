@@ -46,15 +46,4 @@ ALLOWED_HOSTS = [
     '',
 ]
 
-# Should DICOM files be kept or deleted when they have been processed?
 
-# RM_DCM_NOMATCH is only applicable if you use the DICOM Store SCP built into OpenREM
-# The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
-# Philips CT images are kept (False) or deleted (True) when they have been processed
-# See http://docs.openrem.org/en/latest/netdicom.html for more information about the DICOM Store and QR
-
-RM_DCM_NOMATCH = True
-RM_DCM_RDSR = True
-RM_DCM_MG = True
-RM_DCM_DX = True
-RM_DCM_CTPHIL = True

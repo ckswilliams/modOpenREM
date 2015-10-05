@@ -36,6 +36,27 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+class DicomDeleteSettings(SingletonModel):
+    del_no_match = models.BooleanField(default=False,
+                    verbose_name="delete objects that don't match any import functions?")
+    del_rdsr = models.BooleanField(default=False,
+                   verbose_name="delete radiation dose structured reports after processing?")
+    del_mg_im = models.BooleanField(default=False,
+                    verbose_name="delete mammography images after processing?")
+    del_dx_im = models.BooleanField(default=False,
+                    verbose_name="delete radiography images after processing?")
+    del_ct_phil = models.BooleanField(default=False,
+                    verbose_name="delete Philips CT dose info images after processing?")
+
+    def __unicode__(self):
+        return u"Delete DICOM objects settings"
+
+    class Meta:
+        verbose_name = "Delete DICOM objects settings"
+
+    def get_absolute_url(self):
+        return reverse('dicom_summary')
+
 class PatientIDSettings(SingletonModel):
     name_stored = models.BooleanField(default=False)
     name_hashed = models.BooleanField(default=True)

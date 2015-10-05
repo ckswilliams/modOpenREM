@@ -521,10 +521,13 @@ def mam(mg_file):
 
     import os
     import dicom
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomDeleteSettings
     try:
-        from openremproject.settings import RM_DCM_MG
-    except ImportError:
-        RM_DCM_MG = False
+        del_settings = DicomDeleteSettings.objects.get()
+        del_mg_im = del_settings.del_mg_im
+    except ObjectDoesNotExist:
+        del_mg_im = False
 
 
     dataset = dicom.read_file(mg_file)
@@ -537,7 +540,7 @@ def mam(mg_file):
 
     _mammo2db(dataset)
 
-    if RM_DCM_MG:
+    if del_mg_im:
         logging.debug("Mammo %s processing complete, deleting file", mg_file)
         os.remove(mg_file)
     else:

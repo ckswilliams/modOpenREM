@@ -36,6 +36,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import logging
+import pkg_resources
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group, Permission
@@ -977,7 +978,7 @@ def mg_summary_list_filter(request):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
+    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -985,6 +986,10 @@ def openrem_home(request):
     import pkg_resources # part of setuptools
     utc = pytz.UTC
     
+    test_dicom_store_settings = DicomDeleteSettings.objects.all()
+    if not test_dicom_store_settings:
+        DicomDeleteSettings.objects.create()
+
     if not Group.objects.filter(name="viewgroup"):
         vg = Group(name="viewgroup")
         vg.save()
@@ -1526,17 +1531,17 @@ from remapp.models import DicomStoreSCP, DicomRemoteQR
 def dicom_summary(request):
     """Displays current DICOM configuration
     """
-    from openremproject.settings import RM_DCM_NOMATCH
-    from openremproject.settings import RM_DCM_RDSR
-    from openremproject.settings import RM_DCM_MG
-    from openremproject.settings import RM_DCM_DX
-    from openremproject.settings import RM_DCM_CTPHIL
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomDeleteSettings
+
+    try:
+        del_settings = DicomDeleteSettings.objects.get()
+    except ObjectDoesNotExist:
+        DicomDeleteSettings.objects.create()
+        del_settings = DicomDeleteSettings.objects.get()
 
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
-
-    rm_settings = {
-        'no_match': RM_DCM_NOMATCH, 'rdsr': RM_DCM_RDSR, 'mg': RM_DCM_MG, 'dx': RM_DCM_DX, 'ct_phil': RM_DCM_CTPHIL}
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1550,7 +1555,7 @@ def dicom_summary(request):
     # Render list page with the documents and the form
     return render_to_response(
         'remapp/dicomsummary.html',
-        {'store': store, 'remoteqr': remoteqr, 'admin': admin, 'rm_settings': rm_settings},
+        {'store': store, 'remoteqr': remoteqr, 'admin': admin, 'del_settings': del_settings},
         context_instance=RequestContext(request)
     )
 
@@ -1686,6 +1691,25 @@ from remapp.models import PatientIDSettings
 class PatientIDSettingsUpdate(UpdateView):
     model = PatientIDSettings
     fields = ['name_stored', 'name_hashed', 'id_stored', 'id_hashed', 'accession_hashed', 'dob_stored']
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        try:
+            vers = pkg_resources.require("openrem")[0].version
+        except:
+            vers = ''
+        admin = {'openremversion': vers}
+        if self.request.user.groups.filter(name="admingroup"):
+            admin["adminperm"] = True
+        context['admin'] = admin
+        return context
+
+
+from remapp.models import DicomDeleteSettings
+from remapp.forms import DicomDeleteSettingsForm
+class DicomStoreSettingsUpdate(UpdateView):
+    model = DicomDeleteSettings
+    form_class = DicomDeleteSettingsForm
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object

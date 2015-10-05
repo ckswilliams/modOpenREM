@@ -14,7 +14,7 @@ from remapp.models import (GeneralStudyModuleAttr,
     CtRadiationDose, CtAccumulatedDoseData,
     CtIrradiationEventData, ScanningLength,
     CtDoseCheckDetails, CtXRaySourceParameters,
-    Exports, SizeUpload, UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR)
+    Exports, SizeUpload, UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR, DicomDeleteSettings)
 
 from django.contrib import admin
 from solo.admin import SingletonModelAdmin
@@ -60,6 +60,7 @@ admin.site.register(SizeUpload)
 admin.site.register(UniqueEquipmentNames)
 admin.site.register(DicomStoreSCP)
 admin.site.register(DicomRemoteQR)
+admin.site.register(DicomDeleteSettings)
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User

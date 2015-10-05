@@ -791,10 +791,14 @@ def rdsr(rdsr_file):
     """
 
     import dicom
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomDeleteSettings
     try:
-        from openremproject.settings import RM_DCM_RDSR
-    except ImportError:
-        RM_DCM_RDSR = False
+        del_settings = DicomDeleteSettings.objects.get()
+        del_rdsr = del_settings.del_rdsr
+    except ObjectDoesNotExist:
+        del_rdsr = False
+
 
     dataset = dicom.read_file(rdsr_file)
 
@@ -808,7 +812,7 @@ def rdsr(rdsr_file):
 
     _rsdr2db(dataset)
 
-    if RM_DCM_RDSR:
+    if del_rdsr:
         os.remove(rdsr_file)
 
     return 0

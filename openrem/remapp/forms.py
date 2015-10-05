@@ -173,3 +173,40 @@ class DicomQueryForm(forms.Form):
         from remapp.models import DicomRemoteQR, DicomStoreSCP
         self.fields['remote_host_field'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
         self.fields['store_scp_field'].choices = [(x.pk, x.name) for x in DicomStoreSCP.objects.all()]
+
+
+from remapp.models import DicomDeleteSettings
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Field, Div
+from crispy_forms.bootstrap import FormActions
+
+class DicomDeleteSettingsForm(forms.ModelForm):
+    """Form for configuring whether DICOM objects are stored or deleted once processed
+    """
+    def __init__(self, *args, **kwargs):
+        super(DicomDeleteSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-lg-2'
+        self.helper.field_class = 'col-lg-8'
+        self.helper.layout = Layout(
+            Div(
+                HTML("""
+                     <h4>Do you want objects that we can't do anything with to be deleted?</h4>
+                """),
+                'del_no_match',
+                HTML("""
+                     <h4>The remaining choices are for DICOM objects we have processed and attempted to import to the
+                     database:</h4>
+                """),
+                'del_rdsr',
+                'del_mg_im', 'del_dx_im', 'del_ct_phil'
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            ),
+        )
+
+    class Meta:
+        model = DicomDeleteSettings
+        fields = ['del_no_match', 'del_rdsr', 'del_mg_im', 'del_dx_im', 'del_ct_phil']
