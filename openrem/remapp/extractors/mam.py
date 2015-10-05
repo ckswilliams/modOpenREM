@@ -522,9 +522,9 @@ def mam(mg_file):
     import os
     import dicom
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import DicomStoreSettings
+    from remapp.models import DicomDeleteSettings
     try:
-        del_settings = DicomStoreSettings.objects.get()
+        del_settings = DicomDeleteSettings.objects.get()
         del_mg_im = del_settings.del_mg_im
     except ObjectDoesNotExist:
         del_mg_im = False

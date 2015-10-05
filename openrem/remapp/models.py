@@ -36,7 +36,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
-class DicomStoreSettings(SingletonModel):
+class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")
     del_rdsr = models.BooleanField(default=False,

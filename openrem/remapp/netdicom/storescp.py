@@ -70,13 +70,13 @@ def OnReceiveStore(SOPClass, DS):
     from remapp.extractors.mam import mam
     from remapp.extractors.rdsr import rdsr
     from remapp.extractors.ct_philips import ct_philips
-    from remapp.models import DicomStoreSettings
+    from remapp.models import DicomDeleteSettings
     from openremproject.settings import MEDIA_ROOT
 
     logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
                  DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
 
-    del_settings = DicomStoreSettings.objects.get()
+    del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID

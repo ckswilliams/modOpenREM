@@ -978,7 +978,7 @@ def mg_summary_list_filter(request):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomStoreSettings
+    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -986,9 +986,9 @@ def openrem_home(request):
     import pkg_resources # part of setuptools
     utc = pytz.UTC
     
-    test_dicom_store_settings = DicomStoreSettings.objects.all()
+    test_dicom_store_settings = DicomDeleteSettings.objects.all()
     if not test_dicom_store_settings:
-        DicomStoreSettings.objects.create()
+        DicomDeleteSettings.objects.create()
 
     if not Group.objects.filter(name="viewgroup"):
         vg = Group(name="viewgroup")
@@ -1532,13 +1532,13 @@ def dicom_summary(request):
     """Displays current DICOM configuration
     """
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import DicomStoreSettings
+    from remapp.models import DicomDeleteSettings
 
     try:
-        del_settings = DicomStoreSettings.objects.get()
+        del_settings = DicomDeleteSettings.objects.get()
     except ObjectDoesNotExist:
-        DicomStoreSettings.objects.create()
-        del_settings = DicomStoreSettings.objects.get()
+        DicomDeleteSettings.objects.create()
+        del_settings = DicomDeleteSettings.objects.get()
 
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
@@ -1705,10 +1705,10 @@ class PatientIDSettingsUpdate(UpdateView):
         return context
 
 
-from remapp.models import DicomStoreSettings
+from remapp.models import DicomDeleteSettings
 from remapp.forms import DicomDeleteSettingsForm
 class DicomStoreSettingsUpdate(UpdateView):
-    model = DicomStoreSettings
+    model = DicomDeleteSettings
     form_class = DicomDeleteSettingsForm
 
     def get_context_data(self, **context):

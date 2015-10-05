@@ -175,7 +175,7 @@ class DicomQueryForm(forms.Form):
         self.fields['store_scp_field'].choices = [(x.pk, x.name) for x in DicomStoreSCP.objects.all()]
 
 
-from remapp.models import DicomStoreSettings
+from remapp.models import DicomDeleteSettings
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Field, Div
 from crispy_forms.bootstrap import FormActions
@@ -208,5 +208,5 @@ class DicomDeleteSettingsForm(forms.ModelForm):
         )
 
     class Meta:
-        model = DicomStoreSettings
+        model = DicomDeleteSettings
         fields = ['del_no_match', 'del_rdsr', 'del_mg_im', 'del_dx_im', 'del_ct_phil']

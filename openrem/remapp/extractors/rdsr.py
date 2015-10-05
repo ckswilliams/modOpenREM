@@ -792,9 +792,9 @@ def rdsr(rdsr_file):
 
     import dicom
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import DicomStoreSettings
+    from remapp.models import DicomDeleteSettings
     try:
-        del_settings = DicomStoreSettings.objects.get()
+        del_settings = DicomDeleteSettings.objects.get()
         del_rdsr = del_settings.del_rdsr
     except ObjectDoesNotExist:
         del_rdsr = False

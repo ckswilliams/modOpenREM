@@ -688,9 +688,9 @@ def dx(dig_file):
     
     import dicom
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import DicomStoreSettings
+    from remapp.models import DicomDeleteSettings
     try:
-        del_settings = DicomStoreSettings.objects.get()
+        del_settings = DicomDeleteSettings.objects.get()
         del_dx_im = del_settings.del_dx_im
     except ObjectDoesNotExist:
         del_dx_im = False
