@@ -1314,7 +1314,6 @@ def size_imports(request, *args, **kwargs):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-
     return render_to_response(
         'remapp/sizeimports.html',
         {'admin': admin, 'current': current, 'complete': complete, 'errors': errors},
@@ -1386,7 +1385,7 @@ def charts_off(request):
     # Switch chart plotting off
     userProfile.plotCharts = False
     userProfile.save()
-
+    messages.info(request, "Chart plotting has been turned off for {0}".format(request.user.get_full_name()))
     # Go to the OpenREM home page
     response = openrem_home(request)
 
@@ -1406,10 +1405,8 @@ def display_names_view(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return_structure = {'name_list': f, 'admin':admin}
 
@@ -1449,10 +1446,8 @@ def display_name_update(request, pk):
             vers = ''
         admin = {'openremversion' : vers}
 
-        if request.user.groups.filter(name="exportgroup"):
-            admin['exportperm'] = True
-        if request.user.groups.filter(name="admingroup"):
-            admin['adminperm'] = True
+        for group in request.user.groups.all():
+            admin[group.name] = True
 
         return_structure = {'name_list': f, 'admin':admin, 'form': form}
 
