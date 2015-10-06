@@ -610,12 +610,8 @@ def ct_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
@@ -935,6 +931,35 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     return acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData,\
            requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData,\
            studySummary
+
+
+@login_required
+def ct_detail_view(request, pk=None):
+    """Detail view for a CT study
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/ct/')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return render_to_response(
+        'remapp/ctdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
 
 
 @login_required
