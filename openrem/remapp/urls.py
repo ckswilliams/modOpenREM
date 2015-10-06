@@ -67,10 +67,7 @@ urlpatterns = patterns('remapp.views',
 
     url(r'^mg/$',
         'mg_summary_list_filter'),
-    url(r'^mg/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/mgdetail.html'))),
+    url(r'^mg/(?P<pk>\d+)/$', 'mg_detail_view', name='mg_detail_view'),
 
     url(r'^viewdisplaynames/$',
         'display_names_view'),

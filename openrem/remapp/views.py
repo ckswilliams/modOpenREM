@@ -981,18 +981,43 @@ def mg_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return render_to_response(
         'remapp/mgfiltered.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
+
+
+@login_required
+def mg_detail_view(request, pk=None):
+    """Detail view for a CT study
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/mg/')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return render_to_response(
+        'remapp/mgdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
 
 
 def openrem_home(request):
