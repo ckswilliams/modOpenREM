@@ -1,11 +1,6 @@
 {% extends "remapp/base.html" %}
 
-{% block navbar %}
-            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-            {% if request.user.userprofile.displayRF %}<li class="active"><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block navrf %}<li class="active">{% endblock %}
 
 {% block mainblock %}
     <div class="row">
@@ -55,7 +50,8 @@
                 OpenREM will display the exposure incidence map and peak skin dose values integrated into this page.
             </p>
             <h4>
-                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>
+                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>. <small>(Not
+                available if you don't have export permissions.)</small>
             </h4>
         </div>
   </div>
