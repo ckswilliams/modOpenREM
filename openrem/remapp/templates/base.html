@@ -50,12 +50,18 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             {% block navbar %}
-            {% if request.user.userprofile.displayCT %}
-                <li><a href="/openrem/ct">CT</a></li>
-            {% endif %}
-            {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
+                {% if request.user.userprofile.displayCT %}
+                    {% block navct %}<li>{% endblock %}<a href="/openrem/ct">CT</a></li>
+                {% endif %}
+                {% if request.user.userprofile.displayRF %}
+                    {% block navrf %}<li>{% endblock %}<a href="/openrem/rf">Fluoroscopy</a></li>
+                {% endif %}
+                {% if request.user.userprofile.displayMG %}
+                    {% block navmg %}<li>{% endblock %}<a href="/openrem/mg">Mammography</a></li>
+                {% endif %}
+                {% if request.user.userprofile.displayDX %}
+                    {% block navdx %}<li>{% endblock %}<a href="/openrem/dx">Radiography</a></li>
+                {% endif %}
             {% endblock %}
           </ul>
           {% block loginlink %}
