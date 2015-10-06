@@ -149,6 +149,8 @@ def dx_summary_list_filter(request):
         admin['adminperm'] = True
     if request.user.groups.filter(name="pidgroup"):
         admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
@@ -1002,6 +1004,13 @@ def openrem_home(request):
     if not Group.objects.filter(name="pidgroup"):
         pg = Group(name="pidgroup")
         pg.save()
+    if not Group.objects.filter(name="importsizegroup"):
+        sg = Group(name="importsizegroup")
+        sg.save()
+    if not Group.objects.filter(name="importqrgroup"):
+        qg = Group(name="importqrgroup")
+        qg.save()
+
     id_settings = PatientIDSettings.objects.all()
     if not id_settings:
         PatientIDSettings.objects.create()
@@ -1065,6 +1074,8 @@ def openrem_home(request):
         admin['exportperm'] = True
     if request.user.groups.filter(name="admingroup"):
         admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     modalities = ('MG','CT','RF','DX')
     for modality in modalities:
