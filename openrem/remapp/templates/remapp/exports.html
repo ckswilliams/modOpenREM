@@ -6,14 +6,6 @@
 {% endif %}
 {% endblock %}
 
-
-{% block navbar %}
-            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-            {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
-
 {% block exportnav %}
             <li class="active"><a href="/openrem/export">Exports</a></li>
 {% endblock %}
@@ -24,7 +16,7 @@
    {% load humanize %}
    {% load remappduration %}
  
-    {% if admin.exportperm or admin.adminperm %}
+    {% if admin.exportgroup %}
 
 
     {% if messages %}
@@ -91,7 +83,7 @@
         <th>Download</th>
         <th>Delete?</th>
         {% for tsk in complete %}
-            {% if not tsk.includes_pid or tsk.includes_pid and admin.pidperm %}
+            {% if not tsk.includes_pid or tsk.includes_pid and admin.pidgroup %}
                 <tr>
                     <td>{{ tsk.export_date|naturaltime }}</td>
                     <td>{{ tsk.modality }}</td>

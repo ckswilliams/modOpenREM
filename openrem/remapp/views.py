@@ -143,12 +143,6 @@ def dx_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
     for group in request.user.groups.all():
         admin[group.name] = True
 

@@ -63,7 +63,7 @@ def ctcsv1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = exportCT2excel.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
@@ -94,7 +94,7 @@ def ctxlsx1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = ctxlsx.delay(request.GET, pid, name, patid, request.user.id)
     
     return redirect('/openrem/export/')
@@ -124,7 +124,7 @@ def dxcsv1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = exportDX2excel.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
@@ -154,7 +154,7 @@ def dxxlsx1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = dxxlsx.delay(request.GET, pid, name, patid, request.user.id)
     
     return redirect('/openrem/export/')
@@ -184,7 +184,7 @@ def flcsv1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = exportFL2excel.delay(request.GET, pid, name, patid, request.user.id)
     
     return redirect('/openrem/export/')
@@ -214,7 +214,7 @@ def rfxlsx1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = rfxlsx.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
@@ -228,7 +228,7 @@ def rfopenskin(request, pk):
 
     export = get_object_or_404(GeneralStudyModuleAttr, pk=pk)
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = rfopenskin.delay(export.pk)
 
     return redirect('/openrem/export/')
@@ -254,7 +254,7 @@ def mgcsv1(request, name=None, patid=None):
     except:
         patid = None
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = exportMG2excel.delay(request.GET, pid, name, patid, request.user.id)
 
     return redirect('/openrem/export/')
@@ -271,7 +271,7 @@ def mgnhsbsp(request):
     from django.shortcuts import redirect
     from remapp.exports.mg_csv_nhsbsp import mg_csv_nhsbsp
 
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="exportgroup"):
         job = mg_csv_nhsbsp.delay(request.GET, request.user.id)
     
     return redirect('/openrem/export/')
@@ -301,13 +301,8 @@ def export(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
-
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     if 'task_id' in request.session.keys() and request.session['task_id']:
         task_id = request.session['task_id']
@@ -340,8 +335,6 @@ def download(request, task_id):
     pidperm = False
     if request.user.groups.filter(name="exportgroup"):
         exportperm = True
-    if request.user.groups.filter(name="admingroup"):
-        adminperm = True
     if request.user.groups.filter(name="pidgroup"):
         pidperm = True
     try:
@@ -350,7 +343,7 @@ def download(request, task_id):
         messages.error(request, "Can't match the task ID, export aborted")
         return redirect('/openrem/export/')
 
-    if not exportperm and not adminperm:
+    if not exportperm:
         messages.error(request, "You don't have permission to export data")
         return redirect('/openrem/export/')
 
@@ -413,7 +406,7 @@ def export_abort(request, pk):
 
     export = get_object_or_404(Exports, pk=pk)    
 
-    if request.user.groups.filter(name="admingroup") or request.user.groups.filter(name="exportgroup"):
+    if request.user.groups.filter(name="exportgroup"):
         revoke(export.task_id, terminate=True)
         export.delete()
 
