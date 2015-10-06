@@ -1198,10 +1198,8 @@ def size_upload(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     # Render list page with the documents and the form
     return render_to_response(
@@ -1281,10 +1279,8 @@ def size_process(request, *args, **kwargs):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return render_to_response(
         'remapp/sizeprocess.html',
@@ -1315,10 +1311,8 @@ def size_imports(request, *args, **kwargs):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
 
     return render_to_response(
