@@ -1111,10 +1111,6 @@ def openrem_home(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
     for group in request.user.groups.all():
         admin[group.name] = True
 
