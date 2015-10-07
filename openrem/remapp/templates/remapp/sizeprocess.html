@@ -4,18 +4,6 @@
 
 {% block mainblock %}		
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                {% if message.level == 40 %}
-                    <strong>Warning!</strong>
-                {% endif %}
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
 {% if admin.importsizegroup %}
 
       <div class="col-md-8 col-md-offset-2">

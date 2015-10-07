@@ -3,18 +3,6 @@
 {% block navct%}<li class="active">{% endblock %}
 
 {% block toprow %}
-        {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                {% if message.level == 40 %}
-                    <strong>Warning!</strong>
-                {% endif %}
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
 
   {% load pagination_tags %}
 
