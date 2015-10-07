@@ -1,10 +1,5 @@
 {% extends "remapp/base.html" %}
-{% block navbar %}
-            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-            {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li class="active"><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block navdx %}<li class="active">{% endblock %}
 
 
 {% block mainblock %}		

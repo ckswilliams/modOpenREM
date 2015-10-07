@@ -143,12 +143,8 @@ def dx_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
@@ -528,12 +524,9 @@ def rf_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
 
     return render_to_response(
         'remapp/rffiltered.html',
@@ -617,12 +610,8 @@ def ct_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
 
@@ -945,6 +934,35 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
 
 @login_required
+def ct_detail_view(request, pk=None):
+    """Detail view for a CT study
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/ct/')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return render_to_response(
+        'remapp/ctdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     import pkg_resources # part of setuptools
@@ -963,18 +981,43 @@ def mg_summary_list_filter(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-    if request.user.groups.filter(name="pidgroup"):
-        admin['pidperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return render_to_response(
         'remapp/mgfiltered.html',
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
+
+
+@login_required
+def mg_detail_view(request, pk=None):
+    """Detail view for a CT study
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/mg/')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return render_to_response(
+        'remapp/mgdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
 
 
 def openrem_home(request):
@@ -1002,6 +1045,13 @@ def openrem_home(request):
     if not Group.objects.filter(name="pidgroup"):
         pg = Group(name="pidgroup")
         pg.save()
+    if not Group.objects.filter(name="importsizegroup"):
+        sg = Group(name="importsizegroup")
+        sg.save()
+    if not Group.objects.filter(name="importqrgroup"):
+        qg = Group(name="importqrgroup")
+        qg.save()
+
     id_settings = PatientIDSettings.objects.all()
     if not id_settings:
         PatientIDSettings.objects.create()
@@ -1061,10 +1111,8 @@ def openrem_home(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     modalities = ('MG','CT','RF','DX')
     for modality in modalities:
@@ -1150,10 +1198,8 @@ def size_upload(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     # Render list page with the documents and the form
     return render_to_response(
@@ -1233,10 +1279,8 @@ def size_process(request, *args, **kwargs):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return render_to_response(
         'remapp/sizeprocess.html',
@@ -1267,11 +1311,8 @@ def size_imports(request, *args, **kwargs):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return render_to_response(
         'remapp/sizeimports.html',
@@ -1344,7 +1385,11 @@ def charts_off(request):
     # Switch chart plotting off
     userProfile.plotCharts = False
     userProfile.save()
-
+    if request.user.get_full_name():
+        name = request.user.get_full_name()
+    else:
+        name = request.user.get_username()
+    messages.success(request, "Chart plotting has been turned off for {0}".format(name))
     # Go to the OpenREM home page
     response = openrem_home(request)
 
@@ -1364,10 +1409,8 @@ def display_names_view(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     return_structure = {'name_list': f, 'admin':admin}
 
@@ -1407,10 +1450,8 @@ def display_name_update(request, pk):
             vers = ''
         admin = {'openremversion' : vers}
 
-        if request.user.groups.filter(name="exportgroup"):
-            admin['exportperm'] = True
-        if request.user.groups.filter(name="admingroup"):
-            admin['adminperm'] = True
+        for group in request.user.groups.all():
+            admin[group.name] = True
 
         return_structure = {'name_list': f, 'admin':admin, 'form': form}
 
@@ -1471,10 +1512,8 @@ def chart_options_view(request):
         version = ''
     admin = {'openremversion' : version}
 
-    if request.user.groups.filter(name="exportgroup"):
-        admin['exportperm'] = True
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     try:
         # See if the user has plot settings in userprofile
@@ -1549,8 +1588,8 @@ def dicom_summary(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     # Render list page with the documents and the form
     return render_to_response(
@@ -1574,8 +1613,8 @@ class DicomStoreCreate(CreateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1590,8 +1629,8 @@ class DicomStoreUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1607,8 +1646,8 @@ class DicomStoreDelete(DeleteView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1624,8 +1663,8 @@ class DicomQRCreate(CreateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1641,8 +1680,8 @@ class DicomQRUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1658,33 +1697,11 @@ class DicomQRDelete(DeleteView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
-@login_required
-def dicom_ajax(request):
-    """Displays current DICOM configuration
-    """
-    store = DicomStoreSCP.objects.all()
-    remoteqr = DicomRemoteQR.objects.all()
-
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion' : vers}
-
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
-
-    # Render list page with the documents and the form
-    return render_to_response(
-        'remapp/ajaxtest.html',
-        {'store': store, 'remoteqr': remoteqr, 'admin': admin},
-        context_instance=RequestContext(request)
-    )
 
 from remapp.models import PatientIDSettings
 
@@ -1699,15 +1716,17 @@ class PatientIDSettingsUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
 
 from remapp.models import DicomDeleteSettings
 from remapp.forms import DicomDeleteSettingsForm
-class DicomStoreSettingsUpdate(UpdateView):
+
+
+class DicomDeleteSettingsUpdate(UpdateView):
     model = DicomDeleteSettings
     form_class = DicomDeleteSettingsForm
 
@@ -1718,7 +1737,7 @@ class DicomStoreSettingsUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context

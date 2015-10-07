@@ -35,7 +35,7 @@ from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate, DicomStoreSettingsUpdate
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate
 
 
 urlpatterns = patterns('remapp.views',
@@ -54,10 +54,7 @@ urlpatterns = patterns('remapp.views',
         'ct_summary_list_filter'),
     url(r'^ct/chart/$',
         'ct_summary_chart_data', name='ct_summary_chart_data'),
-    url(r'^ct/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/ctdetail.html'))),
+    url(r'^ct/(?P<pk>\d+)/$', 'ct_detail_view', name='ct_detail_view'),
 
     url(r'^dx/$',
         'dx_summary_list_filter', name='dx_summary'),
@@ -70,10 +67,7 @@ urlpatterns = patterns('remapp.views',
 
     url(r'^mg/$',
         'mg_summary_list_filter'),
-    url(r'^mg/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/mgdetail.html'))),
+    url(r'^mg/(?P<pk>\d+)/$', 'mg_detail_view', name='mg_detail_view'),
 
     url(r'^viewdisplaynames/$',
         'display_names_view'),
@@ -95,7 +89,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/dicomqr/(?P<pk>\d+)/$', DicomQRUpdate.as_view(), name='dicomqr_update'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/delete/$', DicomQRDelete.as_view(), name='dicomqr_delete'),
     url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
-    url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomStoreSettingsUpdate.as_view(), name='dicom_store_settings_update'),
+    url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomDeleteSettingsUpdate.as_view(), name='dicom_delete_settings_update'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

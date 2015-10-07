@@ -1,11 +1,6 @@
 {% extends "remapp/filteredbase.html" %}
 
-{% block navbar %}
-  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-  {% if request.user.userprofile.displayDX %}<li class="active"><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block navdx %}<li class="active">{% endblock %}
 
 {% block toprow %}
   {% load pagination_tags %}
@@ -22,12 +17,12 @@
       <h3 class="panel-title">Data export</h3>
   </div>
   <div class="panel-body">
-    {% if admin.exportperm or admin.adminperm %}
+    {% if admin.exportgroup %}
         <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
     <p>
       <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
-          {% if admin.pidperm %}
+          {% if admin.pidgroup %}
               <a href="/openrem/exportdxcsv1/1/0/?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
               <a href="/openrem/exportdxcsv1/0/1/?{{ request.GET.urlencode }}"
@@ -39,7 +34,7 @@
     <p>
           <a href="/openrem/exportdxxlsx1/0/0/?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to XLSX</a>
-          {% if admin.pidperm %}
+          {% if admin.pidgroup %}
               <a href="/openrem/exportdxxlsx1/1/0/?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With names</a>
               <a href="/openrem/exportdxxlsx1/0/1/?{{ request.GET.urlencode }}"
@@ -115,7 +110,7 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
-      {% if admin.adminperm %}
+      {% if admin.admingroup %}
         <th>Delete?</th>
       {% endif %}
     </row>
@@ -156,7 +151,7 @@
             {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}
           </a>
         </td>
-        {% if admin.adminperm %}
+        {% if admin.admingroup %}
           <td>
             <a href="{% url 'study_delete' exam.id %}">Delete</a>
           </td>

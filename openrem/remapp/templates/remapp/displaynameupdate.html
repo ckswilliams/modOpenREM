@@ -1,16 +1,9 @@
 {% extends "remapp/base.html" %}
 
-
-{% block navbar %}
-  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-  {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
-
+{% block confnav %}<li class="dropdown active">{% endblock %}
 
 {% block mainblock %}
-  {% if admin.adminperm %}
+  {% if admin.admingroup %}
   <form action="/openrem/updatedisplayname/{{ name_list.values.get.id }}" method="post">{% csrf_token %}
   {% endif %}
   <table class="table table-bordered table-hover row-clickable">
@@ -18,7 +11,7 @@
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
       <tr>
-        {% if admin.adminperm %}
+        {% if admin.admingroup %}
         <td><a style="text-decoration: none">{{ form.display_name }}</a></td>
         {% else %}
         <td><a style="text-decoration: none">{{ name_list.values.get.display_name }}</a></td>
@@ -33,7 +26,7 @@
         <td><a style="text-decoration: none">{{ name_list.values.get.gantry_id }}</a></td>
       </tr>
   </table>
-  {% if admin.adminperm %}
+  {% if admin.admingroup %}
   <input type="submit" value="Update" />
   {% endif %}
   </form>
