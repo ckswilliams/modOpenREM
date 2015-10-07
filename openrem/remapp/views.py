@@ -1385,7 +1385,11 @@ def charts_off(request):
     # Switch chart plotting off
     userProfile.plotCharts = False
     userProfile.save()
-    messages.info(request, "Chart plotting has been turned off for {0}".format(request.user.get_full_name()))
+    if request.user.get_full_name():
+        name = request.user.get_full_name()
+    else:
+        name = request.user.get_username()
+    messages.success(request, "Chart plotting has been turned off for {0}".format(name))
     # Go to the OpenREM home page
     response = openrem_home(request)
 

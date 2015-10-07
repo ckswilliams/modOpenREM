@@ -138,11 +138,9 @@
       {% block messages %}
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    {% if message.level == 40 %}
-                        <strong>Warning!</strong>
-                    {% endif %}
+                <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 30 %}warning{% elif message.level == 25 %}success{% elif message.level == 20 %}info{% endif %} alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {% if message.level == 40 %}<strong>Warning!</strong>{% endif %}
                     {{ message }}
                 </div>
             {% endfor %}
