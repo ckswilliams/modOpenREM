@@ -1584,8 +1584,8 @@ def dicom_summary(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     # Render list page with the documents and the form
     return render_to_response(
@@ -1609,8 +1609,8 @@ class DicomStoreCreate(CreateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1625,8 +1625,8 @@ class DicomStoreUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1642,8 +1642,8 @@ class DicomStoreDelete(DeleteView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1659,8 +1659,8 @@ class DicomQRCreate(CreateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1676,8 +1676,8 @@ class DicomQRUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1693,8 +1693,8 @@ class DicomQRDelete(DeleteView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
@@ -1711,8 +1711,8 @@ def dicom_ajax(request):
         vers = ''
     admin = {'openremversion' : vers}
 
-    if request.user.groups.filter(name="admingroup"):
-        admin['adminperm'] = True
+    for group in request.user.groups.all():
+        admin[group.name] = True
 
     # Render list page with the documents and the form
     return render_to_response(
@@ -1734,15 +1734,17 @@ class PatientIDSettingsUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
 
 
 from remapp.models import DicomDeleteSettings
 from remapp.forms import DicomDeleteSettingsForm
-class DicomStoreSettingsUpdate(UpdateView):
+
+
+class DicomDeleteSettingsUpdate(UpdateView):
     model = DicomDeleteSettings
     form_class = DicomDeleteSettingsForm
 
@@ -1753,7 +1755,7 @@ class DicomStoreSettingsUpdate(UpdateView):
         except:
             vers = ''
         admin = {'openremversion': vers}
-        if self.request.user.groups.filter(name="admingroup"):
-            admin["adminperm"] = True
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
         context['admin'] = admin
         return context
