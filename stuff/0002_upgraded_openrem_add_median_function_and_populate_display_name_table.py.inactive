@@ -22,6 +22,7 @@ def populate_unique_equipment_names(self, orm):
 
     from remapp.models import UniqueEquipmentNames
     from remapp.models import GeneralEquipmentModuleAttr
+    from remapp.tools.hash_id import hash_id
 
     for each_combination in unique_combinations:
 
@@ -35,14 +36,23 @@ def populate_unique_equipment_names(self, orm):
             display_name_text = "Blank"
 
         new_combination = UniqueEquipmentNames(manufacturer=each_combination[0],
+                                               manufacturer_hash=hash_id(each_combination[0]),
                                                institution_name=each_combination[1],
+                                               institution_name_hash=hash_id(each_combination[1]),
                                                station_name=each_combination[2],
+                                               station_name_hash=hash_id(each_combination[2]),
                                                institutional_department_name=each_combination[3],
+                                               institutional_departement_name_hash=hash_id(each_combination[3]),
                                                manufacturer_model_name=each_combination[4],
+                                               manufacturer_model_name_hash=hash_id(each_combination[4]),
                                                device_serial_number=each_combination[5],
+                                               device_serial_number_hash=hash_id(each_combination[5]),
                                                software_versions=each_combination[6],
+                                               software_versions_hash=hash_id(each_combination[6]),
                                                gantry_id=each_combination[7],
-                                               display_name=display_name_text
+                                               gantry_id_hash=hash_id(each_combination[7]),
+                                               display_name=display_name_text,
+                                               hash_generated=True
                                                )
         new_combination.save()
 
