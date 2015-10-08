@@ -77,7 +77,7 @@ $(function () {
             }
         },
         series: [{
-            name: 'Median DAP',
+            name: 'Median DAP per acquisition protocol',
             data: []
         }],
         drilldown: {

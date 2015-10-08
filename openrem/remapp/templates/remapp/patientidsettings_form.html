@@ -1,0 +1,73 @@
+{% extends "remapp/base.html" %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block mainblock %}
+
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <h3>Modify Patient ID storage settings</h3>
+        {% if admin.admingroup %}
+            <form action="" method="post">
+                <table class="table">
+                    {% csrf_token %}
+                    <tr>
+                        <th></th>
+                        <th><h4>Store the data?</h4></th>
+                        <th><h4>If stored, encrypt?</h4></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form.name_stored.errors }}
+                            <label for="{{ form.name_stored.id_for_label }}">Patient name</label>
+                        </td>
+                        <td>
+                            {{ form.name_stored }}
+                        </td>
+                        <td>
+                            {{ form.name_hashed.errors }}
+                            {{ form.name_hashed }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form.id_stored.errors }}
+                            <label for="{{ form.id_stored.id_for_label }}">Patient ID</label>
+                        </td>
+                        <td>
+                            {{ form.id_stored }}
+                        </td>
+                        <td>
+                            {{ form.id_hashed.errors }}
+                            {{ form.id_hashed }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ form.dob_stored.errors }}
+                            <label for="{{ form.dob_stored.id_for_label }}">Patient date of birth</label>
+                        </td>
+                        <td>
+                            {{ form.dob_stored }}
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <label for="{{ form.accession_hashed.id_for_label }}">Accession number</label>
+                        </td>
+                        <td>
+                            {{ form.accession_hashed.errors }}
+                            {{ form.accession_hashed }}
+                        </td>
+                    </tr>
+                </table>
+            <input type="submit" value="Submit" /> </form>
+        {% else %}
+            <p>Only users in the Admin group can modify these settings.</p>
+        {% endif %}
+      </div>
+    </div>
+
+{% endblock %}	

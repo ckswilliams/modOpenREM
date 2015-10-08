@@ -1,11 +1,6 @@
 {% extends "remapp/base.html" %}
 
-{% block navbar %}
-            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-            {% if request.user.userprofile.displayRF %}<li class="active"><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block navrf %}<li class="active">{% endblock %}
 
 {% block mainblock %}
     <div class="row">
@@ -13,7 +8,14 @@
             <h1>Detail list of events</h1>
 
             <ul>
-                <li>Accession number: {{ generalstudymoduleattr.accession_number }}</li>
+                <li>
+                    Accession number:
+                    {% if not generalstudymoduleattr.accession_hashed %}
+                        {{ generalstudymoduleattr.accession_number }}
+                    {% else %}
+                        <i>hidden</i>
+                    {% endif %}
+                </li>
                 <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
                 <li>Study time: {{ generalstudymoduleattr.study_time }}</li>
                 <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
@@ -48,7 +50,8 @@
                 OpenREM will display the exposure incidence map and peak skin dose values integrated into this page.
             </p>
             <h4>
-                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>
+                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>. <small>(Not
+                available if you don't have export permissions.)</small>
             </h4>
         </div>
   </div>

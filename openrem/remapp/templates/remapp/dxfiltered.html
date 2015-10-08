@@ -1,11 +1,6 @@
 {% extends "remapp/filteredbase.html" %}
 
-{% block navbar %}
-  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-  {% if request.user.userprofile.displayDX %}<li class="active"><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block navdx %}<li class="active">{% endblock %}
 
 {% block toprow %}
   {% load pagination_tags %}
@@ -14,20 +9,50 @@
     There are {{ filter.count }} studies in this list.
   </p>
 
-  {% if admin.exportperm or admin.adminperm %}
-    <ul>
-      <li><a href="/openrem/exportdxcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
-      <li><a href="/openrem/exportdxxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
-    </ul>
-  {% else %}
-    <p>
-      Sorry, you don't have enough permissions to enable study export.
-    </p>
-  {% endif %}
-
 {% endblock %}
 
 {% block col2 %}
+  <div class="panel panel-info">
+  <div class="panel-heading">
+      <h3 class="panel-title">Data export</h3>
+  </div>
+  <div class="panel-body">
+    {% if admin.exportgroup %}
+        <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
+    <p>
+      <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
+          {% if admin.pidgroup %}
+              <a href="/openrem/exportdxcsv1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportdxcsv1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportdxcsv1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+    <p>
+          <a href="/openrem/exportdxxlsx1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to XLSX</a>
+          {% if admin.pidgroup %}
+              <a href="/openrem/exportdxxlsx1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportdxxlsx1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportdxxlsx1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+
+  {% else %}
+    <p>
+      No export permissions
+    </p>
+  {% endif %}
+
+
+  </div>
+  </div>
 
 
   {{ studyfilter }}
@@ -84,8 +109,8 @@
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
-      {% if admin.adminperm %}
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+      {% if admin.admingroup %}
         <th>Delete?</th>
       {% endif %}
     </row>
@@ -110,8 +135,10 @@
         </td>
         <td>
           <a href="/openrem/dx/{{ exam.id }}/">
-            {{ exam.procedure_code_meaning }} |
-            {{ exam.accession_number }}
+            {{ exam.study_description }} |
+              {% if not exam.accession_hashed %}
+                {{ exam.accession_number }}
+              {% endif %}
           </a>
         </td>
         <td>
@@ -124,7 +151,7 @@
             {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}
           </a>
         </td>
-        {% if admin.adminperm %}
+        {% if admin.admingroup %}
           <td>
             <a href="{% url 'study_delete' exam.id %}">Delete</a>
           </td>
@@ -382,6 +409,58 @@
       <!-- End of HTML to include div container for studies per week day pie chart -->
     {% endif %}
 
+    {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
+      <!-- HTML to include div container for mean acquisition protocol kVp over time -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Line plot showing mean kVp of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median kVp of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
+              </a>
+            </h4>
+          </div>
+          <div id="collapseAcquisitionMeankVpOverTime" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="AcquisitionMeankVpOverTimeDIV" style="height: auto; margin: 0 0"></div>
+              <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for mean acquisition protocol kVp over time -->
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
+      <!-- HTML to include div container for mean acquisition protocol mAs over time -->
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Line plot showing mean mAs of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% else %}
+                Line plot showing median mAs of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
+                {% endif %}
+              </a>
+            </h4>
+          </div>
+          <div id="collapseAcquisitionMeanmAsOverTime" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="AcquisitionMeanmAsOverTimeDIV" style="height: auto; margin: 0 0"></div>
+              <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for mean acquisition protocol mAs over time -->
+    {% endif %}
+
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
       <div class="panel-group" id="accordion">
@@ -449,6 +528,14 @@
     <script>var plotDXAcquisitionMeanDAPOverTime = true;</script>
     {% endif %}
 
+    {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
+    <script>var plotDXAcquisitionMeankVpOverTime = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
+    <script>var plotDXAcquisitionMeanmAsOverTime = true;</script>
+    {% endif %}
+
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
     <script>var plotDXAcquisitionMeankVp = true;</script>
     {% endif %}
@@ -481,10 +568,10 @@
       {% endif %}
 
 
-    {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
+    {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeankVpOverTime or request.user.userprofile.plotDXAcquisitionMeanmAsOverTime or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime%}
       <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
       <script>
-        var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+        var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
       </script>
     {% endif %}
 
@@ -532,6 +619,28 @@
       <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
       <script src="{{ STATIC_URL }}js/dxChartStudyWorkload.js"></script>
       <!-- End of JavaScript for studies per week day pie chart -->
+    {% endif %}
+
+
+    {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
+      <!-- JavaScript for mean kvp per acquisition protocol per time period -->
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeankVpperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMediankVpperAcquisitionOverTime.js"></script>
+      {% endif %}
+      <!-- End of JavaScript for mean kVp per acquisition protocol per time period -->
+    {% endif %}
+
+
+    {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
+      <!-- JavaScript for mean mAs per acquisition protocol per time period -->
+      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+      <script src="{{ STATIC_URL }}js/dxChartMeanmAsperAcquisitionOverTime.js"></script>
+      {% else %}
+      <script src="{{ STATIC_URL }}js/dxChartMedianmAsperAcquisitionOverTime.js"></script>
+      {% endif %}
+      <!-- End of JavaScript for mean mAs per acquisition protocol per time period -->
     {% endif %}
 
 

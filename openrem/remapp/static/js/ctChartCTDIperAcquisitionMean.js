@@ -78,7 +78,7 @@ $(function () {
         },
         series: [{
             useHTML: true,
-            name: 'Mean CTDI<sub>vol</sub>',
+            name: 'Mean CTDI<sub>vol</sub> per acquisition protocol',
             data: []
         }],
         drilldown: {

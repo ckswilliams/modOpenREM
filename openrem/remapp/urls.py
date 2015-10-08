@@ -35,44 +35,33 @@ from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate
 
 
 urlpatterns = patterns('remapp.views',
 
     url(r'^$',
-        'openrem_home'),
+        'openrem_home', name='home'),
 
     url(r'^rf/$',
         'rf_summary_list_filter'),
-    url(r'^rf/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/rfdetail.html'))),
+    url(r'^rf/(?P<pk>\d+)/$', 'rf_detail_view', name='rf_detail_view'),
 
     url(r'^ct/$',
         'ct_summary_list_filter'),
     url(r'^ct/chart/$',
         'ct_summary_chart_data', name='ct_summary_chart_data'),
-    url(r'^ct/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/ctdetail.html'))),
+    url(r'^ct/(?P<pk>\d+)/$', 'ct_detail_view', name='ct_detail_view'),
 
     url(r'^dx/$',
         'dx_summary_list_filter', name='dx_summary'),
     url(r'^dx/chart/$',
         'dx_summary_chart_data', name='dx_summary_chart_data'),
-    url(r'^dx/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/dxdetail.html'))),
+    url(r'^dx/(?P<pk>\d+)/$', 'dx_detail_view', name='dx_detail_view'),
 
     url(r'^mg/$',
         'mg_summary_list_filter'),
-    url(r'^mg/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/mgdetail.html'))),
+    url(r'^mg/(?P<pk>\d+)/$', 'mg_detail_view', name='mg_detail_view'),
 
     url(r'^viewdisplaynames/$',
         'display_names_view'),
@@ -93,20 +82,22 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/dicomqr/add/$', DicomQRCreate.as_view(), name='dicomqr_add'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/$', DicomQRUpdate.as_view(), name='dicomqr_update'),
     url(r'^admin/dicomqr/(?P<pk>\d+)/delete/$', DicomQRDelete.as_view(), name='dicomqr_delete'),
+    url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
+    url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomDeleteSettingsUpdate.as_view(), name='dicom_delete_settings_update'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^export/$', 'export'),
-    url(r'^exportctcsv1/$', 'ctcsv1'),
-    url(r'^exportctxlsx1/$', 'ctxlsx1'),
-    url(r'^exportdxcsv1/$', 'dxcsv1'),
-    url(r'^exportdxxlsx1/$', 'dxxlsx1'),
-    url(r'^exportflcsv1/$', 'flcsv1'),
-    url(r'^exportrfxlsx1/$', 'rfxlsx1'),
+    url(r'^exportctcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'ctcsv1'),
+    url(r'^exportctxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'ctxlsx1'),
+    url(r'^exportdxcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'dxcsv1'),
+    url(r'^exportdxxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'dxxlsx1'),
+    url(r'^exportflcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'flcsv1'),
+    url(r'^exportrfxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'rfxlsx1'),
     url(r'^exportrfopenskin/(?P<pk>\d+)$', 'rfopenskin'),
-    url(r'^exportmgcsv1/$', 'mgcsv1'),
+    url(r'^exportmgcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'mgcsv1'),
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
-    url(r'^download/(?P<file_name>.+)$', 'download'),
+    url(r'^download/(?P<task_id>[a-f0-9-]{36})$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
     url(r'^export/abort/(?P<pk>\d+)$', 'export_abort'),
 )

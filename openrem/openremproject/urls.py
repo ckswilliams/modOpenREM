@@ -5,6 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^', include('remapp.urls')),
     url(r'^openrem/', include('remapp.urls')),
     url(r'^admin/', include(admin.site.urls)),
     # Login / logout.

@@ -242,8 +242,9 @@ def _projectionxrayradiationdose(dataset,g):
 
 def _generalequipmentmoduleattributes(dataset,study):
     from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
-    from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
+    from remapp.tools.get_values import get_value_kw
+    from remapp.tools.hash_id import hash_id
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
@@ -259,13 +260,22 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration",dataset)
 
     equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
+                                                                             manufacturer_hash=hash_id(equip.manufacturer),
                                                                              institution_name=equip.institution_name,
+                                                                             institution_name_hash = hash_id(equip.institution_name),
                                                                              station_name=equip.station_name,
+                                                                             station_name_hash=hash_id(equip.station_name),
                                                                              institutional_department_name=equip.institutional_department_name,
+                                                                             institutional_department_name_hash=hash_id(equip.institutional_department_name),
                                                                              manufacturer_model_name=equip.manufacturer_model_name,
+                                                                             manufacturer_model_name_hash=hash_id(equip.manufacturer_model_name),
                                                                              device_serial_number=equip.device_serial_number,
+                                                                             device_serial_number_hash=hash_id(equip.device_serial_number),
                                                                              software_versions=equip.software_versions,
-                                                                             gantry_id=equip.gantry_id
+                                                                             software_versions_hash=hash_id(equip.software_versions),
+                                                                             gantry_id=equip.gantry_id,
+                                                                             gantry_id_hash=hash_id(equip.gantry_id),
+                                                                             hash_generated=True
                                                                              )
     if created:
         if equip.institution_name and equip.station_name:
@@ -292,7 +302,10 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
 
 
 def _patientmoduleattributes(dataset,g): # C.7.1.1
+    from decimal import Decimal
+    import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
+    from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date
     from remapp.tools.not_patient_indicators import get_not_pt
@@ -300,7 +313,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from decimal import Decimal
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex',dataset)
-    patient_birth_date = get_date('PatientBirthDate',dataset) # Not saved to database
+    patient_birth_date = get_date('PatientBirthDate',dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
@@ -315,14 +328,32 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
+
+    patient_id_settings = PatientIDSettings.objects.get()
+    if patient_id_settings.name_stored:
+        name = get_value_kw("PatientName", dataset)
+        if name and patient_id_settings.name_hashed:
+            name = hashlib.sha256(name).hexdigest()
+            pat.name_hashed = True
+        pat.patient_name = name
+    if patient_id_settings.id_stored:
+        patid = get_value_kw("PatientID", dataset)
+        if patid and patient_id_settings.id_hashed:
+            patid = hashlib.sha256(patid).hexdigest()
+            pat.id_hashed = True
+        pat.patient_id = patid
+    if patient_id_settings.dob_stored and patient_birth_date:
+        pat.patient_birth_date = patient_birth_date
     pat.save()
 
 
-
-def _generalstudymoduleattributes(dataset,g):
+def _generalstudymoduleattributes(dataset, g):
+    from datetime import datetime
+    from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
     from remapp.tools.dcmdatetime import get_date, get_time
-    from datetime import datetime
+    from remapp.tools.hash_id import hash_id
+
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
     logging.debug("Populating mammo study %s", g.study_instance_uid)
     g.study_date = get_date('StudyDate',dataset)
@@ -331,7 +362,12 @@ def _generalstudymoduleattributes(dataset,g):
     g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
     g.study_id = get_value_kw('StudyID',dataset)
-    g.accession_number = get_value_kw('AccessionNumber',dataset)
+    accession_number = get_value_kw('AccessionNumber',dataset)
+    patient_id_settings = PatientIDSettings.objects.get()
+    if accession_number and patient_id_settings.accession_hashed:
+        accession_number = hash_id(accession_number)
+        g.accession_hashed = True
+    g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription',dataset)
     g.modality_type = get_value_kw('Modality',dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
@@ -495,10 +531,13 @@ def mam(mg_file):
 
     import os
     import dicom
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.models import DicomDeleteSettings
     try:
-        from openremproject.settings import RM_DCM_MG
-    except ImportError:
-        RM_DCM_MG = False
+        del_settings = DicomDeleteSettings.objects.get()
+        del_mg_im = del_settings.del_mg_im
+    except ObjectDoesNotExist:
+        del_mg_im = False
 
 
     dataset = dicom.read_file(mg_file)
@@ -511,7 +550,7 @@ def mam(mg_file):
 
     _mammo2db(dataset)
 
-    if RM_DCM_MG:
+    if del_mg_im:
         logging.debug("Mammo %s processing complete, deleting file", mg_file)
         os.remove(mg_file)
     else:

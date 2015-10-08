@@ -1,25 +1,19 @@
 {% extends "remapp/base.html" %}
 
-
-{% block navbar %}
-  {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-  {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block confnav %}<li class="dropdown active">{% endblock %}
 
 
 {% block toprow %}
   {% load pagination_tags %}
   <p>
     There are {{ name_list.count }} entries in this table.
-    {% if admin.adminperm %} Click on a row to edit the display name.{% endif %}
+    {% if admin.admingroup %} Click on a row to edit the display name.{% endif %}
   </p>
 {% endblock %}
 
 
 {% block mainblock %}
-  {% if admin.adminperm %}
+  {% if admin.admingroup %}
   <script>
   jQuery(document).ready(function($) {
     $(".clickable-row").click(function() {

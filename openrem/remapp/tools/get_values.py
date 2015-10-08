@@ -39,9 +39,11 @@ def get_value_kw(tag,dataset):
     :returns:           str. -- value
     """
     if (tag in dataset):
-        value = getattr(dataset,tag)
-        if value != '': 
-            return value
+        val = getattr(dataset,tag)
+        if val != '':
+            if type(val) is str:
+                val = val.decode('latin-1', 'replace')
+            return val
 
 def get_value_num(tag,dataset):
     """Get DICOM value by tag group and element number.
@@ -56,7 +58,11 @@ def get_value_num(tag,dataset):
     :returns:           str. -- value
     """
     if (tag in dataset):
-        return dataset[tag].value
+        val = dataset[tag].value
+        if val != '':
+            if type(val) is str:
+                val = val.decode('latin-1', 'replace')
+            return val
 
 def get_seq_code_value(sequence,dataset):
     """From a DICOM sequence, get the code value.
@@ -69,7 +75,7 @@ def get_seq_code_value(sequence,dataset):
     """
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
-        if hasattr(seq[0],'CodeValue'):  
+        if seq and hasattr(seq[0],'CodeValue'):
             return seq[0].CodeValue
 			
 def get_seq_code_meaning(sequence,dataset):
@@ -83,7 +89,7 @@ def get_seq_code_meaning(sequence,dataset):
     """
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
-        if hasattr(seq[0],'CodeMeaning'): 
+        if seq and hasattr(seq[0],'CodeMeaning'):
             return seq[0].CodeMeaning
 
 def get_or_create_cid(codevalue, codemeaning):
@@ -109,3 +115,18 @@ def get_or_create_cid(codevalue, codemeaning):
             logging.warning("Duplicate entry in the ContextID table: %s/%s, import continuing",
                             codevalue, codemeaning)
         return code[0]
+
+def return_for_export(model, field):
+    """
+    Prevent errors due to missing data in models
+    :param val: database field
+    :return: value or None
+    """
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        val = getattr(model, field)
+        if val:
+            val = unicode(val)
+        return val
+    except ObjectDoesNotExist:
+        return None

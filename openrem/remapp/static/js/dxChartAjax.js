@@ -118,17 +118,21 @@ $(document).ready(function() {
 
             //-------------------------------------------------------------------------------------
             // kVp chart data start
-            if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
+            if( typeof plotDXAcquisitionMeankVp !== 'undefined' || typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
+
                 var acq_kVp_summary = $.map(json.acquisitionkVpSummary, function (el) {
                     return el;
                 });
-
-                var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
 
                 var protocolkVpNames = [];
                 for (i = 0; i < acq_kVp_summary.length; i++) {
                     protocolkVpNames.push(acq_kVp_summary[i].acquisition_protocol);
                 }
+            }
+
+            if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
+                var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
+
 
                 var protocolkVpCounts = [];
                 var protocolkVpBins = [];
@@ -196,17 +200,20 @@ $(document).ready(function() {
             
             //-------------------------------------------------------------------------------------
             // mAs chart data start
-            if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
+            if( typeof plotDXAcquisitionMeanmAs !== 'undefined' || typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
+
                 var acq_mAs_summary = $.map(json.acquisitionmAsSummary, function (el) {
                     return el;
                 });
-
-                var acq_histogram_mAs_data = json.acquisitionHistogrammAsData;
 
                 var protocolmAsNames = [];
                 for (i = 0; i < acq_mAs_summary.length; i++) {
                     protocolmAsNames.push(acq_mAs_summary[i].acquisition_protocol);
                 }
+            }
+
+            if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
+                var acq_histogram_mAs_data = json.acquisitionHistogrammAsData;
 
                 var protocolmAsCounts = [];
                 var protocolmAsBins = [];
@@ -279,10 +286,10 @@ $(document).ready(function() {
                 var protocolPiechartData = new Array(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
                     if(typeof plotDXAcquisitionFreq !== 'undefined') {
-                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStart + protocolNames[i]};
+                        protocolPiechartData[i] = {name: protocolNames[i], y: parseInt(acq_summary[i].num_acq), url: urlStartAcq + protocolNames[i]};
                     }
                     else {
-                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStart+protocolNames[i]};
+                        protocolPiechartData[i] = {name:protocolNames[i], y:parseInt(i), url:urlStartAcq+protocolNames[i]};
                     }
                 }
 
@@ -359,18 +366,151 @@ $(document).ready(function() {
 
 
             //-------------------------------------------------------------------------------------
+            // Sort out colours for the ...OverTime plots
+            if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined' || typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
+
+                if(typeof protocolNames !== 'undefined') {
+                    var protocolLineColours =  new Array(protocolNames.length);
+                    protocolPiechartData.sort(sort_by_name);
+                    for(i=0; i<protocolNames.length; i++) {
+                        protocolLineColours[i] = protocolPiechartData[i].color;
+                    }
+                    protocolPiechartData.sort(sort_by_y);
+                }
+
+                if(typeof protocolkVpNames !== 'undefined' && typeof protocolNames !== 'undefined') {
+                    var protocolkVpLineColours =  protocolLineColours
+                }
+
+                if(typeof protocolmAsNames !== 'undefined' && typeof protocolNames !== 'undefined') {
+                    var protocolmAsLineColours =  protocolLineColours
+                }
+
+                if(typeof protocolkVpNames !== 'undefined' && typeof protocolNames == 'undefined') {
+                    if(typeof protocolPiechartData !== 'undefined') {
+                        var protocolkVpLineColours =  new Array(protocolkVpNames.length);
+                        protocolPiechartData.sort(sort_by_name);
+                        for (i = 0; i < protocolkVpNames.length; i++) {
+                            protocolkVpLineColours[i] = protocolPiechartData[i].color;
+                        }
+                        protocolPiechartData.sort(sort_by_y);
+                    }
+                    else {
+                        var protocolkVpLineColours =  getColours(protocolkVpNames.length);
+                    }
+                }
+
+                if(typeof protocolmAsNames !== 'undefined' && typeof protocolNames == 'undefined') {
+                    if(typeof protocolkVpLineColours !== 'undefined') {
+                        var protocolmAsLineColours = protocolkVpLineColours;
+                    }
+                    else if(typeof protocolPiechartData !== 'undefined') {
+                        var protocolmAsLineColours =  new Array(protocolmAsNames.length);
+                        protocolPiechartData.sort(sort_by_name);
+                        for (i = 0; i < protocolmAsNames.length; i++) {
+                            protocolmAsNames[i] = protocolPiechartData[i].color;
+                        }
+                        protocolPiechartData.sort(sort_by_y);
+                    }
+                    else {
+                        var protocolmAsLineColours =  getColours(protocolmAsNames.length);
+                    }
+
+                }
+            }
+            // End of sorting out colours for the ...OverTime plots
+            //-------------------------------------------------------------------------------------
+
+
+            // kVp over time chart data start
+            // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average kVp values
+            if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
+                var kVpOverTime, acq_kvp_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
+                var chartDXAcquisitionMeankVpOverTime = $('#AcquisitionMeankVpOverTimeDIV').highcharts();
+
+                acq_kvp_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeankVpoverTime : json.acquisitionMediankVpoverTime;
+
+                dateAxis = [];
+                for(i=0; i<acq_kvp_over_time[0].length; i++) {
+                    tempDate = new Date(Date.parse(acq_kvp_over_time[0][i][0]));
+                    tempDate = formatDate(tempDate);
+                    dateAxis.push(tempDate);
+                }
+
+                kVpOverTime = [];
+                for(i=0; i<acq_kvp_over_time.length; i++) {
+                    temp = [];
+                    for(j=0; j<acq_kvp_over_time[0].length; j++) {
+                        tempDate = new Date(Date.parse(acq_kvp_over_time[i][j][0]));
+                        date_after = formatDate(tempDate);
+                        date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+
+                        currentValue = parseFloat(acq_kvp_over_time[i][j][1]);
+                        if(currentValue == 0) currentValue = null;
+
+                        temp.push({y:currentValue, url: urlStartAcq+protocolkVpNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                    }
+                    kVpOverTime.push({name: protocolkVpNames[i], color: protocolkVpLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                }
+
+                chartDXAcquisitionMeankVpOverTime.xAxis[0].setCategories(dateAxis);
+                for(i=0; i<kVpOverTime.length; i++) {
+                    chartDXAcquisitionMeankVpOverTime.addSeries(kVpOverTime[i]);
+                }
+                chartDXAcquisitionMeankVpOverTime.redraw({duration: 1000});
+            }
+            // kVp over time chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // mAs over time chart data start
+            // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average mAs values
+            if(typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
+                var mAsOverTime, acq_mas_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
+                var chartDXAcquisitionMeanmAsOverTime = $('#AcquisitionMeanmAsOverTimeDIV').highcharts();
+
+                acq_mas_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeanmAsoverTime : json.acquisitionMedianmAsoverTime;
+
+                dateAxis = [];
+                for(i=0; i<acq_mas_over_time[0].length; i++) {
+                    tempDate = new Date(Date.parse(acq_mas_over_time[0][i][0]));
+                    tempDate = formatDate(tempDate);
+                    dateAxis.push(tempDate);
+                }
+
+                mAsOverTime = [];
+                for(i=0; i<acq_mas_over_time.length; i++) {
+                    temp = [];
+                    for(j=0; j<acq_mas_over_time[0].length; j++) {
+                        tempDate = new Date(Date.parse(acq_mas_over_time[i][j][0]));
+                        date_after = formatDate(tempDate);
+                        date_before = formatDate(new Date((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).setDate((new Date ((tempDate).setMonth((tempDate).getMonth()+1))).getDate()-1)));
+
+                        currentValue = parseFloat(acq_mas_over_time[i][j][1]);
+                        if(currentValue == 0) currentValue = null;
+
+                        temp.push({y:currentValue, url: urlStartAcq+protocolmAsNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                    }
+                    mAsOverTime.push({name: protocolmAsNames[i], color: protocolmAsLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                }
+
+                chartDXAcquisitionMeanmAsOverTime.xAxis[0].setCategories(dateAxis);
+                for(i=0; i<mAsOverTime.length; i++) {
+                    chartDXAcquisitionMeanmAsOverTime.addSeries(mAsOverTime[i]);
+                }
+                chartDXAcquisitionMeanmAsOverTime.redraw({duration: 1000});
+            }
+            // mAs over time chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
             // DAP over time chart data start
             // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average DAP values
             if(typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
                 var DAPOverTime, acq_dap_over_time, dateAxis, currentValue, tempDate, date_after, date_before;
                 var chartDXAcquisitionMeanDAPOverTime = $('#AcquisitionMeanDAPOverTimeDIV').highcharts();
-
-                var protocolLineColours =  new Array(protocolNames.length);
-                protocolPiechartData.sort(sort_by_name);
-                for(i=0; i<protocolNames.length; i++) {
-                    protocolLineColours[i] = protocolPiechartData[i].color;
-                }
-                protocolPiechartData.sort(sort_by_y);
 
                 acq_dap_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeanDAPoverTime : json.acquisitionMedianDAPoverTime;
 
@@ -392,7 +532,7 @@ $(document).ready(function() {
                         currentValue = parseFloat(acq_dap_over_time[i][j][1]);
                         if(currentValue == 0) currentValue = null;
 
-                        temp.push({y:currentValue, url: urlStart+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        temp.push({y:currentValue, url: urlStartAcq+protocolNames[i]+'&date_after='+date_after+'&date_before='+date_before});
                     }
                     DAPOverTime.push({name: protocolNames[i], color: protocolLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
                 }

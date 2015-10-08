@@ -38,6 +38,7 @@ $(function () {
         },
         series: [{
             type: 'pie',
+            name: 'Studies per weekday',
             startAngle:-90,
             endAngle:90,
             center: ['50%','75%'],

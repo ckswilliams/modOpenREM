@@ -13,6 +13,7 @@ import os
 import sys
 import errno
 import logging
+import django
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -20,6 +21,7 @@ projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
 if projectpath not in sys.path:
     sys.path.insert(1,projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
 
 try:
     import netdicom
@@ -28,7 +30,8 @@ try:
         sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
-from netdicom import AE, StorageSOPClass, VerificationSOPClass
+from netdicom import AE
+from netdicom.SOPclass import StorageSOPClass, VerificationSOPClass
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from dicom.dataset import Dataset, FileDataset
 import tempfile
@@ -67,16 +70,18 @@ def OnReceiveStore(SOPClass, DS):
     from remapp.extractors.mam import mam
     from remapp.extractors.rdsr import rdsr
     from remapp.extractors.ct_philips import ct_philips
+    from remapp.models import DicomDeleteSettings
     from openremproject.settings import MEDIA_ROOT
-    from openremproject.settings import RM_DCM_NOMATCH
 
     logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
                  DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
 
+    del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
-    file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.9.5224.1.0.6.0.1"  # Using Medical Connections allocated UID
+    file_meta.ImplementationClassUID = "1.3.6.1.4.1.45593.1.0.7.0.6"
+    file_meta.ImplementationVersionName = "OpenREM_0.7.0b6"
     datestamp = datetime.datetime.now()
     path = os.path.join(
 #        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
@@ -116,7 +121,7 @@ def OnReceiveStore(SOPClass, DS):
     ):
         logging.info("Processing as Philips Dose Info series")
         ct_philips.delay(filename)
-    elif RM_DCM_NOMATCH:
+    elif del_settings.del_no_match:
         os.remove(filename)
         logging.info("Can't find anything to do with this file - it has been deleted")
 
@@ -137,6 +142,7 @@ def web_store(store_pk=None):
         aet = conf.aetitle
         port = conf.port
         conf.task_id = web_store.request.id
+        conf.run = True
         conf.save()
     except ObjectDoesNotExist:
         sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
@@ -172,6 +178,9 @@ def web_store(store_pk=None):
 #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
 
-
-if __name__ == "__main__":
-    web_store(store_pk=1)
+def _interrupt(store_pk=None):
+    from remapp.models import DicomStoreSCP
+    stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
+    stay_alive.run = False
+    stay_alive.status = "Store interrupted from the shell"
+    stay_alive.save()

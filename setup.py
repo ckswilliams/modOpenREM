@@ -18,11 +18,12 @@ requires = [
     'argparse >= 1.2.1',
     'django-qsstats-magic',
     'python-dateutil',
+    'django-solo'
     ]
 
 setup(
     name='OpenREM',
-    version='0.7.0b5',
+    version='0.7.0b6',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,
@@ -31,7 +32,8 @@ setup(
         'openrem/scripts/openrem_mg.py',
         'openrem/scripts/openrem_dx.py',
         'openrem/scripts/openrem_ctphilips.py',
-        'openrem/scripts/openrem_ptsizecsv.py'
+        'openrem/scripts/openrem_ptsizecsv.py',
+        'openrem/scripts/openrem_store.py'
     ],
     license='GPLv3 with additional permissions',  
 #    description='Radiation Exposure Monitoring for physicists',

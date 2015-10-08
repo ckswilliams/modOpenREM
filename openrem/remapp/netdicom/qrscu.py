@@ -52,7 +52,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     d2.Modality = ''
     d2.NumberOfSeriesRelatedInstances = ''
 
-#    print 'd2: {0}'.format(d2)
+    logging.debug('d2: {0}'.format(d2))
 
     assoc_series = my_ae.RequestAssociation(remote_ae)
 
@@ -60,14 +60,14 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
 
     query_id = uuid.uuid4()
 
-#    print 'In _query_series'
+    logging.debug('In _query_series')
     seRspNo = 0
 
     for series in st2:
         if not series[1]:
             continue
         seRspNo += 1
-#        print "Series Response {0}: {1}".format(seRspNo, series[1])
+        logging.debug("Series Response {0}: {1}".format(seRspNo, series[1]))
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
         seriesrsp.query_id = query_id
         # Mandatory tags
@@ -88,7 +88,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
-    # print 'done with status "%s"' % st
+    logging.debug('_query_study done with status "%s"' % st)
 
     # TODO: Replace the code below to deal with find failure
     # if not st:
@@ -99,13 +99,13 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     #     MyAE.Quit()
     #     return
 
-#    rspno = 0
+    rspno = 0
 
     for ss in st:
         if not ss[1]:
             continue
-#        rspno += 1
-#        print "Response {0}".format(rspno)
+        rspno += 1
+        logging.debug("Response {0}".format(rspno))
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
         # Unique key
@@ -162,9 +162,9 @@ def qrscu(
             ]
 
     all_mods = {'CT': {'inc': False, 'mods': ['CT']},
-           'MG': {'inc': False, 'mods': ['MG']},
-           'FL': {'inc': False, 'mods': ['RF','XA']},
-           'DX': {'inc': False, 'mods': ['DX','CR']}
+                'MG': {'inc': False, 'mods': ['MG']},
+                'FL': {'inc': False, 'mods': ['RF','XA']},
+                'DX': {'inc': False, 'mods': ['DX','CR']}
                 }
     # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
     # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
@@ -197,7 +197,7 @@ def qrscu(
     query.save()
 
     # create association with remote AE
-#    print "Request association with {0} {1} {2}".format(rh, rp, aec)
+    logging.debug("Request association with {0} {1} {2}".format(rh, rp, aec))
     assoc = MyAE.RequestAssociation(RemoteAE)
 
     if not assoc:
@@ -236,31 +236,31 @@ def qrscu(
         d.StudyDate = ''
 
     modality_matching = True
-    modalities_left = True
+    trip = 0
 
-    while modalities_left:
-        for selection, details in all_mods.iteritems():
-            if details['inc']:  # No need to check for modality_matching here as modalities_left would also be false
-                for mod in details['mods']:
-                    query.stage = 'Currently querying for {0} studies...'.format(mod)
-                    query.save()
-                    if modality_matching:
-                        d.ModalitiesInStudy = mod
-                        query_id = uuid.uuid4()
-                        _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-                        study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-                        for rsp in study_rsp:
-                            if mod not in rsp.get_modalities_in_study():
-                                modality_matching = False
-                                modalities_left = False
-                                break  # This indicates that there was no modality match, so we have everything already
-        if inc_sr and modality_matching:
-            query.stage = 'Currently querying for SR only studies'
-            query.save()
-            d.ModalitiesInStudy = 'SR'
-            query_id = uuid.uuid4()
-            _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-            # Nothing to gain by checking the response
+    for selection, details in all_mods.iteritems():
+        if details['inc']:  # No need to check for modality_matching here as modalities_left would also be false
+            for mod in details['mods']:
+                query.stage = 'Currently querying for {0} studies...'.format(mod)
+                query.save()
+                trip += 1
+                if modality_matching:
+                    d.ModalitiesInStudy = mod
+                    query_id = uuid.uuid4()
+                    _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
+                    study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+                    for rsp in study_rsp:
+                        if mod not in rsp.get_modalities_in_study():
+                            modality_matching = False
+                            break  # This indicates that there was no modality match, so we have everything already
+
+    if inc_sr and modality_matching:
+        query.stage = 'Currently querying for SR only studies'
+        query.save()
+        d.ModalitiesInStudy = 'SR'
+        query_id = uuid.uuid4()
+        _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
+        # Nothing to gain by checking the response
 
 
     # Now we have all our studies. Time to throw away any we don't want

@@ -1,0 +1,23 @@
+{% extends "remapp/base.html" %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block mainblock %}
+
+      <div class="row">
+      <div class="col-md-4 col-md-offset-4">
+        {% if admin.admingroup %}
+            <h2>Modify DICOM object deletion policy</h2>
+            {% load crispy_forms_tags %}
+            {% crispy form %}
+        {% else %}
+            <p>Only users in the Admin group can modify these settings.</p>
+        {% endif %}
+
+
+
+
+      </div>
+    </div>
+
+{% endblock %}	

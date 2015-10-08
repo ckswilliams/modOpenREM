@@ -14,9 +14,13 @@ from remapp.models import (GeneralStudyModuleAttr,
     CtRadiationDose, CtAccumulatedDoseData,
     CtIrradiationEventData, ScanningLength,
     CtDoseCheckDetails, CtXRaySourceParameters,
-    Exports, SizeUpload, UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR)
+    Exports, SizeUpload, UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR, DicomDeleteSettings)
 
 from django.contrib import admin
+from solo.admin import SingletonModelAdmin
+from remapp.models import PatientIDSettings
+
+admin.site.register(PatientIDSettings, SingletonModelAdmin)
 
 admin.site.register(GeneralStudyModuleAttr)
 admin.site.register(ProjectionXRayRadiationDose)
@@ -56,6 +60,7 @@ admin.site.register(SizeUpload)
 admin.site.register(UniqueEquipmentNames)
 admin.site.register(DicomStoreSCP)
 admin.site.register(DicomRemoteQR)
+admin.site.register(DicomDeleteSettings)
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -72,3 +77,4 @@ class UserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.site_url = "/openrem/"

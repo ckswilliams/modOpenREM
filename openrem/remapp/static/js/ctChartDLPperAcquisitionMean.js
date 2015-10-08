@@ -78,7 +78,7 @@ $(function () {
         },
         series: [{
             useHTML: true,
-            name: 'Mean DLP',
+            name: 'Mean DLP per acquisition protocol',
             data: []
         }],
         drilldown: {

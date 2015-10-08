@@ -28,7 +28,7 @@ var chartAcqFrequency = new Highcharts.Chart({
         },
         series: [{
             type: 'pie',
-            name: 'Study frequency',
+            name: 'Acquisition protocol frequency',
             point: {
                 events: {
                     click: function(e) {

@@ -22,7 +22,7 @@
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="{{ STATIC_URL }}js/html5shiv.js"></script>
+      <script src="{{ STATIC_URL }}js/html5shiv.min.js"></script>
       <script src="{{ STATIC_URL }}js/respond.min.js"></script>
     <![endif]-->
 
@@ -50,50 +50,71 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             {% block navbar %}
-            {% if request.user.userprofile.displayCT %}<li><a href="/openrem/ct">CT</a></li>{% endif %}
-            {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-            {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-            {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
+                {% if request.user.userprofile.displayCT %}
+                    {% block navct %}<li>{% endblock %}<a href="/openrem/ct">CT</a></li>
+                {% endif %}
+                {% if request.user.userprofile.displayRF %}
+                    {% block navrf %}<li>{% endblock %}<a href="/openrem/rf">Fluoroscopy</a></li>
+                {% endif %}
+                {% if request.user.userprofile.displayMG %}
+                    {% block navmg %}<li>{% endblock %}<a href="/openrem/mg">Mammography</a></li>
+                {% endif %}
+                {% if request.user.userprofile.displayDX %}
+                    {% block navdx %}<li>{% endblock %}<a href="/openrem/dx">Radiography</a></li>
+                {% endif %}
             {% endblock %}
           </ul>
           {% block loginlink %}
           <ul class="nav navbar-nav navbar-right">
-            {% if admin.exportperm or admin.adminperm %}
-            {% block exportnav %}
-            <li><a href="/openrem/export">Exports</a></li>
-            {% endblock %}
-            {% endif %}
-
             {% if user.is_authenticated %}
-            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">User options <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="/openrem/charts_off">Switch charts off</a></li>
-                <li><a href="/openrem/charts_off">Switch charts off</a></li>
-                <li><a href="/openrem/chartoptions">Chart options</a></li>
-                <li><a href="/openrem/viewdisplaynames">View display names</a></li>
-              </ul>
-            </li>
+                {% if admin.importsizegroup or admin.importqrgroup %}
+                    {% block importnav %}
+                    <li class="dropdown">
+                    {% endblock %}
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+                            Imports <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/openrem/admin/sizeupload">Import patient size info</a></li>
+                            <li><a href="/openrem/admin/sizeimports">Previous patient size imports</a></li>
+                            <li><a href="/openrem/admin/queryremote">Query remote server</a> </li>
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if admin.exportgroup %}
+                    {% block exportnav %}
+                    <li><a href="/openrem/export">Exports</a></li>
+                    {% endblock %}
+                {% endif %}
+
+                {% block confnav %}
+                <li class="dropdown">
+                {% endblock %}
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+                        Config <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li class="dropdown-header">User level config</li>
+                      <li><a href="/openrem/chartoptions">Chart options</a></li>
+                      <li><a href="/openrem/charts_off">Switch charts off</a></li>
+                      {% if not admin.admingroup %}
+                        <li><a href="/openrem/viewdisplaynames">View display names</a></li>
+                      {% endif %}
+                      {% if admin.admingroup %}
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">System level config</li>
+                        <li><a href="/admin/auth/user/">Manage users</a></li>
+                        <li><a href="/openrem/viewdisplaynames">View and edit display names</a></li>
+                        <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object delete settings</a> </li>
+                        <li><a href="/openrem/admin/dicomsummary">DICOM Network configuration</a></li>
+                        <li><a href="/admin/patientidsettings/1/">Patient ID settings</a> </li>
+                      {% endif %}
+                    </ul>
+                </li>
             {% endif %}
 
-            {% if admin.adminperm %}
-            {% block adminnav %}
-            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
-            {% endblock %}
-              <ul class="dropdown-menu">
-                <li><a href="/openrem/admin/sizeupload">Import patient size info</a></li>
-                <li><a href="/openrem/admin/sizeimports">Previous patient size imports</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/openrem/viewdisplaynames">View and edit display names</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/openrem/admin/dicomsummary">DICOM Network configuration</a></li>
-                <li><a href="/openrem/admin/queryremote">Query remote server</a> </li>
-                <li role="separator" class="divider"></li>
-                <li><a href="/admin/auth/user/">Manage users</a></li>
-              </ul>
-            </li>
-            {% endif %}
 
-            <p class="navbar-text navbar-right">
+            <p class="navbar-text">
               <span class="glyphicon glyphicon-user"></span>
               {% if user.is_authenticated %}
                Welcome {{ user.get_full_name }} -
@@ -114,6 +135,18 @@
         {% block toprow %}
         {% endblock %}
       </div>
+      {% block messages %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 30 %}warning{% elif message.level == 25 %}success{% elif message.level == 20 %}info{% endif %} alert-dismissible fade in">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {% if message.level == 40 %}<strong>Warning!</strong>{% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+      {% endblock %}
+
       {% block mainblock %}
       {% endblock %}
 

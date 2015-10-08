@@ -1,43 +1,14 @@
 {% extends "remapp/base.html" %}
 
+{% block confnav %}<li class="dropdown active">{% endblock %}
 
-
-{% block navbar %}
-            <li><a href="/openrem/ct">CT</a></li>
-            <li><a href="/openrem/rf">Fluoroscopy</a></li>
-            <li><a href="/openrem/mg">Mammography</a></li>
-            <li><a href="/openrem/dx">Radiography</a></li>
-{% endblock %}
-
-{% block adminnav %}
-    <li class="dropdown active">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <i class="fa fa-blank fa-fw"></i>Admin <b class="caret"></b>
-        </a>
-{% endblock %}
-
-
-
-{% block mainblock %}		
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{% if message.level == 40 %}danger{% elif message.level == 25 %}success{% endif %} fade in">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                {% if message.level == 40 %}
-                    <strong>Warning!</strong>
-                {% endif %}
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
+{% block mainblock %}
 
       <div class="row col-md-offset-2">
         <h1>DICOM Network configuration</h1>
       </div>
 
-    {% if admin.adminperm %}
+    {% if admin.admingroup %}
       <div class="row">
       <div class="col-md-8 col-md-offset-2">
           <div class="panel panel-info">

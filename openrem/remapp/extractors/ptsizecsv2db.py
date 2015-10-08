@@ -28,6 +28,8 @@
 
 """
 
+
+
 def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
 
     imp_log = None
@@ -197,6 +199,7 @@ def csv2db(*args, **kwargs):
 
     import os, sys, csv
     import argparse
+    import django
     import openrem_settings
 
     
@@ -212,6 +215,7 @@ def csv2db(*args, **kwargs):
     
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
     openrem_settings.add_project_to_path()
+    django.setup()
 
     f = open(args.csvfile, 'rb')
     try:

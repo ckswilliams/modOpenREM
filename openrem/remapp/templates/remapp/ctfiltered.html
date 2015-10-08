@@ -1,11 +1,6 @@
 {% extends "remapp/filteredbase.html" %}
 
-{% block navbar %}
-  {% if request.user.userprofile.displayCT %}<li class="active"><a href="/openrem/ct">CT</a></li>{% endif %}
-  {% if request.user.userprofile.displayRF %}<li><a href="/openrem/rf">Fluoroscopy</a></li>{% endif %}
-  {% if request.user.userprofile.displayMG %}<li><a href="/openrem/mg">Mammography</a></li>{% endif %}
-  {% if request.user.userprofile.displayDX %}<li><a href="/openrem/dx">Radiography</a></li>{% endif %}
-{% endblock %}
+{% block navct%}<li class="active">{% endblock %}
 
 {% block toprow %}
 
@@ -14,23 +9,51 @@
   <p>
     There are {{ filter.count }} studies in this list.
   </p>
-  {% if admin.exportperm or admin.adminperm %}
-    <ul>
-      <li><strong>Note:</strong> Apply the filter first to refine what is exported.</li>
-      <li><a href="/openrem/exportctcsv1/?{{ request.GET.urlencode }}">Export to CSV</a> </li>
-      <li><a href="/openrem/exportctxlsx1/?{{ request.GET.urlencode }}">Export to XLSX</a></li>
-    </ul>
-
-  {% else %}
-    <p>
-      Sorry, you don't have enough permissions to enable study export.
-    </p>
-  {% endif %}
 
 {% endblock %}
 
-
 {% block col2 %}
+  <div class="panel panel-info">
+  <div class="panel-heading">
+      <h3 class="panel-title">Data export</h3>
+  </div>
+  <div class="panel-body">
+    {% if admin.exportgroup %}
+        <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
+    <p>
+      <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
+          {% if admin.pidgroup %}
+              <a href="/openrem/exportctcsv1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportctcsv1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportctcsv1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+    <p>
+          <a href="/openrem/exportctxlsx1/0/0/?{{ request.GET.urlencode }}"
+             class="btn btn-default btn-sm" role="button">Export to XLSX</a>
+          {% if admin.pidgroup %}
+              <a href="/openrem/exportctxlsx1/1/0/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With names</a>
+              <a href="/openrem/exportctxlsx1/0/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With ID</a>
+              <a href="/openrem/exportctxlsx1/1/1/?{{ request.GET.urlencode }}"
+                 class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
+    </p>
+
+  {% else %}
+    <p>
+      No export permissions
+    </p>
+  {% endif %}
+
+
+  </div>
+  </div>
 
   {{ studyfilter }}
 
@@ -85,7 +108,7 @@
   <table class="table table-bordered table-hover row-clickable">
     <tr>
       <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
-      {% if admin.adminperm %}
+      {% if admin.admingroup %}
         <th>Delete?</th>
       {% endif %}
     </tr>
@@ -111,7 +134,9 @@
           <a href="/openrem/ct/{{ exam.id }}/">
             {{ exam.study_description }}</a> |
           {{ exam.requested_procedure_code_meaning }} |
-          {{ exam.accession_number }}
+          {% if not exam.accession_hashed %}
+            {{ exam.accession_number }}
+          {% endif %}
           </a>
         </td>
         <td>
@@ -124,7 +149,7 @@
             {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
           </a>
         </td>
-        {% if admin.adminperm %}
+        {% if admin.admingroup %}
           <td>
             <a href="{% url 'study_delete' exam.id %}">Delete</a>
           </td>
@@ -527,7 +552,7 @@
     {% if request.user.userprofile.plotCTAcquisitionFreq %}
       <!-- JavaScript for acquisition pie chart -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+        var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
       </script>
 
       <script src="{{ STATIC_URL }}js/ctChartAcquisitionFrequency.js"></script>
@@ -790,7 +815,7 @@
     {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+        var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
       </script>
     {% endif %}
 
@@ -825,7 +850,7 @@
     {% if request.user.userprofile.plotCTRequestFreq %}
       <!-- JavaScript for request pie chart. -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
+        var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
       </script>
     {% endif %}
 
@@ -845,7 +870,7 @@
     {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- JavaScript for mean DLP per study description -->
       <script>
-        var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+        var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
       </script>
 
       {% if request.user.userprofile.plotAverageChoice == 'mean' %}
