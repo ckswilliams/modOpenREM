@@ -110,7 +110,7 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem``
 
-Migrate::
+Migrate:
 
 .. sourcecode:: bash
 
