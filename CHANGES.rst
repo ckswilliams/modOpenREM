@@ -2,9 +2,19 @@
 OpenREM version history
 =======================
 
-0.7.0b5 (2015-09-02)
+0.7.0b6 (2015-10-08)
 --------------------
 
+* `#286`_  Increased granularity of permission groups
+* `#285`_  Tidied up Options and Admin menus
+* `#284`_  Fixed DICOM Query that looped if SCP respected ModalitiesInStudy
+* `#282`_  Missing javascript file required for IE8 and below added
+* `#281`_  Added check to import function to prevent extract failure
+* `#280`_  Fixed typo in mammography export
+* `#279`_  Charts: Fixed issue with median CTDI series from appearing
+* `#278`_  Charts: Fixed javascript namespace pollution that caused links to fail
+* `#277`_  Overhaul of acquisition level filters to get tooltip generated filters to follow through to export
+* `#276`_  Unique fields cannot have unlimited length in MySQL - replaced with hash
 * `#274`_  Charts: Fixed legend display issue
 * `#273`_  Charts: Added plots of average kVp and mAs over time for DX
 * `#272`_  Tweak to display of exam description for DX
@@ -12,29 +22,40 @@ OpenREM version history
 * `#270`_  Django 1.8 Admin site has a 'view site' link. Pointed it back to OpenREM
 * `#268`_  Improved population of procedure_code_meaning for DX imports
 * `#266`_  DICOM C-Store script added back in - largely redundant with web interface
+* `#263`_  Settings for keeping or deleting files once processed moved to database and web interface
 * `#262`_  Dealt with issue where two exposures from the same study would race on import
 * `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
 * `#259`_  Link to manage users added to Admin menu
 * `#258`_  Fixed DX import error where manufacturer or model name was not provided
+* `#257`_  Documentation update
+* `#256`_  Fixed errors with non-ASCII characters in imports
 * `#254`_  Charts: Simplified chart data processing in the templates
 * `#253`_  Charts: AJAX used to make pages responsive with large datasets when charts enabled
 * `#252`_  Fixed duplicate entries in DX filtered data for studies with multiple exposures
+* `#248`_  Charts: can now be ordered by frequency or alphabetically
 * `#247`_  Fixed incorrect reference to manufacturer_model_name
 * `#246`_  Charts: Added median data for PostgreSQL users
 * `#245`_  Fixed error in csv DX export
 * `#244`_  Fixed issue where scripts wouldn't function after upgrade to Django 1.8
 * `#243`_  Added distance related data to DX exports
 * `#242`_  Distance source to patient now extracted from DX images
+* `#241`_  Charts: Median values can be plotted for PostgreSQL users
 * `#240`_  Charts: Improved DAP over time calculations
 * `#239`_  Configurable equipment names to fix multiple sources with the same station name
 * `#237`_  Charts: Tidied up plot data calculations in ``views.py``
+* `#235`_  Added patient sex to each of the exports
 * `#234`_  Charts: Fixed error with datetime combine
 * `#232`_  Charts: on or off displayed on the home page
+* `#231`_  Charts: made links from requested procedure frequency plot respect the other filters
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 * `#229`_  Charts: Added chart of DLP per requested procedure
-* `#207`_  DICOM QR SCU now available from web interface, plus improve control and config of Store SCP
+* `#223`_  Charts: speed improvement for weekday charts
+* `#207`_  DICOM QR SCU now available from web interface
+* `#206`_  DICOM Store SCP configuration now available from web interface
+* `#183`_  Added options to store patient name and ID, and options to hash name, ID and accession number
 * `#171`_  Root URL now resolves so ``/openrem`` is not necessary
 * `#151`_  Suspected non-patient studies can now be filtered out
+* `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
 
 
