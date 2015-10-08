@@ -45,10 +45,7 @@ urlpatterns = patterns('remapp.views',
 
     url(r'^rf/$',
         'rf_summary_list_filter'),
-    url(r'^rf/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/rfdetail.html'))),
+    url(r'^rf/(?P<pk>\d+)/$', 'rf_detail_view', name='rf_detail_view'),
 
     url(r'^ct/$',
         'ct_summary_list_filter'),
@@ -60,10 +57,7 @@ urlpatterns = patterns('remapp.views',
         'dx_summary_list_filter', name='dx_summary'),
     url(r'^dx/chart/$',
         'dx_summary_chart_data', name='dx_summary_chart_data'),
-    url(r'^dx/(?P<pk>\d+)/$',
-        login_required(DetailView.as_view(
-            model=GeneralStudyModuleAttr,
-            template_name='remapp/dxdetail.html'))),
+    url(r'^dx/(?P<pk>\d+)/$', 'dx_detail_view', name='dx_detail_view'),
 
     url(r'^mg/$',
         'mg_summary_list_filter'),

@@ -509,6 +509,35 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
 
 @login_required
+def dx_detail_view(request, pk=None):
+    """Detail view for a DX study
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/dx/')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return render_to_response(
+        'remapp/dxdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
     import pkg_resources # part of setuptools
@@ -533,6 +562,35 @@ def rf_summary_list_filter(request):
         {'filter': f, 'admin':admin},
         context_instance=RequestContext(request)
         )
+
+@login_required
+def rf_detail_view(request, pk=None):
+    """Detail view for an RF study
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/rf/')
+
+    try:
+        vers = pkg_resources.require("openrem")[0].version
+    except:
+        vers = ''
+    admin = {'openremversion' : vers}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    return render_to_response(
+        'remapp/rfdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
 
 @login_required
 def ct_summary_list_filter(request):
