@@ -1133,8 +1133,11 @@ def openrem_home(request):
             latestuid = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
                 ).filter(study_date__exact = latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
-            
-            displayname = (display_name[0]).encode('utf-8')
+
+            try:
+                displayname = (display_name[0]).encode('utf-8')
+            except AttributeError:
+                displayname = "Error has occurred - import probably unsuccessful"
                        
             modalitydata[display_name[0]] = {
                 'total' : studies.filter(

@@ -274,7 +274,8 @@ def _generalequipmentmoduleattributes(dataset,study):
                                                                              software_versions=equip.software_versions,
                                                                              software_versions_hash=hash_id(equip.software_versions),
                                                                              gantry_id=equip.gantry_id,
-                                                                             gantry_id_hash=hash_id(equip.gantry_id)
+                                                                             gantry_id_hash=hash_id(equip.gantry_id),
+                                                                             hash_generated=True
                                                                              )
     if created:
         if equip.institution_name and equip.station_name:
