@@ -1420,6 +1420,22 @@ def display_names_view(request):
         context_instance=RequestContext(request)
     )
 
+
+def display_name_gen_hash(eq):
+    from remapp.tools.hash_id import hash_id
+
+    eq.manufacturer_hash = hash_id(eq.manufacturer)
+    eq.institution_name_hash = hash_id(eq.institution_name)
+    eq.station_name_hash = hash_id(eq.station_name)
+    eq.institutional_department_name_hash = hash_id(eq.institutional_department_name)
+    eq.manufacturer_model_name_hash = hash_id(eq.manufacturer_model_name)
+    eq.device_serial_number_hash = hash_id(eq.device_serial_number)
+    eq.software_versions_hash = hash_id(eq.software_versions)
+    eq.gantry_id_hash = hash_id(eq.gantry_id)
+    eq.hash_generated = True
+    eq.save()
+
+
 @login_required
 def display_name_update(request, pk):
     from remapp.models import UniqueEquipmentNames
@@ -1431,6 +1447,8 @@ def display_name_update(request, pk):
         if form.is_valid():
             new_display_name = form.cleaned_data['display_name']
             display_name_data = UniqueEquipmentNames.objects.get(pk=pk)
+            if not display_name_data.hash_generated:
+                display_name_gen_hash(display_name_data)
             display_name_data.display_name = new_display_name
             display_name_data.save()
             return HttpResponseRedirect('/openrem/viewdisplaynames/')

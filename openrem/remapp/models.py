@@ -260,18 +260,28 @@ post_save.connect(create_user_profile, sender=User)
 
 class UniqueEquipmentNames(models.Model):
     manufacturer = models.TextField(blank=True, null=True)
+    manufacturer_hash = models.CharField(max_length=64, blank=True, null=True)
     institution_name = models.TextField(blank=True, null=True)
+    institution_name_hash = models.CharField(max_length=64, blank=True, null=True)
     station_name = models.CharField(max_length=32, blank=True, null=True)
+    station_name_hash = models.CharField(max_length=64, blank=True, null=True)
     institutional_department_name = models.TextField(blank=True, null=True)
+    institutional_department_name_hash = models.CharField(max_length=64, blank=True, null=True)
     manufacturer_model_name = models.TextField(blank=True, null=True)
+    manufacturer_model_name_hash = models.CharField(max_length=64, blank=True, null=True)
     device_serial_number = models.TextField(blank=True, null=True)
+    device_serial_number_hash = models.CharField(max_length=64, blank=True, null=True)
     software_versions = models.TextField(blank=True, null=True)
+    software_versions_hash = models.CharField(max_length=64, blank=True, null=True)
     gantry_id = models.TextField(blank=True, null=True)
+    gantry_id_hash = models.CharField(max_length=64, blank=True, null=True)
     display_name = models.TextField(blank=True, null=True)
+    hash_generated = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('manufacturer', 'institution_name', 'station_name', 'institutional_department_name',
-                           'manufacturer_model_name', 'device_serial_number', 'software_versions', 'gantry_id')
+        unique_together = ('manufacturer_hash', 'institution_name_hash', 'station_name_hash',
+                           'institutional_department_name_hash', 'manufacturer_model_name_hash',
+                           'device_serial_number_hash', 'software_versions_hash', 'gantry_id_hash')
 
     def __unicode__(self):
         return self.display_name
