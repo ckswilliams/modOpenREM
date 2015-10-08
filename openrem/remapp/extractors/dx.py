@@ -408,8 +408,9 @@ def _projectionxrayradiationdose(dataset,g):
 
 def _generalequipmentmoduleattributes(dataset,study):
     from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
-    from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import get_date, get_time
+    from remapp.tools.get_values import get_value_kw
+    from remapp.tools.hash_id import hash_id
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer",dataset)
     equip.institution_name = get_value_kw("InstitutionName",dataset)
@@ -425,13 +426,21 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration",dataset)
 
     equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
+                                                                             manufacturer_hash=hash_id(equip.manufacturer),
                                                                              institution_name=equip.institution_name,
+                                                                             institution_name_hash = hash_id(equip.institution_name),
                                                                              station_name=equip.station_name,
+                                                                             station_name_hash=hash_id(equip.station_name),
                                                                              institutional_department_name=equip.institutional_department_name,
+                                                                             institutional_department_name_hash=hash_id(equip.institutional_department_name),
                                                                              manufacturer_model_name=equip.manufacturer_model_name,
+                                                                             manufacturer_model_name_hash=hash_id(equip.manufacturer_model_name),
                                                                              device_serial_number=equip.device_serial_number,
+                                                                             device_serial_number_hash=hash_id(equip.device_serial_number),
                                                                              software_versions=equip.software_versions,
-                                                                             gantry_id=equip.gantry_id
+                                                                             software_versions_hash=hash_id(equip.software_versions),
+                                                                             gantry_id=equip.gantry_id,
+                                                                             gantry_id_hash=hash_id(equip.gantry_id)
                                                                              )
     if created:
         if equip.institution_name and equip.station_name:
