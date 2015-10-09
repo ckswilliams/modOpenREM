@@ -50,8 +50,6 @@ Upgrading from version 0.6.0
 
 * The 0.7.0 upgrade must be made from a 0.6.0 (or later) database, and a schema migration is required:
 
-    Delete all numbered migration files in openrem's ``migrations`` folder.
-
 .. sourcecode:: bash
 
     pip install openrem==0.7.0b6
@@ -63,6 +61,12 @@ In a shell/command window, move into the openrem folder:
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem``
+
+Delete all numbered migration files in openrem's ``migrations`` folder.
+
+If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it. It should be empty. In Windows,
+you might create a text file called ``__init__.txt``, then change the file suffix from ``.txt`` to ``.py``, and accept
+the warning about files becoming unusable. In linux, ``touch remapp/migrations/__init__.py`` will do the job.
 
 .. sourcecode:: bash
 
@@ -80,9 +84,8 @@ In a shell/command window, move into the openrem folder:
 
   and then run::
 
-    # Windows:
-    python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp
 
 
 ******************************
