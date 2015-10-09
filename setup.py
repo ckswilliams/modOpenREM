@@ -18,7 +18,8 @@ requires = [
     'argparse >= 1.2.1',
     'django-qsstats-magic',
     'python-dateutil',
-    'django-solo'
+    'django-solo',
+    'django-crispy-forms'
     ]
 
 setup(
