@@ -3,6 +3,89 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 from django.conf import settings
+from django.db.models.loading import get_model
+from datetime import datetime
+
+
+def populate_unique_equipment_names(self, orm):
+
+    study_data = self.get_model('remapp','GeneralStudyModuleAttr')
+
+    unique_combinations = study_data.objects.values_list('generalequipmentmoduleattr__manufacturer',
+                                                         'generalequipmentmoduleattr__institution_name',
+                                                         'generalequipmentmoduleattr__station_name',
+                                                         'generalequipmentmoduleattr__institutional_department_name',
+                                                         'generalequipmentmoduleattr__manufacturer_model_name',
+                                                         'generalequipmentmoduleattr__device_serial_number',
+                                                         'generalequipmentmoduleattr__software_versions',
+                                                         'generalequipmentmoduleattr__gantry_id').distinct()
+
+    from remapp.models import UniqueEquipmentNames
+    from remapp.models import GeneralEquipmentModuleAttr
+    from remapp.tools.hash_id import hash_id
+
+    for each_combination in unique_combinations:
+
+        if each_combination[1] and each_combination[2]:
+            display_name_text = each_combination[1] + ' ' + each_combination[2]
+        elif each_combination[1]:
+            display_name_text = each_combination[1]
+        elif each_combination[2]:
+            display_name_text = each_combination[2]
+        else:
+            display_name_text = "Blank"
+
+        new_combination = UniqueEquipmentNames(manufacturer=each_combination[0],
+                                               manufacturer_hash=hash_id(each_combination[0]),
+                                               institution_name=each_combination[1],
+                                               institution_name_hash=hash_id(each_combination[1]),
+                                               station_name=each_combination[2],
+                                               station_name_hash=hash_id(each_combination[2]),
+                                               institutional_department_name=each_combination[3],
+                                               institutional_departement_name_hash=hash_id(each_combination[3]),
+                                               manufacturer_model_name=each_combination[4],
+                                               manufacturer_model_name_hash=hash_id(each_combination[4]),
+                                               device_serial_number=each_combination[5],
+                                               device_serial_number_hash=hash_id(each_combination[5]),
+                                               software_versions=each_combination[6],
+                                               software_versions_hash=hash_id(each_combination[6]),
+                                               gantry_id=each_combination[7],
+                                               gantry_id_hash=hash_id(each_combination[7]),
+                                               display_name=display_name_text,
+                                               hash_generated=True
+                                               )
+        new_combination.save()
+
+        # Code below here to find every occurrence of the current combination that exists in GeneralStudyModuleAttr
+        # and write the appropriate UniqueEquipmentNames row value into the unique_equipment_name field of
+        # GeneralStudyModuleAttr.
+        equipment_data = GeneralEquipmentModuleAttr.objects.filter(manufacturer=each_combination[0],
+                                                                   institution_name=each_combination[1],
+                                                                   station_name=each_combination[2],
+                                                                   institutional_department_name=each_combination[3],
+                                                                   manufacturer_model_name=each_combination[4],
+                                                                   device_serial_number=each_combination[5],
+                                                                   software_versions=each_combination[6],
+                                                                   gantry_id=each_combination[7])
+
+        for row in equipment_data:
+            row.unique_equipment_name = UniqueEquipmentNames(pk=new_combination.pk)
+            row.save()
+
+
+def populate_study_workload_chart_time(self, orm):
+
+    test = self.get_model('remapp', 'GeneralStudyModuleAttr')
+
+    for studyData in test.objects.all():
+        studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
+        studyTime = studyData.study_time
+        if studyTime:
+            studyDatetime = datetime.combine(studyDate, studyTime)
+        else:
+            studyDatetime = None
+        studyData.study_workload_chart_time = studyDatetime
+        studyData.save()
 
 
 class Migration(migrations.Migration):
@@ -156,6 +239,7 @@ class Migration(migrations.Migration):
             name='study_workload_chart_time',
             field=models.DateTimeField(null=True, blank=True),
         ),
+        migrations.RunPython(populate_study_workload_chart_time),
         migrations.AddField(
             model_name='patientmoduleattr',
             name='id_hashed',
@@ -250,4 +334,5 @@ class Migration(migrations.Migration):
             name='unique_equipment_name',
             field=models.ForeignKey(to='remapp.UniqueEquipmentNames', null=True),
         ),
+        migrations.RunPython(populate_unique_equipment_names),
     ]
