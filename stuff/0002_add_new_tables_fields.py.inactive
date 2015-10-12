@@ -42,7 +42,7 @@ def populate_unique_equipment_names(self, orm):
                                                station_name=each_combination[2],
                                                station_name_hash=hash_id(each_combination[2]),
                                                institutional_department_name=each_combination[3],
-                                               institutional_departement_name_hash=hash_id(each_combination[3]),
+                                               institutional_department_name_hash=hash_id(each_combination[3]),
                                                manufacturer_model_name=each_combination[4],
                                                manufacturer_model_name_hash=hash_id(each_combination[4]),
                                                device_serial_number=each_combination[5],
