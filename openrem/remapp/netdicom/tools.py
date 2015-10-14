@@ -39,16 +39,20 @@ def OnAssociateRequest(association):
 
 
 @shared_task
-def echoscu(
-        scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
-    import uuid
-    import json
+def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
+    """
+    Function to check if built-in Store SCP or remote Query-Retrieve SCP returns a DICOM echo
+    :param scp_pk: Primary key if either Store or QR SCP in database
+    :param store_scp: True if checking Store SCP
+    :param qr_scp: True if checking QR SCP
+    :param args:
+    :param kwargs:
+    :return: 'AssocFail', Success or ?
+    """
     from netdicom.applicationentity import AE
-    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
-    from dicom.dataset import Dataset, FileDataset
+    from netdicom.SOPclass import VerificationSOPClass
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
-    from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
-    from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
+    from remapp.models import DicomRemoteQR, DicomStoreSCP
 
     if store_scp and scp_pk:
         scp = DicomStoreSCP.objects.get(pk=scp_pk)
