@@ -20,7 +20,7 @@ $(function () {
                         chartAcqDLPandCTDI.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
                     }
                     if (parentSeriesName.indexOf('CTDI') != -1) {
-                        chartAcqDLPandCTDI.xAxis[1].setTitle({text: 'CTDI<sub>vol</sub> range (mGy)'});
+                        chartAcqDLPandCTDI.xAxis[0].setTitle({text: 'CTDI<sub>vol</sub> range (mGy)'});
                     }
                     chartAcqDLPandCTDI.xAxis[0].setCategories([], true);
                     chartAcqDLPandCTDI.tooltip.options.formatter = function (e) {
