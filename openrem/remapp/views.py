@@ -1683,7 +1683,7 @@ from django.core.urlresolvers import reverse_lazy
 
 class DicomStoreCreate(CreateView):
     model = DicomStoreSCP
-    fields = ['name', 'aetitle', 'port']
+    fields = ['name', 'aetitle', 'port', 'keep_alive']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
@@ -1699,7 +1699,7 @@ class DicomStoreCreate(CreateView):
 
 class DicomStoreUpdate(UpdateView):
     model = DicomStoreSCP
-    fields = ['name', 'aetitle', 'port']
+    fields = ['name', 'aetitle', 'port', 'keep_alive']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object

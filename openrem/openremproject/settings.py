@@ -25,10 +25,9 @@ CELERY_DEFAULT_QUEUE = 'default'
 
 from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
-    'trigger-keep-alive': {
-        'task': 'remapp.netdicom.keepalive.alive_example',
+    'trigger-dicom-keep-alive': {
+        'task': 'remapp.netdicom.keepalive.keep_alive',
         'schedule': crontab(),
-        'args': (16, 16),
     },
 }
 
