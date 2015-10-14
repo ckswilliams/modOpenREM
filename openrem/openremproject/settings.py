@@ -23,6 +23,14 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_DEFAULT_QUEUE = 'default'
 
+from celery.schedules import crontab
+CELERYBEAT_SCHEDULE = {
+    'trigger-keep-alive': {
+        'task': 'remapp.netdicom.keepalive.alive_example',
+        'schedule': crontab(),
+        'args': (16, 16),
+    },
+}
 
 import os
 ROOT_PROJECT = os.path.join(os.path.split(__file__)[0],"..")
