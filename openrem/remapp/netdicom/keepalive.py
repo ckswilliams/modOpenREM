@@ -14,6 +14,6 @@ def keep_alive():
             logging.info("Keep_alive echo for {0} is {1}".format(store.aetitle, echo))
             if echo is "AssocFail":
                 logging.warning("Starting {0} on port {1} due to Association Request failure.".format(store.aetitle, store.port))
-                store.run = True
+                store.status = "Store not running, but keep-alive is set!"
                 store.save()
                 web_store.delay(store_pk=store.pk)

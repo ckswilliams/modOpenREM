@@ -32,6 +32,7 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
+import pkg_resources
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
@@ -67,6 +68,24 @@ def stop_store(request, pk):
 import json
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import Http404
+
+
+@csrf_exempt
+def status_update_store(request):
+    from remapp.netdicom.tools import echoscu
+
+    resp = {}
+    data = request.POST
+    scp_pk = data.get('scp_pk')
+
+    echo = echoscu(scp_pk=scp_pk, store_scp=True)
+
+    if echo is "Success":
+        resp['message'] = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive </div>"
+    elif echo is "AssocFail":
+        resp['message'] = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association </div>"
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
 
 @csrf_exempt
 def q_update(request):
