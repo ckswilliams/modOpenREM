@@ -27,6 +27,29 @@
 
 
           {% for scp in store %}
+          <script>
+              $(document).ready(
+                      function statusupdate{{ scp.pk }}( json ){
+                          $.ajax({
+                              url: "/openrem/admin/dicomstore/statusupdate",
+                              data: {
+                                  scp_pk: {{ scp.pk }}
+                              },
+                              type: "POST",
+                              dataType: "json",
+                              success: function( json ){
+                                  $( '#store-status-{{ scp.pk }}').html( json.message );
+                                  setTimeout(function(){
+                                      var data = {
+                                          scp_pk: {{ scp.pk }}
+                                      };
+                                      statusupdate{{ scp.pk }}( data );
+                                  }, 2000);
+                              }
+                          })
+                      }
+              )
+          </script>
           <div class="panel panel-info">
               <div class="panel-heading">
                 <h3 class="panel-title">{{ scp.name }}</h3>
@@ -43,10 +66,6 @@
                           <td>{{ scp.port }}</td>
                       </tr>
                       <tr>
-                          <th>Last known status</th>
-                          <td>{{ scp.status }}</td>
-                      </tr>
-                      <tr>
                           <th>Database ID</th>
                           <td>{{ scp.pk }}</td>
                       </tr>
@@ -54,31 +73,12 @@
                           <th>Auto start and keep-alive?</th>
                           <td>{{ scp.keep_alive }}</td>
                       </tr>
+                      <tr>
+                          <th>Status</th>
+                          <td><div id="store-status-{{ scp.pk }}"></div></td>
+                      </tr>
                   </table>
-                  <script>
-                      $(document).ready(
-                              function statusupdate{{ scp.pk }}( json ){
-                                  $.ajax({
-                                      url: "/openrem/admin/dicomstore/statusupdate",
-                                      data: {
-                                          scp_pk: {{ scp.pk }}
-                                      },
-                                      type: "POST",
-                                      dataType: "json",
-                                      success: function( json ){
-                                          $( '#store-status-{{ scp.pk }}').html( json.message );
-                                          setTimeout(function(){
-                                              var data = {
-                                                  scp_pk: {{ scp.pk }}
-                                              };
-                                              statusupdate{{ scp.pk }}( data );
-                                          }, 2000);
-                                      }
-                                  })
-                              }
-                      )
-                  </script>
-                  <div id="store-status-{{ scp.pk }}"></div>
+
 
                   <hr>
                   <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>

@@ -72,6 +72,7 @@ from django.http import Http404
 
 @csrf_exempt
 def status_update_store(request):
+    from remapp.models import DicomStoreSCP
     from remapp.netdicom.tools import echoscu
 
     resp = {}
@@ -80,10 +81,12 @@ def status_update_store(request):
 
     echo = echoscu(scp_pk=scp_pk, store_scp=True)
 
+    store = DicomStoreSCP.objects.get(pk=scp_pk)
+
     if echo is "Success":
-        resp['message'] = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive </div>"
+        resp['message'] = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive. Last status was {0} </div>".format(store.status)
     elif echo is "AssocFail":
-        resp['message'] = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association </div>"
+        resp['message'] = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association. Last status was {0} </div>".format(store.status)
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
