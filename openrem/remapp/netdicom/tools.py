@@ -92,18 +92,23 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     assoc = my_ae.RequestAssociation(remote_ae)
 
     if not assoc:
-        logging.debug("Accociation with {0} {1} {2} was not successful".format(rh, rp, aec))
+        logging.info("Association with {0} {1} {2} was not successful".format(rh, rp, aec))
         return "AssocFail"
-    logging.info("assoc is ... %s", assoc)
+    logging.debug("assoc is ... %s", assoc)
 
     # perform a DICOM ECHO
-    logging.info("DICOM Echo ... ")
+    logging.debug("DICOM Echo... {0} {1} {2}".format(rh, rp, aec))
     echo = assoc.VerificationSOPClass.SCU(1)
-    logging.info('done with status %s', echo)
+    logging.debug('done with status %s', echo)
 
-    logging.info("Release association")
+    logging.debug("Release association from {0} {1} {2}".format(rh, rp, aec))
     assoc.Release(0)
 
     # done
     my_ae.Quit()
-    return echo
+    if echo.Type is "Success":
+        logging.info("Returning Success response from echo to {0} {1} {2}".format(rh, rp, aec))
+        return "Success"
+    else:
+        logging.info("Returning EchoFail response from echo to {0} {1} {2}".format(rh, rp, aec))
+        return "EchoFail"
