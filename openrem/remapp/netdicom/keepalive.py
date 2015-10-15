@@ -11,9 +11,9 @@ def keep_alive():
     for store in stores:
         if store.keep_alive:
             echo = echoscu(scp_pk=store.pk, store_scp=True)
-            logging.warning("echo is {0}".format(echo))
+            logging.info("Keep_alive echo for {0} is {1}".format(store.aetitle, echo))
             if echo is "AssocFail":
-                logging.warning("in not echo")
+                logging.warning("Starting {0} on port {1} due to Association Request failure.".format(store.aetitle, store.port))
                 store.run = True
                 store.save()
                 web_store.delay(store_pk=store.pk)
