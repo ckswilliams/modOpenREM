@@ -234,8 +234,28 @@ def dicom_qr_page(request, *args, **kwargs):
     from django.shortcuts import render_to_response
     from django.template import RequestContext
     from remapp.forms import DicomQueryForm
+    from remapp.models import DicomStoreSCP, DicomRemoteQR
+    from remapp.netdicom.tools import echoscu
 
     form = DicomQueryForm
+
+    storestatus = {}
+    stores = DicomStoreSCP.objects.all()
+    for store in stores:
+        echo = echoscu(scp_pk=store.pk, store_scp=True)
+        if echo is "Success":
+            storestatus[store.name] = "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
+        else:
+            storestatus[store.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
+
+    qrstatus = {}
+    qr = DicomRemoteQR.objects.all()
+    for scp in qr:
+        echo = echoscu(scp_pk=scp.pk, qr_scp=True)
+        if echo is "Success":
+            qrstatus[scp.name] = "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
+        else:
+            qrstatus[scp.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -248,7 +268,7 @@ def dicom_qr_page(request, *args, **kwargs):
 
     return render_to_response(
         'remapp/dicomqr.html',
-        {'form':form, 'admin':admin},
+        {'form':form, 'storestatus':storestatus, 'qrstatus':qrstatus, 'admin':admin},
         context_instance=RequestContext(request)
     )
 

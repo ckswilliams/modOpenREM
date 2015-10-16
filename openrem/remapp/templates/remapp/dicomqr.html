@@ -33,7 +33,29 @@
 
 <div class="row">
     <div class="col-md-4 col-md-offset-1">
-    <form action="{% url "q_process" %}" method="post" enctype="multipart/form-data" role="form"  id="post-form">
+
+        <h3>Current DICOM SCP statuses</h3>
+            Remote QR nodes
+        <dl class="dl-horizontal">
+            {% autoescape off %}
+            {% for name, status in qrstatus.items %}
+            <dt>{{ name }}</dt>
+            <dd>{{ status }}</dd>
+            {% endfor %}
+            {% endautoescape %}
+        </dl>
+            Local Store nodes
+        <dl class="dl-horizontal">
+            {% autoescape off %}
+            {% for name, status in storestatus.items %}
+            <dt>{{ name }}</dt>
+            <dd>{{ status }}</dd>
+            {% endfor %}
+            {% endautoescape %}
+        </dl>
+
+        <h3>Query retrieve dialogue</h3>
+        <form action="{% url "q_process" %}" method="post" enctype="multipart/form-data" role="form"  id="post-form">
 			{% csrf_token %}
             <div class="row">
                 <p>{{ form.non_field_errors }}</p>
