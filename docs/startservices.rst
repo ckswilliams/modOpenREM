@@ -82,6 +82,31 @@ To stop the celery queues::
     celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
 
+Celery periodic tasks: beat
+===========================
+
+Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
+Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
+If this is not successful, then the Store SCP is started.
+
+To run celery beat, open a new shell:
+Linux::
+
+    cd /usr/local/lib/python2.7/dist-packages/openrem/
+
+    celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule -f /path/to/media/celery/celerybeat.log \
+    --pidfile=/path/to/media/celery/celerybeat.pid
+
+Windows::
+
+    cd C:\Python27\Lib\site-packages\openrem\
+
+    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule -f C:\path\to\media\celery\ ^
+    --pidfile=C:\path\to\media\celery\celerybeat.pid
+
+
+
+
 Start the DICOM Store SCP
 -------------------------
 
