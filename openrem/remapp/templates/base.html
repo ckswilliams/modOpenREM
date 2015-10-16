@@ -72,7 +72,7 @@
                     <li class="dropdown">
                     {% endblock %}
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
-                            Imports <span class="caret"></span>
+                            <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Imports <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="/openrem/admin/sizeupload">Import patient size info</a></li>
@@ -83,15 +83,16 @@
                 {% endif %}
                 {% if admin.exportgroup %}
                     {% block exportnav %}
-                    <li><a href="/openrem/export">Exports</a></li>
+                        <li>
                     {% endblock %}
+                        <a href="/openrem/export"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> Exports</a></li>
                 {% endif %}
 
                 {% block confnav %}
                 <li class="dropdown">
                 {% endblock %}
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
-                        Config <span class="caret"></span>
+                                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Config <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
                       <li class="dropdown-header">User level config</li>
