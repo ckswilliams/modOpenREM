@@ -16,7 +16,7 @@
         {% endif %}
     </li>
     <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
-    <li>Study time: {{ generalstudymoduleattr.study_time }}</li>
+    <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
