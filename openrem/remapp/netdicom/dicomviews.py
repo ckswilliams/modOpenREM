@@ -84,9 +84,15 @@ def status_update_store(request):
     store = DicomStoreSCP.objects.get(pk=scp_pk)
 
     if echo is "Success":
-        resp['message'] = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive. Last status was {0} </div>".format(store.status)
+        resp['message'] = "<button class='btn btn-success' type='button'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive</button><div>Last status: {0}</div>".format(store.status)
+        resp['delbutton'] = "<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
+        resp['startbutton'] = "<button type='button' class='btn btn-success' disabled='disabled'>Start server</button>"
+        resp['stopbutton'] = "<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
     elif echo is "AssocFail":
-        resp['message'] = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association. Last status was {0} </div>".format(store.status)
+        resp['message'] = "<button class='btn btn-danger' type='button'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association</button><div>Last status: {0}</div>".format(store.status)
+        resp['delbutton'] = "<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
+        resp['startbutton'] = "<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
+        resp['stopbutton'] = "<button type='button' class='btn btn-danger' disabled='disabled'>Stop server</button>"
 
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
