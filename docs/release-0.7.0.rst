@@ -76,11 +76,11 @@ the warning about files becoming unusable. In linux, ``touch remapp/migrations/_
 
 * Now rename the file::
 
-    0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py.inactive
+    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
 
   to::
 
-    0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py
+    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
 
   and then run::
 
