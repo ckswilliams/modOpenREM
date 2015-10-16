@@ -32,6 +32,7 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
+import pkg_resources
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
@@ -67,6 +68,33 @@ def stop_store(request, pk):
 import json
 from django.http import HttpResponseRedirect, HttpResponse
 from django.http import Http404
+
+
+@csrf_exempt
+def status_update_store(request):
+    from remapp.models import DicomStoreSCP
+    from remapp.netdicom.tools import echoscu
+
+    resp = {}
+    data = request.POST
+    scp_pk = data.get('scp_pk')
+
+    echo = echoscu(scp_pk=scp_pk, store_scp=True)
+
+    store = DicomStoreSCP.objects.get(pk=scp_pk)
+
+    if echo is "Success":
+        resp['message'] = "<button class='btn btn-success' type='button'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive</button><div>Last status: {0}</div>".format(store.status)
+        resp['delbutton'] = "<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
+        resp['startbutton'] = ""
+        resp['stopbutton'] = "<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
+    elif echo is "AssocFail":
+        resp['message'] = "<button class='btn btn-danger' type='button'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association</button><div>Last status: {0}</div>".format(store.status)
+        resp['delbutton'] = "<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
+        resp['startbutton'] = "<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
+        resp['stopbutton'] = ""
+
+    return HttpResponse(json.dumps(resp), content_type="application/json")
 
 @csrf_exempt
 def q_update(request):
@@ -206,8 +234,28 @@ def dicom_qr_page(request, *args, **kwargs):
     from django.shortcuts import render_to_response
     from django.template import RequestContext
     from remapp.forms import DicomQueryForm
+    from remapp.models import DicomStoreSCP, DicomRemoteQR
+    from remapp.netdicom.tools import echoscu
 
     form = DicomQueryForm
+
+    storestatus = {}
+    stores = DicomStoreSCP.objects.all()
+    for store in stores:
+        echo = echoscu(scp_pk=store.pk, store_scp=True)
+        if echo is "Success":
+            storestatus[store.name] = "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
+        else:
+            storestatus[store.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
+
+    qrstatus = {}
+    qr = DicomRemoteQR.objects.all()
+    for scp in qr:
+        echo = echoscu(scp_pk=scp.pk, qr_scp=True)
+        if echo is "Success":
+            qrstatus[scp.name] = "<span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> responding to DICOM echo"
+        else:
+            qrstatus[scp.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -220,7 +268,7 @@ def dicom_qr_page(request, *args, **kwargs):
 
     return render_to_response(
         'remapp/dicomqr.html',
-        {'form':form, 'admin':admin},
+        {'form':form, 'storestatus':storestatus, 'qrstatus':qrstatus, 'admin':admin},
         context_instance=RequestContext(request)
     )
 

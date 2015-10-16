@@ -41,16 +41,16 @@ from django.views.decorators.csrf import csrf_exempt
 
 # callbacks
 def OnAssociateRequest(association):
-    print "association requested"
+    logging.info("Store SCP: association requested")
 
 
 def OnAssociateResponse(association):
-    print "Association response received"
+    logging.info("Store SCP: Association response received")
 
 
 
 def OnReceiveEcho(self):
-    print "Echo received"
+    logging.info("Store SCP: Echo received")
 
 
 def mkdir_p(path):

@@ -82,6 +82,7 @@ class DicomStoreSCP(models.Model):
     task_id = models.CharField(max_length=64, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)
+    keep_alive = models.BooleanField(default=False)
 
     def get_absolute_url(self):
         return reverse('dicom_summary')

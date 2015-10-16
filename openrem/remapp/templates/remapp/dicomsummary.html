@@ -27,6 +27,32 @@
 
 
           {% for scp in store %}
+          <script>
+              $(document).ready(
+                      function statusupdate{{ scp.pk }}( json ){
+                          $.ajax({
+                              url: "/openrem/admin/dicomstore/statusupdate",
+                              data: {
+                                  scp_pk: {{ scp.pk }}
+                              },
+                              type: "POST",
+                              dataType: "json",
+                              success: function( json ){
+                                  $( '#store-status-{{ scp.pk }}' ).html( json.message );
+                                  $( '#store-delete-{{ scp.pk }}' ).html( json.delbutton );
+                                  $( '#store-start-{{ scp.pk }}' ).html( json.startbutton );
+                                  $( '#store-stop-{{ scp.pk }}' ).html( json.stopbutton );
+                                  setTimeout(function(){
+                                      var data = {
+                                          scp_pk: {{ scp.pk }}
+                                      };
+                                      statusupdate{{ scp.pk }}( data );
+                                  }, 2000);
+                              }
+                          })
+                      }
+              )
+          </script>
           <div class="panel panel-info">
               <div class="panel-heading">
                 <h3 class="panel-title">{{ scp.name }}</h3>
@@ -43,21 +69,28 @@
                           <td>{{ scp.port }}</td>
                       </tr>
                       <tr>
-                          <th>Last known status</th>
-                          <td>{{ scp.status }}</td>
-                      </tr>
-                      <tr>
                           <th>Database ID</th>
                           <td>{{ scp.pk }}</td>
                       </tr>
+                      <tr>
+                          <th>Auto start and keep-alive?</th>
+                          <td>{{ scp.keep_alive }}</td>
+                      </tr>
+                      <tr>
+                          <th>Status</th>
+                          <td><div id="store-status-{{ scp.pk }}"></div>
+
+                          </td>
+                      </tr>
                   </table>
+
 
                   <hr>
                   <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
-                  <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/delete/" role="button">Delete</a>
-                  <a class="btn btn-success" href="/openrem/admin/dicomstore/{{ scp.id }}/start/" role="button">Start server</a>
-                  <a class="btn btn-danger" href="/openrem/admin/dicomstore/{{ scp.id }}/stop/" role="button">Stop server</a>
-
+                  <span id="store-delete-{{ scp.pk }}"></span>
+                  <span id="store-start-{{ scp.pk }}" class="pull-right"></span>
+                  <span id="store-stop-{{ scp.pk }}" class="pull-right"></span>
+{#                  <a class="btn btn-danger" href="/openrem/admin/dicomstore/{{ scp.id }}/stop/" role="button">Stop server</a>#}
               </div>
           </div>
           {% endfor %}
