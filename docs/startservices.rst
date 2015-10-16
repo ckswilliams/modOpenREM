@@ -101,7 +101,7 @@ Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
 
-    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule -f C:\path\to\media\celery\ ^
+    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule -f C:\path\to\media\celery\celerybeat.log ^
     --pidfile=C:\path\to\media\celery\celerybeat.pid
 
 
