@@ -27,8 +27,7 @@ def OnAssociateRequest(association):
 def _move_req(my_ae, remote_ae, d):
     assocMove = my_ae.RequestAssociation(remote_ae)
     logging.info("Move association requested")
-#    print "d is {0}".format(d)
-    gen = assocMove.StudyRootMoveSOPClass.SCU(d, 'STOREOPENREM', 1)
+    gen = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     for gg in gen:
         logging.info("gg is %s", gg)
     assocMove.Release(0)

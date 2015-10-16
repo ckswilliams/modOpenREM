@@ -73,8 +73,15 @@ def OnReceiveStore(SOPClass, DS):
     from remapp.models import DicomDeleteSettings
     from openremproject.settings import MEDIA_ROOT
 
-    logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
-                 DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
+    try:
+        logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
+                     DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
+    except:
+        try:
+            logging.info("Received C-Store - station name missing. Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
+                         DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
+        except:
+            logging.info("Received C-Store - error in logging details")
 
     del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
