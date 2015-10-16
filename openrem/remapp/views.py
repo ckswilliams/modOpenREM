@@ -902,7 +902,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
             # Required for mean DLP per study type per week plot
             if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
                 studyMedianDLPoverTime = [None] * len(studySummary)
-            if median_available and (plotAverageChoice=='mean' or plotAverageChoice=='both'):
+            if plotAverageChoice=='mean' or plotAverageChoice=='both':
                 studyMeanDLPoverTime = [None] * len(studySummary)
             startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
