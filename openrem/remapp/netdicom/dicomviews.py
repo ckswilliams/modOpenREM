@@ -33,8 +33,10 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import pkg_resources
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 @login_required
@@ -42,7 +44,7 @@ def run_store(request, pk):
     from django.shortcuts import redirect
     from remapp.models import DicomStoreSCP
     from remapp.netdicom.storescp import web_store
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="admingroup"):
         store = DicomStoreSCP.objects.get(pk__exact = pk)
         store.run = True
         store.save()
@@ -54,7 +56,7 @@ def run_store(request, pk):
 def stop_store(request, pk):
     from django.shortcuts import redirect
     from remapp.models import DicomStoreSCP
-    if request.user.groups.filter(name="exportgroup") or request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="admingroup"):
         store = DicomStoreSCP.objects.filter(pk__exact = pk)
         if store and store[0].task_id:
             store[0].run = False
@@ -236,6 +238,10 @@ def dicom_qr_page(request, *args, **kwargs):
     from remapp.forms import DicomQueryForm
     from remapp.models import DicomStoreSCP, DicomRemoteQR
     from remapp.netdicom.tools import echoscu
+
+    if not request.user.groups.filter(name="importqrgroup"):
+        messages.error(request, "You are not in the importqrgroup - please contact your administrator")
+        return redirect('/openrem/')
 
     form = DicomQueryForm
 

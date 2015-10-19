@@ -1216,6 +1216,8 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     if request.method=='POST':
         if request.user.groups.filter(name="admingroup"):
             study.delete()
+        else:
+            messages.error(request, "Only members of the admingroup are allowed to delete studies")
         return redirect("/openrem/")
 
     if request.user.groups.filter(name="admingroup"):
@@ -1240,8 +1242,13 @@ def size_upload(request):
 
     :param request: If POST, contains the file upload information
     """
+
+    if not request.user.groups.filter(name="importsizegroup"):
+        messages.error(request, "You are not in the import size group - please contact your administrator")
+        return redirect('/openrem/')
+
     # Handle file upload
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.groups.filter(name="importsizegroup"):
         form = SizeUploadForm(request.POST, request.FILES)
         if form.is_valid():
             newcsv = SizeUpload(sizefile = request.FILES['sizefile'])
@@ -1281,7 +1288,11 @@ def size_process(request, *args, **kwargs):
     """
     from remapp.extractors.ptsizecsv2db import websizeimport
 
-    if request.method == 'POST': 
+    if not request.user.groups.filter(name="importsizegroup"):
+        messages.error(request, "You are not in the import size group - please contact your administrator")
+        return redirect('/openrem/')
+
+    if request.method == 'POST':
               
         itemsInPost = len(request.POST.values())
         uniqueItemsInPost = len(set(request.POST.values()))
@@ -1360,6 +1371,10 @@ def size_imports(request, *args, **kwargs):
     from django.shortcuts import render_to_response
     from remapp.models import SizeUpload
 
+    if not request.user.groups.filter(name="importsizegroup") and not request.user.groups.filter(name="admingroup"):
+        messages.error(request, "You are not in the import size group - please contact your administrator")
+        return redirect('/openrem/')
+
     imports = SizeUpload.objects.all().order_by('-import_date')
     
     current = imports.filter(status__contains = 'CURRENT')
@@ -1423,11 +1438,13 @@ def size_abort(request, pk):
 
     size = get_object_or_404(SizeUpload, pk=pk)
 
-    if request.user.groups.filter(name="admingroup"):
+    if request.user.groups.filter(name="importsizegroup") or request.users.groups.filter(name="admingroup"):
         revoke(size.task_id, terminate=True)
         size.logfile.delete()
         size.sizefile.delete()
         size.delete()
+    else:
+        messages.error(request, "Only members of the importsizegroup or admingroup can abort a size import task")
 
     return HttpResponseRedirect("/openrem/admin/sizeimports/")
 
