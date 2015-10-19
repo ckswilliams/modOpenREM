@@ -94,26 +94,38 @@ Linux::
 
     cd /usr/local/lib/python2.7/dist-packages/openrem/
 
-    celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule -f /path/to/media/celery/celerybeat.log \
+    celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule \
+    -f /path/to/media/celery/celerybeat.log \
     --pidfile=/path/to/media/celery/celerybeat.pid
 
 Windows::
 
     cd C:\Python27\Lib\site-packages\openrem\
 
-    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule -f C:\path\to\media\celery\celerybeat.log ^
+    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule ^
+    -f C:\path\to\media\celery\celerybeat.log ^
     --pidfile=C:\path\to\media\celery\celerybeat.pid
 
 
+Check the new settings
+======================
+
+* Go to ``Config -> Manage users`` and make sure the users have the right settings
+    + ``viewgroup`` can browse the data only
+    + ``exportgroup`` can view and export data to a spreadsheet
+    + ``admingroup`` can delete studies and import height and weight data in addition to anything the export group can do
+* Return to the OpenREM interface (click on ``view site`` at the top right)
+* Go to ``Config -> DICOM object delete settings`` and configure appropriately
+* Go to ``Config -> Patient ID settings`` and configure appropriately
+* If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
+  ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
+* When you have some data in the system, you will want to go to ``Config -> View and edit display names`` and customise
+  them.
 
 
-Start the DICOM Store SCP
--------------------------
-
-See :doc:`netdicom` - documentation not yet up to date with features.
 
 Start using it!
----------------
+===============
 
 Add some data!
 

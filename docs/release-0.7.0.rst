@@ -52,7 +52,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b6
+    pip install openrem==0.7.0b7
 
 In a shell/command window, move into the openrem folder:
 
@@ -84,41 +84,8 @@ the warning about files becoming unusable. In linux, ``touch remapp/migrations/_
 
   and then run::
 
-    python manage.py makemigrations remapp
     python manage.py migrate remapp
 
-
-******************************
-Upgrading from version 0.7.0b5
-******************************
-
-* Back up your database
-
-    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
-    * For a non-production SQLite3 database, simply make a copy of the database file
-
-* Upgrade OpenREM
-
-.. sourcecode:: bash
-
-    pip install openrem==0.7.0b6
-
-* Migrate the database
-
-In a shell/command window, move into the openrem folder:
-
-* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
-* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
-
-Migrate:
-
-.. sourcecode:: bash
-
-    python manage.py makemigrations remapp
-    python manage.py migrate
 
 Restart the web server
 ======================
@@ -171,6 +138,32 @@ To stop the celery queues::
 
     celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
+
+Celery periodic tasks: beat
+===========================
+
+Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
+Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
+If this is not successful, then the Store SCP is started.
+
+To run celery beat, open a new shell:
+Linux::
+
+    cd /usr/local/lib/python2.7/dist-packages/openrem/
+
+    celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule \
+    -f /path/to/media/celery/celerybeat.log \
+    --pidfile=/path/to/media/celery/celerybeat.pid
+
+Windows::
+
+    cd C:\Python27\Lib\site-packages\openrem\
+
+    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule ^
+    -f C:\path\to\media\celery\celerybeat.log ^
+    --pidfile=C:\path\to\media\celery\celerybeat.pid
+
+
 Check the new settings
 ======================
 
@@ -178,5 +171,7 @@ Check the new settings
 * Return to the OpenREM interface (click on ``view site`` at the top right)
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately
 * Go to ``Config -> Patient ID settings`` and configure appropriately
-* Go to ``Config -> View and edit display names`` and review. If you have upgraded from ``0.7.0b5``, edit each one in
-  turn and save it.
+* If you want to use OpenREM as a DICOM store, go to ``Config -> Dicom network configuration``
+* Go to ``Config -> View and edit display names`` and review. If you have a lot of existing data you'll
+  need to set a lot of display names, from each time the software version, station name, or other elements
+  have changed. If you have upgraded from ``0.7.0b5``, edit each one in turn and save it.
