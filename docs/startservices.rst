@@ -82,7 +82,7 @@ To stop the celery queues in Linux::
 
     celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
-For Windows, just press ``Ctrl-c``
+For Windows, just press ``Ctrl+c``
 
 You will need to do this twice if there are running tasks you wish to kill.
 
@@ -115,7 +115,7 @@ Windows::
 
 For production use, see `Daemonising Celery`_ below
 
-To stop Celery beat, just press ``Ctrl-c``
+To stop Celery beat, just press ``Ctrl+c``
 
 Configure the settings
 ======================
