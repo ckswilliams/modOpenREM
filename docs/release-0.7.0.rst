@@ -99,18 +99,36 @@ Otherwise restart using the command for your web server
 Restart the Celery task queue
 =============================
 
-For testing, in a new shell:
+The commands for this have changed to enable DICOM store nodes to be managed with Celery tasks.
 
-Linux::
+..  Note::
 
-    # Linux: Debian/Ubuntu and derivatives
-    cd /usr/local/lib/python2.7/dist-packages/openrem/
-    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-    cd /usr/local/lib/python2.7/site-packages/openrem/
+    The webserver and Celery both need to be able to read and write to the
+    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
+    Celery using the same user or group as the webserver, and setting the
+    file permissions accordingly.
 
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 \
+In a new shell/command window, move into the openrem folder:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
+
+Linux - ``\`` is the line continuation character::
+
+    celery multi start stores default -A openremproject -c:stores 1 -c 3 \
     -Q:stores stores -Q default \
     --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
+
+Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuation character::
+
+    celery worker -n default -A openremproject -c 3 -Q default ^
+    --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
+
+    celery worker -n stores -A openremproject -c 1 -Q stores ^
+    --pidfile=C:\path\to\media\celery\stores.pid --logfile=C:\path\to\media\celery\stores.log
 
 If you intend to use OpenREM to provide a DICOM Store SCP (ie you can DICOM send things to OpenREM without using
 any other program, such as Conquest), then we need a Celery Queue just for the store. The node (and queue) created for
@@ -121,23 +139,15 @@ workers should be available for all the other jobs - exports; and imports when u
 You must also specify the location for the pid file and for the log file. You might put these in the media folder, or
 the logs might go in ``/var/log/``.
 
-The ``\`` is added in to allow the single command to go over several lines.
+For production use, see `Daemonising Celery`_ below
 
-Windows::
-
-    cd C:\Python27\Lib\site-packages\openrem\
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
-    -Q:stores stores -Q default ^
-    --pidfile=\path\to\media\celery\%N.pid --logfile=\path\to\media\celery\%N.log
-
-This is the same as for Linux, but this time the line continuation character is ``^``.
-
-For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
-
-To stop the celery queues::
+To stop the celery queues in Linux::
 
     celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
+For Windows, just press ``Ctrl+c``
+
+You will need to do this twice if there are running tasks you wish to kill.
 
 Celery periodic tasks: beat
 ===========================
@@ -146,10 +156,15 @@ Celery beat is a scheduler. If it is running, then every 60 seconds a task is ru
 Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
 If this is not successful, then the Store SCP is started.
 
-To run celery beat, open a new shell:
-Linux::
+To run celery beat, open a new shell and move into the openrem folder:
 
-    cd /usr/local/lib/python2.7/dist-packages/openrem/
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
+
+Linux::
 
     celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule \
     -f /path/to/media/celery/celerybeat.log \
@@ -157,12 +172,13 @@ Linux::
 
 Windows::
 
-    cd C:\Python27\Lib\site-packages\openrem\
-
     celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule ^
     -f C:\path\to\media\celery\celerybeat.log ^
     --pidfile=C:\path\to\media\celery\celerybeat.pid
 
+For production use, see `Daemonising Celery`_ below
+
+To stop Celery beat, just press ``Ctrl+c``
 
 Check the new settings
 ======================
@@ -185,3 +201,16 @@ Check the new settings
 * Go to ``Config -> View and edit display names`` and review. If you have a lot of existing data you'll
   need to set a lot of display names, from each time the software version, station name, or other elements
   have changed. If you have upgraded from ``0.7.0b5``, edit each one in turn and save it.
+
+Further instructions
+====================
+
+
+Daemonising Celery
+------------------
+
+In a production environment, Celery will need to start automatically and
+not depend on a particular user being logged in. Therefore, much like
+the webserver, it will need to be daemonised. For now, please refer to the
+instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
+
