@@ -1,0 +1,373 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
+from django.db.models.loading import get_model
+from datetime import datetime
+
+
+def populate_unique_equipment_names(self, orm):
+
+    study_data = self.get_model('remapp','GeneralStudyModuleAttr')
+
+    unique_combinations = study_data.objects.values_list('generalequipmentmoduleattr__manufacturer',
+                                                         'generalequipmentmoduleattr__institution_name',
+                                                         'generalequipmentmoduleattr__station_name',
+                                                         'generalequipmentmoduleattr__institutional_department_name',
+                                                         'generalequipmentmoduleattr__manufacturer_model_name',
+                                                         'generalequipmentmoduleattr__device_serial_number',
+                                                         'generalequipmentmoduleattr__software_versions',
+                                                         'generalequipmentmoduleattr__gantry_id').distinct()
+
+    from remapp.models import UniqueEquipmentNames
+    from remapp.models import GeneralEquipmentModuleAttr
+    from remapp.tools.hash_id import hash_id
+
+    for each_combination in unique_combinations:
+
+        if each_combination[1] and each_combination[2]:
+            display_name_text = each_combination[1] + ' ' + each_combination[2]
+        elif each_combination[1]:
+            display_name_text = each_combination[1]
+        elif each_combination[2]:
+            display_name_text = each_combination[2]
+        else:
+            display_name_text = "Blank"
+
+        new_combination = UniqueEquipmentNames(manufacturer=each_combination[0],
+                                               manufacturer_hash=hash_id(each_combination[0]),
+                                               institution_name=each_combination[1],
+                                               institution_name_hash=hash_id(each_combination[1]),
+                                               station_name=each_combination[2],
+                                               station_name_hash=hash_id(each_combination[2]),
+                                               institutional_department_name=each_combination[3],
+                                               institutional_department_name_hash=hash_id(each_combination[3]),
+                                               manufacturer_model_name=each_combination[4],
+                                               manufacturer_model_name_hash=hash_id(each_combination[4]),
+                                               device_serial_number=each_combination[5],
+                                               device_serial_number_hash=hash_id(each_combination[5]),
+                                               software_versions=each_combination[6],
+                                               software_versions_hash=hash_id(each_combination[6]),
+                                               gantry_id=each_combination[7],
+                                               gantry_id_hash=hash_id(each_combination[7]),
+                                               display_name=display_name_text,
+                                               hash_generated=True
+                                               )
+        new_combination.save()
+
+        # Code below here to find every occurrence of the current combination that exists in GeneralStudyModuleAttr
+        # and write the appropriate UniqueEquipmentNames row value into the unique_equipment_name field of
+        # GeneralStudyModuleAttr.
+        equipment_data = GeneralEquipmentModuleAttr.objects.filter(manufacturer=each_combination[0],
+                                                                   institution_name=each_combination[1],
+                                                                   station_name=each_combination[2],
+                                                                   institutional_department_name=each_combination[3],
+                                                                   manufacturer_model_name=each_combination[4],
+                                                                   device_serial_number=each_combination[5],
+                                                                   software_versions=each_combination[6],
+                                                                   gantry_id=each_combination[7])
+
+        for row in equipment_data:
+            row.unique_equipment_name = UniqueEquipmentNames(pk=new_combination.pk)
+            row.save()
+
+
+def populate_study_workload_chart_time(self, orm):
+
+    test = self.get_model('remapp', 'GeneralStudyModuleAttr')
+
+    for studyData in test.objects.all():
+        studyDate = datetime.date(datetime(1900,1,1,0,0,0,0))
+        studyTime = studyData.study_time
+        if studyTime:
+            studyDatetime = datetime.combine(studyDate, studyTime)
+        else:
+            studyDatetime = None
+        studyData.study_workload_chart_time = studyDatetime
+        studyData.save()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('remapp', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='DicomDeleteSettings',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('del_no_match', models.BooleanField(default=False, verbose_name=b"delete objects that don't match any import functions?")),
+                ('del_rdsr', models.BooleanField(default=False, verbose_name=b'delete radiation dose structured reports after processing?')),
+                ('del_mg_im', models.BooleanField(default=False, verbose_name=b'delete mammography images after processing?')),
+                ('del_dx_im', models.BooleanField(default=False, verbose_name=b'delete radiography images after processing?')),
+                ('del_ct_phil', models.BooleanField(default=False, verbose_name=b'delete Philips CT dose info images after processing?')),
+            ],
+            options={
+                'verbose_name': 'Delete DICOM objects settings',
+            },
+        ),
+        migrations.CreateModel(
+            name='DicomQRRspImage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('query_id', models.CharField(max_length=64)),
+                ('sop_instance_uid', models.TextField(null=True, blank=True)),
+                ('instance_number', models.IntegerField(null=True, blank=True)),
+                ('sop_class_uid', models.TextField(null=True, blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DicomQRRspSeries',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('query_id', models.CharField(max_length=64)),
+                ('series_instance_uid', models.TextField(null=True, blank=True)),
+                ('series_number', models.IntegerField(null=True, blank=True)),
+                ('modality', models.CharField(max_length=16, null=True, blank=True)),
+                ('series_description', models.TextField(null=True, blank=True)),
+                ('number_of_series_related_instances', models.IntegerField(null=True, blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DicomQRRspStudy',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('query_id', models.CharField(max_length=64)),
+                ('study_instance_uid', models.TextField(null=True, blank=True)),
+                ('modality', models.CharField(max_length=16, null=True, blank=True)),
+                ('modalities_in_study', models.CharField(max_length=100, null=True, blank=True)),
+                ('study_description', models.TextField(null=True, blank=True)),
+                ('number_of_study_related_series', models.IntegerField(null=True, blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DicomQuery',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('complete', models.BooleanField(default=False)),
+                ('query_id', models.CharField(max_length=64)),
+                ('failed', models.BooleanField(default=False)),
+                ('message', models.TextField(null=True, blank=True)),
+                ('stage', models.TextField(null=True, blank=True)),
+                ('move_complete', models.BooleanField(default=False)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DicomRemoteQR',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=64)),
+                ('aetitle', models.CharField(max_length=16, null=True, blank=True)),
+                ('port', models.IntegerField(null=True, blank=True)),
+                ('ip', models.GenericIPAddressField(null=True, blank=True)),
+                ('hostname', models.CharField(max_length=32, null=True, blank=True)),
+                ('enabled', models.BooleanField(default=False)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DicomStoreSCP',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=64)),
+                ('aetitle', models.CharField(max_length=16, null=True, blank=True)),
+                ('port', models.IntegerField(null=True, blank=True)),
+                ('task_id', models.CharField(max_length=64, null=True, blank=True)),
+                ('status', models.CharField(max_length=64, null=True, blank=True)),
+                ('run', models.BooleanField(default=False)),
+                ('keep_alive', models.BooleanField(default=False)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='PatientIDSettings',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name_stored', models.BooleanField(default=False)),
+                ('name_hashed', models.BooleanField(default=True)),
+                ('id_stored', models.BooleanField(default=False)),
+                ('id_hashed', models.BooleanField(default=True)),
+                ('accession_hashed', models.BooleanField(default=False)),
+                ('dob_stored', models.BooleanField(default=False)),
+            ],
+            options={
+                'verbose_name': 'Patient ID Settings',
+            },
+        ),
+        migrations.CreateModel(
+            name='UniqueEquipmentNames',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('manufacturer', models.TextField(null=True, blank=True)),
+                ('manufacturer_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('institution_name', models.TextField(null=True, blank=True)),
+                ('institution_name_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('station_name', models.CharField(max_length=32, null=True, blank=True)),
+                ('station_name_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('institutional_department_name', models.TextField(null=True, blank=True)),
+                ('institutional_department_name_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('manufacturer_model_name', models.TextField(null=True, blank=True)),
+                ('manufacturer_model_name_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('device_serial_number', models.TextField(null=True, blank=True)),
+                ('device_serial_number_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('software_versions', models.TextField(null=True, blank=True)),
+                ('software_versions_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('gantry_id', models.TextField(null=True, blank=True)),
+                ('gantry_id_hash', models.CharField(max_length=64, null=True, blank=True)),
+                ('display_name', models.TextField(null=True, blank=True)),
+                ('hash_generated', models.BooleanField(default=False)),
+            ],
+        ),
+        migrations.AddField(
+            model_name='exports',
+            name='export_user',
+            field=models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True),
+        ),
+        migrations.AddField(
+            model_name='exports',
+            name='includes_pid',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='generalstudymoduleattr',
+            name='accession_hashed',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='generalstudymoduleattr',
+            name='study_workload_chart_time',
+            field=models.DateTimeField(null=True, blank=True),
+        ),
+        migrations.RunPython(populate_study_workload_chart_time),
+        migrations.AddField(
+            model_name='patientmoduleattr',
+            name='id_hashed',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='patientmoduleattr',
+            name='name_hashed',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='median_available',
+            field=models.BooleanField(default=False, editable=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotAverageChoice',
+            field=models.CharField(default=b'mean', max_length=6, choices=[(b'mean', b'mean'), (b'median', b'median'), (b'both', b'both')]),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotCTInitialSortingChoice',
+            field=models.CharField(default=b'freq', max_length=4, choices=[(b'dlp', b'DLP'), (b'ctdi', b'CTDI'), (b'freq', b'Frequency'), (b'name', b'Name')]),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotCTRequestFreq',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotCTRequestMeanDLP',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXAcquisitionMeankVpOverTime',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXAcquisitionMeanmAsOverTime',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXInitialSortingChoice',
+            field=models.CharField(default=b'freq', max_length=4, choices=[(b'dap', b'DAP'), (b'freq', b'Frequency'), (b'name', b'Name')]),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotInitialSortingDirection',
+            field=models.IntegerField(default=-1, null=True, choices=[(1, b'Ascending'), (-1, b'Descending')]),
+        ),
+        migrations.AlterField(
+            model_name='generalstudymoduleattr',
+            name='accession_number',
+            field=models.TextField(null=True, blank=True),
+        ),
+        migrations.AlterUniqueTogether(
+            name='uniqueequipmentnames',
+            unique_together=set([('manufacturer_hash', 'institution_name_hash', 'station_name_hash', 'institutional_department_name_hash', 'manufacturer_model_name_hash', 'device_serial_number_hash', 'software_versions_hash', 'gantry_id_hash')]),
+        ),
+        migrations.AddField(
+            model_name='dicomquery',
+            name='qr_scp_fk',
+            field=models.ForeignKey(blank=True, to='remapp.DicomRemoteQR', null=True),
+        ),
+        migrations.AddField(
+            model_name='dicomquery',
+            name='store_scp_fk',
+            field=models.ForeignKey(blank=True, to='remapp.DicomStoreSCP', null=True),
+        ),
+        migrations.AddField(
+            model_name='dicomqrrspstudy',
+            name='dicom_query',
+            field=models.ForeignKey(to='remapp.DicomQuery'),
+        ),
+        migrations.AddField(
+            model_name='dicomqrrspseries',
+            name='dicom_qr_rsp_study',
+            field=models.ForeignKey(to='remapp.DicomQRRspStudy'),
+        ),
+        migrations.AddField(
+            model_name='dicomqrrspimage',
+            name='dicom_qr_rsp_series',
+            field=models.ForeignKey(to='remapp.DicomQRRspSeries'),
+        ),
+        migrations.AddField(
+            model_name='generalequipmentmoduleattr',
+            name='unique_equipment_name',
+            field=models.ForeignKey(to='remapp.UniqueEquipmentNames', null=True),
+        ),
+        migrations.RunPython(populate_unique_equipment_names),
+    ]
+
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        operations += [
+            migrations.RunSQL(
+                "CREATE FUNCTION _final_median(anyarray) RETURNS NUMERIC AS $$"
+                "  WITH q AS"
+                "  ("
+                "     SELECT val"
+                "     FROM UNNEST($1) val"
+                "     WHERE val IS NOT NULL"
+                "     ORDER BY 1"
+                "  ),"
+                "  cnt AS"
+                "  ("
+                "    SELECT COUNT(*) AS c FROM q"
+                "  )"
+                "  SELECT AVG(val * 10000000000.0)"
+                "  FROM"
+                "  ("
+                "    SELECT val FROM q"
+                "    LIMIT  2 - MOD((SELECT c FROM cnt), 2)"
+                "    OFFSET GREATEST(CEIL((SELECT c FROM cnt) / 2.0) - 1, 0)"
+                "  ) q2;"
+                "$$ LANGUAGE SQL IMMUTABLE;"
+                "CREATE AGGREGATE median(anyelement) ("
+                "  SFUNC=array_append,"
+                "  STYPE=anyarray,"
+                "  FINALFUNC=_final_median,"
+                "  INITCOND='{}'"
+                ");",
+                "DROP AGGREGATE median(anyelement);"
+                "DROP FUNCTION _final_median(anyarray);"
+            ),
+        ]

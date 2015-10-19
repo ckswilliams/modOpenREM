@@ -12,7 +12,7 @@ Install OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b6
+    pip install openrem==0.7.0b7
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -71,7 +71,7 @@ For testing you can use the SQLite3 database
     displayed in OpenREM charts.** Alternatively, other databases such as MySQL/MariaDB, Oracle, and
     some others with lower levels of support can be used.
 
-    There are some further guides to setting up PostgreSQL – see `Database options`_ below
+    There are some further guides to setting up PostgreSQL – see `Database guides`_ below
 
 Location for imports and exports
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -117,29 +117,6 @@ A dot before a hostname allows for subdomains (eg www.doseserver), a dot
 after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
-
-Keep or delete processed DICOM files
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Should DICOM files be kept or deleted when they have been processed?
-
-* ``RM_DCM_NOMATCH`` is only applicable if you use the DICOM Store SCP built into OpenREM
-* The other settings determine whether Radiation Dose Structured Reports, Mammography images, Radiography images and
-  Philips CT images are kept (``False``) or deleted (``True``) when they have been processed
-* The default setting is False, to preserve behaviour from previous versions::
-
-    RM_DCM_NOMATCH = True
-    RM_DCM_RDSR = True
-    RM_DCM_MG = True
-    RM_DCM_DX = True
-    RM_DCM_CTPHIL = True
-
-.. Note::
-
-    It is recommended that the image file types and ``RM_DCM_NOMATCH`` are set to ``True``, as they can fill the disk
-    quickly if they are allowed to build up!
-
-See :doc:`netdicom` (docs not yet up to date with features)
 
 Create the database
 -------------------
@@ -193,14 +170,18 @@ then do the following:
 
 Windows::
 
-	python manage.py makemigrations --empty remapp
-	python manage.py migrate
+    python manage.py makemigrations --empty remapp
+    python manage.py migrate
 
 The first command will create a skeleton ``0001_initial.py`` migration file. The
 second command runs the migration files, and will display the text
 ``Applying remapp.0002_fresh__openrem_install_add_median_function... OK``, indicating
 that the median function has been added.
 
+Start all the services!
+=======================
+
+You are now ready to start the services to allow you to use OpenREM - go to :doc:`startservices` to see how!
 
 
 Further instructions

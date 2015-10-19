@@ -50,11 +50,9 @@ Upgrading from version 0.6.0
 
 * The 0.7.0 upgrade must be made from a 0.6.0 (or later) database, and a schema migration is required:
 
-    Delete all numbered migration files in openrem's ``migrations`` folder.
-
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b6
+    pip install openrem==0.7.0b7
 
 In a shell/command window, move into the openrem folder:
 
@@ -63,6 +61,12 @@ In a shell/command window, move into the openrem folder:
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem``
+
+Delete all numbered migration files in openrem's ``migrations`` folder.
+
+If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it. It should be empty. In Windows,
+you might create a text file called ``__init__.txt``, then change the file suffix from ``.txt`` to ``.py``, and accept
+the warning about files becoming unusable. In linux, ``touch remapp/migrations/__init__.py`` will do the job.
 
 .. sourcecode:: bash
 
@@ -72,50 +76,16 @@ In a shell/command window, move into the openrem folder:
 
 * Now rename the file::
 
-    0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py.inactive
+    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
 
   to::
 
-    0002_upgraded_openrem_add_median_function_and_populate_display_name_table.py
+    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
 
   and then run::
 
-    # Windows:
-    python C:\Python27\Lib\site-packages\openrem\manage.py makemigrations remapp
-    python C:\Python27\Lib\site-packages\openrem\manage.py migrate remapp
+    python manage.py migrate remapp
 
-
-******************************
-Upgrading from version 0.7.0b5
-******************************
-
-* Back up your database
-
-    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
-    * For a non-production SQLite3 database, simply make a copy of the database file
-
-* Upgrade OpenREM
-
-.. sourcecode:: bash
-
-    pip install openrem==0.7.0b6
-
-* Migrate the database
-
-In a shell/command window, move into the openrem folder:
-
-* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
-* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
-
-Migrate:
-
-.. sourcecode:: bash
-
-    python manage.py makemigrations remapp
-    python manage.py migrate
 
 Restart the web server
 ======================
@@ -129,18 +99,36 @@ Otherwise restart using the command for your web server
 Restart the Celery task queue
 =============================
 
-For testing, in a new shell:
+The commands for this have changed to enable DICOM store nodes to be managed with Celery tasks.
 
-Linux::
+..  Note::
 
-    # Linux: Debian/Ubuntu and derivatives
-    cd /usr/local/lib/python2.7/dist-packages/openrem/
-    # Linux: other distros. In a virtualenv replace all up to lib/ as appropriate
-    cd /usr/local/lib/python2.7/site-packages/openrem/
+    The webserver and Celery both need to be able to read and write to the
+    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
+    Celery using the same user or group as the webserver, and setting the
+    file permissions accordingly.
 
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 \
+In a new shell/command window, move into the openrem folder:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
+
+Linux - ``\`` is the line continuation character::
+
+    celery multi start stores default -A openremproject -c:stores 1 -c 3 \
     -Q:stores stores -Q default \
     --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
+
+Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuation character::
+
+    celery worker -n default -A openremproject -c 3 -Q default ^
+    --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
+
+    celery worker -n stores -A openremproject -c 1 -Q stores ^
+    --pidfile=C:\path\to\media\celery\stores.pid --logfile=C:\path\to\media\celery\stores.log
 
 If you intend to use OpenREM to provide a DICOM Store SCP (ie you can DICOM send things to OpenREM without using
 any other program, such as Conquest), then we need a Celery Queue just for the store. The node (and queue) created for
@@ -151,29 +139,79 @@ workers should be available for all the other jobs - exports; and imports when u
 You must also specify the location for the pid file and for the log file. You might put these in the media folder, or
 the logs might go in ``/var/log/``.
 
-The ``\`` is added in to allow the single command to go over several lines.
+For production use, see `Daemonising Celery`_ below
+
+To stop the celery queues in Linux::
+
+    celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
+
+For Windows, just press ``Ctrl+c``
+
+You will need to do this twice if there are running tasks you wish to kill.
+
+Celery periodic tasks: beat
+===========================
+
+Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
+Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
+If this is not successful, then the Store SCP is started.
+
+To run celery beat, open a new shell and move into the openrem folder:
+
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
+
+Linux::
+
+    celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule \
+    -f /path/to/media/celery/celerybeat.log \
+    --pidfile=/path/to/media/celery/celerybeat.pid
 
 Windows::
 
-    cd C:\Python27\Lib\site-packages\openrem\
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
-    -Q:stores stores -Q default ^
-    --pidfile=\path\to\media\celery\%N.pid --logfile=\path\to\media\celery\%N.log
+    celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule ^
+    -f C:\path\to\media\celery\celerybeat.log ^
+    --pidfile=C:\path\to\media\celery\celerybeat.pid
 
-This is the same as for Linux, but this time the line continuation character is ``^``.
+For production use, see `Daemonising Celery`_ below
 
-For production use, see http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html
-
-To stop the celery queues::
-
-    celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
+To stop Celery beat, just press ``Ctrl+c``
 
 Check the new settings
 ======================
 
 * Go to ``Config -> Manage users`` and make sure the users have the right settings
+    + ``viewgroup`` can browse the data only
+    + ``importsizegroup`` can use the csv import facility to add patient height and weight information
+    + ``importqrgroup`` can use the DICOM query-retrieve facility to pull in studies, as long as they are pre-configured
+    + ``exportgroup`` can view and export data to a spreadsheet
+    + ``pidgroup`` can search using patient names and IDs depending on settings, and export with patient names and IDs
+      if they are also a member of the ``exportgroup``
+    + ``admingroup`` can delete studies, configure DICOM Store/QR settings, configure DICOM keep or delete settings,
+      configure patient ID settings, and abort and delete patient size import jobs. *Members of the admingroup no longer
+      inherit the other groups permissions.*
 * Return to the OpenREM interface (click on ``view site`` at the top right)
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately
 * Go to ``Config -> Patient ID settings`` and configure appropriately
-* Go to ``Config -> View and edit display names`` and review. If you have upgraded from ``0.7.0b5``, edit each one in
-  turn and save it.
+* If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
+  ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
+* Go to ``Config -> View and edit display names`` and review. If you have a lot of existing data you'll
+  need to set a lot of display names, from each time the software version, station name, or other elements
+  have changed. If you have upgraded from ``0.7.0b5``, edit each one in turn and save it.
+
+
+Further instructions
+====================
+
+
+Daemonising Celery
+------------------
+
+In a production environment, Celery will need to start automatically and
+not depend on a particular user being logged in. Therefore, much like
+the webserver, it will need to be daemonised. For now, please refer to the
+instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
+

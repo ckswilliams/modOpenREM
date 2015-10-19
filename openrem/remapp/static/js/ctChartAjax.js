@@ -94,7 +94,7 @@ $(document).ready(function() {
                     for (j = 0; j < protocolCounts[0].length; j++) {
                         temp.push([protocolBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocolBins[i][j + 1].toFixed(1).toString(), protocolCounts[i][j]]);
                     }
-                    seriesDrilldown.push({id: protocolNames[i], name: protocolNames[i], useHTML: true, data: temp});
+                    seriesDrilldown.push({id: protocolNames[i], name: protocolNames[i]+' DLP', useHTML: true, data: temp});
                 }
             }
             // DLP per acquisition chart data end
@@ -122,7 +122,7 @@ $(document).ready(function() {
                             freq: acq_summary[i].num_acq,
                             bins: protocol_bins_ctdi[i],
                             tooltip: protocolNames[i] + '<br>' + acq_summary[i].mean_ctdi.toFixed(1) + ' mean<br>(n=' + acq_summary[i].num_acq + ')',
-                            drilldown: protocolNames[i]
+                            drilldown: protocolNames[i]+'CTDI'
                         });
                     }
                 }
@@ -136,7 +136,7 @@ $(document).ready(function() {
                             freq: acq_summary[i].num_acq,
                             bins: protocol_bins_ctdi[i],
                             tooltip: protocolNames[i] + '<br>' + parseFloat(acq_summary[i].median_ctdi).toFixed(1) + ' median<br>(n=' + acq_summary[i].num_acq + ')',
-                            drilldown: protocolNames[i]
+                            drilldown: protocolNames[i]+'CTDI'
                         });
                     }
                 }
@@ -148,7 +148,7 @@ $(document).ready(function() {
                     for (j = 0; j < protocol_counts_ctdi[0].length; j++) {
                         temp.push([protocol_bins_ctdi[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocol_bins_ctdi[i][j + 1].toFixed(1).toString(), protocol_counts_ctdi[i][j]]);
                     }
-                    series_drilldown_ctdi.push({id: protocolNames[i], name: protocolNames[i], useHTML: true, data: temp});
+                    series_drilldown_ctdi.push({id: protocolNames[i]+'CTDI', name: protocolNames[i]+' CTDI<sub>vol<sub>', useHTML: true, data: temp});
                 }
             }
             // CTDI per acquisition chart data end
@@ -160,6 +160,7 @@ $(document).ready(function() {
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined' && typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
                 var chartplotCTAcquisitionMeanDLPandCTDI = $('#histogramPlotDLPandCTDIdiv').highcharts();
                 chartplotCTAcquisitionMeanDLPandCTDI.xAxis[0].setCategories(protocolNames);
+
                 chartplotCTAcquisitionMeanDLPandCTDI.options.drilldown.series = (seriesDrilldown).concat(series_drilldown_ctdi);
                 if (plotAverageChoice == "mean") {
                     chartplotCTAcquisitionMeanDLPandCTDI.series[0].setData(seriesData);

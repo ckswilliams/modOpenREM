@@ -2,9 +2,18 @@
 OpenREM version history
 =======================
 
-0.7.0b6 (2015-10-08)
+0.7.0b7 (2015-10-19)
 --------------------
 
+* `#298`_  Added ordering by accumulated AGD for mammographic studies
+* `#297`_  Fixed ordering by Total DAP for radiographic studies
+* `#295`_  Charts: fixe bug that arose on non-PostgreSQL databases
+* `#294`_  Harmonised time display between filter list and detail view, both to HH:mm
+* `#292`_  Added keep-alive and auto-start to DICOM stores
+* `#291`_  Charts: fixed issue with CTDI and DLP not showing correct drilldown data
+* `#290`_  Added new tables and fields to migration file, uses `#288`_ and median code from `#241`_
+* `#289`_  Crispy forms added into the requires file
+* `#288`_  Added device name hashes to migration file
 * `#286`_  Increased granularity of permission groups
 * `#285`_  Tidied up Options and Admin menus
 * `#284`_  Fixed DICOM Query that looped if SCP respected ModalitiesInStudy

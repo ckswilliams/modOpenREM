@@ -82,6 +82,7 @@ class DicomStoreSCP(models.Model):
     task_id = models.CharField(max_length=64, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)
+    keep_alive = models.BooleanField(default=False)
 
     def get_absolute_url(self):
         return reverse('dicom_summary')
@@ -320,11 +321,10 @@ class Exports(models.Model):
 
 class ContextID(models.Model):
     """Table to hold all the context ID code values and code meanings.
-    
+
     + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. \
     This assumes they are used correctly.
-    
-    """    
+    """
     code_value = models.CharField(max_length=16)
     code_meaning = models.TextField(blank=True, null=True)
     cid_table = models.CharField(max_length=16, blank=True)
@@ -338,10 +338,9 @@ class ContextID(models.Model):
 
 class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     """General Study Module C.7.2.1
-    
-    Specifies the Attributes that describe and identify the Study 
+
+    Specifies the Attributes that describe and identify the Study
     performed upon the Patient.
-    
     From DICOM Part 3: Information Object Definitions Table C.7-3
 
     Additional to the module definition:
@@ -379,14 +378,14 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
 
 class ProjectionXRayRadiationDose(models.Model):  # TID 10001
     """Projection X-Ray Radiation Dose template TID 10001
-    
+
     From DICOM Part 16:
         This template defines a container (the root) with subsidiary content items, each of which represents a
         single projection X-Ray irradiation event entry or plane-specific dose accumulations. There is a defined
         recording observer (the system or person responsible for recording the log, generally the system). A
         Biplane irradiation event will be recorded as two individual events, one for each plane. Accumulated
         values will be kept separate for each plane.
-    
+
     """
     general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     procedure_reported = models.ForeignKey(
@@ -410,11 +409,11 @@ class ProjectionXRayRadiationDose(models.Model):  # TID 10001
 
 class AccumXRayDose(models.Model):  # TID 10002
     """Accumulated X-Ray Dose TID 10002
-    
+
     From DICOM Part 16:
         This general template provides detailed information on projection X-Ray dose value accumulations over
         several irradiation events from the same equipment (typically a study or a performed procedure step).
-    
+
     """
     projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose)
     acquisition_plane = models.ForeignKey(ContextID, blank=True, null=True)
@@ -422,9 +421,9 @@ class AccumXRayDose(models.Model):  # TID 10002
 
 class Calibration(models.Model):
     """Table to hold the calibration information
-    
+
     + Container in TID 10002 Accumulated X-ray dose
-    
+
     """
     accumulated_xray_dose = models.ForeignKey(AccumXRayDose)
     dose_measurement_device = models.ForeignKey(ContextID, blank=True, null=True)
@@ -436,10 +435,10 @@ class Calibration(models.Model):
 
 class IrradEventXRayData(models.Model):  # TID 10003
     """Irradiation Event X-Ray Data TID 10003
-    
+
     From DICOM part 16:
         This template conveys the dose and equipment parameters of a single irradiation event.
-    
+
     """
     projection_xray_radiation_dose = models.ForeignKey(ProjectionXRayRadiationDose)
     acquisition_plane = models.ForeignKey(
@@ -494,14 +493,14 @@ class IrradEventXRayData(models.Model):  # TID 10003
     def convert_gym2_to_cgycm2(self):
         if self.dose_area_product:
             return 1000000*self.dose_area_product
-    
+
 
 class ImageViewModifier(models.Model):  # EV 111032
     """Table to hold image view modifiers for the irradiation event x-ray data table
-    
+
     From DICOM Part 16 Annex D DICOM controlled Terminology Definitions
         + Code Value 111032
-        + Code Meaning Image View Modifier 
+        + Code Meaning Image View Modifier
         + Code Definition Modifier for image view
     """
     irradiation_event_xray_data = models.ForeignKey(IrradEventXRayData)
@@ -513,7 +512,7 @@ class ImageViewModifier(models.Model):  # EV 111032
 
 class IrradEventXRayDetectorData(models.Model):  # TID 10003a
     """Irradiation Event X-Ray Detector Data TID 10003a
-    
+
     From DICOM Part 16 Correction Proposal CP-1077:
         This template contains data which is expected to be available to the X-ray detector or plate reader component of
         the equipment.
@@ -530,10 +529,10 @@ class IrradEventXRayDetectorData(models.Model):  # TID 10003a
 
 class IrradEventXRaySourceData(models.Model):  # TID 10003b
     """Irradiation Event X-Ray Source Data TID 10003b
-    
+
     From DICOM Part 16 Correction Proposal CP-1077:
         This template contains data which is expected to be available to the X-ray source component of the equipment.
-    
+
     Additional to the template:
         * ii_field_size
         * exposure_control_mode
@@ -576,7 +575,7 @@ class IrradEventXRaySourceData(models.Model):  # TID 10003b
 
 class XrayGrid(models.Model):
     """Content ID 10017 X-Ray Grid
-    
+
     From DICOM Part 16
     """
     irradiation_event_xray_source_data = models.ForeignKey(IrradEventXRaySourceData)
@@ -611,7 +610,7 @@ class Exposure(models.Model):  # EV 113736
     exposure = models.DecimalField(max_digits=16, decimal_places=2, blank=True, null=True)
 
     def convert_uAs_to_mAs(self):
-        """Converts uAs to mAs for display in web interface    
+        """Converts uAs to mAs for display in web interface
         """
         if self.exposure:
             return self.exposure / 1000
@@ -627,7 +626,7 @@ class XrayFilters(models.Model):  # EV 113771
         ContextID, blank=True, null=True, related_name='xrayfilters_material')  # CID 10006
     xray_filter_thickness_minimum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     xray_filter_thickness_maximum = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
-        
+
 
 class IrradEventXRayMechanicalData(models.Model):  # TID 10003c
     """Irradiation Event X-Ray Mechanical Data TID 10003c
@@ -635,7 +634,7 @@ class IrradEventXRayMechanicalData(models.Model):  # TID 10003c
     From DICOM Part 16 Correction Proposal CP-1077:
         This template contains data which is expected to be available to the gantry or mechanical component of the
         equipment.
-    
+
     Additional to the template:
         * compression_force
         * magnification_factor
@@ -654,11 +653,11 @@ class IrradEventXRayMechanicalData(models.Model):  # TID 10003c
     # not in DICOM standard - compression force in N
     compression_force = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     magnification_factor = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
-    
+
 
 class DoseRelatedDistanceMeasurements(models.Model):  # CID 10008
     """Dose Related Distance Measurements Context ID 10008
-    
+
     Called from TID 10003c
     """
     irradiation_event_xray_mechanical_data = models.ForeignKey(IrradEventXRayMechanicalData)
@@ -675,15 +674,15 @@ class DoseRelatedDistanceMeasurements(models.Model):  # CID 10008
     # not in DICOM standard - distance source to entrance surface distance in mm
     distance_source_to_entrance_surface = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     radiological_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
-    
+
 
 class AccumProjXRayDose(models.Model):  # TID 10004
     """Accumulated Fluoroscopy and Acquisition Projection X-Ray Dose TID 10004
-    
+
     From DICOM Part 16:
         This general template provides detailed information on projection X-Ray dose value accumulations over
         several irradiation events from the same equipment (typically a study or a performed procedure step).
-    
+
     """
     accumulated_xray_dose = models.ForeignKey(AccumXRayDose)
     fluoro_dose_area_product_total = models.DecimalField(max_digits=16, decimal_places=12, blank=True, null=True)
@@ -703,15 +702,15 @@ class AccumProjXRayDose(models.Model):  # TID 10004
     reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
 
     def convert_gym2_to_cgycm2(self):
-        """Converts Gy.m2 to cGy.cm2 for display in web interface    
+        """Converts Gy.m2 to cGy.cm2 for display in web interface
         """
         if self.dose_area_product_total:
             return 1000000*self.dose_area_product_total
-    
+
 
 class AccumMammographyXRayDose(models.Model):  # TID 10005
     """Accumulated Mammography X-Ray Dose TID 10005
-    
+
     From DICOM Part 16:
         This modality specific template provides detailed information on mammography X-Ray dose value
         accumulations over several irradiation events from the same equipment (typically a study or a performed
@@ -724,7 +723,7 @@ class AccumMammographyXRayDose(models.Model):  # TID 10005
 
 class AccumCassetteBsdProjRadiogDose(models.Model):  # TID 10006
     """Accumulated Cassette-based Projection Radiography Dose TID 10006
-    
+
     From DICOM Part 16 Correction Proposal CP-1077:
         This template provides information on Projection Radiography dose values accumulated on Cassette-
         based systems over one or more irradiation events (typically a study or a performed procedure step) from
@@ -733,11 +732,11 @@ class AccumCassetteBsdProjRadiogDose(models.Model):  # TID 10006
     accumulated_xray_dose = models.ForeignKey(AccumXRayDose)
     detector_type = models.ForeignKey(ContextID, blank=True, null=True)
     total_number_of_radiographic_frames = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
-    
+
 
 class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
     """Accumulated Integrated Projection Radiography Dose TID 10007
-    
+
     From DICOM Part 16 Correction Proposal CP-1077:
         This template provides information on Projection Radiography dose values accumulated on Integrated
         systems over one or more irradiation events (typically a study or a performed procedure step) from the
@@ -759,7 +758,7 @@ class AccumIntegratedProjRadiogDose(models.Model):  # TID 10007
 
 class PatientModuleAttr(models.Model):  # C.7.1.1
     """Patient Module C.7.1.1
-    
+
     From DICOM Part 3: Information Object Definitions Table C.7-1:
         Specifies the Attributes of the Patient that describe and identify the Patient who is
         the subject of a diagnostic Study. This Module contains Attributes of the patient that are needed
@@ -779,10 +778,10 @@ class PatientModuleAttr(models.Model):  # C.7.1.1
 
 class PatientStudyModuleAttr(models.Model):  # C.7.2.2
     """Patient Study Module C.7.2.2
-    
+
     From DICOM Part 3: Information Object Definitions Table C.7-4a:
         Defines Attributes that provide information about the Patient at the time the Study
-        started.        
+        started.
     """
     general_study_module_attributes = models.ForeignKey(GeneralStudyModuleAttr)
     admitting_diagnosis_description = models.TextField(blank=True, null=True)
@@ -792,11 +791,11 @@ class PatientStudyModuleAttr(models.Model):  # C.7.2.2
     patient_size = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     patient_weight = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     # TODO: Add patient size code sequence
-    
+
 
 class GeneralEquipmentModuleAttr(models.Model):  # C.7.5.1
     """General Equipment Module C.7.5.1
-    
+
     From DICOM Part 3: Information Object Definitions Table C.7-8:
         Specifies the Attributes that identify and describe the piece of equipment that
         produced a Series of Composite Instances.
@@ -824,7 +823,7 @@ class GeneralEquipmentModuleAttr(models.Model):  # C.7.5.1
 
 class CtRadiationDose(models.Model):  # TID 10011
     """CT Radiation Dose TID 10011
-    
+
     From DICOM Part 16:
         This template defines a container (the root) with subsidiary content items, each of which corresponds to a
         single CT X-Ray irradiation event entry. There is a defined recording observer (the system or person
@@ -860,7 +859,7 @@ class SourceOfCTDoseInformation(models.Model):  # CID 10021
 
 class CtAccumulatedDoseData(models.Model):  # TID 10012
     """CT Accumulated Dose Data
-    
+
     From DICOM Part 16:
         This general template provides detailed information on CT X-Ray dose value accumulations over several
         irradiation events from the same equipment and over the scope of accumulation specified for the report
@@ -883,10 +882,10 @@ class CtAccumulatedDoseData(models.Model):  # TID 10012
 
 class CtIrradiationEventData(models.Model):  # TID 10013
     """CT Irradiation Event Data TID 10013
-    
+
     From DICOM Part 16:
         This template conveys the dose and equipment parameters of a single irradiation event.
-    
+
     Additional to the template:
         + date_time_started
         + series_description
@@ -948,7 +947,7 @@ class CtXRaySourceParameters(models.Model):
 
 class ScanningLength(models.Model):  # TID 10014
     """Scanning Length TID 10014
-    
+
     From DICOM Part 16:
         No description
     """
@@ -978,7 +977,7 @@ class SizeSpecificDoseEstimation(models.Model):
 
 class CtDoseCheckDetails(models.Model):  # TID 10015
     """CT Dose Check Details TID 10015
-    
+
     From DICOM Part 16:
         This template records details related to the use of the NEMA Dose Check Standard (NEMA XR-25-2010).
     """
@@ -1002,7 +1001,7 @@ class CtDoseCheckDetails(models.Model):  # TID 10015
 
 
 # Models common to both
-    
+
 class ObserverContext(models.Model):  # TID 1002
     """Observer Context TID 1002
 
@@ -1034,7 +1033,7 @@ class ObserverContext(models.Model):  # TID 1002
 
 class DeviceParticipant(models.Model):  # TID 1021
     """Device Participant TID 1021
-    
+
     From DICOM Part 16:
         This template describes a device participating in an activity as other than an observer or subject. E.g. for
         a dose report documenting an irradiating procedure, participants include the irradiating device.
@@ -1054,7 +1053,7 @@ class DeviceParticipant(models.Model):  # TID 1021
 
 class PersonParticipant(models.Model):  # TID 1020
     """Person Participant TID 1020
-    
+
     From DICOM Part 16:
         This template describes a person participating in an activity as other than an observer or subject. E.g. for
         a dose report documenting an irradiating procedure, participants include the person administering the
