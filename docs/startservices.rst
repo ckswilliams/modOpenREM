@@ -107,13 +107,20 @@ Windows::
     --pidfile=C:\path\to\media\celery\celerybeat.pid
 
 
-Check the new settings
+Configure the settings
 ======================
 
-* Go to ``Config -> Manage users`` and make sure the users have the right settings
+* Follow the link presented on the front page to get to the user and group administration. After the first users are
+  configured, this link will no longer be presented and instead you can go to ``Config -> Manage users``. The groups are
     + ``viewgroup`` can browse the data only
+    + ``importsizegroup`` can use the csv import facility to add patient height and weight information
+    + ``importqrgroup`` can use the DICOM query-retrieve facility to pull in studies, as long as they are pre-configured
     + ``exportgroup`` can view and export data to a spreadsheet
-    + ``admingroup`` can delete studies and import height and weight data in addition to anything the export group can do
+    + ``pidgroup`` can search using patient names and IDs depending on settings, and export with patient names and IDs
+      if they are also a member of the ``exportgroup``
+    + ``admingroup`` can delete studies, configure DICOM Store/QR settings, configure DICOM keep or delete settings,
+      configure patient ID settings, and abort and delete patient size import jobs. *Members of the admingroup no longer
+      inherit the other groups permissions.*
 * Return to the OpenREM interface (click on ``view site`` at the top right)
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately
 * Go to ``Config -> Patient ID settings`` and configure appropriately
@@ -133,16 +140,6 @@ Add some data!
 
     openrem_rdsr.py rdsrfile.dcm
 
-Add some users *(New in version 0.4.0)*
-
-* Go to the admin interface (eg http://localhost:8000/admin) and log in with the user created when you created the database (``syncdb``)
-* Create some users and add them to the appropriate groups (if there are no groups, go to the OpenREM homepage and they should be created).
-
-    + ``viewgroup`` can browse the data only
-    + ``exportgroup`` can do as view group plus export data to a spreadsheet
-    + ``admingroup`` can delete studies and import height and weight data in addition to anything the export group can do
-
-* Return to the OpenREM interface (eg http://localhost:8000/openrem) and log out of the superuser in the top right corner and log in again using one of the new users you have just created.
 
 Further instructions
 ====================

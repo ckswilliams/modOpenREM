@@ -168,10 +168,20 @@ Check the new settings
 ======================
 
 * Go to ``Config -> Manage users`` and make sure the users have the right settings
+    + ``viewgroup`` can browse the data only
+    + ``importsizegroup`` can use the csv import facility to add patient height and weight information
+    + ``importqrgroup`` can use the DICOM query-retrieve facility to pull in studies, as long as they are pre-configured
+    + ``exportgroup`` can view and export data to a spreadsheet
+    + ``pidgroup`` can search using patient names and IDs depending on settings, and export with patient names and IDs
+      if they are also a member of the ``exportgroup``
+    + ``admingroup`` can delete studies, configure DICOM Store/QR settings, configure DICOM keep or delete settings,
+      configure patient ID settings, and abort and delete patient size import jobs. *Members of the admingroup no longer
+      inherit the other groups permissions.*
 * Return to the OpenREM interface (click on ``view site`` at the top right)
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately
 * Go to ``Config -> Patient ID settings`` and configure appropriately
-* If you want to use OpenREM as a DICOM store, go to ``Config -> Dicom network configuration``
+* If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
+  ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
 * Go to ``Config -> View and edit display names`` and review. If you have a lot of existing data you'll
   need to set a lot of display names, from each time the software version, station name, or other elements
   have changed. If you have upgraded from ``0.7.0b5``, edit each one in turn and save it.
