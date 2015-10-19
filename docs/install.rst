@@ -71,7 +71,7 @@ For testing you can use the SQLite3 database
     displayed in OpenREM charts.** Alternatively, other databases such as MySQL/MariaDB, Oracle, and
     some others with lower levels of support can be used.
 
-    There are some further guides to setting up PostgreSQL – see `Database options`_ below
+    There are some further guides to setting up PostgreSQL – see `Database guides`_ below
 
 Location for imports and exports
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
