@@ -1371,7 +1371,7 @@ def size_imports(request, *args, **kwargs):
     from django.shortcuts import render_to_response
     from remapp.models import SizeUpload
 
-    if not request.user.groups.filter(name="importsizegroup") or not request.user.groups.filter(name="admingroup"):
+    if not request.user.groups.filter(name="importsizegroup") and not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the import size group - please contact your administrator")
         return redirect('/openrem/')
 
