@@ -202,6 +202,12 @@ Check the new settings
   need to set a lot of display names, from each time the software version, station name, or other elements
   have changed. If you have upgraded from ``0.7.0b5``, edit each one in turn and save it.
 
+Start all the services!
+=======================
+
+You are now ready to start the services to allow you to use OpenREM - go to :doc:`startservices` to see how!
+
+
 Further instructions
 ====================
 
