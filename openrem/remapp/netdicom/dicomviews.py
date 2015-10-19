@@ -33,8 +33,10 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import pkg_resources
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 @login_required
@@ -236,6 +238,10 @@ def dicom_qr_page(request, *args, **kwargs):
     from remapp.forms import DicomQueryForm
     from remapp.models import DicomStoreSCP, DicomRemoteQR
     from remapp.netdicom.tools import echoscu
+
+    if not request.user.groups.filter(name="importqrgroup"):
+        messages.error(request, "You are not in the importqrgroup - please contact your administrator")
+        return redirect('/openrem/')
 
     form = DicomQueryForm
 

@@ -67,7 +67,7 @@
           {% block loginlink %}
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
-                {% if admin.importsizegroup or admin.importqrgroup %}
+                {% if admin.importsizegroup or admin.importqrgroup or admin.admingroup %}
                     {% block importnav %}
                     <li class="dropdown">
                     {% endblock %}
@@ -75,9 +75,15 @@
                             Imports <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
+                            {% if admin.importsizegroup %}
                             <li><a href="/openrem/admin/sizeupload">Import patient size info</a></li>
+                            {% endif %}
+                            {% if admin.importsizegroup or admin.admingroup %}
                             <li><a href="/openrem/admin/sizeimports">Previous patient size imports</a></li>
+                            {% endif %}
+                            {% if admin.importqrgroup %}
                             <li><a href="/openrem/admin/queryremote">Query remote server</a> </li>
+                            {% endif %}
                         </ul>
                     </li>
                 {% endif %}
