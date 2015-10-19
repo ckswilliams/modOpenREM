@@ -40,17 +40,11 @@ import pkg_resources
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse, HttpResponseRedirect
+from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext
-from django.shortcuts import render_to_response
-from django.core.urlresolvers import reverse, reverse_lazy
-import json
 from django.views.decorators.csrf import csrf_exempt
-import datetime
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
-from django.core.context_processors import csrf
 
 try:
     from numpy import *
@@ -1694,9 +1688,6 @@ def dicom_summary(request):
         context_instance=RequestContext(request)
     )
 
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy
-
 
 class DicomStoreCreate(CreateView):
     model = DicomStoreSCP
@@ -1713,6 +1704,7 @@ class DicomStoreCreate(CreateView):
             admin[group.name] = True
         context['admin'] = admin
         return context
+
 
 class DicomStoreUpdate(UpdateView):
     model = DicomStoreSCP
@@ -1799,9 +1791,10 @@ class DicomQRDelete(DeleteView):
         return context
 
 
-from remapp.models import PatientIDSettings
 
 class PatientIDSettingsUpdate(UpdateView):
+    from remapp.models import PatientIDSettings
+
     model = PatientIDSettings
     fields = ['name_stored', 'name_hashed', 'id_stored', 'id_hashed', 'accession_hashed', 'dob_stored']
 
@@ -1818,11 +1811,10 @@ class PatientIDSettingsUpdate(UpdateView):
         return context
 
 
-from remapp.models import DicomDeleteSettings
-from remapp.forms import DicomDeleteSettingsForm
-
-
 class DicomDeleteSettingsUpdate(UpdateView):
+    from remapp.models import DicomDeleteSettings
+    from remapp.forms import DicomDeleteSettingsForm
+
     model = DicomDeleteSettings
     form_class = DicomDeleteSettingsForm
 
