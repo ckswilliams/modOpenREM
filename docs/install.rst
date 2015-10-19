@@ -178,6 +178,10 @@ second command runs the migration files, and will display the text
 ``Applying remapp.0002_fresh__openrem_install_add_median_function... OK``, indicating
 that the median function has been added.
 
+Start all the services!
+=======================
+
+You are now ready to start the services to allow you to use OpenREM - go to :doc:`startservices` to see how!
 
 
 Further instructions
