@@ -5,21 +5,25 @@ Start all the services
 Test web server
 ===============
 
-Linux::
+In a shell/command window, move into the openrem folder:
 
-    python /usr/local/lib/python2.7/dist-packages/openrem/manage.py runserver --insecure
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
 
-Windows::
+Run the built in web server::
 
-    python C:\Python27\Lib\site-packages\openrem\manage.py runserver --insecure
+    python manage.py runserver --insecure
 
-If you are using a headless server and need to be able to see the 
-web interface from another machine, use 
-``python /usr/lib/python2.7/dist-packages/openrem/manage.py runserver x.x.x.x:8000 --insecure`` 
-(or Windows equivalent) replacing the ``x`` with the IP address of the server 
-and ``8000`` with the port you wish to use.
+Open the web addesss given, optionally appending ``/openrem`` (http://localhost:8000/openrem)
 
-Open the web addesss given, appending ``/openrem`` (http://localhost:8000/openrem)
+If you are using a headless server and need to be able to see the web interface from another machine, use
+``python manage.py runserver x.x.x.x:8000 --insecure`` replacing the ``x`` with the IP address of the server
+and ``8000`` with the port you wish to use. Then on your client computer, go to ``http://x.x.x.x:8000/openrem``, again
+replacing the ``x`` with the IP address of the server, and ammending the ``8000`` as appropriate.
+
 
 ..  Note::
 
@@ -41,14 +45,27 @@ RabbitMQ allows for asynchronous task processing for imports and exports.
     Celery using the same user or group as the webserver, and setting the
     file permissions accordingly.
 
-In a new shell:
+In a new shell/command window, move into the openrem folder:
 
-Linux::
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
 
-    cd /usr/local/lib/python2.7/dist-packages/openrem/
+Linux - ``\`` is the line continuation character::
+
     celery multi start stores default -A openremproject -c:stores 1 -c 3 \
     -Q:stores stores -Q default \
     --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
+
+Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuation character::
+
+    celery worker -n default -A openremproject -c 3 -Q default ^
+    --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
+
+    celery worker -n stores -A openremproject -c 1 -Q stores ^
+    --pidfile=C:\path\to\media\celery\stores.pid --logfile=C:\path\to\media\celery\stores.log
 
 If you intend to use OpenREM to provide a DICOM Store SCP (ie you can DICOM send things to OpenREM without using
 any other program, such as Conquest), then we need a Celery Queue just for the store. The node (and queue) created for
@@ -59,28 +76,15 @@ workers should be available for all the other jobs - exports; and imports when u
 You must also specify the location for the pid file and for the log file. You might put these in the media folder, or
 the logs might go in ``/var/log/``.
 
-The ``\`` is added in to allow the single command to go over several lines.
-
-The command above doesn't work on Windows, so we have to use two separate commands that stay running in the command
-window - see `Daemonising Celery`_ below and follow the link to see a guide to running Celery as a Windows service.
-
-Windows::
-
-    cd C:\Python27\Lib\site-packages\openrem\
-
-
-    celery multi start stores default -A openremproject -c:stores 2 -c 3 ^
-    -Q:stores stores -Q default ^
-    --pidfile=C:\path\to\media\celery\%N.pid --logfile=C:\path\to\media\celery\%N.log
-
-This is the same as for Linux, but this time the line continuation character is ``^``.
-
 For production use, see `Daemonising Celery`_ below
 
-To stop the celery queues::
+To stop the celery queues in Linux::
 
     celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
+For Windows, just press ``Ctrl-c``
+
+You will need to do this twice if there are running tasks you wish to kill.
 
 Celery periodic tasks: beat
 ===========================
@@ -89,10 +93,15 @@ Celery beat is a scheduler. If it is running, then every 60 seconds a task is ru
 Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
 If this is not successful, then the Store SCP is started.
 
-To run celery beat, open a new shell:
-Linux::
+To run celery beat, open a new shell and move into the openrem folder:
 
-    cd /usr/local/lib/python2.7/dist-packages/openrem/
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem``
+
+Linux::
 
     celery -A openremproject beat -s /path/to/media/celery/celerybeat-schedule \
     -f /path/to/media/celery/celerybeat.log \
@@ -100,12 +109,13 @@ Linux::
 
 Windows::
 
-    cd C:\Python27\Lib\site-packages\openrem\
-
     celery -A openremproject beat -s C:\path\to\media\celery\celerybeat-schedule ^
     -f C:\path\to\media\celery\celerybeat.log ^
     --pidfile=C:\path\to\media\celery\celerybeat.pid
 
+For production use, see `Daemonising Celery`_ below
+
+To stop Celery beat, just press ``Ctrl-c``
 
 Configure the settings
 ======================
