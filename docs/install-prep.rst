@@ -111,6 +111,11 @@ Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See
 
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+Install OpenREM
+===============
+
+You are now ready to install OpenREM, so go to the :doc:`install` docs.
+
 Further instructions
 ====================
 
