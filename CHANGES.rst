@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0b7 (2015-10-18)
+0.7.0b7 (2015-10-19)
 --------------------
 
 * `#298`_  Added ordering by accumulated AGD for mammographic studies
