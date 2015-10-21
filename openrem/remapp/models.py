@@ -94,6 +94,7 @@ class DicomRemoteQR(models.Model):
     port = models.IntegerField(blank=True, null=True)
     ip = models.GenericIPAddressField(blank=True, null=True)
     hostname = models.CharField(max_length=32, blank=True, null=True)
+    callingaet = models.CharField(max_length=16, blank=True, null=True)
     enabled = models.BooleanField(default=False)
 
     def get_absolute_url(self):
