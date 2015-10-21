@@ -130,7 +130,7 @@ from celery import shared_task
 @shared_task
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
-        rh=None, rp=None, aet="OPENREM", aec="STOREDCMTK", implicit=False, explicit=False, move=False, query_id=None,
+        aet="OPENREM", implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True, *args, **kwargs):
     import uuid
     import json
@@ -339,28 +339,28 @@ def qrscu(
 
 
 
-if __name__ == "__main__":
-    import sys
-    import argparse
-
-    # parse commandline
-    parser = argparse.ArgumentParser(description='storage SCU example')
-    parser.add_argument('remotehost')
-    parser.add_argument('remoteport', type=int)
-    parser.add_argument('-aet', help='calling AE title', default='OPENREM')
-    parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
-    parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
-    parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
-    parser.add_argument('-move', action='store_true', help='automatically request objects to be moved', default=False)
-
-    args = parser.parse_args()
-
-    sys.exit(
-        qrscu(
-            rh=args.remotehost, rp=args.remoteport, aet=args.aet, aec=args.aec,
-            implicit=args.implicit, explicit=args.explicit, move=args.move
-        )
-    )
+# if __name__ == "__main__":
+#     import sys
+#     import argparse
+#
+#     # parse commandline
+#     parser = argparse.ArgumentParser(description='storage SCU example')
+#     parser.add_argument('remotehost')
+#     parser.add_argument('remoteport', type=int)
+#     parser.add_argument('-aet', help='calling AE title', default='OPENREM')
+#     parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
+#     parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
+#     parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
+#     parser.add_argument('-move', action='store_true', help='automatically request objects to be moved', default=False)
+#
+#     args = parser.parse_args()
+#
+#     sys.exit(
+#         qrscu(
+#             rh=args.remotehost, rp=args.remoteport, aet=args.aet, aec=args.aec,
+#             implicit=args.implicit, explicit=args.explicit, move=args.move
+#         )
+#     )
 
 
 @shared_task
