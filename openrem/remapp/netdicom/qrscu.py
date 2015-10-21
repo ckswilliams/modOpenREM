@@ -130,7 +130,7 @@ from celery import shared_task
 @shared_task
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
-        aet="OPENREM", implicit=False, explicit=False, move=False, query_id=None,
+        implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True, *args, **kwargs):
     import uuid
     import json
@@ -148,6 +148,7 @@ def qrscu(
         rh = qr_scp.ip
     rp = qr_scp.port
     aec = qr_scp.aetitle
+    aet = qr_scp.callingaet
 
     if implicit:
         ts = [ImplicitVRLittleEndian]

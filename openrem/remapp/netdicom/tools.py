@@ -57,12 +57,14 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     if store_scp and scp_pk:
         scp = DicomStoreSCP.objects.get(pk=scp_pk)
         rh = "localhost"
+        aet = "OPENREMECHO"
     elif qr_scp and scp_pk:
         scp = DicomRemoteQR.objects.get(pk=scp_pk)
         if scp.hostname:
             rh = scp.hostname
         else:
             rh = scp.ip
+        aet = scp.callingaet
     else:
         logging.warning("echoscu called without SCP information")
         return 0
@@ -76,7 +78,7 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         ExplicitVRBigEndian
         ]
 
-    aet = "OPENREMECHO"
+
 
     # create application entity with just Verification SOP classes as SCU
     my_ae = AE(aet.encode('ascii','ignore'), 0, [VerificationSOPClass], [], ts)
