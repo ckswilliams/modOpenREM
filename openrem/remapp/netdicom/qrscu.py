@@ -149,6 +149,8 @@ def qrscu(
     rp = qr_scp.port
     aec = qr_scp.aetitle
     aet = qr_scp.callingaet
+    if not aet:
+        aet = "OPENREMDEFAULT"
 
     if implicit:
         ts = [ImplicitVRLittleEndian]

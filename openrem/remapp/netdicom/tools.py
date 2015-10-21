@@ -65,6 +65,8 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         else:
             rh = scp.ip
         aet = scp.callingaet
+        if not aet:
+            aet = "OPENREMECHO"
     else:
         logging.warning("echoscu called without SCP information")
         return 0
