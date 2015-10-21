@@ -165,6 +165,7 @@ class Migration(migrations.Migration):
                 ('port', models.IntegerField(null=True, blank=True)),
                 ('ip', models.GenericIPAddressField(null=True, blank=True)),
                 ('hostname', models.CharField(max_length=32, null=True, blank=True)),
+                ('callingaet', models.CharField(max_length=16, null=True, blank=True)),
                 ('enabled', models.BooleanField(default=False)),
             ],
         ),
