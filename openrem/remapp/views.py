@@ -1742,7 +1742,7 @@ class DicomStoreDelete(DeleteView):
 
 class DicomQRCreate(CreateView):
     model = DicomRemoteQR
-    fields = ['name', 'aetitle', 'port', 'ip', 'hostname']
+    fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
@@ -1759,7 +1759,7 @@ class DicomQRCreate(CreateView):
 
 class DicomQRUpdate(UpdateView):
     model = DicomRemoteQR
-    fields = ['name', 'aetitle', 'port', 'ip', 'hostname']
+    fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname']
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
