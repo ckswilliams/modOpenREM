@@ -170,8 +170,6 @@ Rename the ``0002_fresh_openrem_install_add_median_function.py.inactive`` file
 in the ``migrations`` folder to ``0002_fresh_openrem_install_add_median_function.py``
 then do the following:
 
-Windows::
-
     python manage.py makemigrations --empty remapp
     python manage.py migrate
 
