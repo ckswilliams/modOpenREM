@@ -149,6 +149,8 @@ a pair of square brackets something like below::
     contenttypes
      [X] 0001_initial
      [X] 0002_remove_content_type_name
+    remapp
+     [X] 0001_initial
     sessions
      [X] 0001_initial
     sites
