@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('remapp', '0005_dicomremoteqr_callingaet'),
+    ]
+
+    operations = [
+        migrations.AlterField(
+            model_name='dicomremoteqr',
+            name='aetitle',
+            field=models.CharField(max_length=16, null=True, verbose_name=b'AE Title of the remote node - 16 or fewer letters and numbers, no spaces', blank=True),
+        ),
+        migrations.AddField(
+            model_name='dicomremoteqr',
+            name='callingaet',
+            field=models.CharField(max_length=16, null=True, verbose_name=b'AE Title of this OpenREM server - 16 or fewer letters and numbers, no spaces', blank=True),
+        ),
+        migrations.AlterField(
+            model_name='dicomremoteqr',
+            name='callingaet',
+            field=models.CharField(max_length=16, null=True, verbose_name=b'AE Title of this OpenREM server - 16 or fewer letters and numbers, no spaces', blank=True),
+        ),
+        migrations.AlterField(
+            model_name='dicomremoteqr',
+            name='hostname',
+            field=models.CharField(max_length=32, null=True, verbose_name=b'Or remote hostname', blank=True),
+        ),
+        migrations.AlterField(
+            model_name='dicomremoteqr',
+            name='ip',
+            field=models.GenericIPAddressField(null=True, verbose_name=b'Remote IP address', blank=True),
+        ),
+        migrations.AlterField(
+            model_name='dicomremoteqr',
+            name='name',
+            field=models.CharField(unique=True, max_length=64, verbose_name=b'Name of QR node - fewer than 64 characters, spaces allowed'),
+        ),
+        migrations.AlterField(
+            model_name='dicomremoteqr',
+            name='port',
+            field=models.IntegerField(null=True, verbose_name=b'Remote port', blank=True),
+        ),
+    ]
