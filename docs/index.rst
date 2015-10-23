@@ -32,6 +32,7 @@ Contents:
     i_exporting
     openskin
     i_administration
+    troubleshooting
     code
     releasenotes
 
