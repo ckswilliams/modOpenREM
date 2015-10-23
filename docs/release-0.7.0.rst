@@ -86,6 +86,24 @@ the warning about files becoming unusable. In linux, ``touch remapp/migrations/_
 
     python manage.py migrate remapp
 
+********************************************
+Upgrading from version 0.7.0 beta 7 or later
+********************************************
+
+You will need to do a database migration.
+
+.. sourcecode:: bash
+
+    pip install openrem==0.7.0b8
+
+From the openrem folder (see above):
+
+.. sourcecode:: bash
+
+    python manage.py makemigrations remapp
+    python manage.py migrate remapp
+
+
 
 Restart all the services!
 =========================
