@@ -8,15 +8,13 @@ Server 500 errors
 Turn on debug mode
 ------------------
 
-Locate your settings file
+Locate and edit your local_settings file
 
-* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
-* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
-* Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
-
-Edit local_settings.py
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/openremproject/local_settings.py``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\openremproject\local_settings.py``
+* Windows virtualenv: ``Lib\site-packages\openrem\openremproject\local_settings.py``
 
 * Change the line::
 

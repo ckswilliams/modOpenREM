@@ -26,7 +26,7 @@ Locate install location
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 
 There are two files that need renaming:

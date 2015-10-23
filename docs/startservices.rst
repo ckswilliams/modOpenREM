@@ -11,7 +11,7 @@ In a shell/command window, move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Run the built in web server::
 
@@ -51,7 +51,7 @@ In a new shell/command window, move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Linux - ``\`` is the line continuation character::
 
@@ -99,7 +99,7 @@ To run celery beat, open a new shell and move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Linux::
 

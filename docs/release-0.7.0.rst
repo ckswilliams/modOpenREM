@@ -60,7 +60,7 @@ In a shell/command window, move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Delete all numbered migration files in openrem's ``migrations`` folder.
 
