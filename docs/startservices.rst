@@ -139,8 +139,9 @@ Configure the settings
 * Go to ``Config -> Patient ID settings`` and configure appropriately
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
   ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
-* When you have some data in the system, you will want to go to ``Config -> View and edit display names`` and customise
-  them.
+* With data in the system, you will want to go to ``Config -> View and edit display names`` and customise
+  the display names. An established system will have several entries for each device, from each time the software
+  version, station name or other elements changes.
 
 
 
