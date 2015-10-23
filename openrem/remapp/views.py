@@ -1663,14 +1663,14 @@ def chart_options_view(request):
         context_instance=RequestContext(request)
     )
 
-from remapp.models import DicomStoreSCP, DicomRemoteQR
+from remapp.models import DicomStoreSCP
 
 @login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
     """
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.models import DicomDeleteSettings
+    from remapp.models import DicomDeleteSettings, DicomRemoteQR
 
     try:
         del_settings = DicomDeleteSettings.objects.get()
@@ -1750,8 +1750,11 @@ class DicomStoreDelete(DeleteView):
 
 
 class DicomQRCreate(CreateView):
+    from remapp.forms import DicomQRForm
+    from remapp.models import DicomRemoteQR
+
     model = DicomRemoteQR
-    fields = ['name', 'aetitle', 'port', 'ip', 'hostname']
+    form_class = DicomQRForm
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
@@ -1767,8 +1770,11 @@ class DicomQRCreate(CreateView):
 
 
 class DicomQRUpdate(UpdateView):
+    from remapp.forms import DicomQRForm
+    from remapp.models import DicomRemoteQR
+
     model = DicomRemoteQR
-    fields = ['name', 'aetitle', 'port', 'ip', 'hostname']
+    form_class = DicomQRForm
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
@@ -1784,6 +1790,8 @@ class DicomQRUpdate(UpdateView):
 
 
 class DicomQRDelete(DeleteView):
+    from remapp.models import DicomRemoteQR
+
     model = DicomRemoteQR
     success_url = reverse_lazy('dicom_summary')
 

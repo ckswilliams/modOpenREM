@@ -18,8 +18,12 @@
           <div class="panel-body">
               <table>
                   <tr>
-                      <th>AE Title</th>
+                      <th>Remote QR AE Title</th>
                       <td>{{ object.aetitle }}</td>
+                  </tr>
+                  <tr>
+                      <th>Calling AE Title</th>
+                      <td>{{ object.callingaet }}</td>
                   </tr>
                   <tr>
                       <th>Port</th>
@@ -32,10 +36,6 @@
                   <tr>
                       <th>IP Address</th>
                       <td>{{ object.ip }}</td>
-                  </tr>
-                  <tr>
-                      <th>Currently enabled?</th>
-                      <td>{{ object.enabled }}</td>
                   </tr>
               </table>
 
