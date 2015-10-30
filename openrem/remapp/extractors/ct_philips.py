@@ -43,12 +43,14 @@ django.setup()
 
 from celery import shared_task
 
-def _scanninglength(dataset,event): # TID 10014
+
+def _scanninglength(dataset,event):  # TID 10014
     from remapp.models import ScanningLength
     from remapp.tools.get_values import get_value_kw
     scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
     scanlen.scanning_length = get_value_kw('ScanLength',dataset)
     scanlen.save()
+
 
 def _ctxraysourceparameters(dataset,event):
     from remapp.models import CtXRaySourceParameters
@@ -63,7 +65,7 @@ def _ctxraysourceparameters(dataset,event):
     param.save()
 
 
-def _ctirradiationeventdata(dataset,ct): # TID 10013
+def _ctirradiationeventdata(dataset,ct):  # TID 10013
     from remapp.models import CtIrradiationEventData
     from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid
     from remapp.tools.dcmdatetime import get_date_time
@@ -105,7 +107,7 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
     event.date_time_started = get_date_time('AcquisitionDateTime',dataset)
 #    event.series_description = get_value_kw('SeriesDescription',dataset)
     event.save()
-                        
+
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
     from remapp.models import CtAccumulatedDoseData, ContextID
@@ -141,18 +143,18 @@ def _ctradiationdose(dataset,g):
     for series in dataset.ExposureDoseSequence:
         if 'AcquisitionType' in series:
             _ctirradiationeventdata(series,proj)
-    #
-    # Come back and set start and end of irradiation after creating the x-ray events
-    #
-    # Won't work with SQLite
     events = proj.ctirradiationeventdata_set.all()
-    proj.start_of_xray_irradiation = events.aggregate(Min('date_time_started'))['date_time_started__min']
-    latestlength = int(events.latest('date_time_started').exposure_time * 1000) # in microseconds
-    lastevent = events.aggregate(Max('date_time_started'))['date_time_started__max'] 
-    if lastevent and latestlength:
-        last = lastevent + timedelta(microseconds=latestlength)
-        proj.end_of_xray_irradiation = last
-    proj.save()
+    if not events:
+        logging.warning("There were no events in ct_philips import, or they couldn't be read")
+    else:
+        # Come back and set start and end of irradiation after creating the x-ray events
+        proj.start_of_xray_irradiation = events.aggregate(Min('date_time_started'))['date_time_started__min']
+        latestlength = int(events.latest('date_time_started').exposure_time * 1000) # in microseconds
+        lastevent = events.aggregate(Max('date_time_started'))['date_time_started__max']
+        if lastevent and latestlength:
+            last = lastevent + timedelta(microseconds=latestlength)
+            proj.end_of_xray_irradiation = last
+        proj.save()
 
 def _generalequipmentmoduleattributes(dataset,study):
     from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
