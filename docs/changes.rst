@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b7 (2015-10-19)
 --------------------
 
+* `#302`_  Improved handling of Philips Dose Info objects when series information sequence has UN value representation
 * `#301`_  Charts: fixed bug that could stop average kVp and mAs radiographic plots from working
 * `#300`_  Calling AE Title for Query Retrieve SCU is now configured not hardcoded
 * `#299`_  Hash of MultiValued DICOM elements now works
