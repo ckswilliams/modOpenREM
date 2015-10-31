@@ -71,6 +71,10 @@ OpenREM version history
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
 
+0.6.1 (2015-10-30)
+------------------
+* `#303`_  Corrected name of Store SCP command in docs
+
 
 0.6.0 (2015-05-14)
 ------------------
