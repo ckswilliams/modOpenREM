@@ -120,13 +120,17 @@ To stop Celery beat, just press ``Ctrl+c``
 Configure the settings
 ======================
 
-.. figure:: img/HomeNoUsers.png
-    :align: center
-    :alt: Initial home page with no users in groups
 
-* Follow the link presented on the front page to get to the user and group administration. After the first users are
-  configured, this link will no longer be presented and instead you can go to ``Config -> Manage users``. You will
-  need the superuser username and password you created just after creating the database. The groups are
+* Follow the link presented on the front page to get to the user and group administration.
+  .. figure:: img/HomeNoUsers.png
+      :align: center
+      :alt: Initial home page with no users in groups
+* After the first users are configured, this link will no longer be presented and instead you can go to
+  ``Config -> Manage users``.
+  .. figure:: img/ConfigMenu.png
+      :align: right
+      :alt: Configuration menu
+* You will need the superuser username and password you created just after creating the database. The groups are
     + ``viewgroup`` can browse the data only
     + ``importsizegroup`` can use the csv import facility to add patient height and weight information
     + ``importqrgroup`` can use the DICOM query-retrieve facility to pull in studies, as long as they are pre-configured
