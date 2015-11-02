@@ -41,7 +41,16 @@ Store hashed data only
 ======================
 
 If you wish to have the patient name and/or ID available for finding studies relating to a specific patient, but do
-not need to identify who that patient is, then it is possible to create a 'hash' of the ID or name before it is stored.
+not need to identify who that patient is, then it is possible to create a 'encrypted' version of the ID or name. In this
+case, a one-way SHA 256 hash is generated and the hash value is stored instead.
 
-If *exactly* the same name or ID (including spelling, spacing, case etc) occur more than once, then the same hash
+If *exactly* the same name or ID (including spelling, spacing, case etc) occurs more than once, then the same hash
 will be generated.
+
+The same applies to accession numbers if the option to encrypt the accession number is selected.
+
+Using patient identifiable data
+===============================
+
+In the modality pages of the OpenREM web interface, if you are in the ``pidgroup`` you will have a filter for patient
+name and patient ID available.
