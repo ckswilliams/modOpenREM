@@ -143,7 +143,7 @@ Configure the settings
 .. figure:: img/Groups.png
     :align: right
     :alt: Selecting groups in Django user admin
-* In addition to adding users to these groups, you may like to grant a second user a ``superuser`` and ``staff`` status
+* In addition to adding users to these groups, you may like to grant a second user ``superuser`` and ``staff`` status
   so that there are at least two people who can manage the users
 * Return to the OpenREM interface (click on ``View site`` at the top right)
 .. figure:: img/ViewSite.png
