@@ -125,11 +125,11 @@ Configure the settings
 .. figure:: img/HomeNoUsers.png
     :align: center
     :alt: Initial home page with no users in groups
-* After the first users are configured, this link will no longer be presented and instead you can go to
-  ``Config -> Manage users``.
 .. figure:: img/ConfigMenu.png
     :align: right
     :alt: Configuration menu
+* After the first users are configured, this link will no longer be presented and instead you can go to
+  ``Config -> Manage users``.
 * You will need the superuser username and password you created just after creating the database. The groups are
     + ``viewgroup`` can browse the data only
     + ``importsizegroup`` can use the csv import facility to add patient height and weight information
