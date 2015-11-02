@@ -1,5 +1,5 @@
-###########################
-DICOM Networking in OpenREM
-###########################
+##################
+DICOM Store and QR
+##################
 
 Documentation yet to be provided.
