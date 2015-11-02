@@ -27,6 +27,7 @@ Contents:
     startservices
     import
     netdicom
+    patientid
     i_navigate
     charts
     i_exporting
