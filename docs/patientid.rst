@@ -16,4 +16,18 @@ In addition, a key identifier for the exam that is normally not considered patie
 * Study accession number
 
 It has become apparent that there are reasons where people need to store patient identifiable data to make the most of
-OpenREM, such as
+OpenREM, so this is now configurable from version 0.7 onwards.
+
+Configure what is stored
+========================
+
+.. figure:: img/ConfigMenu.png
+    :align: right
+    :alt: Configuration menu
+
+On the Config menu, select ``Patient ID settings``. The default settings are as follows:
+
+.. figure:: img/ModifyPtIDStorage.png
+    :align: center
+    :alt: Modify patient identifiable data settings
+
