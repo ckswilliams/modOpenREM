@@ -74,4 +74,13 @@ match. This is more likely to be successful with patient ID than with patient na
 Study export with patient identifiers
 =====================================
 
+Users in the ``pidgroup`` will have extra export buttons available in the modality pages:
 
+.. figure:: img/ExportWithPID.png
+    :align: center
+    :alt: Export buttons for pidgroup users
+
+If the IDs or names are encrypted, then these columns will contain the hash rather than the original values. However, it
+will be possible to see if more than one study belongs to one patient as the values should be the same for both. Due to
+the nature of the algorithm however, a single change in the name or ID - such as an upper case letter instead of a lower
+case one - will be recoreded as a completely different hash value.
