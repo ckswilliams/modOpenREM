@@ -18,8 +18,9 @@ In addition, a key identifier for the exam that is normally not considered patie
 It has become apparent that there are reasons where people need to store patient identifiable data to make the most of
 OpenREM, so this is now configurable from version 0.7 onwards.
 
+************************
 Configure what is stored
-========================
+************************
 
 .. figure:: img/ConfigMenu.png
     :align: center
@@ -37,8 +38,9 @@ the accession number, though OpenREM continues to work if it is missing.
 To start to store patient identifiable data from now on, select the relevant box and press ``Submit``. If you change the
 setting again later, then data already stored will remain in the database.
 
+**********************
 Store hashed data only
-======================
+**********************
 
 If you wish to have the patient name and/or ID available for finding studies relating to a specific patient, but do
 not need to identify who that patient is, then it is possible to create a 'encrypted' version of the ID or name. In this
@@ -49,8 +51,27 @@ will be generated.
 
 The same applies to accession numbers if the option to encrypt the accession number is selected.
 
+*******************************
 Using patient identifiable data
-===============================
+*******************************
+
+Querying for patient studies
+============================
 
 In the modality pages of the OpenREM web interface, if you are in the ``pidgroup`` you will have a filter for patient
-name and patient ID available.
+name and patient ID available:
+
+.. figure:: img/PIDinFilter.png
+    :align: center
+    :alt: Patient name and ID in search filter
+
+If the values in the database are *not* encrypted, then partial search terms can be used as a case insensitive
+'contains' query will be applied.
+
+If the values are encrypted, then only the entire string, with exactly the same case, spacing and punctuation will
+match. This is more likely to be successful with patient ID than with patient name.
+
+Study export with patient identifiers
+=====================================
+
+
