@@ -35,7 +35,7 @@ On the Config menu, select ``Patient ID settings``. The initial settings are as 
 The default for patient name, ID and date of birth is to not store them. There isn't an option currently to not store
 the accession number, though OpenREM continues to work if it is missing.
 
-To start to store patient identifiable data from now on, select the relevant box and press ``Submit``. If you change the
+To store patient identifiable data from now on, select the relevant box and press ``Submit``. If you change the
 setting again later, then data already stored will remain in the database.
 
 **********************
@@ -43,7 +43,7 @@ Store hashed data only
 **********************
 
 If you wish to have the patient name and/or ID available for finding studies relating to a specific patient, but do
-not need to identify who that patient is, then it is possible to create a 'encrypted' version of the ID or name. In this
+not need to identify who that patient is, then it is possible to create an 'encrypted' version of the ID or name. In this
 case, a one-way SHA 256 hash is generated and the hash value is stored instead.
 
 If *exactly* the same name or ID (including spelling, spacing, case etc) occurs more than once, then the same hash
@@ -65,7 +65,7 @@ name and patient ID available:
     :align: center
     :alt: Patient name and ID in search filter
 
-If the values in the database are *not* encrypted, then partial search terms can be used as a case insensitive
+If the values in the database are *not* encrypted, then partial search terms can be used as a case-insensitive
 'contains' query will be applied.
 
 If the values are encrypted, then only the entire string, with exactly the same case, spacing and punctuation will
