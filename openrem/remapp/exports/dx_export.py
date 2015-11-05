@@ -110,6 +110,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Accession number',
         'Operator',
         'Study date',
+    ]
+    if pid and (name or patid):
+        headers += [
+            'Date of birth',
+        ]
+    headers += [
         'Patient age',
         'Patient sex',
         'Patient height', 
@@ -118,7 +124,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Requested procedure',
         'Number of events',
         'DAP total (cGy.cm^2)',
-        ]
+    ]
 
     from django.db.models import Max
     max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
@@ -149,7 +155,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     patient_name = None
                 if patid:
                     patient_id = None
+                patient_birth_date = None
             else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
                     patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
                 if patid:
@@ -214,6 +222,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
+        ]
+        if pid and (name or patid):
+            examdata += [
+                patient_birth_date,
+            ]
+        examdata += [
             patient_age,
             patient_sex,
             patient_size,
@@ -222,7 +236,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exams.requested_procedure_code_meaning,
             total_number_of_radiographic_frames,
             cgycm2,
-            ]
+        ]
 
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
 
