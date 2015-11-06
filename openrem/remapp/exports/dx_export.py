@@ -151,11 +151,11 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
+                patient_birth_date = None
                 if name:
                     patient_name = None
                 if patid:
                     patient_id = None
-                patient_birth_date = None
             else:
                 patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
@@ -384,6 +384,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     if pid and patid:
         date_column += 1
     wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
+    if pid and (name or patid):
+        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
 
     # Some prep
     pidheadings = []
@@ -400,10 +402,16 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         'Accession number',
         'Operator',
         'Study date',
+    ]
+    if pid and (name or patid):
+        commonheaders += [
+            'Date of birth',
+        ]
+    commonheaders += [
         'Patient age',
         'Patient sex',
-        'Patient height', 
-        'Patient mass (kg)', 
+        'Patient height',
+        'Patient mass (kg)',
         'Test patient?',
         'Study description',
         'Requested procedure',
@@ -461,6 +469,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
             sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
+            if pid and (name or patid):
+                sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -500,6 +510,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             ]
     wsalldata.write_row('A1', alldataheaders)
     wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
+    if pid and (name or patid):
+        wsalldata.set_column(date_column+1, date_column+1, 10) # allow date to be displayed.
     numcolumns = (29 * max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']) + date_column + 8
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
@@ -513,11 +525,13 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
+                patient_birth_date = None
                 if name:
                     patient_name = None
                 if patid:
                     patient_id = None
             else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
                     patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
                 if patid:
@@ -591,6 +605,12 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,  # Is a date - cell needs formatting
+        ]
+        if pid and (name or patid):
+            examdata += [
+                patient_birth_date,
+            ]
+        examdata += [
             patient_age,
             patient_sex,
             patient_size,
@@ -775,6 +795,12 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 exams.accession_number,
                 exams.operator_name,
                 exams.study_date,  # Is a date - cell needs formatting
+            ]
+            if pid and (name or patid):
+                examdata += [
+                    patient_birth_date,
+                ]
+            examdata += [
                 patient_age,
                 patient_sex,
                 patient_size,
