@@ -85,4 +85,4 @@ will be possible to see if more than one study belongs to one patient as the val
 the nature of the algorithm however, a single change in the name or ID - such as an upper case letter instead of a lower
 case one - will be recorded as a completely different hash value.
 
-Any exports with either patient name or patient ID included will also have a date of birth column populated.
+Any exports with either patient name or patient ID included will also have a date of birth column.
