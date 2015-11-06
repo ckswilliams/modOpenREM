@@ -677,6 +677,12 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Study UID',
         'Study date',
         'Study time',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
         'Patient age',
         'Patient sex',
         'Number of events',
@@ -711,11 +717,13 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 try:
                     exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get()
                 except ObjectDoesNotExist:
+                    patient_birth_date = None
                     if name:
                         patient_name = None
                     if patid:
                         patient_id = None
                 else:
+                    patient_birth_date = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_birth_date')
                     if name:
                         patient_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_name')
                     if patid:
@@ -820,6 +828,12 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
                 exp.date_time_started,
+            ]
+            if pid and (name or patid):
+                row += [
+                    patient_birth_date,
+                ]
+            row += [
                 patient_age_decimal,
                 patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
