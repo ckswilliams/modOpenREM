@@ -41,11 +41,13 @@ def _ct_common_get_data(exams, pid, name, patid):
         try:
             exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
+            patient_birth_date = None
             if name:
                 patient_name = None
             if patid:
                 patient_id = None
         else:
+            patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
             if name:
                 patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
             if patid:
@@ -109,6 +111,12 @@ def _ct_common_get_data(exams, pid, name, patid):
         exams.accession_number,
         exams.operator_name,
         exams.study_date,
+    ]
+    if pid and (name or patid):
+        examdata += [
+            patient_birth_date,
+        ]
+    examdata += [
         patient_age_decimal,
         patient_sex,
         patient_size,
@@ -240,6 +248,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     if pid and patid:
         date_column += 1
     wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
+    if pid and (name or patid):
+        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
 
     # Some prep
     pidheadings = []
@@ -255,7 +265,13 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         'Display name',
         'Accession number',
         'Operator',
-        'Date',
+        'Study Date',
+    ]
+    if pid and (name or patid):
+        commonheaders += [
+            'Date of birth',
+        ]
+    commonheaders += [
         'Age',
         'Sex',
         'Height', 
@@ -322,6 +338,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
             sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
+            if pid and (name or patid):
+                sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
