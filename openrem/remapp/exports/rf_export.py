@@ -80,11 +80,13 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         try:
             source.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
+            patient_birth_date = None
             if name:
                 patient_name = None
             if patid:
                 patient_id = None
         else:
+            patient_birth_date = return_for_export(source.patientmoduleattr_set.get(), 'patient_birth_date')
             if name:
                 patient_name = return_for_export(source.patientmoduleattr_set.get(), 'patient_name')
             if patid:
@@ -189,6 +191,12 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         return_for_export(source, 'operator_name'),
         return_for_export(source, 'performing_physician_name'),
         source.study_date,  # Is a date - needs to be a datetime object for formatting
+    ]
+    if pid and (name or patid):
+        examdata += [
+            patient_birth_date,
+        ]
+    examdata += [
         patient_age_decimal,
         patient_sex,
         patient_size,
@@ -225,6 +233,12 @@ def _rf_common_headers(pid=None, name=None, patid=None):
         'Operator',
         'Physician',
         'Study date',
+    ]
+    if pid and (name or patid):
+        commonheaders += [
+            'Date of birth',
+        ]
+    commonheaders += [
         'Patient age',
         'Patient sex',
         'Patient height',
@@ -241,7 +255,7 @@ def _rf_common_headers(pid=None, name=None, patid=None):
         'Acquisition dose RP total',
         'Acquisition time total',
         'Number of events',
-        ]
+    ]
     return commonheaders
 
 
@@ -311,6 +325,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     if pid and patid:
         date_column += 1
     wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
+    if pid and (name or patid):
+        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
 
     ##################
     # All data sheet
@@ -585,6 +601,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tabrows = sheetlist[tab]['count']
         sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
         sheetlist[tab]['sheet'].set_column(date_column, date_column, 10) # allow date to be displayed.
+        if pid and (name or patid):
+            sheetlist[tab]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
 
     # Populate summary sheet
     tsk.progress = 'Now populating the summary sheet...'
