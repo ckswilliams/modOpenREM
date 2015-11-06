@@ -38,9 +38,9 @@ the accession number, though OpenREM continues to work if it is missing.
 To store patient identifiable data from now on, select the relevant box and press ``Submit``. If you change the
 setting again later, then data already stored will remain in the database.
 
-**********************
-Store hashed data only
-**********************
+*************************
+Store encrypted data only
+*************************
 
 If you wish to have the patient name and/or ID available for finding studies relating to a specific patient, but do
 not need to identify who that patient is, then it is possible to create an 'encrypted' version of the ID or name. In this
@@ -84,3 +84,5 @@ If the IDs or names are encrypted, then these columns will contain the hash rath
 will be possible to see if more than one study belongs to one patient as the values should be the same for both. Due to
 the nature of the algorithm however, a single change in the name or ID - such as an upper case letter instead of a lower
 case one - will be recorded as a completely different hash value.
+
+Any exports with either patient name or patient ID included will also have a date of birth column populated.
