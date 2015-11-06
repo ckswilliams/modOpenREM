@@ -368,6 +368,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Accession number',
         'Operator',
         'Study date',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
         'Patient age',
         'Patient sex',
         'Patient height', 
@@ -416,11 +422,13 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
+                patient_birth_date = None
                 if name:
                     patient_name = None
                 if patid:
                     patient_id = None
             else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
                     patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
                 if patid:
@@ -484,6 +492,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
+        ]
+        if pid and (name or patid):
+            examdata += [
+                patient_birth_date,
+            ]
+        examdata += [
             patient_age_decimal,
             patient_sex,
             patient_size,
