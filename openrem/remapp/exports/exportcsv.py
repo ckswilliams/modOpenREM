@@ -107,10 +107,16 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Model name',
         'Institution name',
         'Display name',
-        'Study date',
         'Accession number',
+        'Study date',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
         'Patient age',
-        'Patient sex'
+        'Patient sex',
         'Patient height', 
         'Patient mass (kg)',
         'Not patient?',
@@ -134,11 +140,13 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
+                patient_birth_date = None
                 if name:
                     patient_name = None
                 if patid:
                     patient_id = None
             else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
                     patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
                 if patid:
@@ -232,8 +240,14 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             device_observer_name,
             institution_name,
             display_name,
+            exams.accession_number,
             exams.study_date,
-            exams.accession_number, 
+        ]
+        if pid and (name or patid):
+            row += [
+                patient_birth_date,
+            ]
+        row += [
             patient_age_decimal,
             patient_sex,
             patient_size,
