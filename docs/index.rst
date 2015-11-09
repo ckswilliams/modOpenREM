@@ -25,6 +25,7 @@ Contents:
     install-firsttime
     release-0.7.0
     startservices
+    configuration
     import
     netdicom
     patientid
