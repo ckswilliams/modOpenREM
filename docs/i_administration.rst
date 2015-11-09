@@ -1,5 +1,6 @@
-OpenREM administration (deleting studies, importing patient size data)
-**********************************************************************
+######################
+OpenREM administration
+######################
 
 Contents:
 
@@ -8,5 +9,4 @@ Contents:
     
     i_deletestudies
     i_patientsize
-    i_displaynames
 
