@@ -29,9 +29,9 @@
                  class="btn btn-default btn-sm" role="button">With ID</a>
               <a href="/openrem/exportdxcsv1/1/1/?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
+          {% endif %}
     </p>
     <p>
-          {% endif %}
           <a href="/openrem/exportdxxlsx1/0/0/?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to XLSX</a>
           {% if admin.pidgroup %}
@@ -166,6 +166,40 @@
 {% block plotdata %}
   {% if request.user.userprofile.plotCharts %}
 
+      <script>
+          chart_div_height = 0;
+          $(document).on('webkitfullscreenchange mozfullscreenchange fullscreenchange', function(e)
+          {
+              if (document.webkitIsFullScreen) {
+                  console.log('going to fullscreen');
+                  chart_div_height = e.target.clientHeight;
+                  e.target.style.minHeight = "100%";
+                  e.target.style.width = "100%";
+                  setTimeout(function() {$(document).resize();}, 0);
+              } else {
+                  console.log('returning from fullscreen');
+                  e.target.clientHeight = chart_div_height;
+                  e.target.style.minHeight = "";
+                  e.target.style.height = chart_div_height + 'px';
+                  e.target.style.width = "";
+                  setTimeout(function() {$(document).resize();}, 0);
+              }
+          });
+
+          function enterFullScreen(div_id) {
+              var elem = document.getElementById(div_id);
+              if (elem.webkitRequestFullscreen) {
+                  elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+              } else {
+                  if (elem.mozRequestFullScreen) {
+                      elem.mozRequestFullScreen();
+                  } else {
+                      elem.requestFullscreen();
+                  }
+              }
+          }
+      </script>
+
       <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
@@ -228,6 +262,7 @@
               {% endif %}
                   </tr>
               </table>
+              <button onclick="enterFullScreen('container')">Fullscreen</button>
 
             </div>
           </div>
@@ -250,6 +285,7 @@
           <div id="collapseProtocolPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
+              <button onclick="enterFullScreen('piechartProtocolDIV')">Fullscreen</button>
             </div>
           </div>
         </div>
@@ -314,6 +350,7 @@
               {% endif %}
                   </tr>
               </table>
+              <button onclick="enterFullScreen('chartAcquisitionMeankVp')">Fullscreen</button>
 
             </div>
           </div>
@@ -379,7 +416,7 @@
               {% endif %}
                   </tr>
               </table>
-
+              <button onclick="enterFullScreen('chartAcquisitionMeanmAs')">Fullscreen</button>
             </div>
           </div>
         </div>
@@ -402,6 +439,7 @@
             <div class="panel-body">
               <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+              <button onclick="enterFullScreen('piechartStudyWorkloadDIV')">Fullscreen</button>
             </div>
           </div>
         </div>
@@ -428,6 +466,7 @@
             <div class="panel-body">
               <div id="AcquisitionMeankVpOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+              <button onclick="enterFullScreen('AcquisitionMeankVpOverTimeDIV')">Fullscreen</button>
             </div>
           </div>
         </div>
@@ -454,6 +493,7 @@
             <div class="panel-body">
               <div id="AcquisitionMeanmAsOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+              <button onclick="enterFullScreen('AcquisitionMeanmAsOverTimeDIV')">Fullscreen</button>
             </div>
           </div>
         </div>
@@ -480,6 +520,7 @@
             <div class="panel-body">
               <div id="AcquisitionMeanDAPOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+              <button onclick="enterFullScreen('AcquisitionMeanDAPOverTimeDIV')">Fullscreen</button>
             </div>
           </div>
         </div>
