@@ -342,7 +342,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
         )
         acquisition_mas_names = acquisition_mas_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
 
-    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq:
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
         if median_available and plotAverageChoice=='both':
             acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
                 mean_dap=Avg('dose_area_product')*1000000,
@@ -361,7 +361,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 .order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
-    if plotDXAcquisitionMeankVp:
+    if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
         if median_available and plotAverageChoice=='both':
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
                 mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
@@ -377,7 +377,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
         acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
 
-    if plotDXAcquisitionMeanmAs:
+    if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
         if median_available and plotAverageChoice=='both':
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
                 mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure')/1000,
