@@ -329,7 +329,7 @@
                   </tr>
               </table>
               {% endif %}
-              <a onclick="enterFullScreen('histogramPlotDLPandCTDIdiv')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseDLPandCTDI', 'histogramPlotDLPandCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -398,7 +398,7 @@
               {% endif %}
                   </tr>
               </table>
-              <a onclick="enterFullScreen('histogramPlotDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseTwo', 'histogramPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -466,7 +466,7 @@
               {% endif %}
                   </tr>
               </table>
-              <a onclick="enterFullScreen('histogramPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseCTDI', 'histogramPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -489,7 +489,7 @@
           <div id="collapseProtocolPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
-              <a onclick="enterFullScreen('piechartProtocolDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartProtocolDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -626,7 +626,7 @@
               {% endif %}
                   </tr>
               </table>
-              <a onclick="enterFullScreen('histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseThree', 'histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -649,7 +649,7 @@
           <div id="collapseStudyPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
-              <a onclick="enterFullScreen('piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -720,7 +720,7 @@
               {% endif %}
                   </tr>
               </table>
-              <a onclick="enterFullScreen('histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -743,7 +743,7 @@
           <div id="collapseRequestPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
-              <a onclick="enterFullScreen('piechartRequestDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseRequestPieChart', 'piechartRequestDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -767,7 +767,7 @@
             <div class="panel-body">
               <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
-              <a onclick="enterFullScreen('piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -795,7 +795,7 @@
             <div class="panel-body">
               <div id="studyMeanDLPOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
-              <a onclick="enterFullScreen('studyMeanDLPOverTimeDIV')" class="btn btn-default btn-sm" role="button">Fullscreen</a>
+              <a onclick="enterFullScreen('collapseWeeklyStudyMeanChart', 'studyMeanDLPOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
