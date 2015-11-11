@@ -172,11 +172,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
       <!-- HTML to include div container for acquisition plot -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion1">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion1" href="#collapseOne" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DAP for each acquisition protocol.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -240,11 +240,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionFreq %}
       <!-- HTML to include div container for acquisition pie chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion2">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion2" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of acquisition protocol frequency.
               </a>
             </h4>
@@ -262,11 +262,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
       <!-- HTML to include div container for mean kVp per acquisition chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion3">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion3" href="#collapseAcquisitionMeankVpChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean kVp for each acquisition protocol.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -327,11 +327,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
       <!-- HTML to include div container for mean mAs per acquisition chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion4">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion4" href="#collapseAcquisitionMeanmAsChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean mAs for each acquisition protocol.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -392,11 +392,11 @@
 
     {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion5">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of number of studies per weekday.
               </a>
             </h4>
@@ -415,11 +415,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
       <!-- HTML to include div container for mean acquisition protocol kVp over time -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion6">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeankVpOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion6" href="#collapseAcquisitionMeankVpOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean kVp of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
                 {% else %}
@@ -442,11 +442,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
       <!-- HTML to include div container for mean acquisition protocol mAs over time -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion7">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanmAsOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion7" href="#collapseAcquisitionMeanmAsOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean mAs of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
                 {% else %}
@@ -469,11 +469,11 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion8">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseAcquisitionMeanDAPOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion8" href="#collapseAcquisitionMeanDAPOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
                 {% else %}
