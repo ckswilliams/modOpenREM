@@ -98,8 +98,8 @@ def OnReceiveStore(SOPClass, DS):
     filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
     ds.update(DS)
-    ds.is_little_endian = True
-    ds.is_implicit_VR = True
+    # ds.is_little_endian = True
+    # ds.is_implicit_VR = True
     ds.save_as(filename)
     logging.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
