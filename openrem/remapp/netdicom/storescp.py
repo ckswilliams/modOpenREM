@@ -122,12 +122,21 @@ def OnReceiveStore(SOPClass, DS):
     ):
         logging.info("Processing as MG")
         mam.delay(filename)
-    elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'
-          and DS.Manufacturer == 'Philips'
-          and DS.SeriesDescription == 'Dose Info'
-    ):
-        logging.info("Processing as Philips Dose Info series")
-        ct_philips.delay(filename)
+    elif DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7':
+        try:
+            manufacturer = DS.Manufacturer
+            series_description = DS.SeriesDescription
+        except:
+            if del_settings.del_no_match:
+                os.remove(filename)
+                logging.info("Secondary capture object with either no manufacturer or series description. Deleted.")
+            return SOPClass.Success
+        if manufacturer == 'Philips'and series_description == 'Dose Info':
+            logging.info("Processing as Philips Dose Info series")
+            ct_philips.delay(filename)
+        elif del_settings.del_no_match:
+            os.remove(filename)
+            logging.info("Can't find anything to do with this file - it has been deleted")
     elif del_settings.del_no_match:
         os.remove(filename)
         logging.info("Can't find anything to do with this file - it has been deleted")
