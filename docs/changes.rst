@@ -6,6 +6,7 @@ OpenREM version history
 --------------------
 
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
+* `#306`_  Added a button to each chart to toggle full-screen display
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
 * `#302`_  Improved handling of Philips Dose Info objects when series information sequence has UN value representation
 * `#301`_  Charts: fixed bug that could stop average kVp and mAs radiographic plots from working
