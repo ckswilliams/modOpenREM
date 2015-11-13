@@ -6,7 +6,7 @@ OpenREM version history
 --------------------
 
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
-* `#306`_  Added a button to each chart to toggle full-screen display
+* `#306`_  Charts: added a button to each chart to toggle full-screen display
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
 * `#302`_  Improved handling of Philips Dose Info objects when series information sequence has UN value representation
 * `#301`_  Charts: fixed bug that could stop average kVp and mAs radiographic plots from working
@@ -14,7 +14,7 @@ OpenREM version history
 * `#299`_  Hash of MultiValued DICOM elements now works
 * `#298`_  Added ordering by accumulated AGD for mammographic studies
 * `#297`_  Fixed ordering by Total DAP for radiographic studies
-* `#295`_  Charts: fixe bug that arose on non-PostgreSQL databases
+* `#295`_  Charts: fixed bug that arose on non-PostgreSQL databases
 * `#294`_  Harmonised time display between filter list and detail view, both to HH:mm
 * `#292`_  Added keep-alive and auto-start to DICOM stores
 * `#291`_  Charts: fixed issue with CTDI and DLP not showing correct drilldown data
@@ -45,6 +45,7 @@ OpenREM version history
 * `#258`_  Fixed DX import error where manufacturer or model name was not provided
 * `#257`_  Documentation update
 * `#256`_  Fixed errors with non-ASCII characters in imports
+* `#255`_  Charts: Small y-axis values on histograms are more visible when viewing full-screen
 * `#254`_  Charts: Simplified chart data processing in the templates
 * `#253`_  Charts: AJAX used to make pages responsive with large datasets when charts enabled
 * `#252`_  Fixed duplicate entries in DX filtered data for studies with multiple exposures
