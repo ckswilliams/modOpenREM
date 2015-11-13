@@ -10,6 +10,9 @@ on the CT and radiographic pages.
 ``Chart options`` item on the ``User options`` menu at the top of the OpenREM
 homepage.
 
+*New in 0.7.0* Individual charts can be displayed full-screen by clicking on
+the ``Toggle fullscreen`` button that is positioned below each chart.
+
 *New in 0.7.0* The chart plotting status is displayed on the OpenREM homepage.
 
 .. figure:: img/ChartCTSortingOptions.png
