@@ -65,7 +65,6 @@ def mkdir_p(path):
 
 @csrf_exempt
 def OnReceiveStore(SOPClass, DS):
-    import datetime
     from remapp.extractors.dx import dx
     from remapp.extractors.mam import mam
     from remapp.extractors.rdsr import rdsr
@@ -83,23 +82,23 @@ def OnReceiveStore(SOPClass, DS):
         except:
             logging.info("Received C-Store - error in logging details")
 
+    del DS.TransferSyntaxUID # Don't know why this has become necessary
+
     del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
     file_meta.ImplementationClassUID = "1.3.6.1.4.1.45593.1.0.7.0.6"
     file_meta.ImplementationVersionName = "OpenREM_0.7.0b6"
-    datestamp = datetime.datetime.now()
     path = os.path.join(
-#        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
         MEDIA_ROOT, "dicom_in"
     )
     mkdir_p(path)
     filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
     ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
     ds.update(DS)
-    # ds.is_little_endian = True
-    # ds.is_implicit_VR = True
+    ds.is_little_endian = True
+    ds.is_implicit_VR = True
     ds.save_as(filename)
     logging.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
