@@ -82,7 +82,8 @@ def OnReceiveStore(SOPClass, DS):
         except:
             logging.info("Received C-Store - error in logging details")
 
-    del DS.TransferSyntaxUID # Don't know why this has become necessary
+    if 'TransferSyntaxUID' in DS:
+        del DS.TransferSyntaxUID # Don't know why this has become necessary
 
     del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
