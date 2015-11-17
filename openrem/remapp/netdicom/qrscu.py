@@ -368,11 +368,12 @@ def qrscu(
 
 @shared_task
 def movescu(query_id):
+    from time import sleep
+    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+    from dicom.dataset import Dataset
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
-    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
-    from dicom.dataset import Dataset
 
     query = DicomQuery.objects.get(query_id = query_id)
     query.move_complete = False
@@ -435,3 +436,6 @@ def movescu(query_id):
     query.save()
 
     my_ae.Quit()
+
+    sleep(10)
+    query.delete()
