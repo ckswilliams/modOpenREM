@@ -448,7 +448,7 @@ if __name__ == "__main__":
     parser.add_argument('-sr', action="store_true", help='Query for structured report only studies')
     parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd')
     parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd')
-    parser.add_argument('-dup', action="store_true", help='Remove studies already in database')
+    parser.add_argument('-dup', action="store_true", help="Don't retrieve studies that are already in database")
     args = parser.parse_args()
 
     modalities = []
