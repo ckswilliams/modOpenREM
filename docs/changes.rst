@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b7 (2015-10-19)
 --------------------
 
+* `#311`_  Queries are deleted from database after a successful C-Move
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
