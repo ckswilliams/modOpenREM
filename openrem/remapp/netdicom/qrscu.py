@@ -340,30 +340,11 @@ def qrscu(
     query.stage = "Query complete"
     query.save()
 
+    if move:
+        movescu(query.query_id)
 
 
-# if __name__ == "__main__":
-#     import sys
-#     import argparse
-#
-#     # parse commandline
-#     parser = argparse.ArgumentParser(description='storage SCU example')
-#     parser.add_argument('remotehost')
-#     parser.add_argument('remoteport', type=int)
-#     parser.add_argument('-aet', help='calling AE title', default='OPENREM')
-#     parser.add_argument('-aec', help='called AE title', default='STOREDCMTK')
-#     parser.add_argument('-implicit', action='store_true', help='negociate implicit transfer syntax only', default=False)
-#     parser.add_argument('-explicit', action='store_true', help='negociate explicit transfer syntax only', default=False)
-#     parser.add_argument('-move', action='store_true', help='automatically request objects to be moved', default=False)
-#
-#     args = parser.parse_args()
-#
-#     sys.exit(
-#         qrscu(
-#             rh=args.remotehost, rp=args.remoteport, aet=args.aet, aec=args.aec,
-#             implicit=args.implicit, explicit=args.explicit, move=args.move
-#         )
-#     )
+
 
 
 @shared_task
@@ -439,3 +420,55 @@ def movescu(query_id):
 
     sleep(10)
     query.delete()
+
+
+if __name__ == "__main__":
+    import argparse
+    import datetime
+    import django
+    import os
+    import sys
+
+    # setup django/OpenREM
+    basepath = os.path.dirname(__file__)
+    projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+    if projectpath not in sys.path:
+        sys.path.insert(1,projectpath)
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+    django.setup()
+
+    # parse commandline
+    parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
+    parser.add_argument('qrid', type=int, help='Database ID of the remote QR node')
+    parser.add_argument('storeid', type=int, help='Database ID of the local store node')
+    parser.add_argument('-ct', action="store_true", help='Query for CT studies')
+    parser.add_argument('-mg', action="store_true", help='Query for mammography studies')
+    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies')
+    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies')
+    parser.add_argument('-sr', action="store_true", help='Query for structured report only studies')
+    parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd')
+    parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd')
+    parser.add_argument('-dup', action="store_true", help='Remove studies already in database')
+    args = parser.parse_args()
+
+    modalities = []
+    if args.ct:
+        modalities += ['CT']
+    if args.mg:
+        modalities += ['MG']
+    if args.fl:
+        modalities += ['FL']
+    if args.dx:
+        modalities += ['DX']
+
+    try:
+        datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
+        datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
+    except ValueError:
+        raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+
+    sys.exit(
+        qrscu(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
+              duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil
+        )
+    )
