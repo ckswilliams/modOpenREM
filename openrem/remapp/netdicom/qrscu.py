@@ -413,14 +413,22 @@ def movescu(query_id):
     study_no = 0
     for study in studies:
         study_no += 1
-        query.stage = "Requesting move of study {0} of {1} studies (type {2})".format(
-            study_no, studies.count(), study.modality)
-        query.save()
         d = Dataset()
         d.StudyInstanceUID = study.study_instance_uid
+        series_no = 0
         for series in study.dicomqrrspseries_set.all():
+            series_no += 1
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
+            if series.number_of_series_related_instances:
+                num_objects = ", {0} objects".format(series.number_of_series_related_instances)
+            else:
+                num_objects = ""
+            query.stage = "Requesting move of {0}; series {3} of {4} of study {1} of {2}{5}".format(
+                study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
+                num_objects
+            )
+            query.save()
             _move_req(my_ae, remote_ae, d)
 
     query.move_complete = True
