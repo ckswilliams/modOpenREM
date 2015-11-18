@@ -35,7 +35,7 @@ sys.path.insert(0, projectpath)
 extensions = [
     'sphinx.ext.autodoc',
     'celery.contrib.sphinx',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
