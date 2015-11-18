@@ -459,7 +459,17 @@ def movescu(query_id):
     query.delete()
 
 
-if __name__ == "__main__":
+def qrscu_script(*args, **kwargs):
+    """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
+
+    Args:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+
     import argparse
     import datetime
     import django
@@ -499,8 +509,10 @@ if __name__ == "__main__":
         modalities += ['DX']
 
     try:
-        datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
-        datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
+        if args.dfrom:
+            datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
+        if args.duntil:
+            datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
     except ValueError:
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 

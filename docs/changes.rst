@@ -2,13 +2,14 @@
 OpenREM version history
 =======================
 
-0.7.0b7 (2015-10-19)
+0.7.0b8 (2015-11-18)
 --------------------
 
 * `#311`_  Queries are deleted from database after a successful C-Move
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
+* `#303`_  Fixed a typo in 0.6.0 documents relating to the storescp command
 * `#302`_  Improved handling of Philips Dose Info objects when series information sequence has UN value representation
 * `#301`_  Charts: fixed bug that could stop average kVp and mAs radiographic plots from working
 * `#300`_  Calling AE Title for Query Retrieve SCU is now configured not hardcoded

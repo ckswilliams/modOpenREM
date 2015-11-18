@@ -9,6 +9,6 @@
 """
 
 import sys
-from openrem.remapp.netdicom import qrscu
+from openrem.remapp.netdicom.qrscu import qrscu_script
 
-sys.exit(qrscu(sys.argv))
+sys.exit(qrscu_script(sys.argv))
