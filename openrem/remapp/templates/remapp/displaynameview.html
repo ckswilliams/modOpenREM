@@ -45,4 +45,84 @@
 
   {% paginate %}
 
+<h3>CT</h3>
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in ct_names %}
+      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
+<h3>MG</h3>
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in mg_names %}
+      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
+<h3>DX</h3>
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in dx_names %}
+      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
+<h3>FL</h3>
+  <table class="table table-bordered table-hover row-clickable">
+    <row>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+    </row>
+    {% for eachrow in fl_names %}
+      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+        <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.institutional_department_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.manufacturer_model_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.station_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+
 {% endblock %}

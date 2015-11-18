@@ -1491,6 +1491,11 @@ def display_names_view(request):
         else:
             item.modality_type = False
 
+    ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
+    mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
+    dx_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX").distinct()
+    fl_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="FL").distinct()
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -1500,7 +1505,8 @@ def display_names_view(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'name_list': f, 'admin':admin}
+    return_structure = {'name_list': f, 'admin':admin,
+                        'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'fl_names': fl_names}
 
     return render_to_response(
         'remapp/displaynameview.html',
