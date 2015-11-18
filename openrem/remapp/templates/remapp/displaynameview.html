@@ -27,7 +27,8 @@
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th><th>Modality</th>
     </row>
-    {% for eachrow in name_list %}
+
+    {% for eachrow in name_list|dictsort:"modality_type" %}
       <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
         <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
