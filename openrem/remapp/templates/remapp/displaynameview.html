@@ -25,9 +25,9 @@
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th><th>Modality</th>
     </row>
-    {% for eachrow in name_list.values %}
+    {% for eachrow in name_list %}
       <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
         <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
@@ -38,6 +38,7 @@
         <td><a style="text-decoration: none">{{ eachrow.device_serial_number }}</a></td>
         <td><a style="text-decoration: none">{{ eachrow.software_versions }}</a></td>
         <td><a style="text-decoration: none">{{ eachrow.gantry_id }}</a></td>
+        <td><a style="text-decoration: none">{{ eachrow.modality_type }}</a></td>
       </tr>
     {% endfor %}
   </table>
