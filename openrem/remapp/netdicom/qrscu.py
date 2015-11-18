@@ -376,6 +376,14 @@ def qrscu(
 
 @shared_task
 def movescu(query_id):
+    """ C-Move request element of query-retrieve service class user
+
+    Args:
+        query_id:
+
+    Returns:
+
+    """
     from time import sleep
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from dicom.dataset import Dataset
