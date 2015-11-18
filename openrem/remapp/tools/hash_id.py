@@ -36,7 +36,10 @@ def hash_id(id, *args, **kwargs):
     :type id:          str
     :returns:          str
     """
+    import dicom
     import hashlib
 
     if id:
+        if isinstance(id, dicom.multival.MultiValue):
+            id = ''.join(id)
         return hashlib.sha256(id).hexdigest()

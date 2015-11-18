@@ -15,6 +15,7 @@ Contents:
     code_views
     code_exportviews
     code_forms
+    code_netdicom
 
 
 

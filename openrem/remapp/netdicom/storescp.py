@@ -65,7 +65,6 @@ def mkdir_p(path):
 
 @csrf_exempt
 def OnReceiveStore(SOPClass, DS):
-    import datetime
     from remapp.extractors.dx import dx
     from remapp.extractors.mam import mam
     from remapp.extractors.rdsr import rdsr
@@ -83,15 +82,16 @@ def OnReceiveStore(SOPClass, DS):
         except:
             logging.info("Received C-Store - error in logging details")
 
+    if 'TransferSyntaxUID' in DS:
+        del DS.TransferSyntaxUID # Don't know why this has become necessary
+
     del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
     file_meta.ImplementationClassUID = "1.3.6.1.4.1.45593.1.0.7.0.6"
     file_meta.ImplementationVersionName = "OpenREM_0.7.0b6"
-    datestamp = datetime.datetime.now()
     path = os.path.join(
-#        MEDIA_ROOT, "dicom_in", datestamp.strftime("%Y"), datestamp.strftime("%m"), datestamp.strftime("%d")
         MEDIA_ROOT, "dicom_in"
     )
     mkdir_p(path)
@@ -122,12 +122,21 @@ def OnReceiveStore(SOPClass, DS):
     ):
         logging.info("Processing as MG")
         mam.delay(filename)
-    elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'
-          and DS.Manufacturer == 'Philips'
-          and DS.SeriesDescription == 'Dose Info'
-    ):
-        logging.info("Processing as Philips Dose Info series")
-        ct_philips.delay(filename)
+    elif DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7':
+        try:
+            manufacturer = DS.Manufacturer
+            series_description = DS.SeriesDescription
+        except:
+            if del_settings.del_no_match:
+                os.remove(filename)
+                logging.info("Secondary capture object with either no manufacturer or series description. Deleted.")
+            return SOPClass.Success
+        if manufacturer == 'Philips'and series_description == 'Dose Info':
+            logging.info("Processing as Philips Dose Info series")
+            ct_philips.delay(filename)
+        elif del_settings.del_no_match:
+            os.remove(filename)
+            logging.info("Can't find anything to do with this file - it has been deleted")
     elif del_settings.del_no_match:
         os.remove(filename)
         logging.info("Can't find anything to do with this file - it has been deleted")

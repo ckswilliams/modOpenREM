@@ -121,8 +121,12 @@
                   <div class="panel-body">
                       <table class="table">
                           <tr>
-                              <th>AE Title</th>
+                              <th>Remote AE Title</th>
                               <td>{{ qr.aetitle }}</td>
+                          </tr>
+                          <tr>
+                              <th>Our AE Title</th>
+                              <td>{{ qr.callingaet }}</td>
                           </tr>
                           <tr>
                               <th>Port</th>
@@ -135,6 +139,10 @@
                           <tr>
                               <th>IP Address</th>
                               <td>{{ qr.ip }}</td>
+                          </tr>
+                          <tr>
+                              <th>Database ID</th>
+                              <td>{{ qr.pk }}</td>
                           </tr>
                       </table>
 

@@ -30,9 +30,9 @@
                  class="btn btn-default btn-sm" role="button">With ID</a>
               <a href="/openrem/exportctcsv1/1/1/?{{ request.GET.urlencode }}"
                  class="btn btn-default btn-sm" role="button">With both</a>
-          {% endif %}
     </p>
     <p>
+          {% endif %}
           <a href="/openrem/exportctxlsx1/0/0/?{{ request.GET.urlencode }}"
              class="btn btn-default btn-sm" role="button">Export to XLSX</a>
           {% if admin.pidgroup %}
@@ -169,6 +169,8 @@
 
   {% if request.user.userprofile.plotCharts %}
 
+    <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
+
     <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
     <!-- Include JavaScript to enable highcharts plots -->
@@ -243,11 +245,11 @@
 
     {% if request.user.userprofile.plotCTAcquisitionMeanCTDI and request.user.userprofile.plotCTAcquisitionMeanDLP %}
       <!-- HTML to include div container for acquisition DLP and CTDI plot -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion1">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseDLPandCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion1" href="#collapseDLPandCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DLP and CTDI<sub>vol</sub> for each acquisition protocol.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -327,6 +329,7 @@
                   </tr>
               </table>
               {% endif %}
+              <a onclick="enterFullScreen('collapseDLPandCTDI', 'histogramPlotDLPandCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -336,11 +339,11 @@
 
     {% elif request.user.userprofile.plotCTAcquisitionMeanDLP %}
       <!-- HTML to include div container for acquisition plot -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion2">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DLP for each acquisition protocol.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -395,7 +398,7 @@
               {% endif %}
                   </tr>
               </table>
-
+              <a onclick="enterFullScreen('collapseTwo', 'histogramPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -405,11 +408,11 @@
 
     {% elif request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <!-- HTML to include div container for acquisition CTDI plot -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion3">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean CTDI<sub>vol</sub> for each acquisition protocol.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -463,7 +466,7 @@
               {% endif %}
                   </tr>
               </table>
-
+              <a onclick="enterFullScreen('collapseCTDI', 'histogramPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -474,11 +477,11 @@
 
     {% if request.user.userprofile.plotCTAcquisitionFreq %}
       <!-- HTML to include div container for acquisition pie chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion4">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of acquisition protocol frequency.
               </a>
             </h4>
@@ -486,6 +489,7 @@
           <div id="collapseProtocolPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
+              <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartProtocolDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -562,11 +566,11 @@
 
     {% if request.user.userprofile.plotCTStudyMeanDLP %}
       <!-- HTML to include div container for study plot -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion5">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DLP for each study description.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -622,7 +626,7 @@
               {% endif %}
                   </tr>
               </table>
-
+              <a onclick="enterFullScreen('collapseThree', 'histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -633,11 +637,11 @@
 
     {% if request.user.userprofile.plotCTStudyFreq %}
       <!-- HTML to include div container for study pie chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion6">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of study frequency.
               </a>
             </h4>
@@ -645,6 +649,7 @@
           <div id="collapseStudyPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
+              <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -655,11 +660,11 @@
 
     {% if request.user.userprofile.plotCTRequestMeanDLP %}
       <!-- HTML to include div container for request plot -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion7">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DLP for each requested procedure type.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -715,7 +720,7 @@
               {% endif %}
                   </tr>
               </table>
-
+              <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -726,11 +731,11 @@
 
     {% if request.user.userprofile.plotCTRequestFreq %}
       <!-- HTML to include div container for request pie chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion8">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of requested procedure type frequency.
               </a>
             </h4>
@@ -738,6 +743,7 @@
           <div id="collapseRequestPieChart" class="panel-collapse collapse">
             <div class="panel-body">
               <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
+              <a onclick="enterFullScreen('collapseRequestPieChart', 'piechartRequestDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -748,11 +754,11 @@
 
     {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
       <!-- HTML to include div container for pie chart of studies per week day pie chart -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion9">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 Pie chart showing a breakdown of number of studies per weekday.
               </a>
             </h4>
@@ -761,6 +767,7 @@
             <div class="panel-body">
               <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+              <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
@@ -771,11 +778,11 @@
 
     {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
       <!-- HTML to include div container for mean study DLP per week -->
-      <div class="panel-group" id="accordion">
+      <div class="panel-group" id="accordion10">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
                 {% else %}
@@ -788,6 +795,7 @@
             <div class="panel-body">
               <div id="studyMeanDLPOverTimeDIV" style="height: auto; margin: 0 0"></div>
               <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+              <a onclick="enterFullScreen('collapseWeeklyStudyMeanChart', 'studyMeanDLPOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>

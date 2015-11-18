@@ -12,7 +12,7 @@ Install OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b7
+    pip install openrem==0.7.0b8
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -26,7 +26,7 @@ Locate install location
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 
 There are two files that need renaming:
@@ -149,6 +149,8 @@ a pair of square brackets something like below::
     contenttypes
      [X] 0001_initial
      [X] 0002_remove_content_type_name
+    remapp
+     [X] 0001_initial
     sessions
      [X] 0001_initial
     sites
@@ -167,8 +169,6 @@ Add the median database function: PostgreSQL database only
 Rename the ``0002_fresh_openrem_install_add_median_function.py.inactive`` file
 in the ``migrations`` folder to ``0002_fresh_openrem_install_add_median_function.py``
 then do the following:
-
-Windows::
 
     python manage.py makemigrations --empty remapp
     python manage.py migrate

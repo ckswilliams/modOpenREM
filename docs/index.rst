@@ -25,13 +25,16 @@ Contents:
     install-firsttime
     release-0.7.0
     startservices
+    configuration
     import
     netdicom
+    patientid
     i_navigate
     charts
     i_exporting
     openskin
     i_administration
+    troubleshooting
     code
     releasenotes
 

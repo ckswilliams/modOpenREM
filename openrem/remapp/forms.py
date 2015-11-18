@@ -1,6 +1,11 @@
 from django import forms
 from django.utils.safestring import mark_safe
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Field, Div
+from crispy_forms.bootstrap import FormActions
 from openremproject import settings
+from remapp.models import DicomDeleteSettings, DicomRemoteQR
+
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -175,11 +180,6 @@ class DicomQueryForm(forms.Form):
         self.fields['store_scp_field'].choices = [(x.pk, x.name) for x in DicomStoreSCP.objects.all()]
 
 
-from remapp.models import DicomDeleteSettings
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Field, Div
-from crispy_forms.bootstrap import FormActions
-
 class DicomDeleteSettingsForm(forms.ModelForm):
     """Form for configuring whether DICOM objects are stored or deleted once processed
     """
@@ -210,3 +210,26 @@ class DicomDeleteSettingsForm(forms.ModelForm):
     class Meta:
         model = DicomDeleteSettings
         fields = ['del_no_match', 'del_rdsr', 'del_mg_im', 'del_dx_im', 'del_ct_phil']
+
+
+class DicomQRForm(forms.ModelForm):
+    """Form for configuring remote Query Retrieve nodes
+    """
+    def __init__(self, *args, **kwargs):
+        super(DicomQRForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-lg-4'
+        self.helper.field_class = 'col-lg-2'
+        self.helper.layout = Layout(
+            Div(
+                'name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname'
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            ),
+        )
+
+    class Meta:
+        model = DicomRemoteQR
+        fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname']

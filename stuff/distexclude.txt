@@ -2,7 +2,7 @@
 .gitignore
 docs/
 stuff/
-openrem/remapp/migrations
+openrem/remapp/migrations/0*
 openrem/openremproject/local_settings.py
 openrem/openremproject/wsgi.py
 *.pyc

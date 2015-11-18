@@ -11,7 +11,7 @@ In a shell/command window, move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Run the built in web server::
 
@@ -51,7 +51,7 @@ In a new shell/command window, move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Linux - ``\`` is the line continuation character::
 
@@ -99,7 +99,7 @@ To run celery beat, open a new shell and move into the openrem folder:
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
 * Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
 
 Linux::
 
@@ -120,8 +120,18 @@ To stop Celery beat, just press ``Ctrl+c``
 Configure the settings
 ======================
 
-* Follow the link presented on the front page to get to the user and group administration. After the first users are
-  configured, this link will no longer be presented and instead you can go to ``Config -> Manage users``. The groups are
+
+* Follow the link presented on the front page to get to the user and group administration.
+.. figure:: img/HomeNoUsers.png
+    :align: center
+    :alt: Initial home page with no users in groups
+.. figure:: img/ConfigMenu.png
+    :align: right
+    :alt: Configuration menu
+* After the first users are configured, this link will no longer be presented and instead you can go to
+  ``Config -> Manage users``.
+* You will need the superuser username and password you created just after creating the database. The groups are
+
     + ``viewgroup`` can browse the data only
     + ``importsizegroup`` can use the csv import facility to add patient height and weight information
     + ``importqrgroup`` can use the DICOM query-retrieve facility to pull in studies, as long as they are pre-configured
@@ -131,13 +141,23 @@ Configure the settings
     + ``admingroup`` can delete studies, configure DICOM Store/QR settings, configure DICOM keep or delete settings,
       configure patient ID settings, and abort and delete patient size import jobs. *Members of the admingroup no longer
       inherit the other groups permissions.*
-* Return to the OpenREM interface (click on ``view site`` at the top right)
+.. figure:: img/Groups.png
+    :align: right
+    :alt: Selecting groups in Django user admin
+* In addition to adding users to these groups, you may like to grant a second user ``superuser`` and ``staff`` status
+  so that there are at least two people who can manage the users
+* Return to the OpenREM interface (click on ``View site`` at the top right)
+.. figure:: img/ViewSite.png
+    :align: center
+    :alt: Link from Django user admin back to OpenREM
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately
-* Go to ``Config -> Patient ID settings`` and configure appropriately
+* Go to ``Config -> Patient ID settings`` and configure appropriately. For more information go to :doc:`patientid` (not
+  yet up to date)
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
   ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
-* When you have some data in the system, you will want to go to ``Config -> View and edit display names`` and customise
-  them.
+* With data in the system, you will want to go to ``Config -> View and edit display names`` and customise
+  the display names. An established system will have several entries for each device, from each time the software
+  version, station name or other elements changes.
 
 
 

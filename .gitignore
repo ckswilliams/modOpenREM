@@ -1,7 +1,7 @@
 *.pyc
 docs/_build/*
 docs/_static/*
-openrem/remapp/migrations
+openrem/remapp/migrations/0*
 .idea
 openrem/openremproject/local_settings.py
 openrem/openremproject/wsgi.py

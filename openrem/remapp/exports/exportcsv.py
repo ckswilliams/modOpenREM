@@ -107,10 +107,16 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Model name',
         'Institution name',
         'Display name',
-        'Study date',
         'Accession number',
+        'Study date',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
         'Patient age',
-        'Patient sex'
+        'Patient sex',
         'Patient height', 
         'Patient mass (kg)',
         'Not patient?',
@@ -134,11 +140,13 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
+                patient_birth_date = None
                 if name:
                     patient_name = None
                 if patid:
                     patient_id = None
             else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
                     patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
                 if patid:
@@ -232,8 +240,14 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             device_observer_name,
             institution_name,
             display_name,
+            exams.accession_number,
             exams.study_date,
-            exams.accession_number, 
+        ]
+        if pid and (name or patid):
+            row += [
+                patient_birth_date,
+            ]
+        row += [
             patient_age_decimal,
             patient_sex,
             patient_size,
@@ -354,6 +368,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Accession number',
         'Operator',
         'Study date',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
         'Patient age',
         'Patient sex',
         'Patient height', 
@@ -402,11 +422,13 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 exams.patientmoduleattr_set.get()
             except ObjectDoesNotExist:
+                patient_birth_date = None
                 if name:
                     patient_name = None
                 if patid:
                     patient_id = None
             else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
                     patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
                 if patid:
@@ -470,6 +492,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             exams.accession_number,
             exams.operator_name,
             exams.study_date,
+        ]
+        if pid and (name or patid):
+            examdata += [
+                patient_birth_date,
+            ]
+        examdata += [
             patient_age_decimal,
             patient_sex,
             patient_size,
@@ -649,6 +677,12 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Study UID',
         'Study date',
         'Study time',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
         'Patient age',
         'Patient sex',
         'Number of events',
@@ -683,11 +717,13 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 try:
                     exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get()
                 except ObjectDoesNotExist:
+                    patient_birth_date = None
                     if name:
                         patient_name = None
                     if patid:
                         patient_id = None
                 else:
+                    patient_birth_date = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_birth_date')
                     if name:
                         patient_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_name')
                     if patid:
@@ -792,6 +828,12 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
                 exp.date_time_started,
+            ]
+            if pid and (name or patid):
+                row += [
+                    patient_birth_date,
+                ]
+            row += [
                 patient_age_decimal,
                 patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),

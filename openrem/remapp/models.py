@@ -89,11 +89,15 @@ class DicomStoreSCP(models.Model):
 
 
 class DicomRemoteQR(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-    aetitle = models.CharField(max_length=16, blank=True, null=True)
-    port = models.IntegerField(blank=True, null=True)
-    ip = models.GenericIPAddressField(blank=True, null=True)
-    hostname = models.CharField(max_length=32, blank=True, null=True)
+    name = models.CharField(max_length=64, unique=True,
+                            verbose_name="Name of QR node - fewer than 64 characters, spaces allowed")
+    aetitle = models.CharField(max_length=16, blank=True, null=True,
+                               verbose_name="AE Title of the remote node - 16 or fewer letters and numbers, no spaces")
+    port = models.IntegerField(blank=True, null=True, verbose_name="Remote port")
+    ip = models.GenericIPAddressField(blank=True, null=True, verbose_name="Remote IP address")
+    hostname = models.CharField(max_length=32, blank=True, null=True, verbose_name="Or remote hostname")
+    callingaet = models.CharField(max_length=16, blank=True, null=True,
+                                  verbose_name="AE Title of this OpenREM server - 16 or fewer letters and numbers, no spaces")
     enabled = models.BooleanField(default=False)
 
     def get_absolute_url(self):

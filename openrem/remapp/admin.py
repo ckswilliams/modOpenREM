@@ -15,7 +15,8 @@ from remapp.models import (GeneralStudyModuleAttr,
     CtIrradiationEventData, ScanningLength,
     CtDoseCheckDetails, CtXRaySourceParameters,
     Exports, SizeUpload,
-    UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR, DicomDeleteSettings
+    UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR, DicomDeleteSettings,
+    DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage
 )
 
 from django.contrib import admin
@@ -63,6 +64,10 @@ admin.site.register(UniqueEquipmentNames)
 admin.site.register(DicomStoreSCP)
 admin.site.register(DicomRemoteQR)
 admin.site.register(DicomDeleteSettings)
+admin.site.register(DicomQuery)
+admin.site.register(DicomQRRspStudy)
+admin.site.register(DicomQRRspSeries)
+admin.site.register(DicomQRRspImage)
 
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User

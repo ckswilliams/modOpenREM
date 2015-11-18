@@ -122,10 +122,13 @@ def return_for_export(model, field):
     :param val: database field
     :return: value or None
     """
+    import datetime
     from django.core.exceptions import ObjectDoesNotExist
     try:
         val = getattr(model, field)
         if val:
+            if isinstance(val, datetime.date):
+                return val
             val = unicode(val)
         return val
     except ObjectDoesNotExist:
