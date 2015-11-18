@@ -509,8 +509,10 @@ def qrscu_script(*args, **kwargs):
         modalities += ['DX']
 
     try:
-        datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
-        datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
+        if args.dfrom:
+            datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
+        if args.duntil:
+            datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
     except ValueError:
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 
