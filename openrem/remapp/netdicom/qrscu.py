@@ -459,7 +459,17 @@ def movescu(query_id):
     query.delete()
 
 
-if __name__ == "__main__":
+def qrscu_script(*args, **kwargs):
+    """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
+
+    Args:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+
     import argparse
     import datetime
     import django
