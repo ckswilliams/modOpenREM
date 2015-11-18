@@ -75,6 +75,8 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.series_number = series[1].SeriesNumber
         # Optional useful tags
         seriesrsp.series_description = _try_query_return(series[1], 'SeriesDescription')
+        if seriesrsp.series_description:
+            seriesrsp.series_description = seriesrsp.series_description.strip().lower()
         seriesrsp.number_of_series_related_instances = _try_query_return(series[1], 'NumberOfSeriesRelatedInstances')
         seriesrsp.save()
 
@@ -353,9 +355,9 @@ def qrscu(
             else:
                 series = study.dicomqrrspseries_set.all()
                 series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-                if 'Dose Info' in series_descriptions:  # i.e. Philips dose info series
+                if 'dose info' in series_descriptions:  # i.e. Philips dose info series
                     for s in series:
-                        if s.series_description != 'Dose Info':
+                        if s.series_description != 'dose info':
                             s.delete()
 
     logging.info("Release association")
