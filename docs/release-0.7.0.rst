@@ -28,7 +28,7 @@ Headline changes
     * New chart of DLP per requested procedure type and requested procedure frequency
     * Chart data returned using AJAX to make pages more responsive
     * Chart plotting options available via Config menu
-	* Charts can now be made full-screen
+    * Charts can now be made full-screen
 
 * DICOM Networking
 
