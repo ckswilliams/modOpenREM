@@ -78,15 +78,21 @@ If there is no file named ``__init__.py`` in the ``migrations`` folder, please c
     python manage.py makemigrations remapp
     python manage.py migrate remapp --fake
 
-* Now rename the file::
+Now rename the file
 
-    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
+.. sourcecode:: console
 
-  to::
+    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
 
-    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
+to:
 
-  and then run::
+.. sourcecode:: console
+
+    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
+
+and then run
+
+.. sourcecode:: console
 
     python manage.py migrate remapp
 
