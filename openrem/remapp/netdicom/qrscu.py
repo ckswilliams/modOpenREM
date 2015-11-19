@@ -33,12 +33,6 @@ def _move_req(my_ae, remote_ae, d):
     assocMove.Release(0)
     logging.info("Move association released")
 
-def _try_query_return(rsp, tag):
-    try:
-        x = rsp.tag
-    except:
-        x = None
-    return x
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     import uuid
@@ -74,10 +68,14 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.modality = series[1].Modality
         seriesrsp.series_number = series[1].SeriesNumber
         # Optional useful tags
-        seriesrsp.series_description = _try_query_return(series[1], 'SeriesDescription')
-        if seriesrsp.series_description:
-            seriesrsp.series_description = seriesrsp.series_description.strip().lower()
-        seriesrsp.number_of_series_related_instances = _try_query_return(series[1], 'NumberOfSeriesRelatedInstances')
+        try:
+            seriesrsp.series_description = series[1].SeriesDescription.strip().lower()
+        except AttributeError:
+            pass
+        try:
+            seriesrsp.number_of_series_related_instances = series[1].NumberOfSeriesRelatedInstances
+        except AttributeError:
+            pass
         seriesrsp.save()
 
     assoc_series.Release(0)
@@ -113,7 +111,10 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         # Required keys - none of interest
         # Optional and special keys
-        rsp.study_description = _try_query_return( ss[1], 'StudyDescription')
+        try:
+            rsp.study_description = ss[1].StudyDescription
+        except AttributeError:
+            pass
         # Series level query
         _query_series(my_ae, remote_ae, ss[1], rsp)
         # Populate modalities_in_study, stored as JSON
