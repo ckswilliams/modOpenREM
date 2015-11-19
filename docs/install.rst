@@ -12,7 +12,7 @@ Install OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b8
+    pip install openrem==0.7.0b9
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -163,12 +163,24 @@ Finally, create a Django super user::
 Answer each question as it is asked – this user is needed to set up the other users and the
 permissions.
 
-Add the median database function: PostgreSQL database only
-----------------------------------------------------------
+Add the median database function: PostgreSQL databases only
+-----------------------------------------------------------
 
-Rename the ``0002_fresh_openrem_install_add_median_function.py.inactive`` file
-in the ``migrations`` folder to ``0002_fresh_openrem_install_add_median_function.py``
-then do the following:
+Rename the file
+
+.. sourcecode:: console
+
+    remapp/migrations/0002_fresh_openrem_install_add_median_function.py.inactive
+
+to
+
+.. sourcecode:: console
+
+    remapp/migrations/0002_fresh_openrem_install_add_median_function.py
+
+and then run
+
+.. sourcecode:: console
 
     python manage.py makemigrations --empty remapp
     python manage.py migrate

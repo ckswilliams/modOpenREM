@@ -2,9 +2,10 @@
 OpenREM version history
 =======================
 
-0.7.0b8 (2015-11-18)
+0.7.0b9 (2015-11-19)
 --------------------
 
+* `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display

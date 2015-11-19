@@ -28,6 +28,7 @@ Headline changes
     * New chart of DLP per requested procedure type and requested procedure frequency
     * Chart data returned using AJAX to make pages more responsive
     * Chart plotting options available via Config menu
+    * Charts can now be made full-screen
 
 * DICOM Networking
 
@@ -43,6 +44,7 @@ Updates since beta 7
 ====================
 * Full screen charts
 * Test implementation of QR SCU from the command line
+* Equipment display names are now grouped by modality
 * New docs and bug fixes
 
 ****************************
@@ -51,14 +53,14 @@ Upgrading from version 0.6.0
 
 * Back up your database
 
-    * For PostgreSQL you can refer to :doc:`backupRestorePostgreSQL`
+    * For PostgreSQL you can refer to :ref:`backup-psql-db`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
 * The 0.7.0 upgrade must be made from a 0.6.0 (or later) database, and a schema migration is required:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b8
+    pip install openrem==0.7.0b9
 
 In a shell/command window, move into the openrem folder:
 
@@ -68,11 +70,9 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
-Delete all numbered migration files in openrem's ``migrations`` folder.
+Delete all numbered migration files in openrem's ``migrations`` folder, **leaving the 0002 files ending in .inactive**
 
-If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it. It should be empty. In Windows,
-you might create a text file called ``__init__.txt``, then change the file suffix from ``.txt`` to ``.py``, and accept
-the warning about files becoming unusable. In linux, ``touch remapp/migrations/__init__.py`` will do the job.
+If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it.
 
 .. sourcecode:: bash
 
@@ -80,15 +80,21 @@ the warning about files becoming unusable. In linux, ``touch remapp/migrations/_
     python manage.py makemigrations remapp
     python manage.py migrate remapp --fake
 
-* Now rename the file::
+Now rename the file
 
-    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
+.. sourcecode:: console
 
-  to::
+    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
 
-    0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
+to:
 
-  and then run::
+.. sourcecode:: console
+
+    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
+
+and then run
+
+.. sourcecode:: console
 
     python manage.py migrate remapp
 
@@ -115,18 +121,3 @@ Restart all the services!
 =========================
 
 Some of the commands and services have changed - follow the guide at :doc:`startservices`.
-
-
-
-Further instructions
-====================
-
-
-Daemonising Celery
-------------------
-
-In a production environment, Celery will need to start automatically and
-not depend on a particular user being logged in. Therefore, much like
-the webserver, it will need to be daemonised. For now, please refer to the
-instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
-

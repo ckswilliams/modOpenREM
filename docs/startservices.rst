@@ -141,23 +141,24 @@ Configure the settings
     + ``admingroup`` can delete studies, configure DICOM Store/QR settings, configure DICOM keep or delete settings,
       configure patient ID settings, and abort and delete patient size import jobs. *Members of the admingroup no longer
       inherit the other groups permissions.*
+
 .. figure:: img/Groups.png
-    :align: right
+    :align: center
     :alt: Selecting groups in Django user admin
+
 * In addition to adding users to these groups, you may like to grant a second user ``superuser`` and ``staff`` status
   so that there are at least two people who can manage the users
 * Return to the OpenREM interface (click on ``View site`` at the top right)
 .. figure:: img/ViewSite.png
     :align: center
     :alt: Link from Django user admin back to OpenREM
-* Go to ``Config -> DICOM object delete settings`` and configure appropriately
-* Go to ``Config -> Patient ID settings`` and configure appropriately. For more information go to :doc:`patientid` (not
-  yet up to date)
+* Go to ``Config -> DICOM object delete settings`` and configure appropriately (see :doc:`i_deletesettings`)
+* Go to ``Config -> Patient ID settings`` and configure appropriately (see :doc:`patientid`)
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
   ``Config -> Dicom network configuration``. For more information go to :doc:`netdicom` (not yet up to date)
 * With data in the system, you will want to go to ``Config -> View and edit display names`` and customise
   the display names. An established system will have several entries for each device, from each time the software
-  version, station name or other elements changes.
+  version, station name or other elements changes. See :doc:`i_displaynames` for more information
 
 
 
