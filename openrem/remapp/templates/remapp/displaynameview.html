@@ -66,7 +66,7 @@
     {% endfor %}
   </table>
 
-<h3>MG</h3>
+<h3>Mammography</h3>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
@@ -86,7 +86,7 @@
     {% endfor %}
   </table>
 
-<h3>DX</h3>
+<h3>DX and CR</h3>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
@@ -106,12 +106,12 @@
     {% endfor %}
   </table>
 
-<h3>FL</h3>
+<h3>Fluoroscopy</h3>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
-    {% for eachrow in fl_names %}
+    {% for eachrow in rf_names %}
       <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
         <td><a style="text-decoration: none">{{ eachrow.display_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachrow.institution_name }}</a></td>
