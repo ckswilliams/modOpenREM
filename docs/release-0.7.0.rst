@@ -120,18 +120,3 @@ Restart all the services!
 =========================
 
 Some of the commands and services have changed - follow the guide at :doc:`startservices`.
-
-
-
-Further instructions
-====================
-
-
-Daemonising Celery
-------------------
-
-In a production environment, Celery will need to start automatically and
-not depend on a particular user being logged in. Therefore, much like
-the webserver, it will need to be daemonised. For now, please refer to the
-instructions and links at http://celery.readthedocs.org/en/latest/tutorials/daemonizing.html.
-
