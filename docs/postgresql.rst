@@ -24,8 +24,11 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 Create a user for the database
 ==============================
 
-+ ``sudo -u postgres createuser -P openremuser``
-+ Enter password, twice
+.. sourcecode:: console
+
+    sudo -u postgres createuser -P openremuser``
+
+Enter a new password for the openremuser, twice
 
 Optional: Specify the location for the database
 -----------------------------------------------
@@ -99,6 +102,31 @@ Set the following (changing name, user and password as appropriate)
 Back up the database
 ********************
 
+Ad-hoc backup from the command line
+===================================
+
+.. sourcecode:: console
+
+    sudo -u postgres pg_dump openremdb > /path/to/backup.bak
+
+If you are moving a backup file between systems, or keeping a few backups, you may like to compress the backup; for
+example a 345 MB OpenREM database compresses to 40 MB:
+
+.. sourcecode:: console
+
+    tar -czf backup.bak.tar.gz backup.bak
+
+Automated backup with a bash script
+===================================
+
+.. sourcecode:: bash
+
+    #! /bin/bash
+    rm -rf /path/to/db/backups/*
+    PGPASSWORD="openrem_pw" /usr/bin/pg_dump -Uopenremuser openremdb > /path/to/db/backups/openrem.bak
+
+This script could be called by a cron task, or by a backup system such as backuppc prior to running the system backup.
+
 ********************
 Restore the database
 ********************
@@ -113,6 +141,6 @@ Create a fresh database and restore from the backup
 
     sudo su postgres
     createdb -T template0 new_openremdb_name
-    psql new_openremdb_name < path/to/backup.bak
+    psql new_openremdb_name < /path/to/db/backups/openrem.bak
     exit
 
