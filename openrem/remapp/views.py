@@ -30,9 +30,10 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
-#from __future__ import unicode_literals
+# from __future__ import unicode_literals
 # Following two lines added so that sphinx autodocumentation works.
 import os
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import logging
@@ -48,6 +49,7 @@ from remapp.models import GeneralStudyModuleAttr, create_user_profile
 
 try:
     from numpy import *
+
     plotting = 1
 except ImportError:
     plotting = 0
@@ -65,7 +67,7 @@ def logout_page(request):
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import dx_acq_filter
     from django.db.models import Q
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
 
@@ -108,10 +110,14 @@ def dx_summary_list_filter(request):
             userProfile.plotDXAcquisitionMeankVp = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVp']
             userProfile.plotDXAcquisitionMeanmAs = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAs']
             userProfile.plotDXStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotDXStudyPerDayAndHour']
-            userProfile.plotDXAcquisitionMeankVpOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeankVpOverTime']
-            userProfile.plotDXAcquisitionMeanmAsOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanmAsOverTime']
-            userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
-            userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
+            userProfile.plotDXAcquisitionMeankVpOverTime = chartOptionsForm.cleaned_data[
+                'plotDXAcquisitionMeankVpOverTime']
+            userProfile.plotDXAcquisitionMeanmAsOverTime = chartOptionsForm.cleaned_data[
+                'plotDXAcquisitionMeanmAsOverTime']
+            userProfile.plotDXAcquisitionMeanDAPOverTime = chartOptionsForm.cleaned_data[
+                'plotDXAcquisitionMeanDAPOverTime']
+            userProfile.plotDXAcquisitionMeanDAPOverTimePeriod = chartOptionsForm.cleaned_data[
+                'plotDXAcquisitionMeanDAPOverTimePeriod']
             if median_available:
                 userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
@@ -135,12 +141,12 @@ def dx_summary_list_filter(request):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
+    returnStructure = {'filter': f, 'admin': admin, 'chartOptionsForm': chartOptionsForm}
 
     return render_to_response(
         'remapp/dxfiltered.html',
@@ -161,19 +167,30 @@ def dx_summary_chart_data(request):
     if requestResults.get('acquisitionhist'):
         filters = {}
         if requestResults.get('acquisition_protocol'):
-            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'] = requestResults.get('acquisition_protocol')
+            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'] = requestResults.get(
+                'acquisition_protocol')
         if requestResults.get('acquisition_dap_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get(
+                'acquisition_dap_min')
         if requestResults.get('acquisition_dap_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get(
+                'acquisition_dap_max')
         if requestResults.get('acquisition_kvp_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__gte'] = requestResults.get('acquisition_kvp_min')
+            filters[
+                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__gte'] = requestResults.get(
+                'acquisition_kvp_min')
         if requestResults.get('acquisition_kvp_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get('acquisition_kvp_max')
+            filters[
+                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get(
+                'acquisition_kvp_max')
         if requestResults.get('acquisition_mas_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get('acquisition_mas_min')
+            filters[
+                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get(
+                'acquisition_mas_min')
         if requestResults.get('acquisition_mas_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get('acquisition_mas_max')
+            filters[
+                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get(
+                'acquisition_mas_max')
         if requestResults.get('study_description'):
             filters['study_description__icontains'] = requestResults.get('study_description')
 
@@ -182,11 +199,15 @@ def dx_summary_chart_data(request):
         if requestResults.get('study_description'):
             filters['study_description__icontains'] = requestResults.get('study_description')
         if requestResults.get('acquisition_protocol'):
-            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+            filters[
+                'projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__icontains'] = requestResults.get(
+                'acquisition_protocol')
         if requestResults.get('acquisition_dap_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = requestResults.get(
+                'acquisition_dap_min')
         if requestResults.get('acquisition_dap_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
+            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = requestResults.get(
+                'acquisition_dap_max')
 
     if requestResults.get('accession_number'):
         filters['accession_number'] = requestResults.get('accession_number')
@@ -210,7 +231,7 @@ def dx_summary_chart_data(request):
         filters['generalequipmentmoduleattr__unique_equipment_name__display_name'] = requestResults.get('display_name')
 
     f = DXSummaryListFilter(requestResults, queryset=GeneralStudyModuleAttr.objects.filter(
-        Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR'),
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR'),
         **filters
     ).order_by().distinct())
 
@@ -244,17 +265,17 @@ def dx_summary_chart_data(request):
     plotDXAcquisitionMeanDAPOverTimePeriod = userProfile.plotDXAcquisitionMeanDAPOverTimePeriod
     plotAverageChoice = userProfile.plotAverageChoice
 
-    acquisitionMeankVpoverTime, acquisitionMediankVpoverTime,\
-    acquisitionMeanmAsoverTime, acquisitionMedianmAsoverTime,\
-    acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime,\
-    acquisitionHistogramData, acquisitionHistogramkVpData,\
-    acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary,\
+    acquisitionMeankVpoverTime, acquisitionMediankVpoverTime, \
+    acquisitionMeanmAsoverTime, acquisitionMedianmAsoverTime, \
+    acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, \
+    acquisitionHistogramData, acquisitionHistogramkVpData, \
+    acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, acquisitionmAsSummary, \
     studiesPerHourInWeekdays, acquisition_names = \
         dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plotDXAcquisitionMeankVpOverTime,
-                                plotDXAcquisitionMeanmAsOverTime, plotDXAcquisitionMeanDAPOverTime,
-                                plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
-                                plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
-                                median_available, plotAverageChoice)
+                             plotDXAcquisitionMeanmAsOverTime, plotDXAcquisitionMeanDAPOverTime,
+                             plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp,
+                             plotDXAcquisitionMeanmAs, plotDXStudyPerDayAndHour, requestResults,
+                             median_available, plotAverageChoice)
 
     returnStructure = {}
 
@@ -294,7 +315,6 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                          plotDXAcquisitionMeanmAsOverTime, plotDXAcquisitionMeanDAPOverTime,
                          plotDXAcquisitionMeanDAPOverTimePeriod, plotDXAcquisitionMeankVp, plotDXAcquisitionMeanmAs,
                          plotDXStudyPerDayAndHour, requestResults, median_available, plotAverageChoice):
-
     from remapp.models import IrradEventXRayData, Median
     from django.db.models import Avg, Count, Min
     import datetime, qsstats
@@ -303,7 +323,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
     expInclude = [o.study_instance_uid for o in f]
     acquisitionFilters = {
-    'projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in': expInclude}
+        'projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in': expInclude}
     if requestResults.get('acquisition_dap_max'):
         acquisitionFilters['dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
     if requestResults.get('acquisition_dap_min'):
@@ -315,9 +335,11 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if requestResults.get('acquisition_kvp_max'):
         acquisitionFilters['irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get('acquisition_kvp_max')
     if requestResults.get('acquisition_mas_min'):
-        acquisitionFilters['irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get('acquisition_mas_min')
+        acquisitionFilters['irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get(
+            'acquisition_mas_min')
     if requestResults.get('acquisition_mas_max'):
-        acquisitionFilters['irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get('acquisition_mas_max')
+        acquisitionFilters['irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get(
+            'acquisition_mas_max')
 
     acquisition_events = IrradEventXRayData.objects.exclude(
         dose_area_product__isnull=True
@@ -332,7 +354,8 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
         ).filter(
             **acquisitionFilters
         )
-        acquisition_kvp_names = acquisition_kvp_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
+        acquisition_kvp_names = acquisition_kvp_events.values('acquisition_protocol').distinct().order_by(
+            'acquisition_protocol')
 
     if plotDXAcquisitionMeanmAsOverTime or plotDXAcquisitionMeanmAs:
         acquisition_mas_events = IrradEventXRayData.objects.exclude(
@@ -340,36 +363,37 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
         ).filter(
             **acquisitionFilters
         )
-        acquisition_mas_names = acquisition_mas_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
+        acquisition_mas_names = acquisition_mas_events.values('acquisition_protocol').distinct().order_by(
+            'acquisition_protocol')
 
     if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
-        if median_available and plotAverageChoice=='both':
+        if median_available and plotAverageChoice == 'both':
             acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                mean_dap=Avg('dose_area_product')*1000000,
-                median_dap=Median('dose_area_product')/10000,
-                num_acq=Count('dose_area_product'))\
+                mean_dap=Avg('dose_area_product') * 1000000,
+                median_dap=Median('dose_area_product') / 10000,
+                num_acq=Count('dose_area_product')) \
                 .order_by('acquisition_protocol')
-        elif median_available and plotAverageChoice=='median':
+        elif median_available and plotAverageChoice == 'median':
             acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                median_dap=Median('dose_area_product')/10000,
-                num_acq=Count('dose_area_product'))\
+                median_dap=Median('dose_area_product') / 10000,
+                num_acq=Count('dose_area_product')) \
                 .order_by('acquisition_protocol')
         else:
             acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                mean_dap=Avg('dose_area_product')*1000000,
-                num_acq=Count('dose_area_product'))\
+                mean_dap=Avg('dose_area_product') * 1000000,
+                num_acq=Count('dose_area_product')) \
                 .order_by('acquisition_protocol')
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
     if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
-        if median_available and plotAverageChoice=='both':
+        if median_available and plotAverageChoice == 'both':
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
                 mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
-                median_kVp=Median('irradeventxraysourcedata__kvp__kvp')/10000000000,
+                median_kVp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
                 num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
-        elif median_available and plotAverageChoice=='median':
+        elif median_available and plotAverageChoice == 'median':
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
-                median_kVp=Median('irradeventxraysourcedata__kvp__kvp')/10000000000,
+                median_kVp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
                 num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
         else:
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
@@ -378,18 +402,18 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
         acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
 
     if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
-        if median_available and plotAverageChoice=='both':
+        if median_available and plotAverageChoice == 'both':
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-                mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure')/1000,
-                median_mAs=Median('irradeventxraysourcedata__exposure__exposure')/10000000000000,
+                mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
+                median_mAs=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
                 num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
-        elif median_available and plotAverageChoice=='median':
+        elif median_available and plotAverageChoice == 'median':
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-                median_mAs=Median('irradeventxraysourcedata__exposure__exposure')/10000000000000,
+                median_mAs=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
                 num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
         else:
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-                mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure')/1000,
+                mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
                 num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
         acquisitionHistogrammAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionmAsSummary))]
 
@@ -398,21 +422,21 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
         today = datetime.date.today()
 
         if plotDXAcquisitionMeankVpOverTime:
-            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                 acquisitionMediankVpoverTime = [None] * len(acquisition_kvp_names)
-            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                 acquisitionMeankVpoverTime = [None] * len(acquisition_kvp_names)
 
         if plotDXAcquisitionMeanmAsOverTime:
-            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                 acquisitionMedianmAsoverTime = [None] * len(acquisition_mas_names)
-            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                 acquisitionMeanmAsoverTime = [None] * len(acquisition_mas_names)
 
         if plotDXAcquisitionMeanDAPOverTime:
-            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                 acquisitionMedianDAPoverTime = [None] * len(acquisition_names)
-            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                 acquisitionMeanDAPoverTime = [None] * len(acquisition_names)
 
     if plotDXAcquisitionMeanDAP or plotDXAcquisitionMeanDAPOverTime:
@@ -429,12 +453,16 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
             if plotDXAcquisitionMeanDAPOverTime:
                 # Required for mean DAP over time
-                if plotAverageChoice=='mean' or plotAverageChoice=='both':
-                    qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Avg('dose_area_product')*1000000)
-                    acquisitionMeanDAPoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
-                    qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Median('dose_area_product')/10000)
-                    acquisitionMedianDAPoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                    qss = qsstats.QuerySetStats(subqs, 'date_time_started',
+                                                aggregate=Avg('dose_area_product') * 1000000)
+                    acquisitionMeanDAPoverTime[idx] = qss.time_series(startDate, today,
+                                                                      interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                    qss = qsstats.QuerySetStats(subqs, 'date_time_started',
+                                                aggregate=Median('dose_area_product') / 10000)
+                    acquisitionMedianDAPoverTime[idx] = qss.time_series(startDate, today,
+                                                                        interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
     if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
         for idx, protocol in enumerate(acquisition_kvp_names):
@@ -450,12 +478,16 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
 
             if plotDXAcquisitionMeankVpOverTime:
                 # Required for mean kVp over time
-                if plotAverageChoice=='mean' or plotAverageChoice=='both':
-                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started', aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
-                    acquisitionMeankVpoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
-                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started', aggregate=Median('irradeventxraysourcedata__kvp__kvp')/10000000000)
-                    acquisitionMediankVpoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
+                                                aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
+                    acquisitionMeankVpoverTime[idx] = qss.time_series(startDate, today,
+                                                                      interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
+                                                aggregate=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000)
+                    acquisitionMediankVpoverTime[idx] = qss.time_series(startDate, today,
+                                                                        interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
     if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
         for idx, protocol in enumerate(acquisition_mas_names):
@@ -465,18 +497,22 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
                 # Required for mean mAs per acquisition plot
                 uAsValues = subqsmas.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
                 acquisitionHistogrammAsData[idx][0], acquisitionHistogrammAsData[idx][1] = np.histogram(
-                    [float(x)/1000 for x in uAsValues], bins=20)
+                    [float(x) / 1000 for x in uAsValues], bins=20)
                 acquisitionHistogrammAsData[idx][0] = acquisitionHistogrammAsData[idx][0].tolist()
                 acquisitionHistogrammAsData[idx][1] = acquisitionHistogrammAsData[idx][1].tolist()
 
             if plotDXAcquisitionMeanmAsOverTime:
                 # Required for mean DAP over time
-                if plotAverageChoice=='mean' or plotAverageChoice=='both':
-                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Avg('irradeventxraysourcedata__exposure__exposure')/1000)
-                    acquisitionMeanmAsoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
-                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Median('irradeventxraysourcedata__exposure__exposure')/10000000000000)
-                    acquisitionMedianmAsoverTime[idx] = qss.time_series(startDate, today, interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started',
+                                                aggregate=Avg('irradeventxraysourcedata__exposure__exposure') / 1000)
+                    acquisitionMeanmAsoverTime[idx] = qss.time_series(startDate, today,
+                                                                      interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Median(
+                        'irradeventxraysourcedata__exposure__exposure') / 10000000000000)
+                    acquisitionMedianmAsoverTime[idx] = qss.time_series(startDate, today,
+                                                                        interval=plotDXAcquisitionMeanDAPOverTimePeriod)
 
     if plotDXStudyPerDayAndHour:
         # Required for studies per weekday and studies per hour in each weekday plot
@@ -504,10 +540,10 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq, plo
     if not 'acquisitionmAsSummary' in locals(): acquisitionmAsSummary = 0
     if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
 
-    return acquisitionMeankVpoverTime, acquisitionMediankVpoverTime,\
-           acquisitionMeanmAsoverTime, acquisitionMedianmAsoverTime,\
-           acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData,\
-           acquisitionHistogramkVpData, acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary,\
+    return acquisitionMeankVpoverTime, acquisitionMediankVpoverTime, \
+           acquisitionMeanmAsoverTime, acquisitionMedianmAsoverTime, \
+           acquisitionMeanDAPoverTime, acquisitionMedianDAPoverTime, acquisitionHistogramData, \
+           acquisitionHistogramkVpData, acquisitionHistogrammAsData, acquisitionSummary, acquisitionkVpSummary, \
            acquisitionmAsSummary, studiesPerHourInWeekdays, acquisition_names
 
 
@@ -528,7 +564,7 @@ def dx_detail_view(request, pk=None):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -543,28 +579,28 @@ def dx_detail_view(request, pk=None):
 @login_required
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
 
     if request.user.groups.filter(name='pidgroup'):
-        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
     else:
-        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-
     return render_to_response(
         'remapp/rffiltered.html',
-        {'filter': f, 'admin':admin},
+        {'filter': f, 'admin': admin},
         context_instance=RequestContext(request)
-        )
+    )
+
 
 @login_required
 def rf_detail_view(request, pk=None):
@@ -583,7 +619,7 @@ def rf_detail_view(request, pk=None):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -598,7 +634,7 @@ def rf_detail_view(request, pk=None):
 @login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import ct_acq_filter
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
 
@@ -645,7 +681,8 @@ def ct_summary_list_filter(request):
             userProfile.plotCTRequestFreq = chartOptionsForm.cleaned_data['plotCTRequestFreq']
             userProfile.plotCTStudyPerDayAndHour = chartOptionsForm.cleaned_data['plotCTStudyPerDayAndHour']
             userProfile.plotCTStudyMeanDLPOverTime = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTime']
-            userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
+            userProfile.plotCTStudyMeanDLPOverTimePeriod = chartOptionsForm.cleaned_data[
+                'plotCTStudyMeanDLPOverTimePeriod']
             if median_available:
                 userProfile.plotAverageChoice = chartOptionsForm.cleaned_data['plotMeanMedianOrBoth']
             userProfile.save()
@@ -669,12 +706,12 @@ def ct_summary_list_filter(request):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    returnStructure = {'filter': f, 'admin':admin, 'chartOptionsForm':chartOptionsForm}
+    returnStructure = {'filter': f, 'admin': admin, 'chartOptionsForm': chartOptionsForm}
 
     return render_to_response(
         'remapp/ctfiltered.html',
@@ -686,7 +723,7 @@ def ct_summary_list_filter(request):
 @login_required
 def ct_summary_chart_data(request):
     from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
     from django.http import JsonResponse
@@ -695,10 +732,10 @@ def ct_summary_chart_data(request):
 
     if request.user.groups.filter(name='pidgroup'):
         f = CTFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT').order_by().distinct())
+            modality_type__exact='CT').order_by().distinct())
     else:
         f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact = 'CT').order_by().distinct())
+            modality_type__exact='CT').order_by().distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -730,7 +767,6 @@ def ct_summary_chart_data(request):
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
     plotAverageChoice = userProfile.plotAverageChoice
-
 
     acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
     requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
@@ -771,7 +807,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                          plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                          plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
                          requestResults, median_available, plotAverageChoice):
-
     from django.db.models import Q, Avg, Count, Min
     import datetime, qsstats
     from remapp.models import CtIrradiationEventData, Median
@@ -821,19 +856,19 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
         # Required for mean DLP per acquisition plot
         if plotCTAcquisitionMeanCTDI:
-            if median_available and plotAverageChoice=='both':
+            if median_available and plotAverageChoice == 'both':
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
-                                                                median_ctdi=Median('mean_ctdivol')/10000000000,
+                                                                median_ctdi=Median('mean_ctdivol') / 10000000000,
                                                                 mean_dlp=Avg('dlp'),
-                                                                median_dlp=Median('dlp')/10000000000,
+                                                                median_dlp=Median('dlp') / 10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
-            elif median_available and plotAverageChoice=='median':
+            elif median_available and plotAverageChoice == 'median':
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(median_ctdi=Median('mean_ctdivol')/10000000000,
-                                                                median_dlp=Median('dlp')/10000000000,
+                    'acquisition_protocol').distinct().annotate(median_ctdi=Median('mean_ctdivol') / 10000000000,
+                                                                median_dlp=Median('dlp') / 10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
             else:
                 acquisitionSummary = acquisition_events.exclude(
@@ -844,16 +879,16 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
             acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         else:
-            if median_available and plotAverageChoice=='both':
+            if median_available and plotAverageChoice == 'both':
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
-                                                                median_dlp=Median('dlp')/10000000000,
+                                                                median_dlp=Median('dlp') / 10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
-            elif median_available and plotAverageChoice=='median':
+            elif median_available and plotAverageChoice == 'median':
                 acquisitionSummary = acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(median_dlp=Median('dlp')/10000000000,
+                    'acquisition_protocol').distinct().annotate(median_dlp=Median('dlp') / 10000000000,
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
             else:
                 acquisitionSummary = acquisition_events.exclude(
@@ -881,15 +916,15 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
         # Required for mean DLP per study type plot
-        if median_available and plotAverageChoice=='both':
+        if median_available and plotAverageChoice == 'both':
             studySummary = study_events.values('study_description').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                 num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'study_description')
-        elif median_available and plotAverageChoice=='median':
+        elif median_available and plotAverageChoice == 'median':
             studySummary = study_events.values('study_description').distinct().annotate(
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                 num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'study_description')
         else:
@@ -903,9 +938,9 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
         if plotCTStudyMeanDLPOverTime:
             # Required for mean DLP per study type per week plot
-            if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                 studyMedianDLPoverTime = [None] * len(studySummary)
-            if plotAverageChoice=='mean' or plotAverageChoice=='both':
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                 studyMeanDLPoverTime = [None] * len(studySummary)
             startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
             today = datetime.date.today()
@@ -919,20 +954,23 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     # Required for mean DLP per study type plot
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
-                    studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                    studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues],
+                                                                                          bins=20)
                     studyHistogramData[idx][0] = studyHistogramData[idx][0].tolist()
                     studyHistogramData[idx][1] = studyHistogramData[idx][1].tolist()
 
                 if plotCTStudyMeanDLPOverTime:
                     # Required for mean DLP per study type per time period plot
-                    if plotAverageChoice=='mean' or plotAverageChoice=='both':
+                    if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                         qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
                             'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                        studyMeanDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
-                    if median_available and (plotAverageChoice=='median' or plotAverageChoice=='both'):
+                        studyMeanDLPoverTime[idx] = qss.time_series(startDate, today,
+                                                                    interval=plotCTStudyMeanDLPOverTimePeriod)
+                    if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                         qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000)
-                        studyMedianDLPoverTime[idx] = qss.time_series(startDate, today, interval=plotCTStudyMeanDLPOverTimePeriod)
+                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000)
+                        studyMedianDLPoverTime[idx] = qss.time_series(startDate, today,
+                                                                      interval=plotCTStudyMeanDLPOverTimePeriod)
 
         if plotCTStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
@@ -949,15 +987,15 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
-        if median_available and plotAverageChoice=='both':
+        if median_available and plotAverageChoice == 'both':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                 num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'requested_procedure_code_meaning')
-        elif median_available and plotAverageChoice=='median':
+        elif median_available and plotAverageChoice == 'median':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')/10000000000,
+                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                 num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'requested_procedure_code_meaning')
         else:
@@ -974,7 +1012,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     requested_procedure_code_meaning=study.get('requested_procedure_code_meaning'))
                 dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                               flat=True)
-                requestHistogramData[idx][0], requestHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                requestHistogramData[idx][0], requestHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues],
+                                                                                          bins=20)
                 requestHistogramData[idx][0] = requestHistogramData[idx][0].tolist()
                 requestHistogramData[idx][1] = requestHistogramData[idx][1].tolist()
 
@@ -989,8 +1028,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     if not 'studyHistogramData' in locals(): studyHistogramData = 0
     if not 'studySummary' in locals(): studySummary = 0
 
-    return acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData,\
-           requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData,\
+    return acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
+           requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
            studySummary
 
 
@@ -1011,7 +1050,7 @@ def ct_detail_view(request, pk=None):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1026,30 +1065,30 @@ def ct_detail_view(request, pk=None):
 @login_required
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
 
     if request.user.groups.filter(name='pidgroup'):
-        f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+        f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
     else:
-        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
 
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
     return render_to_response(
         'remapp/mgfiltered.html',
-        {'filter': f, 'admin':admin},
+        {'filter': f, 'admin': admin},
         context_instance=RequestContext(request)
-        )
+    )
 
 
 @login_required
@@ -1069,7 +1108,7 @@ def mg_detail_view(request, pk=None):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1083,11 +1122,11 @@ def mg_detail_view(request, pk=None):
 
 def openrem_home(request):
     from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
-    from django.db.models import Q # For the Q "OR" query used for DX and CR
+    from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
     from collections import OrderedDict
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     utc = pytz.UTC
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
@@ -1126,12 +1165,12 @@ def openrem_home(request):
 
     allstudies = GeneralStudyModuleAttr.objects.all()
     homedata = {
-        'total' : allstudies.count(),
-        'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
-        'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
-        'rf' : allstudies.filter(modality_type__contains = 'RF').count(),
-        'dx' : allstudies.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).count(),
-        }
+        'total': allstudies.count(),
+        'mg': allstudies.filter(modality_type__exact='MG').count(),
+        'ct': allstudies.filter(modality_type__exact='CT').count(),
+        'rf': allstudies.filter(modality_type__contains='RF').count(),
+        'dx': allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).count(),
+    }
 
     try:
         # See if the user has plot settings in userprofile
@@ -1165,34 +1204,35 @@ def openrem_home(request):
 
         userProfile.save()
 
-
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    modalities = ('MG','CT','RF','DX')
+    modalities = ('MG', 'CT', 'RF', 'DX')
     for modality in modalities:
         # 10/10/2014, DJP: added code to combine DX with CR
         if modality == 'DX':
-            #studies = allstudies.filter(modality_type__contains = modality).all()
-            studies = allstudies.filter(Q(modality_type__exact = 'DX') | Q(modality_type__exact = 'CR')).all()
+            # studies = allstudies.filter(modality_type__contains = modality).all()
+            studies = allstudies.filter(Q(modality_type__exact='DX') | Q(modality_type__exact='CR')).all()
         else:
-            studies = allstudies.filter(modality_type__contains = modality).all()
+            studies = allstudies.filter(modality_type__contains=modality).all()
         # End of 10/10/2014 DJP code changes
 
-        display_names = studies.values_list('generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
+        display_names = studies.values_list(
+            'generalequipmentmoduleattr__unique_equipment_name__display_name').distinct()
         modalitydata = {}
         for display_name in display_names:
             latestdate = studies.filter(
-                generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
-                ).latest('study_date').study_date
-            latestuid = studies.filter(generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
-                ).filter(study_date__exact = latestdate).latest('study_time')
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+            ).latest('study_date').study_date
+            latestuid = studies.filter(
+                generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+                ).filter(study_date__exact=latestdate).latest('study_time')
             latestdatetime = datetime.combine(latestuid.study_date, latestuid.study_time)
 
             try:
@@ -1201,22 +1241,24 @@ def openrem_home(request):
                 displayname = "Error has occurred - import probably unsuccessful"
 
             modalitydata[display_name[0]] = {
-                'total' : studies.filter(
-                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
-                    ).count(),
-                'latest' : latestdatetime,
-                'displayname' : displayname
+                'total': studies.filter(
+                    generalequipmentmoduleattr__unique_equipment_name__display_name__exact=display_name[0]
+                ).count(),
+                'latest': latestdatetime,
+                'displayname': displayname
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
 
-    return render(request,"remapp/home.html",{'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
+    return render(request, "remapp/home.html",
+                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
+
 
 @login_required
 def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     study = get_object_or_404(GeneralStudyModuleAttr, pk=pk)
 
-    if request.method=='POST':
+    if request.method == 'POST':
         if request.user.groups.filter(name="admingroup"):
             study.delete()
         else:
@@ -1224,9 +1266,10 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
         return redirect("/openrem/")
 
     if request.user.groups.filter(name="admingroup"):
-        return render(request, template_name, {'exam':study})
+        return render(request, template_name, {'exam': study})
 
     return redirect("/openrem/")
+
 
 import os, sys, csv
 from django.shortcuts import render_to_response
@@ -1234,10 +1277,10 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-
 from openremproject.settings import MEDIA_ROOT
 from remapp.models import SizeUpload
 from remapp.forms import SizeUploadForm
+
 
 @login_required
 def size_upload(request):
@@ -1254,20 +1297,19 @@ def size_upload(request):
     if request.method == 'POST' and request.user.groups.filter(name="importsizegroup"):
         form = SizeUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            newcsv = SizeUpload(sizefile = request.FILES['sizefile'])
+            newcsv = SizeUpload(sizefile=request.FILES['sizefile'])
             newcsv.save()
 
             # Redirect to the document list after POST
             return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(newcsv.id))
     else:
-        form = SizeUploadForm() # A empty, unbound form
-
+        form = SizeUploadForm()  # A empty, unbound form
 
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1275,11 +1317,13 @@ def size_upload(request):
     # Render list page with the documents and the form
     return render_to_response(
         'remapp/sizeupload.html',
-        {'form': form, 'admin':admin},
+        {'form': form, 'admin': admin},
         context_instance=RequestContext(request)
     )
 
+
 from remapp.forms import SizeHeadersForm
+
 
 @login_required
 def size_process(request, *args, **kwargs):
@@ -1301,7 +1345,7 @@ def size_process(request, *args, **kwargs):
         uniqueItemsInPost = len(set(request.POST.values()))
 
         if itemsInPost == uniqueItemsInPost:
-            csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])[0]
+            csvrecord = SizeUpload.objects.all().filter(id__exact=kwargs['pk'])[0]
 
             if not csvrecord.sizefile:
                 messages.error(request, "File to be processed doesn't exist. Do you wish to try again?")
@@ -1313,7 +1357,7 @@ def size_process(request, *args, **kwargs):
             csvrecord.id_type = request.POST['id_type']
             csvrecord.save()
 
-            job = websizeimport.delay(csv_pk = kwargs['pk'])
+            job = websizeimport.delay(csv_pk=kwargs['pk'])
 
             return HttpResponseRedirect("/openrem/admin/sizeimports")
 
@@ -1323,7 +1367,7 @@ def size_process(request, *args, **kwargs):
 
     else:
 
-        csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])
+        csvrecord = SizeUpload.objects.all().filter(id__exact=kwargs['pk'])
         with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
             try:
                 dialect = csv.Sniffer().sniff(csvfile.read(1024))
@@ -1333,18 +1377,23 @@ def size_process(request, *args, **kwargs):
                     dataset = csv.DictReader(csvfile)
                     messages.success(request, "CSV file with column headers found.")
                     fieldnames = tuple(zip(dataset.fieldnames, dataset.fieldnames))
-                    form = SizeHeadersForm(my_choice = fieldnames)
+                    form = SizeHeadersForm(my_choice=fieldnames)
                 else:
                     csvfile.seek(0)
-                    messages.error(request, "Doesn't appear to have a header row. First row: {0}. The uploaded file has been deleted.".format(next(csvfile)))
+                    messages.error(request,
+                                   "Doesn't appear to have a header row. First row: {0}. The uploaded file has been deleted.".format(
+                                       next(csvfile)))
                     csvrecord[0].sizefile.delete()
                     return HttpResponseRedirect("/openrem/admin/sizeupload")
             except csv.Error as e:
-                messages.error(request, "Doesn't appear to be a csv file. Error({0}). The uploaded file has been deleted.".format(e))
+                messages.error(request,
+                               "Doesn't appear to be a csv file. Error({0}). The uploaded file has been deleted.".format(
+                                   e))
                 csvrecord[0].sizefile.delete()
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
             except:
-                messages.error(request, "Unexpected error - please contact an administrator: {0}.".format(sys.exc_info()[0]))
+                messages.error(request,
+                               "Unexpected error - please contact an administrator: {0}.".format(sys.exc_info()[0]))
                 csvrecord[0].sizefile.delete()
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
 
@@ -1352,16 +1401,17 @@ def size_process(request, *args, **kwargs):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
     return render_to_response(
         'remapp/sizeprocess.html',
-        {'form':form, 'csvid':kwargs['pk'], 'admin':admin},
+        {'form': form, 'csvid': kwargs['pk'], 'admin': admin},
         context_instance=RequestContext(request)
     )
+
 
 def size_imports(request, *args, **kwargs):
     """Lists patient size imports in the web interface
@@ -1369,7 +1419,7 @@ def size_imports(request, *args, **kwargs):
     :param request:
     """
     import os
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import SizeUpload
@@ -1380,15 +1430,15 @@ def size_imports(request, *args, **kwargs):
 
     imports = SizeUpload.objects.all().order_by('-import_date')
 
-    current = imports.filter(status__contains = 'CURRENT')
-    complete = imports.filter(status__contains = 'COMPLETE')
-    errors = imports.filter(status__contains = 'ERROR')
+    current = imports.filter(status__contains='CURRENT')
+    complete = imports.filter(status__contains='COMPLETE')
+    errors = imports.filter(status__contains='ERROR')
 
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1396,7 +1446,7 @@ def size_imports(request, *args, **kwargs):
     return render_to_response(
         'remapp/sizeimports.html',
         {'admin': admin, 'current': current, 'complete': complete, 'errors': errors},
-        context_instance = RequestContext(request)
+        context_instance=RequestContext(request)
     )
 
 
@@ -1414,18 +1464,22 @@ def size_delete(request):
     from remapp.models import SizeUpload
 
     for task in request.POST:
-        uploads = SizeUpload.objects.filter(task_id__exact = request.POST[task])
+        uploads = SizeUpload.objects.filter(task_id__exact=request.POST[task])
         for upload in uploads:
             try:
                 upload.logfile.delete()
                 upload.delete()
                 messages.success(request, "Export file and database entry deleted successfully.")
             except OSError as e:
-                messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+                messages.error(request,
+                               "Export file delete failed - please contact an administrator. Error({0}): {1}".format(
+                                   e.errno, e.strerror))
             except:
-                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+                messages.error(request,
+                               "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
 
     return HttpResponseRedirect(reverse(size_imports))
+
 
 @login_required
 def size_abort(request, pk):
@@ -1453,7 +1507,6 @@ def size_abort(request, pk):
 
 
 def charts_off(request):
-
     try:
         # See if the user has plot settings in userprofile
         userProfile = request.user.userprofile
@@ -1481,27 +1534,33 @@ def charts_off(request):
 def display_names_view(request):
     from django.db.models import Q
     from remapp.models import UniqueEquipmentNames
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
     ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
     mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
-    dx_names = f.filter(Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") | Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+    dx_names = f.filter(Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") | Q(
+        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
     rf_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF").distinct()
-    ot_names = f.filter(~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+    ot_names = f.filter(~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") & ~Q(
+        generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") & ~Q(
+        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") & ~Q(
+        generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(
+        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
 
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'name_list': f, 'admin':admin,
-                        'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names, 'ot_names': ot_names}
+    return_structure = {'name_list': f, 'admin': admin,
+                        'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names,
+                        'ot_names': ot_names}
 
     return render_to_response(
         'remapp/displaynameview.html',
@@ -1528,7 +1587,7 @@ def display_name_gen_hash(eq):
 @login_required
 def display_name_update(request, pk):
     from remapp.models import UniqueEquipmentNames
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
     from remapp.forms import UpdateDisplayNameForm
 
     if request.method == 'POST':
@@ -1549,28 +1608,30 @@ def display_name_update(request, pk):
         else:
             return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
-        form = UpdateDisplayNameForm(initial={'display_name': (f.values_list('display_name')[0][0]).encode('utf-8')}, auto_id=False)
+        form = UpdateDisplayNameForm(initial={'display_name': (f.values_list('display_name')[0][0]).encode('utf-8')},
+                                     auto_id=False)
 
         try:
             vers = pkg_resources.require("openrem")[0].version
         except:
             vers = ''
-        admin = {'openremversion' : vers}
+        admin = {'openremversion': vers}
 
         for group in request.user.groups.all():
             admin[group.name] = True
 
-        return_structure = {'name_list': f, 'admin':admin, 'form': form}
+        return_structure = {'name_list': f, 'admin': admin, 'form': form}
 
     return render_to_response('remapp/displaynameupdate.html',
                               return_structure,
                               context_instance=RequestContext(request))
 
+
 @login_required
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm
     from openremproject import settings
-    import pkg_resources # part of setuptools
+    import pkg_resources  # part of setuptools
 
     if request.method == 'POST':
         general_form = GeneralChartOptionsDisplayForm(request.POST)
@@ -1608,7 +1669,8 @@ def chart_options_view(request):
             user_profile.plotDXAcquisitionMeanmAs = dx_form.cleaned_data['plotDXAcquisitionMeanmAs']
             user_profile.plotDXStudyPerDayAndHour = dx_form.cleaned_data['plotDXStudyPerDayAndHour']
             user_profile.plotDXAcquisitionMeanDAPOverTime = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
-            user_profile.plotDXAcquisitionMeanDAPOverTimePeriod = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTimePeriod']
+            user_profile.plotDXAcquisitionMeanDAPOverTimePeriod = dx_form.cleaned_data[
+                'plotDXAcquisitionMeanDAPOverTimePeriod']
             user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
 
             user_profile.save()
@@ -1617,7 +1679,7 @@ def chart_options_view(request):
         version = pkg_resources.require("openrem")[0].version
     except:
         version = ''
-    admin = {'openremversion' : version}
+    admin = {'openremversion': version}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1659,10 +1721,10 @@ def chart_options_view(request):
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
     dx_chart_options_form = DXChartOptionsDisplayForm(dx_form_data)
 
-    return_structure = {'admin':admin,
-                        'GeneralChartOptionsForm':general_chart_options_form,
-                        'CTChartOptionsForm':ct_chart_options_form,
-                        'DXChartOptionsForm':dx_chart_options_form,
+    return_structure = {'admin': admin,
+                        'GeneralChartOptionsForm': general_chart_options_form,
+                        'CTChartOptionsForm': ct_chart_options_form,
+                        'DXChartOptionsForm': dx_chart_options_form,
                         }
 
     return render_to_response(
@@ -1671,7 +1733,9 @@ def chart_options_view(request):
         context_instance=RequestContext(request)
     )
 
+
 from remapp.models import DicomStoreSCP
+
 
 @login_required
 def dicom_summary(request):
@@ -1693,7 +1757,7 @@ def dicom_summary(request):
         vers = pkg_resources.require("openrem")[0].version
     except:
         vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': vers}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1814,7 +1878,6 @@ class DicomQRDelete(DeleteView):
             admin[group.name] = True
         context['admin'] = admin
         return context
-
 
 
 class PatientIDSettingsUpdate(UpdateView):
