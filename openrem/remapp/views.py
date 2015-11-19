@@ -1480,17 +1480,10 @@ def charts_off(request):
 @login_required
 def display_names_view(request):
     from django.db.models import Q
-    from remapp.models import UniqueEquipmentNames, GeneralEquipmentModuleAttr, GeneralStudyModuleAttr
+    from remapp.models import UniqueEquipmentNames
     import pkg_resources # part of setuptools
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
-    for item in f:
-        g = GeneralEquipmentModuleAttr.objects.filter(unique_equipment_name = item.pk)
-        h = g.values("general_study_module_attributes")
-        if len(h) > 0:
-            item.modality_type = GeneralStudyModuleAttr.objects.filter(id = h[0].values()[0]).values('modality_type')[0].values()[0]
-        else:
-            item.modality_type = False
 
     ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
     mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
