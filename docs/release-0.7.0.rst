@@ -98,6 +98,10 @@ and then run
 
     python manage.py migrate remapp
 
+.. note::
+
+    With a large database, this may take some time!
+
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
