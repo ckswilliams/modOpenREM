@@ -11,11 +11,15 @@ Creating the database
 Install PostgreSQL and the python connector
 ===========================================
     
-+ ``sudo apt-get install postgresql libpq-dev``
+.. sourcecode:: console
+
+    sudo apt-get install postgresql libpq-dev
 
 If you are using a virtualenv, make sure you are in it and it is active (``source bin/activate``)
 
-+ ``pip install psycopg2``
+.. sourcecode:: console
+
+    pip install psycopg2
 
 Create a user for the database
 ==============================
@@ -29,29 +33,37 @@ Optional: Specify the location for the database
 You might like to do this if you want to put the database on an encrypted location instead of ``/var/lib/postgresql``.
 
 For this example, I'm going to assume all the OpenREM programs and data are in the folder ``/var/openrem/`` and
-postgresql is at version 9.4 (change both as appropriate)::
+postgresql is at version 9.4 (change both as appropriate)
+
+.. sourcecode:: console
 
     sudo /etc/init.d/postgresql stop
     mkdir /var/openrem/database
     sudo cp -aRv /var/lib/postgresql/9.4/main /var/openrem/database/
     sudo nano /etc/postgresql/9.4/main/postgresql.conf
 
-Change the line::
+Change the line
+
+.. sourcecode:: console
 
     data_directory = '/var/lib/postgresql/9.4/main'
 
-to::
+to
+
+.. sourcecode:: console
 
     data_directory = '/var/openrem/database/main'
 
-then restart the database::
+then restart the database
+
+.. sourcecode:: console
 
     sudo /etc/init.d/postgresql start
 
 Create the database
 ===================
 
-.. code-block::
+.. sourcecode:: console
 
     sudo su postgres
     createdb -T template1 -O openremuser -E 'UTF8' openremdb
@@ -73,7 +85,9 @@ Configure OpenREM to use the database
 Find and edit the settings file, eg
     + ``nano local/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
 
-Set the following (changing name, user and password as appropriate)::
+Set the following (changing name, user and password as appropriate)
+
+.. sourcecode:: python
 
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
     'NAME': 'openremdb',
