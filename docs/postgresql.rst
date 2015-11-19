@@ -21,8 +21,8 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 
     pip install psycopg2
 
-Create a user for the database
-==============================
+Create a user for the OpenREM database
+======================================
 
 .. sourcecode:: console
 
@@ -30,17 +30,17 @@ Create a user for the database
 
 Enter a new password for the ``openremuser``, twice
 
-Optional: Specify the location for the database
------------------------------------------------
+Optional: Specify the location for the database files
+-----------------------------------------------------
 
 You might like to do this if you want to put the database on an encrypted location instead of ``/var/lib/postgresql``.
 
 For this example, I'm going to assume all the OpenREM programs and data are in the folder ``/var/openrem/`` and
-postgresql is at version 9.4 (change both as appropriate)
+PostgreSQL is at version ``9.4`` (change both as appropriate)
 
 .. sourcecode:: console
 
-    sudo /etc/init.d/postgresql stop
+    sudo service postgresql stop
     mkdir /var/openrem/database
     sudo cp -aRv /var/lib/postgresql/9.4/main /var/openrem/database/
     sudo nano /etc/postgresql/9.4/main/postgresql.conf
@@ -57,18 +57,11 @@ to
 
     data_directory = '/var/openrem/database/main'
 
-then restart the database
+then restart PostgreSQL:
 
 .. sourcecode:: console
 
-    sudo /etc/init.d/postgresql start
-
-Create the database
-===================
-
-.. sourcecode:: console
-
-    sudo -u postgres createdb -T template1 -O openremuser -E 'UTF8' openremdb
+    sudo service postgresql start
 
 Change the security configuration
 =================================
@@ -89,6 +82,19 @@ Scroll down to the bottom of the file and edit the following line from ``peer`` 
 Don't worry about any lines that start with a ``#`` as they are ignored. If you can't access the database when
 everything else is configured, you might need to revisit this file and see if there are other lines with a method of
 ``peer`` that need to be ``md5``
+
+Restart PostgreSQL so the new settings take effect:
+
+.. sourcecode:: console
+
+    sudo service postgresql restart
+
+Create the OpenREM database
+===========================
+
+.. sourcecode:: console
+
+    sudo -u postgres createdb -T template1 -O openremuser -E 'UTF8' openremdb
 
 
 Configure OpenREM to use the database
@@ -119,9 +125,9 @@ Set the following (changing database name, user and password as appropriate)
     'PASSWORD': 'openrem_pw',
 
 
-********************
-Back up the database
-********************
+*******************
+Backup the database
+*******************
 
 Ad-hoc backup from the command line
 ===================================
