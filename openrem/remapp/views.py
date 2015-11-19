@@ -1496,6 +1496,7 @@ def display_names_view(request):
     mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
     dx_names = f.filter(Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") | Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
     rf_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF").distinct()
+    ot_names = f.filter(~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1507,7 +1508,7 @@ def display_names_view(request):
         admin[group.name] = True
 
     return_structure = {'name_list': f, 'admin':admin,
-                        'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names}
+                        'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names, 'ot_names': ot_names}
 
     return render_to_response(
         'remapp/displaynameview.html',
