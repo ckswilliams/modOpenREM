@@ -48,7 +48,9 @@ at the right-hand end of the navigation bar at the top of the screen.
 
 The third option, ``View display names``, takes you to a page where you can
 view the list of x-ray systems with data in OpenREM together with their
-current display name.
+current display name. The x-ray systems are grouped into modalities and
+displayed in five tables: CT; mammography; DX and CR; fluoroscopy; and
+other.
 
 .. figure:: img/DisplayNameList.png
    :align: center
