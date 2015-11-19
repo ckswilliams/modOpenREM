@@ -70,9 +70,7 @@ In a shell/command window, move into the openrem folder:
 
 Delete all numbered migration files in openrem's ``migrations`` folder, **leaving the 0002 files ending in .inactive**
 
-If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it. It should be empty. In Windows,
-you might create a text file called ``__init__.txt``, then change the file suffix from ``.txt`` to ``.py``, and accept
-the warning about files becoming unusable. In linux, ``touch remapp/migrations/__init__.py`` will do the job.
+If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it.
 
 .. sourcecode:: bash
 
