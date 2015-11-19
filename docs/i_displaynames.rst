@@ -38,12 +38,12 @@ Viewing x-ray system display names
 .. figure:: img/UserOptionsMenu.png
    :align: right
    :alt: User options menu
-   :width: 177px
-   :height: 154px
+   :width: 179px
+   :height: 173px
 
-   The ``User options`` menu
+   The ``Config`` menu (user)
 
-If you log in as a normal user then the ``User options`` menu becomes available
+If you log in as a normal user then the ``Config`` menu becomes available
 at the right-hand end of the navigation bar at the top of the screen.
 
 The third option, ``View display names``, takes you to a page where you can
@@ -64,14 +64,14 @@ Changing x-ray system display names
 .. figure:: img/AdminMenu.png
    :align: right
    :alt: Admin menu
-   :width: 284px
-   :height: 153px
+   :width: 235px
+   :height: 313px
 
-   The ``Admin`` menu
+   The ``Config`` menu (admin)
 
 If you wish to make changes to a display name then you must log in as a user
 that is in the ``admingroup``. You will then be able to use the
-``View and edit display names`` item under the ``Admin`` menu:
+``View and edit display names`` item under the ``Config`` menu:
 
 This will take you to a page where you can view the list of x-ray systems with
 data in OpenREM. If you wish to change a display name then click on the
