@@ -44,6 +44,7 @@ Updates since beta 7
 ====================
 * Full screen charts
 * Test implementation of QR SCU from the command line
+* Equipment display names are now grouped by modality
 * New docs and bug fixes
 
 ****************************
@@ -59,7 +60,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b8
+    pip install openrem==0.7.0b9
 
 In a shell/command window, move into the openrem folder:
 
