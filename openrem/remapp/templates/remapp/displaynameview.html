@@ -5,10 +5,7 @@
 
 {% block toprow %}
   {% load pagination_tags %}
-  <p>
-    There are {{ name_list.count }} entries in this table.
-    {% if admin.admingroup %} Click on a row to edit the display name.{% endif %}
-  </p>
+  <p>{% if admin.admingroup %} Click on a row to edit the display name.{% endif %}</p>
 {% endblock %}
 
 
@@ -23,6 +20,8 @@
   </script>
   {% endif %}
 
+<h3>All systems</h3>
+  <p>There are {{ name_list.count }} entries in this table.</p>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th><th>Modality</th>
@@ -47,6 +46,7 @@
   {% paginate %}
 
 <h3>CT</h3>
+  <p>There are {{ ct_names.count }} entries in this table.</p>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
@@ -67,6 +67,7 @@
   </table>
 
 <h3>Mammography</h3>
+  <p>There are {{ mg_names.count }} entries in this table.</p>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
@@ -87,6 +88,7 @@
   </table>
 
 <h3>DX and CR</h3>
+  <p>There are {{ dx_names.count }} entries in this table.</p>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
@@ -107,6 +109,7 @@
   </table>
 
 <h3>Fluoroscopy</h3>
+  <p>There are {{ rf_names.count }} entries in this table.</p>
   <table class="table table-bordered table-hover row-clickable">
     <row>
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
