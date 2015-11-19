@@ -1439,13 +1439,13 @@ def size_abort(request, pk):
     from django.shortcuts import render, redirect, get_object_or_404
     from remapp.models import SizeUpload
 
-    size = get_object_or_404(SizeUpload, pk=pk)
+    size_import = get_object_or_404(SizeUpload, pk=pk)
 
     if request.user.groups.filter(name="importsizegroup") or request.users.groups.filter(name="admingroup"):
-        revoke(size.task_id, terminate=True)
-        size.logfile.delete()
-        size.sizefile.delete()
-        size.delete()
+        revoke(size_import.task_id, terminate=True)
+        size_import.logfile.delete()
+        size_import.sizefile.delete()
+        size_import.delete()
     else:
         messages.error(request, "Only members of the importsizegroup or admingroup can abort a size import task")
 
