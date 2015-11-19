@@ -124,6 +124,7 @@ Set the following (changing database name, user and password as appropriate)
     'USER': 'openremuser',
     'PASSWORD': 'openrem_pw',
 
+.. _backup-psql-db:
 
 *******************
 Backup the database
@@ -169,3 +170,14 @@ Create a fresh database and restore from the backup
     sudo -u postgres createdb -T template0 new_openremdb_name
     sudo -u psql new_openremdb_name < /path/to/db/backups/openrem.bak
 
+
+**********************************************
+Alternative instructions and further reference
+**********************************************
+
+Previous versions had instructions that used different backup options and the ``pg_restore`` command. To review these,
+please refer to the 0.6.1 documentation at
+`docs.openrem.org/en/0.6.1/  <http://docs.openrem.org/en/0.6.1/backupRestorePostgreSQL.html>`_
+
+Further details can be found on the PostgreSQL website at
+http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE
