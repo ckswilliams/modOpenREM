@@ -26,9 +26,9 @@ Create a user for the database
 
 .. sourcecode:: console
 
-    sudo -u postgres createuser -P openremuser``
+    sudo -u postgres createuser -P openremuser
 
-Enter a new password for the openremuser, twice
+Enter a new password for the ``openremuser``, twice
 
 Optional: Specify the location for the database
 -----------------------------------------------
@@ -68,27 +68,48 @@ Create the database
 
 .. sourcecode:: console
 
-    sudo su postgres
-    createdb -T template1 -O openremuser -E 'UTF8' openremdb
-    exit
+    sudo -u postgres createdb -T template1 -O openremuser -E 'UTF8' openremdb
 
 Change the security configuration
 =================================
 
 The default security settings are too restrictive to allow access to the database.
 
-+ ``sudo nano /etc/postgresql/9.4/main/pg_hba.conf``
-+ Add the following line, and comment out the other 'local' line:
-    + ``local openrem_db openrem_user md5``
-+ ``sudo /etc/init.d/postgresql restart``
+
+.. sourcecode:: console
+
+    sudo nano /etc/postgresql/9.4/main/pg_hba.conf
+
+Scroll down to the bottom of the file and edit the following line from ``peer`` to ``md5``:
+
+.. sourcecode:: console
+
+    local    all            all                         md5
+
+Don't worry about any lines that start with a ``#`` as they are ignored. If you can't access the database when
+everything else is configured, you might need to revisit this file and see if there are other lines with a method of
+``peer`` that need to be ``md5``
+
 
 Configure OpenREM to use the database
 =====================================
 
-Find and edit the settings file, eg
-    + ``nano local/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
+Move to the OpenREM install directory:
 
-Set the following (changing name, user and password as appropriate)
+* Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Windows: ``C:\Python27\Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\``
+
+
+Edit the settings file, eg
+
+.. sourcecode:: console
+
+    nano openremproject/local_settings.py
+
+Set the following (changing database name, user and password as appropriate)
 
 .. sourcecode:: python
 
@@ -139,8 +160,6 @@ Create a fresh database and restore from the backup
 
 .. sourcecode:: console
 
-    sudo su postgres
-    createdb -T template0 new_openremdb_name
-    psql new_openremdb_name < /path/to/db/backups/openrem.bak
-    exit
+    sudo -u postgres createdb -T template0 new_openremdb_name
+    sudo -u psql new_openremdb_name < /path/to/db/backups/openrem.bak
 
