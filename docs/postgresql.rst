@@ -73,11 +73,12 @@ Configure OpenREM to use the database
 Find and edit the settings file, eg
     + ``nano local/lib/python2.7/site-packages/openrem/openremproject/local_settings.py``
 
-Set the following (changing name, user and password as appropriate):
-    + ``'ENGINE': 'django.db.backends.postgresql_psycopg2',``
-    + ``'NAME': 'openremdb',``
-    + ``'USER': 'openremuser',``
-    + ``'PASSWORD': 'openrem_pw',``
+Set the following (changing name, user and password as appropriate)::
+
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'openremdb',
+    'USER': 'openremuser',
+    'PASSWORD': 'openrem_pw',
 
 
 ********************
@@ -94,9 +95,10 @@ added as was used to create the initial database (see :ref:`create-psql-db`)
 Create a fresh database and restore from the backup
 ===================================================
 
-.. code-block::
+.. sourcecode:: console
 
     sudo su postgres
     createdb -T template0 new_openremdb_name
     psql new_openremdb_name < path/to/backup.bak
     exit
+
