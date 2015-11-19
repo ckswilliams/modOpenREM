@@ -141,9 +141,11 @@ Configure the settings
     + ``admingroup`` can delete studies, configure DICOM Store/QR settings, configure DICOM keep or delete settings,
       configure patient ID settings, and abort and delete patient size import jobs. *Members of the admingroup no longer
       inherit the other groups permissions.*
+
 .. figure:: img/Groups.png
-    :align: right
+    :align: center
     :alt: Selecting groups in Django user admin
+
 * In addition to adding users to these groups, you may like to grant a second user ``superuser`` and ``staff`` status
   so that there are at least two people who can manage the users
 * Return to the OpenREM interface (click on ``View site`` at the top right)
