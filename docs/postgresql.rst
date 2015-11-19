@@ -179,5 +179,5 @@ Previous versions had instructions that used different backup options and the ``
 please refer to the 0.6.1 documentation at
 `docs.openrem.org/en/0.6.1/  <http://docs.openrem.org/en/0.6.1/backupRestorePostgreSQL.html>`_
 
-Further details can be found on the PostgreSQL website at
-http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE
+Further details can be found on the
+`PostgreSQL website <http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE>`_
