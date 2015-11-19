@@ -1089,7 +1089,7 @@ def openrem_home(request):
     from collections import OrderedDict
     import pkg_resources # part of setuptools
     utc = pytz.UTC
-    
+
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
     if not test_dicom_store_settings:
         DicomDeleteSettings.objects.create()
@@ -1125,7 +1125,7 @@ def openrem_home(request):
                 users_in_groups['admin'] = True
 
     allstudies = GeneralStudyModuleAttr.objects.all()
-    homedata = { 
+    homedata = {
         'total' : allstudies.count(),
         'mg' : allstudies.filter(modality_type__exact = 'MG').count(),
         'ct' : allstudies.filter(modality_type__exact = 'CT').count(),
@@ -1199,7 +1199,7 @@ def openrem_home(request):
                 displayname = (display_name[0]).encode('utf-8')
             except AttributeError:
                 displayname = "Error has occurred - import probably unsuccessful"
-                       
+
             modalitydata[display_name[0]] = {
                 'total' : studies.filter(
                     generalequipmentmoduleattr__unique_equipment_name__display_name__exact = display_name[0]
@@ -1296,17 +1296,17 @@ def size_process(request, *args, **kwargs):
         return redirect('/openrem/')
 
     if request.method == 'POST':
-              
+
         itemsInPost = len(request.POST.values())
         uniqueItemsInPost = len(set(request.POST.values()))
-        
+
         if itemsInPost == uniqueItemsInPost:
             csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])[0]
-            
+
             if not csvrecord.sizefile:
                 messages.error(request, "File to be processed doesn't exist. Do you wish to try again?")
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
-            
+
             csvrecord.height_field = request.POST['height_field']
             csvrecord.weight_field = request.POST['weight_field']
             csvrecord.id_field = request.POST['id_field']
@@ -1322,7 +1322,7 @@ def size_process(request, *args, **kwargs):
             return HttpResponseRedirect("/openrem/admin/sizeprocess/{0}/".format(kwargs['pk']))
 
     else:
-    
+
         csvrecord = SizeUpload.objects.all().filter(id__exact = kwargs['pk'])
         with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
             try:
@@ -1370,7 +1370,7 @@ def size_imports(request, *args, **kwargs):
     """
     import os
     import pkg_resources # part of setuptools
-    from django.template import RequestContext  
+    from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import SizeUpload
 
@@ -1379,11 +1379,11 @@ def size_imports(request, *args, **kwargs):
         return redirect('/openrem/')
 
     imports = SizeUpload.objects.all().order_by('-import_date')
-    
+
     current = imports.filter(status__contains = 'CURRENT')
     complete = imports.filter(status__contains = 'COMPLETE')
     errors = imports.filter(status__contains = 'ERROR')
-    
+
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
@@ -1398,7 +1398,7 @@ def size_imports(request, *args, **kwargs):
         {'admin': admin, 'current': current, 'complete': complete, 'errors': errors},
         context_instance = RequestContext(request)
     )
-    
+
 
 @csrf_exempt
 @login_required
@@ -1479,10 +1479,17 @@ def charts_off(request):
 
 @login_required
 def display_names_view(request):
+    from django.db.models import Q
     from remapp.models import UniqueEquipmentNames
     import pkg_resources # part of setuptools
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
+
+    ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
+    mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
+    dx_names = f.filter(Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") | Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+    rf_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF").distinct()
+    ot_names = f.filter(~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
 
     try:
         vers = pkg_resources.require("openrem")[0].version
@@ -1493,7 +1500,8 @@ def display_names_view(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    return_structure = {'name_list': f, 'admin':admin}
+    return_structure = {'name_list': f, 'admin':admin,
+                        'ct_names': ct_names, 'mg_names': mg_names, 'dx_names': dx_names, 'rf_names': rf_names, 'ot_names': ot_names}
 
     return render_to_response(
         'remapp/displaynameview.html',
