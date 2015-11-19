@@ -7,7 +7,7 @@ README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 requires = [
-    'django >= 1.8',
+    'django>=1.8,<1.9',
     'django-filter >= 0.10',
     'pytz >= 0a',
     'humanize',
@@ -24,7 +24,7 @@ requires = [
 
 setup(
     name='OpenREM',
-    version='0.7.0b8',
+    version='0.7.0b9',
     packages=['openrem'],
     include_package_data=True,
     install_requires = requires,

@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0b8 (2015-11-18)
+0.7.0b9 (2015-11-19)
 --------------------
 
 * `#312`_  Display names are now grouped by modality
