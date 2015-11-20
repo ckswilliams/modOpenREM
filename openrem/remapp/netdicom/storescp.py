@@ -115,7 +115,7 @@ def OnReceiveStore(SOPClass, DS):
         logging.error(
             "Unexpected error: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
                 sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
-        raise
+        return SOPClass.Success
 
     logging.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'  # X-Ray Radiation Dose SR
