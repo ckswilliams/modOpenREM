@@ -106,9 +106,13 @@ def OnReceiveStore(SOPClass, DS):
     try:
         ds.save_as(filename)
     except ValueError as e:
+        try:
+            station_name = DS.StationName
+        except:
+            station_name = "missing"
         logging.error(
             "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
-                e.message, DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+                e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
                 DS.SOPInstanceUID))
         return SOPClass.Success
     except:
