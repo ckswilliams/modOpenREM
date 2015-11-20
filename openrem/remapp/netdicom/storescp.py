@@ -9,33 +9,35 @@ sending to this host on specified port.
 For help on usage,
 python storescp.py -h
 """
-import os
-import sys
 import errno
 import logging
+import os
+import sys
+
 import django
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
 if projectpath not in sys.path:
-    sys.path.insert(1,projectpath)
+    sys.path.insert(1, projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
 try:
     import netdicom
     from distutils.version import StrictVersion
+
     if StrictVersion(netdicom.__version__.__version__) <= StrictVersion('0.8.1'):
         sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit('Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 from netdicom import AE
 from netdicom.SOPclass import StorageSOPClass, VerificationSOPClass
-from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
+from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.dataset import Dataset, FileDataset
-import tempfile
 from django.views.decorators.csrf import csrf_exempt
+
 
 # netdicom.debug()
 
@@ -48,7 +50,6 @@ def OnAssociateResponse(association):
     logging.info("Store SCP: Association response received")
 
 
-
 def OnReceiveEcho(self):
     logging.info("Store SCP: Echo received")
 
@@ -56,7 +57,7 @@ def OnReceiveEcho(self):
 def mkdir_p(path):
     try:
         os.makedirs(path)
-    except OSError as exc: # Python >2.5
+    except OSError as exc:  # Python >2.5
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
         else:
@@ -77,13 +78,14 @@ def OnReceiveStore(SOPClass, DS):
                      DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
     except:
         try:
-            logging.info("Received C-Store - station name missing. Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
-                         DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
+            logging.info(
+                "Received C-Store - station name missing. Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
+                DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
         except:
             logging.info("Received C-Store - error in logging details")
 
     if 'TransferSyntaxUID' in DS:
-        del DS.TransferSyntaxUID # Don't know why this has become necessary
+        del DS.TransferSyntaxUID  # Don't know why this has become necessary
 
     del_settings = DicomDeleteSettings.objects.get()
     file_meta = Dataset()
@@ -106,31 +108,34 @@ def OnReceiveStore(SOPClass, DS):
     except ValueError as e:
         logging.error(
             "ValueError on DCM save ({0}); {1}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
-                e.errno, e.strerror, DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                e.errno, e.strerror, DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+                DS.SOPInstanceUID))
         return SOPClass.Success
     except:
-        logging.error("Unexpected error: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+        logging.error(
+            "Unexpected error: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
+                sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
         raise
 
     logging.info("File %s written", filename)
-    if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
+    if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'  # X-Ray Radiation Dose SR
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
-    ):
+        ):
         logging.info("Processing as RDSR")
         rdsr.delay(filename)
-    elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'      # CR Image Storage
-        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'    # Digital X-Ray Image Storage for Presentation
-        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
-    ):
+    elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'  # CR Image Storage
+          or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'  # Digital X-Ray Image Storage for Presentation
+          or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
+          ):
         logging.info("Processing as DX")
         dx.delay(filename)
-    elif ( DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'    # Digital Mammography X-Ray Image Storage for Presentation
-        or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1'  # Digital Mammography X-Ray Image Storage for Processing
-        or (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'     # Secondary Capture Image Storage, for processing
-            and DS.Modality == 'MG'                           # Selenia proprietary DBT projection objects
-            and 'ORIGINAL' in DS.ImageType
-        )
-    ):
+    elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'  # Digital Mammography X-Ray Image Storage for Presentation
+          or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1'  # Digital Mammography X-Ray Image Storage for Processing
+          or (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7'  # Secondary Capture Image Storage, for processing
+              and DS.Modality == 'MG'  # Selenia proprietary DBT projection objects
+              and 'ORIGINAL' in DS.ImageType
+              )
+          ):
         logging.info("Processing as MG")
         mam.delay(filename)
     elif DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7':
@@ -142,7 +147,7 @@ def OnReceiveStore(SOPClass, DS):
                 os.remove(filename)
                 logging.info("Secondary capture object with either no manufacturer or series description. Deleted.")
             return SOPClass.Success
-        if manufacturer == 'Philips'and series_description == 'Dose Info':
+        if manufacturer == 'Philips' and series_description == 'Dose Info':
             logging.info("Processing as Philips Dose Info series")
             ct_philips.delay(filename)
         elif del_settings.del_no_match:
@@ -154,6 +159,7 @@ def OnReceiveStore(SOPClass, DS):
 
     # must return appropriate status
     return SOPClass.Success
+
 
 from celery import shared_task
 
@@ -194,7 +200,7 @@ def web_store(store_pk=None):
     conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
     logging.info("Started AE... AET:%s, port:%s", aet, port)
-#    print "Started AE... AET:{0}, port:{1}".format(aet, port)
+    #    print "Started AE... AET:{0}, port:{1}".format(aet, port)
 
     while 1:
         time.sleep(1)
@@ -202,8 +208,9 @@ def web_store(store_pk=None):
         if not stay_alive.run:
             MyAE.Quit()
             logging.info("Stopped AE... AET:%s, port:%s", aet, port)
-#            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
+            #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
+
 
 def _interrupt(store_pk=None):
     from remapp.models import DicomStoreSCP
