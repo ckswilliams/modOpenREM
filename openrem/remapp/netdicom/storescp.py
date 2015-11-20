@@ -107,13 +107,13 @@ def OnReceiveStore(SOPClass, DS):
         ds.save_as(filename)
     except ValueError as e:
         logging.error(
-            "ValueError on DCM save ({0}); {1}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
-                e.errno, e.strerror, DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+            "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                e.message, DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
                 DS.SOPInstanceUID))
         return SOPClass.Success
     except:
         logging.error(
-            "Unexpected error on DCM save: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
+            "Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                 sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
         return SOPClass.Success
 
