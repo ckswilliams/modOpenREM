@@ -55,8 +55,8 @@ other.
 .. figure:: img/DisplayNameList.png
    :align: center
    :alt: List of current display names
-   :width: 1065px
-   :height: 611px
+   :width: 1036px
+   :height: 962px
 
    Example list of display names
 
