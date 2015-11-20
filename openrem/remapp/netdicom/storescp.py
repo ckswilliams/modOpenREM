@@ -100,7 +100,18 @@ def OnReceiveStore(SOPClass, DS):
     ds.update(DS)
     ds.is_little_endian = True
     ds.is_implicit_VR = True
-    ds.save_as(filename)
+
+    try:
+        ds.save_as(filename)
+    except ValueError as e:
+        logging.error(
+            "ValueError on DCM save ({0}); {1}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
+                e.errno, e.strerror, DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+        return SOPClass.Success
+    except:
+        logging.error("Unexpected error: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+        raise
+
     logging.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'     # X-Ray Radiation Dose SR
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
