@@ -113,7 +113,7 @@ def OnReceiveStore(SOPClass, DS):
         return SOPClass.Success
     except:
         logging.error(
-            "Unexpected error: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
+            "Unexpected error on DCM save: {0}. Stn name {2}, modality {3}, SOPClass UID {4}, Study UID {5}, Instance UID {6}".format(
                 sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
         return SOPClass.Success
 
