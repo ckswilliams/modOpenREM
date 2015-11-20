@@ -1,6 +1,6 @@
-###############################################
-PostgreSQL database for OpenREM on Ubuntu linux
-###############################################
+################################################
+Instructions for the PostgreSQL database (Linux)
+################################################
 
 .. _create-psql-db:
 
@@ -96,6 +96,9 @@ Create the OpenREM database
 
     sudo -u postgres createdb -T template1 -O openremuser -E 'UTF8' openremdb
 
+**If this is your initial install**, you are now ready to install OpenREM, so go to the :doc:`install` docs.
+
+If you are replacing a SQLite test install with PostgreSQL, continue here.
 
 Configure OpenREM to use the database
 =====================================

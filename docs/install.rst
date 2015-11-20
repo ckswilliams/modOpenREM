@@ -51,16 +51,6 @@ Edit local_settings.py
 Database
 ^^^^^^^^
 
-For testing you can use the SQLite3 database
-
-.. sourcecode:: python
-
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
-
-* Linux example: ``'NAME': '/home/user/openrem/openrem.db',``
-* Windows example: ``'NAME': 'C:/Users/myusername/Documents/OpenREM/openrem.db',``
-
 .. Note::
 
     SQLite is great for getting things running quickly and testing if the setup works,
@@ -72,6 +62,25 @@ For testing you can use the SQLite3 database
     some others with lower levels of support can be used.
 
     There are some further guides to setting up PostgreSQL – see `Database guides`_ below
+
+If you are using SQLite:
+
+.. sourcecode:: python
+
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': '/ENTER/PATH/WHERE/DB/FILE/CAN/GO',
+
+* Linux example: ``'NAME': '/home/user/openrem/openrem.db',``
+* Windows example: ``'NAME': 'C:/Users/myusername/Documents/OpenREM/openrem.db',``
+
+If you are using PostgreSQL:
+
+.. sourcecode:: python
+
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'openremdb',
+    'USER': 'openremuser',
+    'PASSWORD': 'openrem_pw',
 
 Location for imports and exports
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -209,7 +218,6 @@ Here are instructions for installing PostgreSQL on linux and on Windows, and gui
     
     postgresql
     postgresql_windows
-    backupRestorePostgreSQL
     backupMySQLWindows
 
 

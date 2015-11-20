@@ -1,7 +1,8 @@
-Installing PostgreSQL for OpenREM on Windows
-********************************************
+##################################################
+Instructions for the PostgreSQL database (Windows)
+##################################################
 
-..  Note:: Author JA Cole
+..  Note:: Original author JA Cole
 
 Get PostgreSQL and the python connector
 =======================================
@@ -12,8 +13,9 @@ Get PostgreSQL and the python connector
 Install PostgreSQL
 ==================
 
-Run the the postgresql installer. It will ask for a location. Ensure the "data" directory is *not* under "Program Files" as this can cause permissions errors.
-Enter a superuser password when prompted. Make sure you keep this safe as you will need it.
+Run the the postgresql installer. It will ask for a location. Ensure the "data" directory is *not* under "Program Files"
+as this can cause permissions errors. Enter a superuser password when prompted. Make sure you keep this safe as you will
+need it.
 
 Create a user and database
 ==========================
@@ -21,7 +23,7 @@ Create a user and database
 Open pgAdmin III
 
 + Click on servers to expand
-+ Double click on PostgreSQL 9.3
++ Double click on PostgreSQL 9.4
 + Enter your superuser password
 + Right click on "login roles" and choose "New login role"
 + Create the openremuser (or whatever you want your user to be called) and under definition add a password.
@@ -34,6 +36,9 @@ Install psycopg2
 ================
 Run the installer you downloaded for psycopg2 earlier.
 
+**If this is your initial install**, you are now ready to install OpenREM, so go to the :doc:`install` docs.
+
+If you are replacing a SQLite test install with PostgreSQL, continue here.
 
 Configure OpenREM to use the database
 =====================================
@@ -47,26 +52,3 @@ Set the following (changing name, user and password as appropriate):
     + ``'USER': 'openremuser',``
     + ``'PASSWORD': 'openrem_pw',``
 
-Fire it up with OpenREM
-=======================
-
-+ ``python path/to/openrem/manage.py syncdb``
-+ ``python path/to/openrem/manage.py convert_to_south remapp``
-
-Fix '' value too long for type character varying(50)'' error
-============================================================
-
-This error is caused by the django auth_permissions system not being able to cope with long names in the models.
-
-+ Open pgAdmin III
-+ Open Servers
-+ Open databases
-+ Open the openrem database
-+ Open schemas
-+ Open public
-+ Open tables
-+ right click on auth_permission
-+ Select properties
-+ Change ''name'' to ''varying(100)'' from ''varying(50)''
-
-Then run ``python path/to/openrem/manage.py syncdb`` again.
