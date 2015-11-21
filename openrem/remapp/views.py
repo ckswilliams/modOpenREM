@@ -37,7 +37,6 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
 import logging
-import pkg_resources
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group, Permission
@@ -45,6 +44,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+import remapp
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
 
 try:
@@ -67,7 +67,6 @@ def logout_page(request):
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import dx_acq_filter
     from django.db.models import Q
-    import pkg_resources  # part of setuptools
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
 
@@ -137,11 +136,7 @@ def dx_summary_list_filter(request):
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = DXChartOptionsForm(formData)
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -560,11 +555,7 @@ def dx_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/dx/')
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -579,18 +570,13 @@ def dx_detail_view(request, pk=None):
 @login_required
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
-    import pkg_resources  # part of setuptools
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
     else:
         f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -615,11 +601,7 @@ def rf_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -634,7 +616,6 @@ def rf_detail_view(request, pk=None):
 @login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import ct_acq_filter
-    import pkg_resources  # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
 
@@ -702,11 +683,7 @@ def ct_summary_list_filter(request):
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = CTChartOptionsForm(formData)
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -723,7 +700,6 @@ def ct_summary_list_filter(request):
 @login_required
 def ct_summary_chart_data(request):
     from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
-    import pkg_resources  # part of setuptools
     from remapp.forms import CTChartOptionsForm
     from openremproject import settings
     from django.http import JsonResponse
@@ -1046,11 +1022,7 @@ def ct_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/ct/')
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1065,7 +1037,6 @@ def ct_detail_view(request, pk=None):
 @login_required
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
-    import pkg_resources  # part of setuptools
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
@@ -1075,11 +1046,7 @@ def mg_summary_list_filter(request):
     else:
         f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1104,11 +1071,7 @@ def mg_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/mg/')
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1126,7 +1089,6 @@ def openrem_home(request):
     from datetime import datetime
     import pytz
     from collections import OrderedDict
-    import pkg_resources  # part of setuptools
     utc = pytz.UTC
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
@@ -1204,11 +1166,7 @@ def openrem_home(request):
 
         userProfile.save()
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1305,11 +1263,7 @@ def size_upload(request):
     else:
         form = SizeUploadForm()  # A empty, unbound form
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1397,11 +1351,7 @@ def size_process(request, *args, **kwargs):
                 csvrecord[0].sizefile.delete()
                 return HttpResponseRedirect("/openrem/admin/sizeupload")
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1418,8 +1368,6 @@ def size_imports(request, *args, **kwargs):
 
     :param request:
     """
-    import os
-    import pkg_resources  # part of setuptools
     from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import SizeUpload
@@ -1434,11 +1382,7 @@ def size_imports(request, *args, **kwargs):
     complete = imports.filter(status__contains='COMPLETE')
     errors = imports.filter(status__contains='ERROR')
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1534,7 +1478,6 @@ def charts_off(request):
 def display_names_view(request):
     from django.db.models import Q
     from remapp.models import UniqueEquipmentNames
-    import pkg_resources  # part of setuptools
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
@@ -1549,11 +1492,7 @@ def display_names_view(request):
         generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(
         generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1587,7 +1526,6 @@ def display_name_gen_hash(eq):
 @login_required
 def display_name_update(request, pk):
     from remapp.models import UniqueEquipmentNames
-    import pkg_resources  # part of setuptools
     from remapp.forms import UpdateDisplayNameForm
 
     if request.method == 'POST':
@@ -1611,11 +1549,7 @@ def display_name_update(request, pk):
         form = UpdateDisplayNameForm(initial={'display_name': (f.values_list('display_name')[0][0]).encode('utf-8')},
                                      auto_id=False)
 
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
         for group in request.user.groups.all():
             admin[group.name] = True
@@ -1631,7 +1565,6 @@ def display_name_update(request, pk):
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm
     from openremproject import settings
-    import pkg_resources  # part of setuptools
 
     if request.method == 'POST':
         general_form = GeneralChartOptionsDisplayForm(request.POST)
@@ -1675,11 +1608,7 @@ def chart_options_view(request):
 
             user_profile.save()
 
-    try:
-        version = pkg_resources.require("openrem")[0].version
-    except:
-        version = ''
-    admin = {'openremversion': version}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1753,11 +1682,7 @@ def dicom_summary(request):
     store = DicomStoreSCP.objects.all()
     remoteqr = DicomRemoteQR.objects.all()
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion': vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1776,11 +1701,7 @@ class DicomStoreCreate(CreateView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1793,11 +1714,7 @@ class DicomStoreUpdate(UpdateView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1810,11 +1727,7 @@ class DicomStoreDelete(DeleteView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1830,11 +1743,7 @@ class DicomQRCreate(CreateView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1850,11 +1759,7 @@ class DicomQRUpdate(UpdateView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1869,11 +1774,7 @@ class DicomQRDelete(DeleteView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1887,12 +1788,9 @@ class PatientIDSettingsUpdate(UpdateView):
     fields = ['name_stored', 'name_hashed', 'id_stored', 'id_hashed', 'accession_hashed', 'dob_stored']
 
     def get_context_data(self, **context):
+
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
@@ -1908,11 +1806,7 @@ class DicomDeleteSettingsUpdate(UpdateView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        try:
-            vers = pkg_resources.require("openrem")[0].version
-        except:
-            vers = ''
-        admin = {'openremversion': vers}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
