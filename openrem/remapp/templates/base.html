@@ -131,6 +131,11 @@
               <a href="/login/?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
               {% endif %}
             </p>
+            <p class="navbar-text">
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/{% block navhelp %}{% endblock %}" class="navbar-link" target="_blank">
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help
+            </a>
+            </p>
           </ul>
           {% endblock %}
         </div><!--/.nav-collapse -->
