@@ -37,6 +37,7 @@ import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+import  remapp
 
 @csrf_exempt
 @login_required
@@ -283,8 +284,7 @@ def export(request):
 
     :param request: Used to get user group.
     """
-    import pkg_resources # part of setuptools
-    from django.template import RequestContext  
+    from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import Exports
     from remapp.exports.exportcsv import exportCT2excel
@@ -295,11 +295,7 @@ def export(request):
     complete = exptsks.filter(status__contains = 'COMPLETE')
     errors = exptsks.filter(status__contains = 'ERROR')
     
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True

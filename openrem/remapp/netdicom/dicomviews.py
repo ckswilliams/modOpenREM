@@ -32,11 +32,11 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import pkg_resources
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
+import remapp
 
 @csrf_exempt
 @login_required
@@ -210,11 +210,7 @@ def q_process(request, *args, **kwargs):
             resp['message'] = errors
             resp['status'] = 'not complete'
 
-            try:
-                vers = pkg_resources.require("openrem")[0].version
-            except:
-                vers = ''
-            admin = {'openremversion' : vers}
+            admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
             for group in request.user.groups.all():
                 admin[group.name] = True
@@ -263,11 +259,7 @@ def dicom_qr_page(request, *args, **kwargs):
         else:
             qrstatus[scp.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
 
-    try:
-        vers = pkg_resources.require("openrem")[0].version
-    except:
-        vers = ''
-    admin = {'openremversion' : vers}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
