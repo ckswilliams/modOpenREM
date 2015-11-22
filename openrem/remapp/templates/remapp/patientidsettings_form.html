@@ -3,23 +3,11 @@
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
-<li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
-        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Docs <span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu">
-        <li>
-            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
-                All docs, version {{ admin.docsversion }}
-            </a>
-        </li>
         <li>
             <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/patientid.html" target="_blank" data-toggle="tooltip" title="Patient ID documentation - opens in a new tab">
                 Patient ID settings
             </a>
         </li>
-    </ul>
-</li>
 {% endblock %}
 
 {% block mainblock %}
