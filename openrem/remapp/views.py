@@ -137,7 +137,7 @@ def dx_summary_list_filter(request):
                         'plotMeanMedianOrBoth': userProfile.plotAverageChoice}
             chartOptionsForm = DXChartOptionsForm(formData)
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.remapp.__docs_version__}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -556,7 +556,7 @@ def dx_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/dx/')
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.remapp.__docs_version__}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -577,7 +577,7 @@ def rf_summary_list_filter(request):
     else:
         f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.remapp.__docs_version__}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -1807,7 +1807,7 @@ class DicomDeleteSettingsUpdate(UpdateView):
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object
-        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.remapp.__docs_version__}
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
         for group in self.request.user.groups.all():
             admin[group.name] = True
         context['admin'] = admin
