@@ -100,6 +100,8 @@ $(document).ready(function() {
                 var chartplotDXAcquisitionDAP = $('#container').highcharts();
                 chartplotDXAcquisitionDAP.xAxis[0].setCategories(protocolNames);
                 chartplotDXAcquisitionDAP.options.drilldown.series = seriesDrilldown;
+                chartplotDXAcquisitionDAP.options.exporting.sourceWidth = $(window).width();
+                chartplotDXAcquisitionDAP.options.exporting.sourceHeight = $(window).height();
                 if(plotAverageChoice == "mean") {
                     chartplotDXAcquisitionDAP.series[0].setData(seriesData);
                 }
@@ -182,6 +184,9 @@ $(document).ready(function() {
                 var chartplotDXAcquisitionMeankVp = $('#chartAcquisitionMeankVp').highcharts();
                 chartplotDXAcquisitionMeankVp.xAxis[0].setCategories(protocolkVpNames);
                 chartplotDXAcquisitionMeankVp.options.drilldown.series = serieskVpDrilldown;
+                chartplotDXAcquisitionMeankVp.options.exporting.sourceWidth = $(window).width();
+                chartplotDXAcquisitionMeankVp.options.exporting.sourceHeight = $(window).height();
+
                 if(plotAverageChoice == "mean") {
                     chartplotDXAcquisitionMeankVp.series[0].setData(serieskVpData);
                 }
@@ -263,6 +268,8 @@ $(document).ready(function() {
                 var chartplotDXAcquisitionMeanmAs = $('#chartAcquisitionMeanmAs').highcharts();
                 chartplotDXAcquisitionMeanmAs.xAxis[0].setCategories(protocolmAsNames);
                 chartplotDXAcquisitionMeanmAs.options.drilldown.series = seriesmAsDrilldown;
+                chartplotDXAcquisitionMeanmAs.options.exporting.sourceWidth = $(window).width();
+                chartplotDXAcquisitionMeanmAs.options.exporting.sourceHeight = $(window).height();
                 if(plotAverageChoice == "mean") {
                     chartplotDXAcquisitionMeanmAs.series[0].setData(seriesmAsData);
                 }
@@ -306,6 +313,9 @@ $(document).ready(function() {
             if(typeof plotDXAcquisitionFreq !== 'undefined') {
                 var chart = $('#piechartProtocolDIV').highcharts();
                 chart.series[0].setData(protocolPiechartData);
+                chart.options.exporting.sourceWidth = $(window).width();
+                chart.options.exporting.sourceHeight = $(window).height();
+
                 chart.redraw({ duration: 1000 });
             }
             // Acquisition frequency chart data end
@@ -359,6 +369,8 @@ $(document).ready(function() {
                 var chartplotDXStudyPerDayAndHour = $('#piechartStudyWorkloadDIV').highcharts();
                 chartplotDXStudyPerDayAndHour.options.drilldown.series = seriesDrillDownPieChart;
                 chartplotDXStudyPerDayAndHour.series[0].setData(studyWorkloadPieChartData);
+                chartplotDXStudyPerDayAndHour.options.exporting.sourceWidth = $(window).width();
+                chartplotDXStudyPerDayAndHour.options.exporting.sourceHeight = $(window).height();
                 chartplotDXStudyPerDayAndHour.redraw({duration: 1000});
             }
             // Study workload chart data end
@@ -457,6 +469,10 @@ $(document).ready(function() {
                 for(i=0; i<kVpOverTime.length; i++) {
                     chartDXAcquisitionMeankVpOverTime.addSeries(kVpOverTime[i]);
                 }
+
+                chartDXAcquisitionMeankVpOverTime.options.exporting.sourceWidth = $(window).width();
+                chartDXAcquisitionMeankVpOverTime.options.exporting.sourceHeight = $(window).height();
+
                 chartDXAcquisitionMeankVpOverTime.redraw({duration: 1000});
             }
             // kVp over time chart data end
@@ -499,6 +515,10 @@ $(document).ready(function() {
                 for(i=0; i<mAsOverTime.length; i++) {
                     chartDXAcquisitionMeanmAsOverTime.addSeries(mAsOverTime[i]);
                 }
+
+                chartDXAcquisitionMeanmAsOverTime.options.exporting.sourceWidth = $(window).width();
+                chartDXAcquisitionMeanmAsOverTime.options.exporting.sourceHeight = $(window).height();
+
                 chartDXAcquisitionMeanmAsOverTime.redraw({duration: 1000});
             }
             // mAs over time chart data end
@@ -541,6 +561,10 @@ $(document).ready(function() {
                 for(i=0; i<DAPOverTime.length; i++) {
                     chartDXAcquisitionMeanDAPOverTime.addSeries(DAPOverTime[i]);
                 }
+
+                chartDXAcquisitionMeanDAPOverTime.options.exporting.sourceWidth = $(window).width();
+                chartDXAcquisitionMeanDAPOverTime.options.exporting.sourceHeight = $(window).height();
+
                 chartDXAcquisitionMeanDAPOverTime.redraw({duration: 1000});
             }
             // DAP over time chart data end

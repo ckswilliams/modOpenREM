@@ -162,6 +162,9 @@ $(document).ready(function() {
                 chartplotCTAcquisitionMeanDLPandCTDI.xAxis[0].setCategories(protocolNames);
 
                 chartplotCTAcquisitionMeanDLPandCTDI.options.drilldown.series = (seriesDrilldown).concat(series_drilldown_ctdi);
+                chartplotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceWidth = $(window).width();
+                chartplotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceHeight = $(window).height();
+
                 if (plotAverageChoice == "mean") {
                     chartplotCTAcquisitionMeanDLPandCTDI.series[0].setData(seriesData);
                     chartplotCTAcquisitionMeanDLPandCTDI.series[1].setData(series_data_ctdi);
@@ -182,6 +185,9 @@ $(document).ready(function() {
                 var chartplotCTAcquisitionMeanDLP = $('#histogramPlotDIV').highcharts();
                 chartplotCTAcquisitionMeanDLP.xAxis[0].setCategories(protocolNames);
                 chartplotCTAcquisitionMeanDLP.options.drilldown.series = seriesDrilldown;
+                chartplotCTAcquisitionMeanDLP.options.exporting.sourceWidth = $(window).width();
+                chartplotCTAcquisitionMeanDLP.options.exporting.sourceHeight = $(window).height();
+
                 if (plotAverageChoice == "mean") {
                     chartplotCTAcquisitionMeanDLP.series[0].setData(seriesData);
                 }
@@ -198,6 +204,9 @@ $(document).ready(function() {
                 var chartplotCTAcquisitionMeanCTDI = $('#histogramPlotCTDIdiv').highcharts();
                 chartplotCTAcquisitionMeanCTDI.xAxis[0].setCategories(protocolNames);
                 chartplotCTAcquisitionMeanCTDI.options.drilldown.series = series_drilldown_ctdi;
+                chartplotCTAcquisitionMeanCTDI.options.exporting.sourceWidth = $(window).width();
+                chartplotCTAcquisitionMeanCTDI.options.exporting.sourceHeight = $(window).height();
+
                 if (plotAverageChoice == "mean") {
                     chartplotCTAcquisitionMeanCTDI.series[0].setData(series_data_ctdi);
                 }
@@ -241,6 +250,9 @@ $(document).ready(function() {
             if(typeof plotCTAcquisitionFreq !== 'undefined') {
                 var chart = $('#piechartProtocolDIV').highcharts();
                 chart.series[0].setData(protocolPiechartData);
+                chart.options.exporting.sourceWidth = $(window).width();
+                chart.options.exporting.sourceHeight = $(window).height();
+
                 chart.redraw({ duration: 1000 });
             }
             // Acquisition frequency chart data end
@@ -313,6 +325,9 @@ $(document).ready(function() {
                 var chartplotCTStudyMeanDLP = $('#histogramStudyPlotDIV').highcharts();
                 chartplotCTStudyMeanDLP.xAxis[0].setCategories(study_names);
                 chartplotCTStudyMeanDLP.options.drilldown.series = series_drilldown_study;
+                chartplotCTStudyMeanDLP.options.exporting.sourceWidth = $(window).width();
+                chartplotCTStudyMeanDLP.options.exporting.sourceHeight = $(window).height();
+
                 if (plotAverageChoice == "mean") {
                     chartplotCTStudyMeanDLP.series[0].setData(study_data);
                 }
@@ -356,6 +371,9 @@ $(document).ready(function() {
             if(typeof plotCTStudyFreq !== 'undefined') {
                 var chart = $('#piechartStudyDIV').highcharts();
                 chart.series[0].setData(study_piechart_data);
+                chart.options.exporting.sourceWidth = $(window).width();
+                chart.options.exporting.sourceHeight = $(window).height();
+
                 chart.redraw({ duration: 1000 });
             }
             // Study frequency chart data end
@@ -428,6 +446,9 @@ $(document).ready(function() {
                 var chartplotCTRequestMeanDLP = $('#histogramRequestPlotDIV').highcharts();
                 chartplotCTRequestMeanDLP.xAxis[0].setCategories(request_names);
                 chartplotCTRequestMeanDLP.options.drilldown.series = series_drilldown_request;
+                chartplotCTRequestMeanDLP.options.exporting.sourceWidth = $(window).width();
+                chartplotCTRequestMeanDLP.options.exporting.sourceHeight = $(window).height();
+
                 if (plotAverageChoice == "mean") {
                     chartplotCTRequestMeanDLP.series[0].setData(request_data);
                 }
@@ -470,6 +491,9 @@ $(document).ready(function() {
             if(typeof plotCTRequestFreq !== 'undefined') {
                 var chart = $('#piechartRequestDIV').highcharts();
                 chart.series[0].setData(request_piechart_data);
+                chart.options.exporting.sourceWidth = $(window).width();
+                chart.options.exporting.sourceHeight = $(window).height();
+
                 chart.redraw({ duration: 1000 });
             }
             // Request frequency chart data end
@@ -523,6 +547,9 @@ $(document).ready(function() {
                 var chartplotDXStudyPerDayAndHour = $('#piechartStudyWorkloadDIV').highcharts();
                 chartplotDXStudyPerDayAndHour.options.drilldown.series = seriesDrillDownPieChart;
                 chartplotDXStudyPerDayAndHour.series[0].setData(studyWorkloadPieChartData);
+                chartplotDXStudyPerDayAndHour.options.exporting.sourceWidth = $(window).width();
+                chartplotDXStudyPerDayAndHour.options.exporting.sourceHeight = $(window).height();
+
                 chartplotDXStudyPerDayAndHour.redraw({duration: 1000});
             }
             // Study workload chart data end
@@ -572,6 +599,10 @@ $(document).ready(function() {
                 for(i=0; i<DLPOverTime.length; i++) {
                     chartCTStudyMeanDLPOverTime.addSeries(DLPOverTime[i]);
                 }
+
+                chartCTStudyMeanDLPOverTime.options.exporting.sourceWidth = $(window).width();
+                chartCTStudyMeanDLPOverTime.options.exporting.sourceHeight = $(window).height();
+
                 chartCTStudyMeanDLPOverTime.redraw({duration: 1000});
             }
             // DLP over time chart data end
