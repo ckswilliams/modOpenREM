@@ -36,7 +36,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-import remapp
+import openrem
 
 @csrf_exempt
 @login_required
@@ -210,7 +210,7 @@ def q_process(request, *args, **kwargs):
             resp['message'] = errors
             resp['status'] = 'not complete'
 
-            admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+            admin = {'openremversion': openrem.__version__, 'docsversion': openrem.__docs_version__}
 
             for group in request.user.groups.all():
                 admin[group.name] = True
@@ -259,7 +259,7 @@ def dicom_qr_page(request, *args, **kwargs):
         else:
             qrstatus[scp.name] = "<span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> not responding to DICOM echo"
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+    admin = {'openremversion': openrem.__version__, 'docsversion': openrem.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
