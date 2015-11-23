@@ -1,5 +1,15 @@
 {% extends "remapp/base.html" %}
 
+
+{% block navhelp %}
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_navigate.html" target="_blank" data-toggle="tooltip" title="Web interface documentation - opens in a new tab">
+                Web interface documentation
+            </a>
+        </li>
+{% endblock %}
+
+
       {% block toprow %}
       <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database browser and export</h1>
 
