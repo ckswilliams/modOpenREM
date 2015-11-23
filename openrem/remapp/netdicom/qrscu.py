@@ -25,16 +25,19 @@ def OnAssociateRequest(association):
     return True
 
 def _move_req(my_ae, remote_ae, d):
+    logging.debug("Requesting move association")
     assocMove = my_ae.RequestAssociation(remote_ae)
     logging.info("Move association requested")
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     for gg in gen:
         logging.info("gg is %s", gg)
+    logging.debug("Releasing move association")
     assocMove.Release(0)
     logging.info("Move association released")
 
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
+    from time import sleep
     import uuid
     from remapp.tools.dcmdatetime import make_date
     from remapp.models import DicomQRRspSeries
@@ -48,6 +51,16 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     logging.debug('d2: {0}'.format(d2))
 
     assoc_series = my_ae.RequestAssociation(remote_ae)
+
+    if not assoc_series:
+        logging.warning("Query series association must have failed, trying again")
+        sleep(2)
+        assoc_series = my_ae.RequestAssociation(remote_ae)
+        if not assoc_series:
+            logging.error(
+                "Query series association has failed. Me: {0}, Remote: {1}, StudyInstanceUID: {2}, SeriesInstanceUID: {3}".format(
+                    my_ae, remote_ae, d2.StudyInstanceUID, d2.SeriesInstanceUID))
+            return
 
     st2 = assoc_series.StudyRootFindSOPClass.SCU(d2, 1)
 
@@ -425,19 +438,23 @@ def movescu(query_id):
 
     query.stage = "Preparing to start move request"
     query.save()
+    logging.info("Preparing to start move request")
 
     studies = query.dicomqrrspstudy_set.all()
     query.stage = "Requesting move of {0} studies".format(studies.count())
     query.save()
+    logging.info("Requesting move of {0} studies".format(studies.count()))
 
     study_no = 0
     for study in studies:
         study_no += 1
+        logging.info("Mv: study_no {0}".format(study_no))
         d = Dataset()
         d.StudyInstanceUID = study.study_instance_uid
         series_no = 0
         for series in study.dicomqrrspseries_set.all():
             series_no += 1
+            logging.info("Mv: study no {0} series no {1}".format(study_no, series_no))
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
             if series.number_of_series_related_instances:
@@ -448,11 +465,17 @@ def movescu(query_id):
                 study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
                 num_objects
             )
+            logging.info("Requesting move of {0}; series {3} of {4} of study {1} of {2}{5}".format(
+                study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
+                num_objects
+            ))
             query.save()
             _move_req(my_ae, remote_ae, d)
+            logging.info("_move_req launched")
 
     query.move_complete = True
     query.save()
+    logging.info("Move complete")
 
     my_ae.Quit()
 
