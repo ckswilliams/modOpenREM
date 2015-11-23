@@ -1,2 +1,2 @@
-from .version import __version__
-from .version import __docs_version__
+from remapp.version import __version__
+from remapp.version import __docs_version__

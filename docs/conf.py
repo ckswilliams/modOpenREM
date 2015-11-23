@@ -16,8 +16,7 @@ import sys
 import os
 
 basepath = os.path.dirname(__file__)
-projectpath = os.path.abspath(os.path.join(basepath, "..", "openrem"))
-sys.path.insert(0, projectpath)
+projectpath = os.path.abspath(os.path.join(basepath, "..", "openrem", "remapp"))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

@@ -37,7 +37,7 @@ import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-import openrem
+import remapp
 
 @csrf_exempt
 @login_required
@@ -295,7 +295,7 @@ def export(request):
     complete = exptsks.filter(status__contains = 'COMPLETE')
     errors = exptsks.filter(status__contains = 'ERROR')
     
-    admin = {'openremversion': openrem.__version__, 'docsversion': openrem.__docs_version__}
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
