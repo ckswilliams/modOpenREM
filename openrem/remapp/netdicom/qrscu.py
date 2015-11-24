@@ -95,6 +95,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
 
 def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
+    from dicom.dataset import Dataset
     from remapp.models import DicomQRRspStudy
     from remapp.tools.dcmdatetime import make_date
 
@@ -117,7 +118,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         if not ss[1]:
             continue
         rspno += 1
-        logging.debug("Response {0}".format(rspno))
+        logging.debug("Response {0}, ss1 is {1}".format(rspno, ss[1]))
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
         # Unique key
@@ -129,7 +130,9 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         except AttributeError:
             pass
         # Series level query
-        _query_series(my_ae, remote_ae, ss[1], rsp)
+        d2 = Dataset()
+        d2.StudyInstanceUID = rsp.study_instance_uid
+        _query_series(my_ae, remote_ae, d2, rsp)
         # Populate modalities_in_study, stored as JSON
         try:
             rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
@@ -264,9 +267,7 @@ def qrscu(
     d.QueryRetrieveLevel = "STUDY"
     d.PatientName = ''
     d.PatientID = ''
-    d.SOPInstanceUID = ''
     d.AccessionNumber = ''
-    d.Modality = ''
     d.ModalitiesInStudy = ''
     d.StudyDescription = ''
     d.StudyID = ''
@@ -288,6 +289,7 @@ def qrscu(
             for mod in details['mods']:
                 query.stage = 'Currently querying for {0} studies...'.format(mod)
                 query.save()
+                logging.info('Currently querying for {0} studies...'.format(mod))
                 trip += 1
                 if modality_matching:
                     d.ModalitiesInStudy = mod
@@ -302,6 +304,7 @@ def qrscu(
     if inc_sr and modality_matching:
         query.stage = 'Currently querying for SR only studies'
         query.save()
+        logging.info('Currently querying for SR only studies')
         d.ModalitiesInStudy = 'SR'
         query_id = uuid.uuid4()
         _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -314,18 +317,26 @@ def qrscu(
     if duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
+        logging.info('Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
                 study_rsp.filter(study_instance_uid__exact = uid).delete()
+        logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
+    logging.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
     query.stage = "Deleting studies we didn't ask for"
     query.save()
+    logging.info("Deleting studies we didn't ask for")
+    logging.debug("mods_in_study_set is {0}".format(mods_in_study_set))
     for mod_set in mods_in_study_set:
+        logging.debug("mod_set is {0}".format(mod_set))
         delete = True
         for mod_choice, details in all_mods.iteritems():
+            logging.debug("mod_choice {0}, details {1}".format(mod_choice, details))
             if details['inc']:
                 for mod in details['mods']:
+                    logging.info("mod is {0}, mod_set is {1}".format(mod, mod_set))
                     if mod in mod_set:
                         delete = False
                         continue
@@ -334,10 +345,12 @@ def qrscu(
         if delete:
             studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)
             studies_to_delete.delete()
+    logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now we need to delete any unwanted series
     query.stage = "Deleting series we can't use"
     query.save()
+    logging.info("Deleting series we can't use")
     for study in study_rsp:
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
             study.modality = 'MG'
@@ -373,6 +386,7 @@ def qrscu(
                     for s in series:
                         if s.series_description != 'dose info':
                             s.delete()
+    logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     logging.info("Release association")
     assoc.Release(0)
