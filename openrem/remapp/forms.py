@@ -205,6 +205,15 @@ class DicomDeleteSettingsForm(forms.ModelForm):
             FormActions(
                 Submit('submit', 'Submit')
             ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-2">
+                    <a href="/openrem/admin/dicomsummary#delete" role="button" class="btn btn-default">
+                        Cancel and return to the DICOM configuration and DICOM object delete summary page
+                    </a>
+                </div>
+                """)
+            )
         )
 
     class Meta:
@@ -228,6 +237,15 @@ class DicomQRForm(forms.ModelForm):
             FormActions(
                 Submit('submit', 'Submit')
             ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-4">
+                    <a href="/openrem/admin/dicomsummary" role="button" class="btn btn-default">
+                        Cancel and return to DICOM configuration summary page
+                    </a>
+                </div>
+                """)
+            )
         )
 
     class Meta:
