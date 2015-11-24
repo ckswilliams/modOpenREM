@@ -2,6 +2,14 @@
 
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
+{% block navhelp %}
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html#changing-x-ray-system-display-names" target="_blank" data-toggle="tooltip" title="Display name documentation - opens in a new tab">
+                Changing display names
+            </a>
+        </li>
+{% endblock %}
+
 {% block mainblock %}
   {% if admin.admingroup %}
   <form action="/openrem/updatedisplayname/{{ name_list.values.get.id }}" method="post">{% csrf_token %}
