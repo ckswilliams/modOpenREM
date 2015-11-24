@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b9 (2015-11-19)
 --------------------
 
+* `#315`_  Charts: made size of exported chart graphics follow the browser window size
 * `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
 * `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
