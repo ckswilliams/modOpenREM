@@ -150,7 +150,9 @@ from celery import shared_task
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True, *args, **kwargs):
+        date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True,
+        study_desc_exc=None, study_desc_inc=None,
+        *args, **kwargs):
     """Query retrieve service class user function
     
     Queries a pre-configured remote query retrieve service class provider for dose metric related objects,
@@ -387,6 +389,9 @@ def qrscu(
                         if s.series_description != 'dose info':
                             s.delete()
     logging.info('Now have {0} studies'.format(study_rsp.count()))
+
+    # Now delete any that don't match the include and exclude criteria
+    
 
     logging.info("Release association")
     assoc.Release(0)
