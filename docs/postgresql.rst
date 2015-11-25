@@ -192,14 +192,14 @@ Useful PostgreSQL commands
 
 .. sourcecode:: psql
 
-    # Start the PostgreSQL console
+    -- Start the PostgreSQL console
     sudo -u postgres psql
 
-    # List users
+    -- List users
     \du
 
-    # List databases
+    -- List databases
     \l
 
-    #Exit the console
+    -- Exit the console
     \q
