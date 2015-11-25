@@ -1,8 +1,8 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Field, Div
-from crispy_forms.bootstrap import FormActions
+from crispy_forms.layout import Layout, Submit, HTML, Div
+from crispy_forms.bootstrap import FormActions, PrependedText
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP
 
@@ -263,8 +263,9 @@ class DicomStoreForm(forms.ModelForm):
         self.helper.field_class = 'col-lg-2'
         self.helper.layout = Layout(
             Div(
-                'name', 'aetitle', 'port', 'keep_alive'
+                'name', 'aetitle', 'port',
             ),
+            PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
             FormActions(
                 Submit('submit', 'Submit')
             ),
@@ -282,3 +283,7 @@ class DicomStoreForm(forms.ModelForm):
     class Meta:
         model = DicomStoreSCP
         fields = ['name', 'aetitle', 'port', 'keep_alive']
+        labels = {
+            'port': "Port: 104 is standard for DICOM but ports higher than 1024 requires fewer admin rights",
+            'keep_alive': "Tick the box to auto-start this server and restart it if it dies. Uses celery beat"
+                  }
