@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.7.0b9 (2015-11-19)
---------------------
+0.7.0b10 (2015-11-25)
+---------------------
 
 * `#315`_  Charts: made size of exported chart graphics follow the browser window size
 * `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
