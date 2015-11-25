@@ -24,7 +24,8 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 Change the security configuration
 =================================
 
-The default security settings are too restrictive to allow access to the database.
+The default security settings are too restrictive to allow access to the database. Assumes version ``9.4``, change as
+appropriate.
 
 
 .. sourcecode:: console
