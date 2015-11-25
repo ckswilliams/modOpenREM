@@ -167,11 +167,19 @@
   {% if request.user.userprofile.plotCharts %}
 
       <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
+      <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
 
       <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
       <!-- HTML to include div container for acquisition plot -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('container');
+      });
+      </script>
+
       <div class="panel-group" id="accordion1">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -240,6 +248,13 @@
 
     {% if request.user.userprofile.plotDXAcquisitionFreq %}
       <!-- HTML to include div container for acquisition pie chart -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('piechartProtocolDIV');
+      });
+      </script>
+
       <div class="panel-group" id="accordion2">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -262,6 +277,13 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
       <!-- HTML to include div container for mean kVp per acquisition chart -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('chartAcquisitionMeankVp');
+      });
+      </script>
+
       <div class="panel-group" id="accordion3">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -327,6 +349,13 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
       <!-- HTML to include div container for mean mAs per acquisition chart -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('chartAcquisitionMeanmAs');
+      });
+      </script>
+
       <div class="panel-group" id="accordion4">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -392,6 +421,13 @@
 
     {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('piechartStudyWorkloadDIV');
+      });
+      </script>
+
       <div class="panel-group" id="accordion5">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -415,6 +451,13 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
       <!-- HTML to include div container for mean acquisition protocol kVp over time -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
+      });
+      </script>
+
       <div class="panel-group" id="accordion6">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -442,6 +485,13 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
       <!-- HTML to include div container for mean acquisition protocol mAs over time -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
+      });
+      </script>
+
       <div class="panel-group" id="accordion7">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -469,6 +519,13 @@
 
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
       <!-- HTML to include div container for mean acquisition protocol DAP per week -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');
+      });
+      </script>
+
       <div class="panel-group" id="accordion8">
         <div class="panel panel-default">
           <div class="panel-heading">

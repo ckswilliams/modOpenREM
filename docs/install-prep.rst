@@ -111,6 +111,20 @@ Pynetdicom is used for the DICOM Store SCP and Query Retrieve SCU functions. See
 
     pip install https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
+Install PostgreSQL database
+===========================
+
+For production use, you will need to install and configure a database. We strongly recommend PostgreSQL, but you can
+use any of the databases listed on the `Django website <https://docs.djangoproject.com/en/1.8/ref/databases/>`_ such
+as MySQL, Oracle or MS SQL Server, with the limitations listed there. There is one additional limitation - the
+calculation of median values for charts in OpenREM is dependent on using PostgreSQL.
+
+If this is your first time installing OpenREM and you just want to test it out, **you can skip this step** and make use
+of the in-built SQLite database. However, you should expect to start again when you move to a production grade database.
+
+* :doc:`postgresql`
+* :doc:`postgresql_windows`
+
 Install OpenREM
 ===============
 

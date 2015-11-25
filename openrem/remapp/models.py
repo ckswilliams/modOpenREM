@@ -76,13 +76,15 @@ class PatientIDSettings(SingletonModel):
 
 
 class DicomStoreSCP(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-    aetitle = models.CharField(max_length=16, blank=True, null=True)
-    port = models.IntegerField(blank=True, null=True)
+    name = models.CharField(max_length=64, unique=True,
+                            verbose_name="Name of local store node - fewer than 64 characters, spaces allowed")
+    aetitle = models.CharField(max_length=16, blank=True, null=True,
+                               verbose_name="AE Title of this node - 16 or fewer letters and numbers, no spaces")
+    port = models.IntegerField(blank=True, null=True, verbose_name="Port: 104 is standard for DICOM but over 1024 requires fewer admin rights")
     task_id = models.CharField(max_length=64, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)
-    keep_alive = models.BooleanField(default=False)
+    keep_alive = models.BooleanField(default=False, verbose_name="Should this server be kept auto-started and kept alive (using celery beat)")
 
     def get_absolute_url(self):
         return reverse('dicom_summary')

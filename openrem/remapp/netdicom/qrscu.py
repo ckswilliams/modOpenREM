@@ -25,22 +25,19 @@ def OnAssociateRequest(association):
     return True
 
 def _move_req(my_ae, remote_ae, d):
+    logging.debug("Requesting move association")
     assocMove = my_ae.RequestAssociation(remote_ae)
     logging.info("Move association requested")
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     for gg in gen:
         logging.info("gg is %s", gg)
+    logging.debug("Releasing move association")
     assocMove.Release(0)
     logging.info("Move association released")
 
-def _try_query_return(rsp, tag):
-    try:
-        x = rsp.tag
-    except:
-        x = None
-    return x
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
+    from time import sleep
     import uuid
     from remapp.tools.dcmdatetime import make_date
     from remapp.models import DicomQRRspSeries
@@ -54,6 +51,16 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     logging.debug('d2: {0}'.format(d2))
 
     assoc_series = my_ae.RequestAssociation(remote_ae)
+
+    if not assoc_series:
+        logging.warning("Query series association must have failed, trying again")
+        sleep(2)
+        assoc_series = my_ae.RequestAssociation(remote_ae)
+        if not assoc_series:
+            logging.error(
+                "Query series association has failed. Me: {0}, Remote: {1}, StudyInstanceUID: {2}, SeriesInstanceUID: {3}".format(
+                    my_ae, remote_ae, d2.StudyInstanceUID, d2.SeriesInstanceUID))
+            return
 
     st2 = assoc_series.StudyRootFindSOPClass.SCU(d2, 1)
 
@@ -74,16 +81,21 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.modality = series[1].Modality
         seriesrsp.series_number = series[1].SeriesNumber
         # Optional useful tags
-        seriesrsp.series_description = _try_query_return(series[1], 'SeriesDescription')
-        if seriesrsp.series_description:
-            seriesrsp.series_description = seriesrsp.series_description.strip().lower()
-        seriesrsp.number_of_series_related_instances = _try_query_return(series[1], 'NumberOfSeriesRelatedInstances')
+        try:
+            seriesrsp.series_description = series[1].SeriesDescription.strip().lower()
+        except AttributeError:
+            pass
+        try:
+            seriesrsp.number_of_series_related_instances = series[1].NumberOfSeriesRelatedInstances
+        except AttributeError:
+            pass
         seriesrsp.save()
 
     assoc_series.Release(0)
 
 def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
+    from dicom.dataset import Dataset
     from remapp.models import DicomQRRspStudy
     from remapp.tools.dcmdatetime import make_date
 
@@ -106,16 +118,21 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         if not ss[1]:
             continue
         rspno += 1
-        logging.debug("Response {0}".format(rspno))
+        logging.debug("Response {0}, ss1 is {1}".format(rspno, ss[1]))
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
         # Unique key
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         # Required keys - none of interest
         # Optional and special keys
-        rsp.study_description = _try_query_return( ss[1], 'StudyDescription')
+        try:
+            rsp.study_description = ss[1].StudyDescription
+        except AttributeError:
+            pass
         # Series level query
-        _query_series(my_ae, remote_ae, ss[1], rsp)
+        d2 = Dataset()
+        d2.StudyInstanceUID = rsp.study_instance_uid
+        _query_series(my_ae, remote_ae, d2, rsp)
         # Populate modalities_in_study, stored as JSON
         try:
             rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
@@ -250,9 +267,7 @@ def qrscu(
     d.QueryRetrieveLevel = "STUDY"
     d.PatientName = ''
     d.PatientID = ''
-    d.SOPInstanceUID = ''
     d.AccessionNumber = ''
-    d.Modality = ''
     d.ModalitiesInStudy = ''
     d.StudyDescription = ''
     d.StudyID = ''
@@ -274,6 +289,7 @@ def qrscu(
             for mod in details['mods']:
                 query.stage = 'Currently querying for {0} studies...'.format(mod)
                 query.save()
+                logging.info('Currently querying for {0} studies...'.format(mod))
                 trip += 1
                 if modality_matching:
                     d.ModalitiesInStudy = mod
@@ -288,6 +304,7 @@ def qrscu(
     if inc_sr and modality_matching:
         query.stage = 'Currently querying for SR only studies'
         query.save()
+        logging.info('Currently querying for SR only studies')
         d.ModalitiesInStudy = 'SR'
         query_id = uuid.uuid4()
         _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -300,18 +317,26 @@ def qrscu(
     if duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
+        logging.info('Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
                 study_rsp.filter(study_instance_uid__exact = uid).delete()
+        logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
+    logging.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
     query.stage = "Deleting studies we didn't ask for"
     query.save()
+    logging.info("Deleting studies we didn't ask for")
+    logging.debug("mods_in_study_set is {0}".format(mods_in_study_set))
     for mod_set in mods_in_study_set:
+        logging.debug("mod_set is {0}".format(mod_set))
         delete = True
         for mod_choice, details in all_mods.iteritems():
+            logging.debug("mod_choice {0}, details {1}".format(mod_choice, details))
             if details['inc']:
                 for mod in details['mods']:
+                    logging.info("mod is {0}, mod_set is {1}".format(mod, mod_set))
                     if mod in mod_set:
                         delete = False
                         continue
@@ -320,10 +345,12 @@ def qrscu(
         if delete:
             studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)
             studies_to_delete.delete()
+    logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now we need to delete any unwanted series
     query.stage = "Deleting series we can't use"
     query.save()
+    logging.info("Deleting series we can't use")
     for study in study_rsp:
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
             study.modality = 'MG'
@@ -359,6 +386,7 @@ def qrscu(
                     for s in series:
                         if s.series_description != 'dose info':
                             s.delete()
+    logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     logging.info("Release association")
     assoc.Release(0)
@@ -424,19 +452,23 @@ def movescu(query_id):
 
     query.stage = "Preparing to start move request"
     query.save()
+    logging.info("Preparing to start move request")
 
     studies = query.dicomqrrspstudy_set.all()
     query.stage = "Requesting move of {0} studies".format(studies.count())
     query.save()
+    logging.info("Requesting move of {0} studies".format(studies.count()))
 
     study_no = 0
     for study in studies:
         study_no += 1
+        logging.info("Mv: study_no {0}".format(study_no))
         d = Dataset()
         d.StudyInstanceUID = study.study_instance_uid
         series_no = 0
         for series in study.dicomqrrspseries_set.all():
             series_no += 1
+            logging.info("Mv: study no {0} series no {1}".format(study_no, series_no))
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
             if series.number_of_series_related_instances:
@@ -447,11 +479,17 @@ def movescu(query_id):
                 study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
                 num_objects
             )
+            logging.info("Requesting move of {0}; series {3} of {4} of study {1} of {2}{5}".format(
+                study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
+                num_objects
+            ))
             query.save()
             _move_req(my_ae, remote_ae, d)
+            logging.info("_move_req launched")
 
     query.move_complete = True
     query.save()
+    logging.info("Move complete")
 
     my_ae.Quit()
 

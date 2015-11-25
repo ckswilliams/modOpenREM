@@ -124,13 +124,27 @@
             <p class="navbar-text">
               <span class="glyphicon glyphicon-user"></span>
               {% if user.is_authenticated %}
-               Welcome {{ user.get_full_name }} -
+               {{ user.get_full_name }} -
                <a href="/logout/" class="navbar-link">logout</a>
               {% else %}
                Not signed in - 
               <a href="/login/?next={{ request.get_full_path|urlencode }}" class="navbar-link">login</a>
               {% endif %}
             </p>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-haspopup="true" aria-expanded="false">
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Docs <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/" target="_blank" data-toggle="tooltip" title="OpenREM documentation - opens in a new tab">
+                OpenREM Documentation ({{ admin.docsversion }})
+            </a>
+        </li>
+              {% block navhelp %}
+              {% endblock %}
+    </ul>
+</li>
           </ul>
           {% endblock %}
         </div><!--/.nav-collapse -->

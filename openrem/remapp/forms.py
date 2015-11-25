@@ -1,10 +1,10 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, HTML, Field, Div
-from crispy_forms.bootstrap import FormActions
+from crispy_forms.layout import Layout, Submit, HTML, Div
+from crispy_forms.bootstrap import FormActions, PrependedText
 from openremproject import settings
-from remapp.models import DicomDeleteSettings, DicomRemoteQR
+from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP
 
 
 DAYS = 'days'
@@ -205,6 +205,15 @@ class DicomDeleteSettingsForm(forms.ModelForm):
             FormActions(
                 Submit('submit', 'Submit')
             ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-2">
+                    <a href="/openrem/admin/dicomsummary#delete" role="button" class="btn btn-default">
+                        Cancel and return to the DICOM configuration and DICOM object delete summary page
+                    </a>
+                </div>
+                """)
+            )
         )
 
     class Meta:
@@ -228,8 +237,53 @@ class DicomQRForm(forms.ModelForm):
             FormActions(
                 Submit('submit', 'Submit')
             ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-4">
+                    <a href="/openrem/admin/dicomsummary" role="button" class="btn btn-default">
+                        Cancel and return to DICOM configuration summary page
+                    </a>
+                </div>
+                """)
+            )
         )
 
     class Meta:
         model = DicomRemoteQR
         fields = ['name', 'aetitle', 'callingaet', 'port', 'ip', 'hostname']
+
+class DicomStoreForm(forms.ModelForm):
+    """Form for configuring local Store nodes
+    """
+    def __init__(self, *args, **kwargs):
+        super(DicomStoreForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-lg-4'
+        self.helper.field_class = 'col-lg-2'
+        self.helper.layout = Layout(
+            Div(
+                'name', 'aetitle', 'port',
+            ),
+            PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
+            FormActions(
+                Submit('submit', 'Submit')
+            ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-4">
+                    <a href="/openrem/admin/dicomsummary" role="button" class="btn btn-default">
+                        Cancel and return to DICOM configuration summary page
+                    </a>
+                </div>
+                """)
+            )
+        )
+
+    class Meta:
+        model = DicomStoreSCP
+        fields = ['name', 'aetitle', 'port', 'keep_alive']
+        labels = {
+            'port': "Port: 104 is standard for DICOM but ports higher than 1024 requires fewer admin rights",
+            'keep_alive': "Tick the box to auto-start this server and restart it if it dies. Uses celery beat"
+                  }

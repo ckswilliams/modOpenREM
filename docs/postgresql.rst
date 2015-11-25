@@ -1,6 +1,6 @@
-###############################################
-PostgreSQL database for OpenREM on Ubuntu linux
-###############################################
+################################################
+Instructions for the PostgreSQL database (Linux)
+################################################
 
 .. _create-psql-db:
 
@@ -24,7 +24,8 @@ If you are using a virtualenv, make sure you are in it and it is active (``sourc
 Change the security configuration
 =================================
 
-The default security settings are too restrictive to allow access to the database.
+The default security settings are too restrictive to allow access to the database. Assumes version ``9.4``, change as
+appropriate.
 
 
 .. sourcecode:: console
@@ -96,6 +97,9 @@ Create the OpenREM database
 
     sudo -u postgres createdb -T template1 -O openremuser -E 'UTF8' openremdb
 
+**If this is your initial install**, you are now ready to install OpenREM, so go to the :doc:`install` docs.
+
+If you are replacing a SQLite test install with PostgreSQL, continue here.
 
 Configure OpenREM to use the database
 =====================================
@@ -181,3 +185,21 @@ please refer to the 0.6.1 documentation at
 
 Further details can be found on the
 `PostgreSQL website <http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE>`_
+
+**************************
+Useful PostgreSQL commands
+**************************
+
+.. sourcecode:: psql
+
+    -- Start the PostgreSQL console
+    sudo -u postgres psql
+
+    -- List users
+    \du
+
+    -- List databases
+    \l
+
+    -- Exit the console
+    \q

@@ -2,11 +2,14 @@
 OpenREM version history
 =======================
 
-0.7.0b9 (2015-11-19)
---------------------
+0.7.0b10 (2015-11-25)
+---------------------
 
+* `#315`_  Charts: made size of exported chart graphics follow the browser window size
+* `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
 * `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
+* `#309`_  StoreSCP now deals safely with incoming files with additional transfer syntax tag
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
@@ -17,6 +20,7 @@ OpenREM version history
 * `#299`_  Hash of MultiValued DICOM elements now works
 * `#298`_  Added ordering by accumulated AGD for mammographic studies
 * `#297`_  Fixed ordering by Total DAP for radiographic studies
+* `#296`_  StoreSCP now logs an error message and continues if incoming file has problems
 * `#295`_  Charts: fixed bug that arose on non-PostgreSQL databases
 * `#294`_  Harmonised time display between filter list and detail view, both to HH:mm
 * `#292`_  Added keep-alive and auto-start to DICOM stores

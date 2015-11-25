@@ -47,6 +47,11 @@ Updates since beta 7
 * Equipment display names are now grouped by modality
 * New docs and bug fixes
 
+Updates since beta 9
+====================
+* QR SCU has been much improved
+* Docs, charts and fixes: see git commits
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
@@ -60,7 +65,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b9
+    pip install openrem==0.7.0b10
 
 In a shell/command window, move into the openrem folder:
 
@@ -98,6 +103,10 @@ and then run
 
     python manage.py migrate remapp
 
+.. note::
+
+    With a large database, this may take some time!
+
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
@@ -106,7 +115,7 @@ You will need to do a database migration.
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b8
+    pip install openrem==0.7.0b10
 
 From the openrem folder (see above):
 
