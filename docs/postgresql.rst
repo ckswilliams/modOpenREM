@@ -185,3 +185,21 @@ please refer to the 0.6.1 documentation at
 
 Further details can be found on the
 `PostgreSQL website <http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE>`_
+
+**************************
+Useful PostgreSQL commands
+**************************
+
+.. sourcecode:: psql
+
+    # Start the PostgreSQL console
+    sudo -u postgres psql
+
+    # List users
+    \du
+
+    # List databases
+    \l
+
+    #Exit the console
+    \q
