@@ -177,17 +177,16 @@ def q_process(request, *args, **kwargs):
             modalities = form.cleaned_data.get('modality_field')
             inc_sr = form.cleaned_data.get('inc_sr_field')
             duplicates = form.cleaned_data.get('duplicates_field')
+            desc_exclude = form.cleaned_data.get('desc_exclude_field')
+            desc_include = form.cleaned_data.get('desc_include_field')
             query_id = str(uuid.uuid4())
-            # rh = DicomRemoteQR.objects.get(pk=rh_pk)
-            # if rh.hostname:
-            #     host = rh.hostname
-            # else:
-            #     host = rh.ip
 
             if date_from:
                 date_from = date_from.isoformat()
             if date_until:
                 date_until = date_until.isoformat()
+
+            if desc_exclude:
 
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates)

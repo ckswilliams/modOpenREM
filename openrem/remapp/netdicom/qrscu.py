@@ -391,7 +391,7 @@ def qrscu(
     logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now delete any that don't match the include and exclude criteria
-    
+
 
     logging.info("Release association")
     assoc.Release(0)

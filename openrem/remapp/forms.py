@@ -170,8 +170,10 @@ class DicomQueryForm(forms.Form):
     modality_field = forms.MultipleChoiceField(
         choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
         attrs={"checked": ""}), required=True)
-    inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=True)
+    inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False)
     duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True)
+    desc_exclude_field = forms.CharField(required=False)
+    desc_include_field = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
