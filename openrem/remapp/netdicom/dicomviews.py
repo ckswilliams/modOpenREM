@@ -187,9 +187,13 @@ def q_process(request, *args, **kwargs):
                 date_until = date_until.isoformat()
 
             if desc_exclude:
-                study_desc_exc = map(str.lower, map(str.strip, desc_exclude.split(',')))
+                study_desc_exc = map(unicode.lower, map(unicode.strip, desc_exclude.split(',')))
+            else:
+                study_desc_exc = None
             if desc_include:
-                study_desc_inc = map(str.lower, map(str.strip, desc_include.split(',')))
+                study_desc_inc = map(unicode.lower, map(unicode.strip, desc_include.split(',')))
+            else:
+                study_desc_inc = None
 
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates,
