@@ -392,17 +392,22 @@ def qrscu(
 
     # Now delete any that don't match the exclude and include criteria
     if study_desc_exc:
+        query.stage = "Deleting any studies that match the exclude criteria"
+        logging.info("Deleting any studies that match the exclude criteria")
         for study in study_rsp:
             if any(term in study.study_description.lower() for term in study_desc_exc):
                 study.delete()
-    logging.info('Now have {0} studies after deleting any containing any of {1}'.format(
-        study_rsp.count(), study_desc_exc))
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logging.info('Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
+
     if study_desc_inc:
+        query.stage = "Deleting any studies that don't match the include criteria"
+        logging.info("Deleting any studies that don't match the include criteria")
         for study in study_rsp:
             if not any(term in study.study_description.lower() for term in study_desc_inc):
                 study.delete()
-    logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(
-        study_rsp.count(), study_desc_inc))
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(), study_desc_inc))
 
     logging.info("Release association")
     assoc.Release(0)
