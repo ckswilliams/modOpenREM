@@ -2,7 +2,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, HTML, Div
-from crispy_forms.bootstrap import FormActions, PrependedText
+from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP
 
@@ -165,15 +165,15 @@ class DicomQueryForm(forms.Form):
 
     remote_host_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
     store_scp_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
-    date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
-    date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control datepicker"}), required=False)
+    date_from_field = forms.DateField(label='Date from', widget=forms.DateInput(attrs={"class": "form-control datepicker",}), required=False, help_text="Format yyyy-mm-dd, restrict as much as possible for best results")
+    date_until_field = forms.DateField(label='Date until', widget=forms.DateInput(attrs={"class": "form-control datepicker",}), required=False, help_text="Format yyyy-mm-dd, restrict as much as possible for best results")
     modality_field = forms.MultipleChoiceField(
         choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
-        attrs={"checked": ""}), required=True)
-    inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False)
-    duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True)
-    desc_exclude_field = forms.CharField(required=False)
-    desc_include_field = forms.CharField(required=False)
+        attrs={"checked": ""}), required=True, help_text="At least one modality must be ticked")
+    inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False, help_text="Normally only useful if querying a store holding just DICOM Radiation Dose Structured Reports")
+    duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True, help_text="Studies with the same study UID won't be imported, so there isn't any point getting them!")
+    desc_exclude_field = forms.CharField(required=False, label="Exclude studies with these terms in the study description:", help_text="Comma separated list of terms")
+    desc_include_field = forms.CharField(required=False, label="Only keep studies with these terms in the study description:", help_text="Comma separated list of terms")
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
@@ -184,6 +184,30 @@ class DicomQueryForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.form_action = 'q_process'
         self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.layout = Layout(
+            Div(
+                Div(
+                    Div('remote_host_field', css_class='col-md-6',),
+                    Div('store_scp_field', css_class='col-md-6',),
+                ),
+                InlineCheckboxes('modality_field'),
+                Div(
+                    Div('date_from_field', css_class='col-md-6',),
+                    Div('date_until_field', css_class='col-md-6',),
+                ),
+                'desc_exclude_field',
+                'desc_include_field',
+                Accordion(
+                    AccordionGroup(
+                        'Advanced',
+                        'inc_sr_field',
+                        'duplicates_field',
+                        active=False
+                    )
+                ),
+            ),
+        )
+
 
 class DicomDeleteSettingsForm(forms.ModelForm):
     """Form for configuring whether DICOM objects are stored or deleted once processed
