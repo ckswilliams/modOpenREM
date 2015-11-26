@@ -180,7 +180,10 @@ class DicomQueryForm(forms.Form):
         from remapp.models import DicomRemoteQR, DicomStoreSCP
         self.fields['remote_host_field'].choices = [(x.pk, x.name) for x in DicomRemoteQR.objects.all()]
         self.fields['store_scp_field'].choices = [(x.pk, x.name) for x in DicomStoreSCP.objects.all()]
-
+        self.helper = FormHelper(self)
+        self.helper.form_method = 'post'
+        self.helper.form_action = 'q_process'
+        self.helper.add_input(Submit('submit', 'Submit'))
 
 class DicomDeleteSettingsForm(forms.ModelForm):
     """Form for configuring whether DICOM objects are stored or deleted once processed

@@ -55,48 +55,51 @@
         </dl>
 
         <h3>Query retrieve dialogue</h3>
-        <form action="{% url "q_process" %}" method="post" enctype="multipart/form-data" role="form"  id="post-form">
-			{% csrf_token %}
-            <div class="row">
-                <p>{{ form.non_field_errors }}</p>
-                <div class="form-group">
-                    {{ form.remote_host_field.label_tag }}
-                    {{ form.remote_host_field.errors }}
-                    {{ form.remote_host_field }}
-                    {{ form.store_scp_field.label_tag }}
-                    {{ form.store_scp_field.errors }}
-                    {{ form.store_scp_field }}
-                    {{ form.date_from_field.label_tag }}
-                    {{ form.date_from_field.errors }}
-                    {{ form.date_from_field }}
-                    {{ form.date_until_field.label_tag }}
-                    {{ form.date_until_field.errors }}
-                    {{ form.date_until_field }}
-                    {{ form.modality_field.label_tag }}
-                    {{ form.modality_field.errors }}
-                    {{ form.modality_field }}
-                    {{ form.inc_sr_field.label_tag }}
-                    {{ form.inc_sr_field.errors }}
-                    {{ form.inc_sr_field }}
-                    {{ form.duplicates_field.label_tag }}
-                    {{ form.duplicates_field.errors }}
-                    {{ form.duplicates_field }}
-                    {{ form.desc_exclude_field.label_tag }}
-                    {{ form.desc_exclude_field.errors }}
-                    {{ form.desc_exclude_field }}
-                    {{ form.desc_include_field.label_tag }}
-                    {{ form.desc_include_field.errors }}
-                    {{ form.desc_include_field }}
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <button type="submit" class="btn btn-default">
-                      launch the query
-                    </button>
-                </div>
-            </div>
-		</form>
+{#        <form action="{% url "q_process" %}" method="post" enctype="multipart/form-data" role="form"  id="post-form">#}
+{#			{% csrf_token %}#}
+{#            <div class="row">#}
+{#                <p>{{ form.non_field_errors }}</p>#}
+{#                <div class="form-group">#}
+{#                    {{ form.remote_host_field.label_tag }}#}
+{#                    {{ form.remote_host_field.errors }}#}
+{#                    {{ form.remote_host_field }}#}
+{#                    {{ form.store_scp_field.label_tag }}#}
+{#                    {{ form.store_scp_field.errors }}#}
+{#                    {{ form.store_scp_field }}#}
+{#                    {{ form.date_from_field.label_tag }}#}
+{#                    {{ form.date_from_field.errors }}#}
+{#                    {{ form.date_from_field }}#}
+{#                    {{ form.date_until_field.label_tag }}#}
+{#                    {{ form.date_until_field.errors }}#}
+{#                    {{ form.date_until_field }}#}
+{#                    {{ form.modality_field.label_tag }}#}
+{#                    {{ form.modality_field.errors }}#}
+{#                    {{ form.modality_field }}#}
+{#                    {{ form.inc_sr_field.label_tag }}#}
+{#                    {{ form.inc_sr_field.errors }}#}
+{#                    {{ form.inc_sr_field }}#}
+{#                    {{ form.duplicates_field.label_tag }}#}
+{#                    {{ form.duplicates_field.errors }}#}
+{#                    {{ form.duplicates_field }}#}
+{#                    {{ form.desc_exclude_field.label_tag }}#}
+{#                    {{ form.desc_exclude_field.errors }}#}
+{#                    {{ form.desc_exclude_field }}#}
+{#                    {{ form.desc_include_field.label_tag }}#}
+{#                    {{ form.desc_include_field.errors }}#}
+{#                    {{ form.desc_include_field }}#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="row">#}
+{#                <div>#}
+{#                    <button type="submit" class="btn btn-default">#}
+{#                      launch the query#}
+{#                    </button>#}
+{#                </div>#}
+{#            </div>#}
+{#		</form>#}
+
+{% load crispy_forms_tags %}
+{% crispy form %}
     </div>
 
 
