@@ -393,13 +393,13 @@ def qrscu(
     # Now delete any that don't match the exclude and include criteria
     if study_desc_exc:
         for study in study_rsp:
-            if any(term in study.study_description for term in study_desc_exc):
+            if any(term in study.study_description.lower() for term in study_desc_exc):
                 study.delete()
     logging.info('Now have {0} studies after deleting any containing any of {1}'.format(
         study_rsp.count(), study_desc_exc))
     if study_desc_inc:
         for study in study_rsp:
-            if not any(term in study.study_description for term in study_desc_inc):
+            if not any(term in study.study_description.lower() for term in study_desc_inc):
                 study.delete()
     logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(
         study_rsp.count(), study_desc_inc))
