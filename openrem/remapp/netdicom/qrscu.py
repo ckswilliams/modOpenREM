@@ -15,6 +15,7 @@ python qrscu.py -h
 
 import logging
 
+
 # call back
 def OnAssociateResponse(association):
     logging.info("Association response received")
@@ -23,6 +24,7 @@ def OnAssociateResponse(association):
 def OnAssociateRequest(association):
     logging.info("Association resquested")
     return True
+
 
 def _move_req(my_ae, remote_ae, d):
     logging.debug("Requesting move association")
@@ -77,7 +79,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
         seriesrsp.query_id = query_id
         # Mandatory tags
-        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        seriesrsp.series_instance_uid = series[1].SeriesInstanceUID
         seriesrsp.modality = series[1].Modality
         seriesrsp.series_number = series[1].SeriesNumber
         # Optional useful tags
@@ -92,6 +94,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.save()
 
     assoc_series.Release(0)
+
 
 def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
@@ -144,7 +147,9 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
     assoc_study.Release(0)
 
+
 from celery import shared_task
+
 
 @shared_task
 def qrscu(
@@ -179,7 +184,6 @@ def qrscu(
 
     """
 
-
     import uuid
     import json
     from netdicom.applicationentity import AE
@@ -209,12 +213,12 @@ def qrscu(
             ExplicitVRLittleEndian,
             ImplicitVRLittleEndian,
             ExplicitVRBigEndian
-            ]
+        ]
 
     all_mods = {'CT': {'inc': False, 'mods': ['CT']},
                 'MG': {'inc': False, 'mods': ['MG']},
-                'FL': {'inc': False, 'mods': ['RF','XA']},
-                'DX': {'inc': False, 'mods': ['DX','CR']}
+                'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                'DX': {'inc': False, 'mods': ['DX', 'CR']}
                 }
     # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
     # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
@@ -225,16 +229,16 @@ def qrscu(
             all_mods[m]['inc'] = True
 
     # create application entity with Find and Move SOP classes as SCU
-    MyAE = AE(aet.encode('ascii','ignore'), 0, [StudyRootFindSOPClass,
-                                 StudyRootMoveSOPClass,
-                                 VerificationSOPClass], [], ts)
+    MyAE = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
+                                                 StudyRootMoveSOPClass,
+                                                 VerificationSOPClass], [], ts)
     MyAE.OnAssociateResponse = OnAssociateResponse
     MyAE.OnAssociateRequest = OnAssociateRequest
     # MyAE.OnReceiveStore = OnReceiveStore
     MyAE.start()
 
     # remote application entity
-    RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii','ignore'))
+    RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
 
     if not query_id:
         query_id = uuid.uuid4()
@@ -312,17 +316,17 @@ def qrscu(
         _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
         # Nothing to gain by checking the response
 
-
     # Now we have all our studies. Time to throw away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all()
 
     if duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
-        logging.info('Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
+        logging.info(
+            'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
-                study_rsp.filter(study_instance_uid__exact = uid).delete()
+                study_rsp.filter(study_instance_uid__exact=uid).delete()
         logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
@@ -345,7 +349,7 @@ def qrscu(
                     if inc_sr and 'SR' in mod_set:
                         delete = False
         if delete:
-            studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)
+            studies_to_delete = study_rsp.filter(modalities_in_study__exact=mod_set)
             studies_to_delete.delete()
     logging.info('Now have {0} studies'.format(study_rsp.count()))
 
@@ -398,7 +402,8 @@ def qrscu(
             if any(term in study.study_description.lower() for term in study_desc_exc):
                 study.delete()
         study_rsp = query.dicomqrrspstudy_set.all()
-        logging.info('Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
+        logging.info(
+            'Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
 
     if study_desc_inc:
         query.stage = "Deleting any studies that don't match the include criteria"
@@ -407,7 +412,8 @@ def qrscu(
             if not any(term in study.study_description.lower() for term in study_desc_inc):
                 study.delete()
         study_rsp = query.dicomqrrspstudy_set.all()
-        logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(), study_desc_inc))
+        logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
+                                                                                                study_desc_inc))
 
     logging.info("Release association")
     assoc.Release(0)
@@ -420,9 +426,6 @@ def qrscu(
 
     if move:
         movescu(query.query_id)
-
-
-
 
 
 @shared_task
@@ -442,7 +445,7 @@ def movescu(query_id):
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
 
-    query = DicomQuery.objects.get(query_id = query_id)
+    query = DicomQuery.objects.get(query_id=query_id)
     query.move_complete = False
     query.failed = False
     query.save()
@@ -453,23 +456,23 @@ def movescu(query_id):
         ExplicitVRLittleEndian,
         ImplicitVRLittleEndian,
         ExplicitVRBigEndian
-        ]
+    ]
 
     if qr_scp.hostname:
         rh = qr_scp.hostname
     else:
         rh = qr_scp.ip
 
-    my_ae = AE(store_scp.aetitle.encode('ascii','ignore'), 0, [StudyRootFindSOPClass,
-                                 StudyRootMoveSOPClass,
-                                 VerificationSOPClass], [], ts)
+    my_ae = AE(store_scp.aetitle.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
+                                                                StudyRootMoveSOPClass,
+                                                                VerificationSOPClass], [], ts)
     my_ae.OnAssociateResponse = OnAssociateResponse
     my_ae.OnAssociateRequest = OnAssociateRequest
     # MyAE.OnReceiveStore = OnReceiveStore
     my_ae.start()
 
     # remote application entity
-    remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii','ignore'))
+    remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii', 'ignore'))
 
     query.stage = "Preparing to start move request"
     query.save()
@@ -539,7 +542,7 @@ def qrscu_script(*args, **kwargs):
     basepath = os.path.dirname(__file__)
     projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
     if projectpath not in sys.path:
-        sys.path.insert(1,projectpath)
+        sys.path.insert(1, projectpath)
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
     django.setup()
 
@@ -578,5 +581,5 @@ def qrscu_script(*args, **kwargs):
     sys.exit(
         qrscu(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
               duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil
-        )
+              )
     )
