@@ -555,9 +555,11 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies')
     parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies')
     parser.add_argument('-sr', action="store_true", help='Query for structured report only studies')
-    parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd')
-    parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd')
+    parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd', metavar='yyy-mm-dd')
+    parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd', metavar='yyy-mm-dd')
     parser.add_argument('-dup', action="store_true", help="Don't retrieve studies that are already in database")
+    parser.add_argument('-descexc', help='Terms to exclude in study description, comma separated, quote whole string')
+    parser.add_argument('-descinc', help='Terms that must be included in study description, comma separated, quote whole string')
     args = parser.parse_args()
 
     modalities = []
@@ -578,8 +580,19 @@ def qrscu_script(*args, **kwargs):
     except ValueError:
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 
+    if args.descexc:
+        study_desc_exc = map(str.lower, map(str.strip, args.descexc.split(',')))
+    else:
+        study_desc_exc = None
+    if args.descinc:
+        study_desc_inc = map(str.lower, map(str.strip, args.descinc.split(',')))
+    else:
+        study_desc_inc = None
+
+
     sys.exit(
         qrscu(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
-              duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil
+              duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil,
+              study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc
               )
     )
