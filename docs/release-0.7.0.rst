@@ -52,6 +52,11 @@ Updates since beta 9
 * QR SCU has been much improved
 * Docs, charts and fixes: see git commits
 
+Updates since beta 10
+=====================
+* QR SCU further improved with more testing
+* QR SCU can now filter by include and exclude terms in study description
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
