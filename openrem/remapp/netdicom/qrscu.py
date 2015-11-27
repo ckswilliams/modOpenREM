@@ -15,6 +15,7 @@ python qrscu.py -h
 
 import logging
 
+
 # call back
 def OnAssociateResponse(association):
     logging.info("Association response received")
@@ -23,6 +24,7 @@ def OnAssociateResponse(association):
 def OnAssociateRequest(association):
     logging.info("Association resquested")
     return True
+
 
 def _move_req(my_ae, remote_ae, d):
     logging.debug("Requesting move association")
@@ -39,7 +41,7 @@ def _move_req(my_ae, remote_ae, d):
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     from time import sleep
     import uuid
-    from remapp.tools.dcmdatetime import make_date
+    from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
     d2.SeriesDescription = ''
@@ -77,27 +79,29 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
         seriesrsp.query_id = query_id
         # Mandatory tags
-        seriesrsp.series_instance_uid= series[1].SeriesInstanceUID
+        seriesrsp.series_instance_uid = series[1].SeriesInstanceUID
         seriesrsp.modality = series[1].Modality
         seriesrsp.series_number = series[1].SeriesNumber
+        if not seriesrsp.series_number:  # despite it being mandatory!
+            seriesrsp.series_number = None  # integer so can't be ''
         # Optional useful tags
-        try:
-            seriesrsp.series_description = series[1].SeriesDescription.strip().lower()
-        except AttributeError:
-            pass
-        try:
-            seriesrsp.number_of_series_related_instances = series[1].NumberOfSeriesRelatedInstances
-        except AttributeError:
-            pass
+        seriesrsp.series_description = get_value_kw('SeriesDescription',series[1])
+        if seriesrsp.series_description:
+            seriesrsp.series_description = ''.join(seriesrsp.series_description).strip().lower()
+        seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
+        if not seriesrsp.number_of_series_related_instances:
+            seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
+
         seriesrsp.save()
 
     assoc_series.Release(0)
+
 
 def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
     from dicom.dataset import Dataset
     from remapp.models import DicomQRRspStudy
-    from remapp.tools.dcmdatetime import make_date
+    from remapp.tools.get_values import get_value_kw
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
@@ -124,15 +128,15 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         # Unique key
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         # Required keys - none of interest
+
         # Optional and special keys
-        try:
-            rsp.study_description = ss[1].StudyDescription
-        except AttributeError:
-            pass
+        rsp.study_description = get_value_kw("StudyDescription", ss[1])
+
         # Series level query
         d2 = Dataset()
         d2.StudyInstanceUID = rsp.study_instance_uid
         _query_series(my_ae, remote_ae, d2, rsp)
+
         # Populate modalities_in_study, stored as JSON
         try:
             rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
@@ -144,13 +148,17 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
     assoc_study.Release(0)
 
+
 from celery import shared_task
+
 
 @shared_task
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True, *args, **kwargs):
+        date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True,
+        study_desc_exc=None, study_desc_inc=None,
+        *args, **kwargs):
     """Query retrieve service class user function
     
     Queries a pre-configured remote query retrieve service class provider for dose metric related objects,
@@ -176,7 +184,6 @@ def qrscu(
       optionally triggered automatically.
 
     """
-
 
     import uuid
     import json
@@ -207,12 +214,12 @@ def qrscu(
             ExplicitVRLittleEndian,
             ImplicitVRLittleEndian,
             ExplicitVRBigEndian
-            ]
+        ]
 
     all_mods = {'CT': {'inc': False, 'mods': ['CT']},
                 'MG': {'inc': False, 'mods': ['MG']},
-                'FL': {'inc': False, 'mods': ['RF','XA']},
-                'DX': {'inc': False, 'mods': ['DX','CR']}
+                'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                'DX': {'inc': False, 'mods': ['DX', 'CR']}
                 }
     # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
     # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
@@ -223,16 +230,16 @@ def qrscu(
             all_mods[m]['inc'] = True
 
     # create application entity with Find and Move SOP classes as SCU
-    MyAE = AE(aet.encode('ascii','ignore'), 0, [StudyRootFindSOPClass,
-                                 StudyRootMoveSOPClass,
-                                 VerificationSOPClass], [], ts)
+    MyAE = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
+                                                 StudyRootMoveSOPClass,
+                                                 VerificationSOPClass], [], ts)
     MyAE.OnAssociateResponse = OnAssociateResponse
     MyAE.OnAssociateRequest = OnAssociateRequest
     # MyAE.OnReceiveStore = OnReceiveStore
     MyAE.start()
 
     # remote application entity
-    RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii','ignore'))
+    RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
 
     if not query_id:
         query_id = uuid.uuid4()
@@ -310,17 +317,17 @@ def qrscu(
         _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
         # Nothing to gain by checking the response
 
-
     # Now we have all our studies. Time to throw away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all()
 
     if duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
-        logging.info('Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
+        logging.info(
+            'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
-                study_rsp.filter(study_instance_uid__exact = uid).delete()
+                study_rsp.filter(study_instance_uid__exact=uid).delete()
         logging.info('Now have {0} studies'.format(study_rsp.count()))
 
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
@@ -343,7 +350,7 @@ def qrscu(
                     if inc_sr and 'SR' in mod_set:
                         delete = False
         if delete:
-            studies_to_delete = study_rsp.filter(modalities_in_study__exact = mod_set)
+            studies_to_delete = study_rsp.filter(modalities_in_study__exact=mod_set)
             studies_to_delete.delete()
     logging.info('Now have {0} studies'.format(study_rsp.count()))
 
@@ -388,6 +395,27 @@ def qrscu(
                             s.delete()
     logging.info('Now have {0} studies'.format(study_rsp.count()))
 
+    # Now delete any that don't match the exclude and include criteria
+    if study_desc_exc:
+        query.stage = "Deleting any studies that match the exclude criteria"
+        logging.info("Deleting any studies that match the exclude criteria")
+        for study in study_rsp:
+            if any(term in study.study_description.lower() for term in study_desc_exc):
+                study.delete()
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logging.info(
+            'Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
+
+    if study_desc_inc:
+        query.stage = "Deleting any studies that don't match the include criteria"
+        logging.info("Deleting any studies that don't match the include criteria")
+        for study in study_rsp:
+            if not any(term in study.study_description.lower() for term in study_desc_inc):
+                study.delete()
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
+                                                                                                study_desc_inc))
+
     logging.info("Release association")
     assoc.Release(0)
 
@@ -399,9 +427,6 @@ def qrscu(
 
     if move:
         movescu(query.query_id)
-
-
-
 
 
 @shared_task
@@ -421,7 +446,7 @@ def movescu(query_id):
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
 
-    query = DicomQuery.objects.get(query_id = query_id)
+    query = DicomQuery.objects.get(query_id=query_id)
     query.move_complete = False
     query.failed = False
     query.save()
@@ -432,23 +457,23 @@ def movescu(query_id):
         ExplicitVRLittleEndian,
         ImplicitVRLittleEndian,
         ExplicitVRBigEndian
-        ]
+    ]
 
     if qr_scp.hostname:
         rh = qr_scp.hostname
     else:
         rh = qr_scp.ip
 
-    my_ae = AE(store_scp.aetitle.encode('ascii','ignore'), 0, [StudyRootFindSOPClass,
-                                 StudyRootMoveSOPClass,
-                                 VerificationSOPClass], [], ts)
+    my_ae = AE(store_scp.aetitle.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
+                                                                StudyRootMoveSOPClass,
+                                                                VerificationSOPClass], [], ts)
     my_ae.OnAssociateResponse = OnAssociateResponse
     my_ae.OnAssociateRequest = OnAssociateRequest
     # MyAE.OnReceiveStore = OnReceiveStore
     my_ae.start()
 
     # remote application entity
-    remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii','ignore'))
+    remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii', 'ignore'))
 
     query.stage = "Preparing to start move request"
     query.save()
@@ -518,7 +543,7 @@ def qrscu_script(*args, **kwargs):
     basepath = os.path.dirname(__file__)
     projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
     if projectpath not in sys.path:
-        sys.path.insert(1,projectpath)
+        sys.path.insert(1, projectpath)
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
     django.setup()
 
@@ -531,9 +556,11 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies')
     parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies')
     parser.add_argument('-sr', action="store_true", help='Query for structured report only studies')
-    parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd')
-    parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd')
+    parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd', metavar='yyy-mm-dd')
+    parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd', metavar='yyy-mm-dd')
     parser.add_argument('-dup', action="store_true", help="Don't retrieve studies that are already in database")
+    parser.add_argument('-descexc', help='Terms to exclude in study description, comma separated, quote whole string')
+    parser.add_argument('-descinc', help='Terms that must be included in study description, comma separated, quote whole string')
     args = parser.parse_args()
 
     modalities = []
@@ -554,8 +581,19 @@ def qrscu_script(*args, **kwargs):
     except ValueError:
         raise ValueError("Incorrect data format, should be YYYY-MM-DD")
 
+    if args.descexc:
+        study_desc_exc = map(str.lower, map(str.strip, args.descexc.split(',')))
+    else:
+        study_desc_exc = None
+    if args.descinc:
+        study_desc_inc = map(str.lower, map(str.strip, args.descinc.split(',')))
+    else:
+        study_desc_inc = None
+
+
     sys.exit(
         qrscu(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
-              duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil
-        )
+              duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil,
+              study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc
+              )
     )
