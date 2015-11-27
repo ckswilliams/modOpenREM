@@ -101,7 +101,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
     from dicom.dataset import Dataset
     from remapp.models import DicomQRRspStudy
-    from remapp.tools.dcmdatetime import make_date
+    from remapp.tools.get_values import get_value_kw
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
@@ -128,15 +128,15 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         # Unique key
         rsp.study_instance_uid = ss[1].StudyInstanceUID
         # Required keys - none of interest
+
         # Optional and special keys
-        try:
-            rsp.study_description = ss[1].StudyDescription
-        except AttributeError:
-            pass
+        rsp.study_description = get_value_kw("StudyDescription", ss[1])
+
         # Series level query
         d2 = Dataset()
         d2.StudyInstanceUID = rsp.study_instance_uid
         _query_series(my_ae, remote_ae, d2, rsp)
+
         # Populate modalities_in_study, stored as JSON
         try:
             rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
