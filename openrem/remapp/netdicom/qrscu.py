@@ -41,7 +41,7 @@ def _move_req(my_ae, remote_ae, d):
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     from time import sleep
     import uuid
-    from remapp.tools.dcmdatetime import make_date
+    from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
     d2.SeriesDescription = ''
@@ -82,15 +82,16 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.series_instance_uid = series[1].SeriesInstanceUID
         seriesrsp.modality = series[1].Modality
         seriesrsp.series_number = series[1].SeriesNumber
+        if not seriesrsp.series_number:  # despite it being mandatory!
+            seriesrsp.series_number = None  # integer so can't be ''
         # Optional useful tags
-        try:
-            seriesrsp.series_description = series[1].SeriesDescription.strip().lower()
-        except AttributeError:
-            pass
-        try:
-            seriesrsp.number_of_series_related_instances = series[1].NumberOfSeriesRelatedInstances
-        except AttributeError:
-            pass
+        seriesrsp.series_description = get_value_kw('SeriesDescription',series[1])
+        if seriesrsp.series_description:
+            seriesrsp.series_description = ''.join(seriesrsp.series_description).strip().lower()
+        seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
+        if not seriesrsp.number_of_series_related_instances:
+            seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
+
         seriesrsp.save()
 
     assoc_series.Release(0)
