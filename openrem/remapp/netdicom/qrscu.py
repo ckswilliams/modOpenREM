@@ -14,7 +14,7 @@ python qrscu.py -h
 """
 
 import logging
-
+from celery import shared_task
 
 # call back
 def OnAssociateResponse(association):
@@ -31,8 +31,11 @@ def _move_req(my_ae, remote_ae, d):
     assocMove = my_ae.RequestAssociation(remote_ae)
     logging.info("Move association requested")
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
-    for gg in gen:
-        logging.info("gg is %s", gg)
+    try:
+        for gg in gen:
+            logging.info("gg is %s", gg)
+    except KeyError as e:
+        logging.error("{0} in qrscu._move_req. Request is {1}")
     logging.debug("Releasing move association")
     assocMove.Release(0)
     logging.info("Move association released")
@@ -149,10 +152,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     assoc_study.Release(0)
 
 
-from celery import shared_task
-
-
-@shared_task
+@shared_task(name='remapp.netdicom.qrscu.qrscu')
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
@@ -555,13 +555,20 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-mg', action="store_true", help='Query for mammography studies')
     parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies')
     parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies')
-    parser.add_argument('-sr', action="store_true", help='Query for structured report only studies')
-    parser.add_argument('-dfrom', help='Date from, format yyyy-mm-dd', metavar='yyy-mm-dd')
-    parser.add_argument('-duntil', help='Date until, format yyyy-mm-dd', metavar='yyy-mm-dd')
-    parser.add_argument('-dup', action="store_true", help="Don't retrieve studies that are already in database")
-    parser.add_argument('-descexc', help='Terms to exclude in study description, comma separated, quote whole string')
-    parser.add_argument('-descinc', help='Terms that must be included in study description, comma separated, quote whole string')
+    parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyy-mm-dd')
+    parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyy-mm-dd')
+    parser.add_argument('-e', '--desc_exclude',
+                        help='Terms to exclude in study description, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-i', '--desc_include',
+                        help='Terms that must be included in study description, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
+    parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
     args = parser.parse_args()
+
+    # For any of the logging to be seen, most of this script would need to be a function with shared_task decorator
+    logging.info("qrscu script called")
 
     modalities = []
     if args.ct:
@@ -573,27 +580,38 @@ def qrscu_script(*args, **kwargs):
     if args.dx:
         modalities += ['DX']
 
+    if not modalities:
+        parser.error("At least one modality must be specified")
+    else:
+        logging.info("Modalities are {0}".format(modalities))
+
+    # Check if dates are in the right format, but keep them as strings
     try:
         if args.dfrom:
             datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
+            logging.info("Date from: {0}".format(args.dfrom))
         if args.duntil:
             datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
+            logging.info("Date until: {0}".format(args.duntil))
     except ValueError:
-        raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+        parser.error("Incorrect data format, should be YYYY-MM-DD")
 
-    if args.descexc:
-        study_desc_exc = map(str.lower, map(str.strip, args.descexc.split(',')))
+    if args.desc_exclude:
+        study_desc_exc = map(str.lower, map(str.strip, args.desc_exclude.split(',')))
+        logging.info("Study description exclude terms are {0}".format(study_desc_exc))
     else:
         study_desc_exc = None
-    if args.descinc:
-        study_desc_inc = map(str.lower, map(str.strip, args.descinc.split(',')))
+    if args.desc_include:
+        study_desc_inc = map(str.lower, map(str.strip, args.desc_include.split(',')))
+        logging.info("Study description include terms are {0}".format(study_desc_inc))
     else:
         study_desc_inc = None
 
+    duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
 
     sys.exit(
-        qrscu(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
-              duplicates=args.dup, date_from=args.dfrom, date_until=args.duntil,
-              study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc
+        qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
+              duplicates=duplicates, date_from=args.dfrom, date_until=args.duntil,
+              study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc,
               )
     )
