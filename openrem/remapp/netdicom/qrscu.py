@@ -497,14 +497,14 @@ def movescu(query_id):
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
             if series.number_of_series_related_instances:
-                num_objects = ", {0} objects".format(series.number_of_series_related_instances)
+                num_objects = " Series contains {0} objects".format(series.number_of_series_related_instances)
             else:
                 num_objects = ""
-            query.stage = "Requesting move of {0}; series {3} of {4} of study {1} of {2}{5}".format(
+            query.stage = "Requesting move: modality {0}, study {1} (of{2}) series {3} (of {4}).{5}".format(
                 study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
                 num_objects
             )
-            logging.info("Requesting move of {0}; series {3} of {4} of study {1} of {2}{5}".format(
+            logging.info("Requesting move: modality {0}, study {1} (of {2}) series {3} (of {4}).{5}".format(
                 study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
                 num_objects
             ))
