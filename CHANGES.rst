@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b10 (2015-11-25)
 ---------------------
 
+* `#320`_  The week now begins on Monday rather than Sunday on date form fields
 * `#316`_  Query retrieve function can now exclude and include based on strings entered
 * `#315`_  Charts: made size of exported chart graphics follow the browser window size
 * `#314`_  One version number declaration now used for distribute, docs and interface
