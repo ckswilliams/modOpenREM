@@ -9,7 +9,7 @@ Radiation Dose Structured Reports. Currently this has only been tested on
 CT and fluoroscopy structured reports, but it also has the logic for
 mammography structured reports if they start to appear.
 
-.. automodule:: remapp.extractors.rdsr
+.. automodule:: openrem.remapp.extractors.rdsr
     :members:
 
 .. _mammo-module:
@@ -23,7 +23,7 @@ However the disadvantage over an RSDR is the requirement to process each
 individual image rather than a single report for the study, which would 
 also capture any rejected images.
 
-.. automodule:: remapp.extractors.mam
+.. automodule:: openrem.remapp.extractors.mam
     :members:
 
 CR and DR module
@@ -33,7 +33,7 @@ In practice this is only useful for DR modalities, but most of them use the
 CR IOD instead of the DX one, so both are catered for. This module makes use
 of the image headers much like the mammography module.
 
-.. automodule:: remapp.extractors.dx
+.. automodule:: openrem.remapp.extractors.dx
     :members:
 
 CT non-standard modules
@@ -43,6 +43,6 @@ Initially only Philips CT dose report images are catered for. These have
 all the information that could be derived from the images also held in
 the DICOM header information, making harvesting relatively easy.
 
-.. automodule:: remapp.extractors.ct_philips
+.. automodule:: openrem.remapp.extractors.ct_philips
     :members:
 

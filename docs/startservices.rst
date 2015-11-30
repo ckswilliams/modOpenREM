@@ -123,12 +123,14 @@ Configure the settings
 
 
 * Follow the link presented on the front page to get to the user and group administration.
+
 .. figure:: img/HomeNoUsers.png
     :align: center
     :alt: Initial home page with no users in groups
 .. figure:: img/ConfigMenu.png
     :align: right
     :alt: Configuration menu
+
 * After the first users are configured, this link will no longer be presented and instead you can go to
   ``Config -> Manage users``.
 * You will need the superuser username and password you created just after creating the database. The groups are
@@ -150,9 +152,11 @@ Configure the settings
 * In addition to adding users to these groups, you may like to grant a second user ``superuser`` and ``staff`` status
   so that there are at least two people who can manage the users
 * Return to the OpenREM interface (click on ``View site`` at the top right)
+
 .. figure:: img/ViewSite.png
     :align: center
     :alt: Link from Django user admin back to OpenREM
+
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately (see :doc:`i_deletesettings`)
 * Go to ``Config -> Patient ID settings`` and configure appropriately (see :doc:`patientid`)
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to
