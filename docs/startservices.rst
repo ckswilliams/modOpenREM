@@ -86,6 +86,7 @@ For Windows, just press ``Ctrl+c``
 
 You will need to do this twice if there are running tasks you wish to kill.
 
+
 Celery periodic tasks: beat
 ===========================
 
