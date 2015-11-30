@@ -1,10 +1,5 @@
-##################
-DICOM Store and QR
-##################
+############################
+DICOM Query Retrieve Service
+############################
 
 
-..  toctree::
-    :maxdepth: 2
-
-    netdicom-nodes
-    netdicom-qr

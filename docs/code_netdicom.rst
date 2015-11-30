@@ -8,7 +8,7 @@ Query-retrieve module
 
 Descriptive text
 
-.. automodule:: remapp.netdicom.qrscu
+.. automodule:: openrem.remapp.netdicom.qrscu
     :members: qrscu, movescu
 
 
