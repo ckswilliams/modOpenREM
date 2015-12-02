@@ -1469,10 +1469,9 @@ def charts_off(request):
     else:
         name = request.user.get_username()
     messages.success(request, "Chart plotting has been turned off for {0}".format(name))
-    # Go to the OpenREM home page
-    response = openrem_home(request)
 
-    return response
+    # Redirect to the calling page, removing '&plotCharts=on' from the url
+    return redirect((request.META['HTTP_REFERER']).replace('&plotCharts=on',''))
 
 
 @login_required
