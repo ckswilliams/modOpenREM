@@ -645,7 +645,7 @@ def _dx2db(dataset):
         elif not study_in_db:
             sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
-            sleep(random)
+            sleep(random())
             # Check if other instance(s) has deleted the study yet
             study_in_db = check_uid.check_uid(study_uid)
             if study_in_db == 1:
@@ -655,7 +655,7 @@ def _dx2db(dataset):
                 study_in_db = check_uid.check_uid(study_uid)
                 if not study_in_db:
                     # both must have been deleted simultaneously!
-                    sleep(random)
+                    sleep(random())
                     # Check if other instance has created the study again yet
                     study_in_db = check_uid.check_uid(study_uid)
                     if study_in_db == 1:
@@ -671,7 +671,7 @@ def _dx2db(dataset):
                             _generalstudymoduleattributes(dataset,g)
                         elif study_in_db > 1:
                             g.delete()
-                            sleep(random)
+                            sleep(random())
                             study_in_db = check_uid.check_uid(study_uid)
                             if study_in_db == 1:
                                 sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
