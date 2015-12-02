@@ -6,6 +6,7 @@ OpenREM version history
 ---------------------
 
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
+* `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
 * `#316`_  Query retrieve function can now exclude and include based on strings entered
 * `#315`_  Charts: made size of exported chart graphics follow the browser window size
