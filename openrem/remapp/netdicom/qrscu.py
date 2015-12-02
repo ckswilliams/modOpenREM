@@ -400,8 +400,11 @@ def qrscu(
         query.stage = "Deleting any studies that match the exclude criteria"
         logging.info("Deleting any studies that match the exclude criteria")
         for study in study_rsp:
-            if any(term in study.study_description.lower() for term in study_desc_exc):
-                study.delete()
+            try:
+                if any(term in study.study_description.lower() for term in study_desc_exc):
+                    study.delete()
+            except AttributeError as e:
+                logging.warning("{0} in study exclude filter. Study kept on retrieve list.".format(e))
         study_rsp = query.dicomqrrspstudy_set.all()
         logging.info(
             'Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
@@ -410,7 +413,11 @@ def qrscu(
         query.stage = "Deleting any studies that don't match the include criteria"
         logging.info("Deleting any studies that don't match the include criteria")
         for study in study_rsp:
-            if not any(term in study.study_description.lower() for term in study_desc_inc):
+            try:
+                if not any(term in study.study_description.lower() for term in study_desc_inc):
+                    study.delete()
+            except AttributeError as e:
+                logging.warning("{0} in study include filter. Study deleted from retrieve list.".format(e))
                 study.delete()
         study_rsp = query.dicomqrrspstudy_set.all()
         logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
@@ -538,6 +545,7 @@ def qrscu_script(*args, **kwargs):
     import django
     import os
     import sys
+    from openrem.remapp.netdicom.tools import echoscu
 
     # setup django/OpenREM
     basepath = os.path.dirname(__file__)
@@ -608,6 +616,13 @@ def qrscu_script(*args, **kwargs):
         study_desc_inc = None
 
     duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
+
+    qrnode_up = echoscu(args.qrid, qr_scp=True)
+    storenode_up = echoscu(args.storeid, store_scp=True)
+
+    if qrnode_up is not "Success" or storenode_up is not "Success":
+        sys.exit("Query-retrieve aborted: DICOM nodes not ready. QR SCP echo is {0}, Store SCP echo is {1}".format(
+            qrnode_up, storenode_up))
 
     sys.exit(
         qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
