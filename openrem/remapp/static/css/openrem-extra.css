@@ -59,4 +59,11 @@ div.fullscreen{
   top: 0;
   left: 0;
   background-color: #fff;
- }
+}
+ 
+.highcharts-tooltip span {
+  background-color: white;
+  opacity: 1;
+  padding: 2px;
+  z-index: 9999 !important;
+}
