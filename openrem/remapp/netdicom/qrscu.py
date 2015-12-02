@@ -35,7 +35,7 @@ def _move_req(my_ae, remote_ae, d):
         for gg in gen:
             logging.info("gg is %s", gg)
     except KeyError as e:
-        logging.error("{0} in qrscu._move_req. Request is {1}")
+        logging.error("{0} in qrscu._move_req. Request is {1}".format(e, d))
     logging.debug("Releasing move association")
     assocMove.Release(0)
     logging.info("Move association released")
@@ -252,7 +252,7 @@ def qrscu(
     query.save()
 
     # create association with remote AE
-    logging.debug("Request association with {0} {1} {2}".format(rh, rp, aec))
+    logging.info("Request association with {0} {1} {2}".format(rh, rp, aec))
     assoc = MyAE.RequestAssociation(RemoteAE)
 
     if not assoc:
