@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/datepicker3.css">
 
   <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
-  <script src="{{ STATIC_URL }}js/datepicker.js"></script>
+
 
 
   <!-- Internet Explorer (up to version 8) doesn't support array indexOf. The script
@@ -83,13 +83,6 @@
         nodes</a>
     </div>
   </div>
-  <script>
-    $('.datepicker').datepicker({
-      format: "yyyy-mm-dd",
-      autoclose: true,
-      todayHighlight: true
-    });
-  </script>
-
+  <script src="{{ STATIC_URL }}js/datepicker.js"></script>
 
 {% endblock %}
