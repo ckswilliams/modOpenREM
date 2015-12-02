@@ -252,7 +252,7 @@ def qrscu(
     query.save()
 
     # create association with remote AE
-    logging.info("Request association with {0} {1} {2}".format(rh, rp, aec))
+    logging.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
     assoc = MyAE.RequestAssociation(RemoteAE)
 
     if not assoc:
