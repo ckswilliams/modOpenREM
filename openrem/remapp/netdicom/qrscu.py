@@ -152,7 +152,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
     assoc_study.Release(0)
 
 
-@shared_task(name='remapp.netdicom.qrscu.qrscu')
+@shared_task(name='remapp.netdicom.qrscu.qrscu', queue='qr')
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
@@ -433,10 +433,10 @@ def qrscu(
     query.save()
 
     if move:
-        movescu(query.query_id)
+        movescu.delay(str(query.query_id))
 
 
-@shared_task
+@shared_task(name='remapp.netdicom.qrscu.movescu', queue='qr')
 def movescu(query_id):
     """C-Move request element of query-retrieve service class user
 
