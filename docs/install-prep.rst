@@ -90,7 +90,7 @@ For Windows, there are various options:
     * Download a pre-compiled Win32 .exe NumPy file from http://sourceforge.net/projects/numpy/files/NumPy/. You need to
       download the file that matches the Python version, which should be 2.7. At the time of writing the latest version was
       1.10.1, and the filename to download was ``numpy-1.10.1-win32-superpack-python2.7.exe``. The filename is truncated on
-      SourceForge, so you may need to click on the *i* icon to see which is which. It's usually the third *superpack*.
+      SourceForge, so you may need to click on the *i* icon to see which is which. It's usually the first *superpack*.
     * Run the downloaded binary file to install NumPy.
 
 2. Or download a ``pip`` installable wheel file:
