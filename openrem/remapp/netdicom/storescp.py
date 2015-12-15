@@ -41,6 +41,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 # netdicom.debug()
 
+logger = logging.getLogger(__name__)
+
 # callbacks
 def OnAssociateRequest(association):
     logging.info("Store SCP: association requested")
@@ -200,10 +202,11 @@ def web_store(store_pk=None):
     # start AE
     conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
+    logger.info("Starting AE... AET:{0}, port:{1}".format(aet, port))
     MyAE.start()
     conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
-    logging.info("Started AE... AET:%s, port:%s", aet, port)
+    logger.info("Started AE... AET:%s, port:%s", aet, port)
     #    print "Started AE... AET:{0}, port:{1}".format(aet, port)
 
     while 1:
@@ -211,7 +214,7 @@ def web_store(store_pk=None):
         stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
         if not stay_alive.run:
             MyAE.Quit()
-            logging.info("Stopped AE... AET:%s, port:%s", aet, port)
+            logger.info("Stopped AE... AET:%s, port:%s", aet, port)
             #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
 

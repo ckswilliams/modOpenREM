@@ -46,4 +46,13 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
+# Logging configuration
+# Set the log file location. The example places the log file in the media directory. Change as required.
+logfilename = "{0}openrem.log".format(MEDIA_ROOT)
+LOGGING['handlers']['file']['filename'] = logfilename
 
+# Set log message format. Options are 'verbose' or 'simple'. Recommend leaving as 'verbose'.
+LOGGING['handlers']['file']['formatter'] = 'verbose'
+
+# Set the log level. Options are 'DEBUG', 'INFO', 'WARNING', 'ERROR', and 'CRITICAL', with progressively less logging.
+LOGGING['loggers']['remapp']['level'] = 'INFO'
