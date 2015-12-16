@@ -189,6 +189,12 @@ LOGGING = {
             'filename': 'openrem.log',
             'formatter': 'verbose'
         },
+        'qr_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'openremqrscu.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django.request': {
@@ -199,6 +205,11 @@ LOGGING = {
         'remapp': {
             'handlers': ['file'],
             'level': 'INFO',
+        },
+        'remapp.netdicom.qrscu': {
+            'handlers': ['qr_file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     }
 }

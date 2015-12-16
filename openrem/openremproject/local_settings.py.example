@@ -49,10 +49,14 @@ ALLOWED_HOSTS = [
 # Logging configuration
 # Set the log file location. The example places the log file in the media directory. Change as required.
 logfilename = "{0}openrem.log".format(MEDIA_ROOT)
-LOGGING['handlers']['file']['filename'] = logfilename
+qrfilename = "{0}openrem_qr.log".format(MEDIA_ROOT)
+LOGGING['handlers']['file']['filename'] = logfilename    # General logs
+LOGGING['handlers']['qr_file']['filename'] = qrfilename  # Query Retrieve SCU logs
 
 # Set log message format. Options are 'verbose' or 'simple'. Recommend leaving as 'verbose'.
-LOGGING['handlers']['file']['formatter'] = 'verbose'
+LOGGING['handlers']['file']['formatter'] = 'verbose'     # General logs
+LOGGING['handlers']['qr_file']['formatter'] = 'verbose'  # Query Retrieve SCU logs
 
 # Set the log level. Options are 'DEBUG', 'INFO', 'WARNING', 'ERROR', and 'CRITICAL', with progressively less logging.
-LOGGING['loggers']['remapp']['level'] = 'INFO'
+LOGGING['loggers']['remapp']['level'] = 'INFO'                 # General logs
+LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'  # Query Retrieve SCU logs
