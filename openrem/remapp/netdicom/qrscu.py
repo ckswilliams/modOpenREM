@@ -13,8 +13,20 @@ For help on usage,
 python qrscu.py -h 
 """
 
+import django
 import logging
+import os, sys
 from celery import shared_task
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1, projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -544,18 +556,8 @@ def qrscu_script(*args, **kwargs):
 
     import argparse
     import datetime
-    import django
-    import os
-    import sys
-    from openrem.remapp.netdicom.tools import echoscu
+    from remapp.netdicom.tools import echoscu
 
-    # setup django/OpenREM
-    basepath = os.path.dirname(__file__)
-    projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
-    if projectpath not in sys.path:
-        sys.path.insert(1, projectpath)
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
-    django.setup()
 
     # parse commandline
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
