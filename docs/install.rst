@@ -127,6 +127,8 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
+.. _local_settings_logfile:
+
 Log file
 ^^^^^^^^
 

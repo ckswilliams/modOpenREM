@@ -112,6 +112,9 @@ and then run
 
     With a large database, this may take some time!
 
+* Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
+:ref:`local_settings_logfile` settings in the install docs.
+
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
@@ -129,6 +132,8 @@ From the openrem folder (see above):
     python manage.py makemigrations remapp
     python manage.py migrate remapp
 
+* Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
+:ref:`local_settings_logfile` settings in the install docs.
 
 
 Restart all the services!
