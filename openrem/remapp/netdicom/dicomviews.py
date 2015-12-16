@@ -48,7 +48,7 @@ def run_store(request, pk):
         store = DicomStoreSCP.objects.get(pk__exact = pk)
         store.run = True
         store.save()
-        storetask = web_store.delay(store_pk=pk)
+        storetask = web_store(store_pk=pk)
     return redirect('/openrem/admin/dicomsummary/')
 
 @csrf_exempt
@@ -58,13 +58,13 @@ def stop_store(request, pk):
     from remapp.models import DicomStoreSCP
     if request.user.groups.filter(name="admingroup"):
         store = DicomStoreSCP.objects.filter(pk__exact = pk)
-        if store and store[0].task_id:
+        if store:
             store[0].run = False
             store[0].save()
             store[0].status = "Quit signal sent"
             store[0].save()
         else:
-            print "Invalid primary key or no task_id recorded"
+            print "Can't stop store SCP: Invalid primary key"
     return redirect('/openrem/admin/dicomsummary/')
 
 import json

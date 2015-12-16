@@ -163,6 +163,15 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -173,13 +182,45 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'openrem.log',
+            'formatter': 'verbose'
+        },
+        'qr_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'openrem_qrscu.log',
+            'formatter': 'verbose'
+        },
+        'store_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'openrem_storescp.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'remapp': {
+            'handlers': ['file'],
+            'level': 'INFO',
+        },
+        'remapp.netdicom.qrscu': {
+            'handlers': ['qr_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'remapp.netdicom.storescp': {
+            'handlers': ['store_file'],
+            'level': 'INFO',
+            'propagate': False,
         },
     }
 }

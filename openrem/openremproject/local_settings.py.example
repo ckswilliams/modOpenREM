@@ -46,4 +46,24 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
+# Logging configuration
+# Set the log file location. The example places the log file in the media directory. Change as required - on linux
+# systems you might put these in a subdirectory of /var/log/. If you want all the logs in one file, set the filename
+# to be the same for each one.
+import os
+logfilename = os.path.join(MEDIA_ROOT, "openrem.log")
+qrfilename = os.path.join(MEDIA_ROOT, "openrem_qr.log")
+storefilename = os.path.join(MEDIA_ROOT, "openrem_store.log")
+LOGGING['handlers']['file']['filename'] = logfilename          # General logs
+LOGGING['handlers']['qr_file']['filename'] = qrfilename        # Query Retrieve SCU logs
+LOGGING['handlers']['store_file']['filename'] = storefilename  # Store SCP logs
 
+# Set log message format. Options are 'verbose' or 'simple'. Recommend leaving as 'verbose'.
+LOGGING['handlers']['file']['formatter'] = 'verbose'        # General logs
+LOGGING['handlers']['qr_file']['formatter'] = 'verbose'     # Query Retrieve SCU logs
+LOGGING['handlers']['store_file']['formatter'] = 'verbose'  # Store SCP logs
+
+# Set the log level. Options are 'DEBUG', 'INFO', 'WARNING', 'ERROR', and 'CRITICAL', with progressively less logging.
+LOGGING['loggers']['remapp']['level'] = 'INFO'                    # General logs
+LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
+LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs

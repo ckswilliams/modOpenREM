@@ -39,19 +39,19 @@ from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt
 
 
-# netdicom.debug()
+logger = logging.getLogger(__name__)
 
 # callbacks
 def OnAssociateRequest(association):
-    logging.info("Store SCP: association requested")
+    logger.info("Store SCP: association requested")
 
 
 def OnAssociateResponse(association):
-    logging.info("Store SCP: Association response received")
+    logger.info("Store SCP: Association response received")
 
 
 def OnReceiveEcho(self):
-    logging.info("Store SCP: Echo received")
+    logger.info("Store SCP: Echo received")
 
 
 def mkdir_p(path):
@@ -74,15 +74,15 @@ def OnReceiveStore(SOPClass, DS):
     from openremproject.settings import MEDIA_ROOT
 
     try:
-        logging.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
+        logger.info("Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
                      DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
     except:
         try:
-            logging.info(
+            logger.info(
                 "Received C-Store - station name missing. Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
                 DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
         except:
-            logging.info("Received C-Store - error in logging details")
+            logger.info("Received C-Store - error in logging details")
 
     if 'TransferSyntaxUID' in DS:
         del DS.TransferSyntaxUID  # Don't know why this has become necessary
@@ -110,28 +110,28 @@ def OnReceiveStore(SOPClass, DS):
             station_name = DS.StationName
         except:
             station_name = "missing"
-        logging.error(
+        logger.error(
             "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                 e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
                 DS.SOPInstanceUID))
         return SOPClass.Success
     except:
-        logging.error(
+        logger.error(
             "Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                 sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
         return SOPClass.Success
 
-    logging.info("File %s written", filename)
+    logger.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'  # X-Ray Radiation Dose SR
         or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22'  # Enhanced SR, as used by GE
         ):
-        logging.info("Processing as RDSR")
+        logger.info("Processing as RDSR")
         rdsr.delay(filename)
     elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1'  # CR Image Storage
           or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1'  # Digital X-Ray Image Storage for Presentation
           or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.1.1'  # Digital X-Ray Image Storage for Processing
           ):
-        logging.info("Processing as DX")
+        logger.info("Processing as DX")
         dx.delay(filename)
     elif (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2'  # Digital Mammography X-Ray Image Storage for Presentation
           or DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1'  # Digital Mammography X-Ray Image Storage for Processing
@@ -140,7 +140,7 @@ def OnReceiveStore(SOPClass, DS):
               and 'ORIGINAL' in DS.ImageType
               )
           ):
-        logging.info("Processing as MG")
+        logger.info("Processing as MG")
         mam.delay(filename)
     elif DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7':
         try:
@@ -149,17 +149,17 @@ def OnReceiveStore(SOPClass, DS):
         except:
             if del_settings.del_no_match:
                 os.remove(filename)
-                logging.info("Secondary capture object with either no manufacturer or series description. Deleted.")
+                logger.info("Secondary capture object with either no manufacturer or series description. Deleted.")
             return SOPClass.Success
         if manufacturer == 'Philips' and series_description == 'Dose Info':
-            logging.info("Processing as Philips Dose Info series")
+            logger.info("Processing as Philips Dose Info series")
             ct_philips.delay(filename)
         elif del_settings.del_no_match:
             os.remove(filename)
-            logging.info("Can't find anything to do with this file - it has been deleted")
+            logger.info("Can't find anything to do with this file - it has been deleted")
     elif del_settings.del_no_match:
         os.remove(filename)
-        logging.info("Can't find anything to do with this file - it has been deleted")
+        logger.info("Can't find anything to do with this file - it has been deleted")
 
     # must return appropriate status
     return SOPClass.Success
@@ -184,7 +184,7 @@ def web_store(store_pk=None):
     except ObjectDoesNotExist:
         sys.exit("Attempt to start DICOM Store SCP with an invalid database pk")
 
-    logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.INFO)
 
     # setup AE
     MyAE = AE(
@@ -200,10 +200,11 @@ def web_store(store_pk=None):
     # start AE
     conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
+    logger.info("Starting AE... AET:{0}, port:{1}".format(aet, port))
     MyAE.start()
     conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
     conf.save()
-    logging.info("Started AE... AET:%s, port:%s", aet, port)
+    logger.info("Started AE... AET:%s, port:%s", aet, port)
     #    print "Started AE... AET:{0}, port:{1}".format(aet, port)
 
     while 1:
@@ -211,7 +212,7 @@ def web_store(store_pk=None):
         stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
         if not stay_alive.run:
             MyAE.Quit()
-            logging.info("Stopped AE... AET:%s, port:%s", aet, port)
+            logger.info("Stopped AE... AET:%s, port:%s", aet, port)
             #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
             break
 

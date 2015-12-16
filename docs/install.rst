@@ -127,6 +127,49 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
+.. _local_settings_logfile:
+
+Log file
+^^^^^^^^
+
+There are two places logfiles need to be configured - here and when starting Celery. The logs defined here capture
+most of the information; the Celery logs just capture workers starting and tasks starting and finishing.
+
+Configure the filename to determine where the logs are written. In linux, you might want to send them to a sub-folder of
+``/var/log/``. In this example, they are written to the ``MEDIA_ROOT``; change as appropriate:
+
+.. sourcecode:: python
+
+    import os
+    logfilename = os.path.join(MEDIA_ROOT, "openrem.log")
+    qrfilename = os.path.join(MEDIA_ROOT, "openrem_qr.log")
+    storefilename = os.path.join(MEDIA_ROOT, "openrem_store.log")
+    LOGGING['handlers']['file']['filename'] = logfilename          # General logs
+    LOGGING['handlers']['qr_file']['filename'] = qrfilename        # Query Retrieve SCU logs
+    LOGGING['handlers']['store_file']['filename'] = storefilename  # Store SCP logs
+
+If you want all the logs in one file, simply set them all to the same filename.
+
+In the settings file, there are ``simple`` and ``verbose`` log message styles. We recommend you leave these as
+``verbose``:
+
+.. sourcecode:: python
+
+    LOGGING['handlers']['file']['formatter'] = 'verbose'        # General logs
+    LOGGING['handlers']['qr_file']['formatter'] = 'verbose'     # Query Retrieve SCU logs
+    LOGGING['handlers']['store_file']['formatter'] = 'verbose'  # Store SCP logs
+
+Finally you can set the logging level. Options are ``DEBUG``, ``INFO``, ``WARNING``, ``ERROR``, and ``CRITICAL``, with
+progressively less logging.
+
+.. sourcecode:: python
+
+    # Set the log level. Options are 'DEBUG', 'INFO', 'WARNING', 'ERROR', and 'CRITICAL', with progressively less logging.
+    LOGGING['loggers']['remapp']['level'] = 'INFO'                    # General logs
+    LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
+    LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
+
+
 Create the database
 -------------------
 

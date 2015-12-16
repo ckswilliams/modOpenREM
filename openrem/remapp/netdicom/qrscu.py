@@ -13,32 +13,44 @@ For help on usage,
 python qrscu.py -h 
 """
 
+import django
 import logging
+import os, sys
 from celery import shared_task
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1, projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
+
+logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
 # call back
 def OnAssociateResponse(association):
-    logging.info("Association response received")
+    logger.info("Association response received")
 
 
 def OnAssociateRequest(association):
-    logging.info("Association resquested")
+    logger.info("Association resquested")
     return True
 
 
 def _move_req(my_ae, remote_ae, d):
-    logging.debug("Requesting move association")
+    logger.debug("Requesting move association")
     assocMove = my_ae.RequestAssociation(remote_ae)
-    logging.info("Move association requested")
+    logger.info("Move association requested")
     gen = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     try:
         for gg in gen:
-            logging.info("gg is %s", gg)
+            logger.info("gg is %s", gg)
     except KeyError as e:
-        logging.error("{0} in qrscu._move_req. Request is {1}".format(e, d))
-    logging.debug("Releasing move association")
+        logger.error("{0} in qrscu._move_req. Request is {1}".format(e, d))
+    logger.debug("Releasing move association")
     assocMove.Release(0)
-    logging.info("Move association released")
+    logger.info("Move association released")
 
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
@@ -53,16 +65,16 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     d2.Modality = ''
     d2.NumberOfSeriesRelatedInstances = ''
 
-    logging.debug('d2: {0}'.format(d2))
+    logger.debug('d2: {0}'.format(d2))
 
     assoc_series = my_ae.RequestAssociation(remote_ae)
 
     if not assoc_series:
-        logging.warning("Query series association must have failed, trying again")
+        logger.warning("Query series association must have failed, trying again")
         sleep(2)
         assoc_series = my_ae.RequestAssociation(remote_ae)
         if not assoc_series:
-            logging.error(
+            logger.error(
                 "Query series association has failed. Me: {0}, Remote: {1}, StudyInstanceUID: {2}, SeriesInstanceUID: {3}".format(
                     my_ae, remote_ae, d2.StudyInstanceUID, d2.SeriesInstanceUID))
             return
@@ -71,14 +83,14 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
 
     query_id = uuid.uuid4()
 
-    logging.debug('In _query_series')
+    logger.debug('In _query_series')
     seRspNo = 0
 
     for series in st2:
         if not series[1]:
             continue
         seRspNo += 1
-        logging.debug("Series Response {0}: {1}".format(seRspNo, series[1]))
+        logger.debug("Series Response {0}: {1}".format(seRspNo, series[1]))
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
         seriesrsp.query_id = query_id
         # Mandatory tags
@@ -108,7 +120,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
-    logging.debug('_query_study done with status "%s"' % st)
+    logger.debug('_query_study done with status "%s"' % st)
 
     # TODO: Replace the code below to deal with find failure
     # if not st:
@@ -125,7 +137,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         if not ss[1]:
             continue
         rspno += 1
-        logging.debug("Response {0}, ss1 is {1}".format(rspno, ss[1]))
+        logger.debug("Response {0}, ss1 is {1}".format(rspno, ss[1]))
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
         # Unique key
@@ -252,7 +264,7 @@ def qrscu(
     query.save()
 
     # create association with remote AE
-    logging.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
+    logger.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
     assoc = MyAE.RequestAssociation(RemoteAE)
 
     if not assoc:
@@ -262,14 +274,14 @@ def qrscu(
         query.save()
         MyAE.Quit()
         return
-    logging.info("assoc is ... %s", assoc)
+    logger.info("assoc is ... %s", assoc)
 
     # perform a DICOM ECHO
-    logging.info("DICOM Echo ... ")
+    logger.info("DICOM Echo ... ")
     echo = assoc.VerificationSOPClass.SCU(1)
-    logging.info('done with status %s', echo)
+    logger.info('done with status %s', echo)
 
-    logging.info("DICOM FindSCU ... ")
+    logger.info("DICOM FindSCU ... ")
     d = Dataset()
     d.QueryRetrieveLevel = "STUDY"
     d.PatientName = ''
@@ -296,7 +308,7 @@ def qrscu(
             for mod in details['mods']:
                 query.stage = 'Currently querying for {0} studies...'.format(mod)
                 query.save()
-                logging.info('Currently querying for {0} studies...'.format(mod))
+                logger.info('Currently querying for {0} studies...'.format(mod))
                 trip += 1
                 if modality_matching:
                     d.ModalitiesInStudy = mod
@@ -311,7 +323,7 @@ def qrscu(
     if inc_sr and modality_matching:
         query.stage = 'Currently querying for SR only studies'
         query.save()
-        logging.info('Currently querying for SR only studies')
+        logger.info('Currently querying for SR only studies')
         d.ModalitiesInStudy = 'SR'
         query_id = uuid.uuid4()
         _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
@@ -323,27 +335,27 @@ def qrscu(
     if duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
-        logging.info(
+        logger.info(
             'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
                 study_rsp.filter(study_instance_uid__exact=uid).delete()
-        logging.info('Now have {0} studies'.format(study_rsp.count()))
+        logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
-    logging.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
+    logger.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
     query.stage = "Deleting studies we didn't ask for"
     query.save()
-    logging.info("Deleting studies we didn't ask for")
-    logging.debug("mods_in_study_set is {0}".format(mods_in_study_set))
+    logger.info("Deleting studies we didn't ask for")
+    logger.debug("mods_in_study_set is {0}".format(mods_in_study_set))
     for mod_set in mods_in_study_set:
-        logging.debug("mod_set is {0}".format(mod_set))
+        logger.debug("mod_set is {0}".format(mod_set))
         delete = True
         for mod_choice, details in all_mods.iteritems():
-            logging.debug("mod_choice {0}, details {1}".format(mod_choice, details))
+            logger.debug("mod_choice {0}, details {1}".format(mod_choice, details))
             if details['inc']:
                 for mod in details['mods']:
-                    logging.info("mod is {0}, mod_set is {1}".format(mod, mod_set))
+                    logger.info("mod is {0}, mod_set is {1}".format(mod, mod_set))
                     if mod in mod_set:
                         delete = False
                         continue
@@ -352,12 +364,12 @@ def qrscu(
         if delete:
             studies_to_delete = study_rsp.filter(modalities_in_study__exact=mod_set)
             studies_to_delete.delete()
-    logging.info('Now have {0} studies'.format(study_rsp.count()))
+    logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now we need to delete any unwanted series
     query.stage = "Deleting series we can't use"
     query.save()
-    logging.info("Deleting series we can't use")
+    logger.info("Deleting series we can't use")
     for study in study_rsp:
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
             study.modality = 'MG'
@@ -393,37 +405,37 @@ def qrscu(
                     for s in series:
                         if s.series_description != 'dose info':
                             s.delete()
-    logging.info('Now have {0} studies'.format(study_rsp.count()))
+    logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now delete any that don't match the exclude and include criteria
     if study_desc_exc:
         query.stage = "Deleting any studies that match the exclude criteria"
-        logging.info("Deleting any studies that match the exclude criteria")
+        logger.info("Deleting any studies that match the exclude criteria")
         for study in study_rsp:
             try:
                 if any(term in study.study_description.lower() for term in study_desc_exc):
                     study.delete()
             except AttributeError as e:
-                logging.warning("{0} in study exclude filter. Study kept on retrieve list.".format(e))
+                logger.warning("{0} in study exclude filter. Study kept on retrieve list.".format(e))
         study_rsp = query.dicomqrrspstudy_set.all()
-        logging.info(
+        logger.info(
             'Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
 
     if study_desc_inc:
         query.stage = "Deleting any studies that don't match the include criteria"
-        logging.info("Deleting any studies that don't match the include criteria")
+        logger.info("Deleting any studies that don't match the include criteria")
         for study in study_rsp:
             try:
                 if not any(term in study.study_description.lower() for term in study_desc_inc):
                     study.delete()
             except AttributeError as e:
-                logging.warning("{0} in study include filter. Study deleted from retrieve list.".format(e))
+                logger.warning("{0} in study include filter. Study deleted from retrieve list.".format(e))
                 study.delete()
         study_rsp = query.dicomqrrspstudy_set.all()
-        logging.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
+        logger.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
                                                                                                 study_desc_inc))
 
-    logging.info("Release association")
+    logger.info("Release association")
     assoc.Release(0)
 
     # done
@@ -484,23 +496,23 @@ def movescu(query_id):
 
     query.stage = "Preparing to start move request"
     query.save()
-    logging.info("Preparing to start move request")
+    logger.info("Preparing to start move request")
 
     studies = query.dicomqrrspstudy_set.all()
     query.stage = "Requesting move of {0} studies".format(studies.count())
     query.save()
-    logging.info("Requesting move of {0} studies".format(studies.count()))
+    logger.info("Requesting move of {0} studies".format(studies.count()))
 
     study_no = 0
     for study in studies:
         study_no += 1
-        logging.info("Mv: study_no {0}".format(study_no))
+        logger.info("Mv: study_no {0}".format(study_no))
         d = Dataset()
         d.StudyInstanceUID = study.study_instance_uid
         series_no = 0
         for series in study.dicomqrrspseries_set.all():
             series_no += 1
-            logging.info("Mv: study no {0} series no {1}".format(study_no, series_no))
+            logger.info("Mv: study no {0} series no {1}".format(study_no, series_no))
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
             if series.number_of_series_related_instances:
@@ -511,17 +523,17 @@ def movescu(query_id):
                 study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
                 num_objects
             )
-            logging.info("Requesting move: modality {0}, study {1} (of {2}) series {3} (of {4}).{5}".format(
+            logger.info("Requesting move: modality {0}, study {1} (of {2}) series {3} (of {4}).{5}".format(
                 study.modality, study_no, studies.count(), series_no, study.dicomqrrspseries_set.all().count(),
                 num_objects
             ))
             query.save()
             _move_req(my_ae, remote_ae, d)
-            logging.info("_move_req launched")
+            logger.info("_move_req launched")
 
     query.move_complete = True
     query.save()
-    logging.info("Move complete")
+    logger.info("Move complete")
 
     my_ae.Quit()
 
@@ -542,18 +554,8 @@ def qrscu_script(*args, **kwargs):
 
     import argparse
     import datetime
-    import django
-    import os
-    import sys
-    from openrem.remapp.netdicom.tools import echoscu
+    from remapp.netdicom.tools import echoscu
 
-    # setup django/OpenREM
-    basepath = os.path.dirname(__file__)
-    projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
-    if projectpath not in sys.path:
-        sys.path.insert(1, projectpath)
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
-    django.setup()
 
     # parse commandline
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
@@ -575,8 +577,7 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
     args = parser.parse_args()
 
-    # For any of the logging to be seen, most of this script would need to be a function with shared_task decorator
-    logging.info("qrscu script called")
+    logger.info("qrscu script called")
 
     modalities = []
     if args.ct:
@@ -591,27 +592,27 @@ def qrscu_script(*args, **kwargs):
     if not modalities:
         parser.error("At least one modality must be specified")
     else:
-        logging.info("Modalities are {0}".format(modalities))
+        logger.info("Modalities are {0}".format(modalities))
 
     # Check if dates are in the right format, but keep them as strings
     try:
         if args.dfrom:
             datetime.datetime.strptime(args.dfrom, '%Y-%m-%d')
-            logging.info("Date from: {0}".format(args.dfrom))
+            logger.info("Date from: {0}".format(args.dfrom))
         if args.duntil:
             datetime.datetime.strptime(args.duntil, '%Y-%m-%d')
-            logging.info("Date until: {0}".format(args.duntil))
+            logger.info("Date until: {0}".format(args.duntil))
     except ValueError:
         parser.error("Incorrect data format, should be YYYY-MM-DD")
 
     if args.desc_exclude:
         study_desc_exc = map(str.lower, map(str.strip, args.desc_exclude.split(',')))
-        logging.info("Study description exclude terms are {0}".format(study_desc_exc))
+        logger.info("Study description exclude terms are {0}".format(study_desc_exc))
     else:
         study_desc_exc = None
     if args.desc_include:
         study_desc_inc = map(str.lower, map(str.strip, args.desc_include.split(',')))
-        logging.info("Study description include terms are {0}".format(study_desc_inc))
+        logger.info("Study description include terms are {0}".format(study_desc_inc))
     else:
         study_desc_inc = None
 
@@ -630,3 +631,6 @@ def qrscu_script(*args, **kwargs):
               study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc,
               )
     )
+
+if __name__ == "__main__":
+    qrscu_script()
