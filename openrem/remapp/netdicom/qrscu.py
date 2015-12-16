@@ -26,9 +26,7 @@ if projectpath not in sys.path:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
-
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
 # call back
 def OnAssociateResponse(association):
@@ -579,7 +577,6 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
     args = parser.parse_args()
 
-    # For any of the logging to be seen, most of this script would need to be a function with shared_task decorator
     logger.info("qrscu script called")
 
     modalities = []
@@ -634,3 +631,6 @@ def qrscu_script(*args, **kwargs):
               study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc,
               )
     )
+
+if __name__ == "__main__":
+    qrscu_script()
