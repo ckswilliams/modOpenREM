@@ -164,7 +164,6 @@ progressively less logging.
 
 .. sourcecode:: python
 
-    # Set the log level. Options are 'DEBUG', 'INFO', 'WARNING', 'ERROR', and 'CRITICAL', with progressively less logging.
     LOGGING['loggers']['remapp']['level'] = 'INFO'                    # General logs
     LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
     LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
