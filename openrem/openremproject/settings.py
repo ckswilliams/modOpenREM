@@ -192,7 +192,13 @@ LOGGING = {
         'qr_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'openremqrscu.log',
+            'filename': 'openrem_qrscu.log',
+            'formatter': 'verbose'
+        },
+        'store_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
         },
     },
@@ -208,6 +214,11 @@ LOGGING = {
         },
         'remapp.netdicom.qrscu': {
             'handlers': ['qr_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'remapp.netdicom.storescp': {
+            'handlers': ['store_file'],
             'level': 'INFO',
             'propagate': False,
         },
