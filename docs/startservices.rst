@@ -36,15 +36,17 @@ Celery task queue
 =================
 
 Celery will have been automatically installed with OpenREM, and along with
-RabbitMQ allows for asynchronous task processing for imports and exports.
+RabbitMQ allows for asynchronous task processing for imports, exports and DICOM networking tasks.
 
 ..  Note::
 
     Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure the
     folder permissions allow this for the user that starts Celery. In the examples below, the logs and pid files are
-    written to the ``MEDIA_ROOT`` location, where Celery and the webserver user also needs to be able to write exported
-    files to. For a Debian/Ubuntu server, this is normally ``www-data``. You might instead wish to write the logs to
-    ``/var/log/`` - wherever you define, **the folder should already exist**.
+    written to the ``MEDIA_ROOT`` location, where Celery and the webserver also needs to be able to write exported
+    files. For a Debian/Ubuntu server, the webserver user is usually ``www-data``, so you might like to start Celery
+    with the ``www-data`` user too.
+
+    You might instead wish to write the logs to ``/var/log/`` - wherever you define, **the folder should already exist**.
 
 In a new shell/command window, move into the openrem folder:
 
