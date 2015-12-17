@@ -165,10 +165,6 @@ def OnReceiveStore(SOPClass, DS):
     return SOPClass.Success
 
 
-from celery import shared_task
-
-
-@shared_task(queue='stores')
 def web_store(store_pk=None):
     import time
     from remapp.models import DicomStoreSCP
