@@ -28,7 +28,8 @@ from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
     'trigger-dicom-keep-alive': {
         'task': 'remapp.netdicom.keepalive.keep_alive',
-        'schedule': crontab(),
+        'schedule': crontab(minute='*/1'),
+        'options': {'expires': 10},   # expire if not run ten seconds after being scheduled
     },
 }
 
