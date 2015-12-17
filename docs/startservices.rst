@@ -46,7 +46,8 @@ RabbitMQ allows for asynchronous task processing for imports, exports and DICOM 
     files. For a Debian/Ubuntu server, the webserver user is usually ``www-data``, so you might like to start Celery
     with the ``www-data`` user too.
 
-    You might instead wish to write the logs to ``/var/log/`` - wherever you define, **the folder should already exist**.
+    You might instead wish to write the logs to a folder in ``/var/log/`` on linux systems - wherever you define,
+    **the folder should already exist**.
 
 In a new shell/command window, move into the openrem folder:
 
