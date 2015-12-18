@@ -2,9 +2,12 @@
 OpenREM version history
 =======================
 
-0.7.0b11 (2015-12-18)
+0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#335`_  DICOM Store keep_alive and echo_scu functions now log correctly
+* `#334`_  Fixed issue with tasks needing to be explicitly named
+* `#333`_  Fixed StoreSCP not starting in beta 11 error
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields

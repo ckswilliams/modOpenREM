@@ -174,7 +174,6 @@ def web_store(store_pk=None):
         conf = DicomStoreSCP.objects.get(pk__exact=store_pk)
         aet = conf.aetitle
         port = conf.port
-        conf.task_id = web_store.request.id
         conf.run = True
         conf.save()
     except ObjectDoesNotExist:

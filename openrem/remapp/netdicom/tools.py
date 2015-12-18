@@ -27,18 +27,18 @@
 from celery import shared_task
 import logging
 
+logger = logging.getLogger(__name__)
 
 # call back
 def OnAssociateResponse(association):
-    logging.info("Association response received")
+    logger.info("Association response received")
 
 
 def OnAssociateRequest(association):
-    logging.info("Association resquested")
+    logger.info("Association resquested")
     return True
 
 
-@shared_task
 def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     """
     Function to check if built-in Store SCP or remote Query-Retrieve SCP returns a DICOM echo
@@ -68,7 +68,7 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         if not aet:
             aet = "OPENREMECHO"
     else:
-        logging.warning("echoscu called without SCP information")
+        logger.warning("echoscu called without SCP information")
         return 0
 
     rp = scp.port
@@ -92,27 +92,27 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     remote_ae = dict(Address=rh, Port=rp, AET=aec.encode('ascii','ignore'))
 
     # create association with remote AE
-    logging.debug("Request association with {0} {1} {2}".format(rh, rp, aec))
+    logger.debug("Request association with {0} {1} {2}".format(rh, rp, aec))
     assoc = my_ae.RequestAssociation(remote_ae)
 
     if not assoc:
-        logging.info("Association with {0} {1} {2} was not successful".format(rh, rp, aec))
+        logger.info("Association with {0} {1} {2} was not successful".format(rh, rp, aec))
         return "AssocFail"
-    logging.debug("assoc is ... %s", assoc)
+    logger.debug("assoc is ... %s", assoc)
 
     # perform a DICOM ECHO
-    logging.debug("DICOM Echo... {0} {1} {2}".format(rh, rp, aec))
+    logger.debug("DICOM Echo... {0} {1} {2}".format(rh, rp, aec))
     echo = assoc.VerificationSOPClass.SCU(1)
-    logging.debug('done with status %s', echo)
+    logger.debug('done with status %s', echo)
 
-    logging.debug("Release association from {0} {1} {2}".format(rh, rp, aec))
+    logger.debug("Release association from {0} {1} {2}".format(rh, rp, aec))
     assoc.Release(0)
 
     # done
     my_ae.Quit()
     if echo.Type is "Success":
-        logging.info("Returning Success response from echo to {0} {1} {2}".format(rh, rp, aec))
+        logger.info("Returning Success response from echo to {0} {1} {2}".format(rh, rp, aec))
         return "Success"
     else:
-        logging.info("Returning EchoFail response from echo to {0} {1} {2}".format(rh, rp, aec))
+        logger.info("Returning EchoFail response from echo to {0} {1} {2}".format(rh, rp, aec))
         return "EchoFail"

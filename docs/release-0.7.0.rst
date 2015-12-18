@@ -67,6 +67,9 @@ Updates since beta 10
 * Improvements (hopefully) to the keep-alive periodic task preventing requests stacking up when something goes wrong
 * Improvements to docs, beginnings of DICOM networking docs
 
+Updates since beta 11
+=====================
+* Fixed errors with DICOM store, keep_alive and echo functions
 
 ****************************
 Upgrading from version 0.6.0
@@ -77,11 +80,13 @@ Upgrading from version 0.6.0
     * For PostgreSQL you can refer to :ref:`backup-psql-db`
     * For a non-production SQLite3 database, simply make a copy of the database file
 
+* Stop any Celery workers
+
 * The 0.7.0 upgrade must be made from a 0.6.0 (or later) database, and a schema migration is required:
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b11
+    pip install openrem==0.7.0b12
 
 In a shell/command window, move into the openrem folder:
 
@@ -124,17 +129,19 @@ and then run
     With a large database, this may take some time!
 
 * Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
-:ref:`local_settings_logfile` settings in the install docs.
+  :ref:`local_settings_logfile` settings in the install docs.
 
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
 
-You will need to do a database migration.
+* Stop any Celery workers
+
+* You might need to do a database migration.
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b11
+    pip install openrem==0.7.0b12
 
 From the openrem folder (see above):
 
