@@ -80,7 +80,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b10
+    pip install openrem==0.7.0b11
 
 In a shell/command window, move into the openrem folder:
 
@@ -133,7 +133,7 @@ You will need to do a database migration.
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b10
+    pip install openrem==0.7.0b11
 
 From the openrem folder (see above):
 
