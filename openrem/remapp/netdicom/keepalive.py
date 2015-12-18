@@ -16,4 +16,4 @@ def keep_alive():
                 logging.warning("Starting {0} on port {1} due to Association Request failure.".format(store.aetitle, store.port))
                 store.status = "Store not running, but keep-alive is set!"
                 store.save()
-                web_store.delay(store_pk=store.pk)
+                web_store(store_pk=store.pk)

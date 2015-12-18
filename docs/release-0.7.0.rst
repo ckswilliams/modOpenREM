@@ -52,6 +52,22 @@ Updates since beta 9
 * QR SCU has been much improved
 * Docs, charts and fixes: see git commits
 
+Updates since beta 10
+=====================
+* QR SCU further improved with more testing
+* QR SCU can now filter by include and exclude terms in study description
+* QR SCU now safe with non-ASCII characters in series names etc
+* Version number now only declared once in the project
+* Monday is now the first day of the week in the pop-up date-pickers
+* Improvements to chart tool-tip visibility
+* 'Turn off charts' no longer changes the page
+* Improvements (hopefully) to Store SCP - no longer a Celery task
+* Improvements (hopefully) to task performance as long-running QR and export operations shouldn't queue tasks when there
+  are unused workers
+* Improvements (hopefully) to the keep-alive periodic task preventing requests stacking up when something goes wrong
+* Improvements to docs, beginnings of DICOM networking docs
+
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
@@ -65,7 +81,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b10
+    pip install openrem==0.7.0b11
 
 In a shell/command window, move into the openrem folder:
 
@@ -107,6 +123,9 @@ and then run
 
     With a large database, this may take some time!
 
+* Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
+:ref:`local_settings_logfile` settings in the install docs.
+
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
@@ -115,7 +134,7 @@ You will need to do a database migration.
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b10
+    pip install openrem==0.7.0b11
 
 From the openrem folder (see above):
 
@@ -124,6 +143,8 @@ From the openrem folder (see above):
     python manage.py makemigrations remapp
     python manage.py migrate remapp
 
+* Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
+:ref:`local_settings_logfile` settings in the install docs.
 
 
 Restart all the services!

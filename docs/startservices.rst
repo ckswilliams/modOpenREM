@@ -36,14 +36,18 @@ Celery task queue
 =================
 
 Celery will have been automatically installed with OpenREM, and along with
-RabbitMQ allows for asynchronous task processing for imports and exports.
+RabbitMQ allows for asynchronous task processing for imports, exports and DICOM networking tasks.
 
 ..  Note::
 
-    The webserver and Celery both need to be able to read and write to the
-    ``MEDIA_ROOT`` location. Therefore you might wish to consider starting
-    Celery using the same user or group as the webserver, and setting the
-    file permissions accordingly.
+    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure the
+    folder permissions allow this for the user that starts Celery. In the examples below, the logs and pid files are
+    written to the ``MEDIA_ROOT`` location, where Celery and the webserver also needs to be able to write exported
+    files. For a Debian/Ubuntu server, the webserver user is usually ``www-data``, so you might like to start Celery
+    with the ``www-data`` user too.
+
+    You might instead wish to write the logs to a folder in ``/var/log/`` on linux systems - wherever you define,
+    **the folder should already exist**.
 
 In a new shell/command window, move into the openrem folder:
 
@@ -53,38 +57,32 @@ In a new shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
-Linux - ``\`` is the line continuation character::
+Linux - ``\`` is the line continuation character:
 
-    celery multi start stores default -A openremproject -c:stores 1 -c 3 \
-    -Q:stores stores -Q default \
+.. sourcecode:: console
+
+    celery multi start default -A openremproject -c 4 -Q default \
     --pidfile=/path/to/media/celery/%N.pid --logfile=/path/to/media/celery/%N.log
 
-Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuation character::
+Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuation character:
 
-    celery worker -n default -A openremproject -c 3 -Q default ^
+.. sourcecode:: console
+
+    celery worker -n default -A openremproject -c 4 -Q default ^
     --pidfile=C:\path\to\media\celery\default.pid --logfile=C:\path\to\media\celery\default.log
-
-    celery worker -n stores -A openremproject -c 1 -Q stores ^
-    --pidfile=C:\path\to\media\celery\stores.pid --logfile=C:\path\to\media\celery\stores.log
-
-If you intend to use OpenREM to provide a DICOM Store SCP (ie you can DICOM send things to OpenREM without using
-any other program, such as Conquest), then we need a Celery Queue just for the store. The node (and queue) created for
-this is called ``stores`` and it needs to have a concurrency equal or greater than the number of store SCPs. This would
-normally be just one. So set ``-c:stores 1`` or ``-c:stores 2`` etc as you see fit. The ``-c 3`` specifies how many
-workers should be available for all the other jobs - exports; and imports when using the OpenREM Store SCP.
-
-You must also specify the location for the pid file and for the log file. You might put these in the media folder, or
-the logs might go in ``/var/log/``.
 
 For production use, see `Daemonising Celery`_ below
 
-To stop the celery queues in Linux::
+To stop the celery queues in Linux:
+
+.. sourcecode:: console
 
     celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
 
 For Windows, just press ``Ctrl+c``
 
 You will need to do this twice if there are running tasks you wish to kill.
+
 
 Celery periodic tasks: beat
 ===========================
@@ -122,12 +120,14 @@ Configure the settings
 
 
 * Follow the link presented on the front page to get to the user and group administration.
+
 .. figure:: img/HomeNoUsers.png
     :align: center
     :alt: Initial home page with no users in groups
 .. figure:: img/ConfigMenu.png
     :align: right
     :alt: Configuration menu
+
 * After the first users are configured, this link will no longer be presented and instead you can go to
   ``Config -> Manage users``.
 * You will need the superuser username and password you created just after creating the database. The groups are
@@ -149,9 +149,11 @@ Configure the settings
 * In addition to adding users to these groups, you may like to grant a second user ``superuser`` and ``staff`` status
   so that there are at least two people who can manage the users
 * Return to the OpenREM interface (click on ``View site`` at the top right)
+
 .. figure:: img/ViewSite.png
     :align: center
     :alt: Link from Django user admin back to OpenREM
+
 * Go to ``Config -> DICOM object delete settings`` and configure appropriately (see :doc:`i_deletesettings`)
 * Go to ``Config -> Patient ID settings`` and configure appropriately (see :doc:`patientid`)
 * If you want to use OpenREM as a DICOM store, or to use OpenREM to query remote systems, go to

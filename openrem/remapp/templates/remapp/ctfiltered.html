@@ -78,7 +78,7 @@
         {% for field in filter.form.hidden_fields %}
           <div style="display:none">{{ field }}</div>
         {% endfor %}
-        <input name="submit" type="submit" />
+        <input class="btn btn-default" name="submit" type="submit" />
       </div>
       <div class="panel-heading">
         <h3 class="panel-title">Chart options</h3>
@@ -88,7 +88,7 @@
           {% csrf_token %}
           {{ chartOptionsForm }}
         </table>
-        <input name="submit" type="submit" />
+        <input class="btn btn-default" name="submit" type="submit" />
       </div>
     </div>
   </form>

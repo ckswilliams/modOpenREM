@@ -2,10 +2,15 @@
 OpenREM version history
 =======================
 
-0.7.0b10 (2015-11-25)
+0.7.0b11 (2015-12-18)
 ---------------------
 
+* `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
+* `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
+* `#320`_  The week now begins on Monday rather than Sunday on date form fields
+* `#316`_  Query retrieve function can now exclude and include based on strings entered
 * `#315`_  Charts: made size of exported chart graphics follow the browser window size
+* `#314`_  One version number declaration now used for distribute, docs and interface
 * `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
 * `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
@@ -51,7 +56,7 @@ OpenREM version history
 * `#259`_  Link to manage users added to Admin menu
 * `#258`_  Fixed DX import error where manufacturer or model name was not provided
 * `#257`_  Documentation update
-* `#256`_  Fixed errors with non-ASCII characters in imports
+* `#256`_  Fixed errors with non-ASCII characters in imports and query-retrieve
 * `#255`_  Charts: Small y-axis values on histograms are more visible when viewing full-screen
 * `#254`_  Charts: Simplified chart data processing in the templates
 * `#253`_  Charts: AJAX used to make pages responsive with large datasets when charts enabled
