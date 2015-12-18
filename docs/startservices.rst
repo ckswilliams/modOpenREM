@@ -73,6 +73,10 @@ Windows - ``celery multi`` doesn't work on Windows, and ``^`` is the continuatio
 
 For production use, see `Daemonising Celery`_ below
 
+Set the number of workers (concurrency, ``-c``) as you see fit. The more you have, the more processes (imports, exports,
+query-retrieve operations etc) can take place simultaneously. However, each extra worker uses extra memory and if you
+have too many they will be competing for CPU resources too.
+
 To stop the celery queues in Linux:
 
 .. sourcecode:: console
@@ -112,6 +116,9 @@ Windows::
     --pidfile=C:\path\to\media\celery\celerybeat.pid
 
 For production use, see `Daemonising Celery`_ below
+
+As with starting the Celery workers, the folder that the pid, log and for beat, schedule files are to be written
+**must already exist** and the user starting Celery beat must be able write to that folder.
 
 To stop Celery beat, just press ``Ctrl+c``
 
