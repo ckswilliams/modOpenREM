@@ -56,6 +56,16 @@ Updates since beta 10
 =====================
 * QR SCU further improved with more testing
 * QR SCU can now filter by include and exclude terms in study description
+* QR SCU now safe with non-ASCII characters in series names etc
+* Version number now only declared once in the project
+* Monday is now the first day of the week in the pop-up date-pickers
+* Improvements to chart tool-tip visibility
+* 'Turn off charts' no longer changes the page
+* Improvements (hopefully) to Store SCP - no longer a Celery task
+* Improvements (hopefully) to task performance as long-running QR and export operations shouldn't queue tasks when there
+  are unused workers
+* Improvements (hopefully) to the keep-alive periodic task preventing requests stacking up when something goes wrong
+
 
 ****************************
 Upgrading from version 0.6.0
