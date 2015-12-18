@@ -65,6 +65,7 @@ Updates since beta 10
 * Improvements (hopefully) to task performance as long-running QR and export operations shouldn't queue tasks when there
   are unused workers
 * Improvements (hopefully) to the keep-alive periodic task preventing requests stacking up when something goes wrong
+* Improvements to docs, beginnings of DICOM networking docs
 
 
 ****************************
