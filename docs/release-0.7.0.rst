@@ -65,6 +65,7 @@ Updates since beta 10
 * Improvements (hopefully) to task performance as long-running QR and export operations shouldn't queue tasks when there
   are unused workers
 * Improvements (hopefully) to the keep-alive periodic task preventing requests stacking up when something goes wrong
+* Improvements to docs, beginnings of DICOM networking docs
 
 
 ****************************
@@ -82,7 +83,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b10
+    pip install openrem==0.7.0b11
 
 In a shell/command window, move into the openrem folder:
 
@@ -137,7 +138,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b10
+    pip install openrem==0.7.0b11
 
 From the openrem folder (see above):
 
