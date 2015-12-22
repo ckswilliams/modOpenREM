@@ -28,6 +28,8 @@
 
 """
 import logging
+logger = logging.getLogger(__name__)
+
 
 def get_value_kw(tag,dataset):
     """Get DICOM value by keyword reference.
@@ -112,7 +114,7 @@ def get_or_create_cid(codevalue, codemeaning):
             cid.save()
         code = ContextID.objects.filter(code_value__exact = codevalue)
         if code.count() > 1:
-            logging.warning("Duplicate entry in the ContextID table: %s/%s, import continuing",
+            logger.warning("Duplicate entry in the ContextID table: %s/%s, import continuing",
                             codevalue, codemeaning)
         return code[0]
 

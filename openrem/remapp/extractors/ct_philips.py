@@ -33,6 +33,8 @@ import sys
 import django
 import logging
 
+logger = logging.getLogger(__name__)
+
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -151,7 +153,7 @@ def _ctradiationdose(dataset,g):
         study_date = g.study_date.date()
         study_time = g.study_time.time()
         accession_number = g.accession_number
-        logging.warning(
+        logger.warning(
             "There were no events in ct_philips import, or they couldn't be read. {0} {1} {2} {3} {4} {5}".format(
                 station_name, manufacturer, manufacturer_model_name, study_date, study_time, accession_number))
     else:

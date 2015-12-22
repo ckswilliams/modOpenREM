@@ -39,6 +39,8 @@ import sys
 import django
 import logging
 
+logger = logging.getLogger(__name__)
+
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -601,7 +603,7 @@ def _create_event(dataset):
             if event_date_time == events.date_time_started:
                 return 0
     except Exception as e:
-        logging.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
+        logger.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
                          study_uid, event_uid, e)
     # study exists, but event doesn't
     _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
