@@ -114,5 +114,5 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
         logger.info("Returning Success response from echo to {0} {1} {2}".format(rh, rp, aec))
         return "Success"
     else:
-        logger.info("Returning EchoFail response from echo to {0} {1} {2}".format(rh, rp, aec))
+        logger.info("Returning EchoFail response from echo to {0} {1} {2}. Type is {3}.".format(rh, rp, aec, echo.Type))
         return "EchoFail"

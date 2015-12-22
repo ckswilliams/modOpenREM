@@ -38,8 +38,8 @@ from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt
 
-
 logger = logging.getLogger(__name__)
+
 
 # callbacks
 def OnAssociateRequest(association):
@@ -218,7 +218,6 @@ def web_store(store_pk=None):
         else:
             conf.status = "Starting AE AET:{0}, port:{1} failed; address already in use!".format(aet, port)
             logger.warning("Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
-
 
 
 def _interrupt(store_pk=None):
