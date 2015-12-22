@@ -166,6 +166,7 @@ def OnReceiveStore(SOPClass, DS):
 
 
 def web_store(store_pk=None):
+    import socket
     import time
     from remapp.models import DicomStoreSCP
     from django.core.exceptions import ObjectDoesNotExist
@@ -182,34 +183,42 @@ def web_store(store_pk=None):
     # logging.basicConfig(level=logging.INFO)
 
     # setup AE
-    MyAE = AE(
-        aet, port, [],
-        [StorageSOPClass, VerificationSOPClass],
-        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
-    )
-    MyAE.OnAssociateRequest = OnAssociateRequest
-    MyAE.OnAssociateResponse = OnAssociateResponse
-    MyAE.OnReceiveStore = OnReceiveStore
-    MyAE.OnReceiveEcho = OnReceiveEcho
+    try:
+        MyAE = AE(
+            aet, port, [],
+            [StorageSOPClass, VerificationSOPClass],
+            [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
+        )
+        MyAE.OnAssociateRequest = OnAssociateRequest
+        MyAE.OnAssociateResponse = OnAssociateResponse
+        MyAE.OnReceiveStore = OnReceiveStore
+        MyAE.OnReceiveEcho = OnReceiveEcho
 
-    # start AE
-    conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
-    conf.save()
-    logger.info("Starting AE... AET:{0}, port:{1}".format(aet, port))
-    MyAE.start()
-    conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
-    conf.save()
-    logger.info("Started AE... AET:%s, port:%s", aet, port)
-    #    print "Started AE... AET:{0}, port:{1}".format(aet, port)
+        # start AE
+        conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
+        conf.save()
+        logger.info("Starting AE... AET:{0}, port:{1}".format(aet, port))
+        MyAE.start()
+        conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
+        conf.save()
+        logger.info("Started AE... AET:%s, port:%s", aet, port)
 
-    while 1:
-        time.sleep(1)
-        stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
-        if not stay_alive.run:
-            MyAE.Quit()
-            logger.info("Stopped AE... AET:%s, port:%s", aet, port)
-            #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
-            break
+        while 1:
+            time.sleep(1)
+            stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
+            if not stay_alive.run:
+                MyAE.Quit()
+                logger.info("Stopped AE... AET:%s, port:%s", aet, port)
+                #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
+                break
+    except socket.error as serr:
+        if serr.errno != errno.EADDRINUSE:
+            conf.status = "Starting AE AET:{0}, port:{1} failed; see logfile".format(aet, port)
+            logger.error("Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+        else:
+            conf.status = "Starting AE AET:{0}, port:{1} failed; address already in use!".format(aet, port)
+            logger.warning("Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+
 
 
 def _interrupt(store_pk=None):
