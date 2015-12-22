@@ -10,6 +10,7 @@ OpenREM version history
 * `#333`_  Fixed StoreSCP not starting in beta 11 error
 * `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
+* `#329`_  All existing logging is now done via the same log files
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
 * `#316`_  Query retrieve function can now exclude and include based on strings entered
