@@ -5,11 +5,13 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#338`_  Fix Kodak illegally using comma in filter thickness values
 * `#335`_  DICOM Store keep_alive and echo_scu functions now log correctly
 * `#334`_  Fixed issue with tasks needing to be explicitly named
 * `#333`_  Fixed StoreSCP not starting in beta 11 error
 * `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
 * `#329`_  All existing logging is now done via the same log files
+* `#328`_  Store SCP no longer uses Celery tasks
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
