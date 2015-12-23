@@ -98,17 +98,17 @@ def OnReceiveStore(SOPClass, DS):
     )
     mkdir_p(path)
     filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
-    ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
-    ds.update(DS)
-    ds.is_little_endian = True
-    ds.is_implicit_VR = True
+    ds_new = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
+    ds_new.update(DS)
+    ds_new.is_little_endian = True
+    ds_new.is_implicit_VR = True
 
     try:
         try:
             station_name = DS.StationName
         except:
             station_name = "missing"
-        ds.save_as(filename)
+        ds_new.save_as(filename)
     except ValueError as e:
         logger.error(
             "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
