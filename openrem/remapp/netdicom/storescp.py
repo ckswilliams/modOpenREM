@@ -38,7 +38,7 @@ from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(name='remapp.netdicom.storescp')
 
 
 # callbacks
@@ -116,6 +116,10 @@ def OnReceiveStore(SOPClass, DS):
                 DS.SOPInstanceUID))
         return SOPClass.Success
     except:
+        try:
+            station_name = DS.StationName
+        except:
+            station_name = "missing"
         logger.error(
             "Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                 sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
@@ -209,7 +213,6 @@ def web_store(store_pk=None):
             if not stay_alive.run:
                 MyAE.Quit()
                 logger.info("Stopped AE... AET:%s, port:%s", aet, port)
-                #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
                 break
     except socket.error as serr:
         if serr.errno != errno.EADDRINUSE:
