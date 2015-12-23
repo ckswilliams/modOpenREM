@@ -104,22 +104,24 @@ def OnReceiveStore(SOPClass, DS):
     ds.is_implicit_VR = True
 
     try:
-        ds.save_as(filename)
-    except ValueError as e:
         try:
             station_name = DS.StationName
         except:
             station_name = "missing"
+        ds.save_as(filename)
+    except ValueError as e:
         logger.error(
             "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                 e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
                 DS.SOPInstanceUID))
         return SOPClass.Success
+    except IOError as e:
+        logger.error(
+                "IOError on DCM save {0} - does the user running storescp have write rights in the {1} folder?".format(
+                    e.message, path
+                ))
+        return SOPClass.Success
     except:
-        try:
-            station_name = DS.StationName
-        except:
-            station_name = "missing"
         logger.error(
             "Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                 sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
