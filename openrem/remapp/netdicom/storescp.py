@@ -98,23 +98,52 @@ def OnReceiveStore(SOPClass, DS):
     )
     mkdir_p(path)
     filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
-    ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
-    ds.update(DS)
-    ds.is_little_endian = True
-    ds.is_implicit_VR = True
+    ds_new = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
+    ds_new.update(DS)
+    ds_new.is_little_endian = True
+    ds_new.is_implicit_VR = True
 
     try:
         try:
             station_name = DS.StationName
         except:
             station_name = "missing"
-        ds.save_as(filename)
+        ds_new.save_as(filename)
     except ValueError as e:
-        logger.error(
-            "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
-                e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
-                DS.SOPInstanceUID))
-        return SOPClass.Success
+        # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        if "Invalid tag (0018, 7052)" in e.message or "Invalid tag (0018, 7054)" in e.message:
+            logger.info("Found illegal use of multiple values of filter thickness using comma. Changing before saving.")
+            thickmin = dict.__getitem__(ds_new, 0x187052)
+            thickvalmin = thickmin.__getattribute__('value')
+            if ',' in thickvalmin:
+                thickvalmin = thickvalmin.replace(',', '\\')
+                thicknewmin = thickmin._replace(value = thickvalmin)
+                dict.__setitem__(ds_new, 0x187052, thicknewmin)
+            thickmax = dict.__getitem__(ds_new, 0x187054)
+            thickvalmax = thickmax.__getattribute__('value')
+            if ',' in thickvalmax:
+                thickvalmax = thickvalmax.replace(',', '\\')
+                thicknewmax = thickmax._replace(value = thickvalmax)
+                dict.__setitem__(ds_new, 0x187054, thicknewmax)
+            try:
+                ds_new.save_as(filename)
+            except ValueError as e:
+                logger.error(
+                    "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                        e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+                        DS.SOPInstanceUID))
+                return SOPClass.Success
+            except:
+                logger.error(
+                    "Unexpected error on DCM save after changing min/max filter thickness strings: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                        sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                return SOPClass.Success
+        else:
+            logger.error(
+                "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                    e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+                    DS.SOPInstanceUID))
+            return SOPClass.Success
     except IOError as e:
         logger.error(
                 "IOError on DCM save {0} - does the user running storescp have write rights in the {1} folder?".format(
