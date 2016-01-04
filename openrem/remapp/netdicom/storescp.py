@@ -224,6 +224,8 @@ def web_store(store_pk=None):
             [StorageSOPClass, VerificationSOPClass],
             [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
         )
+        MyAE.MaxAssociationIdleSeconds = 120
+        MyAE.MaxNumberOfAssociations = 25
         MyAE.OnAssociateRequest = OnAssociateRequest
         MyAE.OnAssociateResponse = OnAssociateResponse
         MyAE.OnReceiveStore = OnReceiveStore
