@@ -133,6 +133,12 @@ def OnReceiveStore(SOPClass, DS):
                 priv_exp_time = dict.__getitem__(ds_new, 0x1f11027)
                 blank_val = priv_exp_time._replace(value='')
                 dict.__setitem__(ds_new, 0x1f11027, blank_val)
+            elif "Invalid tag (01f1, 1033)" in e.message:
+                logger.warning("Invalid value in unknown private tag (01f1,1033). Tag value deleted. Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
+                    station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                priv_tag = dict.__getitem__(ds_new, 0x1f11033)
+                blank_val = priv_tag._replace(value='')
+                dict.__setitem__(ds_new, 0x1f11033, blank_val)
             else:
                 logger.error(
                     "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
