@@ -138,6 +138,17 @@ def OnReceiveStore(SOPClass, DS):
                     "Unexpected error on DCM save after changing min/max filter thickness strings: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
                         sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
                 return SOPClass.Success
+        if "Invalid tag (01f1, 1027)" in e.message:
+            logger.warning("Invalid value {0} in tag (01f1,1027), Exposure time per rotation. Tag value deleted. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+            ds_new[0x1f11027].value = ""
+            try:
+                ds_new.save_as(filename)
+            except:
+                logger.error(
+                    "Unexpected error on DCM save after deleting 01f1,1027 tag value: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                        sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                return SOPClass.Success
         else:
             logger.error(
                 "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
