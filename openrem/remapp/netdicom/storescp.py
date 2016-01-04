@@ -146,6 +146,12 @@ def OnReceiveStore(SOPClass, DS):
             dict.__setitem__(ds_new, 0x1f11027, blank_val)
             try:
                 ds_new.save_as(filename)
+            except ValueError as e:
+                logger.error(
+                    "ValueError on DCM save {0} after deleting 01f1,1027 tag value. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                        e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+                        DS.SOPInstanceUID))
+                return SOPClass.Success
             except:
                 logger.error(
                     "Unexpected error on DCM save after deleting 01f1,1027 tag value: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
