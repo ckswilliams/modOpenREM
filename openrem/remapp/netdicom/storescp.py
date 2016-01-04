@@ -139,9 +139,11 @@ def OnReceiveStore(SOPClass, DS):
                         sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
                 return SOPClass.Success
         if "Invalid tag (01f1, 1027)" in e.message:
-            logger.warning("Invalid value {0} in tag (01f1,1027), Exposure time per rotation. Tag value deleted. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
-                e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
-            ds_new[0x1f11027].value = ""
+            logger.warning("Invalid value in tag (01f1,1027), 'exposure time per rotation'. Tag value deleted. Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
+                station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+            priv_exp_time = dict.__getitem__(ds_new, 0x1f11027)
+            blank_val = priv_exp_time._replace(value = '')
+            dict.__setitem__(ds_new, 0x1f11027, blank_val)
             try:
                 ds_new.save_as(filename)
             except:
