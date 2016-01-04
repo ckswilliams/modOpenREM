@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#340`_  Fixed store failure to save due to illegal values in Philips private tags, improved exception code
 * `#338`_  Fix Kodak illegally using comma in filter thickness values
 * `#335`_  DICOM Store keep_alive and echo_scu functions now log correctly
 * `#334`_  Fixed issue with tasks needing to be explicitly named
