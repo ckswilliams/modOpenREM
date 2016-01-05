@@ -998,17 +998,19 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         if plotCTRequestMeanDLP:
             # This needs re-writing in light of my changes to requestSummary above. Needs to loop
             # through each system that is present in the data.
-            requestHistogramData = [[None for i in xrange(2)] for i in xrange(len(requestSummary))]
+            requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestSummary))] for i in xrange(len(system_list))]
 
-            for idx, study in enumerate(requestSummary):
-                subqs = study_events.filter(
-                    requested_procedure_code_meaning=study.get('requested_procedure_code_meaning'))
-                dlpValues = subqs.values_list('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
-                                              flat=True)
-                requestHistogramData[idx][0], requestHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues],
-                                                                                          bins=20)
-                requestHistogramData[idx][0] = requestHistogramData[idx][0].tolist()
-                requestHistogramData[idx][1] = requestHistogramData[idx][1].tolist()
+            for sys_idx, system in enumerate(system_list):
+                for idx, study in enumerate(requestSummary):
+                    subqs = study_events.filter(
+                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system.values()[0]).filter(
+                            requested_procedure_code_meaning=(study.values('requested_procedure_code_meaning')[0]).values()[0])
+                    dlpValues = subqs.values_list(
+                        'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
+                        flat=True)
+                    requestHistogramData[sys_idx][idx][0], requestHistogramData[sys_idx][idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                    requestHistogramData[sys_idx][idx][0] = requestHistogramData[sys_idx][idx][0].tolist()
+                    requestHistogramData[sys_idx][idx][1] = requestHistogramData[sys_idx][idx][1].tolist()
 
     if not 'acquisitionHistogramData' in locals(): acquisitionHistogramData = 0
     if not 'acquisitionHistogramDataCTDI' in locals(): acquisitionHistogramDataCTDI = 0
