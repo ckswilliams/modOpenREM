@@ -43,7 +43,7 @@ $(function () {
             text: 'Median DLP per requested procedure type'
         },
         legend: {
-            enabled: false
+            enabled: true
         },
         xAxis: {
             categories: [1,2,3,4,5],

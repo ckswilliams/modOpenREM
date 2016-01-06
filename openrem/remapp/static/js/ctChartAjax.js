@@ -388,10 +388,6 @@ $(document).ready(function() {
                     return el;
                 });
 
-                /*var request_names = [];
-                for (i = 0; i < request_summary.length; i++) {
-                    request_names.push(request_summary[i].requested_procedure_code_meaning);
-                }*/
                 var request_names = json.requestNameList;
                 var request_system_names = json.requestSystemList;
             }
@@ -429,10 +425,10 @@ $(document).ready(function() {
                         for (j = 0; j < request_names.length; j++) {
                             (request_data_median[i]).push({
                                 name: request_names[j],
-                                y: parseFloat(request_summary[i*request_system_names.length + j].median_dlp),
-                                freq: request_summary[i*request_system_names.length + j].num_req,
-                                bins: request_bins[i*request_system_names.length + j],
-                                tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i*request_system_names.length + j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i*request_system_names.length + j].num_req + ')',
+                                y: parseFloat(request_summary[i*request_names.length + j].median_dlp),
+                                freq: request_summary[i*request_names.length + j].num_req,
+                                bins: request_bins[i*request_names.length + j],
+                                tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i*request_names.length + j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i*request_names.length + j].num_req + ')',
                                 drilldown: request_names[j]
                             });
                         }
@@ -469,10 +465,11 @@ $(document).ready(function() {
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartplotCTRequestMeanDLP.series.length > i) {
                             chartplotCTRequestMeanDLP.series[i].setData(request_data_median[i]);
+                            chartplotCTRequestMeanDLP.series[i].name = request_system_names[i];
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
-                                name: "A new series",
+                                name: request_system_names[i],
                                 data: request_data_median[i]
                             });
                         }
