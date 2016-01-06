@@ -383,18 +383,13 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // DLP per request chart data start
             if(typeof plotCTRequestMeanDLP !== 'undefined' || typeof plotCTRequestFreq !== 'undefined') {
-
-                var request_summary = $.map(json.requestSummary, function (el) {
-                    return el;
-                });
-
+                var request_summary = json.requestSummary;
                 var request_names = json.requestNameList;
                 var request_system_names = json.requestSystemList;
+                var request_histogram_data = json.requestHistogramData;
             }
 
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
-
-                var request_histogram_data = json.requestHistogramData;
 
                 var request_counts = []; while(request_counts.push([]) < request_system_names.length);
                 var request_bins = []; while(request_bins.push([]) < request_system_names.length);
@@ -425,10 +420,10 @@ $(document).ready(function() {
                         for (j = 0; j < request_names.length; j++) {
                             (request_data_median[i]).push({
                                 name: request_names[j],
-                                y: parseFloat(request_summary[i*request_names.length + j].median_dlp),
-                                freq: request_summary[i*request_names.length + j].num_req,
-                                bins: request_bins[i*request_names.length + j],
-                                tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i*request_names.length + j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i*request_names.length + j].num_req + ')',
+                                y: parseFloat(request_summary[i][j].median_dlp),
+                                freq: request_summary[i][j].num_req,
+                                bins: request_bins[i][j],
+                                tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i][j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i][j].num_req + ')',
                                 drilldown: request_names[j]
                             });
                         }

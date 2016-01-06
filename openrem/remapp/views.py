@@ -966,8 +966,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
-        requestNameList = request_events.values_list('requested_procedure_code_meaning', flat=True).distinct()
-        requestSystemList = request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct()
+        requestNameList = request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning')
+        requestSystemList = request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name')
 
         if median_available and plotAverageChoice == 'both':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
@@ -975,6 +975,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                 num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'requested_procedure_code_meaning')
+
         elif median_available and plotAverageChoice == 'median':
             requestSummary = []
             for system in requestSystemList:
@@ -987,6 +988,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         'requested_procedure_code_meaning'))
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
+
         else:
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
