@@ -747,7 +747,7 @@ def ct_summary_chart_data(request):
 
     acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
     requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
-    studySummary = \
+    studySummary, requestNameList, requestSystemList = \
         ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                              plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                              plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
@@ -767,6 +767,8 @@ def ct_summary_chart_data(request):
         returnStructure['studyHistogramData'] = studyHistogramData
     if plotCTRequestMeanDLP or plotCTRequestFreq:
         returnStructure['requestSummary'] = list(requestSummary)
+        returnStructure['requestNameList'] = list(requestNameList)
+        returnStructure['requestSystemList'] = list(requestSystemList)
     if plotCTRequestMeanDLP:
         returnStructure['requestHistogramData'] = requestHistogramData
     if plotCTStudyPerDayAndHour:
@@ -964,6 +966,9 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
+        requestNameList = request_events.values_list('requested_procedure_code_meaning', flat=True).distinct()
+        requestSystemList = request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct()
+
         if median_available and plotAverageChoice == 'both':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
@@ -971,24 +976,17 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'requested_procedure_code_meaning')
         elif median_available and plotAverageChoice == 'median':
-            #requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-            #    median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-            #    num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-            #    'requested_procedure_code_meaning')
-            # Replaced code above with code that provides results per CT scanner
-            # requestSummary[0] contains results for system_list[0]
-            # requestSummary[1] contains results for system_list[1] etc
-            system_list = request_events.values('generalequipmentmoduleattr__unique_equipment_name_id__display_name').distinct()
             requestSummary = []
-            for system in system_list:
+            for system in requestSystemList:
                 requestSummary.append(request_events.filter(
-                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system.values()[0]).values(
+                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                     'requested_procedure_code_meaning').distinct().annotate(
                         median_dlp=Median(
                             'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                         num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                         'requested_procedure_code_meaning'))
-
+            for index in range(len(requestSummary)):
+                requestSummary[index] = list(requestSummary[index])
         else:
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
@@ -996,27 +994,27 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 'requested_procedure_code_meaning')
 
         if plotCTRequestMeanDLP:
-            # This needs re-writing in light of my changes to requestSummary above. Needs to loop
-            # through each system that is present in the data.
-            requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestSummary))] for i in xrange(len(system_list))]
+            requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestNameList))] for i in xrange(len(requestSystemList))]
 
-            for sys_idx, system in enumerate(system_list):
-                for idx, study in enumerate(requestSummary):
-                    subqs = study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system.values()[0]).filter(
-                            requested_procedure_code_meaning=(study.values('requested_procedure_code_meaning')[0]).values()[0])
+            for sys_idx, system in enumerate(requestSystemList):
+                for req_idx, request_name in enumerate(requestNameList):
+                    subqs = request_events.filter(
+                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            requested_procedure_code_meaning=request_name)
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                         flat=True)
-                    requestHistogramData[sys_idx][idx][0], requestHistogramData[sys_idx][idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
-                    requestHistogramData[sys_idx][idx][0] = requestHistogramData[sys_idx][idx][0].tolist()
-                    requestHistogramData[sys_idx][idx][1] = requestHistogramData[sys_idx][idx][1].tolist()
+                    requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                    requestHistogramData[sys_idx][req_idx][0] = requestHistogramData[sys_idx][req_idx][0].tolist()
+                    requestHistogramData[sys_idx][req_idx][1] = requestHistogramData[sys_idx][req_idx][1].tolist()
 
     if not 'acquisitionHistogramData' in locals(): acquisitionHistogramData = 0
     if not 'acquisitionHistogramDataCTDI' in locals(): acquisitionHistogramDataCTDI = 0
     if not 'acquisitionSummary' in locals(): acquisitionSummary = 0
     if not 'requestHistogramData' in locals(): requestHistogramData = 0
     if not 'requestSummary' in locals(): requestSummary = 0
+    if not 'requestNameList' in locals(): requestNameList = 0
+    if not 'requestSystemList' in locals(): requestSystemList = 0
     if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
     if not 'studyMeanDLPoverTime' in locals(): studyMeanDLPoverTime = 0
     if not 'studyMedianDLPoverTime' in locals(): studyMedianDLPoverTime = 0
@@ -1025,7 +1023,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
     return acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
            requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
-           studySummary
+           studySummary, requestNameList, requestSystemList
 
 
 @login_required
