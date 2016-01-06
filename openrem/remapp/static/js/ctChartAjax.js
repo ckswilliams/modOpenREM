@@ -388,21 +388,25 @@ $(document).ready(function() {
                     return el;
                 });
 
-                var request_names = [];
+                /*var request_names = [];
                 for (i = 0; i < request_summary.length; i++) {
                     request_names.push(request_summary[i].requested_procedure_code_meaning);
-                }
+                }*/
+                var request_names = json.requestNameList;
+                var request_system_names = json.requestSystemList;
             }
 
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
 
                 var request_histogram_data = json.requestHistogramData;
 
-                var request_counts = [];
-                var request_bins = [];
-                for (i = 0; i < request_names.length; i++) {
-                    request_counts.push(request_histogram_data[i][0]);
-                    request_bins.push(request_histogram_data[i][1]);
+                var request_counts = []; while(request_counts.push([]) < request_system_names.length);
+                var request_bins = []; while(request_bins.push([]) < request_system_names.length);
+                for (i = 0; i < request_system_names.length; i++) {
+                    for (j = 0; j < request_names.length; j++) {
+                        (request_counts[i]).push(request_histogram_data[i][j][0]);
+                        (request_bins[i]).push(request_histogram_data[i][j][1]);
+                    }
                 }
 
                 if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
@@ -420,27 +424,36 @@ $(document).ready(function() {
                 }
 
                 if (plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    var request_data_median = [];
-                    for (i = 0; i < request_names.length; i++) {
-                        request_data_median.push({
-                            name: request_names[i],
-                            y: parseFloat(request_summary[i].median_dlp),
-                            freq: request_summary[i].num_req,
-                            bins: request_bins[i],
-                            tooltip: request_names[i] + '<br>' + parseFloat(request_summary[i].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i].num_req + ')',
-                            drilldown: request_names[i]
-                        });
+                    var request_data_median = []; while(request_data_median.push([]) < request_system_names.length);
+                    for (i = 0; i < request_system_names.length; i++) {
+                        for (j = 0; j < request_names.length; j++) {
+                            (request_data_median[i]).push({
+                                name: request_names[j],
+                                y: parseFloat(request_summary[i*request_system_names.length + j].median_dlp),
+                                freq: request_summary[i*request_system_names.length + j].num_req,
+                                bins: request_bins[i*request_system_names.length + j],
+                                tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i*request_system_names.length + j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i*request_system_names.length + j].num_req + ')',
+                                drilldown: request_names[j]
+                            });
+                        }
                     }
                 }
 
                 temp = [];
-                var series_drilldown_request = [];
-                for (i = 0; i < request_names.length; i++) {
-                    temp = [];
-                    for (j = 0; j < request_counts[0].length; j++) {
-                        temp.push([request_bins[i][j].toFixed(1).toString() + ' \u2264 x < ' + request_bins[i][j + 1].toFixed(1).toString(), request_counts[i][j]]);
+                var series_drilldown_request = []; while(series_drilldown_request.push([]) < request_system_names.length);
+                for (i = 0; i < request_system_names.length; i++) {
+                    for (j = 0; j < request_names.length; j++) {
+                        temp = [];
+                        for (k = 0; k < request_counts[i][0].length; k++) {
+                            temp.push([request_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + request_bins[i][j][k + 1].toFixed(1).toString(), request_counts[i][j][k]]);
+                        }
+                        (series_drilldown_request[i]).push({
+                            id: request_names[j],
+                            name: request_names[j],
+                            useHTML: true,
+                            data: temp
+                        });
                     }
-                    series_drilldown_request.push({id: request_names[i], name: request_names[i], useHTML: true, data: temp});
                 }
 
                 var chartplotCTRequestMeanDLP = $('#histogramRequestPlotDIV').highcharts();
@@ -453,7 +466,17 @@ $(document).ready(function() {
                     chartplotCTRequestMeanDLP.series[0].setData(request_data);
                 }
                 else if (plotAverageChoice == "median") {
-                    chartplotCTRequestMeanDLP.series[0].setData(request_data_median);
+                    for (i = 0; i < request_system_names.length; i++) {
+                        if (chartplotCTRequestMeanDLP.series.length > i) {
+                            chartplotCTRequestMeanDLP.series[i].setData(request_data_median[i]);
+                        }
+                        else {
+                            chartplotCTRequestMeanDLP.addSeries({
+                                name: "A new series",
+                                data: request_data_median[i]
+                            });
+                        }
+                    }
                 }
                 else {
                     chartplotCTRequestMeanDLP.series[0].setData(request_data);

@@ -766,7 +766,7 @@ def ct_summary_chart_data(request):
     if plotCTStudyMeanDLP:
         returnStructure['studyHistogramData'] = studyHistogramData
     if plotCTRequestMeanDLP or plotCTRequestFreq:
-        returnStructure['requestSummary'] = list(requestSummary)
+        returnStructure['requestSummary'] = requestSummary
         returnStructure['requestNameList'] = list(requestNameList)
         returnStructure['requestSystemList'] = list(requestSystemList)
     if plotCTRequestMeanDLP:
