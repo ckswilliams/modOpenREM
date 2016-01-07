@@ -786,7 +786,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                          plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                          plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
                          requestResults, median_available, plotAverageChoice):
-    from django.db.models import Q, Avg, Count, Min
+    from django.db.models import Q, Avg, Count, Min, Max, FloatField
     import datetime, qsstats
     from remapp.models import CtIrradiationEventData, Median
     if plotting:
@@ -998,6 +998,11 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         if plotCTRequestMeanDLP:
             requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestNameList))] for i in xrange(len(requestSystemList))]
 
+            requestRanges = request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                min_dlp=Min('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField()),
+                max_dlp=Max('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField())).order_by(
+                'requested_procedure_code_meaning')
+
             for sys_idx, system in enumerate(requestSystemList):
                 for req_idx, request_name in enumerate(requestNameList):
                     subqs = request_events.filter(
@@ -1006,7 +1011,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                         flat=True)
-                    requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dlpValues], bins=20)
+                    requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dlpValues], bins=20, range=requestRanges.filter(requested_procedure_code_meaning=request_name).values_list('min_dlp', 'max_dlp')[0])
                     requestHistogramData[sys_idx][req_idx][0] = requestHistogramData[sys_idx][req_idx][0].tolist()
                     requestHistogramData[sys_idx][req_idx][1] = requestHistogramData[sys_idx][req_idx][1].tolist()
 
