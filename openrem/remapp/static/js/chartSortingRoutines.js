@@ -2,24 +2,26 @@
 // ascending, anything else for descending.
 function seriesSort(chartContainer, p, d) {
     var chart = $(chartContainer).highcharts();
-    if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
-        var chartDataNew = [];
-        for (var i = 0; i < chart.series[0].data.length; i++) {
-            chartDataNew.push({
-                name: chart.series[0].data[i].name,
-                y: chart.series[0].data[i].y,
-                x: chart.series[0].data[i].i,
-                freq: chart.series[0].data[i].freq,
-                drilldown: chart.series[0].data[i].drilldown,
-                category: chart.series[0].data[i].name,
-                tooltip: chart.series[0].data[i].tooltip,
-                bins: chart.series[0].data[i].bins
-            });
+    if(chart.series.length != 0) {
+        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+            var chartDataNew = [];
+            for (var i = 0; i < chart.series[0].data.length; i++) {
+                chartDataNew.push({
+                    name: chart.series[0].data[i].name,
+                    y: chart.series[0].data[i].y,
+                    x: chart.series[0].data[i].i,
+                    freq: chart.series[0].data[i].freq,
+                    drilldown: chart.series[0].data[i].drilldown,
+                    category: chart.series[0].data[i].name,
+                    tooltip: chart.series[0].data[i].tooltip,
+                    bins: chart.series[0].data[i].bins
+                });
+            }
+            bubbleSort(chartDataNew, p, d);
+            rebuildSeries(chartContainer, chartDataNew);
+            chart.yAxis[0].isDirty = true;
+            chart.redraw({duration: 1000});
         }
-        bubbleSort(chartDataNew, p, d);
-        rebuildSeries(chartContainer, chartDataNew);
-        chart.yAxis[0].isDirty = true;
-        chart.redraw({ duration: 1000 });
     }
 }
 

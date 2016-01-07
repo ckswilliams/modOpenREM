@@ -75,11 +75,7 @@ $(function () {
                 borderWidth: 0
             }
         },
-        series: [{
-            useHTML: true,
-            name: 'Median DLP per requested procedure',
-            data: []
-        }],
+        series: [],
         drilldown: {
             series: []
         }

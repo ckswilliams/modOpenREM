@@ -440,7 +440,7 @@ $(document).ready(function() {
                         }
                         series_drilldown_request.push({
                             id: request_system_names[i]+request_names[j],
-                            name: request_names[j],
+                            name: request_system_names[i],
                             useHTML: true,
                             data: temp
                         });
