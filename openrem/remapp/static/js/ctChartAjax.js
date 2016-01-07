@@ -424,22 +424,22 @@ $(document).ready(function() {
                                 freq: request_summary[i][j].num_req,
                                 bins: request_bins[i][j],
                                 tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i][j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i][j].num_req + ')',
-                                drilldown: request_names[j]
+                                drilldown: request_system_names[i]+request_names[j]
                             });
                         }
                     }
                 }
 
                 temp = [];
-                var series_drilldown_request = []; while(series_drilldown_request.push([]) < request_system_names.length);
+                var series_drilldown_request = [];
                 for (i = 0; i < request_system_names.length; i++) {
                     for (j = 0; j < request_names.length; j++) {
                         temp = [];
                         for (k = 0; k < request_counts[i][0].length; k++) {
                             temp.push([request_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + request_bins[i][j][k + 1].toFixed(1).toString(), request_counts[i][j][k]]);
                         }
-                        (series_drilldown_request[i]).push({
-                            id: request_names[j],
+                        series_drilldown_request.push({
+                            id: request_system_names[i]+request_names[j],
                             name: request_names[j],
                             useHTML: true,
                             data: temp
