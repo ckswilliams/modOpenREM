@@ -767,8 +767,8 @@ def ct_summary_chart_data(request):
         returnStructure['studyHistogramData'] = studyHistogramData
     if plotCTRequestMeanDLP or plotCTRequestFreq:
         returnStructure['requestSummary'] = requestSummary
-        returnStructure['requestNameList'] = list(requestNameList)
-        returnStructure['requestSystemList'] = list(requestSystemList)
+        returnStructure['requestNameList'] = requestNameList
+        returnStructure['requestSystemList'] = requestSystemList
     if plotCTRequestMeanDLP:
         returnStructure['requestHistogramData'] = requestHistogramData
     if plotCTStudyPerDayAndHour:
@@ -966,8 +966,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
-        requestNameList = request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning')
-        requestSystemList = request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name')
+        requestNameList = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
+        requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
 
         if median_available and plotAverageChoice == 'both':
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
@@ -988,6 +988,14 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         'requested_procedure_code_meaning'))
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
+
+            # Fill in default values where data for a requested procedure is missing for any of the systems
+            for index in range(len(requestSystemList)):
+                missing_request_names = list(set(requestNameList) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
+                for name in missing_request_names:
+                    (requestSummary[index]).append({'median_dlp': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
+                # Sort the list into ascending order of requested_procedure_code_meaning
+                requestSummary[index] = sorted(requestSummary[index], key=lambda k: k['requested_procedure_code_meaning'])
 
         else:
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(

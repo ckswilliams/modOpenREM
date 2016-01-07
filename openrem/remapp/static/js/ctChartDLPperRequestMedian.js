@@ -12,7 +12,7 @@ $(function () {
                 drilldown: function (e) {
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartRequestDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + e.point.freq + ')'});
+                    chartRequestDLP.setTitle({text: drilldownTitle + e.point.name});
                     chartRequestDLP.yAxis[0].setTitle({text: 'Number'});
                     chartRequestDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
                     chartRequestDLP.xAxis[0].setCategories([], true);
