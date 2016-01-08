@@ -1013,7 +1013,12 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         for index in range(len(requestSystemList)):
             missing_request_names = list(set(requestNameList) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
             for name in missing_request_names:
-                (requestSummary[index]).append({'median_dlp': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
+                if median_available and plotAverageChoice == 'both':
+                    (requestSummary[index]).append({'median_dlp': 0, 'mean_dlp': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
+                elif median_available and plotAverageChoice == 'median':
+                    (requestSummary[index]).append({'median_dlp': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
+                else:
+                    (requestSummary[index]).append({'mean_dlp': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
             # Rearrange the list into the same order as requestNameList
             requestSummaryTemp = []
             for request_name in requestNameList:
