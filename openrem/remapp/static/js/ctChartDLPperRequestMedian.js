@@ -12,35 +12,49 @@ $(function () {
                 drilldown: function (e) {
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartRequestDLP.setTitle({text: drilldownTitle + e.point.name});
-                    chartRequestDLP.yAxis[0].setTitle({text: 'Number'});
-                    chartRequestDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
-                    chartRequestDLP.xAxis[0].setCategories([], true);
-                    chartRequestDLP.tooltip.options.formatter = function (e) {
+                    this.title.textStr = drilldownTitle + e.point.name;
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'Number'
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text: 'DLP range (mGy.cm)'
+                        }
+                    }, false);
+                    this.tooltip.options.formatter = function (e) {
                         var linkText = 'study_dlp_min=' + bins[this.x] + '&study_dlp_max=' + bins[this.x + 1] + '&requested_procedure=' + name;
                         returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?requesthist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function (e) {
-                    chartRequestDLP.setTitle({text: defaultTitle}, {text: ''});
-                    chartRequestDLP.yAxis[0].setTitle({text: 'Median DLP (mGy.cm)'});
-                    chartRequestDLP.xAxis[0].setTitle({text: 'Requested procedure'});
-                    chartRequestDLP.xAxis[0].update({
+                    this.setTitle({text: defaultTitle}, {text: ''});
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'Median DLP (mGy.cm)'
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text: 'Requested procedure'
+                        },
                         categories: {
                             formatter: function (args) {
                                 return this.point.category;
                             }
                         }
-                    }, true);
-                    chartRequestDLP.tooltip.options.formatter = function () {
-                        return this.point.tooltip;                    }
+                    }, false);
+                    this.tooltip.options.formatter = function () {
+                        return this.point.tooltip;
+                    }
                 }
             }
         },
         title: {
             useHTML: true,
-            text: 'Median DLP per requested procedure type'
+            text: 'Median DLP per requested procedure'
         },
         legend: {
             enabled: true
@@ -49,7 +63,7 @@ $(function () {
             categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
-                text: 'Requested procedure type'
+                text: 'Requested procedure'
             },
             labels: {
                 useHTML: true,
