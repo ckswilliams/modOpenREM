@@ -23,7 +23,8 @@ $(function () {
                     this.xAxis[0].update({
                         title: {
                             text: 'DLP range (mGy.cm)'
-                        }
+                        },
+                        categories: []
                     }, false);
                     this.tooltip.options.formatter = function (e) {
                         var linkText = 'study_dlp_min=' + bins[this.x] + '&study_dlp_max=' + bins[this.x + 1] + '&requested_procedure=' + name;
