@@ -789,7 +789,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     from django.db.models import Q, Avg, Count, Min, Max, FloatField
     import datetime, qsstats
     from remapp.models import CtIrradiationEventData, Median
-    from operator import itemgetter
     if plotting:
         import numpy as np
 
