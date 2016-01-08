@@ -144,6 +144,46 @@ function fourSeriesSort(chartContainer, p, d, s) {
     }
 }
 
+
+
+// chartContainer is the div that holds the HighChart; p is the property to sort on; d is the direction of sort: 1 for
+// ascending, anything else for descending; s is the series index to sort: the rest are then sorted to match.
+function anySeriesSort(chartContainer, p, d, s) {
+    var chart = $(chartContainer).highcharts();
+    if(chart.series.length != 0) {
+        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+
+            // Create an array to hold each series
+            var chartDataNew = [];
+            for (var i = 0; i < chart.series.length; i++) {
+                chartDataNew.push([]);
+
+                for (var j = 0; j < chart.series[0].data.length; j++) {
+                    chartDataNew[i].push({
+                        name: chart.series[i].data[j].name,
+                        y: chart.series[i].data[j].y,
+                        x: chart.series[i].data[j].j,
+                        freq: chart.series[i].data[j].freq,
+                        drilldown: chart.series[i].data[j].drilldown,
+                        category: chart.series[i].data[j].name,
+                        tooltip: chart.series[i].data[j].tooltip,
+                        bins: chart.series[i].data[j].bins
+                    });
+                }
+            }
+
+            bubbleSort(chartDataNew[0], p, d);
+            rebuildAnySeries(chartContainer, chartDataNew, s);
+            for (i = 1; i < chart.series.length; i++) {
+                bubbleSort(chartDataNew[i], 'x', 1);
+            }
+            chart.yAxis[0].isDirty = true;
+            chart.redraw({duration: 1000});
+        }
+    }
+}
+
+
 // chartContainer is the div that holds the HighChart
 function rebuildSeries(chartContainer, chartData) {
     var chart = $(chartContainer).highcharts();
@@ -211,6 +251,59 @@ function rebuildTwoSeries(chartContainer, chartData, chartData2, s) {
         }
     }
 }
+
+
+// chartContainer is the div that holds the HighChart; s is the index of the series to sort.
+function rebuildAnySeries(chartContainer, chartData, s) {
+    var chart = $(chartContainer).highcharts();
+    var newCategories = [];
+    var i = 0;
+
+    for (i = 0; i < chartData[0].length; i++) {
+        newCategories.push(chartData[0][i].name);
+        chart.series[s].data[i].update({
+            name: chartData[0][i].name,
+            y: chartData[0][i].y,
+            x: i,
+            freq: chartData[0][i].freq,
+            drilldown: chartData[0][i].drilldown,
+            category: chartData[0][i].name,
+            tooltip: chartData[0][i].tooltip,
+            bins: chartData[0][i].bins
+        }, false);
+    }
+    chart.xAxis[0].categories = newCategories;
+
+
+    for (i = 0; i < chartData[0].length; i++) {
+        for (k = 0; k < chartData.length; k++) {
+            if (k != s) {
+                var found = false;
+                var j = 0;
+                while (found == false) {
+                    if (chartData[k][i].name == chartData[0][j].name) {
+                        chart.series[k].data[j].update({
+                            index: j,
+                            name: chartData[k][i].name,
+                            y: chartData[k][i].y,
+                            x: j,
+                            freq: chartData[k][i].freq,
+                            drilldown: chartData[k][i].drilldown,
+                            category: chartData[k][i].category,
+                            tooltip: chartData[k][i].tooltip,
+                            bins: chartData[k][i].bins
+                        }, false);
+                        found = true;
+                    }
+                    else {
+                        j++;
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 // chartContainer is the div that holds the HighChart; s is the index of the series to sort.
 function rebuildFourSeries(chartContainer, chartData, chartData2, chartData3, chartData4, s) {
