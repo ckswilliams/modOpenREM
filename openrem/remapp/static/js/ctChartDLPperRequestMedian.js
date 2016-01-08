@@ -12,7 +12,9 @@ $(function () {
                 drilldown: function (e) {
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    this.title.textStr = drilldownTitle + e.point.name;
+                    this.setTitle({
+                        text: drilldownTitle + e.point.name
+                    });
                     this.yAxis[0].update({
                         title: {
                             text: 'Number'
@@ -30,7 +32,9 @@ $(function () {
                     }
                 },
                 drillup: function (e) {
-                    this.setTitle({text: defaultTitle}, {text: ''});
+                    this.setTitle({
+                        text: defaultTitle
+                    });
                     this.yAxis[0].update({
                         title: {
                             text: 'Median DLP (mGy.cm)'
@@ -54,7 +58,7 @@ $(function () {
         },
         title: {
             useHTML: true,
-            text: 'Median DLP per requested procedure'
+            text: defaultTitle
         },
         legend: {
             enabled: true
