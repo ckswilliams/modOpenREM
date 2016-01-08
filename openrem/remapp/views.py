@@ -789,6 +789,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     from django.db.models import Q, Avg, Count, Min, Max, FloatField
     import datetime, qsstats
     from remapp.models import CtIrradiationEventData, Median
+    from operator import itemgetter
     if plotting:
         import numpy as np
 
@@ -994,8 +995,11 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 missing_request_names = list(set(requestNameList) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
                 for name in missing_request_names:
                     (requestSummary[index]).append({'median_dlp': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
-                # Sort the list into ascending order of requested_procedure_code_meaning
-                requestSummary[index] = sorted(requestSummary[index], key=lambda k: k['requested_procedure_code_meaning'])
+                # Rearrange the list into the same order as requestNameList
+                requestSummaryTemp = []
+                for request_name in requestNameList:
+                    requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
+                requestSummary[index] = requestSummaryTemp
 
         else:
             requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
