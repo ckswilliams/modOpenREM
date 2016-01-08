@@ -970,11 +970,18 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
 
         if median_available and plotAverageChoice == 'both':
-            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                'requested_procedure_code_meaning')
+            requestSummary = []
+            for system in requestSystemList:
+                requestSummary.append(request_events.filter(
+                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                    'requested_procedure_code_meaning').distinct().annotate(
+                        mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        median_dlp=Median(
+                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'requested_procedure_code_meaning'))
+            for index in range(len(requestSummary)):
+                requestSummary[index] = list(requestSummary[index])
 
         elif median_available and plotAverageChoice == 'median':
             requestSummary = []
@@ -989,22 +996,29 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
-            # Fill in default values where data for a requested procedure is missing for any of the systems
-            for index in range(len(requestSystemList)):
-                missing_request_names = list(set(requestNameList) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
-                for name in missing_request_names:
-                    (requestSummary[index]).append({'median_dlp': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
-                # Rearrange the list into the same order as requestNameList
-                requestSummaryTemp = []
-                for request_name in requestNameList:
-                    requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
-                requestSummary[index] = requestSummaryTemp
-
         else:
-            requestSummary = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                'requested_procedure_code_meaning')
+            requestSummary = []
+            for system in requestSystemList:
+                requestSummary.append(request_events.filter(
+                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                    'requested_procedure_code_meaning').distinct().annotate(
+                        mean_dlp=Avg(
+                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'requested_procedure_code_meaning'))
+            for index in range(len(requestSummary)):
+                requestSummary[index] = list(requestSummary[index])
+
+        # Fill in default values where data for a requested procedure is missing for any of the systems
+        for index in range(len(requestSystemList)):
+            missing_request_names = list(set(requestNameList) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
+            for name in missing_request_names:
+                (requestSummary[index]).append({'median_dlp': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
+            # Rearrange the list into the same order as requestNameList
+            requestSummaryTemp = []
+            for request_name in requestNameList:
+                requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
+            requestSummary[index] = requestSummaryTemp
 
         if plotCTRequestMeanDLP:
             requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestNameList))] for i in xrange(len(requestSystemList))]

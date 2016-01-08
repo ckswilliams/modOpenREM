@@ -29,47 +29,49 @@ function seriesSort(chartContainer, p, d) {
 // ascending, anything else for descending; s is the index of the series to sort.
 function twoSeriesSort(chartContainer, p, d, s) {
     var chart = $(chartContainer).highcharts();
-    if(typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
-        var series_index_to_sort, other_series_index;
-        if (s==0) {
-            series_index_to_sort = 0;
-            other_series_index = 1;
+    if(chart.series.length != 0) {
+        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+            var series_index_to_sort, other_series_index;
+            if (s == 0) {
+                series_index_to_sort = 0;
+                other_series_index = 1;
+            }
+            else {
+                series_index_to_sort = 1;
+                other_series_index = 0;
+            }
+            var chartDataNew0 = [];
+            for (var i = 0; i < chart.series[series_index_to_sort].data.length; i++) {
+                chartDataNew0.push({
+                    name: chart.series[series_index_to_sort].data[i].name,
+                    y: chart.series[series_index_to_sort].data[i].y,
+                    x: chart.series[series_index_to_sort].data[i].i,
+                    freq: chart.series[series_index_to_sort].data[i].freq,
+                    drilldown: chart.series[series_index_to_sort].data[i].drilldown,
+                    category: chart.series[series_index_to_sort].data[i].name,
+                    tooltip: chart.series[series_index_to_sort].data[i].tooltip,
+                    bins: chart.series[series_index_to_sort].data[i].bins
+                });
+            }
+            var chartDataNew1 = [];
+            for (var i = 0; i < chart.series[other_series_index].data.length; i++) {
+                chartDataNew1.push({
+                    name: chart.series[other_series_index].data[i].name,
+                    y: chart.series[other_series_index].data[i].y,
+                    x: chart.series[other_series_index].data[i].i,
+                    freq: chart.series[other_series_index].data[i].freq,
+                    drilldown: chart.series[other_series_index].data[i].drilldown,
+                    category: chart.series[other_series_index].data[i].name,
+                    tooltip: chart.series[other_series_index].data[i].tooltip,
+                    bins: chart.series[other_series_index].data[i].bins
+                });
+            }
+            bubbleSort(chartDataNew0, p, d);
+            rebuildTwoSeries(chartContainer, chartDataNew0, chartDataNew1, s);
+            bubbleSort(chartDataNew1, 'x', 1);
+            chart.yAxis[0].isDirty = true;
+            chart.redraw({duration: 1000});
         }
-        else {
-            series_index_to_sort = 1;
-            other_series_index = 0;
-        }
-        var chartDataNew0 = [];
-        for (var i = 0; i < chart.series[series_index_to_sort].data.length; i++) {
-            chartDataNew0.push({
-                name: chart.series[series_index_to_sort].data[i].name,
-                y: chart.series[series_index_to_sort].data[i].y,
-                x: chart.series[series_index_to_sort].data[i].i,
-                freq: chart.series[series_index_to_sort].data[i].freq,
-                drilldown: chart.series[series_index_to_sort].data[i].drilldown,
-                category: chart.series[series_index_to_sort].data[i].name,
-                tooltip: chart.series[series_index_to_sort].data[i].tooltip,
-                bins: chart.series[series_index_to_sort].data[i].bins
-            });
-        }
-        var chartDataNew1 = [];
-        for (var i = 0; i < chart.series[other_series_index].data.length; i++) {
-            chartDataNew1.push({
-                name: chart.series[other_series_index].data[i].name,
-                y: chart.series[other_series_index].data[i].y,
-                x: chart.series[other_series_index].data[i].i,
-                freq: chart.series[other_series_index].data[i].freq,
-                drilldown: chart.series[other_series_index].data[i].drilldown,
-                category: chart.series[other_series_index].data[i].name,
-                tooltip: chart.series[other_series_index].data[i].tooltip,
-                bins: chart.series[other_series_index].data[i].bins
-            });
-        }
-        bubbleSort(chartDataNew0, p, d);
-        rebuildTwoSeries(chartContainer, chartDataNew0, chartDataNew1, s);
-        bubbleSort(chartDataNew1, 'x', 1);
-        chart.yAxis[0].isDirty = true;
-        chart.redraw({ duration: 1000 });
     }
 }
 

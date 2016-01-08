@@ -99,6 +99,7 @@ $(function () {
             series: []
         }
     });
+
     switch(chartSorting) {
         case 'freq':
             seriesSort('#histogramRequestPlotDIV', 'freq', chartSortingDirection);
