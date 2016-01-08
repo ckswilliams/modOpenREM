@@ -515,26 +515,26 @@ $(document).ready(function() {
             if(typeof plotCTRequestFreq !== 'undefined') {
                 //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'request_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&request_description=';
                 var request_piechart_data = new Array(request_names.length);
-                for(i=0; i<request_names.length; i++) {
-                    if(typeof plotCTRequestFreq !== 'undefined') {
-                        request_piechart_data[i] = {name: request_names[i], y: parseInt(request_summary[i].num_req), url: urlStartReq + request_names[i]};
+                var num_requests = 0;
+                for (i = 0; i < request_names.length; i++) {
+                    num_requests = 0;
+                    for (j = 0; j < request_system_names.length; j++) {
+                        num_requests += parseInt(request_summary[j][i].num_req)
                     }
-                    else {
-                        request_piechart_data[i] = {name: request_names[i], y:parseInt(i), url:urlStartReq+request_names[i]};
-                    }
+                    request_piechart_data[i] = {
+                        name: request_names[i],
+                        y: num_requests,
+                        url: urlStartReq + request_names[i]
+                    };
                 }
 
-                if(typeof plotCTRequestFreq !== 'undefined') {
-                    request_piechart_data.sort(sort_by_y);
-                }
+                request_piechart_data.sort(sort_by_y);
 
                 var request_colours = getColours(request_names.length);
                 for(i=0; i<request_names.length; i++) {
                     request_piechart_data[i].color = request_colours[i];
                 }
-            }
 
-            if(typeof plotCTRequestFreq !== 'undefined') {
                 var chart = $('#piechartRequestDIV').highcharts();
                 chart.series[0].setData(request_piechart_data);
                 chart.options.exporting.sourceWidth = $(window).width();
