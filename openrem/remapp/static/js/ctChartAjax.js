@@ -470,7 +470,7 @@ $(document).ready(function() {
                                 y: request_summary[i][j].mean_dlp,
                                 freq: request_summary[i][j].num_req,
                                 bins: request_bins[i][j],
-                                tooltip: request_names[j] + '<br>' + request_summary[i][j].mean_dlp.toFixed(1) + ' mean<br>(n=' + request_summary[i][j].num_req + ')',
+                                tooltip: request_system_names[i] + '<br>' + request_names[j] + '<br>' + request_summary[i][j].mean_dlp.toFixed(1) + ' mean<br>(n=' + request_summary[i][j].num_req + ')',
                                 drilldown: request_system_names[i]+request_names[j]
                             });
                         }
@@ -486,7 +486,7 @@ $(document).ready(function() {
                                 y: parseFloat(request_summary[i][j].median_dlp),
                                 freq: request_summary[i][j].num_req,
                                 bins: request_bins[i][j],
-                                tooltip: request_names[j] + '<br>' + parseFloat(request_summary[i][j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i][j].num_req + ')',
+                                tooltip: request_system_names[i] + '<br>' + request_names[j] + '<br>' + parseFloat(request_summary[i][j].median_dlp).toFixed(1) + ' median<br>(n=' + request_summary[i][j].num_req + ')',
                                 drilldown: request_system_names[i]+request_names[j]
                             });
                         }
