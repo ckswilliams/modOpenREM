@@ -241,7 +241,7 @@ $(document).ready(function() {
                     protocolPiechartData.sort(sort_by_y);
                 }
 
-                var protocolColours = getColours(protocolNames.length);
+                var protocolColours = getColours(protocolNames.length, 5);
                 for(i=0; i<protocolNames.length; i++) {
                     protocolPiechartData[i].color = protocolColours[i];
                 }
@@ -362,7 +362,7 @@ $(document).ready(function() {
                     study_piechart_data.sort(sort_by_y);
                 }
 
-                var study_colours = getColours(study_names.length);
+                var study_colours = getColours(study_names.length, 5);
                 for(i=0; i<study_names.length; i++) {
                     study_piechart_data[i].color = study_colours[i];
                 }
@@ -456,50 +456,61 @@ $(document).ready(function() {
                 chartplotCTRequestMeanDLP.options.exporting.sourceHeight = $(window).height();
 
                 if (plotAverageChoice == "mean") {
+                    var request_series_colours = getColours(request_system_names.length, 3);
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartplotCTRequestMeanDLP.series.length > i) {
                             chartplotCTRequestMeanDLP.series[i].setData(request_data[i]);
                             chartplotCTRequestMeanDLP.series[i].name = request_system_names[i];
+                            chartplotCTRequestMeanDLP.series[i].color = request_series_colours[i];
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[i],
-                                data: request_data[i]
+                                data: request_data[i],
+                                color: request_series_colours[i]
                             });
                         }
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var request_series_colours = getColours(request_system_names.length, 3);
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartplotCTRequestMeanDLP.series.length > i) {
                             chartplotCTRequestMeanDLP.series[i].setData(request_data_median[i]);
                             chartplotCTRequestMeanDLP.series[i].name = request_system_names[i];
+                            chartplotCTRequestMeanDLP.series[i].color = request_series_colours[i];
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[i],
-                                data: request_data_median[i]
+                                data: request_data_median[i],
+                                color: request_series_colours[i]
                             });
                         }
                     }
                 }
                 else {
                     var current_series = 0;
+                    var request_series_colours = getColours(request_system_names.length*2, 3);
                     for (i = 0; i < (request_system_names.length)*2; i+=2) {
                         if (chartplotCTRequestMeanDLP.series.length > i+1) {
                             chartplotCTRequestMeanDLP.series[i].setData(request_data[current_series]);
                             chartplotCTRequestMeanDLP.series[i].name = request_system_names[current_series];
+                            chartplotCTRequestMeanDLP.series[i].color = request_series_colours[i];
                             chartplotCTRequestMeanDLP.series[i+1].setData(request_data_median[current_series]);
                             chartplotCTRequestMeanDLP.series[i+1].name = request_system_names[current_series];
+                            chartplotCTRequestMeanDLP.series[i+1].color = request_series_colours[i+1];
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[current_series],
-                                data: request_data[current_series]
+                                data: request_data[current_series],
+                                color: request_series_colours[i]
                             });
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[current_series],
-                                data: request_data_median[current_series]
+                                data: request_data_median[current_series],
+                                color: request_series_colours[i+1]
                             });
                         }
                         current_series++;
@@ -530,7 +541,7 @@ $(document).ready(function() {
 
                 request_piechart_data.sort(sort_by_y);
 
-                var request_colours = getColours(request_names.length);
+                var request_colours = getColours(request_names.length, 5);
                 for(i=0; i<request_names.length; i++) {
                     request_piechart_data[i].color = request_colours[i];
                 }
@@ -563,8 +574,8 @@ $(document).ready(function() {
                     studiesPerWeekday[i] = dayTotal;
                 }
 
-                var hourColours = getColours(24);
-                var dayColours = getColours(7);
+                var hourColours = getColours(24, 5);
+                var dayColours = getColours(7, 5);
                 var studyWorkloadPieChartData = [];
                 var seriesDrillDownPieChart = [];
                 var tempTime;

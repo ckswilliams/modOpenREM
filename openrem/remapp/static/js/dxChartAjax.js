@@ -304,7 +304,7 @@ $(document).ready(function() {
                     protocolPiechartData.sort(sort_by_y);
                 }
 
-                var protocolColours = getColours(protocolNames.length);
+                var protocolColours = getColours(protocolNames.length, 5);
                 for(i=0; i<protocolNames.length; i++) {
                     protocolPiechartData[i].color = protocolColours[i];
                 }
@@ -339,8 +339,8 @@ $(document).ready(function() {
                     studiesPerWeekday[i] = dayTotal;
                 }
 
-                var hourColours = getColours(24);
-                var dayColours = getColours(7);
+                var hourColours = getColours(24, 5);
+                var dayColours = getColours(7, 5);
                 var studyWorkloadPieChartData = [];
                 var seriesDrillDownPieChart = [];
                 var tempTime;
@@ -408,7 +408,7 @@ $(document).ready(function() {
                         protocolPiechartData.sort(sort_by_y);
                     }
                     else {
-                        var protocolkVpLineColours =  getColours(protocolkVpNames.length);
+                        var protocolkVpLineColours =  getColours(protocolkVpNames.length, 5);
                     }
                 }
 
@@ -425,7 +425,7 @@ $(document).ready(function() {
                         protocolPiechartData.sort(sort_by_y);
                     }
                     else {
-                        var protocolmAsLineColours =  getColours(protocolmAsNames.length);
+                        var protocolmAsLineColours =  getColours(protocolmAsNames.length, 5);
                     }
 
                 }
