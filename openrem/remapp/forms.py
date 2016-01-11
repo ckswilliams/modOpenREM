@@ -151,6 +151,7 @@ class GeneralChartOptionsDisplayForm(forms.Form):
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
     plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION,
                                                     required=False)
+    plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
 
 
 class UpdateDisplayNameForm(forms.Form):

@@ -293,7 +293,7 @@ $(document).ready(function() {
                 }
 
                 for(i=0; i<protocolNames.length; i++) {
-                    protocolPiechartData[i].color = colourScale(i/(protocolNames.length-1)).hex();
+                    protocolPiechartData[i].color = colourScale(i/(protocolNames.length)).hex();
                 }
             }
 
@@ -425,7 +425,7 @@ $(document).ready(function() {
                 }
 
                 for(i=0; i<study_names.length; i++) {
-                    study_piechart_data[i].color = colourScale(i/(study_names.length-1)).hex();
+                    study_piechart_data[i].color = colourScale(i/(study_names.length)).hex();
                 }
             }
 
@@ -522,14 +522,14 @@ $(document).ready(function() {
                             chartplotCTRequestMeanDLP.series[i].update({
                                 name: request_system_names[i],
                                 data: request_data[i],
-                                color: colourScale(i/(request_system_names.length-1)).hex()
+                                color: colourScale(i/(request_system_names.length)).hex()
                             });
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[i],
                                 data: request_data[i],
-                                color: colourScale(i/(request_system_names.length-1)).hex()
+                                color: colourScale(i/(request_system_names.length)).hex()
                             });
                         }
                     }
@@ -540,14 +540,14 @@ $(document).ready(function() {
                             chartplotCTRequestMeanDLP.series[i].update({
                                 name: request_system_names[i],
                                 data: request_data_median[i],
-                                color: colourScale(i/(request_system_names.length-1)).hex()
+                                color: colourScale(i/(request_system_names.length)).hex()
                             });
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[i],
                                 data: request_data_median[i],
-                                color: colourScale(i/(request_system_names.length-1)).hex()
+                                color: colourScale(i/(request_system_names.length)).hex()
                             });
                         }
                     }
@@ -559,24 +559,24 @@ $(document).ready(function() {
                             chartplotCTRequestMeanDLP.series[i].update({
                                 name: request_system_names[current_series],
                                 data: request_data[current_series],
-                                color: colourScale(i/(request_system_names.length*2-1)).hex()
+                                color: colourScale(i/(request_system_names.length*2)).hex()
                             });
                             chartplotCTRequestMeanDLP.series[i+1].update({
                                 name: request_system_names[current_series],
                                 data: request_data_median[current_series],
-                                color: colourScale((i+1)/(request_system_names.length*2-1)).hex()
+                                color: colourScale((i+1)/(request_system_names.length*2)).hex()
                             });
                         }
                         else {
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[current_series],
                                 data: request_data[current_series],
-                                color: colourScale(i/(request_system_names.length*2-1)).hex()
+                                color: colourScale(i/(request_system_names.length*2)).hex()
                             });
                             chartplotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[current_series],
                                 data: request_data_median[current_series],
-                                color: colourScale((i+1)/(request_system_names.length*2-1)).hex()
+                                color: colourScale((i+1)/(request_system_names.length*2)).hex()
                             });
                         }
                         current_series++;
@@ -608,7 +608,7 @@ $(document).ready(function() {
                 request_piechart_data.sort(sort_by_y);
 
                 for(i=0; i<request_names.length; i++) {
-                    request_piechart_data[i].color = colourScale(i/(request_names.length-1)).hex();
+                    request_piechart_data[i].color = colourScale(i/(request_names.length)).hex();
                 }
 
                 var chart = $('#piechartRequestDIV').highcharts();

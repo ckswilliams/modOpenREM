@@ -744,6 +744,7 @@ def ct_summary_chart_data(request):
     plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
     plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
     plotAverageChoice = userProfile.plotAverageChoice
+    plotSeriesPerSystem = userProfile.plotSeriesPerSystem
 
     acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
     requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
@@ -751,7 +752,7 @@ def ct_summary_chart_data(request):
         ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                              plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                              plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                             requestResults, median_available, plotAverageChoice)
+                             requestResults, median_available, plotAverageChoice, plotSeriesPerSystem)
 
     returnStructure = {}
 
@@ -785,7 +786,7 @@ def ct_summary_chart_data(request):
 def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                          plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                          plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                         requestResults, median_available, plotAverageChoice):
+                         requestResults, median_available, plotAverageChoice, plotSeriesPerSystems):
     from django.db.models import Q, Avg, Count, Min, Max, FloatField
     import datetime, qsstats
     from remapp.models import CtIrradiationEventData, Median
@@ -966,46 +967,78 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
+
         requestNameList = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
-        requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
+        if plotSeriesPerSystems:
+            requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
+        else:
+            requestSystemList = ['All systems']
 
         if median_available and plotAverageChoice == 'both':
             requestSummary = []
             for system in requestSystemList:
-                requestSummary.append(request_events.filter(
-                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                    'requested_procedure_code_meaning').distinct().annotate(
-                        mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                        median_dlp=Median(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                        num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                        'requested_procedure_code_meaning'))
+                if plotSeriesPerSystems:
+                    requestSummary.append(request_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                            median_dlp=Median(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+                else:
+                    requestSummary.append(request_events.values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                            median_dlp=Median(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
         elif median_available and plotAverageChoice == 'median':
             requestSummary = []
             for system in requestSystemList:
-                requestSummary.append(request_events.filter(
-                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                    'requested_procedure_code_meaning').distinct().annotate(
-                        median_dlp=Median(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                        num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                        'requested_procedure_code_meaning'))
+                if plotSeriesPerSystems:
+                    requestSummary.append(request_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            median_dlp=Median(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+                else:
+                    requestSummary.append(request_events.values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            median_dlp=Median(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
         else:
             requestSummary = []
             for system in requestSystemList:
-                requestSummary.append(request_events.filter(
-                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                    'requested_procedure_code_meaning').distinct().annotate(
-                        mean_dlp=Avg(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                        num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                        'requested_procedure_code_meaning'))
+                if plotSeriesPerSystems:
+                    requestSummary.append(request_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            mean_dlp=Avg(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+                else:
+                    requestSummary.append(request_events.values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            mean_dlp=Avg(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
@@ -1035,9 +1068,13 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
             for sys_idx, system in enumerate(requestSystemList):
                 for req_idx, request_name in enumerate(requestNameList):
-                    subqs = request_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                            requested_procedure_code_meaning=request_name)
+                    if plotSeriesPerSystems:
+                        subqs = request_events.filter(
+                                generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                                requested_procedure_code_meaning=request_name)
+                    else:
+                        subqs = request_events.filter(requested_procedure_code_meaning=request_name)
+
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                         flat=True)
@@ -1636,6 +1673,7 @@ def chart_options_view(request):
             user_profile.plotInitialSortingDirection = general_form.cleaned_data['plotInitialSortingDirection']
             if 'postgresql' in settings.DATABASES['default']['ENGINE']:
                 user_profile.plotAverageChoice = general_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.plotSeriesPerSystem = general_form.cleaned_data['plotSeriesPerSystem']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1676,7 +1714,8 @@ def chart_options_view(request):
 
     general_form_data = {'plotCharts': user_profile.plotCharts,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
-                         'plotInitialSortingDirection': user_profile.plotInitialSortingDirection}
+                         'plotInitialSortingDirection': user_profile.plotInitialSortingDirection,
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem}
 
     ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
                     'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,

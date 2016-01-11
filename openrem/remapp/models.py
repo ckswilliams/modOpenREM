@@ -257,6 +257,8 @@ class UserProfile(models.Model):
     displayMG = models.BooleanField(default=True)
     displayDX = models.BooleanField(default=True)
 
+    plotSeriesPerSystem = models.BooleanField(default=False)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
