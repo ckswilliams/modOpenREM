@@ -519,7 +519,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 def _generalstudymoduleattributes(dataset,g):
     from datetime import datetime
     from remapp.models import PatientIDSettings
-    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
+    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value, get_value_num
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
@@ -547,6 +547,11 @@ def _generalstudymoduleattributes(dataset,g):
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
+    if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value('RequestAttributesSequence',dataset)
+    if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value('PerformedProtocolCodeSequence',dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning('RequestAttributesSequence',dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(0x00321060,dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning('PerformedProtocolCodeSequence',dataset)
     g.save()
     
     _generalequipmentmoduleattributes(dataset,g)
