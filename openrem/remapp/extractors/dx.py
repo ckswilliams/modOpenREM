@@ -552,6 +552,11 @@ def _generalstudymoduleattributes(dataset,g):
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning('RequestAttributesSequence',dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(0x00321060,dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning('PerformedProtocolCodeSequence',dataset)
+    if not g.requested_procedure_code_meaning:
+        manufacturer_check = get_value_kw("Manufacturer",dataset)
+        model_check = get_value_kw("ManufacturerModelName",dataset)
+        if manufacturer_check == 'Canon Inc.' and model_check == 'CXDI':
+            g.requested_procedure_code_meaning = get_value_num(0x00081030,dataset)
     g.save()
     
     _generalequipmentmoduleattributes(dataset,g)
