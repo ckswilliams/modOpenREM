@@ -108,7 +108,7 @@
 
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study | Request | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
       {% if admin.admingroup %}
         <th>Delete?</th>
       {% endif %}
@@ -135,6 +135,7 @@
         <td>
           <a href="/openrem/dx/{{ exam.id }}/">
             {{ exam.study_description }} |
+            {{ exam.requested_procedure_code_meaning }} |
               {% if not exam.accession_hashed %}
                 {{ exam.accession_number }}
               {% endif %}
