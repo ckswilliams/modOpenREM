@@ -49,7 +49,6 @@ $(document).ready(function() {
             }
 
             if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
-                //var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 var acq_histogram_data = json.acquisitionHistogramData;
 
                 var protocolCounts = [];
@@ -117,11 +116,9 @@ $(document).ready(function() {
             // DAP chart data end
             //-------------------------------------------------------------------------------------
 
-
-
             
             //-------------------------------------------------------------------------------------
-            // Requested procedure frequency data start
+            // Requested procedure frequency and DAP per requested procedure data start
             if( typeof plotDXRequestMeanDAP !== 'undefined' || typeof plotDXRequestFreq !== 'undefined') {
 
                 var req_summary = $.map(json.requestSummary, function (el) {
@@ -132,10 +129,75 @@ $(document).ready(function() {
                     return el.requested_procedure_code_meaning;
                 });
             }
-            // Requested procedure frequency data end
-            //-------------------------------------------------------------------------------------
             
-            
+            if(typeof plotDXRequestMeanDAP !== 'undefined') {
+                var req_histogram_data = json.requestHistogramData;
+
+                var requestCounts = [];
+                var requestBins = [];
+                for (i = 0; i < requestNames.length; i++) {
+                    requestCounts.push(req_histogram_data[i][0]);
+                    requestBins.push(req_histogram_data[i][1]);
+                }
+
+                if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var seriesData = [];
+                    for (i = 0; i < requestNames.length; i++) {
+                        seriesData.push({
+                            name: requestNames[i],
+                            y: req_summary[i].mean_dap,
+                            freq: req_summary[i].num_req,
+                            bins: requestBins[i],
+                            tooltip: requestNames[i] + '<br>' + req_summary[i].mean_dap.toFixed(1) + ' mean<br>(n=' + req_summary[i].num_req + ')',
+                            drilldown: requestNames[i]
+                        });
+                    }
+                }
+
+                if(plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var seriesMedianData = [];
+                    for (i = 0; i < requestNames.length; i++) {
+                        seriesMedianData.push({
+                            name: requestNames[i],
+                            y: parseFloat(req_summary[i].median_dap),
+                            freq: req_summary[i].num_req,
+                            bins: requestBins[i],
+                            tooltip: requestNames[i] + '<br>' + parseFloat(req_summary[i].median_dap).toFixed(1) + ' median<br>(n=' + req_summary[i].num_req + ')',
+                            drilldown: requestNames[i]
+                        });
+                    }
+                }
+
+                temp = [];
+                var seriesDrilldown = [];
+                for (i = 0; i < requestNames.length; i++) {
+                    temp = [];
+                    for (j = 0; j < requestCounts[0].length; j++) {
+                        temp.push([requestBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + requestBins[i][j+1].toFixed(1).toString(), requestCounts[i][j]]);
+                    }
+                    seriesDrilldown.push({id: requestNames[i], name: requestNames[i], useHTML: true, data: temp});
+                }
+
+                var chartplotDXRequestDAP = $('#plotDXARequestMeanDAPContainer').highcharts();
+                chartplotDXRequestDAP.xAxis[0].setCategories(requestNames);
+                chartplotDXRequestDAP.options.drilldown.series = seriesDrilldown;
+                chartplotDXRequestDAP.options.exporting.sourceWidth = $(window).width();
+                chartplotDXRequestDAP.options.exporting.sourceHeight = $(window).height();
+                if(plotAverageChoice == "mean") {
+                    chartplotDXRequestDAP.series[0].setData(seriesData);
+                }
+                else if(plotAverageChoice == "median") {
+                    chartplotDXRequestDAP.series[0].setData(seriesMedianData);
+                }
+                else {
+                    chartplotDXRequestDAP.series[0].setData(seriesData);
+                    chartplotDXRequestDAP.series[1].setData(seriesMedianData);
+                }
+                chartplotDXRequestDAP.redraw({ duration: 1000 });
+            }
+            // DAP per requested procedure name chart data end
+            //-------------------------------------------------------------------------------------            
+
 
             //-------------------------------------------------------------------------------------
             // kVp chart data start
@@ -340,9 +402,7 @@ $(document).ready(function() {
             // Acquisition frequency chart data end
             //-------------------------------------------------------------------------------------
 
-            
 
-            
             //-------------------------------------------------------------------------------------
             // Requested procedure frequency chart data start
             if(typeof plotDXRequestFreq !== 'undefined') {
@@ -367,9 +427,7 @@ $(document).ready(function() {
             }
             // Requested procedure frequency chart data end
             //-------------------------------------------------------------------------------------
-            
-            
-            
+
 
             //-------------------------------------------------------------------------------------
             // Study workload chart data start

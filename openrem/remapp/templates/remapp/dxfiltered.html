@@ -293,11 +293,11 @@
             <h4 class="panel-title">
               <a data-toggle="collapse" data-parent="#plotDXARequestMeanDAPAccordion" href="#collapsePlotDXARequestMeanDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Plot of mean DAP for each acquisition protocol.
+                Plot of mean DAP for each requested procedure name.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                Plot of median DAP for each acquisition protocol.
+                Plot of median DAP for each requested procedure name.
                 {% else %}
-                Plot of mean and median DAP for each acquisition protocol.
+                Plot of mean and median DAP for each requested procedure name.
                 {% endif %}
               </a>
             </h4>
