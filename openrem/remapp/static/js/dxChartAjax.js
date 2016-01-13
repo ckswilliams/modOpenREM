@@ -118,6 +118,25 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
 
 
+
+            
+            //-------------------------------------------------------------------------------------
+            // Requested procedure frequency data start
+            if( typeof plotDXRequestMeanDAP !== 'undefined' || typeof plotDXRequestFreq !== 'undefined') {
+
+                var req_summary = $.map(json.requestSummary, function (el) {
+                    return el;
+                });
+
+                var requestNames = $.map(json.request_names, function (el) {
+                    return el.requested_procedure_code_meaning;
+                });
+            }
+            // Requested procedure frequency data end
+            //-------------------------------------------------------------------------------------
+            
+            
+
             //-------------------------------------------------------------------------------------
             // kVp chart data start
             if( typeof plotDXAcquisitionMeankVp !== 'undefined' || typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
@@ -321,6 +340,36 @@ $(document).ready(function() {
             // Acquisition frequency chart data end
             //-------------------------------------------------------------------------------------
 
+            
+
+            
+            //-------------------------------------------------------------------------------------
+            // Requested procedure frequency chart data start
+            if(typeof plotDXRequestFreq !== 'undefined') {
+                var requestPiechartData = new Array(requestNames.length);
+                for(i=0; i<requestNames.length; i++) {
+                    requestPiechartData[i] = {name: requestNames[i], y: parseInt(req_summary[i].num_req), url: urlStartReq + requestNames[i]};
+                }
+
+                requestPiechartData.sort(sort_by_y);
+
+                var requestColours = getColours(requestNames.length, 5);
+                for(i=0; i<requestNames.length; i++) {
+                    requestPiechartData[i].color = requestColours[i];
+                }
+
+                var chart = $('#piechartRequestDIV').highcharts();
+                chart.series[0].setData(requestPiechartData);
+                chart.options.exporting.sourceWidth = $(window).width();
+                chart.options.exporting.sourceHeight = $(window).height();
+
+                chart.redraw({ duration: 1000 });
+            }
+            // Requested procedure frequency chart data end
+            //-------------------------------------------------------------------------------------
+            
+            
+            
 
             //-------------------------------------------------------------------------------------
             // Study workload chart data start

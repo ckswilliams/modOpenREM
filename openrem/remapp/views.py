@@ -302,6 +302,11 @@ def dx_summary_chart_data(request):
         returnStructure['acquisitionSummary'] = list(acquisitionSummary)
     if plotDXAcquisitionMeanDAP:
         returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+    if plotDXRequestMeanDAP or plotDXRequestFreq:
+        returnStructure['request_names'] = list(request_names)
+        returnStructure['requestSummary'] = list(requestSummary)
+    if plotDXRequestMeanDAP:
+        returnStructure['requestHistogramData'] = requestHistogramData
     if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
         returnStructure['acquisitionkVpSummary'] = list(acquisitionkVpSummary)
         returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
