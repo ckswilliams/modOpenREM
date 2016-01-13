@@ -116,7 +116,7 @@ $(document).ready(function() {
             // DAP chart data end
             //-------------------------------------------------------------------------------------
 
-            
+
             //-------------------------------------------------------------------------------------
             // Requested procedure frequency and DAP per requested procedure data start
             if( typeof plotDXRequestMeanDAP !== 'undefined' || typeof plotDXRequestFreq !== 'undefined') {
@@ -178,7 +178,7 @@ $(document).ready(function() {
                     seriesDrilldown.push({id: requestNames[i], name: requestNames[i], useHTML: true, data: temp});
                 }
 
-                var chartplotDXRequestDAP = $('#plotDXARequestMeanDAPContainer').highcharts();
+                var chartplotDXRequestDAP = $('#plotDXRequestMeanDAPContainer').highcharts();
                 chartplotDXRequestDAP.xAxis[0].setCategories(requestNames);
                 chartplotDXRequestDAP.options.drilldown.series = seriesDrilldown;
                 chartplotDXRequestDAP.options.exporting.sourceWidth = $(window).width();
@@ -196,7 +196,89 @@ $(document).ready(function() {
                 chartplotDXRequestDAP.redraw({ duration: 1000 });
             }
             // DAP per requested procedure name chart data end
-            //-------------------------------------------------------------------------------------            
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // Study description frequency and DAP per study description data start
+            if( typeof plotDXStudyMeanDAP !== 'undefined' || typeof plotDXStudyFreq !== 'undefined') {
+
+                var study_summary = $.map(json.studySummary, function (el) {
+                    return el;
+                });
+
+                var studyNames = $.map(json.study_names, function (el) {
+                    return el.study_description;
+                });
+            }
+            
+            if(typeof plotDXStudyMeanDAP !== 'undefined') {
+                var study_histogram_data = json.studyHistogramData;
+
+                var studyCounts = [];
+                var studyBins = [];
+                for (i = 0; i < studyNames.length; i++) {
+                    studyCounts.push(study_histogram_data[i][0]);
+                    studyBins.push(study_histogram_data[i][1]);
+                }
+
+                if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var seriesData = [];
+                    for (i = 0; i < studyNames.length; i++) {
+                        seriesData.push({
+                            name: studyNames[i],
+                            y: study_summary[i].mean_dap,
+                            freq: study_summary[i].num_stu,
+                            bins: studyBins[i],
+                            tooltip: studyNames[i] + '<br>' + study_summary[i].mean_dap.toFixed(1) + ' mean<br>(n=' + study_summary[i].num_stu + ')',
+                            drilldown: studyNames[i]
+                        });
+                    }
+                }
+
+                if(plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var seriesMedianData = [];
+                    for (i = 0; i < studyNames.length; i++) {
+                        seriesMedianData.push({
+                            name: studyNames[i],
+                            y: parseFloat(study_summary[i].median_dap),
+                            freq: study_summary[i].num_stu,
+                            bins: studyBins[i],
+                            tooltip: studyNames[i] + '<br>' + parseFloat(study_summary[i].median_dap).toFixed(1) + ' median<br>(n=' + study_summary[i].num_stu + ')',
+                            drilldown: studyNames[i]
+                        });
+                    }
+                }
+
+                temp = [];
+                var seriesDrilldown = [];
+                for (i = 0; i < studyNames.length; i++) {
+                    temp = [];
+                    for (j = 0; j < studyCounts[0].length; j++) {
+                        temp.push([studyBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + studyBins[i][j+1].toFixed(1).toString(), studyCounts[i][j]]);
+                    }
+                    seriesDrilldown.push({id: studyNames[i], name: studyNames[i], useHTML: true, data: temp});
+                }
+
+                var chartplotDXStudyDAP = $('#plotDXStudyMeanDAPContainer').highcharts();
+                chartplotDXStudyDAP.xAxis[0].setCategories(studyNames);
+                chartplotDXStudyDAP.options.drilldown.series = seriesDrilldown;
+                chartplotDXStudyDAP.options.exporting.sourceWidth = $(window).width();
+                chartplotDXStudyDAP.options.exporting.sourceHeight = $(window).height();
+                if(plotAverageChoice == "mean") {
+                    chartplotDXStudyDAP.series[0].setData(seriesData);
+                }
+                else if(plotAverageChoice == "median") {
+                    chartplotDXStudyDAP.series[0].setData(seriesMedianData);
+                }
+                else {
+                    chartplotDXStudyDAP.series[0].setData(seriesData);
+                    chartplotDXStudyDAP.series[1].setData(seriesMedianData);
+                }
+                chartplotDXStudyDAP.redraw({ duration: 1000 });
+            }
+            // DAP per study description chart data end
+            //-------------------------------------------------------------------------------------
 
 
             //-------------------------------------------------------------------------------------
@@ -426,6 +508,32 @@ $(document).ready(function() {
                 chart.redraw({ duration: 1000 });
             }
             // Requested procedure frequency chart data end
+            //-------------------------------------------------------------------------------------
+
+
+            //-------------------------------------------------------------------------------------
+            // Study description frequency chart data start
+            if(typeof plotDXStudyFreq !== 'undefined') {
+                var studyPiechartData = new Array(studyNames.length);
+                for(i=0; i<studyNames.length; i++) {
+                    studyPiechartData[i] = {name: studyNames[i], y: parseInt(study_summary[i].num_stu), url: urlStartStudy + studyNames[i]};
+                }
+
+                studyPiechartData.sort(sort_by_y);
+
+                var studyColours = getColours(studyNames.length, 5);
+                for(i=0; i<studyNames.length; i++) {
+                    studyPiechartData[i].color = studyColours[i];
+                }
+
+                var chart = $('#piechartStudyDIV').highcharts();
+                chart.series[0].setData(studyPiechartData);
+                chart.options.exporting.sourceWidth = $(window).width();
+                chart.options.exporting.sourceHeight = $(window).height();
+
+                chart.redraw({ duration: 1000 });
+            }
+            // Study description frequency chart data end
             //-------------------------------------------------------------------------------------
 
 

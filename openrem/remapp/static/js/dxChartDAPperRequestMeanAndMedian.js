@@ -7,7 +7,7 @@ var name = '';
 var chartDAPperRequest = new Highcharts.Chart({
         chart: {
             type: 'column',
-            renderTo: 'plotDXARequestMeanDAPContainer',
+            renderTo: 'plotDXRequestMeanDAPContainer',
             events: {
                 drilldown: function(e) {
                     bins = e.point.bins;
@@ -18,7 +18,7 @@ var chartDAPperRequest = new Highcharts.Chart({
                     chartDAPperRequest.xAxis[0].setCategories([], true);
                     chartDAPperRequest.tooltip.options.formatter = function(e) {
                         var linkText = 'study_dap_min=' + bins[this.x] + '&study_dap_max=' + bins[this.x+1] + '&requested_procedure=' + name;
-                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
+                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' requests</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
@@ -90,16 +90,16 @@ var chartDAPperRequest = new Highcharts.Chart({
 
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#plotDXARequestMeanDAPContainer', 'freq', chartSortingDirection, 0);
+            twoSeriesSort('#plotDXRequestMeanDAPContainer', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            twoSeriesSort('#plotDXARequestMeanDAPContainer', 'y', chartSortingDirection, 0);
+            twoSeriesSort('#plotDXRequestMeanDAPContainer', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#plotDXARequestMeanDAPContainer', 'name', chartSortingDirection, 0);
+            twoSeriesSort('#plotDXRequestMeanDAPContainer', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#plotDXARequestMeanDAPContainer', 'name', chartSortingDirection, 0);
+            twoSeriesSort('#plotDXRequestMeanDAPContainer', 'name', chartSortingDirection, 0);
     }
 
 });

@@ -275,9 +275,6 @@
       <!-- End of HTML to include div container for acquisition pie chart -->
     {% endif %}
 
-      
-      
-      
     {% if request.user.userprofile.plotDXRequestMeanDAP %}
       <!-- HTML to include div container for requested procedure plot -->
 
@@ -287,11 +284,11 @@
       });
       </script>
 
-      <div class="panel-group" id="plotDXARequestMeanDAPAccordion">
+      <div class="panel-group" id="plotDXRequestMeanDAPAccordion">
         <div class="panel panel-default">
           <div class="panel-heading">
             <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#plotDXARequestMeanDAPAccordion" href="#collapsePlotDXARequestMeanDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
+              <a data-toggle="collapse" data-parent="#plotDXRequestMeanDAPAccordion" href="#collapsePlotDXRequestMeanDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 Plot of mean DAP for each requested procedure name.
                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -302,9 +299,9 @@
               </a>
             </h4>
           </div>
-          <div id="collapsePlotDXARequestMeanDAPAccordion" class="panel-collapse collapse">
+          <div id="collapsePlotDXRequestMeanDAPAccordion" class="panel-collapse collapse">
             <div class="panel-body">
-              <div id="plotDXARequestMeanDAPContainer" style="height: auto; margin: 0 0"></div>
+              <div id="plotDXRequestMeanDAPContainer" style="height: auto; margin: 0 0"></div>
 
               <table style="border:none">
                   <tr>
@@ -316,41 +313,41 @@
                   </tr>
                   <tr>
               {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
               {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
               {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXARequestMeanDAPContainer', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXARequestMeanDAPContainer', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXARequestMeanDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXRequestMeanDAPContainer', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXRequestMeanDAPContainer', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXRequestMeanDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
               {% endif %}
                   </tr>
                   <tr>
               {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
               {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXARequestMeanDAPContainer', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXRequestMeanDAPContainer', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
               {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXARequestMeanDAPContainer', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXARequestMeanDAPContainer', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXARequestMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXRequestMeanDAPContainer', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXRequestMeanDAPContainer', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXRequestMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
               {% endif %}
                   </tr>
               </table>
-              <a onclick="enterFullScreen('collapsePlotDXARequestMeanDAPAccordion','plotDXARequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+              <a onclick="enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
             </div>
           </div>
         </div>
       </div>
-      <!-- End of HTML to include div for acquisition plot -->
+      <!-- End of HTML to include div for requested procedure name plot -->
     {% endif %}
 
     {% if request.user.userprofile.plotDXRequestFreq %}
@@ -379,9 +376,114 @@
           </div>
         </div>
       </div>
-      <!-- End of HTML to include div container for acquisition pie chart -->
+      <!-- End of HTML to include div container for requested procedure name pie chart -->
     {% endif %}
+
       
+      
+    {% if request.user.userprofile.plotDXStudyMeanDAP %}
+      <!-- HTML to include div container for study plot -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('plotDXStudyMeanDAPContainer');
+      });
+      </script>
+
+      <div class="panel-group" id="plotDXStudyMeanDAPAccordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#plotDXStudyMeanDAPAccordion" href="#collapsePlotDXStudyMeanDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                Plot of mean DAP for each study description.
+                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                Plot of median DAP for each study description.
+                {% else %}
+                Plot of mean and median DAP for each study description.
+                {% endif %}
+              </a>
+            </h4>
+          </div>
+          <div id="collapsePlotDXStudyMeanDAPAccordion" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="plotDXStudyMeanDAPContainer" style="height: auto; margin: 0 0"></div>
+
+              <table style="border:none">
+                  <tr>
+                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                      <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that study description.<br>
+                          Click on a histogram bin tooltip to see the studies that contain the study names in the bin. Note that
+                          this will include studies at the upper bin boundary, so in some cases may display more data than
+                          shown in the histogram bin.</td>
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXStudyMeanDAPContainer', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXStudyMeanDAPContainer', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXStudyMeanDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+              {% endif %}
+                  </tr>
+                  <tr>
+              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#plotDXStudyMeanDAPContainer', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% else %}
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXStudyMeanDAPContainer', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXStudyMeanDAPContainer', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#plotDXStudyMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+              {% endif %}
+                  </tr>
+              </table>
+              <a onclick="enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div for study name plot -->
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXStudyFreq %}
+      <!-- HTML to include div container for study name pie chart -->
+
+      <script>
+      $(window).resize(function() {
+          chartSetExportSize('piechartStudyDIV');
+      });
+      </script>
+
+      <div class="panel-group" id="accordionPiechartStudy">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                Pie chart showing a breakdown of study name frequency.
+              </a>
+            </h4>
+          </div>
+          <div id="collapseStudyPieChart" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
+              <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End of HTML to include div container for study name pie chart -->
+    {% endif %}      
       
       
       
@@ -708,6 +810,14 @@
     <script>var plotDXRequestFreq = true;</script>
     {% endif %}
 
+    {% if request.user.userprofile.plotDXStudyMeanDAP %}
+    <script>var plotDXStudyMeanDAP = true;</script>
+    {% endif %}
+
+    {% if request.user.userprofile.plotDXStudyFreq %}
+    <script>var plotDXStudyFreq = true;</script>
+    {% endif %}
+
     {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
     <script>var plotDXAcquisitionMeanDAPOverTime = true;</script>
     {% endif %}
@@ -776,6 +886,33 @@
 
       <script src="{{ STATIC_URL }}js/dxChartRequestFrequency.js"></script>
       <!-- End of JavaScript for requested procedure name pie chart -->
+    {% endif %}
+
+
+      {% if request.user.userprofile.plotDXStudyMeanDAP %}
+          <script>
+              var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          </script>
+
+          {% if request.user.userprofile.plotAverageChoice == 'both' %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperStudyMeanAndMedian.js"></script>
+          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperStudyMean.js"></script>
+          {% else %}
+              <script src="{{ STATIC_URL }}js/dxChartDAPperStudyMedian.js"></script>
+          {% endif %}
+          <!-- End of JavaScript for study description plot -->
+      {% endif %}
+
+
+    {% if request.user.userprofile.plotDXStudyFreq %}
+      <!-- JavaScript for study description pie chart. -->
+      <script>
+        var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+      </script>
+
+      <script src="{{ STATIC_URL }}js/dxChartStudyFrequency.js"></script>
+      <!-- End of JavaScript for study description pie chart -->
     {% endif %}
 
 

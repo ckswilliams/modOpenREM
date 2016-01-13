@@ -8,7 +8,7 @@ $(function () {
     var chartDAPperRequest = new Highcharts.Chart({
         chart: {
             type: 'column',
-            renderTo: 'plotDXARequestMeanDAPContainer',
+            renderTo: 'plotDXRequestMeanDAPContainer',
             events: {
                 drilldown: function(e) {
                     bins = e.point.bins;
@@ -19,7 +19,7 @@ $(function () {
                     chartDAPperRequest.xAxis[0].setCategories([], true);
                     chartDAPperRequest.tooltip.options.formatter = function(e) {
                         var linkText = 'study_dap_min=' + bins[this.x] + '&study_dap_max=' + bins[this.x+1] + '&requested_procedure=' + name;
-                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' requests</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
@@ -87,16 +87,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#plotDXARequestMeanDAPContainer', 'freq', chartSortingDirection);
+            seriesSort('#plotDXRequestMeanDAPContainer', 'freq', chartSortingDirection);
             break;
         case 'dap':
-            seriesSort('#plotDXARequestMeanDAPContainer', 'y', chartSortingDirection);
+            seriesSort('#plotDXRequestMeanDAPContainer', 'y', chartSortingDirection);
             break;
         case 'name':
-            seriesSort('#plotDXARequestMeanDAPContainer', 'name', chartSortingDirection);
+            seriesSort('#plotDXRequestMeanDAPContainer', 'name', chartSortingDirection);
             break;
         default:
-            seriesSort('#plotDXARequestMeanDAPContainer', 'name', 1);
+            seriesSort('#plotDXRequestMeanDAPContainer', 'name', 1);
     }
 
 });

@@ -307,6 +307,11 @@ def dx_summary_chart_data(request):
         returnStructure['requestSummary'] = list(requestSummary)
     if plotDXRequestMeanDAP:
         returnStructure['requestHistogramData'] = requestHistogramData
+    if plotDXStudyMeanDAP or plotDXStudyFreq:
+        returnStructure['study_names'] = list(study_names)
+        returnStructure['studySummary'] = list(studySummary)
+    if plotDXStudyMeanDAP:
+        returnStructure['studyHistogramData'] = studyHistogramData
     if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
         returnStructure['acquisitionkVpSummary'] = list(acquisitionkVpSummary)
         returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
@@ -549,7 +554,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
 
     if plotDXStudyMeanDAP:
         for idx, study in enumerate(study_names):
-            subqs = study_events.filter(study_protocol__exact=study.get('study_description'))
+            subqs = study_events.filter(study_description__exact=study.get('study_description'))
             dapValues = subqs.values_list('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram(
                 [float(x) * 1000000 for x in dapValues], bins=20)
