@@ -370,6 +370,24 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
     )
     acquisition_names = acquisition_events.values('acquisition_protocol').distinct().order_by('acquisition_protocol')
 
+    study_events = GeneralStudyModuleAttr.objects.exclude(
+        projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+    ).exclude(
+        study_description__isnull=True
+    ).filter(
+        study_instance_uid__in=expInclude
+    )
+    study_names = study_events.values('study_description').distinct().order_by('study_description')
+
+    request_events = GeneralStudyModuleAttr.objects.exclude(
+        projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+    ).exclude(
+        requested_procedure_code_meaning__isnull=True
+    ).filter(
+        study_instance_uid__in=expInclude
+    )
+    request_names = request_events.values('requested_procedure_code_meaning').distinct().order_by('requested_procedure_code_meaning')
+
     if plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeankVp:
         acquisition_kvp_events = IrradEventXRayData.objects.exclude(
             irradeventxraysourcedata__kvp__kvp__isnull=True
