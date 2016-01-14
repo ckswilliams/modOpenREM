@@ -35,6 +35,9 @@ $(document).ready(function() {
             // this.url contains info about which charts need to be plotted
             var plotting_info = URLToArray(this.url);
 
+            // Initialise some colours to use for plotting
+            var colourScale = chroma.scale('RdYlBu');
+
             //-------------------------------------------------------------------------------------
             // DAP chart data start
             if( typeof plotDXAcquisitionMeanDAP !== 'undefined' || typeof plotDXAcquisitionFreq !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
@@ -102,14 +105,26 @@ $(document).ready(function() {
                 chartplotDXAcquisitionDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXAcquisitionDAP.options.exporting.sourceHeight = $(window).height();
                 if(plotAverageChoice == "mean") {
-                    chartplotDXAcquisitionDAP.series[0].setData(seriesData);
+                    chartplotDXAcquisitionDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesData
+                    });
                 }
                 else if(plotAverageChoice == "median") {
-                    chartplotDXAcquisitionDAP.series[0].setData(seriesMedianData);
+                    chartplotDXAcquisitionDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesMedianData
+                    });
                 }
                 else {
-                    chartplotDXAcquisitionDAP.series[0].setData(seriesData);
-                    chartplotDXAcquisitionDAP.series[1].setData(seriesMedianData);
+                    chartplotDXAcquisitionDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesData
+                    });
+                    chartplotDXAcquisitionDAP.series[1].update({
+                        color: colourScale(1).hex(),
+                        data: seriesMedianData
+                    });
                 }
                 chartplotDXAcquisitionDAP.redraw({ duration: 1000 });
             }
@@ -184,14 +199,26 @@ $(document).ready(function() {
                 chartplotDXRequestDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXRequestDAP.options.exporting.sourceHeight = $(window).height();
                 if(plotAverageChoice == "mean") {
-                    chartplotDXRequestDAP.series[0].setData(seriesData);
+                    chartplotDXRequestDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesData
+                    });
                 }
                 else if(plotAverageChoice == "median") {
-                    chartplotDXRequestDAP.series[0].setData(seriesMedianData);
+                    chartplotDXRequestDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesMedianData
+                    });
                 }
                 else {
-                    chartplotDXRequestDAP.series[0].setData(seriesData);
-                    chartplotDXRequestDAP.series[1].setData(seriesMedianData);
+                    chartplotDXRequestDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesData
+                    });
+                    chartplotDXRequestDAP.series[1].update({
+                        color: colourScale(1).hex(),
+                        data: seriesMedianData
+                    });
                 }
                 chartplotDXRequestDAP.redraw({ duration: 1000 });
             }
@@ -266,14 +293,26 @@ $(document).ready(function() {
                 chartplotDXStudyDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXStudyDAP.options.exporting.sourceHeight = $(window).height();
                 if(plotAverageChoice == "mean") {
-                    chartplotDXStudyDAP.series[0].setData(seriesData);
+                    chartplotDXStudyDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesData
+                    });
                 }
                 else if(plotAverageChoice == "median") {
-                    chartplotDXStudyDAP.series[0].setData(seriesMedianData);
+                    chartplotDXStudyDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesMedianData
+                    });
                 }
                 else {
-                    chartplotDXStudyDAP.series[0].setData(seriesData);
-                    chartplotDXStudyDAP.series[1].setData(seriesMedianData);
+                    chartplotDXStudyDAP.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesData
+                    });
+                    chartplotDXStudyDAP.series[1].update({
+                        color: colourScale(1).hex(),
+                        data: seriesMedianData
+                    });
                 }
                 chartplotDXStudyDAP.redraw({ duration: 1000 });
             }
@@ -297,7 +336,6 @@ $(document).ready(function() {
 
             if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
                 var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
-
 
                 var protocolkVpCounts = [];
                 var protocolkVpBins = [];
@@ -351,14 +389,26 @@ $(document).ready(function() {
                 chartplotDXAcquisitionMeankVp.options.exporting.sourceHeight = $(window).height();
 
                 if(plotAverageChoice == "mean") {
-                    chartplotDXAcquisitionMeankVp.series[0].setData(serieskVpData);
+                    chartplotDXAcquisitionMeankVp.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: serieskVpData
+                    });
                 }
                 else if(plotAverageChoice == "median") {
-                    chartplotDXAcquisitionMeankVp.series[0].setData(seriesMediankVpData);
+                    chartplotDXAcquisitionMeankVp.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesMediankVpData
+                    });
                 }
                 else {
-                    chartplotDXAcquisitionMeankVp.series[0].setData(serieskVpData);
-                    chartplotDXAcquisitionMeankVp.series[1].setData(seriesMediankVpData);
+                    chartplotDXAcquisitionMeankVp.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: serieskVpData
+                    });
+                    chartplotDXAcquisitionMeankVp.series[1].update({
+                        color: colourScale(1).hex(),
+                        data: seriesMediankVpData
+                    });
                 }
                 chartplotDXAcquisitionMeankVp.redraw({ duration: 1000 });
             }
@@ -434,14 +484,26 @@ $(document).ready(function() {
                 chartplotDXAcquisitionMeanmAs.options.exporting.sourceWidth = $(window).width();
                 chartplotDXAcquisitionMeanmAs.options.exporting.sourceHeight = $(window).height();
                 if(plotAverageChoice == "mean") {
-                    chartplotDXAcquisitionMeanmAs.series[0].setData(seriesmAsData);
+                    chartplotDXAcquisitionMeanmAs.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesmAsData
+                    });
                 }
                 else if(plotAverageChoice == "median") {
-                    chartplotDXAcquisitionMeanmAs.series[0].setData(seriesMedianmAsData);
+                    chartplotDXAcquisitionMeanmAs.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesMedianmAsData
+                    });
                 }
                 else {
-                    chartplotDXAcquisitionMeanmAs.series[0].setData(seriesmAsData);
-                    chartplotDXAcquisitionMeanmAs.series[1].setData(seriesMedianmAsData);
+                    chartplotDXAcquisitionMeanmAs.series[0].update({
+                        color: colourScale(0).hex(),
+                        data: seriesmAsData
+                    });
+                    chartplotDXAcquisitionMeanmAs.series[1].update({
+                        color: colourScale(1).hex(),
+                        data: seriesMedianmAsData
+                    });
                 }
                 chartplotDXAcquisitionMeanmAs.redraw({ duration: 1000 });
             }
@@ -467,9 +529,8 @@ $(document).ready(function() {
                     protocolPiechartData.sort(sort_by_y);
                 }
 
-                var protocolColours = getColours(protocolNames.length, 5);
                 for(i=0; i<protocolNames.length; i++) {
-                    protocolPiechartData[i].color = protocolColours[i];
+                    protocolPiechartData[i].color = colourScale(i/(protocolNames.length)).hex();
                 }
             }
 
@@ -495,9 +556,8 @@ $(document).ready(function() {
 
                 requestPiechartData.sort(sort_by_y);
 
-                var requestColours = getColours(requestNames.length, 5);
                 for(i=0; i<requestNames.length; i++) {
-                    requestPiechartData[i].color = requestColours[i];
+                    requestPiechartData[i].color = colourScale(i/(requestNames.length)).hex();
                 }
 
                 var chart = $('#piechartRequestDIV').highcharts();
@@ -521,9 +581,8 @@ $(document).ready(function() {
 
                 studyPiechartData.sort(sort_by_y);
 
-                var studyColours = getColours(studyNames.length, 5);
                 for(i=0; i<studyNames.length; i++) {
-                    studyPiechartData[i].color = studyColours[i];
+                    studyPiechartData[i].color = colourScale(i/(studyNames.length)).hex();
                 }
 
                 var chart = $('#piechartStudyDIV').highcharts();
@@ -554,8 +613,6 @@ $(document).ready(function() {
                     studiesPerWeekday[i] = dayTotal;
                 }
 
-                var hourColours = getColours(24, 5);
-                var dayColours = getColours(7, 5);
                 var studyWorkloadPieChartData = [];
                 var seriesDrillDownPieChart = [];
                 var tempTime;
@@ -564,12 +621,12 @@ $(document).ready(function() {
                     for (j = 0; j < 24; j++) {
                         tempTime = "0" + j;
                         tempTime = tempTime.substr(tempTime.length-2);
-                        temp.push({name: tempTime + ':00', y: studies_per_hour_in_weekdays[i][j], color: hourColours[j]});
+                        temp.push({name: tempTime + ':00', y: studies_per_hour_in_weekdays[i][j], color: colourScale(j/(23)).hex()});
                     }
                     studyWorkloadPieChartData.push({
                         name: dayNames[i],
                         y: studiesPerWeekday[i],
-                        color: dayColours[i],
+                        color: colourScale(i/(6)).hex(),
                         drilldown: dayNames[i]
                     });
                     seriesDrillDownPieChart.push({
@@ -623,7 +680,7 @@ $(document).ready(function() {
                         protocolPiechartData.sort(sort_by_y);
                     }
                     else {
-                        var protocolkVpLineColours =  getColours(protocolkVpNames.length, 5);
+                        var protocolkVpLineColours =  colourScale(i/(protocolkVpNames.length)).hex();
                     }
                 }
 
@@ -640,7 +697,7 @@ $(document).ready(function() {
                         protocolPiechartData.sort(sort_by_y);
                     }
                     else {
-                        var protocolmAsLineColours =  getColours(protocolmAsNames.length, 5);
+                        var protocolmAsLineColours =  colourScale(i/(protocolmAsNames.length)).hex();
                     }
 
                 }
