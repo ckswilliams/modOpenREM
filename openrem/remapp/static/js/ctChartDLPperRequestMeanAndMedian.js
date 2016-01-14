@@ -92,7 +92,8 @@ $(function () {
         plotOptions: {
             column: {
                 pointPadding: 0,
-                borderWidth: 0
+                borderWidth: 1,
+                borderColor: '#999999'
             }
         },
         series: [],
