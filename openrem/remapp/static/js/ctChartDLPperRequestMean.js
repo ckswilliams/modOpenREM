@@ -28,6 +28,7 @@ $(function () {
                     }, false);
                     this.tooltip.options.formatter = function (e) {
                         var linkText = 'study_dlp_min=' + bins[this.x] + '&study_dlp_max=' + bins[this.x + 1] + '&requested_procedure=' + name;
+                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
                         returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/ct/?requesthist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
