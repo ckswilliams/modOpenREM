@@ -588,12 +588,13 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                                                 aggregate=Avg('dose_area_product') * 1000000)
                     acquisitionMeanDAPoverTime[idx] = qss.time_series(startDate, today,
                                                                       interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                    returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
                 if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                     qss = qsstats.QuerySetStats(subqs, 'date_time_started',
                                                 aggregate=Median('dose_area_product') / 10000)
                     acquisitionMedianDAPoverTime[idx] = qss.time_series(startDate, today,
                                                                         interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
+                    returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
 
     if plotDXStudyMeanDAP:
         for idx, study in enumerate(study_names):
@@ -625,12 +626,13 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                                                 aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
                     acquisitionMeankVpoverTime[idx] = qss.time_series(startDate, today,
                                                                       interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                    returnStructure['acquisitionMeankVpoverTime'] = acquisitionMeankVpoverTime
                 if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                     qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
                                                 aggregate=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000)
                     acquisitionMediankVpoverTime[idx] = qss.time_series(startDate, today,
                                                                         interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                returnStructure['acquisitionMediankVpoverTime'] = acquisitionMediankVpoverTime
+                    returnStructure['acquisitionMediankVpoverTime'] = acquisitionMediankVpoverTime
 
     if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
         for idx, protocol in enumerate(acquisition_mas_names):
@@ -652,12 +654,13 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                                                 aggregate=Avg('irradeventxraysourcedata__exposure__exposure') / 1000)
                     acquisitionMeanmAsoverTime[idx] = qss.time_series(startDate, today,
                                                                       interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                    returnStructure['acquisitionMeanmAsoverTime'] = acquisitionMeanmAsoverTime
                 if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                     qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Median(
                         'irradeventxraysourcedata__exposure__exposure') / 10000000000000)
                     acquisitionMedianmAsoverTime[idx] = qss.time_series(startDate, today,
                                                                         interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                returnStructure['acquisitionMedianmAsoverTime'] = acquisitionMedianmAsoverTime
+                    returnStructure['acquisitionMedianmAsoverTime'] = acquisitionMedianmAsoverTime
 
     if plotDXStudyPerDayAndHour:
         # Required for studies per weekday and studies per hour in each weekday plot
@@ -865,52 +868,11 @@ def ct_summary_chart_data(request):
         userProfile.save()
         median_available = False
 
-    plotCTAcquisitionMeanDLP = userProfile.plotCTAcquisitionMeanDLP
-    plotCTAcquisitionMeanCTDI = userProfile.plotCTAcquisitionMeanCTDI
-    plotCTAcquisitionFreq = userProfile.plotCTAcquisitionFreq
-    plotCTStudyMeanDLP = userProfile.plotCTStudyMeanDLP
-    plotCTStudyFreq = userProfile.plotCTStudyFreq
-    plotCTRequestMeanDLP = userProfile.plotCTRequestMeanDLP
-    plotCTRequestFreq = userProfile.plotCTRequestFreq
-    plotCTStudyPerDayAndHour = userProfile.plotCTStudyPerDayAndHour
-    plotCTStudyMeanDLPOverTime = userProfile.plotCTStudyMeanDLPOverTime
-    plotCTStudyMeanDLPOverTimePeriod = userProfile.plotCTStudyMeanDLPOverTimePeriod
-    plotAverageChoice = userProfile.plotAverageChoice
-    plotSeriesPerSystem = userProfile.plotSeriesPerSystem
-
-    acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
-    requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
-    studySummary, request_names, requestSystemList = \
-        ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
-                             plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
-                             plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                             requestResults, median_available, plotAverageChoice, plotSeriesPerSystem)
-
-    returnStructure = {}
-
-    if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
-        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
-    if plotCTAcquisitionMeanDLP:
-        returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
-    if plotCTAcquisitionMeanCTDI:
-        returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
-    if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
-        returnStructure['studySummary'] = list(studySummary)
-    if plotCTStudyMeanDLP:
-        returnStructure['studyHistogramData'] = studyHistogramData
-    if plotCTRequestMeanDLP or plotCTRequestFreq:
-        returnStructure['requestSummary'] = requestSummary
-        returnStructure['requestNameList'] = requestNameList
-        returnStructure['requestSystemList'] = requestSystemList
-    if plotCTRequestMeanDLP:
-        returnStructure['requestHistogramData'] = requestHistogramData
-    if plotCTStudyPerDayAndHour:
-        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
-    if plotCTStudyMeanDLPOverTime:
-        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-            returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
-        if plotAverageChoice == 'median' or plotAverageChoice == 'both':
-            returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
+    returnStructure =\
+        ct_plot_calculations(f, userProfile.plotCTAcquisitionFreq, userProfile.plotCTAcquisitionMeanCTDI, userProfile.plotCTAcquisitionMeanDLP,
+                             userProfile.plotCTRequestFreq, userProfile.plotCTRequestMeanDLP, userProfile.plotCTStudyFreq, userProfile.plotCTStudyMeanDLP,
+                             userProfile.plotCTStudyMeanDLPOverTime, userProfile.plotCTStudyMeanDLPOverTimePeriod, userProfile.plotCTStudyPerDayAndHour,
+                             requestResults, median_available, userProfile.plotAverageChoice, userProfile.plotSeriesPerSystem)
 
     return JsonResponse(returnStructure, safe=False)
 
@@ -924,6 +886,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     from remapp.models import CtIrradiationEventData, Median
     if plotting:
         import numpy as np
+
+    returnStructure = {}
 
     # Need to exclude all Constant Angle Acquisitions when calculating data for acquisition plots, as Philips
     # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
@@ -988,7 +952,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
                                                                 mean_dlp=Avg('dlp'),
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
-
             acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         else:
             if median_available and plotAverageChoice == 'both':
@@ -1008,6 +971,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
 
+        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
         acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
         for idx, protocol in enumerate(acquisitionSummary):
@@ -1017,6 +981,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 [float(x) for x in dlpValues], bins=20)
             acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
             acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
+            returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
 
             if plotCTAcquisitionMeanCTDI:
                 ctdiValues = acquisition_events.filter(
@@ -1025,6 +990,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     [float(x) for x in ctdiValues], bins=20)
                 acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
                 acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
+                returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
         # Required for mean DLP per study type plot
@@ -1044,6 +1010,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                 num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                 'study_description')
+        returnStructure['studySummary'] = list(studySummary)
 
         if plotCTStudyMeanDLP:
             studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
@@ -1070,6 +1037,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                                                                                           bins=20)
                     studyHistogramData[idx][0] = studyHistogramData[idx][0].tolist()
                     studyHistogramData[idx][1] = studyHistogramData[idx][1].tolist()
+                    returnStructure['studyHistogramData'] = studyHistogramData
 
                 if plotCTStudyMeanDLPOverTime:
                     # Required for mean DLP per study type per time period plot
@@ -1078,11 +1046,13 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                             'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
                         studyMeanDLPoverTime[idx] = qss.time_series(startDate, today,
                                                                     interval=plotCTStudyMeanDLPOverTimePeriod)
+                        returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
                     if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
                         qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
                             'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000)
                         studyMedianDLPoverTime[idx] = qss.time_series(startDate, today,
                                                                       interval=plotCTStudyMeanDLPOverTimePeriod)
+                        returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
 
         if plotCTStudyPerDayAndHour:
             # Required for studies per weekday and studies per hour in each weekday plot
@@ -1097,14 +1067,18 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                                                       datetime.datetime(1900, 1, 1, 23, 59), interval='hours')
                     for hour in range(24):
                         studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
+            returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
 
         requestNameList = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
+        returnStructure['requestNameList'] = requestNameList
+
         if plotSeriesPerSystems:
             requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
             requestSystemList = ['All systems']
+        returnStructure['requestSystemList'] = requestSystemList
 
         if median_available and plotAverageChoice == 'both':
             requestSummary = []
@@ -1190,6 +1164,8 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
             requestSummary[index] = requestSummaryTemp
 
+        returnStructure['requestSummary'] = requestSummary
+
         if plotCTRequestMeanDLP:
             requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestNameList))] for i in xrange(len(requestSystemList))]
 
@@ -1214,22 +1190,9 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     requestHistogramData[sys_idx][req_idx][0] = requestHistogramData[sys_idx][req_idx][0].tolist()
                     requestHistogramData[sys_idx][req_idx][1] = requestHistogramData[sys_idx][req_idx][1].tolist()
 
-    if not 'acquisitionHistogramData' in locals(): acquisitionHistogramData = 0
-    if not 'acquisitionHistogramDataCTDI' in locals(): acquisitionHistogramDataCTDI = 0
-    if not 'acquisitionSummary' in locals(): acquisitionSummary = 0
-    if not 'requestHistogramData' in locals(): requestHistogramData = 0
-    if not 'requestSummary' in locals(): requestSummary = 0
-    if not 'requestNameList' in locals(): requestNameList = 0
-    if not 'requestSystemList' in locals(): requestSystemList = 0
-    if not 'studiesPerHourInWeekdays' in locals(): studiesPerHourInWeekdays = 0
-    if not 'studyMeanDLPoverTime' in locals(): studyMeanDLPoverTime = 0
-    if not 'studyMedianDLPoverTime' in locals(): studyMedianDLPoverTime = 0
-    if not 'studyHistogramData' in locals(): studyHistogramData = 0
-    if not 'studySummary' in locals(): studySummary = 0
+            returnStructure['requestHistogramData'] = requestHistogramData
 
-    return acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
-           requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
-           studySummary, requestNameList, requestSystemList
+    return returnStructure
 
 
 @login_required
