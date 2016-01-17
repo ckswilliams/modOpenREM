@@ -136,89 +136,145 @@ $(document).ready(function() {
             // Requested procedure frequency and DAP per requested procedure data start
             if( typeof plotDXRequestMeanDAP !== 'undefined' || typeof plotDXRequestFreq !== 'undefined') {
 
-                var req_summary = $.map(json.requestSummary, function (el) {
-                    return el;
-                });
-
-                var requestNames = $.map(json.request_names, function (el) {
+                var request_summary = json.requestSummary;
+                var request_names = $.map(json.request_names, function (el) {
                     return el.requested_procedure_code_meaning;
                 });
+                var request_system_names = json.requestSystemList;
+                var request_histogram_data = json.requestHistogramData;
             }
             
             if(typeof plotDXRequestMeanDAP !== 'undefined') {
-                var req_histogram_data = json.requestHistogramData;
 
-                var requestCounts = [];
-                var requestBins = [];
-                for (i = 0; i < requestNames.length; i++) {
-                    requestCounts.push(req_histogram_data[i][0]);
-                    requestBins.push(req_histogram_data[i][1]);
-                }
-
-                if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    var seriesData = [];
-                    for (i = 0; i < requestNames.length; i++) {
-                        seriesData.push({
-                            name: requestNames[i],
-                            y: req_summary[i].mean_dap,
-                            freq: req_summary[i].num_req,
-                            bins: requestBins[i],
-                            tooltip: requestNames[i] + '<br>' + req_summary[i].mean_dap.toFixed(1) + ' mean<br>(n=' + req_summary[i].num_req + ')',
-                            drilldown: requestNames[i]
-                        });
+                var request_counts = []; while(request_counts.push([]) < request_system_names.length);
+                var request_bins = []; while(request_bins.push([]) < request_system_names.length);
+                for (i = 0; i < request_system_names.length; i++) {
+                    for (j = 0; j < request_names.length; j++) {
+                        (request_counts[i]).push(request_histogram_data[i][j][0]);
+                        (request_bins[i]).push(request_histogram_data[i][j][1]);
                     }
                 }
 
-                if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    var seriesMedianData = [];
-                    for (i = 0; i < requestNames.length; i++) {
-                        seriesMedianData.push({
-                            name: requestNames[i],
-                            y: parseFloat(req_summary[i].median_dap),
-                            freq: req_summary[i].num_req,
-                            bins: requestBins[i],
-                            tooltip: requestNames[i] + '<br>' + parseFloat(req_summary[i].median_dap).toFixed(1) + ' median<br>(n=' + req_summary[i].num_req + ')',
-                            drilldown: requestNames[i]
-                        });
+                if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var request_data = []; while(request_data.push([]) < request_system_names.length);
+                    for (i = 0; i < request_system_names.length; i++) {
+                        for (j = 0; j < request_names.length; j++) {
+                            (request_data[i]).push({
+                                name: request_names[j],
+                                y: request_summary[i][j].mean_dap,
+                                freq: request_summary[i][j].num_req,
+                                bins: request_bins[i][j],
+                                tooltip: request_system_names[i] + '<br>' + request_names[j] + '<br>' + request_summary[i][j].mean_dap.toFixed(1) + ' mean<br>(n=' + request_summary[i][j].num_req + ')',
+                                drilldown: request_system_names[i]+request_names[j]
+                            });
+                        }
+                    }
+                }
+
+                if (plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var request_data_median = []; while(request_data_median.push([]) < request_system_names.length);
+                    for (i = 0; i < request_system_names.length; i++) {
+                        for (j = 0; j < request_names.length; j++) {
+                            (request_data_median[i]).push({
+                                name: request_names[j],
+                                y: parseFloat(request_summary[i][j].median_dap),
+                                freq: request_summary[i][j].num_req,
+                                bins: request_bins[i][j],
+                                tooltip: request_system_names[i] + '<br>' + request_names[j] + '<br>' + parseFloat(request_summary[i][j].median_dap).toFixed(1) + ' median<br>(n=' + request_summary[i][j].num_req + ')',
+                                drilldown: request_system_names[i]+request_names[j]
+                            });
+                        }
                     }
                 }
 
                 temp = [];
-                var seriesDrilldown = [];
-                for (i = 0; i < requestNames.length; i++) {
-                    temp = [];
-                    for (j = 0; j < requestCounts[0].length; j++) {
-                        temp.push([requestBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + requestBins[i][j+1].toFixed(1).toString(), requestCounts[i][j]]);
+                var series_drilldown_request = [];
+                for (i = 0; i < request_system_names.length; i++) {
+                    for (j = 0; j < request_names.length; j++) {
+                        temp = [];
+                        for (k = 0; k < request_counts[i][0].length; k++) {
+                            temp.push([request_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + request_bins[i][j][k + 1].toFixed(1).toString(), request_counts[i][j][k]]);
+                        }
+                        series_drilldown_request.push({
+                            id: request_system_names[i]+request_names[j],
+                            name: request_system_names[i],
+                            useHTML: true,
+                            data: temp
+                        });
                     }
-                    seriesDrilldown.push({id: requestNames[i], name: requestNames[i], useHTML: true, data: temp});
                 }
 
                 var chartplotDXRequestDAP = $('#plotDXRequestMeanDAPContainer').highcharts();
-                chartplotDXRequestDAP.xAxis[0].setCategories(requestNames);
-                chartplotDXRequestDAP.options.drilldown.series = seriesDrilldown;
+                chartplotDXRequestDAP.xAxis[0].setCategories(request_names);
+                chartplotDXRequestDAP.options.drilldown.series = series_drilldown_request;
                 chartplotDXRequestDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXRequestDAP.options.exporting.sourceHeight = $(window).height();
-                if(plotAverageChoice == "mean") {
-                    chartplotDXRequestDAP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesData
-                    });
+
+                if (plotAverageChoice == "mean") {
+                    for (i = 0; i < request_system_names.length; i++) {
+                        if (chartplotDXRequestDAP.series.length > i) {
+                            chartplotDXRequestDAP.series[i].update({
+                                name: request_system_names[i],
+                                data: request_data[i],
+                                color: colourScale(i/(request_system_names.length)).hex()
+                            });
+                        }
+                        else {
+                            chartplotDXRequestDAP.addSeries({
+                                name: request_system_names[i],
+                                data: request_data[i],
+                                color: colourScale(i/(request_system_names.length)).hex()
+                            });
+                        }
+                    }
                 }
-                else if(plotAverageChoice == "median") {
-                    chartplotDXRequestDAP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesMedianData
-                    });
+                else if (plotAverageChoice == "median") {
+                    for (i = 0; i < request_system_names.length; i++) {
+                        if (chartplotDXRequestDAP.series.length > i) {
+                            chartplotDXRequestDAP.series[i].update({
+                                name: request_system_names[i],
+                                data: request_data_median[i],
+                                color: colourScale(i/(request_system_names.length)).hex()
+                            });
+                        }
+                        else {
+                            chartplotDXRequestDAP.addSeries({
+                                name: request_system_names[i],
+                                data: request_data_median[i],
+                                color: colourScale(i/(request_system_names.length)).hex()
+                            });
+                        }
+                    }
                 }
                 else {
-                    chartplotDXRequestDAP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesData
-                    });
-                    chartplotDXRequestDAP.series[1].update({
-                        color: colourScale(1).hex(),
-                        data: seriesMedianData
-                    });
+                    var current_series = 0;
+                    for (i = 0; i < (request_system_names.length)*2; i+=2) {
+                        if (chartplotDXRequestDAP.series.length > i+1) {
+                            chartplotDXRequestDAP.series[i].update({
+                                name: request_system_names[current_series],
+                                data: request_data[current_series],
+                                color: colourScale(i/(request_system_names.length*2)).hex()
+                            });
+                            chartplotDXRequestDAP.series[i+1].update({
+                                name: request_system_names[current_series],
+                                data: request_data_median[current_series],
+                                color: colourScale((i+1)/(request_system_names.length*2)).hex()
+                            });
+                        }
+                        else {
+                            chartplotDXRequestDAP.addSeries({
+                                name: request_system_names[current_series],
+                                data: request_data[current_series],
+                                color: colourScale(i/(request_system_names.length*2)).hex()
+                            });
+                            chartplotDXRequestDAP.addSeries({
+                                name: request_system_names[current_series],
+                                data: request_data_median[current_series],
+                                color: colourScale((i+1)/(request_system_names.length*2)).hex()
+                            });
+                        }
+                        current_series++;
+                    }
                 }
                 chartplotDXRequestDAP.redraw({ duration: 1000 });
             }
@@ -549,15 +605,24 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Requested procedure frequency chart data start
             if(typeof plotDXRequestFreq !== 'undefined') {
-                var requestPiechartData = new Array(requestNames.length);
-                for(i=0; i<requestNames.length; i++) {
-                    requestPiechartData[i] = {name: requestNames[i], y: parseInt(req_summary[i].num_req), url: urlStartReq + requestNames[i]};
+                var requestPiechartData = new Array(request_names.length);
+                var num_requests = 0;
+                for (i = 0; i < request_names.length; i++) {
+                    num_requests = 0;
+                    for (j = 0; j < request_system_names.length; j++) {
+                        num_requests += parseInt(request_summary[j][i].num_req)
+                    }
+                    requestPiechartData[i] = {
+                        name: request_names[i],
+                        y: num_requests,
+                        url: urlStartReq + request_names[i]
+                    };
                 }
 
                 requestPiechartData.sort(sort_by_y);
 
-                for(i=0; i<requestNames.length; i++) {
-                    requestPiechartData[i].color = colourScale(i/(requestNames.length)).hex();
+                for(i=0; i<request_names.length; i++) {
+                    requestPiechartData[i].color = colourScale(i/(request_names.length)).hex();
                 }
 
                 var chart = $('#piechartRequestDIV').highcharts();

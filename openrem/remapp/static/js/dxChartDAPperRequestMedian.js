@@ -3,8 +3,7 @@ $(function () {
     var defaultTitle   = 'Median DAP per requested procedure name';
     var bins = [];
     var name = '';
-
-
+    
     var chartDAPperRequest = new Highcharts.Chart({
         chart: {
             type: 'column',
@@ -13,38 +12,58 @@ $(function () {
                 drilldown: function(e) {
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartDAPperRequest.setTitle({ text: drilldownTitle + e.point.name + ' DAP values' }, { text: '(n = ' + e.point.freq +')' });
-                    chartDAPperRequest.yAxis[0].setTitle({text:'Number'});
-                    chartDAPperRequest.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
-                    chartDAPperRequest.xAxis[0].setCategories([], true);
-                    chartDAPperRequest.tooltip.options.formatter = function(e) {
+                    this.setTitle({
+                        text: drilldownTitle + e.point.name + ' DAP values'
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'Number'
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text:'DAP range (cGy.cm<sup>2</sup>)'
+                        },
+                        categories: []
+                    }, false);
+                    this.tooltip.options.formatter = function(e) {
                         var linkText = 'study_dap_min=' + bins[this.x] + '&study_dap_max=' + bins[this.x+1] + '&requested_procedure=' + name;
+                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
                         returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' requests</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function(e) {
-                    chartDAPperRequest.setTitle({ text: defaultTitle }, { text: '' });
-                    chartDAPperRequest.yAxis[0].setTitle({text:'Median DAP (cGy.cm<sup>2</sup>)'});
-                    chartDAPperRequest.xAxis[0].setTitle({text:'Requested procedure name'});
-                    chartDAPperRequest.xAxis[0].update({
+                    this.setTitle({
+                        text: defaultTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'Median DAP (cGy.cm<sup>2</sup>)'
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text:'Requested procedure name'
+                        },
                         categories: {
                             formatter: function (args) {
                                 return this.point.category;
                             }
                         }
-                    }, true);
-                    chartDAPperRequest.tooltip.options.formatter = function() {
+                    });
+                    this.tooltip.options.formatter = function() {
                         return this.point.tooltip;
                     }
                 }
             }
         },
         title: {
-            text: 'Median DAP per requested procedure name'
+            useHTML: true,
+            text: defaultTitle
         },
         legend: {
-            enabled: false
+            enabled: true
         },
         xAxis: {
             categories: [1,2,3,4,5],
@@ -72,14 +91,12 @@ $(function () {
         },
         plotOptions: {
             column: {
-                pointPadding: 0.2,
-                borderWidth: 0
+                pointPadding: 0,
+                borderWidth: 1,
+                borderColor: '#999999'
             }
         },
-        series: [{
-            name: 'Median DAP per requested procedure name',
-            data: []
-        }],
+        series: [],
         drilldown: {
             series: []
         }
@@ -87,17 +104,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#plotDXRequestMeanDAPContainer', 'freq', chartSortingDirection);
+            anySeriesSort('#plotDXRequestMeanDAPContainer', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            seriesSort('#plotDXRequestMeanDAPContainer', 'y', chartSortingDirection);
+            anySeriesSort('#plotDXRequestMeanDAPContainer', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            seriesSort('#plotDXRequestMeanDAPContainer', 'name', chartSortingDirection);
+            anySeriesSort('#plotDXRequestMeanDAPContainer', 'name', chartSortingDirection, 0);
             break;
         default:
-            seriesSort('#plotDXRequestMeanDAPContainer', 'name', 1);
+            anySeriesSort('#plotDXRequestMeanDAPContainer', 'name', 1, 0);
     }
 
 });
-
