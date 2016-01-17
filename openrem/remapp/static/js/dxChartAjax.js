@@ -725,14 +725,6 @@ $(document).ready(function() {
                     protocolPiechartData.sort(sort_by_y);
                 }
 
-                if(typeof protocolkVpNames !== 'undefined' && typeof protocolNames !== 'undefined') {
-                    var protocolkVpLineColours =  protocolLineColours
-                }
-
-                if(typeof protocolmAsNames !== 'undefined' && typeof protocolNames !== 'undefined') {
-                    var protocolmAsLineColours =  protocolLineColours
-                }
-
                 if(typeof protocolkVpNames !== 'undefined' && typeof protocolNames == 'undefined') {
                     if(typeof protocolPiechartData !== 'undefined') {
                         var protocolkVpLineColours =  new Array(protocolkVpNames.length);
@@ -743,7 +735,7 @@ $(document).ready(function() {
                         protocolPiechartData.sort(sort_by_y);
                     }
                     else {
-                        var protocolkVpLineColours =  colourScale(i/(protocolkVpNames.length)).hex();
+                        var protocolkVpLineColours =  colourScale.colors(protocolkVpNames.length);
                     }
                 }
 
@@ -760,7 +752,7 @@ $(document).ready(function() {
                         protocolPiechartData.sort(sort_by_y);
                     }
                     else {
-                        var protocolmAsLineColours =  colourScale(i/(protocolmAsNames.length)).hex();
+                        var protocolmAsLineColours =  colourScale.colors(protocolmAsNames.length);
                     }
 
                 }
