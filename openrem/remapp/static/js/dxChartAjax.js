@@ -137,9 +137,7 @@ $(document).ready(function() {
             if( typeof plotDXRequestMeanDAP !== 'undefined' || typeof plotDXRequestFreq !== 'undefined') {
 
                 var request_summary = json.requestSummary;
-                var request_names = $.map(json.request_names, function (el) {
-                    return el.requested_procedure_code_meaning;
-                });
+                var request_names = json.request_names;
                 var request_system_names = json.requestSystemList;
                 var request_histogram_data = json.requestHistogramData;
             }

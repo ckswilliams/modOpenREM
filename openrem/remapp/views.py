@@ -399,7 +399,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
     ).filter(
         study_instance_uid__in=expInclude
     )
-    request_names = request_events.values('requested_procedure_code_meaning').distinct().order_by('requested_procedure_code_meaning')
+    request_names = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
 
     if plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeankVp:
         acquisition_kvp_events = IrradEventXRayData.objects.exclude(
@@ -440,7 +440,6 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
 
     if plotDXRequestMeanDAP or plotDXRequestFreq:
 
-        requestNameList = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
         if plotSeriesPerSystems:
             requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
@@ -504,7 +503,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
 
         # Fill in default values where data for a requested procedure is missing for any of the systems
         for index in range(len(requestSystemList)):
-            missing_request_names = list(set(requestNameList) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
+            missing_request_names = list(set(request_names) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
             for name in missing_request_names:
                 if median_available and plotAverageChoice == 'both':
                     (requestSummary[index]).append({'median_dap': 0, 'mean_dap': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
@@ -512,14 +511,14 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                     (requestSummary[index]).append({'median_dap': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
                 else:
                     (requestSummary[index]).append({'mean_dap': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
-            # Rearrange the list into the same order as requestNameList
+            # Rearrange the list into the same order as request_names
             requestSummaryTemp = []
-            for request_name in requestNameList:
+            for request_name in request_names:
                 requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
             requestSummary[index] = requestSummaryTemp
 
     if plotDXRequestMeanDAP:
-            requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(requestNameList))] for i in xrange(len(requestSystemList))]
+            requestHistogramData = [[[None for k in xrange(2)] for j in xrange(len(request_names))] for i in xrange(len(requestSystemList))]
 
             requestRanges = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 min_dap=Min('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField()),
@@ -527,7 +526,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                 'requested_procedure_code_meaning')
 
             for sys_idx, system in enumerate(requestSystemList):
-                for req_idx, request_name in enumerate(requestNameList):
+                for req_idx, request_name in enumerate(request_names):
                     if plotSeriesPerSystems:
                         subqs = request_events.filter(
                                 generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
@@ -958,7 +957,7 @@ def ct_summary_chart_data(request):
 
     acquisitionHistogramData, acquisitionHistogramDataCTDI, acquisitionSummary, requestHistogramData, \
     requestSummary, studiesPerHourInWeekdays, studyMeanDLPoverTime, studyMedianDLPoverTime, studyHistogramData, \
-    studySummary, requestNameList, requestSystemList = \
+    studySummary, request_names, requestSystemList = \
         ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                              plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                              plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
