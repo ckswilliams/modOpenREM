@@ -380,7 +380,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
 
     if plotDXRequestMeanDAP or plotDXRequestFreq:
 
-        if plotSeriesPerSystems:
+        if plotSeriesPerSystems and plotDXRequestMeanDAP:
             requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
             requestSystemList = ['All systems']
@@ -388,75 +388,88 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
 
         if median_available and plotAverageChoice == 'both':
             requestSummary = []
-            for system in requestSystemList:
-                if plotSeriesPerSystems:
+            if plotSeriesPerSystems and plotDXRequestMeanDAP:
+                for system in requestSystemList:
                     requestSummary.append(request_events.filter(
                             generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                             'requested_procedure_code_meaning').distinct().annotate(
                             mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                             median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
                             num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).order_by('requested_procedure_code_meaning'))
-                else:
-                    requestSummary.append(request_events.values(
-                            'requested_procedure_code_meaning').distinct().annotate(
-                            mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
-                            num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).order_by('requested_procedure_code_meaning'))
+            elif plotDXRequestMeanDAP:
+                requestSummary.append(request_events.values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                        mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
+                        median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                        num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')).order_by('requested_procedure_code_meaning'))
+            else:
+                requestSummary.append(request_events.values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                        num_req=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
 
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
         elif median_available and plotAverageChoice == 'median':
             requestSummary = []
-            for system in requestSystemList:
-                if plotSeriesPerSystems:
+            if plotSeriesPerSystems and plotDXRequestMeanDAP:
+                for system in requestSystemList:
                     requestSummary.append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
                         median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
                         num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
                         .order_by('requested_procedure_code_meaning'))
-                else:
-                    requestSummary.append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                        median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
-                        num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
-                        .order_by('requested_procedure_code_meaning'))
+            elif plotDXRequestMeanDAP:
+                requestSummary.append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                    median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                    num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
+                    .order_by('requested_procedure_code_meaning'))
+            else:
+                requestSummary.append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                    num_req=Count('requested_procedure_code_meaning')) \
+                    .order_by('requested_procedure_code_meaning'))
 
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
         else:
             requestSummary = []
-            for system in requestSystemList:
-                if plotSeriesPerSystems:
+            if plotSeriesPerSystems and plotDXRequestMeanDAP:
+                for system in requestSystemList:
                     requestSummary.append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
                         mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
                         .order_by('requested_procedure_code_meaning'))
-                else:
+            elif plotDXRequestMeanDAP:
                     requestSummary.append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
                         mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         num_req=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
+                        .order_by('requested_procedure_code_meaning'))
+            else:
+                    requestSummary.append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
+                        num_req=Count('requested_procedure_code_meaning')) \
                         .order_by('requested_procedure_code_meaning'))
 
             for index in range(len(requestSummary)):
                 requestSummary[index] = list(requestSummary[index])
 
         # Fill in default values where data for a requested procedure is missing for any of the systems
-        for index in range(len(requestSystemList)):
-            missing_request_names = list(set(request_names) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
-            for name in missing_request_names:
-                if median_available and plotAverageChoice == 'both':
-                    (requestSummary[index]).append({'median_dap': 0, 'mean_dap': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
-                elif median_available and plotAverageChoice == 'median':
-                    (requestSummary[index]).append({'median_dap': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
-                else:
-                    (requestSummary[index]).append({'mean_dap': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
-            # Rearrange the list into the same order as request_names
-            requestSummaryTemp = []
-            for request_name in request_names:
-                requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
-            requestSummary[index] = requestSummaryTemp
+        if plotSeriesPerSystems and plotDXRequestMeanDAP:
+            for index in range(len(requestSystemList)):
+                missing_request_names = list(set(request_names) - set([d['requested_procedure_code_meaning'] for d in requestSummary[index]]))
+                for name in missing_request_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (requestSummary[index]).append({'median_dap': 0, 'mean_dap': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (requestSummary[index]).append({'median_dap': 0, 'requested_procedure_code_meaning':name, 'num_req': 0})
+                    else:
+                        (requestSummary[index]).append({'mean_dap': 0,'requested_procedure_code_meaning':name, 'num_req': 0})
+                # Rearrange the list into the same order as request_names
+                requestSummaryTemp = []
+                for request_name in request_names:
+                    requestSummaryTemp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, requestSummary[index] )[0])
+                requestSummary[index] = requestSummaryTemp
 
         returnStructure['requestSummary'] = list(requestSummary)
 
