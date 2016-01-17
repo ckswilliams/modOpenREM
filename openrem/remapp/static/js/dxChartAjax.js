@@ -41,17 +41,14 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // DAP chart data start
             if( typeof plotDXAcquisitionMeanDAP !== 'undefined' || typeof plotDXAcquisitionFreq !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
+                var protocolNames = json.acquisition_names;
+            }
 
+            if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 var acq_summary = $.map(json.acquisitionSummary, function (el) {
                     return el;
                 });
 
-                var protocolNames = $.map(json.acquisition_names, function (el) {
-                    return el.acquisition_protocol;
-                });
-            }
-
-            if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 var acq_histogram_data = json.acquisitionHistogramData;
 
                 var protocolCounts = [];
@@ -135,7 +132,6 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Requested procedure frequency and DAP per requested procedure data start
             if( typeof plotDXRequestMeanDAP !== 'undefined' || typeof plotDXRequestFreq !== 'undefined') {
-
                 var request_summary = json.requestSummary;
                 var request_names = json.request_names;
                 var request_system_names = json.requestSystemList;
@@ -143,7 +139,6 @@ $(document).ready(function() {
             }
             
             if(typeof plotDXRequestMeanDAP !== 'undefined') {
-
                 var request_counts = []; while(request_counts.push([]) < request_system_names.length);
                 var request_bins = []; while(request_bins.push([]) < request_system_names.length);
                 for (i = 0; i < request_system_names.length; i++) {
@@ -283,14 +278,10 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Study description frequency and DAP per study description data start
             if( typeof plotDXStudyMeanDAP !== 'undefined' || typeof plotDXStudyFreq !== 'undefined') {
-
                 var study_summary = $.map(json.studySummary, function (el) {
                     return el;
                 });
-
-                var studyNames = $.map(json.study_names, function (el) {
-                    return el.study_description;
-                });
+                var studyNames = json.study_names;
             }
             
             if(typeof plotDXStudyMeanDAP !== 'undefined') {
@@ -377,20 +368,15 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // kVp chart data start
             if( typeof plotDXAcquisitionMeankVp !== 'undefined' || typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
+                var protocolkVpNames = json.acquisition_kvp_names;
+            }
 
+            if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
                 var acq_kVp_summary = $.map(json.acquisitionkVpSummary, function (el) {
                     return el;
                 });
 
-                var protocolkVpNames = [];
-                for (i = 0; i < acq_kVp_summary.length; i++) {
-                    protocolkVpNames.push(acq_kVp_summary[i].acquisition_protocol);
-                }
-            }
-
-            if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
                 var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
-
                 var protocolkVpCounts = [];
                 var protocolkVpBins = [];
                 for (i = 0; i < protocolkVpNames.length; i++) {
@@ -473,18 +459,14 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // mAs chart data start
             if( typeof plotDXAcquisitionMeanmAs !== 'undefined' || typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
+                var protocolmAsNames = json.acquisition_mas_names;
+            }
 
+            if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
                 var acq_mAs_summary = $.map(json.acquisitionmAsSummary, function (el) {
                     return el;
                 });
 
-                var protocolmAsNames = [];
-                for (i = 0; i < acq_mAs_summary.length; i++) {
-                    protocolmAsNames.push(acq_mAs_summary[i].acquisition_protocol);
-                }
-            }
-
-            if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
                 var acq_histogram_mAs_data = json.acquisitionHistogrammAsData;
 
                 var protocolmAsCounts = [];
