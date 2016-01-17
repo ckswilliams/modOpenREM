@@ -714,9 +714,8 @@ $(document).ready(function() {
 
             //-------------------------------------------------------------------------------------
             // Sort out colours for the ...OverTime plots
-            if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined' || typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
-
-                if(typeof protocolNames !== 'undefined') {
+            if(typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
+                if(typeof plotDXAcquisitionFreq !== 'undefined') {
                     var protocolLineColours =  new Array(protocolNames.length);
                     protocolPiechartData.sort(sort_by_name);
                     for(i=0; i<protocolNames.length; i++) {
@@ -724,37 +723,39 @@ $(document).ready(function() {
                     }
                     protocolPiechartData.sort(sort_by_y);
                 }
-
-                if(typeof protocolkVpNames !== 'undefined' && typeof protocolNames == 'undefined') {
-                    if(typeof protocolPiechartData !== 'undefined') {
-                        var protocolkVpLineColours =  new Array(protocolkVpNames.length);
-                        protocolPiechartData.sort(sort_by_name);
-                        for (i = 0; i < protocolkVpNames.length; i++) {
-                            protocolkVpLineColours[i] = protocolPiechartData[i].color;
-                        }
-                        protocolPiechartData.sort(sort_by_y);
-                    }
-                    else {
-                        var protocolkVpLineColours =  colourScale.colors(protocolkVpNames.length);
-                    }
+                else {
+                    var protocolLineColours = colourScale.colors(protocolNames.length);
                 }
+            }
 
-                if(typeof protocolmAsNames !== 'undefined' && typeof protocolNames == 'undefined') {
-                    if(typeof protocolkVpLineColours !== 'undefined') {
-                        var protocolmAsLineColours = protocolkVpLineColours;
+            if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
+                if(typeof plotDXAcquisitionFreq !== 'undefined') {
+                    var protocolkVpLineColours =  new Array(protocolkVpNames.length);
+                    protocolPiechartData.sort(sort_by_name);
+                    for (i = 0; i < protocolkVpNames.length; i++) {
+                        protocolkVpLineColours[i] = protocolPiechartData[i].color;
                     }
-                    else if(typeof protocolPiechartData !== 'undefined') {
-                        var protocolmAsLineColours =  new Array(protocolmAsNames.length);
-                        protocolPiechartData.sort(sort_by_name);
-                        for (i = 0; i < protocolmAsNames.length; i++) {
-                            protocolmAsNames[i] = protocolPiechartData[i].color;
-                        }
-                        protocolPiechartData.sort(sort_by_y);
-                    }
-                    else {
-                        var protocolmAsLineColours =  colourScale.colors(protocolmAsNames.length);
-                    }
+                    protocolPiechartData.sort(sort_by_y);
+                }
+                else {
+                    var protocolkVpLineColours = colourScale.colors(protocolkVpNames.length);
+                }
+            }
 
+            if(typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
+                if(typeof protocolkVpLineColours !== 'undefined') {
+                    var protocolmAsLineColours = protocolkVpLineColours;
+                }
+                else if(typeof plotDXAcquisitionFreq !== 'undefined') {
+                    var protocolmAsLineColours =  new Array(protocolmAsNames.length);
+                    protocolPiechartData.sort(sort_by_name);
+                    for (i = 0; i < protocolmAsNames.length; i++) {
+                        protocolmAsLineColours[i] = protocolPiechartData[i].color;
+                    }
+                    protocolPiechartData.sort(sort_by_y);
+                }
+                else {
+                    var protocolmAsLineColours = colourScale.colors(protocolmAsNames.length);
                 }
             }
             // End of sorting out colours for the ...OverTime plots
