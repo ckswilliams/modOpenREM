@@ -263,6 +263,8 @@ class UserProfile(models.Model):
 
     plotSeriesPerSystem = models.BooleanField(default=False)
 
+    plotHistogramBins = models.PositiveSmallIntegerField(default=20)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

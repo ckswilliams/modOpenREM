@@ -270,7 +270,8 @@ def dx_summary_chart_data(request):
                              userProfile.plotDXAcquisitionMeanDAPOverTime, userProfile.plotDXAcquisitionMeanDAPOverTimePeriod,
                              userProfile.plotDXAcquisitionMeankVp, userProfile.plotDXAcquisitionMeanmAs,
                              userProfile.plotDXStudyPerDayAndHour, requestResults,
-                             median_available, userProfile.plotAverageChoice, userProfile.plotSeriesPerSystem)
+                             median_available, userProfile.plotAverageChoice, userProfile.plotSeriesPerSystem,
+                             userProfile.plotHistogramBins)
 
     return JsonResponse(returnStructure, safe=False)
 
@@ -282,7 +283,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                          plotDXAcquisitionMeanDAPOverTime, plotDXAcquisitionMeanDAPOverTimePeriod,
                          plotDXAcquisitionMeankVp, plotDXAcquisitionMeanmAs,
                          plotDXStudyPerDayAndHour, requestResults,
-                         median_available, plotAverageChoice, plotSeriesPerSystems):
+                         median_available, plotAverageChoice, plotSeriesPerSystems, plotHistogramBins):
     from remapp.models import IrradEventXRayData, Median
     from django.db.models import Avg, Count, Min, Max, FloatField
     import datetime, qsstats
@@ -496,7 +497,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                 dapValues = subqs.values_list(
                         'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
                         flat=True)
-                requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dapValues], bins=20, range=requestRanges.filter(requested_procedure_code_meaning=request_name).values_list('min_dap', 'max_dap')[0])
+                requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dapValues], bins=plotHistogramBins, range=requestRanges.filter(requested_procedure_code_meaning=request_name).values_list('min_dap', 'max_dap')[0])
                 requestHistogramData[sys_idx][req_idx][0] = requestHistogramData[sys_idx][req_idx][0].tolist()
                 requestHistogramData[sys_idx][req_idx][1] = (requestHistogramData[sys_idx][req_idx][1] * 1000000).tolist()
 
@@ -596,7 +597,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                 # Required for mean DAP per acquisition plot
                 dapValues = subqs.values_list('dose_area_product', flat=True)
                 acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
-                    [float(x) * 1000000 for x in dapValues], bins=20)
+                    [float(x) * 1000000 for x in dapValues], bins=plotHistogramBins)
                 acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
                 acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
                 returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
@@ -621,7 +622,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
             subqs = study_events.filter(study_description__exact=study)
             dapValues = subqs.values_list('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', flat=True)
             studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram(
-                [float(x) * 1000000 for x in dapValues], bins=20)
+                [float(x) * 1000000 for x in dapValues], bins=plotHistogramBins)
             studyHistogramData[idx][0] = studyHistogramData[idx][0].tolist()
             studyHistogramData[idx][1] = studyHistogramData[idx][1].tolist()
             returnStructure['studyHistogramData'] = studyHistogramData
@@ -634,7 +635,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                 # Required for mean kVp per acquisition plot
                 kVpValues = subqskvp.values_list('irradeventxraysourcedata__kvp__kvp', flat=True)
                 acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram(
-                    [float(x) for x in kVpValues], bins=20)
+                    [float(x) for x in kVpValues], bins=plotHistogramBins)
                 acquisitionHistogramkVpData[idx][0] = acquisitionHistogramkVpData[idx][0].tolist()
                 acquisitionHistogramkVpData[idx][1] = acquisitionHistogramkVpData[idx][1].tolist()
                 returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
@@ -662,7 +663,7 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                 # Required for mean mAs per acquisition plot
                 uAsValues = subqsmas.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
                 acquisitionHistogrammAsData[idx][0], acquisitionHistogrammAsData[idx][1] = np.histogram(
-                    [float(x) / 1000 for x in uAsValues], bins=20)
+                    [float(x) / 1000 for x in uAsValues], bins=plotHistogramBins)
                 acquisitionHistogrammAsData[idx][0] = acquisitionHistogrammAsData[idx][0].tolist()
                 acquisitionHistogrammAsData[idx][1] = acquisitionHistogrammAsData[idx][1].tolist()
                 returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
@@ -892,7 +893,7 @@ def ct_summary_chart_data(request):
         ct_plot_calculations(f, userProfile.plotCTAcquisitionFreq, userProfile.plotCTAcquisitionMeanCTDI, userProfile.plotCTAcquisitionMeanDLP,
                              userProfile.plotCTRequestFreq, userProfile.plotCTRequestMeanDLP, userProfile.plotCTStudyFreq, userProfile.plotCTStudyMeanDLP,
                              userProfile.plotCTStudyMeanDLPOverTime, userProfile.plotCTStudyMeanDLPOverTimePeriod, userProfile.plotCTStudyPerDayAndHour,
-                             requestResults, median_available, userProfile.plotAverageChoice, userProfile.plotSeriesPerSystem)
+                             requestResults, median_available, userProfile.plotAverageChoice, userProfile.plotSeriesPerSystem, userProfile.plotHistogramBins)
 
     return JsonResponse(returnStructure, safe=False)
 
@@ -900,7 +901,7 @@ def ct_summary_chart_data(request):
 def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, plotCTAcquisitionMeanDLP,
                          plotCTRequestFreq, plotCTRequestMeanDLP, plotCTStudyFreq, plotCTStudyMeanDLP,
                          plotCTStudyMeanDLPOverTime, plotCTStudyMeanDLPOverTimePeriod, plotCTStudyPerDayAndHour,
-                         requestResults, median_available, plotAverageChoice, plotSeriesPerSystems):
+                         requestResults, median_available, plotAverageChoice, plotSeriesPerSystems, plotHistogramBins):
     from django.db.models import Q, Avg, Count, Min, Max, FloatField
     import datetime, qsstats
     from remapp.models import CtIrradiationEventData, Median
@@ -998,7 +999,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
             dlpValues = acquisition_events.filter(
                 acquisition_protocol=protocol).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
-                [float(x) for x in dlpValues], bins=20)
+                [float(x) for x in dlpValues], bins=plotHistogramBins)
             acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
             acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
             returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
@@ -1007,7 +1008,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 ctdiValues = acquisition_events.filter(
                     acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
                 acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram(
-                    [float(x) for x in ctdiValues], bins=20)
+                    [float(x) for x in ctdiValues], bins=plotHistogramBins)
                 acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
                 acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
                 returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
@@ -1054,7 +1055,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
                     studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues],
-                                                                                          bins=20)
+                                                                                          bins=plotHistogramBins)
                     studyHistogramData[idx][0] = studyHistogramData[idx][0].tolist()
                     studyHistogramData[idx][1] = studyHistogramData[idx][1].tolist()
                     returnStructure['studyHistogramData'] = studyHistogramData
@@ -1206,7 +1207,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     dlpValues = subqs.values_list(
                         'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                         flat=True)
-                    requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dlpValues], bins=20, range=requestRanges.filter(requested_procedure_code_meaning=request_name).values_list('min_dlp', 'max_dlp')[0])
+                    requestHistogramData[sys_idx][req_idx][0], requestHistogramData[sys_idx][req_idx][1] = np.histogram([float(x) for x in dlpValues], bins=plotHistogramBins, range=requestRanges.filter(requested_procedure_code_meaning=request_name).values_list('min_dlp', 'max_dlp')[0])
                     requestHistogramData[sys_idx][req_idx][0] = requestHistogramData[sys_idx][req_idx][0].tolist()
                     requestHistogramData[sys_idx][req_idx][1] = requestHistogramData[sys_idx][req_idx][1].tolist()
 
@@ -1795,6 +1796,7 @@ def chart_options_view(request):
             if 'postgresql' in settings.DATABASES['default']['ENGINE']:
                 user_profile.plotAverageChoice = general_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.plotSeriesPerSystem = general_form.cleaned_data['plotSeriesPerSystem']
+            user_profile.plotHistogramBins = general_form.cleaned_data['plotHistogramBins']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1820,6 +1822,8 @@ def chart_options_view(request):
 
             user_profile.save()
 
+        messages.success(request, "Chart options have been updated")
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
@@ -1836,7 +1840,8 @@ def chart_options_view(request):
     general_form_data = {'plotCharts': user_profile.plotCharts,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
                          'plotInitialSortingDirection': user_profile.plotInitialSortingDirection,
-                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem}
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
+                         'plotHistogramBins': user_profile.plotHistogramBins}
 
     ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
                     'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,

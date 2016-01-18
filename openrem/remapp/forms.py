@@ -160,6 +160,7 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION,
                                                     required=False)
     plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
+    plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=100, required=False)
 
 
 class UpdateDisplayNameForm(forms.Form):
