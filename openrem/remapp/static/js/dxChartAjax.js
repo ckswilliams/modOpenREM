@@ -44,11 +44,13 @@ $(document).ready(function() {
                 var protocolNames = json.acquisition_names;
             }
 
-            if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
+            if(typeof plotDXAcquisitionMeanDAP !== 'undefined' || typeof plotDXAcquisitionFreq !== 'undefined') {
                 var acq_summary = $.map(json.acquisitionSummary, function (el) {
                     return el;
                 });
+            }
 
+            if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 var acq_histogram_data = json.acquisitionHistogramData;
 
                 var protocolCounts = [];
