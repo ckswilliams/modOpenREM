@@ -507,17 +507,17 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
             studySummary = study_events.values('study_description').distinct().annotate(
                 mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                 median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
-                num_stu=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
+                num_stu=Count('study_description')) \
                 .order_by('study_description')
         elif median_available and plotAverageChoice == 'median':
             studySummary = study_events.values('study_description').distinct().annotate(
                 median_dap=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
-                num_stu=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
+                num_stu=Count('study_description')) \
                 .order_by('study_description')
         else:
             studySummary = study_events.values('study_description').distinct().annotate(
                 mean_dap=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                num_stu=Count('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total')) \
+                num_stu=Count('study_description')) \
                 .order_by('study_description')
 
         returnStructure['studySummary'] = list(studySummary)
@@ -533,15 +533,15 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
                 mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
                 median_kVp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
-                num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
+                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
         elif median_available and plotAverageChoice == 'median':
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
                 median_kVp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
-                num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
+                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
         else:
             acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
                 mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
-                num_acq=Count('irradeventxraysourcedata__kvp__kvp')).order_by('acquisition_protocol')
+                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
 
         returnStructure['acquisitionkVpSummary'] = list(acquisitionkVpSummary)
 
@@ -552,15 +552,15 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
                 mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
                 median_mAs=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
-                num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
+                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
         elif median_available and plotAverageChoice == 'median':
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
                 median_mAs=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
-                num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
+                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
         else:
             acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
                 mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                num_acq=Count('irradeventxraysourcedata__exposure__exposure')).order_by('acquisition_protocol')
+                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
 
         returnStructure['acquisitionmAsSummary'] = list(acquisitionmAsSummary)
 
