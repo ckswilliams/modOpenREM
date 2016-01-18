@@ -88,16 +88,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#plotDXStudyMeanDAPContainer', 'freq', chartSortingDirection);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            seriesSort('#plotDXStudyMeanDAPContainer', 'y', chartSortingDirection);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            seriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection, 0);
             break;
         default:
-            seriesSort('#plotDXStudyMeanDAPContainer', 'name', 1);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', 1, 0);
     }
 
 });

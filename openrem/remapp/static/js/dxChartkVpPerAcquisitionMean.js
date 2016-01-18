@@ -87,16 +87,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            seriesSort('#chartAcquisitionMeankVp', 'freq', chartSortingDirection);
+            anySeriesSort('#chartAcquisitionMeankVp', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            seriesSort('#chartAcquisitionMeankVp', 'y', chartSortingDirection);
+            anySeriesSort('#chartAcquisitionMeankVp', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            seriesSort('#chartAcquisitionMeankVp', 'name', chartSortingDirection);
+            anySeriesSort('#chartAcquisitionMeankVp', 'name', chartSortingDirection, 0);
             break;
         default:
-            seriesSort('#chartAcquisitionMeankVp', 'name', 1);
+            anySeriesSort('#chartAcquisitionMeankVp', 'name', 1, 0);
     }
 
 });

@@ -90,16 +90,16 @@ var chartDAPperStudy = new Highcharts.Chart({
 
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#plotDXStudyMeanDAPContainer', 'freq', chartSortingDirection, 0);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'freq', chartSortingDirection, 0);
             break;
         case 'dap':
-            twoSeriesSort('#plotDXStudyMeanDAPContainer', 'y', chartSortingDirection, 0);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection, 0);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection, 0);
+            anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection, 0);
     }
 
 });
