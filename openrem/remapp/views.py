@@ -1425,14 +1425,20 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
     if request.method == 'POST':
         if request.user.groups.filter(name="admingroup"):
             study.delete()
+            messages.success(request, "Study deleted")
         else:
             messages.error(request, "Only members of the admingroup are allowed to delete studies")
-        return redirect("/openrem/")
+        return redirect(request.POST['return_url'])
 
     if request.user.groups.filter(name="admingroup"):
-        return render(request, template_name, {'exam': study})
+        return render(request, template_name, {'exam': study,'return_url': request.META['HTTP_REFERER']})
 
-    return redirect("/openrem/")
+    if 'HTTP_REFERER' in request.META.keys():
+        return redirect(request.META['HTTP_REFERER'])
+    else:
+        return redirect("/openrem/")
+
+
 
 
 import os, sys, csv
