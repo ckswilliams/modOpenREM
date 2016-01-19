@@ -36,10 +36,9 @@ import os
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import logging
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -54,7 +53,6 @@ try:
 except ImportError:
     plotting = 0
 
-import remapp
 
 def logout_page(request):
     """
@@ -67,7 +65,6 @@ def logout_page(request):
 @login_required
 def dx_summary_list_filter(request):
     from remapp.interface.mod_filters import dx_acq_filter
-    from django.db.models import Q
     from remapp.forms import DXChartOptionsForm
     from openremproject import settings
 
@@ -857,7 +854,6 @@ def ct_summary_list_filter(request):
 @login_required
 def ct_summary_chart_data(request):
     from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
-    from remapp.forms import CTChartOptionsForm
     from openremproject import settings
     from django.http import JsonResponse
 
@@ -1446,7 +1442,6 @@ import os, sys, csv
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
 from django.contrib import messages
 from openremproject.settings import MEDIA_ROOT
 from remapp.models import SizeUpload
@@ -1647,7 +1642,7 @@ def size_abort(request, pk):
     """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
-    from django.shortcuts import render, redirect, get_object_or_404
+    from django.shortcuts import get_object_or_404
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
