@@ -179,6 +179,7 @@
     <script src="{{ STATIC_URL }}js/exporting.js"></script>
     <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+    <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
     <script>
         var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
         var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -771,6 +772,7 @@
                   </tr>
               </table>
               <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+              <a onclick="normaliseHistograms('#histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a>
             </div>
           </div>
         </div>

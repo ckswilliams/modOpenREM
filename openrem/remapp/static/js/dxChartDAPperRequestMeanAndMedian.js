@@ -1,5 +1,4 @@
 $(function () {
-var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'DAP per requested procedure name';
 var bins = [];
 var name = '';
@@ -12,12 +11,24 @@ var chartDAPperRequest = new Highcharts.Chart({
                 drilldown: function(e) {
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
+
+                    if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
+
+                    if (!e.points && !this.options.drilldown.normalise) var drilldownTitle = 'Histogram of ';
+                    else if (!e.points && this.options.drilldown.normalise) var drilldownTitle = 'Normalised histogram of ';
+                    else if (e.points && !this.options.drilldown.normalise) var drilldownTitle = 'Histograms of ';
+                    else var drilldownTitle = 'Normalised histograms of ';
+
                     this.setTitle({
                         text: drilldownTitle + e.point.name + ' DAP values'
                     });
                     this.yAxis[0].update({
                         title: {
-                            text:'Number'
+                            text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
+                        },
+                        max: (this.options.drilldown.normalise ? 1.0 : null),
+                        labels: {
+                            format: (this.options.drilldown.normalise ? '{value:.2f}' : null)
                         }
                     }, false);
                     this.xAxis[0].update({
@@ -39,7 +50,11 @@ var chartDAPperRequest = new Highcharts.Chart({
                     });
                     this.yAxis[0].update({
                         title: {
-                            text:'DAP (cGy.cm<sup>2</sup>)'
+                            text: 'Mean DAP (cGy.cm<sup>2</sup>)'
+                        },
+                        max: null,
+                        labels: {
+                            format: null
                         }
                     }, false);
                     this.xAxis[0].update({
