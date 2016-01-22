@@ -42,6 +42,10 @@ div.req-hist-norm-btn {
   display: none;
 }
 
+div.stu-hist-norm-btn {
+  display: none;
+}
+
 div.ajax-error {
   position: fixed;
   display: none;

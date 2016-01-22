@@ -282,86 +282,144 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Study description frequency and DAP per study description data start
             if( typeof plotDXStudyMeanDAP !== 'undefined' || typeof plotDXStudyFreq !== 'undefined') {
-                var study_summary = $.map(json.studySummary, function (el) {
-                    return el;
-                });
-                var studyNames = json.study_names;
+                var study_summary = json.studySummary
+                var study_names = json.study_names;
+                var study_system_names = json.studySystemList;
+                var study_histogram_data = json.studyHistogramData;
             }
             
             if(typeof plotDXStudyMeanDAP !== 'undefined') {
-                var study_histogram_data = json.studyHistogramData;
-
-                var studyCounts = [];
-                var studyBins = [];
-                for (i = 0; i < studyNames.length; i++) {
-                    studyCounts.push(study_histogram_data[i][0]);
-                    studyBins.push(study_histogram_data[i][1]);
-                }
-
-                if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    var seriesData = [];
-                    for (i = 0; i < studyNames.length; i++) {
-                        seriesData.push({
-                            name: studyNames[i],
-                            y: study_summary[i].mean_dap,
-                            freq: study_summary[i].num_stu,
-                            bins: studyBins[i],
-                            tooltip: studyNames[i] + '<br>' + study_summary[i].mean_dap.toFixed(1) + ' mean<br>(n=' + study_summary[i].num_stu + ')',
-                            drilldown: studyNames[i]
-                        });
+                var study_counts = []; while(study_counts.push([]) < study_system_names.length);
+                var study_bins = []; while(study_bins.push([]) < study_system_names.length);
+                for (i = 0; i < study_system_names.length; i++) {
+                    for (j = 0; j < study_names.length; j++) {
+                        (study_counts[i]).push(study_histogram_data[i][j][0]);
+                        (study_bins[i]).push(study_histogram_data[i][j][1]);
                     }
                 }
 
-                if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    var seriesMedianData = [];
-                    for (i = 0; i < studyNames.length; i++) {
-                        seriesMedianData.push({
-                            name: studyNames[i],
-                            y: parseFloat(study_summary[i].median_dap),
-                            freq: study_summary[i].num_stu,
-                            bins: studyBins[i],
-                            tooltip: studyNames[i] + '<br>' + parseFloat(study_summary[i].median_dap).toFixed(1) + ' median<br>(n=' + study_summary[i].num_stu + ')',
-                            drilldown: studyNames[i]
-                        });
+                if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var study_data = []; while(study_data.push([]) < study_system_names.length);
+                    for (i = 0; i < study_system_names.length; i++) {
+                        for (j = 0; j < study_names.length; j++) {
+                            (study_data[i]).push({
+                                name: study_names[j],
+                                y: study_summary[i][j].mean_dap,
+                                freq: study_summary[i][j].num_stu,
+                                bins: study_bins[i][j],
+                                tooltip: study_system_names[i] + '<br>' + study_names[j] + '<br>' + study_summary[i][j].mean_dap.toFixed(1) + ' mean<br>(n=' + study_summary[i][j].num_stu + ')',
+                                drilldown: study_system_names[i]+study_names[j]
+                            });
+                        }
+                    }
+                }
+
+                if (plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var study_data_median = []; while(study_data_median.push([]) < study_system_names.length);
+                    for (i = 0; i < study_system_names.length; i++) {
+                        for (j = 0; j < study_names.length; j++) {
+                            (study_data_median[i]).push({
+                                name: study_names[j],
+                                y: parseFloat(study_summary[i][j].median_dap),
+                                freq: study_summary[i][j].num_stu,
+                                bins: study_bins[i][j],
+                                tooltip: study_system_names[i] + '<br>' + study_names[j] + '<br>' + parseFloat(study_summary[i][j].median_dap).toFixed(1) + ' median<br>(n=' + study_summary[i][j].num_stu + ')',
+                                drilldown: study_system_names[i]+study_names[j]
+                            });
+                        }
                     }
                 }
 
                 temp = [];
-                var seriesDrilldown = [];
-                for (i = 0; i < studyNames.length; i++) {
-                    temp = [];
-                    for (j = 0; j < studyCounts[0].length; j++) {
-                        temp.push([studyBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + studyBins[i][j+1].toFixed(1).toString(), studyCounts[i][j]]);
+                var series_drilldown_study = [];
+                for (i = 0; i < study_system_names.length; i++) {
+                    for (j = 0; j < study_names.length; j++) {
+                        temp = [];
+                        for (k = 0; k < study_counts[i][0].length; k++) {
+                            temp.push([study_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + study_bins[i][j][k + 1].toFixed(1).toString(), study_counts[i][j][k]]);
+                        }
+                        series_drilldown_study.push({
+                            id: study_system_names[i]+study_names[j],
+                            name: study_system_names[i],
+                            useHTML: true,
+                            data: temp
+                        });
                     }
-                    seriesDrilldown.push({id: studyNames[i], name: studyNames[i], useHTML: true, data: temp});
                 }
 
                 var chartplotDXStudyDAP = $('#plotDXStudyMeanDAPContainer').highcharts();
-                chartplotDXStudyDAP.xAxis[0].setCategories(studyNames);
-                chartplotDXStudyDAP.options.drilldown.series = seriesDrilldown;
+                chartplotDXStudyDAP.xAxis[0].setCategories(study_names);
+                chartplotDXStudyDAP.options.drilldown.series = series_drilldown_study;
                 chartplotDXStudyDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXStudyDAP.options.exporting.sourceHeight = $(window).height();
-                if(plotAverageChoice == "mean") {
-                    chartplotDXStudyDAP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesData
-                    });
+
+                var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
+
+                if (plotAverageChoice == "mean") {
+                    for (i = 0; i < study_system_names.length; i++) {
+                        if (chartplotDXStudyDAP.series.length > i) {
+                            chartplotDXStudyDAP.series[i].update({
+                                name: study_system_names[i],
+                                data: study_data[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                        else {
+                            chartplotDXStudyDAP.addSeries({
+                                name: study_system_names[i],
+                                data: study_data[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                    }
                 }
-                else if(plotAverageChoice == "median") {
-                    chartplotDXStudyDAP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesMedianData
-                    });
+                else if (plotAverageChoice == "median") {
+                    for (i = 0; i < study_system_names.length; i++) {
+                        if (chartplotDXStudyDAP.series.length > i) {
+                            chartplotDXStudyDAP.series[i].update({
+                                name: study_system_names[i],
+                                data: study_data_median[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                        else {
+                            chartplotDXStudyDAP.addSeries({
+                                name: study_system_names[i],
+                                data: study_data_median[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                    }
                 }
                 else {
-                    chartplotDXStudyDAP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesData
-                    });
-                    chartplotDXStudyDAP.series[1].update({
-                        color: colourScale(1).hex(),
-                        data: seriesMedianData
-                    });
+                    var current_series = 0;
+                    for (i = 0; i < (study_system_names.length)*2; i+=2) {
+                        if (chartplotDXStudyDAP.series.length > i+1) {
+                            chartplotDXStudyDAP.series[i].update({
+                                name: study_system_names[current_series],
+                                data: study_data[current_series],
+                                color: colourScale(i/(stu_sys_colour_max*2-1)).hex()
+                            });
+                            chartplotDXStudyDAP.series[i+1].update({
+                                name: study_system_names[current_series],
+                                data: study_data_median[current_series],
+                                color: colourScale((i+1)/(stu_sys_colour_max*2-1)).hex()
+                            });
+                        }
+                        else {
+                            chartplotDXStudyDAP.addSeries({
+                                name: study_system_names[current_series],
+                                data: study_data[current_series],
+                                color: colourScale(i/(stu_sys_colour_max*2-1)).hex()
+                            });
+                            chartplotDXStudyDAP.addSeries({
+                                name: study_system_names[current_series],
+                                data: study_data_median[current_series],
+                                color: colourScale((i+1)/(stu_sys_colour_max*2-1)).hex()
+                            });
+                        }
+                        current_series++;
+                    }
                 }
                 chartplotDXStudyDAP.redraw({ duration: 1000 });
             }
@@ -625,15 +683,24 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Study description frequency chart data start
             if(typeof plotDXStudyFreq !== 'undefined') {
-                var studyPiechartData = new Array(studyNames.length);
-                for(i=0; i<studyNames.length; i++) {
-                    studyPiechartData[i] = {name: studyNames[i], y: parseInt(study_summary[i].num_stu), url: urlStartStudy + studyNames[i]};
+                var studyPiechartData = new Array(study_names.length);
+                var num_studies = 0;
+                for (i = 0; i < study_names.length; i++) {
+                    num_studies = 0;
+                    for (j = 0; j < study_system_names.length; j++) {
+                        num_studies += parseInt(study_summary[j][i].num_stu)
+                    }
+                    studyPiechartData[i] = {
+                        name: study_names[i],
+                        y: num_studies,
+                        url: urlStartStu + study_names[i]
+                    };
                 }
 
                 studyPiechartData.sort(sort_by_y);
 
-                var stu_name_colour_max = studyNames.length == 1 ? studyNames.length : studyNames.length - 1;
-                for(i=0; i<studyNames.length; i++) {
+                var stu_name_colour_max = study_names.length == 1 ? study_names.length : study_names.length - 1;
+                for(i=0; i<study_names.length; i++) {
                     studyPiechartData[i].color = colourScale(i/stu_name_colour_max).hex();
                 }
 
