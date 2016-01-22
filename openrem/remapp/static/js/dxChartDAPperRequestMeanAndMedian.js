@@ -14,13 +14,13 @@ var chartDAPperRequest = new Highcharts.Chart({
 
                     if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
 
-                    if (!e.points && !this.options.drilldown.normalise) var drilldownTitle = 'Histogram of ';
-                    else if (!e.points && this.options.drilldown.normalise) var drilldownTitle = 'Normalised histogram of ';
-                    else if (e.points && !this.options.drilldown.normalise) var drilldownTitle = 'Histograms of ';
-                    else var drilldownTitle = 'Normalised histograms of ';
+                    var drilldownTitle;
+                    if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
+                    drilldownTitle += e.point.name + ' DAP values';
+                    if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
 
                     this.setTitle({
-                        text: drilldownTitle + e.point.name + ' DAP values'
+                        text: drilldownTitle
                     });
                     this.yAxis[0].update({
                         title: {
