@@ -40,14 +40,14 @@ $(function () {
                         categories: []
                     }, false);
                     this.tooltip.options.formatter = function(e) {
-                        var linkText = 'study_dap_min=' + bins[this.x] + '&study_dap_max=' + bins[this.x+1] + '&requested_procedure=' + name;
+                        var linkText = 'study_dap_min=' + bins[this.x] + '&study_dap_max=' + bins[this.x+1] + '&study_description=' + name;
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
-                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' requests</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersStudy + '">Click to view</a></td></tr></table>';
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' studies</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersStudy + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function(e) {
-                    $('.req-hist-norm-btn').css('display','none');
+                    $('.stu-hist-norm-btn').css('display','none');
 
                     this.setTitle({
                         text: defaultTitle
@@ -63,7 +63,7 @@ $(function () {
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text: 'Requested procedure name'
+                            text: 'Study description'
                         },
                         categories: {
                             formatter: function (args) {
