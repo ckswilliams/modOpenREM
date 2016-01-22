@@ -993,7 +993,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
         for idx, protocol in enumerate(acquisitionSummary):
             dlpValues = acquisition_events.filter(
-                acquisition_protocol=protocol).values_list('dlp', flat=True)
+                acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
             acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
                 [float(x) for x in dlpValues], bins=plotHistogramBins)
             acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
@@ -1044,7 +1044,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         if plotCTStudyMeanDLP or plotCTStudyMeanDLPOverTime:
             for idx, study in enumerate(studySummary):
                 # Required for Mean DLP per study type plot AND mean DLP per study type per week plot
-                subqs = study_events.filter(study_description=study)
+                subqs = study_events.filter(study_description=study.get('study_description'))
 
                 if plotCTStudyMeanDLP:
                     # Required for mean DLP per study type plot
