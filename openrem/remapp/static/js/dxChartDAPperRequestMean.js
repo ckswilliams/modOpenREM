@@ -9,6 +9,8 @@ $(function () {
             renderTo: 'plotDXRequestMeanDAPContainer',
             events: {
                 drilldown: function(e) {
+                    $('.req-hist-norm-btn').css('display','inline-block');
+
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
 
@@ -45,6 +47,8 @@ $(function () {
                     }
                 },
                 drillup: function(e) {
+                    $('.req-hist-norm-btn').css('display','none');
+
                     this.setTitle({
                         text: defaultTitle
                     });

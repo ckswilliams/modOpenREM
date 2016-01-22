@@ -38,6 +38,10 @@ div.ajax-progress {
   border: none;
 }
 
+div.req-hist-norm-btn {
+  display: none;
+}
+
 div.ajax-error {
   position: fixed;
   display: none;
