@@ -586,28 +586,28 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
         if plotDXStudyMeanDAP:
             studyHistogramData = [[[None for k in xrange(2)] for j in xrange(len(study_names))] for i in xrange(len(studySystemList))]
 
-        studyRanges = study_events.values('study_description').distinct().annotate(
-                min_dap=Min('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField()),
-                max_dap=Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField())).order_by(
-                'study_description')
+            studyRanges = study_events.values('study_description').distinct().annotate(
+                    min_dap=Min('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField()),
+                    max_dap=Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField())).order_by(
+                    'study_description')
 
-        for sys_idx, system in enumerate(studySystemList):
-            for stu_idx, study_name in enumerate(study_names):
-                if plotSeriesPerSystems:
-                    subqs = study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                            study_description=study_name)
-                else:
-                    subqs = study_events.filter(study_description=study_name)
+            for sys_idx, system in enumerate(studySystemList):
+                for stu_idx, study_name in enumerate(study_names):
+                    if plotSeriesPerSystems:
+                        subqs = study_events.filter(
+                                generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                                study_description=study_name)
+                    else:
+                        subqs = study_events.filter(study_description=study_name)
 
-                dapValues = subqs.values_list(
-                        'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
-                        flat=True)
-                studyHistogramData[sys_idx][stu_idx][0], studyHistogramData[sys_idx][stu_idx][1] = np.histogram([float(x) for x in dapValues], bins=plotHistogramBins, range=studyRanges.filter(study_description=study_name).values_list('min_dap', 'max_dap')[0])
-                studyHistogramData[sys_idx][stu_idx][0] = studyHistogramData[sys_idx][stu_idx][0].tolist()
-                studyHistogramData[sys_idx][stu_idx][1] = (studyHistogramData[sys_idx][stu_idx][1] * 1000000).tolist()
+                    dapValues = subqs.values_list(
+                            'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                            flat=True)
+                    studyHistogramData[sys_idx][stu_idx][0], studyHistogramData[sys_idx][stu_idx][1] = np.histogram([float(x) for x in dapValues], bins=plotHistogramBins, range=studyRanges.filter(study_description=study_name).values_list('min_dap', 'max_dap')[0])
+                    studyHistogramData[sys_idx][stu_idx][0] = studyHistogramData[sys_idx][stu_idx][0].tolist()
+                    studyHistogramData[sys_idx][stu_idx][1] = (studyHistogramData[sys_idx][stu_idx][1] * 1000000).tolist()
 
-        returnStructure['studyHistogramData'] = studyHistogramData
+            returnStructure['studyHistogramData'] = studyHistogramData
 
     if plotDXAcquisitionMeankVp:
         if median_available and plotAverageChoice == 'both':
