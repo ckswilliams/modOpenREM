@@ -1042,7 +1042,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
                                                                 mean_dlp=Avg('dlp'),
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
-            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
         else:
             if median_available and plotAverageChoice == 'both':
                 acquisitionSummary = acquisition_events.exclude(
@@ -1062,25 +1061,28 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                                                                 num_acq=Count('dlp')).order_by('acquisition_protocol')
 
         returnStructure['acquisitionSummary'] = list(acquisitionSummary)
-        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
 
-        for idx, protocol in enumerate(acquisitionSummary):
-            dlpValues = acquisition_events.filter(
-                acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
-            acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
-                [float(x) for x in dlpValues], bins=plotHistogramBins)
-            acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
-            acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
+        if plotCTAcquisitionMeanDLP:
+            acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+            for idx, protocol in enumerate(acquisitionSummary):
+                dlpValues = acquisition_events.filter(
+                    acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
+                    [float(x) for x in dlpValues], bins=plotHistogramBins)
+                acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
+                acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
             returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
 
-            if plotCTAcquisitionMeanCTDI:
+        if plotCTAcquisitionMeanCTDI:
+            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+            for idx, protocol in enumerate(acquisitionSummary):
                 ctdiValues = acquisition_events.filter(
                     acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
                 acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram(
                     [float(x) for x in ctdiValues], bins=plotHistogramBins)
                 acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
                 acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
-                returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
+            returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyMeanDLPOverTime:
         studyNameList = list(study_events.values_list('study_description', flat=True).distinct().order_by('study_description'))
