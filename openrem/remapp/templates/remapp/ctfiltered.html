@@ -634,32 +634,32 @@
                   </tr>
                   <tr>
               {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
               {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
               {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
               {% endif %}
                   </tr>
                   <tr>
               {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
               {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
               {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                      <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
               {% endif %}
                   </tr>
               </table>
