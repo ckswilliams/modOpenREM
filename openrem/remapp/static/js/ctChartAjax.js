@@ -161,114 +161,114 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Use above DLP and CTDI data to populate the 1, 2 or 4 series in the DLP and/or CTDI plot as appropriate
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined' && typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
-                var chartplotCTAcquisitionMeanDLPandCTDI = $('#histogramPlotDLPandCTDIdiv').highcharts();
-                chartplotCTAcquisitionMeanDLPandCTDI.xAxis[0].setCategories(protocolNames);
+                var chartPlotCTAcquisitionMeanDLPandCTDI = $('#histogramPlotDLPandCTDIdiv').highcharts();
+                chartPlotCTAcquisitionMeanDLPandCTDI.xAxis[0].setCategories(protocolNames);
 
-                chartplotCTAcquisitionMeanDLPandCTDI.options.drilldown.series = (seriesDrilldown).concat(series_drilldown_ctdi);
-                chartplotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceWidth = $(window).width();
-                chartplotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceHeight = $(window).height();
+                chartPlotCTAcquisitionMeanDLPandCTDI.options.drilldown.series = (seriesDrilldown).concat(series_drilldown_ctdi);
+                chartPlotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceWidth = $(window).width();
+                chartPlotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceHeight = $(window).height();
 
                 if (plotAverageChoice == "mean") {
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[0].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[0].update({
                         color: colourScale(0/1).hex(),
                         data: seriesData
                     });
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[1].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[1].update({
                         color: colourScale(1/1).hex(),
                         data: series_data_ctdi
                     });
                 }
                 else if (plotAverageChoice == "median") {
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[0].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[0].update({
                         color: colourScale(0/1).hex(),
                         data: seriesMedianData
                     });
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[1].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[1].update({
                         color: colourScale(1/1).hex(),
                         data: seriesMedianData
                     });
                 }
                 else {
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[0].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[0].update({
                         color: colourScale(0/1).hex(),
                         data: seriesData
                     });
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[1].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[1].update({
                         color: colourScale(1/3).hex(),
                         data: seriesMedianData
                     });
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[2].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[2].update({
                         color: colourScale(2/3).hex(),
                         data: series_data_ctdi
                     });
-                    chartplotCTAcquisitionMeanDLPandCTDI.series[3].update({
+                    chartPlotCTAcquisitionMeanDLPandCTDI.series[3].update({
                         color: colourScale(3/3).hex(),
                         data: series_median_data_ctdi
                     });
                 }
-                chartplotCTAcquisitionMeanDLPandCTDI.redraw({duration: 1000});
+                chartPlotCTAcquisitionMeanDLPandCTDI.redraw({duration: 1000});
             }
             else if(typeof plotCTAcquisitionMeanDLP !== 'undefined') {
-                var chartplotCTAcquisitionMeanDLP = $('#histogramPlotDIV').highcharts();
-                chartplotCTAcquisitionMeanDLP.xAxis[0].setCategories(protocolNames);
-                chartplotCTAcquisitionMeanDLP.options.drilldown.series = seriesDrilldown;
-                chartplotCTAcquisitionMeanDLP.options.exporting.sourceWidth = $(window).width();
-                chartplotCTAcquisitionMeanDLP.options.exporting.sourceHeight = $(window).height();
+                var chartPlotCTAcquisitionMeanDLP = $('#histogramPlotDIV').highcharts();
+                chartPlotCTAcquisitionMeanDLP.xAxis[0].setCategories(protocolNames);
+                chartPlotCTAcquisitionMeanDLP.options.drilldown.series = seriesDrilldown;
+                chartPlotCTAcquisitionMeanDLP.options.exporting.sourceWidth = $(window).width();
+                chartPlotCTAcquisitionMeanDLP.options.exporting.sourceHeight = $(window).height();
 
                 if (plotAverageChoice == "mean") {
-                    chartplotCTAcquisitionMeanDLP.series[0].update({
+                    chartPlotCTAcquisitionMeanDLP.series[0].update({
                         color: colourScale(0).hex(),
                         data: seriesData
                     });
                 }
                 else if (plotAverageChoice == "median") {
-                    chartplotCTAcquisitionMeanDLP.series[0].update({
+                    chartPlotCTAcquisitionMeanDLP.series[0].update({
                         color: colourScale(0).hex(),
                         data: seriesMedianData
                     });
                 }
                 else {
-                    chartplotCTAcquisitionMeanDLP.series[0].update({
+                    chartPlotCTAcquisitionMeanDLP.series[0].update({
                         color: colourScale(0).hex(),
                         data: seriesData
                     });
-                    chartplotCTAcquisitionMeanDLP.series[1].update({
+                    chartPlotCTAcquisitionMeanDLP.series[1].update({
                         color: colourScale(1).hex(),
                         data: seriesMedianData
                     });
                 }
-                chartplotCTAcquisitionMeanDLP.redraw({duration: 1000});
+                chartPlotCTAcquisitionMeanDLP.redraw({duration: 1000});
             }
             else if(typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
-                var chartplotCTAcquisitionMeanCTDI = $('#histogramPlotCTDIdiv').highcharts();
-                chartplotCTAcquisitionMeanCTDI.xAxis[0].setCategories(protocolNames);
-                chartplotCTAcquisitionMeanCTDI.options.drilldown.series = series_drilldown_ctdi;
-                chartplotCTAcquisitionMeanCTDI.options.exporting.sourceWidth = $(window).width();
-                chartplotCTAcquisitionMeanCTDI.options.exporting.sourceHeight = $(window).height();
+                var chartPlotCTAcquisitionMeanCTDI = $('#histogramPlotCTDIdiv').highcharts();
+                chartPlotCTAcquisitionMeanCTDI.xAxis[0].setCategories(protocolNames);
+                chartPlotCTAcquisitionMeanCTDI.options.drilldown.series = series_drilldown_ctdi;
+                chartPlotCTAcquisitionMeanCTDI.options.exporting.sourceWidth = $(window).width();
+                chartPlotCTAcquisitionMeanCTDI.options.exporting.sourceHeight = $(window).height();
 
                 if (plotAverageChoice == "mean") {
-                    chartplotCTAcquisitionMeanCTDI.series[0].update({
+                    chartPlotCTAcquisitionMeanCTDI.series[0].update({
                         color: colourScale(0).hex(),
                         data: series_data_ctdi
                     });
                 }
                 else if (plotAverageChoice == "median") {
-                    chartplotCTAcquisitionMeanCTDI.series[0].update({
+                    chartPlotCTAcquisitionMeanCTDI.series[0].update({
                         color: colourScale(0).hex(),
                         data: series_median_data_ctdi
                     });
                 }
                 else {
-                    chartplotCTAcquisitionMeanCTDI.series[0].update({
+                    chartPlotCTAcquisitionMeanCTDI.series[0].update({
                         color: colourScale(0/1).hex(),
                         data: series_data_ctdi
                     });
-                    chartplotCTAcquisitionMeanCTDI.series[1].update({
+                    chartPlotCTAcquisitionMeanCTDI.series[1].update({
                         color: colourScale(1/1).hex(),
                         data: series_median_data_ctdi
                     });
                 }
-                chartplotCTAcquisitionMeanCTDI.redraw({duration: 1000});
+                chartPlotCTAcquisitionMeanCTDI.redraw({duration: 1000});
             }
             // End of populating the DLP and/or CTDI plot
             //-------------------------------------------------------------------------------------
@@ -313,112 +313,170 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // DLP per study chart data start
             if( typeof plotCTStudyMeanDLP !== 'undefined' || typeof plotCTStudyFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+                var study_names = json.studyNameList;
+                var study_system_names = json.studySystemList;
+                var study_summary = json.studySummary;
+            }
 
-                var study_summary = $.map(json.studySummary, function (el) {
-                    return el;
-                });
-
-                var study_names = [];
-                for (i = 0; i < study_summary.length; i++) {
-                    study_names.push(study_summary[i].study_description);
-                }
+            if( typeof plotCTStudyMeanDLP !== 'undefined' || typeof plotCTStudyFreq !== 'undefined') {
+                var study_histogram_data = json.studyHistogramData;
             }
 
             if(typeof plotCTStudyMeanDLP !== 'undefined') {
                 
-                var study_histogram_data = json.studyHistogramData;
-
-                var study_counts = [];
-                var study_bins = [];
-                for (i = 0; i < study_names.length; i++) {
-                    study_counts.push(study_histogram_data[i][0]);
-                    study_bins.push(study_histogram_data[i][1]);
+                var study_counts = []; while(study_counts.push([]) < study_system_names.length);
+                var study_bins = []; while(study_bins.push([]) < study_system_names.length);
+                for (i = 0; i < study_system_names.length; i++) {
+                    for (j = 0; j < study_names.length; j++) {
+                        (study_counts[i]).push(study_histogram_data[i][j][0]);
+                        (study_bins[i]).push(study_histogram_data[i][j][1]);
+                    }
                 }
 
                 if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    var study_data = [];
-                    for (i = 0; i < study_names.length; i++) {
-                        study_data.push({
-                            name: study_names[i],
-                            y: study_summary[i].mean_dlp,
-                            freq: study_summary[i].num_acq,
-                            bins: study_bins[i],
-                            tooltip: study_names[i] + '<br>' + study_summary[i].mean_dlp.toFixed(1) + ' mean<br>(n=' + study_summary[i].num_acq + ')',
-                            drilldown: study_names[i]
-                        });
+                    var study_data = []; while(study_data.push([]) < study_system_names.length);
+                    for (i = 0; i < study_system_names.length; i++) {
+                        for (j = 0; j < study_names.length; j++) {
+                            (study_data[i]).push({
+                                name: study_names[j],
+                                y: study_summary[i][j].mean_dlp,
+                                freq: study_summary[i][j].num_stu,
+                                bins: study_bins[i][j],
+                                tooltip: study_system_names[i] + '<br>' + study_names[j] + '<br>' + study_summary[i][j].mean_dlp.toFixed(1) + ' mean<br>(n=' + study_summary[i][j].num_stu + ')',
+                                drilldown: study_system_names[i]+study_names[j]
+                            });
+                        }
                     }
                 }
 
                 if (plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    var study_data_median = [];
-                    for (i = 0; i < study_names.length; i++) {
-                        study_data_median.push({
-                            name: study_names[i],
-                            y: parseFloat(study_summary[i].median_dlp),
-                            freq: study_summary[i].num_acq,
-                            bins: study_bins[i],
-                            tooltip: study_names[i] + '<br>' + parseFloat(study_summary[i].median_dlp).toFixed(1) + ' median<br>(n=' + study_summary[i].num_acq + ')',
-                            drilldown: study_names[i]
-                        });
+                    var study_data_median = []; while(study_data_median.push([]) < study_system_names.length);
+                    for (i = 0; i < study_system_names.length; i++) {
+                        for (j = 0; j < study_names.length; j++) {
+                            (study_data_median[i]).push({
+                                name: study_names[j],
+                                y: parseFloat(study_summary[i][j].median_dlp),
+                                freq: study_summary[i][j].num_stu,
+                                bins: study_bins[i][j],
+                                tooltip: study_system_names[i] + '<br>' + study_names[j] + '<br>' + parseFloat(study_summary[i][j].median_dlp).toFixed(1) + ' median<br>(n=' + study_summary[i][j].num_stu + ')',
+                                drilldown: study_system_names[i]+study_names[j]
+                            });
+                        }
                     }
                 }
 
                 temp = [];
                 var series_drilldown_study = [];
-                for (i = 0; i < study_names.length; i++) {
-                    temp = [];
-                    for (j = 0; j < study_counts[0].length; j++) {
-                        temp.push([study_bins[i][j].toFixed(1).toString() + ' \u2264 x < ' + study_bins[i][j + 1].toFixed(1).toString(), study_counts[i][j]]);
+                for (i = 0; i < study_system_names.length; i++) {
+                    for (j = 0; j < study_names.length; j++) {
+                        temp = [];
+                        for (k = 0; k < study_counts[i][0].length; k++) {
+                            temp.push([study_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + study_bins[i][j][k + 1].toFixed(1).toString(), study_counts[i][j][k]]);
+                        }
+                        series_drilldown_study.push({
+                            id: study_system_names[i]+study_names[j],
+                            name: study_system_names[i],
+                            useHTML: true,
+                            data: temp
+                        });
                     }
-                    series_drilldown_study.push({id: study_names[i], name: study_names[i], useHTML: true, data: temp});
                 }
 
-                var chartplotCTStudyMeanDLP = $('#histogramStudyPlotDIV').highcharts();
-                chartplotCTStudyMeanDLP.xAxis[0].setCategories(study_names);
-                chartplotCTStudyMeanDLP.options.drilldown.series = series_drilldown_study;
-                chartplotCTStudyMeanDLP.options.exporting.sourceWidth = $(window).width();
-                chartplotCTStudyMeanDLP.options.exporting.sourceHeight = $(window).height();
+                var chartPlotCTStudyMeanDLP = $('#histogramStudyPlotDIV').highcharts();
+                chartPlotCTStudyMeanDLP.xAxis[0].setCategories(study_names);
+                chartPlotCTStudyMeanDLP.options.drilldown.series = series_drilldown_study;
+                chartPlotCTStudyMeanDLP.options.exporting.sourceWidth = $(window).width();
+                chartPlotCTStudyMeanDLP.options.exporting.sourceHeight = $(window).height();
+
+                var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
 
                 if (plotAverageChoice == "mean") {
-                    chartplotCTStudyMeanDLP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: study_data
-                    });
+                    for (i = 0; i < study_system_names.length; i++) {
+                        if (chartPlotCTStudyMeanDLP.series.length > i) {
+                            chartPlotCTStudyMeanDLP.series[i].update({
+                                name: study_system_names[i],
+                                data: study_data[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                        else {
+                            chartPlotCTStudyMeanDLP.addSeries({
+                                name: study_system_names[i],
+                                data: study_data[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                    }
                 }
                 else if (plotAverageChoice == "median") {
-                    chartplotCTStudyMeanDLP.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: study_data_median
-                    });
+                    for (i = 0; i < study_system_names.length; i++) {
+                        if (chartPlotCTStudyMeanDLP.series.length > i) {
+                            chartPlotCTStudyMeanDLP.series[i].update({
+                                name: study_system_names[i],
+                                data: study_data_median[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                        else {
+                            chartPlotCTStudyMeanDLP.addSeries({
+                                name: study_system_names[i],
+                                data: study_data_median[i],
+                                color: colourScale(i/stu_sys_colour_max).hex()
+                            });
+                        }
+                    }
                 }
                 else {
-                    chartplotCTStudyMeanDLP.series[0].update({
-                        color: colourScale(0/1).hex(),
-                        data: study_data
-                    });
-                    chartplotCTStudyMeanDLP.series[1].update({
-                        color: colourScale(1/1).hex(),
-                        data: study_data_median
-                    });
+                    var current_series = 0;
+                    for (i = 0; i < (study_system_names.length)*2; i+=2) {
+                        if (chartPlotCTStudyMeanDLP.series.length > i+1) {
+                            chartPlotCTStudyMeanDLP.series[i].update({
+                                name: study_system_names[current_series],
+                                data: study_data[current_series],
+                                color: colourScale(i/(stu_sys_colour_max*2+1)).hex()
+                            });
+                            chartPlotCTStudyMeanDLP.series[i+1].update({
+                                name: study_system_names[current_series],
+                                data: study_data_median[current_series],
+                                color: colourScale((i+1)/(stu_sys_colour_max*2+1)).hex()
+                            });
+                        }
+                        else {
+                            chartPlotCTStudyMeanDLP.addSeries({
+                                name: study_system_names[current_series],
+                                data: study_data[current_series],
+                                color: colourScale(i/(stu_sys_colour_max*2+1)).hex()
+                            });
+                            chartPlotCTStudyMeanDLP.addSeries({
+                                name: study_system_names[current_series],
+                                data: study_data_median[current_series],
+                                color: colourScale((i+1)/(stu_sys_colour_max*2+1)).hex()
+                            });
+                        }
+                        current_series++;
+                    }
                 }
-                chartplotCTStudyMeanDLP.redraw({duration: 1000});
+                chartPlotCTStudyMeanDLP.redraw({duration: 1000});
             }
             // DLP per study chart data end
             //-------------------------------------------------------------------------------------
-
-
+            
             //-------------------------------------------------------------------------------------
             // Study frequency chart data start
             if(typeof plotCTStudyFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
                 //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 var study_piechart_data = new Array(study_names.length);
-                for(i=0; i<study_names.length; i++) {
-                    if(typeof plotCTStudyFreq !== 'undefined') {
-                        study_piechart_data[i] = {name: study_names[i], y: parseInt(study_summary[i].num_acq), url: urlStartStudy + study_names[i]};
+                var num_studies = 0;
+                for (i = 0; i < study_names.length; i++) {
+                    num_studies = 0;
+                    for (j = 0; j < study_system_names.length; j++) {
+                        num_studies += parseInt(study_summary[j][i].num_stu)
                     }
-                    else {
-                        study_piechart_data[i] = {name: study_names[i], y:parseInt(i), url:urlStartStudy+study_names[i]};
-                    }
+                    study_piechart_data[i] = {
+                        name: study_names[i],
+                        y: num_studies,
+                        url: urlStartStudy + study_names[i]
+                    };
                 }
 
                 if(typeof plotCTStudyFreq !== 'undefined') {
@@ -426,6 +484,7 @@ $(document).ready(function() {
                 }
 
                 var stu_name_colour_max = study_names.length == 1 ? study_names.length : study_names.length - 1;
+
                 for(i=0; i<study_names.length; i++) {
                     study_piechart_data[i].color = colourScale(i/stu_name_colour_max).hex();
                 }
@@ -512,25 +571,25 @@ $(document).ready(function() {
                     }
                 }
 
-                var chartplotCTRequestMeanDLP = $('#histogramRequestPlotDIV').highcharts();
-                chartplotCTRequestMeanDLP.xAxis[0].setCategories(request_names);
-                chartplotCTRequestMeanDLP.options.drilldown.series = series_drilldown_request;
-                chartplotCTRequestMeanDLP.options.exporting.sourceWidth = $(window).width();
-                chartplotCTRequestMeanDLP.options.exporting.sourceHeight = $(window).height();
+                var chartPlotCTRequestMeanDLP = $('#histogramRequestPlotDIV').highcharts();
+                chartPlotCTRequestMeanDLP.xAxis[0].setCategories(request_names);
+                chartPlotCTRequestMeanDLP.options.drilldown.series = series_drilldown_request;
+                chartPlotCTRequestMeanDLP.options.exporting.sourceWidth = $(window).width();
+                chartPlotCTRequestMeanDLP.options.exporting.sourceHeight = $(window).height();
 
                 var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
 
                 if (plotAverageChoice == "mean") {
                     for (i = 0; i < request_system_names.length; i++) {
-                        if (chartplotCTRequestMeanDLP.series.length > i) {
-                            chartplotCTRequestMeanDLP.series[i].update({
+                        if (chartPlotCTRequestMeanDLP.series.length > i) {
+                            chartPlotCTRequestMeanDLP.series[i].update({
                                 name: request_system_names[i],
                                 data: request_data[i],
                                 color: colourScale(i/req_sys_colour_max).hex()
                             });
                         }
                         else {
-                            chartplotCTRequestMeanDLP.addSeries({
+                            chartPlotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[i],
                                 data: request_data[i],
                                 color: colourScale(i/req_sys_colour_max).hex()
@@ -540,15 +599,15 @@ $(document).ready(function() {
                 }
                 else if (plotAverageChoice == "median") {
                     for (i = 0; i < request_system_names.length; i++) {
-                        if (chartplotCTRequestMeanDLP.series.length > i) {
-                            chartplotCTRequestMeanDLP.series[i].update({
+                        if (chartPlotCTRequestMeanDLP.series.length > i) {
+                            chartPlotCTRequestMeanDLP.series[i].update({
                                 name: request_system_names[i],
                                 data: request_data_median[i],
                                 color: colourScale(i/req_sys_colour_max).hex()
                             });
                         }
                         else {
-                            chartplotCTRequestMeanDLP.addSeries({
+                            chartPlotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[i],
                                 data: request_data_median[i],
                                 color: colourScale(i/req_sys_colour_max).hex()
@@ -559,25 +618,25 @@ $(document).ready(function() {
                 else {
                     var current_series = 0;
                     for (i = 0; i < (request_system_names.length)*2; i+=2) {
-                        if (chartplotCTRequestMeanDLP.series.length > i+1) {
-                            chartplotCTRequestMeanDLP.series[i].update({
+                        if (chartPlotCTRequestMeanDLP.series.length > i+1) {
+                            chartPlotCTRequestMeanDLP.series[i].update({
                                 name: request_system_names[current_series],
                                 data: request_data[current_series],
                                 color: colourScale(i/(req_sys_colour_max*2+1)).hex()
                             });
-                            chartplotCTRequestMeanDLP.series[i+1].update({
+                            chartPlotCTRequestMeanDLP.series[i+1].update({
                                 name: request_system_names[current_series],
                                 data: request_data_median[current_series],
                                 color: colourScale((i+1)/(req_sys_colour_max*2+1)).hex()
                             });
                         }
                         else {
-                            chartplotCTRequestMeanDLP.addSeries({
+                            chartPlotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[current_series],
                                 data: request_data[current_series],
                                 color: colourScale(i/(req_sys_colour_max*2+1)).hex()
                             });
-                            chartplotCTRequestMeanDLP.addSeries({
+                            chartPlotCTRequestMeanDLP.addSeries({
                                 name: request_system_names[current_series],
                                 data: request_data_median[current_series],
                                 color: colourScale((i+1)/(req_sys_colour_max*2+1)).hex()
@@ -586,7 +645,7 @@ $(document).ready(function() {
                         current_series++;
                     }
                 }
-                chartplotCTRequestMeanDLP.redraw({duration: 1000});
+                chartPlotCTRequestMeanDLP.redraw({duration: 1000});
             }
             // DLP per request chart data end
             //-------------------------------------------------------------------------------------
@@ -670,13 +729,13 @@ $(document).ready(function() {
                     });
                 }
 
-                var chartplotDXStudyPerDayAndHour = $('#piechartStudyWorkloadDIV').highcharts();
-                chartplotDXStudyPerDayAndHour.options.drilldown.series = seriesDrillDownPieChart;
-                chartplotDXStudyPerDayAndHour.series[0].setData(studyWorkloadPieChartData);
-                chartplotDXStudyPerDayAndHour.options.exporting.sourceWidth = $(window).width();
-                chartplotDXStudyPerDayAndHour.options.exporting.sourceHeight = $(window).height();
+                var chartPlotDXStudyPerDayAndHour = $('#piechartStudyWorkloadDIV').highcharts();
+                chartPlotDXStudyPerDayAndHour.options.drilldown.series = seriesDrillDownPieChart;
+                chartPlotDXStudyPerDayAndHour.series[0].setData(studyWorkloadPieChartData);
+                chartPlotDXStudyPerDayAndHour.options.exporting.sourceWidth = $(window).width();
+                chartPlotDXStudyPerDayAndHour.options.exporting.sourceHeight = $(window).height();
 
-                chartplotDXStudyPerDayAndHour.redraw({duration: 1000});
+                chartPlotDXStudyPerDayAndHour.redraw({duration: 1000});
             }
             // Study workload chart data end
             //-------------------------------------------------------------------------------------

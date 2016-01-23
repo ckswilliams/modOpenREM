@@ -1082,82 +1082,171 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
                 returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
 
-    if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyPerDayAndHour or plotCTStudyMeanDLPOverTime:
-        # Required for mean DLP per study type plot
-        if median_available and plotAverageChoice == 'both':
-            studySummary = study_events.values('study_description').distinct().annotate(
-                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                'study_description')
-        elif median_available and plotAverageChoice == 'median':
-            studySummary = study_events.values('study_description').distinct().annotate(
-                median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                'study_description')
+    if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyMeanDLPOverTime:
+        studyNameList = list(study_events.values_list('study_description', flat=True).distinct().order_by('study_description'))
+        returnStructure['studyNameList'] = studyNameList
+
+        if plotSeriesPerSystems:
+            studySystemList = list(study_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
-            studySummary = study_events.values('study_description').distinct().annotate(
-                mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                num_acq=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                'study_description')
-        returnStructure['studySummary'] = list(studySummary)
+            studySystemList = ['All systems']
+        returnStructure['studySystemList'] = studySystemList
+
+        if median_available and plotAverageChoice == 'both':
+            studySummary = []
+            for system in studySystemList:
+                if plotSeriesPerSystems and plotCTStudyMeanDLP:
+                    studySummary.append(study_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                        mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+                elif plotCTStudyMeanDLP:
+                    studySummary.append(study_events.values('study_description').distinct().annotate(
+                        mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+                else:
+                    studySummary.append(study_events.values('study_description').distinct().annotate(
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+
+            for index in range(len(studySummary)):
+                studySummary[index] = list(studySummary[index])
+
+        elif median_available and plotAverageChoice == 'median':
+            studySummary = []
+            for system in studySystemList:
+                if plotSeriesPerSystems and plotCTStudyMeanDLP:
+                    studySummary.append(study_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                        median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+                elif plotCTStudyMeanDLP:
+                    studySummary.append(study_events.values('study_description').distinct().annotate(
+                        median_dlp=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+                else:
+                    studySummary.append(study_events.values('study_description').distinct().annotate(
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+
+            for index in range(len(studySummary)):
+                studySummary[index] = list(studySummary[index])
+
+        else:
+            studySummary = []
+            for system in studySystemList:
+                if plotSeriesPerSystems and plotCTStudyMeanDLP:
+                    studySummary.append(study_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                        mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+                elif plotCTStudyMeanDLP:
+                    studySummary.append(study_events.values('study_description').distinct().annotate(
+                        mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+                else:
+                    studySummary.append(study_events.values('study_description').distinct().annotate(
+                        num_stu=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+
+            for index in range(len(studySummary)):
+                studySummary[index] = list(studySummary[index])
+
+        # Fill in default values where data for a study description is missing for any of the systems
+        for index in range(len(studySystemList)):
+            missing_study_names = list(set(studyNameList) - set([d['study_description'] for d in studySummary[index]]))
+            for name in missing_study_names:
+                if median_available and plotAverageChoice == 'both':
+                    (studySummary[index]).append({'median_dlp': 0, 'mean_dlp': 0,'study_description':name, 'num_stu': 0})
+                elif median_available and plotAverageChoice == 'median':
+                    (studySummary[index]).append({'median_dlp': 0, 'study_description':name, 'num_stu': 0})
+                else:
+                    (studySummary[index]).append({'mean_dlp': 0,'study_description':name, 'num_stu': 0})
+            # Rearrange the list into the same order as studyNameList
+            studySummaryTemp = []
+            for study_name in studyNameList:
+                studySummaryTemp.append(filter(lambda item: item['study_description'] == study_name, studySummary[index] )[0])
+            studySummary[index] = studySummaryTemp
+
+        returnStructure['studySummary'] = studySummary
 
         if plotCTStudyMeanDLP:
-            studyHistogramData = [[None for i in xrange(2)] for i in xrange(len(studySummary))]
+            studyHistogramData = [[[None for k in xrange(2)] for j in xrange(len(studyNameList))] for i in xrange(len(studySystemList))]
 
-        if plotCTStudyMeanDLPOverTime:
-            # Required for mean DLP per study type per week plot
-            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
-                studyMedianDLPoverTime = [None] * len(studySummary)
-            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                studyMeanDLPoverTime = [None] * len(studySummary)
-            startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
-            today = datetime.date.today()
+            studyRanges = study_events.values('study_description').distinct().annotate(
+                min_dlp=Min('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField()),
+                max_dlp=Max('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField())).order_by(
+                'study_description')
 
-        if plotCTStudyMeanDLP or plotCTStudyMeanDLPOverTime:
-            for idx, study in enumerate(studySummary):
-                # Required for Mean DLP per study type plot AND mean DLP per study type per week plot
-                subqs = study_events.filter(study_description=study.get('study_description'))
+            for sys_idx, system in enumerate(studySystemList):
+                for stu_idx, study_name in enumerate(studyNameList):
+                    if plotSeriesPerSystems:
+                        subqs = study_events.filter(
+                                generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                                study_description=study_name)
+                    else:
+                        subqs = study_events.filter(study_description=study_name)
 
-                if plotCTStudyMeanDLP:
-                    # Required for mean DLP per study type plot
                     dlpValues = subqs.values_list(
-                        'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', flat=True)
-                    studyHistogramData[idx][0], studyHistogramData[idx][1] = np.histogram([float(x) for x in dlpValues],
-                                                                                          bins=plotHistogramBins)
-                    studyHistogramData[idx][0] = studyHistogramData[idx][0].tolist()
-                    studyHistogramData[idx][1] = studyHistogramData[idx][1].tolist()
-                    returnStructure['studyHistogramData'] = studyHistogramData
+                        'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
+                        flat=True)
+                    studyHistogramData[sys_idx][stu_idx][0], studyHistogramData[sys_idx][stu_idx][1] = np.histogram([float(x) for x in dlpValues], bins=plotHistogramBins, range=studyRanges.filter(study_description=study_name).values_list('min_dlp', 'max_dlp')[0])
+                    studyHistogramData[sys_idx][stu_idx][0] = studyHistogramData[sys_idx][stu_idx][0].tolist()
+                    studyHistogramData[sys_idx][stu_idx][1] = studyHistogramData[sys_idx][stu_idx][1].tolist()
 
-                if plotCTStudyMeanDLPOverTime:
-                    # Required for mean DLP per study type per time period plot
-                    if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                        qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                        studyMeanDLPoverTime[idx] = qss.time_series(startDate, today,
-                                                                    interval=plotCTStudyMeanDLPOverTimePeriod)
-                        returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
-                    if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
-                        qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
-                            'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000)
-                        studyMedianDLPoverTime[idx] = qss.time_series(startDate, today,
-                                                                      interval=plotCTStudyMeanDLPOverTimePeriod)
-                        returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
+            returnStructure['studyHistogramData'] = studyHistogramData
 
-        if plotCTStudyPerDayAndHour:
-            # Required for studies per weekday and studies per hour in each weekday plot
-            studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
-            for day in range(7):
-                studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day + 1).values(
-                    'study_workload_chart_time')
+    if plotCTStudyMeanDLPOverTime:
+        if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+            studyMedianDLPoverTime = [None] * len(studyNameList)
+        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+            studyMeanDLPoverTime = [None] * len(studyNameList)
+        startDate = study_events.aggregate(Min('study_date')).get('study_date__min')
+        today = datetime.date.today()
 
-                if studyTimesOnThisWeekday:
-                    qss = qsstats.QuerySetStats(studyTimesOnThisWeekday, 'study_workload_chart_time')
-                    hourlyBreakdown = qss.time_series(datetime.datetime(1900, 1, 1, 0, 0),
-                                                      datetime.datetime(1900, 1, 1, 23, 59), interval='hours')
-                    for hour in range(24):
-                        studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
-            returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
+        for idx, study_name in enumerate(studyNameList):
+            subqs = study_events.filter(study_description=study_name)
+
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
+                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
+                studyMeanDLPoverTime[idx] = qss.time_series(startDate, today,
+                                                                interval=plotCTStudyMeanDLPOverTimePeriod)
+
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
+                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000)
+                studyMedianDLPoverTime[idx] = qss.time_series(startDate, today,
+                                                                interval=plotCTStudyMeanDLPOverTimePeriod)
+
+        if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+            returnStructure['studyMeanDLPoverTime'] = studyMeanDLPoverTime
+
+        if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+            returnStructure['studyMedianDLPoverTime'] = studyMedianDLPoverTime
+
+    if plotCTStudyPerDayAndHour:
+        # Required for studies per weekday and studies per hour in each weekday plot
+        studiesPerHourInWeekdays = [[0 for x in range(24)] for x in range(7)]
+        for day in range(7):
+            studyTimesOnThisWeekday = study_events.filter(study_date__week_day=day + 1).values(
+                'study_workload_chart_time')
+
+            if studyTimesOnThisWeekday:
+                qss = qsstats.QuerySetStats(studyTimesOnThisWeekday, 'study_workload_chart_time')
+                hourlyBreakdown = qss.time_series(datetime.datetime(1900, 1, 1, 0, 0),
+                                                  datetime.datetime(1900, 1, 1, 23, 59), interval='hours')
+                for hour in range(24):
+                    studiesPerHourInWeekdays[day][hour] = hourlyBreakdown[hour][1]
+        returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
 
@@ -1173,9 +1262,17 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         if median_available and plotAverageChoice == 'both':
             requestSummary = []
             for system in requestSystemList:
-                if plotSeriesPerSystems:
+                if plotSeriesPerSystems and plotCTRequestMeanDLP:
                     requestSummary.append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                            median_dlp=Median(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+                elif plotCTRequestMeanDLP:
+                    requestSummary.append(request_events.values(
                         'requested_procedure_code_meaning').distinct().annotate(
                             mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                             median_dlp=Median(
@@ -1185,9 +1282,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 else:
                     requestSummary.append(request_events.values(
                         'requested_procedure_code_meaning').distinct().annotate(
-                            mean_dlp=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                            median_dlp=Median(
-                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                             num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                             'requested_procedure_code_meaning'))
 
@@ -1197,9 +1291,16 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         elif median_available and plotAverageChoice == 'median':
             requestSummary = []
             for system in requestSystemList:
-                if plotSeriesPerSystems:
+                if plotSeriesPerSystems and plotCTRequestMeanDLP:
                     requestSummary.append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            median_dlp=Median(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+                elif plotCTRequestMeanDLP:
+                    requestSummary.append(request_events.values(
                         'requested_procedure_code_meaning').distinct().annotate(
                             median_dlp=Median(
                                 'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
@@ -1208,8 +1309,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 else:
                     requestSummary.append(request_events.values(
                         'requested_procedure_code_meaning').distinct().annotate(
-                            median_dlp=Median(
-                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                             num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                             'requested_procedure_code_meaning'))
 
@@ -1219,9 +1318,16 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         else:
             requestSummary = []
             for system in requestSystemList:
-                if plotSeriesPerSystems:
+                if plotSeriesPerSystems and plotCTRequestMeanDLP:
                     requestSummary.append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'requested_procedure_code_meaning').distinct().annotate(
+                            mean_dlp=Avg(
+                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                            num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                            'requested_procedure_code_meaning'))
+                elif plotCTRequestMeanDLP:
+                    requestSummary.append(request_events.values(
                         'requested_procedure_code_meaning').distinct().annotate(
                             mean_dlp=Avg(
                                 'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
@@ -1230,8 +1336,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 else:
                     requestSummary.append(request_events.values(
                         'requested_procedure_code_meaning').distinct().annotate(
-                            mean_dlp=Avg(
-                                'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                             num_req=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                             'requested_procedure_code_meaning'))
 
