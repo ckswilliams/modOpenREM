@@ -52,7 +52,6 @@ $(document).ready(function() {
 
             if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 var acq_histogram_data = json.acquisitionHistogramData;
-
                 var protocolCounts = [];
                 var protocolBins = [];
                 for (i = 0; i < protocolNames.length; i++) {
@@ -612,7 +611,6 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Acquisition frequency chart data start
             if(typeof plotDXAcquisitionFreq !== 'undefined' || typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
-                //var urlStart = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
                 var protocolPiechartData = new Array(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
                     if(typeof plotDXAcquisitionFreq !== 'undefined') {
@@ -722,29 +720,22 @@ $(document).ready(function() {
 
                 // A [7][24] list of integer values
                 var studies_per_hour_in_weekdays = json.studiesPerHourInWeekdays;
-                var studiesPerWeekday = [];
                 var dayTotal = 0;
-                for (i = 0; i < 7; i++) {
-                    dayTotal = 0;
-                    for (j = 0; j < 24; j++) {
-                        dayTotal = dayTotal + studies_per_hour_in_weekdays[i][j];
-                    }
-                    studiesPerWeekday[i] = dayTotal;
-                }
-
                 var studyWorkloadPieChartData = [];
                 var seriesDrillDownPieChart = [];
                 var tempTime;
                 for (i = 0; i < 7; i++) {
+                    dayTotal = 0;
                     temp = [];
                     for (j = 0; j < 24; j++) {
+                        dayTotal += studies_per_hour_in_weekdays[i][j];
                         tempTime = "0" + j;
                         tempTime = tempTime.substr(tempTime.length-2);
                         temp.push({name: tempTime + ':00', y: studies_per_hour_in_weekdays[i][j], color: colourScale(j/(23)).hex()});
                     }
                     studyWorkloadPieChartData.push({
                         name: dayNames[i],
-                        y: studiesPerWeekday[i],
+                        y: dayTotal,
                         color: colourScale(i/(6)).hex(),
                         drilldown: dayNames[i]
                     });
@@ -818,6 +809,7 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
 
 
+            //-------------------------------------------------------------------------------------
             // kVp over time chart data start
             // A [num acq protocols][num time periods] list of 2-element arrays containing datetime and average kVp values
             if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {

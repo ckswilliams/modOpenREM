@@ -54,7 +54,6 @@ $(document).ready(function() {
 
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined') {
                 var acq_histogram_data = json.acquisitionHistogramData;
-
                 var protocolCounts = [];
                 var protocolBins = [];
                 for (i = 0; i < protocolNames.length; i++) {
@@ -163,7 +162,6 @@ $(document).ready(function() {
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined' && typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
                 var chartPlotCTAcquisitionMeanDLPandCTDI = $('#histogramPlotDLPandCTDIdiv').highcharts();
                 chartPlotCTAcquisitionMeanDLPandCTDI.xAxis[0].setCategories(protocolNames);
-
                 chartPlotCTAcquisitionMeanDLPandCTDI.options.drilldown.series = (seriesDrilldown).concat(series_drilldown_ctdi);
                 chartPlotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceWidth = $(window).width();
                 chartPlotCTAcquisitionMeanDLPandCTDI.options.exporting.sourceHeight = $(window).height();
@@ -277,7 +275,6 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // Acquisition frequency chart data start
             if(typeof plotCTAcquisitionFreq !== 'undefined') {
-                //var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
                 var protocolPiechartData = new Array(protocolNames.length);
                 for(i=0; i<protocolNames.length; i++) {
                     if(typeof plotCTAcquisitionFreq !== 'undefined') {
@@ -318,12 +315,8 @@ $(document).ready(function() {
                 var study_summary = json.studySummary;
             }
 
-            if( typeof plotCTStudyMeanDLP !== 'undefined' || typeof plotCTStudyFreq !== 'undefined') {
-                var study_histogram_data = json.studyHistogramData;
-            }
-
             if(typeof plotCTStudyMeanDLP !== 'undefined') {
-                
+                var study_histogram_data = json.studyHistogramData;
                 var study_counts = []; while(study_counts.push([]) < study_system_names.length);
                 var study_bins = []; while(study_bins.push([]) < study_system_names.length);
                 for (i = 0; i < study_system_names.length; i++) {
@@ -460,11 +453,11 @@ $(document).ready(function() {
             }
             // DLP per study chart data end
             //-------------------------------------------------------------------------------------
-            
+
+
             //-------------------------------------------------------------------------------------
             // Study frequency chart data start
             if(typeof plotCTStudyFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
-                //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 var study_piechart_data = new Array(study_names.length);
                 var num_studies = 0;
                 for (i = 0; i < study_names.length; i++) {
@@ -512,7 +505,6 @@ $(document).ready(function() {
             }
 
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
-
                 var request_counts = []; while(request_counts.push([]) < request_system_names.length);
                 var request_bins = []; while(request_bins.push([]) < request_system_names.length);
                 for (i = 0; i < request_system_names.length; i++) {
@@ -650,10 +642,10 @@ $(document).ready(function() {
             // DLP per request chart data end
             //-------------------------------------------------------------------------------------
 
+
             //-------------------------------------------------------------------------------------
             // Request frequency chart data start
             if(typeof plotCTRequestFreq !== 'undefined') {
-                //var var urlStart = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'request_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&request_description=';
                 var request_piechart_data = new Array(request_names.length);
                 var num_requests = 0;
                 for (i = 0; i < request_names.length; i++) {
@@ -694,29 +686,22 @@ $(document).ready(function() {
 
                 // A [7][24] list of integer values
                 var studies_per_hour_in_weekdays = json.studiesPerHourInWeekdays;
-                var studiesPerWeekday = [];
                 var dayTotal = 0;
-                for (i = 0; i < 7; i++) {
-                    dayTotal = 0;
-                    for (j = 0; j < 24; j++) {
-                        dayTotal = dayTotal + studies_per_hour_in_weekdays[i][j];
-                    }
-                    studiesPerWeekday[i] = dayTotal;
-                }
-
                 var studyWorkloadPieChartData = [];
                 var seriesDrillDownPieChart = [];
                 var tempTime;
                 for (i = 0; i < 7; i++) {
+                    dayTotal = 0;
                     temp = [];
                     for (j = 0; j < 24; j++) {
+                        dayTotal += studies_per_hour_in_weekdays[i][j];
                         tempTime = "0" + j;
                         tempTime = tempTime.substr(tempTime.length-2);
                         temp.push({name: tempTime + ':00', y: studies_per_hour_in_weekdays[i][j], color: colourScale(j/(23)).hex()});
                     }
                     studyWorkloadPieChartData.push({
                         name: dayNames[i],
-                        y: studiesPerWeekday[i],
+                        y: dayTotal,
                         color: colourScale(i/(6)).hex(),
                         drilldown: dayNames[i]
                     });
