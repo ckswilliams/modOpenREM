@@ -693,7 +693,7 @@ $(document).ready(function() {
                     studyPiechartData[i] = {
                         name: study_names[i],
                         y: num_studies,
-                        url: urlStartStu + study_names[i]
+                        url: urlStartStudy + study_names[i]
                     };
                 }
 
