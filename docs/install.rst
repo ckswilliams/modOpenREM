@@ -48,7 +48,7 @@ Edit local_settings.py
     In local_settings.py, always use forward slashes and not backslashes, even for paths on
     Windows systems.
 
-    The directories in this local_settings file must already exist - OpenREM will not create them for you.
+    The directories in this local_settings.py file must already exist - OpenREM will not create them for you.
 
 Database
 ^^^^^^^^
