@@ -4,6 +4,9 @@ $(function () {
     var name = '';
 
     var chartRequestDLP = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
             renderTo: 'histogramRequestPlotDIV',

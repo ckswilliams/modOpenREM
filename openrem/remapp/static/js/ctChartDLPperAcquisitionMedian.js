@@ -5,6 +5,9 @@ $(function () {
     var name = '';
 
     var chartAcqDLP = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
             renderTo: 'histogramPlotDIV',

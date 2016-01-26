@@ -1,5 +1,8 @@
 $(function () {
 var chartAcqFreq = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             renderTo: 'piechartProtocolDIV',
             plotBackgroundColor: null,

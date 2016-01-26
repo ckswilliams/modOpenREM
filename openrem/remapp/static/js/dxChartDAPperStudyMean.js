@@ -4,6 +4,9 @@ $(function () {
     var name = '';
 
     var chartDAPperStudy = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
             renderTo: 'plotDXStudyMeanDAPContainer',

@@ -1,5 +1,8 @@
 $(function () {
     var chartAcquisitionMeanmAsOverTime = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             renderTo: 'AcquisitionMeanmAsOverTimeDIV',
             zoomType: 'x'

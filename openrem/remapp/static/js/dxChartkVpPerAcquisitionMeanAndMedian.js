@@ -5,6 +5,9 @@ $(function () {
     var name = '';
 
     var chartkVpPerAcquisition = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
             renderTo: 'chartAcquisitionMeankVp',

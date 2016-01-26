@@ -6,6 +6,9 @@ $(function () {
 
 
     var chartDAPperAcquisition = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
             renderTo: 'container',

@@ -1,5 +1,8 @@
 $(function () {
     var chartStudyMeanDLPOverTime = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             renderTo: 'studyMeanDLPOverTimeDIV',
             zoomType: 'x'
