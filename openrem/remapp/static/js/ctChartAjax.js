@@ -183,7 +183,7 @@ $(document).ready(function() {
                     });
                     chartPlotCTAcquisitionMeanDLPandCTDI.series[1].update({
                         color: colourScale(1/1).hex(),
-                        data: seriesMedianData
+                        data: series_median_data_ctdi
                     });
                 }
                 else {

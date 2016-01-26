@@ -1062,7 +1062,27 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
 
         returnStructure['acquisitionSummary'] = list(acquisitionSummary)
 
-        if plotCTAcquisitionMeanDLP:
+        if plotCTAcquisitionMeanDLP and plotCTAcquisitionMeanCTDI:
+            acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+
+            for idx, protocol in enumerate(acquisitionSummary):
+                dlpAndCtdiValues = acquisition_events.filter(
+                    acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', 'mean_ctdivol')
+                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
+                    [float(x[0]) for x in dlpAndCtdiValues], bins=plotHistogramBins)
+                acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
+                acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
+
+                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram(
+                    [float(x[1]) for x in dlpAndCtdiValues], bins=plotHistogramBins)
+                acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
+                acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
+
+            returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
+            returnStructure['acquisitionHistogramDataCTDI'] = list(acquisitionHistogramDataCTDI)
+
+        elif plotCTAcquisitionMeanDLP:
             acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
             for idx, protocol in enumerate(acquisitionSummary):
                 dlpValues = acquisition_events.filter(
@@ -1073,7 +1093,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                 acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
             returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
 
-        if plotCTAcquisitionMeanCTDI:
+        elif plotCTAcquisitionMeanCTDI:
             acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
             for idx, protocol in enumerate(acquisitionSummary):
                 ctdiValues = acquisition_events.filter(
@@ -1082,7 +1102,7 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                     [float(x) for x in ctdiValues], bins=plotHistogramBins)
                 acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
                 acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
-            returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
+            returnStructure['acquisitionHistogramDataCTDI'] = list(acquisitionHistogramDataCTDI)
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyMeanDLPOverTime:
         studyNameList = list(study_events.values_list('study_description', flat=True).distinct().order_by('study_description'))
