@@ -1492,7 +1492,7 @@ def size_download(request, task_id):
     response = HttpResponse(file_wrapper, content_type=file_mimetype )
     response['X-Sendfile'] = file_path
     response['Content-Length'] = os.stat(file_path).st_size
-    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(exp.filename)
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(exp.logfile)
     return response
 
 
