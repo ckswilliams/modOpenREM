@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
 * `#342`_  Charts: improved the colours used for plotting chart data
 * `#340`_  Fixed store failure to save due to illegal values in Philips private tags, improved exception code
