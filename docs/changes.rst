@@ -7,6 +7,7 @@ OpenREM version history
 
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
+* `#343`_  Charts: user can now specify number of histogram bins in the range of 2 to 40
 * `#342`_  Charts: improved the colours used for plotting chart data
 * `#340`_  Fixed store failure to save due to illegal values in Philips private tags, improved exception code
 * `#339`_  Improved extraction of requested procedure information for radiographic studies
