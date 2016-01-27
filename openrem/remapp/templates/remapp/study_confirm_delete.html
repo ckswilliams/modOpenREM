@@ -48,7 +48,7 @@
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}</td>
 {% elif exam.modality_type = "MG" %}
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">{{ exam.procedure_code_meaning }}</a> |
