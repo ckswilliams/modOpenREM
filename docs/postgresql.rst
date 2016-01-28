@@ -172,7 +172,7 @@ Create a fresh database and restore from the backup
 .. sourcecode:: console
 
     sudo -u postgres createdb -T template0 new_openremdb_name
-    sudo -u psql new_openremdb_name < /path/to/db/backups/openrem.bak
+    sudo -u postgres psql new_openremdb_name < /path/to/db/backups/openrem.bak
 
 
 **********************************************
@@ -180,8 +180,8 @@ Alternative instructions and further reference
 **********************************************
 
 Previous versions had instructions that used different backup options and the ``pg_restore`` command. To review these,
-please refer to the 0.6.1 documentation at
-`docs.openrem.org/en/0.6.1/  <http://docs.openrem.org/en/0.6.1/backupRestorePostgreSQL.html>`_
+please refer to the 0.6.2 documentation at
+`docs.openrem.org/en/0.6.2/  <http://docs.openrem.org/en/0.6.2/backupRestorePostgreSQL.html>`_
 
 Further details can be found on the
 `PostgreSQL website <http://www.postgresql.org/docs/9.4/static/backup-dump.html#BACKUP-DUMP-RESTORE>`_
