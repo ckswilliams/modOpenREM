@@ -360,30 +360,117 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
         acquisition_mas_names = list(acquisition_mas_events.values_list('acquisition_protocol', flat=True).distinct().order_by('acquisition_protocol'))
         returnStructure['acquisition_mas_names'] = acquisition_mas_names
 
-    if plotDXAcquisitionMeanDAP:
-        if median_available and plotAverageChoice == 'both':
-            acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                mean_dap=Avg('dose_area_product') * 1000000,
-                median_dap=Median('dose_area_product') / 10000,
-                num_acq=Count('dose_area_product')) \
-                .order_by('acquisition_protocol')
-        elif median_available and plotAverageChoice == 'median':
-            acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                median_dap=Median('dose_area_product') / 10000,
-                num_acq=Count('dose_area_product')) \
-                .order_by('acquisition_protocol')
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq:
+        if plotSeriesPerSystems and plotDXAcquisitionMeanDAP:
+            acquisitionSystemList = list(acquisition_events.values_list('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
-            acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                mean_dap=Avg('dose_area_product') * 1000000,
-                num_acq=Count('dose_area_product')) \
-                .order_by('acquisition_protocol')
-        acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
+            acquisitionSystemList = ['All systems']
+        returnStructure['acquisitionSystemList'] = list(acquisitionSystemList)
+
+        if median_available and plotAverageChoice == 'both':
+            acquisitionSummary = []
+            if plotSeriesPerSystems and plotDXAcquisitionMeanDAP:
+                for system in acquisitionSystemList:
+                    acquisitionSummary.append(acquisition_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            mean_dap=Avg('dose_area_product') * 1000000,
+                            median_dap=Median('dose_area_product') / 10000,
+                            num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+            elif plotDXAcquisitionMeanDAP:
+                acquisitionSummary.append(acquisition_events.values(
+                        'acquisition_protocol').annotate(
+                        mean_dap=Avg('dose_area_product') * 1000000,
+                        median_dap=Median('dose_area_product') / 10000,
+                        num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+            else:
+                acquisitionSummary.append(acquisition_events.values('acquisition_protocol').annotate(
+                        num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionSummary)):
+                acquisitionSummary[index] = list(acquisitionSummary[index])
+
+        elif median_available and plotAverageChoice == 'median':
+            acquisitionSummary = []
+            if plotSeriesPerSystems and plotDXAcquisitionMeanDAP:
+                for system in acquisitionSystemList:
+                    acquisitionSummary.append(acquisition_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            median_dap=Median('dose_area_product') / 10000,
+                            num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+            elif plotDXAcquisitionMeanDAP:
+                acquisitionSummary.append(acquisition_events.values('acquisition_protocol').annotate(
+                        median_dap=Median('dose_area_product') / 10000,
+                        num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+            else:
+                acquisitionSummary.append(acquisition_events.values('acquisition_protocol').annotate(
+                        num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionSummary)):
+                acquisitionSummary[index] = list(acquisitionSummary[index])
+
+        else:
+            acquisitionSummary = []
+            if plotSeriesPerSystems and plotDXAcquisitionMeanDAP:
+                for system in acquisitionSystemList:
+                    acquisitionSummary.append(acquisition_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            mean_dap=Avg('dose_area_product') * 1000000,
+                            num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+            elif plotDXAcquisitionMeanDAP:
+                acquisitionSummary.append(acquisition_events.values('acquisition_protocol').annotate(
+                        mean_dap=Avg('dose_area_product') * 1000000,
+                        num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+            else:
+                acquisitionSummary.append(acquisition_events.values('acquisition_protocol').annotate(
+                        num_acq=Count('dose_area_product')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionSummary)):
+                acquisitionSummary[index] = list(acquisitionSummary[index])
+
+        # Fill in default values where data for an acquisition protocol is missing for any of the systems
+        if plotSeriesPerSystems and plotDXAcquisitionMeanDAP:
+            for index in range(len(acquisitionSystemList)):
+                missing_acquisition_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in acquisitionSummary[index]]))
+                for name in missing_acquisition_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (acquisitionSummary[index]).append({'median_dap': 0, 'mean_dap': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (acquisitionSummary[index]).append({'median_dap': 0, 'acquisition_protocol':name, 'num_acq': 0})
+                    else:
+                        (acquisitionSummary[index]).append({'mean_dap': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionSummary[index] )[0])
+                acquisitionSummary[index] = acquisitionSummaryTemp
+
         returnStructure['acquisitionSummary'] = list(acquisitionSummary)
 
-    elif plotDXAcquisitionFreq:
-        acquisitionSummary = acquisition_events.values('acquisition_protocol').annotate(
-                num_acq=Count('dose_area_product')).order_by('acquisition_protocol')
-        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
+    if plotDXAcquisitionMeanDAP:
+        acquisitionHistogramData = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(acquisitionSystemList))]
+
+        acquisitionRanges = acquisition_events.values('acquisition_protocol').distinct().annotate(
+                min_dap=Min('dose_area_product', output_field=FloatField()),
+                max_dap=Max('dose_area_product', output_field=FloatField())).order_by(
+                'acquisition_protocol')
+
+        for sys_idx, system in enumerate(acquisitionSystemList):
+            for acq_idx, acquisition_name in enumerate(acquisition_names):
+                if plotSeriesPerSystems:
+                    subqs = acquisition_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            acquisition_protocol=acquisition_name)
+                else:
+                    subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
+
+                dapValues = subqs.values_list(
+                        'dose_area_product',
+                        flat=True)
+                acquisitionHistogramData[sys_idx][acq_idx][0], acquisitionHistogramData[sys_idx][acq_idx][1] = np.histogram([float(x) for x in dapValues], bins=plotHistogramBins, range=acquisitionRanges.filter(acquisition_protocol=acquisition_name).values_list('min_dap', 'max_dap')[0])
+                acquisitionHistogramData[sys_idx][acq_idx][0] = acquisitionHistogramData[sys_idx][acq_idx][0].tolist()
+                acquisitionHistogramData[sys_idx][acq_idx][1] = (acquisitionHistogramData[sys_idx][acq_idx][1] * 1000000).tolist()
+
+        returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
 
     if plotDXRequestMeanDAP or plotDXRequestFreq:
         if plotSeriesPerSystems and plotDXRequestMeanDAP:
@@ -674,33 +761,22 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
             if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
                 acquisitionMeanDAPoverTime = [None] * len(acquisition_names)
 
-    if plotDXAcquisitionMeanDAP or plotDXAcquisitionMeanDAPOverTime:
+    if plotDXAcquisitionMeanDAPOverTime:
         for idx, protocol in enumerate(acquisition_names):
             subqs = acquisition_events.filter(acquisition_protocol__exact=protocol)
 
-            if plotDXAcquisitionMeanDAP:
-                # Required for mean DAP per acquisition plot
-                dapValues = subqs.values_list('dose_area_product', flat=True)
-                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
-                    [float(x) * 1000000 for x in dapValues], bins=plotHistogramBins)
-                acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
-                acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
-                returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
-
-            if plotDXAcquisitionMeanDAPOverTime:
-                # Required for mean DAP over time
-                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                    qss = qsstats.QuerySetStats(subqs, 'date_time_started',
-                                                aggregate=Avg('dose_area_product') * 1000000)
-                    acquisitionMeanDAPoverTime[idx] = qss.time_series(startDate, today,
-                                                                      interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                    returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
-                if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
-                    qss = qsstats.QuerySetStats(subqs, 'date_time_started',
-                                                aggregate=Median('dose_area_product') / 10000)
-                    acquisitionMedianDAPoverTime[idx] = qss.time_series(startDate, today,
-                                                                        interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                    returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                qss = qsstats.QuerySetStats(subqs, 'date_time_started',
+                                            aggregate=Avg('dose_area_product') * 1000000)
+                acquisitionMeanDAPoverTime[idx] = qss.time_series(startDate, today,
+                                                                    interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                returnStructure['acquisitionMeanDAPoverTime'] = acquisitionMeanDAPoverTime
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                qss = qsstats.QuerySetStats(subqs, 'date_time_started',
+                                            aggregate=Median('dose_area_product') / 10000)
+                acquisitionMedianDAPoverTime[idx] = qss.time_series(startDate, today,
+                                                                    interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
 
     if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
         for idx, protocol in enumerate(acquisition_kvp_names):
