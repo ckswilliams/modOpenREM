@@ -1,5 +1,4 @@
 $(function () {
-    var drilldownkVpTitle = 'Histogram of ';
     var defaultkVpTitle   = 'kVp per acquisition protocol';
     var bins = [];
     var name = '';
@@ -13,44 +12,83 @@ $(function () {
             renderTo: 'chartAcquisitionMeankVp',
             events: {
                 drilldown: function(e) {
+                    $('.kvp-hist-norm-btn').css('display','inline-block');
+
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartkVpPerAcquisition.setTitle({ text: drilldownkVpTitle + e.point.name + ' kVp values' }, { text: '(n = ' + e.point.freq +')' });
-                    chartkVpPerAcquisition.yAxis[0].setTitle({text:'Number'});
-                    chartkVpPerAcquisition.xAxis[0].setTitle({text:'kVp range'});
-                    chartkVpPerAcquisition.xAxis[0].setCategories([], true);
-                    chartkVpPerAcquisition.tooltip.options.formatter = function(e) {
+
+                    if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
+
+                    var drilldownTitle;
+                    if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
+                    drilldownTitle += e.point.name + ' kVp values';
+                    if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
+
+                    this.setTitle({
+                        text: drilldownTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
+                        },
+                        max: (this.options.drilldown.normalise ? 1.0 : null),
+                        labels: {
+                            format: (this.options.drilldown.normalise ? '{value:.2f}' : null)
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text:'kVp range'
+                        },
+                        categories: []
+                    }, false);
+                    this.tooltip.options.formatter = function(e) {
                         var linkText = 'acquisition_kvp_min=' + bins[this.x] + '&acquisition_kvp_max=' + bins[this.x+1] + '&acquisition_protocol=' + name;
+                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFilterskVp + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function(e) {
-                    chartkVpPerAcquisition.setTitle({ text: defaultkVpTitle }, { text: '' });
-                    chartkVpPerAcquisition.yAxis[0].setTitle({text:'kVp'});
-                    chartkVpPerAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartkVpPerAcquisition.xAxis[0].update({
+                    $('.kvp-hist-norm-btn').css('display','none');
+
+                    this.setTitle({
+                        text: defaultkVpTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text:'kVp'
+                        },
+                        max: null,
+                        labels: {
+                            format: null
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text:'Protocol name'
+                        },
                         categories: {
                             formatter: function (args) {
-                                return this.value;
+                                return this.point.category;
                             }
                         }
                     });
-                    chartkVpPerAcquisition.tooltip.options.formatter = function(args) {
+                    this.tooltip.options.formatter = function() {
                         return this.point.tooltip;
                     }
                 }
             }
         },
         title: {
-            text: 'kVp per acquisition protocol',
-            useHTML: true
+            useHTML: true,
+            text: defaultkVpTitle
         },
         legend: {
             enabled: true
         },
         xAxis: {
-            categories: [1,2,3,4,5],
+            categories: [],
             title: {
                 useHTML: true,
                 text: 'Protocol name'
@@ -68,7 +106,7 @@ $(function () {
             }
         },
         tooltip: {
-            formatter: function (args) {
+            formatter: function () {
                 return this.point.tooltip;
             },
             useHTML: true
@@ -76,16 +114,11 @@ $(function () {
         plotOptions: {
             column: {
                 pointPadding: 0,
-                borderWidth: 0
+                borderWidth: 1,
+                borderColor: '#999999'
             }
         },
-        series: [{
-            name: 'Mean kVp per acquisition protocol',
-            data: []
-        }, {
-            name: 'Median kVp per acquisition protocol',
-            data: []
-        }],
+        series: [],
         drilldown: {
             series: []
         }
@@ -104,5 +137,4 @@ $(function () {
         default:
             anySeriesSort('#chartAcquisitionMeankVp', 'name', chartSortingDirection, 0);
     }
-
 });

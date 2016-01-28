@@ -485,89 +485,146 @@ $(document).ready(function() {
             //-------------------------------------------------------------------------------------
             // kVp chart data start
             if( typeof plotDXAcquisitionMeankVp !== 'undefined' || typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
-                var protocolkVpNames = json.acquisition_kvp_names;
+                var acquisition_kvp_summary = json.acquisitionkVpSummary;
+                var acquisition_kvp_names = json.acquisition_kvp_names;
+                var acquisition_kvp_system_names = json.acquisitionkVpSystemList;
+                var acquisition_kvp_histogram_data = json.acquisitionHistogramkVpData;
             }
 
             if(typeof plotDXAcquisitionMeankVp !== 'undefined') {
-                var acq_kVp_summary = $.map(json.acquisitionkVpSummary, function (el) {
-                    return el;
-                });
-
-                var acq_histogram_kVp_data = json.acquisitionHistogramkVpData;
-                var protocolkVpCounts = [];
-                var protocolkVpBins = [];
-                for (i = 0; i < protocolkVpNames.length; i++) {
-                    protocolkVpCounts.push(acq_histogram_kVp_data[i][0]);
-                    protocolkVpBins.push(acq_histogram_kVp_data[i][1]);
-                }
-
-                if(plotAverageChoice == "mean" || plotAverageChoice == "both") {
-                    var serieskVpData = [];
-                    for (i = 0; i < protocolkVpNames.length; i++) {
-                        serieskVpData.push({
-                            name: protocolkVpNames[i],
-                            y: acq_kVp_summary[i].mean_kVp,
-                            freq: acq_kVp_summary[i].num_acq,
-                            bins: protocolkVpBins[i],
-                            tooltip: protocolkVpNames[i] + '<br>' + acq_kVp_summary[i].mean_kVp.toFixed(1) + ' mean<br>(n=' + acq_kVp_summary[i].num_acq + ')',
-                            drilldown: protocolkVpNames[i]
-                        });
+                var acquisition_kvp_counts = []; while(acquisition_kvp_counts.push([]) < acquisition_kvp_system_names.length);
+                var acquisition_kvp_bins = []; while(acquisition_kvp_bins.push([]) < acquisition_kvp_system_names.length);
+                for (i = 0; i < acquisition_kvp_system_names.length; i++) {
+                    for (j = 0; j < acquisition_kvp_names.length; j++) {
+                        (acquisition_kvp_counts[i]).push(acquisition_kvp_histogram_data[i][j][0]);
+                        (acquisition_kvp_bins[i]).push(acquisition_kvp_histogram_data[i][j][1]);
                     }
                 }
 
-                if(plotAverageChoice == "median" || plotAverageChoice == "both") {
-                    var seriesMediankVpData = [];
-                    for (i = 0; i < protocolkVpNames.length; i++) {
-                        seriesMediankVpData.push({
-                            name: protocolkVpNames[i],
-                            y: parseFloat(acq_kVp_summary[i].median_kVp),
-                            freq: acq_kVp_summary[i].num_acq,
-                            bins: protocolkVpBins[i],
-                            tooltip: protocolkVpNames[i] + '<br>' + parseFloat(acq_kVp_summary[i].median_kVp).toFixed(1) + ' median<br>(n=' + acq_kVp_summary[i].num_acq + ')',
-                            drilldown: protocolkVpNames[i]
-                        });
+                if (plotAverageChoice == "mean" || plotAverageChoice == "both") {
+                    var acquisition_kvp_data = []; while(acquisition_kvp_data.push([]) < acquisition_kvp_system_names.length);
+                    for (i = 0; i < acquisition_kvp_system_names.length; i++) {
+                        for (j = 0; j < acquisition_kvp_names.length; j++) {
+                            (acquisition_kvp_data[i]).push({
+                                name: acquisition_kvp_names[j],
+                                y: acquisition_kvp_summary[i][j].mean_kvp,
+                                freq: acquisition_kvp_summary[i][j].num_acq,
+                                bins: acquisition_kvp_bins[i][j],
+                                tooltip: acquisition_kvp_system_names[i] + '<br>' + acquisition_kvp_names[j] + '<br>' + acquisition_kvp_summary[i][j].mean_kvp.toFixed(1) + ' mean<br>(n=' + acquisition_kvp_summary[i][j].num_acq + ')',
+                                drilldown: acquisition_kvp_system_names[i]+acquisition_kvp_names[j]
+                            });
+                        }
+                    }
+                }
+
+                if (plotAverageChoice == "median" || plotAverageChoice == "both") {
+                    var acquisition_kvp_data_median = []; while(acquisition_kvp_data_median.push([]) < acquisition_kvp_system_names.length);
+                    for (i = 0; i < acquisition_kvp_system_names.length; i++) {
+                        for (j = 0; j < acquisition_kvp_names.length; j++) {
+                            (acquisition_kvp_data_median[i]).push({
+                                name: acquisition_kvp_names[j],
+                                y: parseFloat(acquisition_kvp_summary[i][j].median_kvp),
+                                freq: acquisition_kvp_summary[i][j].num_acq,
+                                bins: acquisition_kvp_bins[i][j],
+                                tooltip: acquisition_kvp_system_names[i] + '<br>' + acquisition_kvp_names[j] + '<br>' + parseFloat(acquisition_kvp_summary[i][j].median_kvp).toFixed(1) + ' median<br>(n=' + acquisition_kvp_summary[i][j].num_acq + ')',
+                                drilldown: acquisition_kvp_system_names[i]+acquisition_kvp_names[j]
+                            });
+                        }
                     }
                 }
 
                 temp = [];
-                var serieskVpDrilldown = [];
-                for (i = 0; i < protocolkVpNames.length; i++) {
-                    temp = [];
-                    for (j = 0; j < protocolkVpCounts[0].length; j++) {
-                        temp.push([protocolkVpBins[i][j].toFixed(1).toString() + ' \u2264 x < ' + protocolkVpBins[i][j+1].toFixed(1).toString(), protocolkVpCounts[i][j]]);
+                var series_drilldown_acquisition_kvp = [];
+                for (i = 0; i < acquisition_kvp_system_names.length; i++) {
+                    for (j = 0; j < acquisition_kvp_names.length; j++) {
+                        temp = [];
+                        for (k = 0; k < acquisition_kvp_counts[i][0].length; k++) {
+                            temp.push([acquisition_kvp_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + acquisition_kvp_bins[i][j][k + 1].toFixed(1).toString(), acquisition_kvp_counts[i][j][k]]);
+                        }
+                        series_drilldown_acquisition_kvp.push({
+                            id: acquisition_kvp_system_names[i]+acquisition_kvp_names[j],
+                            name: acquisition_kvp_system_names[i],
+                            useHTML: true,
+                            data: temp
+                        });
                     }
-                    serieskVpDrilldown.push({id: protocolkVpNames[i], name: protocolkVpNames[i], useHTML: true, data: temp});
                 }
 
-                var chartplotDXAcquisitionMeankVp = $('#chartAcquisitionMeankVp').highcharts();
-                chartplotDXAcquisitionMeankVp.xAxis[0].setCategories(protocolkVpNames);
-                chartplotDXAcquisitionMeankVp.options.drilldown.series = serieskVpDrilldown;
-                chartplotDXAcquisitionMeankVp.options.exporting.sourceWidth = $(window).width();
-                chartplotDXAcquisitionMeankVp.options.exporting.sourceHeight = $(window).height();
+                var chartPlotDXAcquisitionMeankVp = $('#chartAcquisitionMeankVp').highcharts();
+                chartPlotDXAcquisitionMeankVp.xAxis[0].setCategories(acquisition_kvp_names);
+                chartPlotDXAcquisitionMeankVp.options.drilldown.series = series_drilldown_acquisition_kvp;
+                chartPlotDXAcquisitionMeankVp.options.exporting.sourceWidth = $(window).width();
+                chartPlotDXAcquisitionMeankVp.options.exporting.sourceHeight = $(window).height();
 
-                if(plotAverageChoice == "mean") {
-                    chartplotDXAcquisitionMeankVp.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: serieskVpData
-                    });
+                var acq_kvp_sys_colour_max = acquisition_kvp_system_names.length == 1 ? acquisition_kvp_system_names.length : acquisition_kvp_system_names.length - 1;
+
+                if (plotAverageChoice == "mean") {
+                    for (i = 0; i < acquisition_kvp_system_names.length; i++) {
+                        if (chartPlotDXAcquisitionMeankVp.series.length > i) {
+                            chartPlotDXAcquisitionMeankVp.series[i].update({
+                                name: acquisition_kvp_system_names[i],
+                                data: acquisition_kvp_data[i],
+                                color: colourScale(i/acq_kvp_sys_colour_max).hex()
+                            });
+                        }
+                        else {
+                            chartPlotDXAcquisitionMeankVp.addSeries({
+                                name: acquisition_kvp_system_names[i],
+                                data: acquisition_kvp_data[i],
+                                color: colourScale(i/acq_kvp_sys_colour_max).hex()
+                            });
+                        }
+                    }
                 }
-                else if(plotAverageChoice == "median") {
-                    chartplotDXAcquisitionMeankVp.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: seriesMediankVpData
-                    });
+                else if (plotAverageChoice == "median") {
+                    for (i = 0; i < acquisition_kvp_system_names.length; i++) {
+                        if (chartPlotDXAcquisitionMeankVp.series.length > i) {
+                            chartPlotDXAcquisitionMeankVp.series[i].update({
+                                name: acquisition_kvp_system_names[i],
+                                data: acquisition_kvp_data_median[i],
+                                color: colourScale(i/acq_kvp_sys_colour_max).hex()
+                            });
+                        }
+                        else {
+                            chartPlotDXAcquisitionMeankVp.addSeries({
+                                name: acquisition_kvp_system_names[i],
+                                data: acquisition_kvp_data_median[i],
+                                color: colourScale(i/acq_kvp_sys_colour_max).hex()
+                            });
+                        }
+                    }
                 }
                 else {
-                    chartplotDXAcquisitionMeankVp.series[0].update({
-                        color: colourScale(0).hex(),
-                        data: serieskVpData
-                    });
-                    chartplotDXAcquisitionMeankVp.series[1].update({
-                        color: colourScale(1).hex(),
-                        data: seriesMediankVpData
-                    });
+                    var current_series_kvp = 0;
+                    for (i = 0; i < (acquisition_kvp_system_names.length)*2; i+=2) {
+                        if (chartPlotDXAcquisitionMeankVp.series.length > i+1) {
+                            chartPlotDXAcquisitionMeankVp.series[i].update({
+                                name: acquisition_kvp_system_names[current_series_kvp],
+                                data: acquisition_kvp_data[current_series_kvp],
+                                color: colourScale(i/(acq_kvp_sys_colour_max*2+1)).hex()
+                            });
+                            chartPlotDXAcquisitionMeankVp.series[i+1].update({
+                                name: acquisition_kvp_system_names[current_series_kvp],
+                                data: acquisition_kvp_data_median[current_series_kvp],
+                                color: colourScale((i+1)/(acq_kvp_sys_colour_max*2+1)).hex()
+                            });
+                        }
+                        else {
+                            chartPlotDXAcquisitionMeankVp.addSeries({
+                                name: acquisition_kvp_system_names[current_series_kvp],
+                                data: acquisition_kvp_data[current_series_kvp],
+                                color: colourScale(i/(acq_kvp_sys_colour_max*2+1)).hex()
+                            });
+                            chartPlotDXAcquisitionMeankVp.addSeries({
+                                name: acquisition_kvp_system_names[current_series_kvp],
+                                data: acquisition_kvp_data_median[current_series_kvp],
+                                color: colourScale((i+1)/(acq_kvp_sys_colour_max*2+1)).hex()
+                            });
+                        }
+                        current_series_kvp++;
+                    }
                 }
-                chartplotDXAcquisitionMeankVp.redraw({ duration: 1000 });
+                chartPlotDXAcquisitionMeankVp.redraw({ duration: 1000 });
             }
             // kVp chart data end
             //-------------------------------------------------------------------------------------

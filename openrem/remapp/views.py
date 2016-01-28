@@ -702,23 +702,105 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
             returnStructure['studyHistogramData'] = studyHistogramData
 
     if plotDXAcquisitionMeankVp:
-        if median_available and plotAverageChoice == 'both':
-            acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
-                mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
-                median_kVp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
-                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
-        elif median_available and plotAverageChoice == 'median':
-            acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
-                median_kVp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
-                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
+        if plotSeriesPerSystems:
+            acquisitionkVpSystemList = list(acquisition_kvp_events.values_list('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
-            acquisitionkVpSummary = acquisition_kvp_events.values('acquisition_protocol').annotate(
-                mean_kVp=Avg('irradeventxraysourcedata__kvp__kvp'),
-                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
+            acquisitionkVpSystemList = ['All systems']
+        returnStructure['acquisitionkVpSystemList'] = list(acquisitionkVpSystemList)
+
+        if median_available and plotAverageChoice == 'both':
+            acquisitionkVpSummary = []
+            if plotSeriesPerSystems:
+                for system in acquisitionkVpSystemList:
+                    acquisitionkVpSummary.append(acquisition_kvp_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            mean_kvp=Avg('irradeventxraysourcedata__kvp__kvp'),
+                            median_kvp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                            num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+            else:
+                acquisitionkVpSummary.append(acquisition_kvp_events.values('acquisition_protocol').annotate(
+                        mean_kvp=Avg('irradeventxraysourcedata__kvp__kvp'),
+                        median_kvp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                        num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionkVpSummary)):
+                acquisitionkVpSummary[index] = list(acquisitionkVpSummary[index])
+
+        elif median_available and plotAverageChoice == 'median':
+            acquisitionkVpSummary = []
+            if plotSeriesPerSystems:
+                for system in acquisitionkVpSystemList:
+                    acquisitionkVpSummary.append(acquisition_kvp_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            median_kvp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                            num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+            else:
+                acquisitionkVpSummary.append(acquisition_kvp_events.values('acquisition_protocol').annotate(
+                        median_kvp=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                        num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionkVpSummary)):
+                acquisitionkVpSummary[index] = list(acquisitionkVpSummary[index])
+
+        else:
+            acquisitionkVpSummary = []
+            if plotSeriesPerSystems:
+                for system in acquisitionkVpSystemList:
+                    acquisitionkVpSummary.append(acquisition_kvp_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            mean_kvp=Avg('irradeventxraysourcedata__kvp__kvp'),
+                            num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+            else:
+                acquisitionkVpSummary.append(acquisition_kvp_events.values('acquisition_protocol').annotate(
+                        mean_kvp=Avg('irradeventxraysourcedata__kvp__kvp'),
+                        num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionkVpSummary)):
+                acquisitionkVpSummary[index] = list(acquisitionkVpSummary[index])
+
+        # Fill in default values where data for an acquisition protocol is missing for any of the systems
+        if plotSeriesPerSystems:
+            for index in range(len(acquisitionkVpSystemList)):
+                missing_acquisition_names = list(set(acquisition_kvp_names) - set([d['acquisition_protocol'] for d in acquisitionkVpSummary[index]]))
+                for name in missing_acquisition_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (acquisitionkVpSummary[index]).append({'median_kvp': 0, 'mean_kvp': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (acquisitionkVpSummary[index]).append({'median_kvp': 0, 'acquisition_protocol':name, 'num_acq': 0})
+                    else:
+                        (acquisitionkVpSummary[index]).append({'mean_kvp': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_kvp_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionkVpSummary[index] )[0])
+                acquisitionkVpSummary[index] = acquisitionSummaryTemp
 
         returnStructure['acquisitionkVpSummary'] = list(acquisitionkVpSummary)
 
-        acquisitionHistogramkVpData = [[None for i in xrange(2)] for i in xrange(len(acquisitionkVpSummary))]
+        acquisitionHistogramkVpData = [[[None for k in xrange(2)] for j in xrange(len(acquisition_kvp_names))] for i in xrange(len(acquisitionkVpSystemList))]
+
+        acquisitionkVpRanges = acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
+                min_kvp=Min('irradeventxraysourcedata__kvp__kvp', output_field=FloatField()),
+                max_kvp=Max('irradeventxraysourcedata__kvp__kvp', output_field=FloatField())).order_by(
+                'acquisition_protocol')
+
+        for sys_idx, system in enumerate(acquisitionkVpSystemList):
+            for acq_idx, acquisition_name in enumerate(acquisition_kvp_names):
+                if plotSeriesPerSystems:
+                    subqs = acquisition_kvp_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            acquisition_protocol=acquisition_name)
+                else:
+                    subqs = acquisition_kvp_events.filter(acquisition_protocol=acquisition_name)
+
+                kvpValues = subqs.values_list(
+                        'irradeventxraysourcedata__kvp__kvp',
+                        flat=True)
+                acquisitionHistogramkVpData[sys_idx][acq_idx][0], acquisitionHistogramkVpData[sys_idx][acq_idx][1] = np.histogram([float(x) for x in kvpValues], bins=plotHistogramBins, range=acquisitionkVpRanges.filter(acquisition_protocol=acquisition_name).values_list('min_kvp', 'max_kvp')[0])
+                acquisitionHistogramkVpData[sys_idx][acq_idx][0] = acquisitionHistogramkVpData[sys_idx][acq_idx][0].tolist()
+                acquisitionHistogramkVpData[sys_idx][acq_idx][1] = acquisitionHistogramkVpData[sys_idx][acq_idx][1].tolist()
+
+        returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
 
     if plotDXAcquisitionMeanmAs:
         if median_available and plotAverageChoice == 'both':
@@ -778,33 +860,22 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                                                                     interval=plotDXAcquisitionMeanDAPOverTimePeriod)
                 returnStructure['acquisitionMedianDAPoverTime'] = acquisitionMedianDAPoverTime
 
-    if plotDXAcquisitionMeankVp or plotDXAcquisitionMeankVpOverTime:
+    if plotDXAcquisitionMeankVpOverTime:
         for idx, protocol in enumerate(acquisition_kvp_names):
             subqskvp = acquisition_kvp_events.filter(acquisition_protocol=protocol)
 
-            if plotDXAcquisitionMeankVp:
-                # Required for mean kVp per acquisition plot
-                kVpValues = subqskvp.values_list('irradeventxraysourcedata__kvp__kvp', flat=True)
-                acquisitionHistogramkVpData[idx][0], acquisitionHistogramkVpData[idx][1] = np.histogram(
-                    [float(x) for x in kVpValues], bins=plotHistogramBins)
-                acquisitionHistogramkVpData[idx][0] = acquisitionHistogramkVpData[idx][0].tolist()
-                acquisitionHistogramkVpData[idx][1] = acquisitionHistogramkVpData[idx][1].tolist()
-                returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
-
-            if plotDXAcquisitionMeankVpOverTime:
-                # Required for mean kVp over time
-                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
-                                                aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
-                    acquisitionMeankVpoverTime[idx] = qss.time_series(startDate, today,
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
+                                            aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
+                acquisitionMeankVpoverTime[idx] = qss.time_series(startDate, today,
                                                                       interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                    returnStructure['acquisitionMeankVpoverTime'] = acquisitionMeankVpoverTime
-                if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
-                    qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
-                                                aggregate=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000)
-                    acquisitionMediankVpoverTime[idx] = qss.time_series(startDate, today,
+                returnStructure['acquisitionMeankVpoverTime'] = acquisitionMeankVpoverTime
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                qss = qsstats.QuerySetStats(subqskvp, 'date_time_started',
+                                            aggregate=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000)
+                acquisitionMediankVpoverTime[idx] = qss.time_series(startDate, today,
                                                                         interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                    returnStructure['acquisitionMediankVpoverTime'] = acquisitionMediankVpoverTime
+                returnStructure['acquisitionMediankVpoverTime'] = acquisitionMediankVpoverTime
 
     if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
         for idx, protocol in enumerate(acquisition_mas_names):

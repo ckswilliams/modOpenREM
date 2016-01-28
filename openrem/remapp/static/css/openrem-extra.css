@@ -50,6 +50,10 @@ div.acq-hist-norm-btn {
   display: none;
 }
 
+div.kvp-hist-norm-btn {
+  display: none;
+}
+
 div.ajax-error {
   position: fixed;
   display: none;
