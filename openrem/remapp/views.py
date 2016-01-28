@@ -290,52 +290,57 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
     returnStructure = {}
 
     expInclude = [o.study_instance_uid for o in f]
-    acquisitionFilters = {
-        'projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in': expInclude}
-    if requestResults.get('acquisition_dap_max'):
-        acquisitionFilters['dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
-    if requestResults.get('acquisition_dap_min'):
-        acquisitionFilters['dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
-    if requestResults.get('acquisition_protocol'):
-        acquisitionFilters['acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
-    if requestResults.get('acquisition_kvp_min'):
-        acquisitionFilters['irradeventxraysourcedata__kvp__kvp__gte'] = requestResults.get('acquisition_kvp_min')
-    if requestResults.get('acquisition_kvp_max'):
-        acquisitionFilters['irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get('acquisition_kvp_max')
-    if requestResults.get('acquisition_mas_min'):
-        acquisitionFilters['irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get(
-            'acquisition_mas_min')
-    if requestResults.get('acquisition_mas_max'):
-        acquisitionFilters['irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get(
-            'acquisition_mas_max')
 
-    acquisition_events = IrradEventXRayData.objects.exclude(
-        dose_area_product__isnull=True
-    ).filter(
-        **acquisitionFilters
-    )
-    acquisition_names = list(acquisition_events.values_list('acquisition_protocol', flat=True).distinct().order_by('acquisition_protocol'))
-    returnStructure['acquisition_names'] = acquisition_names
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime or plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeankVp or plotDXAcquisitionMeanmAsOverTime or plotDXAcquisitionMeanmAs:
+        acquisitionFilters = {
+            'projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in': expInclude}
+        if requestResults.get('acquisition_dap_max'):
+            acquisitionFilters['dose_area_product__lte'] = requestResults.get('acquisition_dap_max')
+        if requestResults.get('acquisition_dap_min'):
+            acquisitionFilters['dose_area_product__gte'] = requestResults.get('acquisition_dap_min')
+        if requestResults.get('acquisition_protocol'):
+            acquisitionFilters['acquisition_protocol__icontains'] = requestResults.get('acquisition_protocol')
+        if requestResults.get('acquisition_kvp_min'):
+            acquisitionFilters['irradeventxraysourcedata__kvp__kvp__gte'] = requestResults.get('acquisition_kvp_min')
+        if requestResults.get('acquisition_kvp_max'):
+            acquisitionFilters['irradeventxraysourcedata__kvp__kvp__lte'] = requestResults.get('acquisition_kvp_max')
+        if requestResults.get('acquisition_mas_min'):
+            acquisitionFilters['irradeventxraysourcedata__exposure__exposure__gte'] = requestResults.get(
+                'acquisition_mas_min')
+        if requestResults.get('acquisition_mas_max'):
+            acquisitionFilters['irradeventxraysourcedata__exposure__exposure__lte'] = requestResults.get(
+                'acquisition_mas_max')
 
-    study_events = GeneralStudyModuleAttr.objects.exclude(
-        projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-    ).exclude(
-        study_description__isnull=True
-    ).filter(
-        study_instance_uid__in=expInclude
-    )
-    study_names = list(study_events.values_list('study_description', flat=True).distinct().order_by('study_description'))
-    returnStructure['study_names'] = study_names
+    if plotDXAcquisitionMeanDAP or plotDXAcquisitionFreq or plotDXAcquisitionMeanDAPOverTime:
+        acquisition_events = IrradEventXRayData.objects.exclude(
+            dose_area_product__isnull=True
+        ).filter(
+            **acquisitionFilters
+        )
+        acquisition_names = list(acquisition_events.values_list('acquisition_protocol', flat=True).distinct().order_by('acquisition_protocol'))
+        returnStructure['acquisition_names'] = acquisition_names
 
-    request_events = GeneralStudyModuleAttr.objects.exclude(
-        projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-    ).exclude(
-        requested_procedure_code_meaning__isnull=True
-    ).filter(
-        study_instance_uid__in=expInclude
-    )
-    request_names = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
-    returnStructure['request_names'] = request_names
+    if plotDXStudyMeanDAP or plotDXStudyFreq:
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+        ).exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in=expInclude
+        )
+        study_names = list(study_events.values_list('study_description', flat=True).distinct().order_by('study_description'))
+        returnStructure['study_names'] = study_names
+
+    if plotDXRequestMeanDAP or plotDXRequestFreq:
+        request_events = GeneralStudyModuleAttr.objects.exclude(
+            projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+        ).exclude(
+            requested_procedure_code_meaning__isnull=True
+        ).filter(
+            study_instance_uid__in=expInclude
+        )
+        request_names = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
+        returnStructure['request_names'] = request_names
 
     if plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeankVp:
         acquisition_kvp_events = IrradEventXRayData.objects.exclude(
