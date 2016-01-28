@@ -57,7 +57,7 @@ $(function () {
                     });
                     this.yAxis[0].update({
                         title: {
-                            text:'Mean DAP (cGy.cm<sup>2</sup>)'
+                            text:'Median DAP (cGy.cm<sup>2</sup>)'
                         },
                         max: null,
                         labels: {
