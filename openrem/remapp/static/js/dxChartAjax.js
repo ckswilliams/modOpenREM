@@ -890,15 +890,15 @@ $(document).ready(function() {
 
             if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
                 if(typeof plotDXAcquisitionFreq !== 'undefined') {
-                    var protocolkVpLineColours =  new Array(protocolkVpNames.length);
+                    var protocolkVpLineColours =  new Array(acquisition_kvp_names.length);
                     acquisitionPiechartData.sort(sort_by_name);
-                    for (i = 0; i < protocolkVpNames.length; i++) {
+                    for (i = 0; i < acquisition_kvp_names.length; i++) {
                         protocolkVpLineColours[i] = acquisitionPiechartData[i].color;
                     }
                     acquisitionPiechartData.sort(sort_by_y);
                 }
                 else {
-                    var protocolkVpLineColours = colourScale.colors(protocolkVpNames.length);
+                    var protocolkVpLineColours = colourScale.colors(acquisition_kvp_names.length);
                 }
             }
 
@@ -949,9 +949,9 @@ $(document).ready(function() {
                         currentValue = parseFloat(acq_kvp_over_time[i][j][1]);
                         if(currentValue == 0) currentValue = null;
 
-                        temp.push({y:currentValue, url: urlStartAcq+protocolkVpNames[i]+'&date_after='+date_after+'&date_before='+date_before});
+                        temp.push({y:currentValue, url: urlStartAcq+acquisition_kvp_names[i]+'&date_after='+date_after+'&date_before='+date_before});
                     }
-                    kVpOverTime.push({name: protocolkVpNames[i], color: protocolkVpLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
+                    kVpOverTime.push({name: acquisition_kvp_names[i], color: protocolkVpLineColours[i], marker:{enabled:true}, point:{events: {click: function(e) {location.href = e.point.url; e.preventDefault();}}}, data: temp,});
                 }
 
                 chartDXAcquisitionMeankVpOverTime.xAxis[0].setCategories(dateAxis);
