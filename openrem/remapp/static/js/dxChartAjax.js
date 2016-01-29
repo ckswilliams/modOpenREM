@@ -877,11 +877,11 @@ $(document).ready(function() {
             if(typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
                 if(typeof plotDXAcquisitionFreq !== 'undefined') {
                     var protocolLineColours =  new Array(acquisition_names.length);
-                    protocolPiechartData.sort(sort_by_name);
+                    acquisitionPiechartData.sort(sort_by_name);
                     for(i=0; i<acquisition_names.length; i++) {
-                        protocolLineColours[i] = protocolPiechartData[i].color;
+                        protocolLineColours[i] = acquisitionPiechartData[i].color;
                     }
-                    protocolPiechartData.sort(sort_by_y);
+                    acquisitionPiechartData.sort(sort_by_y);
                 }
                 else {
                     var protocolLineColours = colourScale.colors(acquisition_names.length);
@@ -891,11 +891,11 @@ $(document).ready(function() {
             if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
                 if(typeof plotDXAcquisitionFreq !== 'undefined') {
                     var protocolkVpLineColours =  new Array(protocolkVpNames.length);
-                    protocolPiechartData.sort(sort_by_name);
+                    acquisitionPiechartData.sort(sort_by_name);
                     for (i = 0; i < protocolkVpNames.length; i++) {
-                        protocolkVpLineColours[i] = protocolPiechartData[i].color;
+                        protocolkVpLineColours[i] = acquisitionPiechartData[i].color;
                     }
-                    protocolPiechartData.sort(sort_by_y);
+                    acquisitionPiechartData.sort(sort_by_y);
                 }
                 else {
                     var protocolkVpLineColours = colourScale.colors(protocolkVpNames.length);
@@ -908,11 +908,11 @@ $(document).ready(function() {
                 }
                 else if(typeof plotDXAcquisitionFreq !== 'undefined') {
                     var protocolmAsLineColours =  new Array(protocolmAsNames.length);
-                    protocolPiechartData.sort(sort_by_name);
+                    acquisitionPiechartData.sort(sort_by_name);
                     for (i = 0; i < protocolmAsNames.length; i++) {
-                        protocolmAsLineColours[i] = protocolPiechartData[i].color;
+                        protocolmAsLineColours[i] = acquisitionPiechartData[i].color;
                     }
-                    protocolPiechartData.sort(sort_by_y);
+                    acquisitionPiechartData.sort(sort_by_y);
                 }
                 else {
                     var protocolmAsLineColours = colourScale.colors(protocolmAsNames.length);
