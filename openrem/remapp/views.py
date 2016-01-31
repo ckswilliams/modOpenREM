@@ -803,23 +803,105 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
         returnStructure['acquisitionHistogramkVpData'] = acquisitionHistogramkVpData
 
     if plotDXAcquisitionMeanmAs:
-        if median_available and plotAverageChoice == 'both':
-            acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-                mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                median_mAs=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
-                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
-        elif median_available and plotAverageChoice == 'median':
-            acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-                median_mAs=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
-                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
+        if plotSeriesPerSystems:
+            acquisitionmAsSystemList = list(acquisition_mas_events.values_list('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
-            acquisitionmAsSummary = acquisition_mas_events.values('acquisition_protocol').annotate(
-                mean_mAs=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol')
+            acquisitionmAsSystemList = ['All systems']
+        returnStructure['acquisitionmAsSystemList'] = list(acquisitionmAsSystemList)
+
+        if median_available and plotAverageChoice == 'both':
+            acquisitionmAsSummary = []
+            if plotSeriesPerSystems:
+                for system in acquisitionmAsSystemList:
+                    acquisitionmAsSummary.append(acquisition_mas_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            mean_mas=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
+                            median_mas=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                            num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+            else:
+                acquisitionmAsSummary.append(acquisition_mas_events.values('acquisition_protocol').annotate(
+                        mean_mas=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
+                        median_mas=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                        num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionmAsSummary)):
+                acquisitionmAsSummary[index] = list(acquisitionmAsSummary[index])
+
+        elif median_available and plotAverageChoice == 'median':
+            acquisitionmAsSummary = []
+            if plotSeriesPerSystems:
+                for system in acquisitionmAsSystemList:
+                    acquisitionmAsSummary.append(acquisition_mas_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            median_mas=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                            num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+            else:
+                acquisitionmAsSummary.append(acquisition_mas_events.values('acquisition_protocol').annotate(
+                        median_mas=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                        num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionmAsSummary)):
+                acquisitionmAsSummary[index] = list(acquisitionmAsSummary[index])
+
+        else:
+            acquisitionmAsSummary = []
+            if plotSeriesPerSystems:
+                for system in acquisitionmAsSystemList:
+                    acquisitionmAsSummary.append(acquisition_mas_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            mean_mas=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
+                            num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+            else:
+                acquisitionmAsSummary.append(acquisition_mas_events.values('acquisition_protocol').annotate(
+                        mean_mas=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
+                        num_acq=Count('acquisition_protocol')).order_by('acquisition_protocol'))
+
+            for index in range(len(acquisitionmAsSummary)):
+                acquisitionmAsSummary[index] = list(acquisitionmAsSummary[index])
+
+        # Fill in default values where data for an acquisition protocol is missing for any of the systems
+        if plotSeriesPerSystems:
+            for index in range(len(acquisitionmAsSystemList)):
+                missing_acquisition_names = list(set(acquisition_mas_names) - set([d['acquisition_protocol'] for d in acquisitionmAsSummary[index]]))
+                for name in missing_acquisition_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (acquisitionmAsSummary[index]).append({'median_mas': 0, 'mean_mas': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (acquisitionmAsSummary[index]).append({'median_mas': 0, 'acquisition_protocol':name, 'num_acq': 0})
+                    else:
+                        (acquisitionmAsSummary[index]).append({'mean_mas': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_mas_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionmAsSummary[index] )[0])
+                acquisitionmAsSummary[index] = acquisitionSummaryTemp
 
         returnStructure['acquisitionmAsSummary'] = list(acquisitionmAsSummary)
 
-        acquisitionHistogrammAsData = [[None for i in xrange(2)] for i in xrange(len(acquisitionmAsSummary))]
+        acquisitionHistogrammAsData = [[[None for k in xrange(2)] for j in xrange(len(acquisition_mas_names))] for i in xrange(len(acquisitionmAsSystemList))]
+
+        acquisitionmAsRanges = acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
+                min_mas=Min('irradeventxraysourcedata__exposure__exposure', output_field=FloatField()),
+                max_mas=Max('irradeventxraysourcedata__exposure__exposure', output_field=FloatField())).order_by(
+                'acquisition_protocol')
+
+        for sys_idx, system in enumerate(acquisitionmAsSystemList):
+            for acq_idx, acquisition_name in enumerate(acquisition_mas_names):
+                if plotSeriesPerSystems:
+                    subqs = acquisition_mas_events.filter(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            acquisition_protocol=acquisition_name)
+                else:
+                    subqs = acquisition_mas_events.filter(acquisition_protocol=acquisition_name)
+
+                mAsValues = subqs.values_list(
+                        'irradeventxraysourcedata__exposure__exposure',
+                        flat=True)
+                acquisitionHistogrammAsData[sys_idx][acq_idx][0], acquisitionHistogrammAsData[sys_idx][acq_idx][1] = np.histogram([float(x) for x in mAsValues], bins=plotHistogramBins, range=acquisitionmAsRanges.filter(acquisition_protocol=acquisition_name).values_list('min_mas', 'max_mas')[0])
+                acquisitionHistogrammAsData[sys_idx][acq_idx][0] = acquisitionHistogrammAsData[sys_idx][acq_idx][0].tolist()
+                acquisitionHistogrammAsData[sys_idx][acq_idx][1] = (acquisitionHistogrammAsData[sys_idx][acq_idx][1]/1000).tolist()
+
+        returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
 
     if plotDXAcquisitionMeankVpOverTime or plotDXAcquisitionMeanmAsOverTime or plotDXAcquisitionMeanDAPOverTime:
         startDate = f.qs.aggregate(Min('study_date')).get('study_date__min')
@@ -877,33 +959,22 @@ def dx_plot_calculations(f, plotDXAcquisitionMeanDAP, plotDXAcquisitionFreq,
                                                                         interval=plotDXAcquisitionMeanDAPOverTimePeriod)
                 returnStructure['acquisitionMediankVpoverTime'] = acquisitionMediankVpoverTime
 
-    if plotDXAcquisitionMeanmAs or plotDXAcquisitionMeanmAsOverTime:
+    if plotDXAcquisitionMeanmAsOverTime:
         for idx, protocol in enumerate(acquisition_mas_names):
             subqsmas = acquisition_mas_events.filter(acquisition_protocol=protocol)
 
-            if plotDXAcquisitionMeanmAs:
-                # Required for mean mAs per acquisition plot
-                uAsValues = subqsmas.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
-                acquisitionHistogrammAsData[idx][0], acquisitionHistogrammAsData[idx][1] = np.histogram(
-                    [float(x) / 1000 for x in uAsValues], bins=plotHistogramBins)
-                acquisitionHistogrammAsData[idx][0] = acquisitionHistogrammAsData[idx][0].tolist()
-                acquisitionHistogrammAsData[idx][1] = acquisitionHistogrammAsData[idx][1].tolist()
-                returnStructure['acquisitionHistogrammAsData'] = acquisitionHistogrammAsData
-
-            if plotDXAcquisitionMeanmAsOverTime:
-                # Required for mean DAP over time
-                if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
-                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started',
-                                                aggregate=Avg('irradeventxraysourcedata__exposure__exposure') / 1000)
-                    acquisitionMeanmAsoverTime[idx] = qss.time_series(startDate, today,
-                                                                      interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                    returnStructure['acquisitionMeanmAsoverTime'] = acquisitionMeanmAsoverTime
-                if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
-                    qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Median(
-                        'irradeventxraysourcedata__exposure__exposure') / 10000000000000)
-                    acquisitionMedianmAsoverTime[idx] = qss.time_series(startDate, today,
-                                                                        interval=plotDXAcquisitionMeanDAPOverTimePeriod)
-                    returnStructure['acquisitionMedianmAsoverTime'] = acquisitionMedianmAsoverTime
+            if plotAverageChoice == 'mean' or plotAverageChoice == 'both':
+                qss = qsstats.QuerySetStats(subqsmas, 'date_time_started',
+                                            aggregate=Avg('irradeventxraysourcedata__exposure__exposure') / 1000)
+                acquisitionMeanmAsoverTime[idx] = qss.time_series(startDate, today,
+                                                                    interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                returnStructure['acquisitionMeanmAsoverTime'] = acquisitionMeanmAsoverTime
+            if median_available and (plotAverageChoice == 'median' or plotAverageChoice == 'both'):
+                qss = qsstats.QuerySetStats(subqsmas, 'date_time_started', aggregate=Median(
+                    'irradeventxraysourcedata__exposure__exposure') / 10000000000000)
+                acquisitionMedianmAsoverTime[idx] = qss.time_series(startDate, today,
+                                                                    interval=plotDXAcquisitionMeanDAPOverTimePeriod)
+                returnStructure['acquisitionMedianmAsoverTime'] = acquisitionMedianmAsoverTime
 
     if plotDXStudyPerDayAndHour:
         # Required for studies per weekday and studies per hour in each weekday plot

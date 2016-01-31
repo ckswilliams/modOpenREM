@@ -54,6 +54,10 @@ div.kvp-hist-norm-btn {
   display: none;
 }
 
+div.mas-hist-norm-btn {
+  display: none;
+}
+
 div.ajax-error {
   position: fixed;
   display: none;
