@@ -316,7 +316,13 @@ class DicomStoreForm(forms.ModelForm):
             Div(
                 'name', 'aetitle', 'port',
             ),
-            PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
+            Accordion(
+                AccordionGroup(
+                    'Advanced - test/development use only',
+                    PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
+                    active=False
+                )
+            ),
             FormActions(
                 Submit('submit', 'Submit')
             ),
