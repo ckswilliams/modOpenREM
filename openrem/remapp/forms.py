@@ -310,8 +310,8 @@ class DicomStoreForm(forms.ModelForm):
         super(DicomStoreForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-4'
-        self.helper.field_class = 'col-lg-2'
+        self.helper.label_class = 'col-md-8'
+        self.helper.field_class = 'col-md-4'
         self.helper.layout = Layout(
             Div(
                 'name', 'aetitle', 'port',
@@ -319,6 +319,18 @@ class DicomStoreForm(forms.ModelForm):
             Accordion(
                 AccordionGroup(
                     'Advanced - test/development use only',
+                    Div(
+                        HTML("""
+                        <p>
+                          DICOM store node built in to OpenREM is not yet ready for production. See
+                            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/netdicom-nodes.html"
+                                target="_blank" data-toggle="tooltip"
+                                title="DICOM store documentation - opens in a new tab">
+                                DICOM store documentation (Advanced)
+                            </a>
+                        </p>
+                        """)
+                    ),
                     PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
                     active=False
                 )
