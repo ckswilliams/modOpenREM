@@ -332,16 +332,16 @@ $(document).ready(function() {
             // Acquisition frequency chart data start
             if(typeof plotCTAcquisitionFreq !== 'undefined') {
                 var acquisition_piechart_data = new Array(acquisition_names.length);
-                var num_studies = 0;
+                var num_acq = 0;
                 for (i = 0; i < acquisition_names.length; i++) {
-                    num_studies = 0;
+                    num_acq = 0;
                     for (j = 0; j < acquisition_system_names.length; j++) {
-                        num_studies += parseInt(acquisition_summary[j][i].num_stu)
+                        num_acq += parseInt(acquisition_summary[j][i].num_acq)
                     }
                     acquisition_piechart_data[i] = {
                         name: acquisition_names[i],
-                        y: num_studies,
-                        url: urlStartAcquisition + acquisition_names[i]
+                        y: num_acq,
+                        url: urlStartAcq + acquisition_names[i]
                     };
                 }
 
@@ -349,10 +349,10 @@ $(document).ready(function() {
                     acquisition_piechart_data.sort(sort_by_y);
                 }
 
-                var stu_name_colour_max = acquisition_names.length == 1 ? acquisition_names.length : acquisition_names.length - 1;
+                var acq_name_colour_max = acquisition_names.length == 1 ? acquisition_names.length : acquisition_names.length - 1;
 
                 for(i=0; i<acquisition_names.length; i++) {
-                    acquisition_piechart_data[i].color = colourScale(i/stu_name_colour_max).hex();
+                    acquisition_piechart_data[i].color = colourScale(i/acq_name_colour_max).hex();
                 }
             }
 

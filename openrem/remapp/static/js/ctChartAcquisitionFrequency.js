@@ -4,7 +4,7 @@ var chartAcqFreq = new Highcharts.Chart({
             fallbackToExportServer: false
         },
         chart: {
-            renderTo: 'piechartProtocolDIV',
+            renderTo: 'piechartAcquisitionDIV',
             plotBackgroundColor: null,
             plotShadow: false
         },
@@ -43,4 +43,3 @@ var chartAcqFreq = new Highcharts.Chart({
         }]
     });
 });
-

@@ -1350,18 +1350,10 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         num_acq=Count('dlp')).order_by('acquisition_protocol'))
 
         else:
-            if plotSeriesPerSystems:
-                for system in acquisitionSystemList:
-                    acquisitionSummary.append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                        'acquisition_protocol').distinct().annotate(
-                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
-            else:
-                acquisitionSummary.append(acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(
-                    num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            acquisitionSummary.append(acquisition_events.exclude(
+                Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                'acquisition_protocol').distinct().annotate(
+                num_acq=Count('dlp')).order_by('acquisition_protocol'))
 
         for index in range(len(acquisitionSummary)):
             acquisitionSummary[index] = list(acquisitionSummary[index])
@@ -1409,6 +1401,17 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
                         (acquisitionSummary[index]).append({'median_ctdi': 0, 'acquisition_protocol':name, 'num_acq': 0})
                     else:
                         (acquisitionSummary[index]).append({'mean_ctdi': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionSummary[index])[0])
+                acquisitionSummary[index] = acquisitionSummaryTemp
+
+        elif plotSeriesPerSystems and plotCTAcquisitionFreq:
+            for index in range(len(acquisitionSystemList)):
+                missing_acquisition_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in acquisitionSummary[index]]))
+                for name in missing_acquisition_names:
+                    (acquisitionSummary[index]).append({'acquisition_protocol':name, 'num_acq': 0})
                 # Rearrange the list into the same order as acquisition_names
                 acquisitionSummaryTemp = []
                 for acquisition_name in acquisition_names:
