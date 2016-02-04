@@ -1,42 +1,80 @@
 $(function () {
-    var drilldownTitle = 'Histogram of ';
-    var defaultTitle   = 'CTDI<sub>vol</sub> per acquisition protocol';
+    var defaultTitle = 'CTDI<sub>vol</sub> per acquisition protocol type';
     var bins = [];
     var name = '';
 
-    var chartAcqCTDI = new Highcharts.Chart({
+    var chartAcquisitionDLP = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
             type: 'column',
-            renderTo: 'histogramPlotCTDIdiv',
+            renderTo: 'histogramAcquisitionPlotCTDIdiv',
             events: {
-                drilldown: function(e) {
+                drilldown: function (e) {
+                    $('.acq-hist-norm-btn').css('display','inline-block');
+
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartAcqCTDI.setTitle({ text: drilldownTitle + e.point.name}, { text: '(n = ' + e.point.freq +')' });
-                    chartAcqCTDI.yAxis[0].setTitle({text:'Number'});
-                    chartAcqCTDI.xAxis[0].setTitle({text:'CTDI<sub>vol</sub> range (mGy)'});
-                    chartAcqCTDI.xAxis[0].setCategories([], true);
-                    chartAcqCTDI.tooltip.options.formatter = function(e) {
-                        var linkText = 'acquisition_ctdi_min=' + bins[this.x] + '&acquisition_ctdi_max=' + bins[this.x+1] + '&acquisition_protocol=' + name;
-                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>';
+
+                    if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
+
+                    var drilldownTitle;
+                    if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
+                    drilldownTitle += e.point.name + ' CTDI<sub>vol</sub> values';
+                    if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
+
+                    this.setTitle({
+                        text: drilldownTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
+                        },
+                        max: (this.options.drilldown.normalise ? 1.0 : null),
+                        labels: {
+                            format: (this.options.drilldown.normalise ? '{value:.2f}' : null)
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text: 'CTDI<sub>vol</sub> range (mGy.cm)'
+                        },
+                        categories: []
+                    }, false);
+                    this.tooltip.options.formatter = function (e) {
+                        var linkText = 'acquisition_ctdi_min=' + bins[this.x] + '&acquisition_ctdi_max=' + bins[this.x + 1] + '&acquisition_protocol=' + name;
+                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
-                drillup: function(e) {
-                    chartAcqCTDI.setTitle({ text: defaultTitle }, { text: '' });
-                    chartAcqCTDI.yAxis[0].setTitle({text:'CTDI<sub>vol</sub> (mGy)'});
-                    chartAcqCTDI.xAxis[0].setTitle({text:'Protocol name'});
-                    chartAcqCTDI.xAxis[0].update({
+                drillup: function (e) {
+                    $('.acq-hist-norm-btn').css('display','none');
+
+                    this.setTitle({
+                        text: defaultTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'CTDI<sub>vol</sub> (mGy.cm)'
+                        },
+                        max: null,
+                        labels: {
+                            format: null
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text: 'Acquisition protocol'
+                        },
                         categories: {
                             formatter: function (args) {
-                                return this.value;
+                                return this.point.category;
                             }
                         }
                     });
-                    chartAcqCTDI.tooltip.options.formatter = function(args) {
+                    this.tooltip.options.formatter = function () {
                         return this.point.tooltip;
                     }
                 }
@@ -44,7 +82,7 @@ $(function () {
         },
         title: {
             useHTML: true,
-            text: 'CTDI<sub>vol</sub> per acquisition protocol'
+            text: defaultTitle
         },
         legend: {
             enabled: true
@@ -53,7 +91,7 @@ $(function () {
             categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
-                text: 'Protocol name'
+                text: 'Acquisition protocol type'
             },
             labels: {
                 useHTML: true,
@@ -64,11 +102,11 @@ $(function () {
             min: 0,
             title: {
                 useHTML: true,
-                text: 'CTDI<sub>vol</sub> (mGy)'
+                text: 'CTDI<sub>vol</sub> (mGy.cm)'
             }
         },
         tooltip: {
-            formatter: function (args) {
+            formatter: function () {
                 return this.point.tooltip;
             },
             useHTML: true
@@ -76,18 +114,11 @@ $(function () {
         plotOptions: {
             column: {
                 pointPadding: 0,
-                borderWidth: 0
+                borderWidth: 1,
+                borderColor: '#999999'
             }
         },
-        series: [{
-            useHTML: true,
-            name: 'Mean CTDI<sub>vol</sub> per acquisition protocol',
-            data: []
-        }, {
-            useHTML: true,
-            name: 'Median CTDI<sub>vol</sub> per acquisition protocol',
-            data: []
-        }],
+        series: [],
         drilldown: {
             series: []
         }
@@ -95,16 +126,16 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            twoSeriesSort('#histogramPlotCTDIdiv', 'freq', chartSortingDirection, 0);
+            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'freq', chartSortingDirection, 0);
             break;
         case 'ctdi':
-            twoSeriesSort('#histogramPlotCTDIdiv', 'y', chartSortingDirection, 0);
+            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'y', chartSortingDirection, 0);
             break;
         case 'name':
-            twoSeriesSort('#histogramPlotCTDIdiv', 'name', chartSortingDirection, 0);
+            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', chartSortingDirection, 0);
             break;
         default:
-            twoSeriesSort('#histogramPlotCTDIdiv', 'name', chartSortingDirection, 0);
+            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', 1, 0);
     }
 
 });

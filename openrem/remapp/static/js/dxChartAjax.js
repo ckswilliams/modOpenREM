@@ -157,24 +157,24 @@ $(document).ready(function() {
                             chartPlotDXAcquisitionDAP.series[i].update({
                                 name: acquisition_system_names[current_series],
                                 data: acquisition_data[current_series],
-                                color: colourScale(i/(acq_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(acq_sys_colour_max*2-1)).hex()
                             });
                             chartPlotDXAcquisitionDAP.series[i+1].update({
                                 name: acquisition_system_names[current_series],
                                 data: acquisition_data_median[current_series],
-                                color: colourScale((i+1)/(acq_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(acq_sys_colour_max*2-1)).hex()
                             });
                         }
                         else {
                             chartPlotDXAcquisitionDAP.addSeries({
                                 name: acquisition_system_names[current_series],
                                 data: acquisition_data[current_series],
-                                color: colourScale(i/(acq_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(acq_sys_colour_max*2-1)).hex()
                             });
                             chartPlotDXAcquisitionDAP.addSeries({
                                 name: acquisition_system_names[current_series],
                                 data: acquisition_data_median[current_series],
-                                color: colourScale((i+1)/(acq_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(acq_sys_colour_max*2-1)).hex()
                             });
                         }
                         current_series++;
@@ -305,24 +305,24 @@ $(document).ready(function() {
                             chartplotDXRequestDAP.series[i].update({
                                 name: request_system_names[current_series],
                                 data: request_data[current_series],
-                                color: colourScale(i/(req_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(req_sys_colour_max*2-1)).hex()
                             });
                             chartplotDXRequestDAP.series[i+1].update({
                                 name: request_system_names[current_series],
                                 data: request_data_median[current_series],
-                                color: colourScale((i+1)/(req_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(req_sys_colour_max*2-1)).hex()
                             });
                         }
                         else {
                             chartplotDXRequestDAP.addSeries({
                                 name: request_system_names[current_series],
                                 data: request_data[current_series],
-                                color: colourScale(i/(req_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(req_sys_colour_max*2-1)).hex()
                             });
                             chartplotDXRequestDAP.addSeries({
                                 name: request_system_names[current_series],
                                 data: request_data_median[current_series],
-                                color: colourScale((i+1)/(req_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(req_sys_colour_max*2-1)).hex()
                             });
                         }
                         current_series++;
@@ -453,24 +453,24 @@ $(document).ready(function() {
                             chartplotDXStudyDAP.series[i].update({
                                 name: study_system_names[current_series],
                                 data: study_data[current_series],
-                                color: colourScale(i/(stu_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(stu_sys_colour_max*2-1)).hex()
                             });
                             chartplotDXStudyDAP.series[i+1].update({
                                 name: study_system_names[current_series],
                                 data: study_data_median[current_series],
-                                color: colourScale((i+1)/(stu_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(stu_sys_colour_max*2-1)).hex()
                             });
                         }
                         else {
                             chartplotDXStudyDAP.addSeries({
                                 name: study_system_names[current_series],
                                 data: study_data[current_series],
-                                color: colourScale(i/(stu_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(stu_sys_colour_max*2-1)).hex()
                             });
                             chartplotDXStudyDAP.addSeries({
                                 name: study_system_names[current_series],
                                 data: study_data_median[current_series],
-                                color: colourScale((i+1)/(stu_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(stu_sys_colour_max*2-1)).hex()
                             });
                         }
                         current_series++;
@@ -601,24 +601,24 @@ $(document).ready(function() {
                             chartPlotDXAcquisitionMeankVp.series[i].update({
                                 name: acquisition_kvp_system_names[current_series_kvp],
                                 data: acquisition_kvp_data[current_series_kvp],
-                                color: colourScale(i/(acq_kvp_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(acq_kvp_sys_colour_max*2-1)).hex()
                             });
                             chartPlotDXAcquisitionMeankVp.series[i+1].update({
                                 name: acquisition_kvp_system_names[current_series_kvp],
                                 data: acquisition_kvp_data_median[current_series_kvp],
-                                color: colourScale((i+1)/(acq_kvp_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(acq_kvp_sys_colour_max*2-1)).hex()
                             });
                         }
                         else {
                             chartPlotDXAcquisitionMeankVp.addSeries({
                                 name: acquisition_kvp_system_names[current_series_kvp],
                                 data: acquisition_kvp_data[current_series_kvp],
-                                color: colourScale(i/(acq_kvp_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(acq_kvp_sys_colour_max*2-1)).hex()
                             });
                             chartPlotDXAcquisitionMeankVp.addSeries({
                                 name: acquisition_kvp_system_names[current_series_kvp],
                                 data: acquisition_kvp_data_median[current_series_kvp],
-                                color: colourScale((i+1)/(acq_kvp_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(acq_kvp_sys_colour_max*2-1)).hex()
                             });
                         }
                         current_series_kvp++;
@@ -749,24 +749,24 @@ $(document).ready(function() {
                             chartPlotDXAcquisitionMeanmAs.series[i].update({
                                 name: acquisition_mas_system_names[current_series_mas],
                                 data: acquisition_mas_data[current_series_mas],
-                                color: colourScale(i/(acq_mas_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(acq_mas_sys_colour_max*2-1)).hex()
                             });
                             chartPlotDXAcquisitionMeanmAs.series[i+1].update({
                                 name: acquisition_mas_system_names[current_series_mas],
                                 data: acquisition_mas_data_median[current_series_mas],
-                                color: colourScale((i+1)/(acq_mas_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(acq_mas_sys_colour_max*2-1)).hex()
                             });
                         }
                         else {
                             chartPlotDXAcquisitionMeanmAs.addSeries({
                                 name: acquisition_mas_system_names[current_series_mas],
                                 data: acquisition_mas_data[current_series_mas],
-                                color: colourScale(i/(acq_mas_sys_colour_max*2+1)).hex()
+                                color: colourScale(i/(acq_mas_sys_colour_max*2-1)).hex()
                             });
                             chartPlotDXAcquisitionMeanmAs.addSeries({
                                 name: acquisition_mas_system_names[current_series_mas],
                                 data: acquisition_mas_data_median[current_series_mas],
-                                color: colourScale((i+1)/(acq_mas_sys_colour_max*2+1)).hex()
+                                color: colourScale((i+1)/(acq_mas_sys_colour_max*2-1)).hex()
                             });
                         }
                         current_series_mas++;

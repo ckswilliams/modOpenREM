@@ -1152,119 +1152,354 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
     if requestResults.get('acquisition_ctdi_min'):
         acquisitionFilters['mean_ctdivol__gte'] = requestResults.get('acquisition_ctdi_min')
 
-    acquisition_events = CtIrradiationEventData.objects.exclude(
-        ct_acquisition_type__code_meaning__exact=u'Constant Angle Acquisition'
-    ).exclude(
-        dlp__isnull=True
-    ).filter(
-        **acquisitionFilters
-    )
-
-    study_events = GeneralStudyModuleAttr.objects.exclude(
-        ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-    ).exclude(
-        study_description__isnull=True
-    ).filter(
-        study_instance_uid__in=expInclude
-    )
-
-    request_events = GeneralStudyModuleAttr.objects.exclude(
-        ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-    ).exclude(
-        requested_procedure_code_meaning__isnull=True
-    ).filter(
-        study_instance_uid__in=expInclude
-    )
-
     if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
-        # Required for mean DLP per acquisition plot
-        if plotCTAcquisitionMeanCTDI:
-            if median_available and plotAverageChoice == 'both':
-                acquisitionSummary = acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
-                                                                median_ctdi=Median('mean_ctdivol') / 10000000000,
-                                                                mean_dlp=Avg('dlp'),
-                                                                median_dlp=Median('dlp') / 10000000000,
-                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
-            elif median_available and plotAverageChoice == 'median':
-                acquisitionSummary = acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(median_ctdi=Median('mean_ctdivol') / 10000000000,
-                                                                median_dlp=Median('dlp') / 10000000000,
-                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
-            else:
-                acquisitionSummary = acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(mean_ctdi=Avg('mean_ctdivol'),
-                                                                mean_dlp=Avg('dlp'),
-                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
-        else:
-            if median_available and plotAverageChoice == 'both':
-                acquisitionSummary = acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
-                                                                median_dlp=Median('dlp') / 10000000000,
-                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
-            elif median_available and plotAverageChoice == 'median':
-                acquisitionSummary = acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(median_dlp=Median('dlp') / 10000000000,
-                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
-            else:
-                acquisitionSummary = acquisition_events.exclude(
-                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                    'acquisition_protocol').distinct().annotate(mean_dlp=Avg('dlp'),
-                                                                num_acq=Count('dlp')).order_by('acquisition_protocol')
-
-        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
-
-        if plotCTAcquisitionMeanDLP and plotCTAcquisitionMeanCTDI:
-            acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-
-            for idx, protocol in enumerate(acquisitionSummary):
-                dlpAndCtdiValues = acquisition_events.filter(
-                    acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', 'mean_ctdivol')
-                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
-                    [float(x[0]) for x in dlpAndCtdiValues], bins=plotHistogramBins)
-                acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
-                acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
-
-                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram(
-                    [float(x[1]) for x in dlpAndCtdiValues], bins=plotHistogramBins)
-                acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
-                acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
-
-            returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
-            returnStructure['acquisitionHistogramDataCTDI'] = list(acquisitionHistogramDataCTDI)
-
-        elif plotCTAcquisitionMeanDLP:
-            acquisitionHistogramData = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-            for idx, protocol in enumerate(acquisitionSummary):
-                dlpValues = acquisition_events.filter(
-                    acquisition_protocol=protocol.get('acquisition_protocol')).values_list('dlp', flat=True)
-                acquisitionHistogramData[idx][0], acquisitionHistogramData[idx][1] = np.histogram(
-                    [float(x) for x in dlpValues], bins=plotHistogramBins)
-                acquisitionHistogramData[idx][0] = acquisitionHistogramData[idx][0].tolist()
-                acquisitionHistogramData[idx][1] = acquisitionHistogramData[idx][1].tolist()
-            returnStructure['acquisitionHistogramData'] = list(acquisitionHistogramData)
-
-        elif plotCTAcquisitionMeanCTDI:
-            acquisitionHistogramDataCTDI = [[None for i in xrange(2)] for i in xrange(len(acquisitionSummary))]
-            for idx, protocol in enumerate(acquisitionSummary):
-                ctdiValues = acquisition_events.filter(
-                    acquisition_protocol=protocol.get('acquisition_protocol')).values_list('mean_ctdivol', flat=True)
-                acquisitionHistogramDataCTDI[idx][0], acquisitionHistogramDataCTDI[idx][1] = np.histogram(
-                    [float(x) for x in ctdiValues], bins=plotHistogramBins)
-                acquisitionHistogramDataCTDI[idx][0] = acquisitionHistogramDataCTDI[idx][0].tolist()
-                acquisitionHistogramDataCTDI[idx][1] = acquisitionHistogramDataCTDI[idx][1].tolist()
-            returnStructure['acquisitionHistogramDataCTDI'] = list(acquisitionHistogramDataCTDI)
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact=u'Constant Angle Acquisition'
+        ).exclude(
+            dlp__isnull=True
+        ).filter(
+            **acquisitionFilters
+        )
+        acquisition_names = list(acquisition_events.values_list('acquisition_protocol', flat=True).distinct().order_by('acquisition_protocol'))
+        returnStructure['acquisitionNameList'] = acquisition_names
 
     if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyMeanDLPOverTime:
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+        ).exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in=expInclude
+        )
         studyNameList = list(study_events.values_list('study_description', flat=True).distinct().order_by('study_description'))
         returnStructure['studyNameList'] = studyNameList
 
+    if plotCTRequestMeanDLP or plotCTRequestFreq:
+        request_events = GeneralStudyModuleAttr.objects.exclude(
+            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+        ).exclude(
+            requested_procedure_code_meaning__isnull=True
+        ).filter(
+            study_instance_uid__in=expInclude
+        )
+        requestNameList = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
+        returnStructure['requestNameList'] = requestNameList
+
+    if plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI or plotCTAcquisitionFreq:
+        if plotSeriesPerSystems and (plotCTAcquisitionMeanDLP or plotCTAcquisitionMeanCTDI):
+            acquisitionSystemList = list(acquisition_events.values_list('ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
+        else:
+            acquisitionSystemList = ['All systems']
+        returnStructure['acquisitionSystemList'] = list(acquisitionSystemList)
+
+        acquisitionSummary = []
+
+        if plotCTAcquisitionMeanDLP and plotCTAcquisitionMeanCTDI:
+            if median_available and plotAverageChoice == 'both':
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            mean_ctdi=Avg('mean_ctdivol'),
+                            median_ctdi=Median('mean_ctdivol') / 10000000000,
+                            mean_dlp=Avg('dlp'),
+                            median_dlp=Median('dlp') / 10000000000,
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean_ctdi=Avg('mean_ctdivol'),
+                        median_ctdi=Median('mean_ctdivol') / 10000000000,
+                        mean_dlp=Avg('dlp'),
+                        median_dlp=Median('dlp') / 10000000000,
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            elif median_available and plotAverageChoice == 'median':
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            median_ctdi=Median('mean_ctdivol') / 10000000000,
+                            median_dlp=Median('dlp') / 10000000000,
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        median_ctdi=Median('mean_ctdivol') / 10000000000,
+                        median_dlp=Median('dlp') / 10000000000,
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            mean_ctdi=Avg('mean_ctdivol'),
+                            mean_dlp=Avg('dlp'),
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean_ctdi=Avg('mean_ctdivol'),
+                        mean_dlp=Avg('dlp'),
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+
+        elif plotCTAcquisitionMeanDLP:
+            if median_available and plotAverageChoice == 'both':
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            mean_dlp=Avg('dlp'),
+                            median_dlp=Median('dlp') / 10000000000,
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean_dlp=Avg('dlp'),
+                        median_dlp=Median('dlp') / 10000000000,
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            elif median_available and plotAverageChoice == 'median':
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            median_dlp=Median('dlp') / 10000000000,
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        median_dlp=Median('dlp') / 10000000000,
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            mean_dlp=Avg('dlp'),
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean_dlp=Avg('dlp'),
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+
+        elif plotCTAcquisitionMeanCTDI:
+            if median_available and plotAverageChoice == 'both':
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            mean_ctdi=Avg('mean_ctdivol'),
+                            median_ctdi=Median('mean_ctdivol') / 10000000000,
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean_ctdi=Avg('mean_ctdivol'),
+                        median_ctdi=Median('mean_ctdivol') / 10000000000,
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            elif median_available and plotAverageChoice == 'median':
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            median_ctdi=Median('mean_ctdivol') / 10000000000,
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        median_ctdi=Median('mean_ctdivol') / 10000000000,
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                if plotSeriesPerSystems:
+                    for system in acquisitionSystemList:
+                        acquisitionSummary.append(acquisition_events.exclude(
+                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                            'acquisition_protocol').distinct().annotate(
+                            mean_ctdi=Avg('mean_ctdivol'),
+                            num_acq=Count('dlp')).order_by('acquisition_protocol'))
+                else:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean_ctdi=Avg('mean_ctdivol'),
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+
+        else:
+            if plotSeriesPerSystems:
+                for system in acquisitionSystemList:
+                    acquisitionSummary.append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'acquisition_protocol').distinct().annotate(
+                        num_acq=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                acquisitionSummary.append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(
+                    num_acq=Count('dlp')).order_by('acquisition_protocol'))
+
+        for index in range(len(acquisitionSummary)):
+            acquisitionSummary[index] = list(acquisitionSummary[index])
+
+        # Fill in default values where data for an acquisition protocol is missing for any of the systems
+        if plotSeriesPerSystems and plotCTAcquisitionMeanDLP and plotCTAcquisitionMeanCTDI:
+            for index in range(len(acquisitionSystemList)):
+                missing_acquisition_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in acquisitionSummary[index]]))
+                for name in missing_acquisition_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (acquisitionSummary[index]).append({'median_dlp': 0, 'mean_dlp': 0, 'median_ctdi': 0, 'mean_ctdi': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (acquisitionSummary[index]).append({'median_dlp': 0, 'median_ctdi': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    else:
+                        (acquisitionSummary[index]).append({'mean_dlp': 0, 'mean_ctdi': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionSummary[index])[0])
+                acquisitionSummary[index] = acquisitionSummaryTemp
+
+        elif plotSeriesPerSystems and plotCTAcquisitionMeanDLP:
+            for index in range(len(acquisitionSystemList)):
+                missing_acquisition_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in acquisitionSummary[index]]))
+                for name in missing_acquisition_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (acquisitionSummary[index]).append({'median_dlp': 0, 'mean_dlp': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (acquisitionSummary[index]).append({'median_dlp': 0, 'acquisition_protocol':name, 'num_acq': 0})
+                    else:
+                        (acquisitionSummary[index]).append({'mean_dlp': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionSummary[index])[0])
+                acquisitionSummary[index] = acquisitionSummaryTemp
+
+        elif plotSeriesPerSystems and plotCTAcquisitionMeanCTDI:
+            for index in range(len(acquisitionSystemList)):
+                missing_acquisition_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in acquisitionSummary[index]]))
+                for name in missing_acquisition_names:
+                    if median_available and plotAverageChoice == 'both':
+                        (acquisitionSummary[index]).append({'median_ctdi': 0, 'mean_ctdi': 0,'acquisition_protocol':name, 'num_acq': 0})
+                    elif median_available and plotAverageChoice == 'median':
+                        (acquisitionSummary[index]).append({'median_ctdi': 0, 'acquisition_protocol':name, 'num_acq': 0})
+                    else:
+                        (acquisitionSummary[index]).append({'mean_ctdi': 0,'acquisition_protocol':name, 'num_acq': 0})
+                # Rearrange the list into the same order as acquisition_names
+                acquisitionSummaryTemp = []
+                for acquisition_name in acquisition_names:
+                    acquisitionSummaryTemp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, acquisitionSummary[index])[0])
+                acquisitionSummary[index] = acquisitionSummaryTemp
+
+        returnStructure['acquisitionSummary'] = list(acquisitionSummary)
+
+
+        if plotCTAcquisitionMeanDLP and plotCTAcquisitionMeanCTDI:
+            acquisitionHistogramData = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(acquisitionSystemList))]
+            acquisitionHistogramDataCTDI = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(acquisitionSystemList))]
+
+            acquisitionRanges = acquisition_events.values('acquisition_protocol').distinct().annotate(
+                min_dlp=Min('dlp', output_field=FloatField()),
+                max_dlp=Max('dlp', output_field=FloatField()),
+                min_ctdi=Min('mean_ctdivol', output_field=FloatField()),
+                max_ctdi=Max('mean_ctdivol', output_field=FloatField())).order_by('acquisition_protocol')
+
+            for sys_idx, system in enumerate(acquisitionSystemList):
+                for acq_idx, acquisition_name in enumerate(acquisition_names):
+                    if plotSeriesPerSystems:
+                        subqs = acquisition_events.filter(
+                                ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                                acquisition_protocol=acquisition_name)
+                    else:
+                        subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
+
+                    dlp_and_ctdi_values = subqs.values_list('dlp', 'mean_ctdivol')
+
+                    acquisitionHistogramData[sys_idx][acq_idx][0], acquisitionHistogramData[sys_idx][acq_idx][1] = np.histogram([float(x[0]) for x in dlp_and_ctdi_values], bins=plotHistogramBins, range=acquisitionRanges.filter(acquisition_protocol=acquisition_name).values_list('min_dlp', 'max_dlp')[0])
+                    acquisitionHistogramData[sys_idx][acq_idx][0] = acquisitionHistogramData[sys_idx][acq_idx][0].tolist()
+                    acquisitionHistogramData[sys_idx][acq_idx][1] = acquisitionHistogramData[sys_idx][acq_idx][1].tolist()
+
+                    acquisitionHistogramDataCTDI[sys_idx][acq_idx][0], acquisitionHistogramDataCTDI[sys_idx][acq_idx][1] = np.histogram([float(x[1]) for x in dlp_and_ctdi_values], bins=plotHistogramBins, range=acquisitionRanges.filter(acquisition_protocol=acquisition_name).values_list('min_ctdi', 'max_ctdi')[0])
+                    acquisitionHistogramDataCTDI[sys_idx][acq_idx][0] = acquisitionHistogramDataCTDI[sys_idx][acq_idx][0].tolist()
+                    acquisitionHistogramDataCTDI[sys_idx][acq_idx][1] = acquisitionHistogramDataCTDI[sys_idx][acq_idx][1].tolist()
+
+            returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+            returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
+
+        elif plotCTAcquisitionMeanDLP:
+            acquisitionHistogramData = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(acquisitionSystemList))]
+
+            acquisitionRanges = acquisition_events.values('acquisition_protocol').distinct().annotate(
+                min_dlp=Min('dlp', output_field=FloatField()),
+                max_dlp=Max('dlp', output_field=FloatField())).order_by('acquisition_protocol')
+
+            for sys_idx, system in enumerate(acquisitionSystemList):
+                for acq_idx, acquisition_name in enumerate(acquisition_names):
+                    if plotSeriesPerSystems:
+                        subqs = acquisition_events.filter(
+                                ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                                acquisition_protocol=acquisition_name)
+                    else:
+                        subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
+
+                    dlp_values = subqs.values_list('dlp', flat=True)
+
+                    acquisitionHistogramData[sys_idx][acq_idx][0], acquisitionHistogramData[sys_idx][acq_idx][1] = np.histogram([float(x) for x in dlp_values], bins=plotHistogramBins, range=acquisitionRanges.filter(acquisition_protocol=acquisition_name).values_list('min_dlp', 'max_dlp')[0])
+                    acquisitionHistogramData[sys_idx][acq_idx][0] = acquisitionHistogramData[sys_idx][acq_idx][0].tolist()
+                    acquisitionHistogramData[sys_idx][acq_idx][1] = acquisitionHistogramData[sys_idx][acq_idx][1].tolist()
+
+            returnStructure['acquisitionHistogramData'] = acquisitionHistogramData
+
+        elif plotCTAcquisitionMeanCTDI:
+            acquisitionHistogramDataCTDI = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(acquisitionSystemList))]
+
+            acquisitionRanges = acquisition_events.values('acquisition_protocol').distinct().annotate(
+                min_ctdi=Min('mean_ctdivol', output_field=FloatField()),
+                max_ctdi=Max('mean_ctdivol', output_field=FloatField())).order_by('acquisition_protocol')
+
+            for sys_idx, system in enumerate(acquisitionSystemList):
+                for acq_idx, acquisition_name in enumerate(acquisition_names):
+                    if plotSeriesPerSystems:
+                        subqs = acquisition_events.filter(
+                                ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                                acquisition_protocol=acquisition_name)
+                    else:
+                        subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
+
+                    ctdi_values = subqs.values_list('mean_ctdivol', flat=True)
+
+                    acquisitionHistogramDataCTDI[sys_idx][acq_idx][0], acquisitionHistogramDataCTDI[sys_idx][acq_idx][1] = np.histogram([float(x) for x in ctdi_values], bins=plotHistogramBins, range=acquisitionRanges.filter(acquisition_protocol=acquisition_name).values_list('min_ctdi', 'max_ctdi')[0])
+                    acquisitionHistogramDataCTDI[sys_idx][acq_idx][0] = acquisitionHistogramDataCTDI[sys_idx][acq_idx][0].tolist()
+                    acquisitionHistogramDataCTDI[sys_idx][acq_idx][1] = acquisitionHistogramDataCTDI[sys_idx][acq_idx][1].tolist()
+
+            returnStructure['acquisitionHistogramDataCTDI'] = acquisitionHistogramDataCTDI
+
+
+    if plotCTStudyMeanDLP or plotCTStudyFreq or plotCTStudyMeanDLPOverTime:
         if plotSeriesPerSystems:
             studySystemList = list(study_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
@@ -1428,10 +1663,6 @@ def ct_plot_calculations(f, plotCTAcquisitionFreq, plotCTAcquisitionMeanCTDI, pl
         returnStructure['studiesPerHourInWeekdays'] = studiesPerHourInWeekdays
 
     if plotCTRequestMeanDLP or plotCTRequestFreq:
-
-        requestNameList = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
-        returnStructure['requestNameList'] = requestNameList
-
         if plotSeriesPerSystems:
             requestSystemList = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
