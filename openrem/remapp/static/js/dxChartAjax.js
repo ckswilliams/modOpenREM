@@ -940,9 +940,7 @@ $(document).ready(function() {
                     }
                     acquisitionPiechartData.sort(sort_by_y);
                 }
-                else {
-                    var protocolLineColours = colourScale.colors(acquisition_names.length);
-                }
+                else var protocolLineColours = colourScale.colors(acquisition_names.length);
             }
 
             if(typeof plotDXAcquisitionMeankVpOverTime !== 'undefined') {
@@ -954,9 +952,7 @@ $(document).ready(function() {
                     }
                     acquisitionPiechartData.sort(sort_by_y);
                 }
-                else {
-                    var protocolkVpLineColours = colourScale.colors(acquisition_kvp_names.length);
-                }
+                else var protocolkVpLineColours = colourScale.colors(acquisition_kvp_names.length);
             }
 
             if(typeof plotDXAcquisitionMeanmAsOverTime !== 'undefined') {
@@ -968,9 +964,7 @@ $(document).ready(function() {
                     }
                     acquisitionPiechartData.sort(sort_by_y);
                 }
-                else {
-                    var protocolmAsLineColours = colourScale.colors(acquisition_mas_names.length);
-                }
+                else var protocolmAsLineColours = colourScale.colors(acquisition_mas_names.length);
             }
             // End of sorting out colours for the ...OverTime plots
             //-------------------------------------------------------------------------------------

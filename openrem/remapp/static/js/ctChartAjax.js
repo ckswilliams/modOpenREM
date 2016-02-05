@@ -518,7 +518,7 @@ $(document).ready(function() {
 
             //-------------------------------------------------------------------------------------
             // Study frequency chart data start
-            if(typeof plotCTStudyFreq !== 'undefined' || typeof plotCTStudyMeanDLPOverTime !== 'undefined') {
+            if(typeof plotCTStudyFreq !== 'undefined') {
                 var study_piechart_data = new Array(study_names.length);
                 var num_studies = 0;
                 for (i = 0; i < study_names.length; i++) {
@@ -795,11 +795,14 @@ $(document).ready(function() {
                 var chartCTStudyMeanDLPOverTime = $('#studyMeanDLPOverTimeDIV').highcharts();
 
                 var study_line_colours =  new Array(study_names.length);
-                study_piechart_data.sort(sort_by_name);
-                for(i=0; i<study_names.length; i++) {
-                    study_line_colours[i] = study_piechart_data[i].color;
+                if(typeof plotCTStudyFreq !== 'undefined') {
+                    study_piechart_data.sort(sort_by_name);
+                    for (i = 0; i < study_names.length; i++) {
+                        study_line_colours[i] = study_piechart_data[i].color;
+                    }
+                    study_piechart_data.sort(sort_by_y);
                 }
-                study_piechart_data.sort(sort_by_y);
+                else study_line_colours = colourScale.colors(study_names.length);
 
                 study_dlp_over_time = (plotAverageChoice == "mean") ? json.studyMeanDLPoverTime : json.studyMedianDLPoverTime;
 
