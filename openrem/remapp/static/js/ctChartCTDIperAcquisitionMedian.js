@@ -38,7 +38,7 @@ $(function () {
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text: 'CTDI<sub>vol</sub> range (mGy.cm)'
+                            text: 'CTDI<sub>vol</sub> range (mGy)'
                         },
                         categories: []
                     }, false);
@@ -57,7 +57,7 @@ $(function () {
                     });
                     this.yAxis[0].update({
                         title: {
-                            text: 'Median CTDI<sub>vol</sub> (mGy.cm)'
+                            text: 'Median CTDI<sub>vol</sub> (mGy)'
                         },
                         max: null,
                         labels: {
@@ -102,7 +102,7 @@ $(function () {
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Median CTDI<sub>vol</sub> (mGy.cm)'
+                text: 'Median CTDI<sub>vol</sub> (mGy)'
             }
         },
         tooltip: {
