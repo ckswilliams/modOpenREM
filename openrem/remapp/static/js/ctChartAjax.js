@@ -112,9 +112,8 @@ $(document).ready(function() {
                 chartPlotCTAcquisitionMeanDLP.options.exporting.sourceWidth = $(window).width();
                 chartPlotCTAcquisitionMeanDLP.options.exporting.sourceHeight = $(window).height();
 
-                var acq_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var acq_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
                     for (i = 0; i < acquisition_system_names.length; i++) {
                         if (chartPlotCTAcquisitionMeanDLP.series.length > i) {
                             chartPlotCTAcquisitionMeanDLP.series[i].update({
@@ -133,6 +132,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var acq_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
                     for (i = 0; i < acquisition_system_names.length; i++) {
                         if (chartPlotCTAcquisitionMeanDLP.series.length > i) {
                             chartPlotCTAcquisitionMeanDLP.series[i].update({
@@ -151,6 +151,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var acq_sys_colour_max = acquisition_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (acquisition_system_names.length)*2; i+=2) {
                         if (chartPlotCTAcquisitionMeanDLP.series.length > i+1) {
@@ -254,9 +255,8 @@ $(document).ready(function() {
                 chartPlotCTAcquisitionMeanCTDI.options.exporting.sourceWidth = $(window).width();
                 chartPlotCTAcquisitionMeanCTDI.options.exporting.sourceHeight = $(window).height();
 
-                var acq_ctdi_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var acq_ctdi_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
                     for (i = 0; i < acquisition_system_names.length; i++) {
                         if (chartPlotCTAcquisitionMeanCTDI.series.length > i) {
                             chartPlotCTAcquisitionMeanCTDI.series[i].update({
@@ -275,6 +275,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var acq_ctdi_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
                     for (i = 0; i < acquisition_system_names.length; i++) {
                         if (chartPlotCTAcquisitionMeanCTDI.series.length > i) {
                             chartPlotCTAcquisitionMeanCTDI.series[i].update({
@@ -293,6 +294,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var acq_ctdi_sys_colour_max = acquisition_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (acquisition_system_names.length)*2; i+=2) {
                         if (chartPlotCTAcquisitionMeanCTDI.series.length > i+1) {
@@ -442,9 +444,8 @@ $(document).ready(function() {
                 chartPlotCTStudyMeanDLP.options.exporting.sourceWidth = $(window).width();
                 chartPlotCTStudyMeanDLP.options.exporting.sourceHeight = $(window).height();
 
-                var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
                     for (i = 0; i < study_system_names.length; i++) {
                         if (chartPlotCTStudyMeanDLP.series.length > i) {
                             chartPlotCTStudyMeanDLP.series[i].update({
@@ -463,6 +464,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
                     for (i = 0; i < study_system_names.length; i++) {
                         if (chartPlotCTStudyMeanDLP.series.length > i) {
                             chartPlotCTStudyMeanDLP.series[i].update({
@@ -481,6 +483,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var stu_sys_colour_max = study_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (study_system_names.length)*2; i+=2) {
                         if (chartPlotCTStudyMeanDLP.series.length > i+1) {
@@ -630,9 +633,8 @@ $(document).ready(function() {
                 chartPlotCTRequestMeanDLP.options.exporting.sourceWidth = $(window).width();
                 chartPlotCTRequestMeanDLP.options.exporting.sourceHeight = $(window).height();
 
-                var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartPlotCTRequestMeanDLP.series.length > i) {
                             chartPlotCTRequestMeanDLP.series[i].update({
@@ -651,6 +653,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartPlotCTRequestMeanDLP.series.length > i) {
                             chartPlotCTRequestMeanDLP.series[i].update({
@@ -669,6 +672,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var req_sys_colour_max = request_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (request_system_names.length)*2; i+=2) {
                         if (chartPlotCTRequestMeanDLP.series.length > i+1) {

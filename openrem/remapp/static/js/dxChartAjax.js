@@ -112,9 +112,8 @@ $(document).ready(function() {
                 chartPlotDXAcquisitionDAP.options.exporting.sourceWidth = $(window).width();
                 chartPlotDXAcquisitionDAP.options.exporting.sourceHeight = $(window).height();
 
-                var acq_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var acq_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
                     for (i = 0; i < acquisition_system_names.length; i++) {
                         if (chartPlotDXAcquisitionDAP.series.length > i) {
                             chartPlotDXAcquisitionDAP.series[i].update({
@@ -133,6 +132,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var acq_sys_colour_max = acquisition_system_names.length == 1 ? acquisition_system_names.length : acquisition_system_names.length - 1;
                     for (i = 0; i < acquisition_system_names.length; i++) {
                         if (chartPlotDXAcquisitionDAP.series.length > i) {
                             chartPlotDXAcquisitionDAP.series[i].update({
@@ -151,6 +151,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var acq_sys_colour_max = acquisition_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (acquisition_system_names.length)*2; i+=2) {
                         if (chartPlotDXAcquisitionDAP.series.length > i+1) {
@@ -260,9 +261,8 @@ $(document).ready(function() {
                 chartplotDXRequestDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXRequestDAP.options.exporting.sourceHeight = $(window).height();
 
-                var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartplotDXRequestDAP.series.length > i) {
                             chartplotDXRequestDAP.series[i].update({
@@ -281,6 +281,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var req_sys_colour_max = request_system_names.length == 1 ? request_system_names.length : request_system_names.length - 1;
                     for (i = 0; i < request_system_names.length; i++) {
                         if (chartplotDXRequestDAP.series.length > i) {
                             chartplotDXRequestDAP.series[i].update({
@@ -299,6 +300,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var req_sys_colour_max = request_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (request_system_names.length)*2; i+=2) {
                         if (chartplotDXRequestDAP.series.length > i+1) {
@@ -408,9 +410,8 @@ $(document).ready(function() {
                 chartplotDXStudyDAP.options.exporting.sourceWidth = $(window).width();
                 chartplotDXStudyDAP.options.exporting.sourceHeight = $(window).height();
 
-                var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
                     for (i = 0; i < study_system_names.length; i++) {
                         if (chartplotDXStudyDAP.series.length > i) {
                             chartplotDXStudyDAP.series[i].update({
@@ -429,6 +430,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var stu_sys_colour_max = study_system_names.length == 1 ? study_system_names.length : study_system_names.length - 1;
                     for (i = 0; i < study_system_names.length; i++) {
                         if (chartplotDXStudyDAP.series.length > i) {
                             chartplotDXStudyDAP.series[i].update({
@@ -447,6 +449,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var stu_sys_colour_max = study_system_names.length;
                     var current_series = 0;
                     for (i = 0; i < (study_system_names.length)*2; i+=2) {
                         if (chartplotDXStudyDAP.series.length > i+1) {
@@ -556,9 +559,8 @@ $(document).ready(function() {
                 chartPlotDXAcquisitionMeankVp.options.exporting.sourceWidth = $(window).width();
                 chartPlotDXAcquisitionMeankVp.options.exporting.sourceHeight = $(window).height();
 
-                var acq_kvp_sys_colour_max = acquisition_kvp_system_names.length == 1 ? acquisition_kvp_system_names.length : acquisition_kvp_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var acq_kvp_sys_colour_max = acquisition_kvp_system_names.length == 1 ? acquisition_kvp_system_names.length : acquisition_kvp_system_names.length - 1;
                     for (i = 0; i < acquisition_kvp_system_names.length; i++) {
                         if (chartPlotDXAcquisitionMeankVp.series.length > i) {
                             chartPlotDXAcquisitionMeankVp.series[i].update({
@@ -577,6 +579,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var acq_kvp_sys_colour_max = acquisition_kvp_system_names.length == 1 ? acquisition_kvp_system_names.length : acquisition_kvp_system_names.length - 1;
                     for (i = 0; i < acquisition_kvp_system_names.length; i++) {
                         if (chartPlotDXAcquisitionMeankVp.series.length > i) {
                             chartPlotDXAcquisitionMeankVp.series[i].update({
@@ -595,6 +598,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var acq_kvp_sys_colour_max = acquisition_kvp_system_names.length;
                     var current_series_kvp = 0;
                     for (i = 0; i < (acquisition_kvp_system_names.length)*2; i+=2) {
                         if (chartPlotDXAcquisitionMeankVp.series.length > i+1) {
@@ -704,9 +708,8 @@ $(document).ready(function() {
                 chartPlotDXAcquisitionMeanmAs.options.exporting.sourceWidth = $(window).width();
                 chartPlotDXAcquisitionMeanmAs.options.exporting.sourceHeight = $(window).height();
 
-                var acq_mas_sys_colour_max = acquisition_mas_system_names.length == 1 ? acquisition_mas_system_names.length : acquisition_mas_system_names.length - 1;
-
                 if (plotAverageChoice == "mean") {
+                    var acq_mas_sys_colour_max = acquisition_mas_system_names.length == 1 ? acquisition_mas_system_names.length : acquisition_mas_system_names.length - 1;
                     for (i = 0; i < acquisition_mas_system_names.length; i++) {
                         if (chartPlotDXAcquisitionMeanmAs.series.length > i) {
                             chartPlotDXAcquisitionMeanmAs.series[i].update({
@@ -725,6 +728,7 @@ $(document).ready(function() {
                     }
                 }
                 else if (plotAverageChoice == "median") {
+                    var acq_mas_sys_colour_max = acquisition_mas_system_names.length == 1 ? acquisition_mas_system_names.length : acquisition_mas_system_names.length - 1;
                     for (i = 0; i < acquisition_mas_system_names.length; i++) {
                         if (chartPlotDXAcquisitionMeanmAs.series.length > i) {
                             chartPlotDXAcquisitionMeanmAs.series[i].update({
@@ -743,6 +747,7 @@ $(document).ready(function() {
                     }
                 }
                 else {
+                    var acq_mas_sys_colour_max = acquisition_mas_system_names.length;
                     var current_series_mas = 0;
                     for (i = 0; i < (acquisition_mas_system_names.length)*2; i+=2) {
                         if (chartPlotDXAcquisitionMeanmAs.series.length > i+1) {
