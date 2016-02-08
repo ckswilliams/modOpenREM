@@ -165,79 +165,8 @@ def dx_summary_chart_data(request):
 
     request_results = request.GET
 
-    if request_results.get('acquisitionhist'):
-        filters = {}
-        if request_results.get('acquisition_protocol'):
-            filters['projectionxrayradiationdose__irradeventxraydata__acquisition_protocol'] = request_results.get(
-                'acquisition_protocol')
-        if request_results.get('acquisition_dap_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = request_results.get(
-                'acquisition_dap_min')
-        if request_results.get('acquisition_dap_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = request_results.get(
-                'acquisition_dap_max')
-        if request_results.get('acquisition_kvp_min'):
-            filters[
-                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__gte'] = request_results.get(
-                'acquisition_kvp_min')
-        if request_results.get('acquisition_kvp_max'):
-            filters[
-                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp__lte'] = request_results.get(
-                'acquisition_kvp_max')
-        if request_results.get('acquisition_mas_min'):
-            filters[
-                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__gte'] = request_results.get(
-                'acquisition_mas_min')
-        if request_results.get('acquisition_mas_max'):
-            filters[
-                'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure__lte'] = request_results.get(
-                'acquisition_mas_max')
-        if request_results.get('study_description'):
-            filters['study_description__icontains'] = request_results.get('study_description')
-        if request_results.get('requested_procedure'):
-            filters['requested_procedure_code_meaning__icontains'] = request_results.get('requested_procedure')
-
-    else:
-        filters = {}
-        if request_results.get('study_description'):
-            filters['study_description__icontains'] = request_results.get('study_description')
-        if request_results.get('acquisition_protocol'):
-            filters[
-                'projectionxrayradiationdose__irradeventxraydata__acquisition_protocol__icontains'] = request_results.get(
-                'acquisition_protocol')
-        if request_results.get('acquisition_dap_min'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__gte'] = request_results.get(
-                'acquisition_dap_min')
-        if request_results.get('acquisition_dap_max'):
-            filters['projectionxrayradiationdose__irradeventxraydata__dose_area_product__lte'] = request_results.get(
-                'acquisition_dap_max')
-        if request_results.get('requested_procedure'):
-            filters['requested_procedure_code_meaning__icontains'] = request_results.get('requested_procedure')
-
-    if request_results.get('accession_number'):
-        filters['accession_number'] = request_results.get('accession_number')
-    if request_results.get('date_after'):
-        filters['study_date__gte'] = request_results.get('date_after')
-    if request_results.get('date_before'):
-        filters['study_date__lte'] = request_results.get('date_before')
-    if request_results.get('institution_name'):
-        filters['generalequipmentmoduleattr__institution_name'] = request_results.get('institution_name')
-    if request_results.get('manufacturer'):
-        filters['generalequipmentmoduleattr__manufacturer'] = request_results.get('manufacturer')
-    if request_results.get('model_name'):
-        filters['generalequipmentmoduleattr__manufacturer_model_name'] = request_results.get('model_name')
-    if request_results.get('patient_age_max'):
-        filters['patientstudymoduleattr__patient_age_decimal__lte'] = request_results.get('patient_age_max')
-    if request_results.get('patient_age_min'):
-        filters['patientstudymoduleattr__patient_age_decimal__gte'] = request_results.get('patient_age_min')
-    if request_results.get('station_name'):
-        filters['generalequipmentmoduleattr__station_name'] = request_results.get('station_name')
-    if request_results.get('display_name'):
-        filters['generalequipmentmoduleattr__unique_equipment_name__display_name'] = request_results.get('display_name')
-
     f = DXSummaryListFilter(request_results, queryset=GeneralStudyModuleAttr.objects.filter(
-        Q(modality_type__exact='DX') | Q(modality_type__exact='CR'),
-        **filters
+        Q(modality_type__exact='DX') | Q(modality_type__exact='CR')
     ).order_by().distinct())
 
     try:
