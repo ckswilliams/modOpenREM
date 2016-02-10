@@ -40,7 +40,7 @@ $(document).ready(function() {
             var colour_scale = chroma.scale('RdYlBu');
 
             // DLP per acquisition chart data
-            if(typeof plotCTAcquisitionMean !== 'undefined') {
+            if(typeof plotCTAcquisitionMeanDLP !== 'undefined') {
                 updateAverageChart(json.acquisitionNameList, json.acquisitionSystemList, json.acquisitionSummary, json.acquisitionHistogramData, plotAverageChoice, 'histogramAcquisitionPlotDLPdiv', colour_scale);
             }
 
