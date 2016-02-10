@@ -1080,132 +1080,61 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         else:
             return_structure['acquisitionSystemList'] = ['All systems']
 
-        if plot_acquisition_mean_dlp:
-            return_structure['acquisitionSummary'] = []
-            if median_available and plot_average_choice == 'both':
-                if plot_series_per_systems:
-                    for system in return_structure['acquisitionSystemList']:
-                        return_structure['acquisitionSummary'].append(acquisition_events.exclude(
-                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                            'acquisition_protocol').distinct().annotate(
-                            mean=Avg('dlp'),
-                            median=Median('dlp') / 10000000000,
-                            num=Count('dlp')).order_by('acquisition_protocol'))
-                else:
-                    return_structure['acquisitionSummary'].append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                        'acquisition_protocol').distinct().annotate(
-                        mean=Avg('dlp'),
-                        median=Median('dlp') / 10000000000,
-                        num=Count('dlp')).order_by('acquisition_protocol'))
-            elif median_available and plot_average_choice == 'median':
-                if plot_series_per_systems:
-                    for system in return_structure['acquisitionSystemList']:
-                        return_structure['acquisitionSummary'].append(acquisition_events.exclude(
-                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                            'acquisition_protocol').distinct().annotate(
-                            median=Median('dlp') / 10000000000,
-                            num=Count('dlp')).order_by('acquisition_protocol'))
-                else:
-                    return_structure['acquisitionSummary'].append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                        'acquisition_protocol').distinct().annotate(
-                        median=Median('dlp') / 10000000000,
-                        num=Count('dlp')).order_by('acquisition_protocol'))
-            else:
-                if plot_series_per_systems:
-                    for system in return_structure['acquisitionSystemList']:
-                        return_structure['acquisitionSummary'].append(acquisition_events.exclude(
-                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                            'acquisition_protocol').distinct().annotate(
-                            mean=Avg('dlp'),
-                            num=Count('dlp')).order_by('acquisition_protocol'))
-                else:
-                    return_structure['acquisitionSummary'].append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                        'acquisition_protocol').distinct().annotate(
-                        mean=Avg('dlp'),
-                        num=Count('dlp')).order_by('acquisition_protocol'))
-
-            for index in range(len(return_structure['acquisitionSummary'])):
-                return_structure['acquisitionSummary'][index] = list(return_structure['acquisitionSummary'][index])
-
-        if plot_acquisition_mean_ctdi:
-            return_structure['acquisitionSummaryCTDI'] = []
-            if median_available and plot_average_choice == 'both':
-                if plot_series_per_systems:
-                    for system in return_structure['acquisitionSystemList']:
-                        return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
-                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                            'acquisition_protocol').distinct().annotate(
-                            mean=Avg('mean_ctdivol'),
-                            median=Median('mean_ctdivol') / 10000000000,
-                            num=Count('dlp')).order_by('acquisition_protocol'))
-                else:
-                    return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                        'acquisition_protocol').distinct().annotate(
-                        mean=Avg('mean_ctdivol'),
-                        median=Median('mean_ctdivol') / 10000000000,
-                        num=Count('dlp')).order_by('acquisition_protocol'))
-            elif median_available and plot_average_choice == 'median':
-                if plot_series_per_systems:
-                    for system in return_structure['acquisitionSystemList']:
-                        return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
-                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                            'acquisition_protocol').distinct().annotate(
-                            median=Median('mean_ctdivol') / 10000000000,
-                            num=Count('dlp')).order_by('acquisition_protocol'))
-                else:
-                    return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                        'acquisition_protocol').distinct().annotate(
-                        median=Median('mean_ctdivol') / 10000000000,
-                        num=Count('dlp')).order_by('acquisition_protocol'))
-            else:
-                if plot_series_per_systems:
-                    for system in return_structure['acquisitionSystemList']:
-                        return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
-                            Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
-                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
-                            'acquisition_protocol').distinct().annotate(
-                            mean=Avg('mean_ctdivol'),
-                            num=Count('dlp')).order_by('acquisition_protocol'))
-                else:
-                    return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
-                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
-                        'acquisition_protocol').distinct().annotate(
-                        mean=Avg('mean_ctdivol'),
-                        num=Count('dlp')).order_by('acquisition_protocol'))
-
-            for index in range(len(return_structure['acquisitionSummaryCTDI'])):
-                return_structure['acquisitionSummaryCTDI'][index] = list(return_structure['acquisitionSummaryCTDI'][index])
-
-        if plot_acquisition_freq and not plot_acquisition_mean_dlp and not plot_acquisition_mean_ctdi:
-            return_structure['acquisitionSummary'] = []
+    if plot_acquisition_mean_dlp:
+        return_structure['acquisitionSummary'] = []
+        if median_available and plot_average_choice == 'both':
             if plot_series_per_systems:
                 for system in return_structure['acquisitionSystemList']:
                     return_structure['acquisitionSummary'].append(acquisition_events.exclude(
                         Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
                         ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'acquisition_protocol').distinct().annotate(
+                        mean=Avg('dlp'),
+                        median=Median('dlp') / 10000000000,
                         num=Count('dlp')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummary'].append(acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(
+                    mean=Avg('dlp'),
+                    median=Median('dlp') / 10000000000,
+                    num=Count('dlp')).order_by('acquisition_protocol'))
+        elif median_available and plot_average_choice == 'median':
+            if plot_series_per_systems:
+                for system in return_structure['acquisitionSystemList']:
+                    return_structure['acquisitionSummary'].append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'acquisition_protocol').distinct().annotate(
+                        median=Median('dlp') / 10000000000,
+                        num=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                return_structure['acquisitionSummary'].append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(
+                    median=Median('dlp') / 10000000000,
+                    num=Count('dlp')).order_by('acquisition_protocol'))
+        else:
+            if plot_series_per_systems:
+                for system in return_structure['acquisitionSystemList']:
+                    return_structure['acquisitionSummary'].append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean=Avg('dlp'),
+                        num=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                return_structure['acquisitionSummary'].append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(
+                    mean=Avg('dlp'),
                     num=Count('dlp')).order_by('acquisition_protocol'))
 
-            for index in range(len(return_structure['acquisitionSummary'])):
-                return_structure['acquisitionSummary'][index] = list(return_structure['acquisitionSummary'][index])
+        for index in range(len(return_structure['acquisitionSummary'])):
+            return_structure['acquisitionSummary'][index] = list(return_structure['acquisitionSummary'][index])
 
         # Fill in default values where data for an acquisition protocol is missing for any of the systems
-        if plot_series_per_systems and plot_acquisition_mean_dlp:
+        if plot_series_per_systems:
             for index in range(len(return_structure['acquisitionSystemList'])):
                 missing_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in return_structure['acquisitionSummary'][index]]))
                 for missing_name in missing_names:
@@ -1221,7 +1150,81 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionSummary'][index])[0])
                 return_structure['acquisitionSummary'][index] = summary_temp
 
-        if plot_series_per_systems and plot_acquisition_mean_ctdi:
+        return_structure['acquisitionHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(return_structure['acquisitionSystemList']))]
+
+        value_ranges = acquisition_events.values('acquisition_protocol').distinct().annotate(
+            min_dlp=Min('dlp', output_field=FloatField()),
+            max_dlp=Max('dlp', output_field=FloatField())).order_by('acquisition_protocol')
+
+        for sys_idx, system in enumerate(return_structure['acquisitionSystemList']):
+            for acq_idx, acquisition_name in enumerate(acquisition_names):
+                if plot_series_per_systems:
+                    subqs = acquisition_events.filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            acquisition_protocol=acquisition_name)
+                else:
+                    subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
+
+                data_values = subqs.values_list('dlp', flat=True)
+
+                return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0], return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_dlp', 'max_dlp')[0])
+                return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0].tolist()
+                return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] = return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1].tolist()
+
+    if plot_acquisition_mean_ctdi:
+        return_structure['acquisitionSummaryCTDI'] = []
+        if median_available and plot_average_choice == 'both':
+            if plot_series_per_systems:
+                for system in return_structure['acquisitionSystemList']:
+                    return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean=Avg('mean_ctdivol'),
+                        median=Median('mean_ctdivol') / 10000000000,
+                        num=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(
+                    mean=Avg('mean_ctdivol'),
+                    median=Median('mean_ctdivol') / 10000000000,
+                    num=Count('dlp')).order_by('acquisition_protocol'))
+        elif median_available and plot_average_choice == 'median':
+            if plot_series_per_systems:
+                for system in return_structure['acquisitionSystemList']:
+                    return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'acquisition_protocol').distinct().annotate(
+                        median=Median('mean_ctdivol') / 10000000000,
+                        num=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(
+                    median=Median('mean_ctdivol') / 10000000000,
+                    num=Count('dlp')).order_by('acquisition_protocol'))
+        else:
+            if plot_series_per_systems:
+                for system in return_structure['acquisitionSystemList']:
+                    return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
+                        Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                        ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                        'acquisition_protocol').distinct().annotate(
+                        mean=Avg('mean_ctdivol'),
+                        num=Count('dlp')).order_by('acquisition_protocol'))
+            else:
+                return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                    'acquisition_protocol').distinct().annotate(
+                    mean=Avg('mean_ctdivol'),
+                    num=Count('dlp')).order_by('acquisition_protocol'))
+
+        for index in range(len(return_structure['acquisitionSummaryCTDI'])):
+            return_structure['acquisitionSummaryCTDI'][index] = list(return_structure['acquisitionSummaryCTDI'][index])
+
+        if plot_series_per_systems:
             for index in range(len(return_structure['acquisitionSystemList'])):
                 missing_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in return_structure['acquisitionSummaryCTDI'][index]]))
                 for missing_name in missing_names:
@@ -1237,7 +1240,46 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionSummaryCTDI'][index])[0])
                 return_structure['acquisitionSummaryCTDI'][index] = summary_temp
 
-        if plot_series_per_systems and plot_acquisition_freq and not plot_acquisition_mean_dlp and not plot_acquisition_mean_ctdi:
+        return_structure['acquisitionHistogramDataCTDI'] = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(return_structure['acquisitionSystemList']))]
+
+        value_ranges = acquisition_events.values('acquisition_protocol').distinct().annotate(
+            min_ctdi=Min('mean_ctdivol', output_field=FloatField()),
+            max_ctdi=Max('mean_ctdivol', output_field=FloatField())).order_by('acquisition_protocol')
+
+        for sys_idx, system in enumerate(return_structure['acquisitionSystemList']):
+            for acq_idx, acquisition_name in enumerate(acquisition_names):
+                if plot_series_per_systems:
+                    subqs = acquisition_events.filter(
+                            ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            acquisition_protocol=acquisition_name)
+                else:
+                    subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
+
+                data_values = subqs.values_list('mean_ctdivol', flat=True)
+
+                return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][0], return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_ctdi', 'max_ctdi')[0])
+                return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][0].tolist()
+                return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][1] = return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][1].tolist()
+
+    if plot_acquisition_freq and not plot_acquisition_mean_dlp and not plot_acquisition_mean_ctdi:
+        return_structure['acquisitionSummary'] = []
+        if plot_series_per_systems:
+            for system in return_structure['acquisitionSystemList']:
+                return_structure['acquisitionSummary'].append(acquisition_events.exclude(
+                    Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
+                    ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
+                    'acquisition_protocol').distinct().annotate(
+                    num=Count('dlp')).order_by('acquisition_protocol'))
+        else:
+            return_structure['acquisitionSummary'].append(acquisition_events.exclude(
+                Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
+                'acquisition_protocol').distinct().annotate(
+                num=Count('dlp')).order_by('acquisition_protocol'))
+
+        for index in range(len(return_structure['acquisitionSummary'])):
+            return_structure['acquisitionSummary'][index] = list(return_structure['acquisitionSummary'][index])
+
+        if plot_series_per_systems:
             for index in range(len(return_structure['acquisitionSystemList'])):
                 missing_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in return_structure['acquisitionSummary'][index]]))
                 for missing_name in missing_names:
@@ -1248,51 +1290,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionSummary'][index])[0])
                 return_structure['acquisitionSummary'][index] = summary_temp
 
-        if plot_acquisition_mean_dlp:
-            return_structure['acquisitionHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(return_structure['acquisitionSystemList']))]
-
-            value_ranges = acquisition_events.values('acquisition_protocol').distinct().annotate(
-                min_dlp=Min('dlp', output_field=FloatField()),
-                max_dlp=Max('dlp', output_field=FloatField())).order_by('acquisition_protocol')
-
-            for sys_idx, system in enumerate(return_structure['acquisitionSystemList']):
-                for acq_idx, acquisition_name in enumerate(acquisition_names):
-                    if plot_series_per_systems:
-                        subqs = acquisition_events.filter(
-                                ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                                acquisition_protocol=acquisition_name)
-                    else:
-                        subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
-
-                    data_values = subqs.values_list('dlp', flat=True)
-
-                    return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0], return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_dlp', 'max_dlp')[0])
-                    return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0].tolist()
-                    return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] = return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1].tolist()
-
-        if plot_acquisition_mean_ctdi:
-            return_structure['acquisitionHistogramDataCTDI'] = [[[None for k in xrange(2)] for j in xrange(len(acquisition_names))] for i in xrange(len(return_structure['acquisitionSystemList']))]
-
-            value_ranges = acquisition_events.values('acquisition_protocol').distinct().annotate(
-                min_ctdi=Min('mean_ctdivol', output_field=FloatField()),
-                max_ctdi=Max('mean_ctdivol', output_field=FloatField())).order_by('acquisition_protocol')
-
-            for sys_idx, system in enumerate(return_structure['acquisitionSystemList']):
-                for acq_idx, acquisition_name in enumerate(acquisition_names):
-                    if plot_series_per_systems:
-                        subqs = acquisition_events.filter(
-                                ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                                acquisition_protocol=acquisition_name)
-                    else:
-                        subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
-
-                    data_values = subqs.values_list('mean_ctdivol', flat=True)
-
-                    return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][0], return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_ctdi', 'max_ctdi')[0])
-                    return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][0].tolist()
-                    return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][1] = return_structure['acquisitionHistogramDataCTDI'][sys_idx][acq_idx][1].tolist()
-
-    if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time:
+    if plot_study_mean_dlp or plot_study_freq:
         if plot_series_per_systems:
             return_structure['studySystemList'] = list(study_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
         else:
@@ -1300,71 +1298,55 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
         return_structure['studySummary'] = []
 
-        if plot_study_mean_dlp:
-            if median_available and plot_average_choice == 'both':
-                if plot_series_per_systems:
-                    for system in return_structure['studySystemList']:
-                        return_structure['studySummary'].append(study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                            num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                            'study_description'))
-                else:
-                    return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                        num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                        'study_description'))
-
-            elif median_available and plot_average_choice == 'median':
-                if plot_series_per_systems:
-                    for system in return_structure['studySystemList']:
-                        return_structure['studySummary'].append(study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                            num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                            'study_description'))
-                else:
-                    return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                        num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                        'study_description'))
-
-            else:
-                if plot_series_per_systems:
-                    for system in return_structure['studySystemList']:
-                        return_structure['studySummary'].append(study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                            num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                            'study_description'))
-                else:
-                    return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                        num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                        'study_description'))
-
-            for index in range(len(return_structure['studySummary'])):
-                return_structure['studySummary'][index] = list(return_structure['studySummary'][index])
-
-        elif plot_study_freq:
+    if plot_study_mean_dlp:
+        if median_available and plot_average_choice == 'both':
             if plot_series_per_systems:
                 for system in return_structure['studySystemList']:
                     return_structure['studySummary'].append(study_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                        mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                         num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                         'study_description'))
             else:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
+                    mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                    median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                     num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                     'study_description'))
 
-            for index in range(len(return_structure['studySummary'])):
-                return_structure['studySummary'][index] = list(return_structure['studySummary'][index])
+        elif median_available and plot_average_choice == 'median':
+            if plot_series_per_systems:
+                for system in return_structure['studySystemList']:
+                    return_structure['studySummary'].append(study_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+            else:
+                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
+                    median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                    num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                    'study_description'))
 
-        # Fill in default values where data for a study description is missing for any of the systems
-        if plot_series_per_systems and plot_study_mean_dlp:
+        else:
+            if plot_series_per_systems:
+                for system in return_structure['studySystemList']:
+                    return_structure['studySummary'].append(study_events.filter(
+                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                        mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                        num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'study_description'))
+            else:
+                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
+                    mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
+                    num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                    'study_description'))
+
+        for index in range(len(return_structure['studySummary'])):
+            return_structure['studySummary'][index] = list(return_structure['studySummary'][index])
+
+        if plot_series_per_systems:
             for index in range(len(return_structure['studySystemList'])):
                 missing_names = list(set(return_structure['studyNameList']) - set([d['study_description'] for d in return_structure['studySummary'][index]]))
                 for missing_name in missing_names:
@@ -1380,7 +1362,47 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     summary_temp.append(filter(lambda item: item['study_description'] == study_name, return_structure['studySummary'][index])[0])
                 return_structure['studySummary'][index] = summary_temp
 
-        elif plot_series_per_systems and plot_study_freq:
+
+        return_structure['studyHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['studyNameList']))] for i in xrange(len(return_structure['studySystemList']))]
+
+        value_ranges = study_events.values('study_description').distinct().annotate(
+            min_dlp=Min('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField()),
+            max_dlp=Max('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField())).order_by(
+            'study_description')
+
+        for sys_idx, system in enumerate(return_structure['studySystemList']):
+            for stu_idx, study_name in enumerate(return_structure['studyNameList']):
+                if plot_series_per_systems:
+                    subqs = study_events.filter(
+                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
+                            study_description=study_name)
+                else:
+                    subqs = study_events.filter(study_description=study_name)
+
+                data_values = subqs.values_list(
+                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
+                    flat=True)
+                return_structure['studyHistogramData'][sys_idx][stu_idx][0], return_structure['studyHistogramData'][sys_idx][stu_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(study_description=study_name).values_list('min_dlp', 'max_dlp')[0])
+                return_structure['studyHistogramData'][sys_idx][stu_idx][0] = return_structure['studyHistogramData'][sys_idx][stu_idx][0].tolist()
+                return_structure['studyHistogramData'][sys_idx][stu_idx][1] = return_structure['studyHistogramData'][sys_idx][stu_idx][1].tolist()
+
+    elif plot_study_freq:
+        if plot_series_per_systems:
+            for system in return_structure['studySystemList']:
+                return_structure['studySummary'].append(study_events.filter(
+                    generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
+                    num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                    'study_description'))
+        else:
+            return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
+                num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                'study_description'))
+
+        for index in range(len(return_structure['studySummary'])):
+            return_structure['studySummary'][index] = list(return_structure['studySummary'][index])
+
+        # Fill in default values where data for a study description is missing for any of the systems
+        if plot_series_per_systems:
             for index in range(len(return_structure['studySystemList'])):
                 missing_names = list(set(return_structure['studyNameList']) - set([d['study_description'] for d in return_structure['studySummary'][index]]))
                 for missing_name in missing_names:
@@ -1390,30 +1412,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 for study_name in return_structure['studyNameList']:
                     summary_temp.append(filter(lambda item: item['study_description'] == study_name, return_structure['studySummary'][index])[0])
                 return_structure['studySummary'][index] = summary_temp
-
-        if plot_study_mean_dlp:
-            return_structure['studyHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['studyNameList']))] for i in xrange(len(return_structure['studySystemList']))]
-
-            value_ranges = study_events.values('study_description').distinct().annotate(
-                min_dlp=Min('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField()),
-                max_dlp=Max('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total', output_field=FloatField())).order_by(
-                'study_description')
-
-            for sys_idx, system in enumerate(return_structure['studySystemList']):
-                for stu_idx, study_name in enumerate(return_structure['studyNameList']):
-                    if plot_series_per_systems:
-                        subqs = study_events.filter(
-                                generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                                study_description=study_name)
-                    else:
-                        subqs = study_events.filter(study_description=study_name)
-
-                    data_values = subqs.values_list(
-                        'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
-                        flat=True)
-                    return_structure['studyHistogramData'][sys_idx][stu_idx][0], return_structure['studyHistogramData'][sys_idx][stu_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(study_description=study_name).values_list('min_dlp', 'max_dlp')[0])
-                    return_structure['studyHistogramData'][sys_idx][stu_idx][0] = return_structure['studyHistogramData'][sys_idx][stu_idx][0].tolist()
-                    return_structure['studyHistogramData'][sys_idx][stu_idx][1] = return_structure['studyHistogramData'][sys_idx][stu_idx][1].tolist()
 
     if plot_study_mean_dlp_over_time:
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
@@ -1530,7 +1528,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 for request_name in return_structure['requestNameList']:
                     summary_temp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, return_structure['requestSummary'][index])[0])
                 return_structure['requestSummary'][index] = summary_temp
-
 
         return_structure['requestHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['requestNameList']))] for i in xrange(len(return_structure['requestSystemList']))]
 
