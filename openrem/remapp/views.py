@@ -1221,7 +1221,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionSummary'][index])[0])
                 return_structure['acquisitionSummary'][index] = summary_temp
 
-        elif plot_series_per_systems and plot_acquisition_mean_ctdi:
+        if plot_series_per_systems and plot_acquisition_mean_ctdi:
             for index in range(len(return_structure['acquisitionSystemList'])):
                 missing_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in return_structure['acquisitionSummaryCTDI'][index]]))
                 for missing_name in missing_names:
@@ -1237,7 +1237,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionSummaryCTDI'][index])[0])
                 return_structure['acquisitionSummaryCTDI'][index] = summary_temp
 
-        elif plot_series_per_systems and plot_acquisition_freq:
+        if plot_series_per_systems and plot_acquisition_freq and not plot_acquisition_mean_dlp and not plot_acquisition_mean_ctdi:
             for index in range(len(return_structure['acquisitionSystemList'])):
                 missing_names = list(set(acquisition_names) - set([d['acquisition_protocol'] for d in return_structure['acquisitionSummary'][index]]))
                 for missing_name in missing_names:
