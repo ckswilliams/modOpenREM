@@ -233,24 +233,24 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
         for (i = 0; i < (system_list.length)*2; i+=2) {
             if (chart.series.length > i+1) {
                 chart.series[i].update({
-                    name: system_list[current_series],
+                    name: system_list[current_series] + ' (mean)',
                     data: mean_data[current_series],
                     color: colour_scale(i/(colour_max*2-1)).hex()
                 });
                 chart.series[i+1].update({
-                    name: system_list[current_series],
+                    name: system_list[current_series] + ' (median)',
                     data: median_data[current_series],
                     color: colour_scale((i+1)/(colour_max*2-1)).hex()
                 });
             }
             else {
                 chart.addSeries({
-                    name: system_list[current_series],
+                    name: system_list[current_series] + ' (mean)',
                     data: mean_data[current_series],
                     color: colour_scale(i/(colour_max*2-1)).hex()
                 });
                 chart.addSeries({
-                    name: system_list[current_series],
+                    name: system_list[current_series] + ' (median)',
                     data: median_data[current_series],
                     color: colour_scale((i+1)/(colour_max*2-1)).hex()
                 });
