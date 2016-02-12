@@ -42,21 +42,25 @@ $(document).ready(function() {
             // DLP per acquisition chart data
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined') {
                 updateAverageChart(json.acquisitionNameList, json.acquisitionSystemList, json.acquisitionSummary, json.acquisitionHistogramData, plotAverageChoice, 'histogramAcquisitionPlotDLPdiv', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramAcquisitionPlotDLPdiv');
             }
 
             // CTDI per acquisition chart data
             if(typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
                 updateAverageChart(json.acquisitionNameList, json.acquisitionSystemList, json.acquisitionSummaryCTDI, json.acquisitionHistogramDataCTDI, plotAverageChoice, 'histogramAcquisitionPlotCTDIdiv', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramAcquisitionPlotCTDIdiv');
             }
 
             // DLP per study chart data
             if(typeof plotCTStudyMeanDLP !== 'undefined') {
                 updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, 'histogramStudyPlotDIV', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramStudyPlotDIV');
             }
 
             // DLP per request chart data start
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
                 updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, 'histogramRequestPlotDIV', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramRequestPlotDIV');
             }
 
             // Acquisition frequency chart data start

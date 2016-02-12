@@ -123,19 +123,4 @@ var chartDAPperStudy = new Highcharts.Chart({
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            anySeriesSort('#plotDXStudyMeanDAPContainer', 'total_counts', chartSortingDirection, 0);
-            break;
-        case 'dap':
-            anySeriesSort('#plotDXStudyMeanDAPContainer', 'y', chartSortingDirection, 0);
-            break;
-        case 'name':
-            anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', chartSortingDirection, 0);
-            break;
-        default:
-            anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', 1, 0);
-    }
-
 });

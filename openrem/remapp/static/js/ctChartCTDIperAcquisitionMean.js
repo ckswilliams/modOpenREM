@@ -123,19 +123,4 @@ $(function () {
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'total_counts', chartSortingDirection, 0);
-            break;
-        case 'ctdi':
-            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'y', chartSortingDirection, 0);
-            break;
-        case 'name':
-            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', chartSortingDirection, 0);
-            break;
-        default:
-            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', 1, 0);
-    }
-
 });

@@ -41,28 +41,33 @@ $(document).ready(function() {
             // Acquisition DAP chart data
             if(typeof plotDXAcquisitionMeanDAP !== 'undefined') {
                 updateAverageChart(json.acquisition_names, json.acquisitionSystemList, json.acquisitionSummary, json.acquisitionHistogramData, plotAverageChoice, 'container', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'container');
             }
 
             // DAP per requested procedure data
             if( typeof plotDXRequestMeanDAP !== 'undefined') {
                 updateAverageChart(json.request_names, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, 'plotDXRequestMeanDAPContainer', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'plotDXRequestMeanDAPContainer');
             }
-            
+
             // DAP per study description data
             if( typeof plotDXStudyMeanDAP !== 'undefined') {
                 updateAverageChart(json.study_names, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, 'plotDXStudyMeanDAPContainer', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'plotDXStudyMeanDAPContainer');
             }
 
             // kVp chart data
             if( typeof plotDXAcquisitionMeankVp !== 'undefined') {
                 updateAverageChart(json.acquisition_kvp_names, json.acquisitionkVpSystemList, json.acquisitionkVpSummary, json.acquisitionHistogramkVpData, plotAverageChoice, 'chartAcquisitionMeankVp', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'chartAcquisitionMeankVp');
             }
 
             // mAs chart data start
             if(typeof plotDXAcquisitionMeanmAs !== 'undefined') {
                 updateAverageChart(json.acquisition_mas_names, json.acquisitionmAsSystemList, json.acquisitionmAsSummary, json.acquisitionHistogrammAsData, plotAverageChoice, 'chartAcquisitionMeanmAs', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'chartAcquisitionMeanmAs');
             }
-            
+
             // Acquisition frequency chart data
             if(typeof plotDXAcquisitionFreq !== 'undefined') {
                 updateFrequencyChart(json.acquisition_names, json.acquisitionSystemList, json.acquisitionSummary, urlStartAcq, 'piechartProtocolDIV', colour_scale);

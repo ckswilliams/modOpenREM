@@ -123,18 +123,4 @@ $(function () {
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            anySeriesSort('#histogramStudyPlotDIV', 'total_counts', chartSortingDirection, 0);
-            break;
-        case 'dlp':
-            anySeriesSort('#histogramStudyPlotDIV', 'y', chartSortingDirection, 0);
-            break;
-        case 'name':
-            anySeriesSort('#histogramStudyPlotDIV', 'name', chartSortingDirection, 0);
-            break;
-        default:
-            anySeriesSort('#histogramStudyPlotDIV', 'name', 1, 0);
-    }
 });

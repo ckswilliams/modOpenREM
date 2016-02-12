@@ -123,19 +123,4 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            anySeriesSort('#container', 'total_counts', chartSortingDirection, 0, 0);
-            break;
-        case 'dap':
-            anySeriesSort('#container', 'y', chartSortingDirection, 0, 0);
-            break;
-        case 'name':
-            anySeriesSort('#container', 'name', chartSortingDirection, 0, 0);
-            break;
-        default:
-            anySeriesSort('#container', 'name', chartSortingDirection, 0, 0);
-    }
-
 });

@@ -123,20 +123,4 @@ $(function () {
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            anySeriesSort('#chartAcquisitionMeanmAs', 'total_counts', chartSortingDirection, 0);
-            break;
-        case 'dap':
-            anySeriesSort('#chartAcquisitionMeanmAs', 'y', chartSortingDirection, 0);
-            break;
-        case 'name':
-            anySeriesSort('#chartAcquisitionMeanmAs', 'name', chartSortingDirection, 0);
-            break;
-        default:
-            anySeriesSort('#chartAcquisitionMeanmAs', 'name', 1, 0);
-    }
-
 });
-

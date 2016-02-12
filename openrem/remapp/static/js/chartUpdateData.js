@@ -1,3 +1,26 @@
+function sortChartDataToDefault(sorting_field, sorting_direction, chart_div) {
+    switch(sorting_field) {
+        case 'freq':
+            anySeriesSort('#'+chart_div, 'total_counts', sorting_direction, 0);
+            break;
+        case 'dlp':
+            anySeriesSort('#'+chart_div, 'y', sorting_direction, 0);
+            break;
+        case 'ctdi':
+            anySeriesSort('#'+chart_div, 'y', sorting_direction, 0);
+            break;
+        case 'dap':
+            anySeriesSort('#'+chart_div, 'y', sorting_direction, 0);
+            break;
+        case 'name':
+            anySeriesSort('#'+chart_div, 'name', sorting_direction, 0);
+            break;
+        default:
+            anySeriesSort('#'+chart_div, 'name', 1, 0);
+    }
+}
+
+
 function updateWorkloadChart(workload_data, chart_div, colour_scale) {
     var day_names = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     var day_total = 0;
