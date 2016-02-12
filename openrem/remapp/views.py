@@ -1486,12 +1486,12 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                             median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
                             num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                             'requested_procedure_code_meaning'))
-                else:
-                    return_structure['requestSummary'].append(request_events.values(
-                        'requested_procedure_code_meaning').distinct().annotate(
-                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
-                            num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
-                            'requested_procedure_code_meaning'))
+            else:
+                return_structure['requestSummary'].append(request_events.values(
+                    'requested_procedure_code_meaning').distinct().annotate(
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
+                        'requested_procedure_code_meaning'))
 
         else:
             if plot_series_per_systems:
