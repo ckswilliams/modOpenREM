@@ -127,11 +127,16 @@ function updateFrequencyChart(name_list, system_list, summary_data, url_start, c
 function updateAverageChart(name_list, system_list, summary_data, histogram_data, average_choice, chart_div, colour_scale) {
     var data_counts = []; while(data_counts.push([]) < system_list.length);
     var data_bins = []; while(data_bins.push([]) < system_list.length);
-    for (i = 0; i < system_list.length; i++) {
-        for (j = 0; j < name_list.length; j++) {
+    var total_counts_per_name = [];
+    var current_counts;
+    for (j = 0; j < name_list.length; j++) {
+        current_counts = 0;
+        for (i = 0; i < system_list.length; i++) {
             (data_counts[i]).push(histogram_data[i][j][0]);
             (data_bins[i]).push(histogram_data[i][j][1]);
+            current_counts += parseFloat(summary_data[i][j].num);
         }
+        total_counts_per_name.push(current_counts);
     }
 
     if (average_choice == "mean" || average_choice == "both") {
@@ -144,7 +149,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + summary_data[i][j].mean.toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
-                    drilldown: system_list[i]+name_list[j]
+                    drilldown: system_list[i]+name_list[j],
+                    total_counts: total_counts_per_name[j]
                 });
             }
         }
@@ -160,7 +166,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + parseFloat(summary_data[i][j].median).toFixed(1) + ' median<br>(n=' + summary_data[i][j].num + ')',
-                    drilldown: system_list[i]+name_list[j]
+                    drilldown: system_list[i]+name_list[j],
+                    total_counts: total_counts_per_name[j]
                 });
             }
         }

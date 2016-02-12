@@ -126,7 +126,7 @@ var chartDAPperRequest = new Highcharts.Chart({
 
     switch(chartSorting) {
         case 'freq':
-            anySeriesSort('#plotDXRequestMeanDAPContainer', 'freq', chartSortingDirection, 0);
+            anySeriesSort('#plotDXRequestMeanDAPContainer', 'total_counts', chartSortingDirection, 0);
             break;
         case 'dap':
             anySeriesSort('#plotDXRequestMeanDAPContainer', 'y', chartSortingDirection, 0);

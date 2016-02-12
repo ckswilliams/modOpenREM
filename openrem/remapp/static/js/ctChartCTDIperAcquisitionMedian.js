@@ -126,7 +126,7 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'freq', chartSortingDirection, 0);
+            anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'total_counts', chartSortingDirection, 0);
             break;
         case 'ctdi':
             anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'y', chartSortingDirection, 0);

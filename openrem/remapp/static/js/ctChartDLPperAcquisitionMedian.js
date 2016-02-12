@@ -126,7 +126,7 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'freq', chartSortingDirection, 0);
+            anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'total_counts', chartSortingDirection, 0);
             break;
         case 'dlp':
             anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'y', chartSortingDirection, 0);

@@ -126,7 +126,7 @@ $(function () {
 
     switch(chartSorting) {
         case 'freq':
-            anySeriesSort('#container', 'freq', chartSortingDirection, 0);
+            anySeriesSort('#container', 'total_counts', chartSortingDirection, 0);
             break;
         case 'dap':
             anySeriesSort('#container', 'y', chartSortingDirection, 0);
