@@ -85,6 +85,7 @@ class DicomStoreSCP(models.Model):
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)
     keep_alive = models.BooleanField(default=False, verbose_name="Should this server be kept auto-started and kept alive (using celery beat)")
+    controlled = models.BooleanField(default=False, verbose_name="Is this server controlled by OpenREM")
 
     def get_absolute_url(self):
         return reverse('dicom_summary')
