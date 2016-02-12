@@ -39,6 +39,7 @@
                               dataType: "json",
                               success: function( json ){
                                   $( '#store-status-{{ scp.pk }}' ).html( json.message );
+                                  $( '#store-status-indicator-{{ scp.pk }}' ).html( json.statusindicator );
                                   $( '#store-delete-{{ scp.pk }}' ).html( json.delbutton );
                                   $( '#store-start-{{ scp.pk }}' ).html( json.startbutton );
                                   $( '#store-stop-{{ scp.pk }}' ).html( json.stopbutton );
@@ -55,6 +56,7 @@
           </script>
           <div class="panel panel-info">
               <div class="panel-heading">
+                  <div id="store-status-indicator-{{ scp.pk }}"></div>
                 <h3 class="panel-title">{{ scp.name }}</h3>
               </div>
               <div class="panel-body">

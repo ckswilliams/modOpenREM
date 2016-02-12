@@ -91,7 +91,8 @@ def status_update_store(request):
         resp['startbutton'] = ""
         resp['stopbutton'] = "<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
     elif echo is "AssocFail":
-        resp['message'] = "<button class='btn btn-danger' type='button'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association</button><div>Last status: {0}</div>".format(store.status)
+        resp['message'] = "<button class='btn btn-danger pull-right btn-sm' type='button'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association</button><div>Last status: {0}</div>".format(store.status)
+        resp['statusindicator'] = "<button class='btn btn-danger pull-right btn-sm' type='button'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association</button>".format(store.status)
         resp['delbutton'] = "<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
         resp['startbutton'] = "<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
         resp['stopbutton'] = ""
