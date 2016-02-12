@@ -4,13 +4,13 @@ function sortChartDataToDefault(sorting_field, sorting_direction, chart_div) {
             anySeriesSort('#'+chart_div, 'total_counts', sorting_direction, 0);
             break;
         case 'dlp':
-            anySeriesSort('#'+chart_div, 'y', sorting_direction, 0);
+            anySeriesSort('#'+chart_div, 'avg_value', sorting_direction, 0);
             break;
         case 'ctdi':
-            anySeriesSort('#'+chart_div, 'y', sorting_direction, 0);
+            anySeriesSort('#'+chart_div, 'avg_value', sorting_direction, 0);
             break;
         case 'dap':
-            anySeriesSort('#'+chart_div, 'y', sorting_direction, 0);
+            anySeriesSort('#'+chart_div, 'avg_value', sorting_direction, 0);
             break;
         case 'name':
             anySeriesSort('#'+chart_div, 'name', sorting_direction, 0);
@@ -152,14 +152,24 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var data_bins = []; while(data_bins.push([]) < system_list.length);
     var total_counts_per_name = [];
     var current_counts;
+    var average_value_per_name = [];
+    var current_value;
     for (j = 0; j < name_list.length; j++) {
         current_counts = 0;
+        current_value = 0;
         for (i = 0; i < system_list.length; i++) {
             (data_counts[i]).push(histogram_data[i][j][0]);
             (data_bins[i]).push(histogram_data[i][j][1]);
             current_counts += parseFloat(summary_data[i][j].num);
+            if (average_choice == "mean" || average_choice == "both") {
+                current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
+            }
+            else {
+                current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
+            }
         }
         total_counts_per_name.push(current_counts);
+        average_value_per_name.push(current_value / current_counts);
     }
 
     if (average_choice == "mean" || average_choice == "both") {
@@ -173,7 +183,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + summary_data[i][j].mean.toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
                     drilldown: system_list[i]+name_list[j],
-                    total_counts: total_counts_per_name[j]
+                    total_counts: total_counts_per_name[j],
+                    avg_value: average_value_per_name[j]
                 });
             }
         }
@@ -190,7 +201,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + parseFloat(summary_data[i][j].median).toFixed(1) + ' median<br>(n=' + summary_data[i][j].num + ')',
                     drilldown: system_list[i]+name_list[j],
-                    total_counts: total_counts_per_name[j]
+                    total_counts: total_counts_per_name[j],
+                    avg_value: average_value_per_name[j]
                 });
             }
         }
