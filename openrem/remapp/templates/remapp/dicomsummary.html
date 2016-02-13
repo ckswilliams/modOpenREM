@@ -90,8 +90,10 @@
                   <hr>
                   <a class="btn btn-primary" href="/openrem/admin/dicomstore/{{ scp.id }}/" role="button">Modify</a>
                   <span id="store-delete-{{ scp.pk }}"></span>
-                  <span id="store-start-{{ scp.pk }}" class="pull-right"></span>
-                  <span id="store-stop-{{ scp.pk }}" class="pull-right"></span>
+                  {% if scp.controlled %}
+                      <span id="store-start-{{ scp.pk }}" class="pull-right"></span>
+                      <span id="store-stop-{{ scp.pk }}" class="pull-right"></span>
+                  {% endif %}
 {#                  <a class="btn btn-danger" href="/openrem/admin/dicomstore/{{ scp.id }}/stop/" role="button">Stop server</a>#}
               </div>
           </div>
