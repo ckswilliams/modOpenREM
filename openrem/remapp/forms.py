@@ -331,7 +331,8 @@ class DicomStoreForm(forms.ModelForm):
                         </p>
                         """)
                     ),
-                    PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
+                    PrependedText('controlled', ''),  # Trick to force label to join the other labels, otherwise sits to right
+                    PrependedText('keep_alive', ''),
                     active=False
                 )
             ),
@@ -351,8 +352,9 @@ class DicomStoreForm(forms.ModelForm):
 
     class Meta:
         model = DicomStoreSCP
-        fields = ['name', 'aetitle', 'port', 'keep_alive']
+        fields = ['name', 'aetitle', 'port', 'controlled', 'keep_alive']
         labels = {
             'port': "Port: 104 is standard for DICOM but ports higher than 1024 requires fewer admin rights",
-            'keep_alive': "Tick the box to auto-start this server and restart it if it dies. Uses celery beat"
+            'controlled': "Advanced use only: tick this box to control the server using OpenREM",
+            'keep_alive': "Advanced use only: tick this box to auto-start this server using celery beat"
         }

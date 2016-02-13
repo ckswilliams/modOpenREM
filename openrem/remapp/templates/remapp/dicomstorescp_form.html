@@ -37,7 +37,9 @@
                 {% load crispy_forms_tags %}
                 {% crispy form %}
             {% else %}
-                <p>Only users in the Admin group can create or modify DICOM Store SCP entries.</p>
+                <p>
+                    <strong>Only users in the Admin group can create or modify DICOM Store SCP entries.</strong>
+                </p>
             {% endif %}
         </div>
       </div>
