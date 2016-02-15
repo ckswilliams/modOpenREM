@@ -275,6 +275,7 @@
             <div class="panel-body">
               <div id="histogramAcquisitionPlotDLPdiv" style="height: auto; margin: 0 0"></div>
 
+              <div class="acq-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -295,6 +296,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseTwo', 'histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -333,6 +335,7 @@
             <div class="panel-body">
               <div id="histogramAcquisitionPlotCTDIdiv" style="height: auto; margin: 0 0"></div>
 
+              <div class="acq-ctdi-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -352,6 +355,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseCTDI', 'histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="acqctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -467,8 +471,7 @@
             <div class="panel-body">
               <div id="histogramStudyPlotDIV" style="height: auto; margin: 0 0"></div>
 
-
-
+              <div class="stu-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -488,6 +491,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseThree', 'histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -556,8 +560,7 @@
             <div class="panel-body">
               <div id="histogramRequestPlotDIV" style="height: auto; margin: 0 0"></div>
 
-
-
+              <div class="req-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -577,6 +580,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>

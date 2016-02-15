@@ -13,6 +13,7 @@ $(function () {
             events: {
                 drilldown: function (e) {
                     $('.req-hist-norm-btn').css('display','inline-block');
+                    $('.req-instructions').css('display','none');
 
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
@@ -51,6 +52,7 @@ $(function () {
                 },
                 drillup: function (e) {
                     $('.req-hist-norm-btn').css('display','none');
+                    $('.req-instructions').css('display','inline-block');
 
                     this.setTitle({
                         text: defaultTitle

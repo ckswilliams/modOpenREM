@@ -62,6 +62,22 @@ div.mas-hist-norm-btn {
   display: none;
 }
 
+div.acq-instructions {
+  display: inline-block;
+}
+
+div.acq-ctdi-instructions {
+  display: inline-block;
+}
+
+div.stu-instructions {
+  display: inline-block;
+}
+
+div.req-instructions {
+  display: inline-block;
+}
+
 div.ajax-error {
   position: fixed;
   display: none;
