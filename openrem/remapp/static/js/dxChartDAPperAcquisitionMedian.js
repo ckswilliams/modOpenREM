@@ -53,7 +53,7 @@ $(function () {
                 },
                 drillup: function(e) {
                     $('.req-hist-norm-btn').css('display','none');
-                    $('.acq-instructions').css('display','inline-block');
+                    $('.acq-instructions').css('display','block');
                     if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
                     this.setTitle({

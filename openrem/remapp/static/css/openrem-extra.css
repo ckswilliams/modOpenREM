@@ -63,27 +63,27 @@ div.mas-hist-norm-btn {
 }
 
 div.acq-instructions {
-  display: inline-block;
+  display: block;
 }
 
 div.acq-ctdi-instructions {
-  display: inline-block;
+  display: block;
 }
 
 div.stu-instructions {
-  display: inline-block;
+  display: block;
 }
 
 div.req-instructions {
-  display: inline-block;
+  display: block;
 }
 
 div.kvp-instructions {
-  display: inline-block;
+  display: block;
 }
 
 div.mas-instructions {
-  display: inline-block;
+  display: block;
 }
 
 div.ajax-error {

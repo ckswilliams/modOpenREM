@@ -55,7 +55,7 @@ $(function () {
                 },
                 drillup: function(e) {
                     $('.mas-hist-norm-btn').css('display','none');
-                    $('.mas-instructions').css('display','inline-block');
+                    $('.mas-instructions').css('display','block');
                     if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
                     this.setTitle({
