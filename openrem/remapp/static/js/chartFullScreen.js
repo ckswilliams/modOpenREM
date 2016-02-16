@@ -18,3 +18,8 @@ function enterFullScreen(div_id, chart_div) {
 
     setTimeout(function() {$(document).resize();}, 0);
 }
+
+function updateFullScreen(div_id, chart_div) {
+    enterFullScreen(div_id, chart_div);
+    enterFullScreen(div_id, chart_div);
+}

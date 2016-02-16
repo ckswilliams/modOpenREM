@@ -14,6 +14,7 @@ $(function () {
                 drilldown: function (e) {
                     $('.acq-hist-norm-btn').css('display','inline-block');
                     $('.acq-instructions').css('display','none');
+                    if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
@@ -53,6 +54,7 @@ $(function () {
                 drillup: function (e) {
                     $('.acq-hist-norm-btn').css('display','none');
                     $('.acq-instructions').css('display','inline-block');
+                    if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
                     this.setTitle({
                         text: defaultTitle
