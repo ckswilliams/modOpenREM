@@ -50,10 +50,8 @@
     </p>
   {% endif %}
 
-
   </div>
   </div>
-
 
   {{ studyfilter }}
 
@@ -99,7 +97,6 @@
   <script src="{{ STATIC_URL }}js/formatDate.js"></script>
 
 {% endblock %}
-
 
 {% block col1 %}
   {% autopaginate filter.qs 50 as filter_list %}
@@ -200,6 +197,7 @@
             <div class="panel-body">
               <div id="container" style="height: auto; margin: 0 0"></div>
 
+              <div class="acq-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -219,6 +217,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#container', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseOne','container')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -285,6 +284,7 @@
             <div class="panel-body">
               <div id="plotDXRequestMeanDAPContainer" style="height: auto; margin: 0 0"></div>
 
+              <div class="req-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -304,6 +304,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -342,8 +343,6 @@
       <!-- End of HTML to include div container for requested procedure name pie chart -->
     {% endif %}
 
-      
-      
     {% if request.user.userprofile.plotDXStudyMeanDAP %}
       <!-- HTML to include div container for study plot -->
 
@@ -372,6 +371,7 @@
             <div class="panel-body">
               <div id="plotDXStudyMeanDAPContainer" style="height: auto; margin: 0 0"></div>
 
+              <div class="stu-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -391,6 +391,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -428,11 +429,7 @@
       </div>
       <!-- End of HTML to include div container for study name pie chart -->
     {% endif %}      
-      
-      
-      
-      
-      
+
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
       <!-- HTML to include div container for mean kVp per acquisition chart -->
 
@@ -461,6 +458,7 @@
             <div class="panel-body">
               <div id="chartAcquisitionMeankVp" style="height: auto; margin: 0 0"></div>
 
+              <div class="kvp-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -477,6 +475,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseAcquisitionMeankVpChart', 'chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>
@@ -514,6 +513,7 @@
             <div class="panel-body">
               <div id="chartAcquisitionMeanmAs" style="height: auto; margin: 0 0"></div>
 
+              <div class="mas-instructions">
               <table style="border:none">
                   <tr>
                       <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
@@ -530,6 +530,7 @@
                       <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
                   </tr>
               </table>
+              </div>
               <a onclick="enterFullScreen('collapseAcquisitionMeanmAsChart', 'chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
               <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
             </div>

@@ -78,6 +78,14 @@ div.req-instructions {
   display: inline-block;
 }
 
+div.kvp-instructions {
+  display: inline-block;
+}
+
+div.mas-instructions {
+  display: inline-block;
+}
+
 div.ajax-error {
   position: fixed;
   display: none;
