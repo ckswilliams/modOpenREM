@@ -12,7 +12,7 @@ $(function () {
             renderTo: 'histogramAcquisitionPlotCTDIdiv',
             events: {
                 drilldown: function (e) {
-                    $('.acq-hist-norm-btn').css('display','inline-block');
+                    $('.acqctdi-hist-norm-btn').css('display','inline-block');
                     $('.acq-ctdi-instructions').css('display','none');
                     if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
@@ -52,7 +52,7 @@ $(function () {
                     }
                 },
                 drillup: function (e) {
-                    $('.acq-hist-norm-btn').css('display','none');
+                    $('.acqctdi-hist-norm-btn').css('display','none');
                     $('.acq-ctdi-instructions').css('display','block');
                     if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
