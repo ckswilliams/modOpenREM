@@ -54,9 +54,10 @@ Edit the ``dicom.ini`` file in the ``/etc/conquest-dicom-server`` folder, for ex
 
     sudo nano /etc/conquest-dicom-server/dicom.ini
 
-Modify the following lines as required. The server name field ``MyACRNema`` is the AE Title, so should
-be 16 characters or less and consist of letters and numbers with no spaces. The ``TCPPort`` is normally
-either 104, the standard DICOM port, or any number greater than 1023.
+Modify the following lines as required. The server name field, with the Conquest default of ``CONQUESTSRV1`` is the AE
+Title, so should be 16 characters or less and consist of letters and numbers with no spaces. It is case
+insensitive. The ``TCPPort`` is normally either 104, the standard DICOM port, or any number greater than
+1023.
 
 .. sourcecode:: console
 
@@ -64,7 +65,7 @@ either 104, the standard DICOM port, or any number greater than 1023.
     MyACRNema                = CONQUESTSRV1
     TCPPort                  = 11112
 
-
+Again, save and exit.
 
 
 .. _`in its repositories,`: http://packages.ubuntu.com/search?keywords=conquest
