@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#355`_  Charts: sorting now works as expected for plots with a series per system
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
 * `#343`_  Charts: user can now specify number of histogram bins in the range of 2 to 40
