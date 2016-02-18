@@ -296,48 +296,47 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems and plot_acquisition_mean_dap:
                 for system in return_structure['acquisitionSystemList']:
                     return_structure['acquisitionSummary'].append(acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('dose_area_product') * 1000000,
                             median=Median('dose_area_product') / 10000,
                             num=Count('dose_area_product')).order_by('acquisition_protocol'))
             elif plot_acquisition_mean_dap:
-                return_structure['acquisitionSummary'].append(acquisition_events.values(
-                        'acquisition_protocol').annotate(
+                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('dose_area_product') * 1000000,
                         median=Median('dose_area_product') / 10000,
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
 
         elif median_available and plot_average_choice == 'median':
             if plot_series_per_systems and plot_acquisition_mean_dap:
                 for system in return_structure['acquisitionSystemList']:
                     return_structure['acquisitionSummary'].append(acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             median=Median('dose_area_product') / 10000,
                             num=Count('dose_area_product')).order_by('acquisition_protocol'))
             elif plot_acquisition_mean_dap:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         median=Median('dose_area_product') / 10000,
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
 
         else:
             if plot_series_per_systems and plot_acquisition_mean_dap:
                 for system in return_structure['acquisitionSystemList']:
                     return_structure['acquisitionSummary'].append(acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('dose_area_product') * 1000000,
                             num=Count('dose_area_product')).order_by('acquisition_protocol'))
             elif plot_acquisition_mean_dap:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('dose_area_product') * 1000000,
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
 
         for index in range(len(return_structure['acquisitionSummary'])):
@@ -398,14 +397,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                             median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
                             num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
             elif plot_request_mean_dap:
-                return_structure['requestSummary'].append(request_events.values(
-                        'requested_procedure_code_meaning').distinct().annotate(
+                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
                         mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
                         num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
             else:
-                return_structure['requestSummary'].append(request_events.values(
-                        'requested_procedure_code_meaning').distinct().annotate(
+                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
                         num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
 
         elif median_available and plot_average_choice == 'median':
@@ -463,8 +460,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
 
         value_ranges = request_events.values('requested_procedure_code_meaning').distinct().annotate(
                 min_dap=Min('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField()),
-                max_dap=Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField())).order_by(
-                'requested_procedure_code_meaning')
+                max_dap=Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField())).order_by('requested_procedure_code_meaning')
 
         for sys_idx, system in enumerate(return_structure['requestSystemList']):
             for req_idx, request_name in enumerate(return_structure['request_names']):
@@ -588,12 +584,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems:
                 for system in return_structure['acquisitionkVpSystemList']:
                     return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('irradeventxraysourcedata__kvp__kvp'),
                             median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('irradeventxraysourcedata__kvp__kvp'),
                         median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
@@ -602,11 +598,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems:
                 for system in return_structure['acquisitionkVpSystemList']:
                     return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
                         median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
@@ -614,11 +610,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems:
                 for system in return_structure['acquisitionkVpSystemList']:
                     return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('irradeventxraysourcedata__kvp__kvp'),
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('irradeventxraysourcedata__kvp__kvp'),
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
@@ -674,12 +670,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems:
                 for system in return_structure['acquisitionmAsSystemList']:
                     return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
                             median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
                         median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
@@ -688,11 +684,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems:
                 for system in return_structure['acquisitionmAsSystemList']:
                     return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
                         median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
@@ -700,11 +696,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             if plot_series_per_systems:
                 for system in return_structure['acquisitionmAsSystemList']:
                     return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').annotate(
+                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
-                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').annotate(
+                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
