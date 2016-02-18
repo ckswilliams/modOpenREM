@@ -87,7 +87,7 @@ def status_update_store(request):
 
     if echo is "Success":
         resp['message'] = "<div>Last status: {0}</div>".format(store.status)
-        resp['statusindicator'] = "<h3 class='pull-right panel-title><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
+        resp['statusindicator'] = "<h3 class='pull-right panel-title'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
         resp['delbutton'] = "<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
         resp['startbutton'] = ""
         resp['stopbutton'] = "<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
