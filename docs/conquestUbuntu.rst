@@ -20,9 +20,9 @@ The install process will create a folder ``/etc/conquest-dicom-server``, then cr
 settings files there.
 
 
-*************
-Configuration
-*************
+*******************
+Basic configuration
+*******************
 
 Modify dgatesop.lst
 ===================
@@ -66,6 +66,16 @@ insensitive. The ``TCPPort`` is normally either 104, the standard DICOM port, or
     TCPPort                  = 11112
 
 Again, save and exit.
+
+***************************
+Testing basic configuration
+***************************
+
+Test the Store SCP by returning to OpenREM and navigating to ``Config`` -> ``DICOM network configuration``.
+
+Click to ``Add new store`` and enter the AE title and port you have set, along with a reference name.
+
+Click to ``Submit``, and you will return to the summary page which should inform you if the server is running.
 
 
 .. _`in its repositories,`: http://packages.ubuntu.com/search?keywords=conquest
