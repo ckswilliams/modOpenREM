@@ -1,5 +1,8 @@
 $(function () {
     var chartAcquisitionMeanDAPOverTime = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             renderTo: 'AcquisitionMeanDAPOverTimeDIV',
             zoomType: 'x'

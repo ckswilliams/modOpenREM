@@ -5,7 +5,13 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#355`_  Charts: sorting now works as expected for plots with a series per system
+* `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
+* `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
+* `#343`_  Charts: user can now specify number of histogram bins in the range of 2 to 40
+* `#342`_  Charts: improved the colours used for plotting chart data
 * `#340`_  Fixed store failure to save due to illegal values in Philips private tags, improved exception code
+* `#339`_  Improved extraction of requested procedure information for radiographic studies
 * `#338`_  Fix Kodak illegally using comma in filter thickness values
 * `#335`_  DICOM Store keep_alive and echo_scu functions now log correctly
 * `#334`_  Fixed issue with tasks needing to be explicitly named
@@ -94,6 +100,7 @@ OpenREM version history
 * `#151`_  Suspected non-patient studies can now be filtered out
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
+* `#70`_   User is returned to the filtered view after deleting a study
 
 0.6.1 (2015-10-30)
 ------------------

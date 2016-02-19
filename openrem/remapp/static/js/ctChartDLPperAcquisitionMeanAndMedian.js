@@ -1,39 +1,84 @@
 $(function () {
-    var drilldownTitle = 'Histogram of ';
-    var defaultTitle = 'DLP per acquisition protocol';
+    var defaultTitle = 'DLP per acquisition protocol type';
     var bins = [];
     var name = '';
 
-    var chartAcqDLP = new Highcharts.Chart({
+    var chartAcquisitionDLP = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
-            renderTo: 'histogramPlotDIV',
+            renderTo: 'histogramAcquisitionPlotDLPdiv',
             events: {
                 drilldown: function (e) {
+                    $('.acq-hist-norm-btn').css('display','inline-block');
+                    $('.acq-instructions').css('display','none');
+
+
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartAcqDLP.setTitle({text: drilldownTitle + e.point.name}, {text: '(n = ' + e.point.freq + ')'});
-                    chartAcqDLP.yAxis[0].setTitle({text: 'Number'});
-                    chartAcqDLP.xAxis[0].setTitle({text: 'DLP range (mGy.cm)'});
-                    chartAcqDLP.xAxis[0].setCategories([], true);
-                    chartAcqDLP.tooltip.options.formatter = function (e) {
+
+                    if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
+
+                    var drilldownTitle;
+                    if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
+                    drilldownTitle += e.point.name + ' DLP values';
+                    if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
+
+                    this.setTitle({
+                        text: drilldownTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
+                        },
+                        max: (this.options.drilldown.normalise ? 1.0 : null),
+                        labels: {
+                            format: (this.options.drilldown.normalise ? '{value:.2f}' : null)
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text: 'DLP range (mGy.cm)'
+                        },
+                        categories: []
+                    }, false);
+                    this.tooltip.options.formatter = function (e) {
                         var linkText = 'acquisition_dlp_min=' + bins[this.x] + '&acquisition_dlp_max=' + bins[this.x + 1] + '&acquisition_protocol=' + name;
-                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
+                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
+                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcq + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function (e) {
-                    chartAcqDLP.setTitle({text: defaultTitle}, {text: ''});
-                    chartAcqDLP.yAxis[0].setTitle({text: 'DLP (mGy.cm)'});
-                    chartAcqDLP.xAxis[0].setTitle({text: 'Protocol name'});
-                    chartAcqDLP.xAxis[0].update({
+                    $('.acq-hist-norm-btn').css('display','none');
+                    $('.acq-instructions').css('display','block');
+
+
+                    this.setTitle({
+                        text: defaultTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'DLP (mGy.cm)'
+                        },
+                        max: null,
+                        labels: {
+                            format: null
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text: 'Acquisition protocol'
+                        },
                         categories: {
                             formatter: function (args) {
-                                return this.value;
+                                return this.point.category;
                             }
                         }
                     });
-                    chartAcqDLP.tooltip.options.formatter = function (args) {
+                    this.tooltip.options.formatter = function () {
                         return this.point.tooltip;
                     }
                 }
@@ -41,7 +86,7 @@ $(function () {
         },
         title: {
             useHTML: true,
-            text: 'DLP per acquisition protocol'
+            text: defaultTitle
         },
         legend: {
             enabled: true
@@ -50,7 +95,7 @@ $(function () {
             categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
-                text: 'Protocol name'
+                text: 'Acquisition protocol type'
             },
             labels: {
                 useHTML: true,
@@ -65,7 +110,7 @@ $(function () {
             }
         },
         tooltip: {
-            formatter: function (args) {
+            formatter: function () {
                 return this.point.tooltip;
             },
             useHTML: true
@@ -73,35 +118,13 @@ $(function () {
         plotOptions: {
             column: {
                 pointPadding: 0,
-                borderWidth: 0
+                borderWidth: 1,
+                borderColor: '#999999'
             }
         },
-        series: [{
-            useHTML: true,
-            name: 'Mean DLP per acquisition protocol',
-            data: []
-        }, {
-            useHTML: true,
-            name: 'Median DLP per acquisition protocol',
-            data: []
-        }],
+        series: [],
         drilldown: {
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            twoSeriesSort('#histogramPlotDIV', 'freq', chartSortingDirection, 0);
-            break;
-        case 'dlp':
-            twoSeriesSort('#histogramPlotDIV', 'y', chartSortingDirection, 0);
-            break;
-        case 'name':
-            twoSeriesSort('#histogramPlotDIV', 'name', chartSortingDirection, 0);
-            break;
-        default:
-            twoSeriesSort('#histogramPlotDIV', 'name', chartSortingDirection, 0);
-    }
-
 });

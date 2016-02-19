@@ -5,7 +5,7 @@ var chartAcqFrequency = new Highcharts.Chart({
             fallbackToExportServer: false
         },
         chart: {
-            renderTo: 'piechartProtocolDIV',
+            renderTo: 'piechartRequestDIV',
             plotBackgroundColor: null,
             plotShadow: false
         },
@@ -31,7 +31,7 @@ var chartAcqFrequency = new Highcharts.Chart({
         },
         series: [{
             type: 'pie',
-            name: 'Acquisition protocol frequency',
+            name: 'Requested procedure name frequency',
             point: {
                 events: {
                     click: function(e) {

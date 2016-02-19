@@ -1,11 +1,11 @@
 $(function () {
 
-var chartAcqFrequency = new Highcharts.Chart({
+var chartStudyFrequency = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
-            renderTo: 'piechartProtocolDIV',
+            renderTo: 'piechartStudyDIV',
             plotBackgroundColor: null,
             plotShadow: false
         },
@@ -31,7 +31,7 @@ var chartAcqFrequency = new Highcharts.Chart({
         },
         series: [{
             type: 'pie',
-            name: 'Acquisition protocol frequency',
+            name: 'Study description frequency',
             point: {
                 events: {
                     click: function(e) {
