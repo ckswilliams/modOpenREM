@@ -5,6 +5,8 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
+* `#356`_  Charts: histogram normalise button appears for all appropriate charts
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
@@ -16,6 +18,7 @@ OpenREM version history
 * `#335`_  DICOM Store keep_alive and echo_scu functions now log correctly
 * `#334`_  Fixed issue with tasks needing to be explicitly named
 * `#333`_  Fixed StoreSCP not starting in beta 11 error
+* `#332`_  Charts: some charts can now be plotted with a series per x-ray system
 * `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
 * `#329`_  All existing logging is now done via the same log files
 * `#328`_  Store SCP no longer uses Celery tasks
