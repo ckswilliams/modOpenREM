@@ -354,7 +354,7 @@ class Migration(migrations.Migration):
                 "  ("
                 "    SELECT COUNT(*) AS c FROM q"
                 "  )"
-                "  SELECT AVG(val * 10000000000.0)"
+                "  SELECT AVG(val)"
                 "  FROM"
                 "  ("
                 "    SELECT val FROM q"
@@ -368,7 +368,5 @@ class Migration(migrations.Migration):
                 "  FINALFUNC=_final_median,"
                 "  INITCOND='{}'"
                 ");",
-                "DROP AGGREGATE median(anyelement);"
-                "DROP FUNCTION _final_median(anyarray);"
             ),
         ]
