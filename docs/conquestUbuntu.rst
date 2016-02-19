@@ -137,7 +137,7 @@ or comment out that line (add a ``#`` character to the start of the line).
 
     rm ${mamim}
 
-* Radiography images (DX and CR that might be DX)
+* Radiography images (DX, and CR that might be DX)
 * ``openrem-dx.sh``
 
 .. sourcecode:: bash
@@ -180,20 +180,22 @@ At the end of the ``/etc/conquest-dicom-server/dicom.ini`` file, add the followi
 to tailor them to save the file to an appropriate place. The ``_conquest`` user will need to be able to
 write to that location. You will also need to make sure the path to the scripts you just created are correct.
 
-# RDSR
-ImportConverter0  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to /var/dose/incoming/%o.dcm; system /var/dose/scipts/openrem-rdsr.sh /var/dose/incoming/%o.dcm; }; destroy
-# Import arguments for GE CT - uses Enhanced SR instead of Radiation Dose SR
-ImportConverter1  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.22"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-rdsr.sh /var/dose/incoming/%o.dcm; }; destroy
-# MG images
-ImportModality2   = MG
-ImportConverter2  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-mg.sh /var/dose/incoming/%o.dcm; destroy
-# DX images
-ImportModality3   = DX
-ImportConverter3  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/dose/incoming/%o.dcm; destroy
-# CR images
-ImportModality4   = CR
-ImportConverter4  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/dose/incoming/%o.dcm; destroy
-# Philips CT
-ImportConverter5  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.7"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-ctphilips.sh /var/dose/incoming/%o.dcm; }; destroy
+.. sourcecode:: console
+
+    # RDSR
+    ImportConverter0  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to /var/dose/incoming/%o.dcm; system /var/dose/scipts/openrem-rdsr.sh /var/dose/incoming/%o.dcm; }; destroy
+    # Import arguments for GE CT - uses Enhanced SR instead of Radiation Dose SR
+    ImportConverter1  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.22"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-rdsr.sh /var/dose/incoming/%o.dcm; }; destroy
+    # MG images
+    ImportModality2   = MG
+    ImportConverter2  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-mg.sh /var/dose/incoming/%o.dcm; destroy
+    # DX images
+    ImportModality3   = DX
+    ImportConverter3  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/dose/incoming/%o.dcm; destroy
+    # CR images
+    ImportModality4   = CR
+    ImportConverter4  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/dose/incoming/%o.dcm; destroy
+    # Philips CT
+    ImportConverter5  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.7"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-ctphilips.sh /var/dose/incoming/%o.dcm; }; destroy
 
 .. _`in its repositories,`: http://packages.ubuntu.com/search?keywords=conquest
