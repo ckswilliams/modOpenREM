@@ -298,12 +298,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                     return_structure['acquisitionSummary'].append(acquisition_events.filter(
                             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('dose_area_product') * 1000000,
-                            median=Median('dose_area_product') / 10000,
+                            median=Median('dose_area_product') * 1000000,
                             num=Count('dose_area_product')).order_by('acquisition_protocol'))
             elif plot_acquisition_mean_dap:
                 return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('dose_area_product') * 1000000,
-                        median=Median('dose_area_product') / 10000,
+                        median=Median('dose_area_product') * 1000000,
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
@@ -314,11 +314,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 for system in return_structure['acquisitionSystemList']:
                     return_structure['acquisitionSummary'].append(acquisition_events.filter(
                             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            median=Median('dose_area_product') / 10000,
+                            median=Median('dose_area_product') * 1000000,
                             num=Count('dose_area_product')).order_by('acquisition_protocol'))
             elif plot_acquisition_mean_dap:
                 return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        median=Median('dose_area_product') / 10000,
+                        median=Median('dose_area_product') * 1000000,
                         num=Count('dose_area_product')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
@@ -394,12 +394,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                     return_structure['requestSummary'].append(request_events.filter(
                             generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
                             mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                             num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
             elif plot_request_mean_dap:
                 return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
                         mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
             else:
                 return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
@@ -410,11 +410,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 for system in return_structure['requestSystemList']:
                     return_structure['requestSummary'].append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
             elif plot_request_mean_dap:
                 return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                    median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                    median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                     num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
             else:
                 return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
@@ -490,12 +490,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                     return_structure['studySummary'].append(study_events.filter(
                             generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
                             mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                             num=Count('study_description')).order_by('study_description'))
             elif plot_study_mean_dap:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
                         mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         num=Count('study_description')).order_by('study_description'))
             else:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
@@ -506,11 +506,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 for system in return_structure['studySystemList']:
                     return_structure['studySummary'].append(study_events.filter(
                             generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                             num=Count('study_description')).order_by('study_description'))
             elif plot_study_mean_dap:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') / 10000,
+                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
                         num=Count('study_description')).order_by('study_description'))
             else:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
@@ -586,12 +586,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                     return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
                             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('irradeventxraysourcedata__kvp__kvp'),
-                            median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                            median=Median('irradeventxraysourcedata__kvp__kvp'),
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('irradeventxraysourcedata__kvp__kvp'),
-                        median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                        median=Median('irradeventxraysourcedata__kvp__kvp'),
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
         elif median_available and plot_average_choice == 'median':
@@ -599,11 +599,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 for system in return_structure['acquisitionkVpSystemList']:
                     return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
                             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                            median=Median('irradeventxraysourcedata__kvp__kvp'),
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
-                        median=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000,
+                        median=Median('irradeventxraysourcedata__kvp__kvp'),
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
         else:
@@ -672,12 +672,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                     return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
                             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
                             mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                            median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                            median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
                         mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                        median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                        median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
         elif median_available and plot_average_choice == 'median':
@@ -685,11 +685,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 for system in return_structure['acquisitionmAsSystemList']:
                     return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
                             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                            median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
                             num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
-                        median=Median('irradeventxraysourcedata__exposure__exposure') / 10000000000000,
+                        median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
                         num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
 
         else:
@@ -774,7 +774,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Avg('dose_area_product') * 1000000)
                 return_structure['acquisitionMeanDAPoverTime'][idx] = qss.time_series(start_date, today, interval=plot_acquisition_mean_dap_over_time_period)
             if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-                qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Median('dose_area_product') / 10000)
+                qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Median('dose_area_product') * 1000000)
                 return_structure['acquisitionMedianDAPoverTime'][idx] = qss.time_series(start_date, today, interval=plot_acquisition_mean_dap_over_time_period)
 
     if plot_acquisition_mean_kvp_over_time:
@@ -785,7 +785,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 qss = qsstats.QuerySetStats(subqs_kvp, 'date_time_started', aggregate=Avg('irradeventxraysourcedata__kvp__kvp'))
                 return_structure['acquisitionMeankVpoverTime'][idx] = qss.time_series(start_date, today, interval=plot_acquisition_mean_dap_over_time_period)
             if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-                qss = qsstats.QuerySetStats(subqs_kvp, 'date_time_started', aggregate=Median('irradeventxraysourcedata__kvp__kvp') / 10000000000)
+                qss = qsstats.QuerySetStats(subqs_kvp, 'date_time_started', aggregate=Median('irradeventxraysourcedata__kvp__kvp'))
                 return_structure['acquisitionMediankVpoverTime'][idx] = qss.time_series(start_date, today, interval=plot_acquisition_mean_dap_over_time_period)
 
     if plot_acquisition_mean_mas_over_time:
@@ -796,7 +796,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 qss = qsstats.QuerySetStats(subqs_mas, 'date_time_started', aggregate=Avg('irradeventxraysourcedata__exposure__exposure') / 1000)
                 return_structure['acquisitionMeanmAsoverTime'][idx] = qss.time_series(start_date, today, interval=plot_acquisition_mean_dap_over_time_period)
             if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-                qss = qsstats.QuerySetStats(subqs_mas, 'date_time_started', aggregate=Median( 'irradeventxraysourcedata__exposure__exposure') / 10000000000000)
+                qss = qsstats.QuerySetStats(subqs_mas, 'date_time_started', aggregate=Median( 'irradeventxraysourcedata__exposure__exposure') / 1000)
                 return_structure['acquisitionMedianmAsoverTime'][idx] = qss.time_series(start_date, today, interval=plot_acquisition_mean_dap_over_time_period)
 
     if plot_study_per_day_and_hour:
@@ -1086,14 +1086,14 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                         ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'acquisition_protocol').distinct().annotate(
                         mean=Avg('dlp'),
-                        median=Median('dlp') / 10000000000,
+                        median=Median('dlp'),
                         num=Count('dlp')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummary'].append(acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(
                     mean=Avg('dlp'),
-                    median=Median('dlp') / 10000000000,
+                    median=Median('dlp'),
                     num=Count('dlp')).order_by('acquisition_protocol'))
         elif median_available and plot_average_choice == 'median':
             if plot_series_per_systems:
@@ -1102,13 +1102,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                         Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
                         ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'acquisition_protocol').distinct().annotate(
-                        median=Median('dlp') / 10000000000,
+                        median=Median('dlp'),
                         num=Count('dlp')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummary'].append(acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(
-                    median=Median('dlp') / 10000000000,
+                    median=Median('dlp'),
                     num=Count('dlp')).order_by('acquisition_protocol'))
         else:
             if plot_series_per_systems:
@@ -1177,14 +1177,14 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                         ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'acquisition_protocol').distinct().annotate(
                         mean=Avg('mean_ctdivol'),
-                        median=Median('mean_ctdivol') / 10000000000,
+                        median=Median('mean_ctdivol'),
                         num=Count('dlp')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(
                     mean=Avg('mean_ctdivol'),
-                    median=Median('mean_ctdivol') / 10000000000,
+                    median=Median('mean_ctdivol'),
                     num=Count('dlp')).order_by('acquisition_protocol'))
         elif median_available and plot_average_choice == 'median':
             if plot_series_per_systems:
@@ -1193,13 +1193,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                         Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).filter(
                         ct_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'acquisition_protocol').distinct().annotate(
-                        median=Median('mean_ctdivol') / 10000000000,
+                        median=Median('mean_ctdivol'),
                         num=Count('dlp')).order_by('acquisition_protocol'))
             else:
                 return_structure['acquisitionSummaryCTDI'].append(acquisition_events.exclude(
                     Q(acquisition_protocol__isnull=True) | Q(acquisition_protocol='')).values(
                     'acquisition_protocol').distinct().annotate(
-                    median=Median('mean_ctdivol') / 10000000000,
+                    median=Median('mean_ctdivol'),
                     num=Count('dlp')).order_by('acquisition_protocol'))
         else:
             if plot_series_per_systems:
@@ -1301,13 +1301,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     return_structure['studySummary'].append(study_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
                         mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                         num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                         'study_description'))
             else:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
                     mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                    median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                    median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                     num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                     'study_description'))
 
@@ -1316,12 +1316,12 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 for system in return_structure['studySystemList']:
                     return_structure['studySummary'].append(study_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                         num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                         'study_description'))
             else:
                 return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                    median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                    median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                     num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                     'study_description'))
 
@@ -1428,7 +1428,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
             if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
                 qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
-                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000)
+                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
                 return_structure['studyMedianDLPoverTime'][idx] = qss.time_series(start_date, today,
                                                                                   interval=plot_study_mean_dlp_over_time_period)
 
@@ -1462,14 +1462,14 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'requested_procedure_code_meaning').distinct().annotate(
                             mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                             num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                             'requested_procedure_code_meaning'))
             else:
                 return_structure['requestSummary'].append(request_events.values(
                     'requested_procedure_code_meaning').distinct().annotate(
                         mean=Avg('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
-                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                         num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                         'requested_procedure_code_meaning'))
 
@@ -1479,13 +1479,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                     return_structure['requestSummary'].append(request_events.filter(
                         generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values(
                         'requested_procedure_code_meaning').distinct().annotate(
-                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                            median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                             num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                             'requested_procedure_code_meaning'))
             else:
                 return_structure['requestSummary'].append(request_events.values(
                     'requested_procedure_code_meaning').distinct().annotate(
-                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total') / 10000000000,
+                        median=Median('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'),
                         num=Count('ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total')).order_by(
                         'requested_procedure_code_meaning'))
 
