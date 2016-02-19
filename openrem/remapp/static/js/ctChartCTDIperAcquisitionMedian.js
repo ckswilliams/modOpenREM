@@ -14,7 +14,6 @@ $(function () {
                 drilldown: function (e) {
                     $('.acqctdi-hist-norm-btn').css('display','inline-block');
                     $('.acq-ctdi-instructions').css('display','none');
-                    if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
@@ -49,12 +48,11 @@ $(function () {
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
                         returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/ct/?acquisitionhist=1&' + linkText + tooltipFiltersAcqCTDI + '">Click to view</a></td></tr></table>';
                         return returnValue;
-                    }
+                    };
                 },
                 drillup: function (e) {
                     $('.acqctdi-hist-norm-btn').css('display','none');
                     $('.acq-ctdi-instructions').css('display','block');
-                    if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
 
                     this.setTitle({
                         text: defaultTitle
@@ -80,7 +78,7 @@ $(function () {
                     });
                     this.tooltip.options.formatter = function () {
                         return this.point.tooltip;
-                    }
+                    };
                 }
             }
         },

@@ -14,7 +14,7 @@ var chartDAPperStudy = new Highcharts.Chart({
                 drilldown: function(e) {
                     $('.stu-hist-norm-btn').css('display','inline-block');
                     $('.stu-instructions').css('display','none');
-                    if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
+
 
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
@@ -54,7 +54,7 @@ var chartDAPperStudy = new Highcharts.Chart({
                 drillup: function(e) {
                     $('.stu-hist-norm-btn').css('display','none');
                     $('.stu-instructions').css('display','block');
-                    if (chartFullScreen == true) updateFullScreen($('#'+this.renderTo.id).parent().parent()[0].id, this.renderTo.id);
+
 
                     this.setTitle({
                         text: defaultTitle
