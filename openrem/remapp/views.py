@@ -285,464 +285,92 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         return_structure['acquisition_mas_names'] = list(acquisition_mas_events.values_list('acquisition_protocol', flat=True).distinct().order_by('acquisition_protocol'))
 
     if plot_acquisition_mean_dap or plot_acquisition_freq:
-        if plot_series_per_systems and plot_acquisition_mean_dap:
-            return_structure['acquisitionSystemList'] = list(acquisition_events.values_list('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
-        else:
-            return_structure['acquisitionSystemList'] = ['All systems']
+        result = average_chart_inc_histogram_data(acquisition_events,
+                                                  'projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'acquisition_protocol',
+                                                  'dose_area_product',
+                                                  1000000,
+                                                  plot_acquisition_mean_dap,
+                                                  plot_acquisition_freq,
+                                                  plot_series_per_systems,
+                                                  plot_average_choice,
+                                                  median_available,
+                                                  plot_histogram_bins)
 
-        return_structure['acquisitionSummary'] = []
-
-        if median_available and plot_average_choice == 'both':
-            if plot_series_per_systems and plot_acquisition_mean_dap:
-                for system in return_structure['acquisitionSystemList']:
-                    return_structure['acquisitionSummary'].append(acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            mean=Avg('dose_area_product') * 1000000,
-                            median=Median('dose_area_product') * 1000000,
-                            num=Count('dose_area_product')).order_by('acquisition_protocol'))
-            elif plot_acquisition_mean_dap:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        mean=Avg('dose_area_product') * 1000000,
-                        median=Median('dose_area_product') * 1000000,
-                        num=Count('dose_area_product')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        num=Count('dose_area_product')).order_by('acquisition_protocol'))
-
-        elif median_available and plot_average_choice == 'median':
-            if plot_series_per_systems and plot_acquisition_mean_dap:
-                for system in return_structure['acquisitionSystemList']:
-                    return_structure['acquisitionSummary'].append(acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            median=Median('dose_area_product') * 1000000,
-                            num=Count('dose_area_product')).order_by('acquisition_protocol'))
-            elif plot_acquisition_mean_dap:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        median=Median('dose_area_product') * 1000000,
-                        num=Count('dose_area_product')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        num=Count('dose_area_product')).order_by('acquisition_protocol'))
-
-        else:
-            if plot_series_per_systems and plot_acquisition_mean_dap:
-                for system in return_structure['acquisitionSystemList']:
-                    return_structure['acquisitionSummary'].append(acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            mean=Avg('dose_area_product') * 1000000,
-                            num=Count('dose_area_product')).order_by('acquisition_protocol'))
-            elif plot_acquisition_mean_dap:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        mean=Avg('dose_area_product') * 1000000,
-                        num=Count('dose_area_product')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionSummary'].append(acquisition_events.values('acquisition_protocol').distinct().annotate(
-                        num=Count('dose_area_product')).order_by('acquisition_protocol'))
-
-        for index in range(len(return_structure['acquisitionSummary'])):
-            return_structure['acquisitionSummary'][index] = list(return_structure['acquisitionSummary'][index])
-
-        # Fill in default values where data for an acquisition protocol is missing for any of the systems
-        if plot_series_per_systems and plot_acquisition_mean_dap:
-            for index in range(len(return_structure['acquisitionSystemList'])):
-                missing_names = list(set(return_structure['acquisition_names']) - set([d['acquisition_protocol'] for d in return_structure['acquisitionSummary'][index]]))
-                for missing_name in missing_names:
-                    if median_available and plot_average_choice == 'both':
-                        (return_structure['acquisitionSummary'][index]).append({'median': 0, 'mean': 0,'acquisition_protocol':missing_name, 'num': 0})
-                    elif median_available and plot_average_choice == 'median':
-                        (return_structure['acquisitionSummary'][index]).append({'median': 0, 'acquisition_protocol':missing_name, 'num': 0})
-                    else:
-                        (return_structure['acquisitionSummary'][index]).append({'mean': 0,'acquisition_protocol':missing_name, 'num': 0})
-                # Rearrange the list into the same order as acquisition_names
-                summary_temp = []
-                for acquisition_name in return_structure['acquisition_names']:
-                    summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionSummary'][index])[0])
-                return_structure['acquisitionSummary'][index] = summary_temp
-
-    if plot_acquisition_mean_dap:
-        return_structure['acquisitionHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['acquisition_names']))] for i in xrange(len(return_structure['acquisitionSystemList']))]
-
-        value_ranges = acquisition_events.values('acquisition_protocol').distinct().annotate(
-                min_dap=Min('dose_area_product', output_field=FloatField()),
-                max_dap=Max('dose_area_product', output_field=FloatField())).order_by('acquisition_protocol')
-
-        for sys_idx, system in enumerate(return_structure['acquisitionSystemList']):
-            for acq_idx, acquisition_name in enumerate(return_structure['acquisition_names']):
-                if plot_series_per_systems:
-                    subqs = acquisition_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                            acquisition_protocol=acquisition_name)
-                else:
-                    subqs = acquisition_events.filter(acquisition_protocol=acquisition_name)
-
-                data_values = subqs.values_list('dose_area_product', flat=True)
-                return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0], return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_dap', 'max_dap')[0])
-                return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogramData'][sys_idx][acq_idx][0].tolist()
-                return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] = (return_structure['acquisitionHistogramData'][sys_idx][acq_idx][1] * 1000000).tolist()
+        return_structure['acquisitionSystemList'] = result['system_list']
+        return_structure['acquisitionSummary'] = result['summary']
+        if plot_acquisition_mean_dap:
+            return_structure['acquisitionHistogramData'] = result['histogram_data']
 
     if plot_request_mean_dap or plot_request_freq:
-        if plot_series_per_systems and plot_request_mean_dap:
-            return_structure['requestSystemList'] = list(request_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
-        else:
-            return_structure['requestSystemList'] = ['All systems']
+        result = average_chart_inc_histogram_data(request_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'requested_procedure_code_meaning',
+                                                  'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                                                  1000000,
+                                                  plot_request_mean_dap,
+                                                  plot_request_freq,
+                                                  plot_series_per_systems,
+                                                  plot_average_choice,
+                                                  median_available,
+                                                  plot_histogram_bins)
 
-        return_structure['requestSummary'] = []
-
-        if median_available and plot_average_choice == 'both':
-            if plot_series_per_systems and plot_request_mean_dap:
-                for system in return_structure['requestSystemList']:
-                    return_structure['requestSummary'].append(request_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
-                            mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-            elif plot_request_mean_dap:
-                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                        mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-            else:
-                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                        num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-
-        elif median_available and plot_average_choice == 'median':
-            if plot_series_per_systems and plot_request_mean_dap:
-                for system in return_structure['requestSystemList']:
-                    return_structure['requestSummary'].append(request_events.filter(
-                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-            elif plot_request_mean_dap:
-                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                    median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                    num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-            else:
-                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                    num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-
-        else:
-            if plot_series_per_systems and plot_request_mean_dap:
-                for system in return_structure['requestSystemList']:
-                    return_structure['requestSummary'].append(request_events.filter(
-                        generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('requested_procedure_code_meaning').distinct().annotate(
-                        mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-            elif plot_request_mean_dap:
-                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                    mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                    num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-            else:
-                return_structure['requestSummary'].append(request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                    num=Count('requested_procedure_code_meaning')).order_by('requested_procedure_code_meaning'))
-
-        for index in range(len(return_structure['requestSummary'])):
-            return_structure['requestSummary'][index] = list(return_structure['requestSummary'][index])
-
-        # Fill in default values where data for a requested procedure is missing for any of the systems
-        if plot_series_per_systems and plot_request_mean_dap:
-            for index in range(len(return_structure['requestSystemList'])):
-                missing_names = list(set(return_structure['request_names']) - set([d['requested_procedure_code_meaning'] for d in return_structure['requestSummary'][index]]))
-                for missing_name in missing_names:
-                    if median_available and plot_average_choice == 'both':
-                        (return_structure['requestSummary'][index]).append({'median': 0, 'mean': 0,'requested_procedure_code_meaning':missing_name, 'num': 0})
-                    elif median_available and plot_average_choice == 'median':
-                        (return_structure['requestSummary'][index]).append({'median': 0, 'requested_procedure_code_meaning':missing_name, 'num': 0})
-                    else:
-                        (return_structure['requestSummary'][index]).append({'mean': 0,'requested_procedure_code_meaning':missing_name, 'num': 0})
-                # Rearrange the list into the same order as request_names
-                summary_temp = []
-                for request_name in return_structure['request_names']:
-                    summary_temp.append(filter(lambda item: item['requested_procedure_code_meaning'] == request_name, return_structure['requestSummary'][index])[0])
-                return_structure['requestSummary'][index] = summary_temp
-
-    if plot_request_mean_dap:
-        return_structure['requestHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['request_names']))] for i in xrange(len(return_structure['requestSystemList']))]
-
-        value_ranges = request_events.values('requested_procedure_code_meaning').distinct().annotate(
-                min_dap=Min('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField()),
-                max_dap=Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField())).order_by('requested_procedure_code_meaning')
-
-        for sys_idx, system in enumerate(return_structure['requestSystemList']):
-            for req_idx, request_name in enumerate(return_structure['request_names']):
-                if plot_series_per_systems:
-                    subqs = request_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                            requested_procedure_code_meaning=request_name)
-                else:
-                    subqs = request_events.filter(requested_procedure_code_meaning=request_name)
-
-                data_values = subqs.values_list('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', flat=True)
-                return_structure['requestHistogramData'][sys_idx][req_idx][0], return_structure['requestHistogramData'][sys_idx][req_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(requested_procedure_code_meaning=request_name).values_list('min_dap', 'max_dap')[0])
-                return_structure['requestHistogramData'][sys_idx][req_idx][0] = return_structure['requestHistogramData'][sys_idx][req_idx][0].tolist()
-                return_structure['requestHistogramData'][sys_idx][req_idx][1] = (return_structure['requestHistogramData'][sys_idx][req_idx][1] * 1000000).tolist()
+        return_structure['requestSystemList'] = result['system_list']
+        return_structure['requestSummary'] = result['summary']
+        if plot_request_mean_dap:
+            return_structure['requestHistogramData'] = result['histogram_data']
 
     if plot_study_mean_dap or plot_study_freq:
-        if plot_series_per_systems and plot_study_mean_dap:
-            return_structure['studySystemList'] = list(study_events.values_list('generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
-        else:
-            return_structure['studySystemList'] = ['All systems']
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                                                  1000000,
+                                                  plot_study_mean_dap,
+                                                  plot_study_freq,
+                                                  plot_series_per_systems,
+                                                  plot_average_choice,
+                                                  median_available,
+                                                  plot_histogram_bins)
 
-        return_structure['studySummary'] = []
-
-        if median_available and plot_average_choice == 'both':
-            if plot_series_per_systems and plot_study_mean_dap:
-                for system in return_structure['studySystemList']:
-                    return_structure['studySummary'].append(study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            num=Count('study_description')).order_by('study_description'))
-            elif plot_study_mean_dap:
-                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        num=Count('study_description')).order_by('study_description'))
-            else:
-                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        num=Count('study_description')).order_by('study_description'))
-
-        elif median_available and plot_average_choice == 'median':
-            if plot_series_per_systems and plot_study_mean_dap:
-                for system in return_structure['studySystemList']:
-                    return_structure['studySummary'].append(study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            num=Count('study_description')).order_by('study_description'))
-            elif plot_study_mean_dap:
-                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        median=Median('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        num=Count('study_description')).order_by('study_description'))
-            else:
-                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        num=Count('study_description')).order_by('study_description'))
-
-        else:
-            if plot_series_per_systems and plot_study_mean_dap:
-                for system in return_structure['studySystemList']:
-                    return_structure['studySummary'].append(study_events.filter(
-                            generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('study_description').distinct().annotate(
-                            mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                            num=Count('study_description')).order_by('study_description'))
-            elif plot_study_mean_dap:
-                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        mean=Avg('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total') * 1000000,
-                        num=Count('study_description')).order_by('study_description'))
-            else:
-                return_structure['studySummary'].append(study_events.values('study_description').distinct().annotate(
-                        num=Count('study_description')).order_by('study_description'))
-
-        for index in range(len(return_structure['studySummary'])):
-            return_structure['studySummary'][index] = list(return_structure['studySummary'][index])
-
-        # Fill in default values where data for a study description is missing for any of the systems
-        if plot_series_per_systems and plot_study_mean_dap:
-            for index in range(len(return_structure['studySystemList'])):
-                missing_names = list(set(return_structure['study_names']) - set([d['study_description'] for d in return_structure['studySummary'][index]]))
-                for missing_name in missing_names:
-                    if median_available and plot_average_choice == 'both':
-                        (return_structure['studySummary'][index]).append({'median': 0, 'mean': 0,'study_description':missing_name, 'num': 0})
-                    elif median_available and plot_average_choice == 'median':
-                        (return_structure['studySummary'][index]).append({'median': 0, 'study_description':missing_name, 'num': 0})
-                    else:
-                        (return_structure['studySummary'][index]).append({'mean': 0,'study_description':missing_name, 'num': 0})
-                # Rearrange the list into the same order as study_names
-                summary_temp = []
-                for study_name in return_structure['study_names']:
-                    summary_temp.append(filter(lambda item: item['study_description'] == study_name, return_structure['studySummary'][index])[0])
-                return_structure['studySummary'][index] = summary_temp
-
+        return_structure['studySystemList'] = result['system_list']
+        return_structure['studySummary'] = result['summary']
         if plot_study_mean_dap:
-            return_structure['studyHistogramData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['study_names']))] for i in xrange(len(return_structure['studySystemList']))]
-
-            value_ranges = study_events.values('study_description').distinct().annotate(
-                    min_dap=Min('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField()),
-                    max_dap=Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', output_field=FloatField())).order_by('study_description')
-
-            for sys_idx, system in enumerate(return_structure['studySystemList']):
-                for stu_idx, study_name in enumerate(return_structure['study_names']):
-                    if plot_series_per_systems:
-                        subqs = study_events.filter(
-                                generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                                study_description=study_name)
-                    else:
-                        subqs = study_events.filter(study_description=study_name)
-
-                    data_values = subqs.values_list('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total', flat=True)
-                    return_structure['studyHistogramData'][sys_idx][stu_idx][0], return_structure['studyHistogramData'][sys_idx][stu_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(study_description=study_name).values_list('min_dap', 'max_dap')[0])
-                    return_structure['studyHistogramData'][sys_idx][stu_idx][0] = return_structure['studyHistogramData'][sys_idx][stu_idx][0].tolist()
-                    return_structure['studyHistogramData'][sys_idx][stu_idx][1] = (return_structure['studyHistogramData'][sys_idx][stu_idx][1] * 1000000).tolist()
+            return_structure['studyHistogramData'] = result['histogram_data']
 
     if plot_acquisition_mean_kvp:
-        if plot_series_per_systems:
-            return_structure['acquisitionkVpSystemList'] = list(acquisition_kvp_events.values_list('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
-        else:
-            return_structure['acquisitionkVpSystemList'] = ['All systems']
+        result = average_chart_inc_histogram_data(acquisition_kvp_events,
+                                                  'projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'acquisition_protocol',
+                                                  'irradeventxraysourcedata__kvp__kvp',
+                                                  1,
+                                                  plot_acquisition_mean_kvp,
+                                                  0,
+                                                  plot_series_per_systems,
+                                                  plot_average_choice,
+                                                  median_available,
+                                                  plot_histogram_bins)
 
-        return_structure['acquisitionkVpSummary'] = []
-
-        if median_available and plot_average_choice == 'both':
-            if plot_series_per_systems:
-                for system in return_structure['acquisitionkVpSystemList']:
-                    return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            mean=Avg('irradeventxraysourcedata__kvp__kvp'),
-                            median=Median('irradeventxraysourcedata__kvp__kvp'),
-                            num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
-                        mean=Avg('irradeventxraysourcedata__kvp__kvp'),
-                        median=Median('irradeventxraysourcedata__kvp__kvp'),
-                        num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-
-        elif median_available and plot_average_choice == 'median':
-            if plot_series_per_systems:
-                for system in return_structure['acquisitionkVpSystemList']:
-                    return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            median=Median('irradeventxraysourcedata__kvp__kvp'),
-                            num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
-                        median=Median('irradeventxraysourcedata__kvp__kvp'),
-                        num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-
-        else:
-            if plot_series_per_systems:
-                for system in return_structure['acquisitionkVpSystemList']:
-                    return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            mean=Avg('irradeventxraysourcedata__kvp__kvp'),
-                            num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionkVpSummary'].append(acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
-                        mean=Avg('irradeventxraysourcedata__kvp__kvp'),
-                        num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-
-        for index in range(len(return_structure['acquisitionkVpSummary'])):
-            return_structure['acquisitionkVpSummary'][index] = list(return_structure['acquisitionkVpSummary'][index])
-
-        # Fill in default values where data for an acquisition protocol is missing for any of the systems
-        if plot_series_per_systems:
-            for index in range(len(return_structure['acquisitionkVpSystemList'])):
-                missing_names = list(set(return_structure['acquisition_kvp_names']) - set([d['acquisition_protocol'] for d in return_structure['acquisitionkVpSummary'][index]]))
-                for missing_name in missing_names:
-                    if median_available and plot_average_choice == 'both':
-                        (return_structure['acquisitionkVpSummary'][index]).append({'median': 0, 'mean': 0,'acquisition_protocol':missing_name, 'num': 0})
-                    elif median_available and plot_average_choice == 'median':
-                        (return_structure['acquisitionkVpSummary'][index]).append({'median': 0, 'acquisition_protocol':missing_name, 'num': 0})
-                    else:
-                        (return_structure['acquisitionkVpSummary'][index]).append({'mean': 0,'acquisition_protocol':missing_name, 'num': 0})
-                # Rearrange the list into the same order as acquisition_names
-                summary_temp = []
-                for acquisition_name in return_structure['acquisition_kvp_names']:
-                    summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionkVpSummary'][index])[0])
-                return_structure['acquisitionkVpSummary'][index] = summary_temp
-
-        return_structure['acquisitionHistogramkVpData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['acquisition_kvp_names']))] for i in xrange(len(return_structure['acquisitionkVpSystemList']))]
-
-        value_ranges = acquisition_kvp_events.values('acquisition_protocol').distinct().annotate(
-                min_kvp=Min('irradeventxraysourcedata__kvp__kvp', output_field=FloatField()),
-                max_kvp=Max('irradeventxraysourcedata__kvp__kvp', output_field=FloatField())).order_by('acquisition_protocol')
-
-        for sys_idx, system in enumerate(return_structure['acquisitionkVpSystemList']):
-            for acq_idx, acquisition_name in enumerate(return_structure['acquisition_kvp_names']):
-                if plot_series_per_systems:
-                    subqs = acquisition_kvp_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                            acquisition_protocol=acquisition_name)
-                else:
-                    subqs = acquisition_kvp_events.filter(acquisition_protocol=acquisition_name)
-
-                data_values = subqs.values_list('irradeventxraysourcedata__kvp__kvp', flat=True)
-                return_structure['acquisitionHistogramkVpData'][sys_idx][acq_idx][0], return_structure['acquisitionHistogramkVpData'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_kvp', 'max_kvp')[0])
-                return_structure['acquisitionHistogramkVpData'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogramkVpData'][sys_idx][acq_idx][0].tolist()
-                return_structure['acquisitionHistogramkVpData'][sys_idx][acq_idx][1] = return_structure['acquisitionHistogramkVpData'][sys_idx][acq_idx][1].tolist()
+        return_structure['acquisitionkVpSystemList'] = result['system_list']
+        return_structure['acquisitionkVpSummary'] = result['summary']
+        return_structure['acquisitionHistogramkVpData'] = result['histogram_data']
 
     if plot_acquisition_mean_mas:
-        if plot_series_per_systems:
-            return_structure['acquisitionmAsSystemList'] = list(acquisition_mas_events.values_list('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name', flat=True).distinct().order_by('projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name'))
-        else:
-            return_structure['acquisitionmAsSystemList'] = ['All systems']
+        result = average_chart_inc_histogram_data(acquisition_mas_events,
+                                                  'projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'acquisition_protocol',
+                                                  'irradeventxraysourcedata__exposure__exposure',
+                                                  0.001,
+                                                  plot_acquisition_mean_mas,
+                                                  0,
+                                                  plot_series_per_systems,
+                                                  plot_average_choice,
+                                                  median_available,
+                                                  plot_histogram_bins)
 
-        return_structure['acquisitionmAsSummary'] = []
-
-        if median_available and plot_average_choice == 'both':
-            if plot_series_per_systems:
-                for system in return_structure['acquisitionmAsSystemList']:
-                    return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                            median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
-                            num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
-                        mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                        median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
-                        num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-
-        elif median_available and plot_average_choice == 'median':
-            if plot_series_per_systems:
-                for system in return_structure['acquisitionmAsSystemList']:
-                    return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
-                            num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
-                        median=Median('irradeventxraysourcedata__exposure__exposure') / 1000,
-                        num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-
-        else:
-            if plot_series_per_systems:
-                for system in return_structure['acquisitionmAsSystemList']:
-                    return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).values('acquisition_protocol').distinct().annotate(
-                            mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                            num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-            else:
-                return_structure['acquisitionmAsSummary'].append(acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
-                        mean=Avg('irradeventxraysourcedata__exposure__exposure') / 1000,
-                        num=Count('acquisition_protocol')).order_by('acquisition_protocol'))
-
-        for index in range(len(return_structure['acquisitionmAsSummary'])):
-            return_structure['acquisitionmAsSummary'][index] = list(return_structure['acquisitionmAsSummary'][index])
-
-        # Fill in default values where data for an acquisition protocol is missing for any of the systems
-        if plot_series_per_systems:
-            for index in range(len(return_structure['acquisitionmAsSystemList'])):
-                missing_names = list(set(return_structure['acquisition_mas_names']) - set([d['acquisition_protocol'] for d in return_structure['acquisitionmAsSummary'][index]]))
-                for missing_name in missing_names:
-                    if median_available and plot_average_choice == 'both':
-                        (return_structure['acquisitionmAsSummary'][index]).append({'median': 0, 'mean': 0,'acquisition_protocol':missing_name, 'num': 0})
-                    elif median_available and plot_average_choice == 'median':
-                        (return_structure['acquisitionmAsSummary'][index]).append({'median': 0, 'acquisition_protocol':missing_name, 'num': 0})
-                    else:
-                        (return_structure['acquisitionmAsSummary'][index]).append({'mean': 0,'acquisition_protocol':missing_name, 'num': 0})
-                # Rearrange the list into the same order as acquisition_names
-                summary_temp = []
-                for acquisition_name in return_structure['acquisition_mas_names']:
-                    summary_temp.append(filter(lambda item: item['acquisition_protocol'] == acquisition_name, return_structure['acquisitionmAsSummary'][index])[0])
-                return_structure['acquisitionmAsSummary'][index] = summary_temp
-
-        return_structure['acquisitionHistogrammAsData'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['acquisition_mas_names']))] for i in xrange(len(return_structure['acquisitionmAsSystemList']))]
-
-        value_ranges = acquisition_mas_events.values('acquisition_protocol').distinct().annotate(
-                min_mas=Min('irradeventxraysourcedata__exposure__exposure', output_field=FloatField()),
-                max_mas=Max('irradeventxraysourcedata__exposure__exposure', output_field=FloatField())).order_by('acquisition_protocol')
-
-        for sys_idx, system in enumerate(return_structure['acquisitionmAsSystemList']):
-            for acq_idx, acquisition_name in enumerate(return_structure['acquisition_mas_names']):
-                if plot_series_per_systems:
-                    subqs = acquisition_mas_events.filter(
-                            projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name=system).filter(
-                            acquisition_protocol=acquisition_name)
-                else:
-                    subqs = acquisition_mas_events.filter(acquisition_protocol=acquisition_name)
-
-                data_values = subqs.values_list('irradeventxraysourcedata__exposure__exposure', flat=True)
-                return_structure['acquisitionHistogrammAsData'][sys_idx][acq_idx][0], return_structure['acquisitionHistogrammAsData'][sys_idx][acq_idx][1] = np.histogram([float(x) for x in data_values], bins=plot_histogram_bins, range=value_ranges.filter(acquisition_protocol=acquisition_name).values_list('min_mas', 'max_mas')[0])
-                return_structure['acquisitionHistogrammAsData'][sys_idx][acq_idx][0] = return_structure['acquisitionHistogrammAsData'][sys_idx][acq_idx][0].tolist()
-                return_structure['acquisitionHistogrammAsData'][sys_idx][acq_idx][1] = (return_structure['acquisitionHistogrammAsData'][sys_idx][acq_idx][1]/1000).tolist()
+        return_structure['acquisitionmAsSystemList'] = result['system_list']
+        return_structure['acquisitionmAsSummary'] = result['summary']
+        return_structure['acquisitionHistogrammAsData'] = result['histogram_data']
 
     if plot_acquisition_mean_kvp_over_time or plot_acquisition_mean_mas_over_time or plot_acquisition_mean_dap_over_time:
         start_date = f.qs.aggregate(Min('study_date')).get('study_date__min')
@@ -2439,3 +2067,111 @@ class DicomDeleteSettingsUpdate(UpdateView):
             admin[group.name] = True
         context['admin'] = admin
         return context
+
+
+def average_chart_inc_histogram_data(database_events, db_display_name_relationship, db_series_names, db_value_name, value_multiplier, plot_average, plot_freq, plot_series_per_system, plot_average_choice, median_available, num_hist_bins):
+    from django.db.models import Avg, Count, Min, Max, FloatField
+    from remapp.models import Median
+    import numpy as np
+
+    return_structure = {}
+
+    if plot_average or plot_freq:
+        return_structure['series_names'] = list(database_events.values_list(db_series_names, flat=True).distinct().order_by(db_series_names))
+
+        if plot_series_per_system and plot_average:
+            return_structure['system_list'] = list(database_events.values_list(db_display_name_relationship, flat=True).distinct().order_by(db_display_name_relationship))
+        else:
+            return_structure['system_list'] = ['All systems']
+
+        return_structure['summary'] = []
+
+        if median_available and plot_average_choice == 'both':
+            if plot_series_per_system and plot_average:
+                for system in return_structure['system_list']:
+                    return_structure['summary'].append(database_events.filter(
+                            **{db_display_name_relationship: system}).values(db_series_names).distinct().annotate(
+                            mean=Avg(db_value_name) * value_multiplier,
+                            median=Median(db_value_name) * value_multiplier,
+                            num=Count(db_value_name)).order_by(db_series_names))
+            elif plot_average:
+                return_structure['summary'].append(database_events.values(db_series_names).distinct().annotate(
+                        mean=Avg(db_value_name) * value_multiplier,
+                        median=Median(db_value_name) * value_multiplier,
+                        num=Count(db_value_name)).order_by(db_series_names))
+            else:
+                return_structure['summary'].append(database_events.values(db_series_names).distinct().annotate(
+                        num=Count(db_value_name)).order_by(db_series_names))
+
+        elif median_available and plot_average_choice == 'median':
+            if plot_series_per_system and plot_average:
+                for system in return_structure['system_list']:
+                    return_structure['summary'].append(database_events.filter(
+                            **{db_display_name_relationship: system}).values(db_series_names).distinct().annotate(
+                            median=Median(db_value_name) * value_multiplier,
+                            num=Count(db_value_name)).order_by(db_series_names))
+            elif plot_average:
+                return_structure['summary'].append(database_events.values(db_series_names).distinct().annotate(
+                        median=Median(db_value_name) * value_multiplier,
+                        num=Count(db_value_name)).order_by(db_series_names))
+            else:
+                return_structure['summary'].append(database_events.values(db_series_names).distinct().annotate(
+                        num=Count(db_value_name)).order_by(db_series_names))
+
+        else:
+            if plot_series_per_system and plot_average:
+                for system in return_structure['system_list']:
+                    return_structure['summary'].append(database_events.filter(
+                            **{db_display_name_relationship: system}).values(db_series_names).distinct().annotate(
+                            mean=Avg(db_value_name) * value_multiplier,
+                            num=Count(db_value_name)).order_by(db_series_names))
+            elif plot_average:
+                return_structure['summary'].append(database_events.values(db_series_names).distinct().annotate(
+                        mean=Avg(db_value_name) * value_multiplier,
+                        num=Count(db_value_name)).order_by(db_series_names))
+            else:
+                return_structure['summary'].append(database_events.values(db_series_names).distinct().annotate(
+                        num=Count(db_value_name)).order_by(db_series_names))
+
+        for index in range(len(return_structure['summary'])):
+            return_structure['summary'][index] = list(return_structure['summary'][index])
+
+        # Fill in default values where data for a series name is missing for any of the systems
+        if plot_series_per_system and plot_average:
+            for index in range(len(return_structure['system_list'])):
+                missing_names = list(set(return_structure['series_names']) - set([d[db_series_names] for d in return_structure['summary'][index]]))
+                for missing_name in missing_names:
+                    if median_available and plot_average_choice == 'both':
+                        (return_structure['summary'][index]).append({'median': 0, 'mean': 0, db_series_names: missing_name, 'num': 0})
+                    elif median_available and plot_average_choice == 'median':
+                        (return_structure['summary'][index]).append({'median': 0, db_series_names: missing_name, 'num': 0})
+                    else:
+                        (return_structure['summary'][index]).append({'mean': 0, db_series_names: missing_name, 'num': 0})
+                # Rearrange the list into the same order as series_names
+                summary_temp = []
+                for series_name in return_structure['series_names']:
+                    summary_temp.append(filter(lambda item: item[db_series_names] == series_name, return_structure['summary'][index])[0])
+                return_structure['summary'][index] = summary_temp
+
+    if plot_average:
+        return_structure['histogram_data'] = [[[None for k in xrange(2)] for j in xrange(len(return_structure['series_names']))] for i in xrange(len(return_structure['system_list']))]
+
+        value_ranges = database_events.values(db_series_names).distinct().annotate(
+                min_dap=Min(db_value_name, output_field=FloatField()),
+                max_dap=Max(db_value_name, output_field=FloatField())).order_by(db_series_names)
+
+        for system_i, system in enumerate(return_structure['system_list']):
+            for series_i, series_name in enumerate(return_structure['series_names']):
+                if plot_series_per_system:
+                    subqs = database_events.filter(**{
+                            db_display_name_relationship: system,
+                            db_series_names: series_name})
+                else:
+                    subqs = database_events.filter(**{db_series_names: series_name})
+
+                data_values = subqs.values_list(db_value_name, flat=True)
+                return_structure['histogram_data'][system_i][series_i][0], return_structure['histogram_data'][system_i][series_i][1] = np.histogram([float(x) for x in data_values], bins=num_hist_bins, range=value_ranges.filter(**{db_series_names: series_name}).values_list('min_dap', 'max_dap')[0])
+                return_structure['histogram_data'][system_i][series_i][0] = return_structure['histogram_data'][system_i][series_i][0].tolist()
+                return_structure['histogram_data'][system_i][series_i][1] = (return_structure['histogram_data'][system_i][series_i][1] * value_multiplier).tolist()
+
+    return return_structure
