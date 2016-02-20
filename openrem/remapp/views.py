@@ -376,11 +376,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         result = average_chart_over_time_data(f,
                                               acquisition_events,
                                               'acquisition_protocol',
+                                              'dose_area_product',
                                               'study_date',
+                                              'date_time_started',
                                               median_available,
                                               plot_average_choice,
                                               1000000,
-                                              'dose_area_product',
                                               plot_acquisition_mean_dap_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianDAPoverTime'] = result['median_over_time']
@@ -393,11 +394,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         result = average_chart_over_time_data(f,
                                               acquisition_kvp_events,
                                               'acquisition_protocol',
+                                              'irradeventxraysourcedata__kvp__kvp',
                                               'study_date',
+                                              'date_time_started',
                                               median_available,
                                               plot_average_choice,
                                               1,
-                                              'irradeventxraysourcedata__kvp__kvp',
                                               plot_acquisition_mean_dap_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMediankVpoverTime'] = result['median_over_time']
@@ -409,11 +411,12 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         result = average_chart_over_time_data(f,
                                               acquisition_mas_events,
                                               'acquisition_protocol',
+                                              'irradeventxraysourcedata__exposure__exposure',
                                               'study_date',
+                                              'date_time_started',
                                               median_available,
                                               plot_average_choice,
                                               0.001,
-                                              'irradeventxraysourcedata__exposure__exposure',
                                               plot_acquisition_mean_dap_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianmAsoverTime'] = result['median_over_time']
@@ -782,27 +785,22 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['requestHistogramData'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
+        result = average_chart_over_time_data(f,
+                                              study_events,
+                                              'study_description',
+                                              'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
+                                              'study_date',
+                                              'study_date',
+                                              median_available,
+                                              plot_average_choice,
+                                              1,
+                                              plot_study_mean_dlp_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-            return_structure['studyMedianDLPoverTime'] = [None] * len(return_structure['studyNameList'])
+            return_structure['studyMedianDLPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
-            return_structure['studyMeanDLPoverTime'] = [None] * len(return_structure['studyNameList'])
-        start_date = study_events.aggregate(Min('study_date')).get('study_date__min')
-        today = datetime.date.today()
-
-        for idx, study_name in enumerate(return_structure['studyNameList']):
-            subqs = study_events.filter(study_description=study_name)
-
-            if plot_average_choice == 'mean' or plot_average_choice == 'both':
-                qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Avg(
-                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                return_structure['studyMeanDLPoverTime'][idx] = qss.time_series(start_date, today,
-                                                            interval=plot_study_mean_dlp_over_time_period)
-
-            if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-                qss = qsstats.QuerySetStats(subqs, 'study_date', aggregate=Median(
-                    'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total'))
-                return_structure['studyMedianDLPoverTime'][idx] = qss.time_series(start_date, today,
-                                                                                  interval=plot_study_mean_dlp_over_time_period)
+            return_structure['studyMeanDLPoverTime'] = result['mean_over_time']
+        if not plot_study_mean_dlp and not plot_study_freq:
+            return_structure['studyNameList'] = result['series_names']
 
     if plot_study_per_day_and_hour:
         # Required for studies per weekday and studies per hour in each weekday plot
@@ -1810,8 +1808,8 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
     return return_structure
 
 
-def average_chart_over_time_data(f, database_events, db_series_names, db_date_field, median_available,
-                                 plot_average_choice, value_multiplier, db_value_name, time_period):
+def average_chart_over_time_data(f, database_events, db_series_names, db_value_name, db_date_field, db_date_time_field,
+                                 median_available, plot_average_choice, value_multiplier, time_period):
     import datetime, qsstats
     from django.db.models import Min, Avg
     from remapp.models import Median
@@ -1832,10 +1830,10 @@ def average_chart_over_time_data(f, database_events, db_series_names, db_date_fi
         subqs = database_events.filter(**{db_series_names: series_name})
 
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
-            qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Avg(db_value_name) * value_multiplier)
+            qss = qsstats.QuerySetStats(subqs, db_date_time_field, aggregate=Avg(db_value_name) * value_multiplier)
             return_structure['mean_over_time'][i] = qss.time_series(start_date, today, interval=time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-            qss = qsstats.QuerySetStats(subqs, 'date_time_started', aggregate=Median(db_value_name) * value_multiplier)
+            qss = qsstats.QuerySetStats(subqs, db_date_time_field, aggregate=Median(db_value_name) * value_multiplier)
             return_structure['median_over_time'][i] = qss.time_series(start_date, today, interval=time_period)
 
     return return_structure
