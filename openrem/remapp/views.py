@@ -653,7 +653,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         ).filter(
             study_instance_uid__in=exp_include
         )
-        return_structure['requestNameList'] = list(request_events.values_list('requested_procedure_code_meaning', flat=True).distinct().order_by('requested_procedure_code_meaning'))
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(acquisition_events,
