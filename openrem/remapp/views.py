@@ -247,7 +247,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             **acquisition_filters
         )
 
-    if plot_study_mean_dap or plot_study_freq:
+    if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
         study_events = GeneralStudyModuleAttr.objects.exclude(
             projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
         ).exclude(
@@ -285,12 +285,9 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   'acquisition_protocol',
                                                   'dose_area_product',
                                                   1000000,
-                                                  plot_acquisition_mean_dap,
-                                                  plot_acquisition_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_acquisition_mean_dap, plot_acquisition_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisition_names'] = result['series_names']
@@ -304,12 +301,9 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   'requested_procedure_code_meaning',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
                                                   1000000,
-                                                  plot_request_mean_dap,
-                                                  plot_request_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_request_mean_dap, plot_request_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['request_names'] = result['series_names']
@@ -323,12 +317,9 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
                                                   1000000,
-                                                  plot_study_mean_dap,
-                                                  plot_study_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_study_mean_dap, plot_study_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['study_names'] = result['series_names']
@@ -342,12 +333,9 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   'acquisition_protocol',
                                                   'irradeventxraysourcedata__kvp__kvp',
                                                   1,
-                                                  plot_acquisition_mean_kvp,
-                                                  0,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_acquisition_mean_kvp, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['acquisitionkVpSystemList'] = result['system_list']
         return_structure['acquisition_kvp_names'] = result['series_names']
@@ -360,12 +348,9 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   'acquisition_protocol',
                                                   'irradeventxraysourcedata__exposure__exposure',
                                                   0.001,
-                                                  plot_acquisition_mean_mas,
-                                                  0,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_acquisition_mean_mas, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['acquisitionmAsSystemList'] = result['system_list']
         return_structure['acquisition_mas_names'] = result['series_names']
@@ -373,16 +358,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         return_structure['acquisitionHistogrammAsData'] = result['histogram_data']
 
     if plot_acquisition_mean_dap_over_time:
-        result = average_chart_over_time_data(f,
-                                              acquisition_events,
-                                              'acquisition_protocol',
-                                              'dose_area_product',
-                                              'study_date',
-                                              'date_time_started',
-                                              median_available,
-                                              plot_average_choice,
-                                              1000000,
-                                              plot_acquisition_mean_dap_over_time_period)
+        result = average_chart_over_time_data(f, acquisition_events,
+                                              'acquisition_protocol', 'dose_area_product',
+                                              'study_date', 'date_time_started',
+                                              median_available, plot_average_choice,
+                                              1000000, plot_acquisition_mean_dap_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianDAPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -391,16 +371,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
             return_structure['acquisition_names'] = result['series_names']
 
     if plot_acquisition_mean_kvp_over_time:
-        result = average_chart_over_time_data(f,
-                                              acquisition_kvp_events,
-                                              'acquisition_protocol',
-                                              'irradeventxraysourcedata__kvp__kvp',
-                                              'study_date',
-                                              'date_time_started',
-                                              median_available,
-                                              plot_average_choice,
-                                              1,
-                                              plot_acquisition_mean_dap_over_time_period)
+        result = average_chart_over_time_data(f, acquisition_kvp_events,
+                                              'acquisition_protocol', 'irradeventxraysourcedata__kvp__kvp',
+                                              'study_date', 'date_time_started',
+                                              median_available, plot_average_choice,
+                                              1, plot_acquisition_mean_dap_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMediankVpoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -408,16 +383,11 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         return_structure['acquisition_kvp_names'] = result['series_names']
 
     if plot_acquisition_mean_mas_over_time:
-        result = average_chart_over_time_data(f,
-                                              acquisition_mas_events,
-                                              'acquisition_protocol',
-                                              'irradeventxraysourcedata__exposure__exposure',
-                                              'study_date',
-                                              'date_time_started',
-                                              median_available,
-                                              plot_average_choice,
-                                              0.001,
-                                              plot_acquisition_mean_dap_over_time_period)
+        result = average_chart_over_time_data(f, acquisition_mas_events,
+                                              'acquisition_protocol', 'irradeventxraysourcedata__exposure__exposure',
+                                              'study_date', 'date_time_started',
+                                              median_available, plot_average_choice,
+                                              0.001, plot_acquisition_mean_dap_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianmAsoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -425,15 +395,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         return_structure['acquisition_mas_names'] = result['series_names']
 
     if plot_study_per_day_and_hour:
-        # Required for studies per weekday and studies per hour in each weekday plot
-        return_structure['studiesPerHourInWeekdays'] = [[0 for x in range(24)] for x in range(7)]
-        for day in range(7):
-            study_times_on_this_weekday = f.qs.filter(study_date__week_day=day + 1).values('study_workload_chart_time')
-            if study_times_on_this_weekday:
-                qss = qsstats.QuerySetStats(study_times_on_this_weekday, 'study_workload_chart_time')
-                hourly_breakdown = qss.time_series(datetime.datetime(1900, 1, 1, 0, 0), datetime.datetime(1900, 1, 1, 23, 59), interval='hours')
-                for hour in range(24):
-                    return_structure['studiesPerHourInWeekdays'][day][hour] = hourly_breakdown[hour][1]
+        result = workload_chart_data(study_events)
+        return_structure['studiesPerHourInWeekdays'] = result['workload']
 
     return return_structure
 
@@ -698,12 +661,9 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   'acquisition_protocol',
                                                   'dlp',
                                                   1,
-                                                  plot_acquisition_mean_dlp,
-                                                  plot_acquisition_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_acquisition_mean_dlp, plot_acquisition_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']
@@ -717,12 +677,9 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   'acquisition_protocol',
                                                   'mean_ctdivol',
                                                   1,
-                                                  plot_acquisition_mean_ctdi,
-                                                  plot_acquisition_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_acquisition_mean_ctdi, plot_acquisition_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['acquisitionSystemListCTDI'] = result['system_list']
         return_structure['acquisitionNameListCTDI'] = result['series_names']
@@ -735,12 +692,9 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   'acquisition_protocol',
                                                   'dlp',
                                                   1,
-                                                  0,
-                                                  plot_acquisition_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  0, plot_acquisition_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']
@@ -752,12 +706,9 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   'study_description',
                                                   'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                                   1,
-                                                  plot_study_mean_dlp,
-                                                  plot_study_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_study_mean_dlp, plot_study_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
@@ -771,12 +722,9 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   'requested_procedure_code_meaning',
                                                   'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                                   1,
-                                                  plot_request_mean_dlp,
-                                                  plot_request_freq,
-                                                  plot_series_per_systems,
-                                                  plot_average_choice,
-                                                  median_available,
-                                                  plot_histogram_bins)
+                                                  plot_request_mean_dlp, plot_request_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['requestNameList'] = result['series_names']
@@ -785,16 +733,12 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['requestHistogramData'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
-        result = average_chart_over_time_data(f,
-                                              study_events,
+        result = average_chart_over_time_data(f, study_events,
                                               'study_description',
                                               'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
-                                              'study_date',
-                                              'study_date',
-                                              median_available,
-                                              plot_average_choice,
-                                              1,
-                                              plot_study_mean_dlp_over_time_period)
+                                              'study_date', 'study_date',
+                                              median_available, plot_average_choice,
+                                              1, plot_study_mean_dlp_over_time_period)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['studyMedianDLPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -803,18 +747,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
             return_structure['studyNameList'] = result['series_names']
 
     if plot_study_per_day_and_hour:
-        # Required for studies per weekday and studies per hour in each weekday plot
-        return_structure['studiesPerHourInWeekdays'] = [[0 for x in range(24)] for x in range(7)]
-        for day in range(7):
-            study_times_on_this_weekday = study_events.filter(study_date__week_day=day + 1).values(
-                'study_workload_chart_time')
-
-            if study_times_on_this_weekday:
-                qss = qsstats.QuerySetStats(study_times_on_this_weekday, 'study_workload_chart_time')
-                hourly_breakdown = qss.time_series(datetime.datetime(1900, 1, 1, 0, 0),
-                                                   datetime.datetime(1900, 1, 1, 23, 59), interval='hours')
-                for hour in range(24):
-                    return_structure['studiesPerHourInWeekdays'][day][hour] = hourly_breakdown[hour][1]
+        result = workload_chart_data(study_events)
+        return_structure['studiesPerHourInWeekdays'] = result['workload']
 
     return return_structure
 
@@ -1810,13 +1744,15 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
 
 def average_chart_over_time_data(f, database_events, db_series_names, db_value_name, db_date_field, db_date_time_field,
                                  median_available, plot_average_choice, value_multiplier, time_period):
-    import datetime, qsstats
+    import datetime
+    import qsstats
     from django.db.models import Min, Avg
     from remapp.models import Median
 
-    return_structure = {}
+    return_structure = dict()
 
-    return_structure['series_names'] = list(database_events.values_list(db_series_names, flat=True).distinct().order_by(db_series_names))
+    return_structure['series_names'] = list(database_events.values_list(
+        db_series_names, flat=True).distinct().order_by(db_series_names))
 
     start_date = f.qs.aggregate(Min(db_date_field)).get(db_date_field+'__min')
     today = datetime.date.today()
@@ -1835,5 +1771,26 @@ def average_chart_over_time_data(f, database_events, db_series_names, db_value_n
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             qss = qsstats.QuerySetStats(subqs, db_date_time_field, aggregate=Median(db_value_name) * value_multiplier)
             return_structure['median_over_time'][i] = qss.time_series(start_date, today, interval=time_period)
+
+    return return_structure
+
+
+def workload_chart_data(database_events):
+    import datetime
+    import qsstats
+
+    return_structure = dict()
+
+    return_structure['workload'] = [[0 for x in range(24)] for x in range(7)]
+    for day in range(7):
+        study_times_on_this_weekday = database_events.filter(study_date__week_day=day + 1).values(
+            'study_workload_chart_time')
+
+        if study_times_on_this_weekday:
+            qss = qsstats.QuerySetStats(study_times_on_this_weekday, 'study_workload_chart_time')
+            hourly_breakdown = qss.time_series(datetime.datetime(1900, 1, 1, 0, 0),
+                                               datetime.datetime(1900, 1, 1, 23, 59), interval='hours')
+            for hour in range(24):
+                return_structure['workload'][day][hour] = hourly_breakdown[hour][1]
 
     return return_structure
