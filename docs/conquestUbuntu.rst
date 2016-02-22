@@ -198,4 +198,31 @@ write to that location. You will also need to make sure the path to the scripts 
     # Philips CT
     ImportConverter5  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.7"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-ctphilips.sh /var/dose/incoming/%o.dcm; }; destroy
 
+    # Temp: Copy of my dicom.ini for reference
+
+    # RDSR
+    ImportConverter0  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to /var/conquest/dosedata/sr/%s/%o.dcm; system /var/conquest/openrem-rdsr.sh /var/conquest/dosedata/sr/%s/%o.dcm; }
+    # Import arguments for GE CT - uses Enhanced SR instead of Radiation Dose SR
+    ImportConverter1  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.22"; {save to /var/conquest/dosedata/sr/%s/%o.dcm; system /var/conquest/openrem-rdsr.sh /var/conquest/dosedata/sr/%s/%o.dcm; }
+
+    # MG images
+    ImportModality2   = MG
+    ImportConverter2  = save to /var/conquest/dosedata/incoming/%o.dcm; system /var/conquest/openrem-mam-launch.sh /var/conquest/dosedata/incoming/%o.dcm; destroy
+
+    # DX images
+    ImportModality3   = DX
+    ImportConverter3  = save to /var/conquest/dosedata/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/conquest/dosedata/incoming/%o.dcm; destroy
+
+    # CR images
+    ImportModality4   = CR
+    ImportConverter4  = save to /var/conquest/dosedata/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/conquest/dosedata/incoming/%o.dcm; destroy
+
+    # Philips CT
+    ImportConverter5  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.7"; {save to /var/conquest/dosedata/incoming/%o.dcm; system /var/conquest/openrem-ctphilips.sh /var/conquest/dosedata/incoming/%o.dcm; destroy}
+
+    # Other CT images
+    ImportConverter6  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.2"; destroy
+
+
+
 .. _`in its repositories,`: http://packages.ubuntu.com/search?keywords=conquest
