@@ -98,8 +98,8 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
              for i in xrange(len(return_structure['system_list']))]
 
         value_ranges = database_events.values(db_series_names).distinct().annotate(
-                min_dap=Min(db_value_name, output_field=FloatField()),
-                max_dap=Max(db_value_name, output_field=FloatField())).order_by(db_series_names)
+                min_value=Min(db_value_name, output_field=FloatField()),
+                max_value=Max(db_value_name, output_field=FloatField())).order_by(db_series_names)
 
         for system_i, system in enumerate(return_structure['system_list']):
             for series_i, series_name in enumerate(return_structure['series_names']):
@@ -114,7 +114,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                 return_structure['histogram_data'][system_i][series_i][0], \
                     return_structure['histogram_data'][system_i][series_i][1] = \
                     np.histogram([float(x) for x in data_values], bins=num_hist_bins, range=value_ranges.filter(
-                        **{db_series_names: series_name}).values_list('min_dap', 'max_dap')[0])
+                        **{db_series_names: series_name}).values_list('min_value', 'max_value')[0])
 
                 return_structure['histogram_data'][system_i][series_i][0] = \
                     return_structure['histogram_data'][system_i][series_i][0].tolist()

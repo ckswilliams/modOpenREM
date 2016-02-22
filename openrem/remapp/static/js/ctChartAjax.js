@@ -47,7 +47,7 @@ $(document).ready(function() {
 
             // CTDI per acquisition chart data
             if(typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
-                updateAverageChart(json.acquisitionNameList, json.acquisitionSystemList, json.acquisitionSummaryCTDI, json.acquisitionHistogramDataCTDI, plotAverageChoice, 'histogramAcquisitionPlotCTDIdiv', colour_scale);
+                updateAverageChart(json.acquisitionNameListCTDI, json.acquisitionSystemListCTDI, json.acquisitionSummaryCTDI, json.acquisitionHistogramDataCTDI, plotAverageChoice, 'histogramAcquisitionPlotCTDIdiv', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramAcquisitionPlotCTDIdiv');
             }
 
