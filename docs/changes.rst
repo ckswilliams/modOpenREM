@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
