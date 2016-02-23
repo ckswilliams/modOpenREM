@@ -92,7 +92,11 @@ Bash scripts
 ------------
 
 Create a bash script for each of RDSR, mammo, DX and Philips CT dose images, as required. They should have
-content something like the following. The key step in these scripts is to activate the virtual environment.
+content something like the following. The examples that follow assume the files have been saved in the folder
+``/etc/conquest-dicom-server`` but you can save them where you like and change the ``dicom.ini`` commands accordingly.
+
+
+The key step in these scripts is to activate the virtual environment.
 This is done on the line with ``. /var/dose/venv/bin/activate`` - you should change the path to your virtualenv
 appropriately.
 
@@ -180,23 +184,31 @@ At the end of the ``/etc/conquest-dicom-server/dicom.ini`` file, add the followi
 to tailor them to save the file to an appropriate place. The ``_conquest`` user will need to be able to
 write to that location. You will also need to make sure the path to the scripts you just created are correct.
 
+The example below assumes images will be saved in ``/var/lib/conquest-dicom-server/incoming/``, which you can create as
+follows:
+
+.. sourcecode:: console
+
+    sudo mkdir /var/lib/conquest-dicom-server/incoming
+    sudo chown _conquest:_conquest /var/lib/conquest-dicom-server/incoming
+
 .. sourcecode:: console
 
     # RDSR
-    ImportConverter0  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to /var/dose/incoming/%o.dcm; system /var/dose/scipts/openrem-rdsr.sh /var/dose/incoming/%o.dcm; }; destroy
+    ImportConverter0  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-rdsr.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy}
     # Import arguments for GE CT - uses Enhanced SR instead of Radiation Dose SR
-    ImportConverter1  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.22"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-rdsr.sh /var/dose/incoming/%o.dcm; }; destroy
+    ImportConverter1  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.22"; {save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-rdsr.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy}
     # MG images
     ImportModality2   = MG
-    ImportConverter2  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-mg.sh /var/dose/incoming/%o.dcm; destroy
+    ImportConverter2  = save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-mg.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy
     # DX images
     ImportModality3   = DX
-    ImportConverter3  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/dose/incoming/%o.dcm; destroy
+    ImportConverter3  = save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-dx.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy
     # CR images
     ImportModality4   = CR
-    ImportConverter4  = save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-dx.sh /var/dose/incoming/%o.dcm; destroy
+    ImportConverter4  = save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-dx.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy
     # Philips CT
-    ImportConverter5  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.7"; {save to /var/dose/incoming/%o.dcm; system /var/conquest/openrem-ctphilips.sh /var/dose/incoming/%o.dcm; }; destroy
+    ImportConverter5  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.7"; {save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-ctphilips.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy}
 
     # Temp: Copy of my dicom.ini for reference
 
