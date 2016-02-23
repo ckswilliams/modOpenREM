@@ -182,9 +182,13 @@
     <script src="{{ STATIC_URL }}js/export-csv.js"></script>
     <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
     <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+    <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
     <script>
         var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
         var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
+
+        var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
+                field_name_min, field_name_max, field_cat_name, tooltip_filters, href_start, result;
     </script>
 
     <!-- End of include JavaScript to enable highcharts plots -->
@@ -403,15 +407,35 @@
     {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
       <!-- JavaScript for acquisition mean DLP plot -->
       <script>
-        var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          norm_btn_class = '.acq-hist-norm-btn';
+          instr_class = '.acq-instructions';
+          render_div = 'histogramAcquisitionPlotDLPdiv';
+          val_label = 'DLP';
+          val_units = 'mGy.cm';
+          cat_label = 'Acquisition protocol';
+          cat_counter = 'exposures';
+          field_name_min = 'acquisition_dlp_min';
+          field_name_max = 'acquisition_dlp_max';
+          field_cat_name = 'acquisition_protocol';
+          tooltip_filters = tooltipFiltersAcq;
+          href_start = '/openrem/ct/?acquisitionhist=1&';
       </script>
+
           {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisitionMeanAndMedian.js"></script>
+              <script>avg_label = 'Mean and median';</script>
           {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisitionMean.js"></script>
+              <script>avg_label = 'Mean';</script>
           {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisitionMedian.js"></script>
+              <script>avg_label = 'Median';</script>
           {% endif %}
+
+      <script>
+          def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+          result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
+                  tooltip_filters, href_start);
+      </script>
       <!-- End of JavaScript for acquisition plot -->
     {% endif %}
 
@@ -419,15 +443,35 @@
     {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
       <!-- JavaScript for acquisition mean CTDI plot -->
       <script>
-        var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          norm_btn_class = '.acqctdi-hist-norm-btn';
+          instr_class = '.acq-ctdi-instructions';
+          render_div = 'histogramAcquisitionPlotCTDIdiv';
+          val_label = 'CTDI<sub>vol</sub>';
+          val_units = 'mGy';
+          cat_label = 'Acquisition protocol';
+          cat_counter = 'exposures';
+          field_name_min = 'acquisition_ctdi_min';
+          field_name_max = 'acquisition_ctdi_max';
+          field_cat_name = 'acquisition_protocol';
+          tooltip_filters = tooltipFiltersAcqCTDI;
+          href_start = '/openrem/ct/?acquisitionhist=1&';
       </script>
+
           {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisitionMeanAndMedian.js"></script>
+              <script>avg_label = 'Mean and median';</script>
           {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisitionMean.js"></script>
+              <script>avg_label = 'Mean';</script>
           {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisitionMedian.js"></script>
+              <script>avg_label = 'Median';</script>
           {% endif %}
+
+      <script>
+          def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+          result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
+                  tooltip_filters, href_start);
+      </script>
       <!-- End of JavaScript for acquisition CTDI plot -->
     {% endif %}
 
