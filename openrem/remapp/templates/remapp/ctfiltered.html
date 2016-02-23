@@ -732,17 +732,37 @@
 
 
     {% if request.user.userprofile.plotCTStudyMeanDLP %}
+      <!-- JavaScript for study DLP plot -->
       <script>
-        var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+          norm_btn_class = '.stu-hist-norm-btn';
+          instr_class = '.stu-instructions';
+          render_div = 'histogramStudyPlotDIV';
+          val_label = 'DLP';
+          val_units = 'mGy.cm';
+          cat_label = 'Study description';
+          cat_counter = 'studies';
+          field_name_min = 'study_dlp_min';
+          field_name_max = 'study_dlp_max';
+          field_cat_name = 'study_description';
+          tooltip_filters = tooltipFiltersStudy;
+          href_start = '/openrem/ct/?studyhist=1&';
       </script>
 
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMedian.js"></script>
-      {% endif %}
+          {% if request.user.userprofile.plotAverageChoice == 'both' %}
+              <script>avg_label = 'Mean and median';</script>
+          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+              <script>avg_label = 'Mean';</script>
+          {% else %}
+              <script>avg_label = 'Median';</script>
+          {% endif %}
+
+      <script>
+          def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+          result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
+                  tooltip_filters, href_start);
+      </script>
       <!-- End of JavaScript for study plot -->
     {% endif %}
 
@@ -770,14 +790,35 @@
     {% endif %}
 
     {% if request.user.userprofile.plotCTRequestMeanDLP %}
+      <script>
+          norm_btn_class = '.req-hist-norm-btn';
+          instr_class = '.req-instructions';
+          render_div = 'histogramRequestPlotDIV';
+          val_label = 'DLP';
+          val_units = 'mGy.cm';
+          cat_label = 'Requested procedure';
+          cat_counter = 'studies';
+          field_name_min = 'study_dlp_min';
+          field_name_max = 'study_dlp_max';
+          field_cat_name = 'requested_procedure';
+          tooltip_filters = tooltipFiltersRequest;
+          href_start = '/openrem/ct/?requesthist=1&';
+      </script>
 
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMedian.js"></script>
-      {% endif %}
+          {% if request.user.userprofile.plotAverageChoice == 'both' %}
+              <script>avg_label = 'Mean and median';</script>
+          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+              <script>avg_label = 'Mean';</script>
+          {% else %}
+              <script>avg_label = 'Median';</script>
+          {% endif %}
+
+      <script>
+          def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+          result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
+                  tooltip_filters, href_start);
+      </script>
       <!-- End of JavaScript for request plot -->
     {% endif %}
 
