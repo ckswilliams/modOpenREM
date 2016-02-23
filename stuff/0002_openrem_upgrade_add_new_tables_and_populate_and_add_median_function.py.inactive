@@ -297,6 +297,36 @@ class Migration(migrations.Migration):
             name='plotInitialSortingDirection',
             field=models.IntegerField(default=-1, null=True, choices=[(1, b'Ascending'), (-1, b'Descending')]),
         ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXStudyMeanDAP',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXStudyFreq',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXRequestMeanDAP',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotDXRequestFreq',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotSeriesPerSystem',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotHistogramBins',
+            field=models.IntegerField(default=20),
+        ),
         migrations.AlterField(
             model_name='generalstudymoduleattr',
             name='accession_number',
