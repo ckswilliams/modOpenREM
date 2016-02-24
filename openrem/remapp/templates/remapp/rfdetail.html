@@ -23,17 +23,19 @@
                 <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
                 <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
                 <li>
-                    Total DAP:
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                        Total DAP, tube {{ forloop.counter0|add:"1" }}:
+                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
+
+                        <br>
                     {% endfor %}
-                    cGy.cm2
                 </li>
-                <li>Total dose at RP:
+                <li>
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                        Total dose at RP, tube {{ forloop.counter0|add:"1" }}:
+                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }} Gy
+                        <br>
                     {% endfor %}
-                    Gy
                 </li>
                 <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
                 <li>

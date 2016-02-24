@@ -140,14 +140,18 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
                     {% for record in exam.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                        Tube {{ forloop.counter0|add:"1" }}:
                         {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                        <br>
                     {% endfor %}
                 </a>
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
                     {% for record in exam.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                        Tube {{ forloop.counter0|add:"1" }}:
                         {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                        <br>
                     {% endfor %}
                 </a>
             </td>
