@@ -65,11 +65,12 @@
   </div>
 
 <table class="table table-striped table-bordered">
-    <th>Time</th><th>Acquisition protocol</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
+    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
+        <td>{{ event.acquisition_plane }}</td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:3 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
