@@ -127,63 +127,6 @@ def _ct_common_get_data(exams, pid, name, patid):
         total_number_of_irradiation_events,
         ct_dose_length_product_total,
     ]
-    # for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
-    #     examdata += [
-    #         s.acquisition_protocol,
-    #         str(s.ct_acquisition_type),
-    #         str(s.exposure_time),
-    #         str(s.scanninglength_set.get().scanning_length),
-    #         str(s.nominal_single_collimation_width),
-    #         str(s.nominal_total_collimation_width),
-    #         str(s.pitch_factor),
-    #         str(s.number_of_xray_sources),
-    #         str(s.mean_ctdivol),
-    #         str(s.dlp),
-    #         ]
-    #     if s.number_of_xray_sources > 1:
-    #         for source in s.ctxraysourceparameters_set.all():
-    #             examdata += [
-    #                 str(source.identification_of_the_xray_source),
-    #                 str(source.kvp),
-    #                 str(source.maximum_xray_tube_current),
-    #                 str(source.xray_tube_current),
-    #                 str(source.exposure_time_per_rotation),
-    #                 ]
-    #     else:
-    #         try:
-    #             try:
-    #                 s.ctxraysourceparameters_set.get()
-    #             except ObjectDoesNotExist:
-    #                 identification_of_the_xray_source = None
-    #                 kvp = None
-    #                 maximum_xray_tube_current = None
-    #                 xray_tube_current = None
-    #                 exposure_time_per_rotation = None
-    #             else:
-    #                 identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(), 'identification_of_the_xray_source')
-    #                 kvp = return_for_export(s.ctxraysourceparameters_set.get(), 'kvp')
-    #                 maximum_xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current')
-    #                 xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current')
-    #                 exposure_time_per_rotation = return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation')
-    #
-    #             examdata += [
-    #                 identification_of_the_xray_source,
-    #                 kvp,
-    #                 maximum_xray_tube_current,
-    #                 xray_tube_current,
-    #                 exposure_time_per_rotation,
-    #                 'n/a',
-    #                 'n/a',
-    #                 'n/a',
-    #                 'n/a',
-    #                 'n/a',
-    #                 ]
-    #         except:
-    #                 examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
-    #     examdata += [
-    #         s.xray_modulation_type,
-    #         str(s.comment),
-    #         ]
 
     return examdata
 
@@ -406,11 +349,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
 
-
-
-    ##################
-    # All data sheet
-
     from django.db.models import Max
     max_events = e.aggregate(Max('ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events'))
 
@@ -457,8 +395,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
         allexamdata = _ct_common_get_data(exams, pid, name, patid)
 
-
-
         # Now we need to write a sheet per series protocol for each 'exams'.
         
         for s in exams.ctradiationdose_set.get().ctirradiationeventdata_set.all():
@@ -476,48 +412,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             
             examdata = _ct_common_get_data(exams, pid, name, patid)
             examdata += _ct_get_series_data(s)
-
-            # examdata += [
-            #     s.acquisition_protocol,
-            #     str(s.ct_acquisition_type),
-            #     str(s.exposure_time),
-            #     str(s.scanninglength_set.get().scanning_length),
-            #     str(s.nominal_single_collimation_width),
-            #     str(s.nominal_total_collimation_width),
-            #     str(s.pitch_factor),
-            #     str(s.number_of_xray_sources),
-            #     str(s.mean_ctdivol),
-            #     str(s.dlp),
-            #     ]
-            # if s.number_of_xray_sources > 1:
-            #     for source in s.ctxraysourceparameters_set.all():
-            #         examdata += [
-            #             str(source.identification_of_the_xray_source),
-            #             str(source.kvp),
-            #             str(source.maximum_xray_tube_current),
-            #             str(source.xray_tube_current),
-            #             str(source.exposure_time_per_rotation),
-            #             ]
-            # else:
-            #     try:
-            #         examdata += [
-            #             str(s.ctxraysourceparameters_set.get().identification_of_the_xray_source),
-            #             str(s.ctxraysourceparameters_set.get().kvp),
-            #             str(s.ctxraysourceparameters_set.get().maximum_xray_tube_current),
-            #             str(s.ctxraysourceparameters_set.get().xray_tube_current),
-            #             str(s.ctxraysourceparameters_set.get().exposure_time_per_rotation),
-            #             'n/a',
-            #             'n/a',
-            #             'n/a',
-            #             'n/a',
-            #             'n/a',
-            #             ]
-            #     except:
-            #             examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
-            # examdata += [
-            #     s.xray_modulation_type,
-            #     s.comment,
-            #     ]
 
             sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
 
