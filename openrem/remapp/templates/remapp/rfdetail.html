@@ -24,15 +24,14 @@
                 <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
                 <li>
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                        Total DAP, tube {{ forloop.counter0|add:"1" }}:
+                        Total DAP, {{ record.acquisition_plane }}:
                         {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
-
                         <br>
                     {% endfor %}
                 </li>
                 <li>
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
-                        Total dose at RP, tube {{ forloop.counter0|add:"1" }}:
+                        Total dose at RP, {{ record.acquisition_plane }}:
                         {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }} Gy
                         <br>
                     {% endfor %}
