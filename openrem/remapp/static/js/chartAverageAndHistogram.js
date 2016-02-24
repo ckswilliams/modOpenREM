@@ -1,6 +1,6 @@
 function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, render_div,
                                   value_label, value_units, avg_label, cat_label, cat_counter,
-                                  fld_min, fld_max, fld_cat_name,
+                                  fld_min, fld_max, fld_multiplier, fld_cat_name,
                                   tooltip_filters, href_start) {
     var bins = [];
     var name = '';
@@ -47,7 +47,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                         categories: []
                     }, false);
                     this.tooltip.options.formatter = function (e) {
-                        var linkText = fld_min + '=' + bins[this.x] + '&' + fld_max + '=' + bins[this.x + 1] + '&' + fld_cat_name + '=' + name;
+                        var linkText = fld_min + '=' + (bins[this.x])*fld_multiplier + '&' + fld_max + '=' + (bins[this.x + 1])*fld_multiplier + '&' + fld_cat_name + '=' + name;
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + href_start + linkText + tooltip_filters + '">Click to view</a></td></tr></table>';
                         return returnValue;

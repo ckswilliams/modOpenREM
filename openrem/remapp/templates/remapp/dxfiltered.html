@@ -680,9 +680,13 @@
     <script src="{{ STATIC_URL }}js/drilldown.js"></script>
     <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
     <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+    <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
     <script>
         var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
         var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
+
+        var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
+                field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
     </script>
     <!-- End of include JavaScript for the plots -->
 
@@ -755,46 +759,88 @@
 
     <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
 
-      {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
-          <script>
-              var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-          </script>
+    {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
+      <!-- JavaScript for acquisition DAP plot -->
+        <script>
+            var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            norm_btn_class = '.acq-hist-norm-btn';
+            instr_class = '.acq-instructions';
+            render_div = 'container';
+            val_label = 'DAP';
+            val_units = 'cGy.cm<sup>2</sup>';
+            cat_label = 'Acquisition protocol';
+            cat_counter = 'exposures';
+            field_name_min = 'acquisition_dap_min';
+            field_name_max = 'acquisition_dap_max';
+            field_multiplier = 0.000001;
+            field_cat_name = 'acquisition_protocol';
+            tooltip_filters = tooltipFilters;
+            href_start = '/openrem/dx/?acquisitionhist=1&';
+        </script>
 
-          {% if request.user.userprofile.plotAverageChoice == 'both' %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMeanAndMedian.js"></script>
-          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMean.js"></script>
-          {% else %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperAcquisitionMedian.js"></script>
-          {% endif %}
-          <!-- End of JavaScript for acquisition plot -->
-      {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'both' %}
+            <script>avg_label = 'Mean and median';</script>
+        {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+            <script>avg_label = 'Mean';</script>
+        {% else %}
+            <script>avg_label = 'Median';</script>
+        {% endif %}
+
+        <script>
+            def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+            result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                    val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                    field_cat_name, tooltip_filters, href_start);
+        </script>
+    <!-- End of JavaScript for acquisition plot -->
+    {% endif %}
 
       {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeankVpOverTime or request.user.userprofile.plotDXAcquisitionMeanmAsOverTime or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime%}
-        <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
-        <script>
-          var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-        </script>
+          <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
+          <script>
+              var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+          </script>
       {% endif %}
 
       {% if request.user.userprofile.plotDXAcquisitionFreq %}
-        <script src="{{ STATIC_URL }}js/dxChartAcquisitionFrequency.js"></script>
-        <!-- End of JavaScript for acquisition pie chart -->
+          <script src="{{ STATIC_URL }}js/dxChartAcquisitionFrequency.js"></script>
+          <!-- End of JavaScript for acquisition pie chart -->
       {% endif %}
 
       {% if request.user.userprofile.plotDXRequestMeanDAP %}
+          <!-- JavaScript for requested procedure DAP plot -->
           <script>
               var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            norm_btn_class = '.req-hist-norm-btn';
+            instr_class = '.req-instructions';
+            render_div = 'plotDXRequestMeanDAPContainer';
+            val_label = 'DAP';
+            val_units = 'cGy.cm<sup>2</sup>';
+            cat_label = 'Requested procedure';
+            cat_counter = 'requests';
+            field_name_min = 'study_dap_min';
+            field_name_max = 'study_dap_max';
+            field_multiplier = 1.0;
+            field_cat_name = 'requested_procedure';
+            tooltip_filters = tooltipFiltersRequest;
+            href_start = '/openrem/dx/?acquisitionhist=1&';
           </script>
 
-          {% if request.user.userprofile.plotAverageChoice == 'both' %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperRequestMeanAndMedian.js"></script>
-          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperRequestMean.js"></script>
-          {% else %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperRequestMedian.js"></script>
-          {% endif %}
-          <!-- End of JavaScript for requested procedure name plot -->
+        {% if request.user.userprofile.plotAverageChoice == 'both' %}
+            <script>avg_label = 'Mean and median';</script>
+        {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+            <script>avg_label = 'Mean';</script>
+        {% else %}
+            <script>avg_label = 'Median';</script>
+        {% endif %}
+
+        <script>
+            def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+            result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                    val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                    field_cat_name, tooltip_filters, href_start);
+        </script>
+          <!-- End of JavaScript for requested procedure DAP plot -->
       {% endif %}
 
 
@@ -810,17 +856,38 @@
 
 
       {% if request.user.userprofile.plotDXStudyMeanDAP %}
+          <!-- JavaScript for study description plot -->
           <script>
               var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            norm_btn_class = '.stu-hist-norm-btn';
+            instr_class = '.stu-instructions';
+            render_div = 'plotDXStudyMeanDAPContainer';
+            val_label = 'DAP';
+            val_units = 'cGy.cm<sup>2</sup>';
+            cat_label = 'Study description';
+            cat_counter = 'studies';
+            field_name_min = 'study_dap_min';
+            field_name_max = 'study_dap_max';
+            field_multiplier = 1.0;
+            field_cat_name = 'study_description';
+            tooltip_filters = tooltipFiltersStudy;
+            href_start = '/openrem/dx/?acquisitionhist=1&';
           </script>
 
-          {% if request.user.userprofile.plotAverageChoice == 'both' %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperStudyMeanAndMedian.js"></script>
-          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperStudyMean.js"></script>
-          {% else %}
-              <script src="{{ STATIC_URL }}js/dxChartDAPperStudyMedian.js"></script>
-          {% endif %}
+        {% if request.user.userprofile.plotAverageChoice == 'both' %}
+            <script>avg_label = 'Mean and median';</script>
+        {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+            <script>avg_label = 'Mean';</script>
+        {% else %}
+            <script>avg_label = 'Median';</script>
+        {% endif %}
+
+        <script>
+            def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+            result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                    val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                    field_cat_name, tooltip_filters, href_start);
+        </script>
           <!-- End of JavaScript for study description plot -->
       {% endif %}
 
@@ -837,36 +904,76 @@
 
 
     {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
-        <!-- JavaScript for acquisition mean kVp plot -->
+        <!-- JavaScript for acquisition kVp plot -->
         <script>
             var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            norm_btn_class = '.kvp-hist-norm-btn';
+            instr_class = '.kvp-instructions';
+            render_div = 'chartAcquisitionMeankVp';
+            val_label = 'kVp';
+            val_units = 'kVp';
+            cat_label = 'Acquisition protocol';
+            cat_counter = 'exposures';
+            field_name_min = 'acquisition_kvp_min';
+            field_name_max = 'acquisition_kvp_max';
+            field_multiplier = 1.0;
+            field_cat_name = 'acquisition_protocol';
+            tooltip_filters = tooltipFilterskVp;
+            href_start = '/openrem/dx/?acquisitionhist=1&';
         </script>
 
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/dxChartkVpPerAcquisitionMedian.js"></script>
-      {% endif %}
-      <!-- End of JavaScript for acquisition mean kVp plot -->
+        {% if request.user.userprofile.plotAverageChoice == 'both' %}
+            <script>avg_label = 'Mean and median';</script>
+        {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+            <script>avg_label = 'Mean';</script>
+        {% else %}
+            <script>avg_label = 'Median';</script>
+        {% endif %}
+
+        <script>
+            def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+            result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                    val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                    field_cat_name, tooltip_filters, href_start);
+        </script>
+      <!-- End of JavaScript for acquisition kVp plot -->
     {% endif %}
 
 
     {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
-      <!-- JavaScript for acquisition mean mAs plot -->
+      <!-- JavaScript for acquisition mean plot -->
       <script>
         var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            norm_btn_class = '.mas-hist-norm-btn';
+            instr_class = '.mas-instructions';
+            render_div = 'chartAcquisitionMeanmAs';
+            val_label = 'mAs';
+            val_units = 'mAs';
+            cat_label = 'Acquisition protocol';
+            cat_counter = 'exposures';
+            field_name_min = 'acquisition_mas_min';
+            field_name_max = 'acquisition_mas_max';
+            field_multiplier = 1000;
+            field_cat_name = 'acquisition_protocol';
+            tooltip_filters = tooltipFiltersmAs;
+            href_start = '/openrem/dx/?acquisitionhist=1&';
       </script>
 
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/dxChartmAsPerAcquisitionMedian.js"></script>
-      {% endif %}
-      <!-- End of JavaScript for acquisition mean mAs plot -->
+        {% if request.user.userprofile.plotAverageChoice == 'both' %}
+            <script>avg_label = 'Mean and median';</script>
+        {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+            <script>avg_label = 'Mean';</script>
+        {% else %}
+            <script>avg_label = 'Median';</script>
+        {% endif %}
+
+        <script>
+            def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+            result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                    val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                    field_cat_name, tooltip_filters, href_start);
+        </script>
+      <!-- End of JavaScript for acquisition mAs plot -->
     {% endif %}
 
 

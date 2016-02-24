@@ -188,7 +188,7 @@
         var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
         var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                field_name_min, field_name_max, field_cat_name, tooltip_filters, href_start, result;
+                field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
     </script>
 
     <!-- End of include JavaScript to enable highcharts plots -->
@@ -417,6 +417,7 @@
           cat_counter = 'exposures';
           field_name_min = 'acquisition_dlp_min';
           field_name_max = 'acquisition_dlp_max';
+          field_multiplier = 1.0;
           field_cat_name = 'acquisition_protocol';
           tooltip_filters = tooltipFiltersAcq;
           href_start = '/openrem/ct/?acquisitionhist=1&';
@@ -433,8 +434,8 @@
       <script>
           def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
           result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
-                  tooltip_filters, href_start);
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                  field_cat_name, tooltip_filters, href_start);
       </script>
       <!-- End of JavaScript for acquisition plot -->
     {% endif %}
@@ -453,6 +454,7 @@
           cat_counter = 'exposures';
           field_name_min = 'acquisition_ctdi_min';
           field_name_max = 'acquisition_ctdi_max';
+          field_multiplier = 1.0;
           field_cat_name = 'acquisition_protocol';
           tooltip_filters = tooltipFiltersAcqCTDI;
           href_start = '/openrem/ct/?acquisitionhist=1&';
@@ -469,8 +471,8 @@
       <script>
           def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
           result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
-                  tooltip_filters, href_start);
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                  field_cat_name, tooltip_filters, href_start);
       </script>
       <!-- End of JavaScript for acquisition CTDI plot -->
     {% endif %}
@@ -744,6 +746,7 @@
           cat_counter = 'studies';
           field_name_min = 'study_dlp_min';
           field_name_max = 'study_dlp_max';
+          field_multiplier = 1.0;
           field_cat_name = 'study_description';
           tooltip_filters = tooltipFiltersStudy;
           href_start = '/openrem/ct/?studyhist=1&';
@@ -760,8 +763,8 @@
       <script>
           def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
           result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
-                  tooltip_filters, href_start);
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                  field_cat_name, tooltip_filters, href_start);
       </script>
       <!-- End of JavaScript for study plot -->
     {% endif %}
@@ -800,6 +803,7 @@
           cat_counter = 'studies';
           field_name_min = 'study_dlp_min';
           field_name_max = 'study_dlp_max';
+          field_multiplier = 1.0;
           field_cat_name = 'requested_procedure';
           tooltip_filters = tooltipFiltersRequest;
           href_start = '/openrem/ct/?requesthist=1&';
@@ -816,8 +820,8 @@
       <script>
           def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
           result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_cat_name,
-                  tooltip_filters, href_start);
+                  val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                  field_cat_name, tooltip_filters, href_start);
       </script>
       <!-- End of JavaScript for request plot -->
     {% endif %}
