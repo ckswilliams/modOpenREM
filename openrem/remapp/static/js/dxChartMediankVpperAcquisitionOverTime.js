@@ -1,5 +1,8 @@
 $(function () {
     var chartAcquisitionMediankVpOverTime = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             renderTo: 'AcquisitionMeankVpOverTimeDIV',
             zoomType: 'x'

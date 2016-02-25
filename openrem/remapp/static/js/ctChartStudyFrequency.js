@@ -1,5 +1,8 @@
 $(function () {
     var chartStudyFreq = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             renderTo: 'piechartStudyDIV',
             plotBackgroundColor: null,

@@ -139,12 +139,24 @@ $('.datepicker').datepicker({
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                    {% for record in exam.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                        {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.all.count > 1 %}
+                            {{ record.acquisition_plane }}:
+                        {% endif %}
+                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
+                        <br>
+                    {% endfor %}
                 </a>
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                    {% for record in exam.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                        {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.all.count > 1 %}
+                            {{ record.acquisition_plane }}:
+                        {% endif %}
+                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                        <br>
+                    {% endfor %}
                 </a>
             </td>
             <td>

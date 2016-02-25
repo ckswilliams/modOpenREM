@@ -1,46 +1,92 @@
 $(function () {
-var drilldownTitle = 'Histogram of ';
 var defaultTitle   = 'DAP per acquisition protocol';
 var bins = [];
 var name = '';
 
 var chartDAPperAcquisition = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
             type: 'column',
             renderTo: 'container',
             events: {
                 drilldown: function(e) {
+                    $('.acq-hist-norm-btn').css('display','inline-block');
+                    $('.acq-instructions').css('display','none');
+
+
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
-                    chartDAPperAcquisition.setTitle({ text: drilldownTitle + e.point.name + ' DAP values' }, { text: '(n = ' + e.point.freq +')' });
-                    chartDAPperAcquisition.yAxis[0].setTitle({text:'Number'});
-                    chartDAPperAcquisition.xAxis[0].setTitle({text:'DAP range (cGy.cm<sup>2</sup>)'});
-                    chartDAPperAcquisition.xAxis[0].setCategories([], true);
-                    chartDAPperAcquisition.tooltip.options.formatter = function(e) {
+
+                    if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
+
+                    var drilldownTitle;
+                    if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
+                    drilldownTitle += e.point.name + ' DAP values';
+                    if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
+
+                    this.setTitle({
+                        text: drilldownTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
+                        },
+                        max: (this.options.drilldown.normalise ? 1.0 : null),
+                        labels: {
+                            format: (this.options.drilldown.normalise ? '{value:.2f}' : null)
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text:'DAP range (cGy.cm<sup>2</sup>)'
+                        },
+                        categories: []
+                    }, false);
+                    this.tooltip.options.formatter = function(e) {
                         var linkText = 'acquisition_dap_min=' + (bins[this.x])/1000000 + '&acquisition_dap_max=' + (bins[this.x+1])/1000000 + '&acquisition_protocol=' + name;
+                        if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
                         var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFilters + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function(e) {
-                    chartDAPperAcquisition.setTitle({ text: defaultTitle }, { text: '' });
-                    chartDAPperAcquisition.yAxis[0].setTitle({text:'DAP (cGy.cm<sup>2</sup>)'});
-                    chartDAPperAcquisition.xAxis[0].setTitle({text:'Protocol name'});
-                    chartDAPperAcquisition.xAxis[0].update({
+                    $('.acq-hist-norm-btn').css('display','none');
+                    $('.acq-instructions').css('display','block');
+
+
+                    this.setTitle({
+                        text: defaultTitle
+                    });
+                    this.yAxis[0].update({
+                        title: {
+                            text: 'DAP (cGy.cm<sup>2</sup>)'
+                        },
+                        max: null,
+                        labels: {
+                            format: null
+                        }
+                    }, false);
+                    this.xAxis[0].update({
+                        title: {
+                            text:'Protocol name'
+                        },
                         categories: {
                             formatter: function (args) {
                                 return this.value;
                             }
                         }
                     });
-                    chartDAPperAcquisition.tooltip.options.formatter = function(args) {
+                    this.tooltip.options.formatter = function(args) {
                         return this.point.tooltip;
                     }
                 }
             }
         },
         title: {
-            text: 'DAP per acquisition protocol'
+            useHTML: true,
+            text: defaultTitle
         },
         legend: {
             enabled: true
@@ -67,40 +113,18 @@ var chartDAPperAcquisition = new Highcharts.Chart({
             formatter: function (args) {
                 return this.point.tooltip;
             },
-
             useHTML: true
         },
         plotOptions: {
             column: {
                 pointPadding: 0,
-                borderWidth: 0
+                borderWidth: 1,
+                borderColor: '#999999'
             }
         },
-        series: [{
-            name: 'Mean DAP per acquisition protocol',
-            data: []
-        }, {
-            name: 'Median DAP per acquisition protocol',
-            data: []
-        }],
+        series: [],
         drilldown: {
             series: []
         }
     });
-
-    switch(chartSorting) {
-        case 'freq':
-            twoSeriesSort('#container', 'freq', chartSortingDirection, 0);
-            break;
-        case 'dap':
-            twoSeriesSort('#container', 'y', chartSortingDirection, 0);
-            break;
-        case 'name':
-            twoSeriesSort('#container', 'name', chartSortingDirection, 0);
-            break;
-        default:
-            twoSeriesSort('#container', 'name', chartSortingDirection, 0);
-    }
-
 });
-

@@ -224,6 +224,10 @@ class UserProfile(models.Model):
     plotCharts = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
     plotDXAcquisitionFreq = models.BooleanField(default=False)
+    plotDXStudyMeanDAP = models.BooleanField(default=True)
+    plotDXStudyFreq = models.BooleanField(default=True)
+    plotDXRequestMeanDAP = models.BooleanField(default=True)
+    plotDXRequestFreq = models.BooleanField(default=True)
     plotDXAcquisitionMeankVp = models.BooleanField(default=False)
     plotDXAcquisitionMeanmAs = models.BooleanField(default=False)
     plotDXStudyPerDayAndHour = models.BooleanField(default=False)
@@ -257,6 +261,10 @@ class UserProfile(models.Model):
     displayRF = models.BooleanField(default=True)
     displayMG = models.BooleanField(default=True)
     displayDX = models.BooleanField(default=True)
+
+    plotSeriesPerSystem = models.BooleanField(default=False)
+
+    plotHistogramBins = models.PositiveSmallIntegerField(default=20)
 
 
 def create_user_profile(sender, instance, created, **kwargs):

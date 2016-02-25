@@ -1,21 +1,19 @@
-
-
 $(function () {
-    var defaultmAsTitle = 'Mean mAs per acquisition protocol';
-    var bins = [];
-    var name = '';
+var defaultTitle   = 'DAP per requested procedure name';
+var bins = [];
+var name = '';
 
-    var chartmAsPerAcquisition = new Highcharts.Chart({
+var chartDAPperRequest = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
             type: 'column',
-            renderTo: 'chartAcquisitionMeanmAs',
+            renderTo: 'plotDXRequestMeanDAPContainer',
             events: {
                 drilldown: function(e) {
-                    $('.mas-hist-norm-btn').css('display','inline-block');
-                    $('.mas-instructions').css('display','none');
+                    $('.req-hist-norm-btn').css('display','inline-block');
+                    $('.req-instructions').css('display','none');
 
 
                     bins = e.point.bins;
@@ -25,7 +23,7 @@ $(function () {
 
                     var drilldownTitle;
                     if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
-                    drilldownTitle += e.point.name + ' mAs values';
+                    drilldownTitle += e.point.name + ' DAP values';
                     if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
 
                     this.setTitle({
@@ -42,28 +40,28 @@ $(function () {
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text:'mAs range'
+                            text:'DAP range (cGy.cm<sup>2</sup>)'
                         },
                         categories: []
                     }, false);
                     this.tooltip.options.formatter = function(e) {
-                        var linkText = 'acquisition_mas_min=' + (bins[this.x])*1000 + '&acquisition_mas_max=' + (bins[this.x+1])*1000 + '&acquisition_protocol=' + name;
+                        var linkText = 'study_dap_min=' + bins[this.x] + '&study_dap_max=' + bins[this.x+1] + '&requested_procedure=' + name;
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
-                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>';
+                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' requests</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersRequest + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
                 drillup: function(e) {
-                    $('.mas-hist-norm-btn').css('display','none');
-                    $('.mas-instructions').css('display','block');
+                    $('.req-hist-norm-btn').css('display','none');
+                    $('.req-instructions').css('display','block');
 
 
                     this.setTitle({
-                        text: defaultmAsTitle
+                        text: defaultTitle
                     });
                     this.yAxis[0].update({
                         title: {
-                            text:'Mean mAs'
+                            text: 'Mean DAP (cGy.cm<sup>2</sup>)'
                         },
                         max: null,
                         labels: {
@@ -72,15 +70,15 @@ $(function () {
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text:'Protocol name'
+                            text:'Requested procedure name'
                         },
                         categories: {
                             formatter: function (args) {
-                                return this.point.category;
+                                return this.value;
                             }
                         }
                     });
-                    this.tooltip.options.formatter = function() {
+                    this.tooltip.options.formatter = function(args) {
                         return this.point.tooltip;
                     }
                 }
@@ -88,16 +86,16 @@ $(function () {
         },
         title: {
             useHTML: true,
-            text: defaultmAsTitle
+            text: defaultTitle
         },
         legend: {
             enabled: true
         },
         xAxis: {
-            categories: [],
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
-                text: 'Protocol name'
+                text: 'Requested procedure name'
             },
             labels: {
                 useHTML: true,
@@ -108,11 +106,11 @@ $(function () {
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean mAs'
+                text: 'DAP (cGy.cm<sup>2</sup>)'
             }
         },
         tooltip: {
-            formatter: function () {
+            formatter: function (args) {
                 return this.point.tooltip;
             },
             useHTML: true

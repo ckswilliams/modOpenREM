@@ -7,14 +7,14 @@
 
 <table class="table table-striped">
         <th>Institution</th><th>Make | Model | Station name</th><th>Date</th>
-{% if exam.modality_type = "CT" %}
+{% if exam.modality_type == "CT" %}
         <th>Study description | Accession number</th><th>Number of events</th><th>Dose Length Product Total mGy.cm</th>
-{% elif exam.modality_type = "RF" %}
+{% elif exam.modality_type == "RF" %}
         <th>Study description | Accession number</th><th>Number of events</th><th>DAP Total cGy.cm2</th><th>Dose at RP total Gy</th><th>Physician</th>
-{% elif exam.modality_type = "MG" %}
+{% elif exam.modality_type == "MG" %}
         <th>Protocol | Accession number</th><th>Number of events</th><th>Laterality</th><th>Accumulated AGD (mGy)</th>
-{% elif exam.modality_type = "DX" %}
-        <th>Protocol | Accession number</th><th>Number of events</th><th>DAP Total cGy.cm2</th>
+{% elif exam.modality_type == "DX" or exam.modality_type == "CR" %}
+        <th>Protocol | Accession number</th><th>Number of events</th><th>DAP Total cGy.cm<sup>2</sup></th>
 {% endif %}
         <tr>
             <td>{{ exam.generalequipmentmoduleattr_set.get.institution_name }}</td>
@@ -24,7 +24,7 @@
                 {{ exam.generalequipmentmoduleattr_set.get.station_name }}
             </td>
             <td>{{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
-{% if exam.modality_type = "CT" %}
+{% if exam.modality_type == "CT" %}
             <td>
                 <a href="/openrem/ct/{{ exam.id }}/">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }} |
@@ -33,7 +33,7 @@
             </td>
             <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}</td>
             <td>{{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}</td>
-{% elif exam.modality_type = "RF" %}
+{% elif exam.modality_type == "RF" %}
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }}
@@ -42,14 +42,14 @@
             <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
             <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }}</td>
             <td>{{ exam.performing_physician_name }}</td>
-{% elif exam.modality_type = "DX" %}
+{% elif exam.modality_type == "DX" or exam.modality_type == "CR" %}
             <td>
                 <a href="/openrem/dx/{{ exam.id }}/">{{ exam.study_description }}</a> |
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-{% elif exam.modality_type = "MG" %}
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2 | floatformat:1 }}</td>
+{% elif exam.modality_type == "MG" %}
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">{{ exam.procedure_code_meaning }}</a> |
                 {{ exam.accession_number }}
@@ -62,7 +62,15 @@
 </table>
 
     Are you sure you want to delete the above study with UID {{ exam }}?
-    <input type="submit" value="Delete" />
+    <input type="hidden" name="return_url" value="{{ return_url }}" />
+    <input type="submit" value="Delete" class="btn btn-primary" />
+    <button onclick="goBack()" class="btn btn-default">Cancel</button>
+
+    <script>
+    function goBack() {
+        window.history.back();
+    }
+    </script>
 </form>
 
 

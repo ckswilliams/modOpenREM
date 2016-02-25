@@ -87,6 +87,10 @@ class DXChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
+    plotDXStudyMeanDAP = forms.BooleanField(label='DAP per study', required=False)
+    plotDXStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotDXRequestMeanDAP = forms.BooleanField(label='DAP per requested procedure', required=False)
+    plotDXRequestFreq = forms.BooleanField(label='Requested procedure frequency', required=False)
     plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition', required=False)
     plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition', required=False)
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
@@ -118,6 +122,10 @@ class CTChartOptionsForm(forms.Form):
 class DXChartOptionsDisplayForm(forms.Form):
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
+    plotDXStudyMeanDAP = forms.BooleanField(label='DAP per study', required=False)
+    plotDXStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotDXRequestMeanDAP = forms.BooleanField(label='DAP per requested procedure', required=False)
+    plotDXRequestFreq = forms.BooleanField(label='requested procedure frequency', required=False)
     plotDXAcquisitionMeankVp = forms.BooleanField(label='kVp per acquisition', required=False)
     plotDXAcquisitionMeanmAs = forms.BooleanField(label='mAs per acquisition', required=False)
     plotDXStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
@@ -151,6 +159,8 @@ class GeneralChartOptionsDisplayForm(forms.Form):
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
     plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION,
                                                     required=False)
+    plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
+    plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
 
 
 class UpdateDisplayNameForm(forms.Form):
