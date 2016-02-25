@@ -682,6 +682,7 @@
         <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -804,7 +805,7 @@
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionFreq %}
-            <script src="{{ STATIC_URL }}js/dxChartAcquisitionFrequency.js"></script>
+            <script>result = chartFrequency('piechartProtocolDIV', 'Acquisition protocol frequency');</script>
             <!-- End of JavaScript for acquisition pie chart -->
         {% endif %}
 
@@ -851,7 +852,7 @@
                 var urlStartReq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
             </script>
 
-            <script src="{{ STATIC_URL }}js/dxChartRequestFrequency.js"></script>
+            <script>result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');</script>
             <!-- End of JavaScript for requested procedure name pie chart -->
         {% endif %}
 
@@ -899,7 +900,7 @@
                 var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
             </script>
 
-            <script src="{{ STATIC_URL }}js/dxChartStudyFrequency.js"></script>
+            <script>result = chartFrequency('piechartStudyDIV', 'Study description frequency');</script>
             <!-- End of JavaScript for study description pie chart -->
         {% endif %}
 

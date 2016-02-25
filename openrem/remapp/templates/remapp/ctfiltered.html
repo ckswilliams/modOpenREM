@@ -184,6 +184,7 @@
         <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -485,7 +486,7 @@
                 var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
             </script>
 
-            <script src="{{ STATIC_URL }}js/ctChartAcquisitionFrequency.js"></script>
+            <script>result = chartFrequency('piechartAcquisitionDIV', 'Acquisition protocol frequency');</script>
             <!-- End of JavaScript for acquisition pie chart -->
         {% endif %}
 
@@ -779,7 +780,7 @@
         {% endif %}
 
         {% if request.user.userprofile.plotCTStudyFreq %}
-            <script src="{{ STATIC_URL }}js/ctChartStudyFrequency.js"></script>
+            <script>result = chartFrequency('piechartStudyDIV', 'Study description frequency');</script>
             <!-- End of JavaScript for study pie chart -->
         {% endif %}
 
@@ -836,7 +837,7 @@
         {% endif %}
 
         {% if request.user.userprofile.plotCTRequestFreq %}
-            <script src="{{ STATIC_URL }}js/ctChartRequestFrequency.js"></script>
+            <script>result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');</script>
             <!-- End of JavaScript for request pie chart -->
         {% endif %}
 
