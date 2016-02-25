@@ -107,6 +107,14 @@ or comment out that line (add a ``#`` character to the start of the line).
 
 * Radiation Dose Structured Reports
 * ``openrem-rdsr.sh``
+* Use which ever editor you are comfortable with - a good choice might be nano. For example:
+
+.. sourcecode:: console
+
+    sudo nano /etc/conquest-dicom-server/openrem-rdsr.sh
+
+If you are pasting from the clipboard into nano from within Linux, use ``Shift-Ctrl-v``. It is different if you are using
+PuTTY from Windows. To save and exit from nano, use ``Ctrl-o`` ``y`` followed by ``Ctrl-x``.
 
 .. sourcecode:: bash
 
@@ -115,13 +123,25 @@ or comment out that line (add a ``#`` character to the start of the line).
     # usage: ./openrem-rdsr.sh rdsrfilepath
     #
 
+    # Get the name of the RDSR as variable 'rdsr'
     rdsr="$1"
 
+    # Setup the python virtual environment -  change to suit your path or remove if not using virtualenv
     . /var/dose/venv/bin/activate
 
+    # Import RDSR into OpenREM
     openrem_rdsr.py ${rdsr}
 
+    # Delete RDSR file - remove or comment (#) this line if you want the file to remain
     rm ${rdsr}
+
+Now set the script to be executable:
+
+.. sourcecode:: console
+
+    sudo chmod +x /etc/conquest-dicom-server/openrem-rdsr.sh
+
+And repeat for the other modality scripts below:
 
 * Mammography images
 * ``openrem-mg.sh``
