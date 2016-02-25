@@ -1,5 +1,5 @@
 function chartFrequency(render_div, series_name) {
-    var chartAcqFrequency = new Highcharts.Chart({
+    var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },

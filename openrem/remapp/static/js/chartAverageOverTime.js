@@ -1,5 +1,5 @@
 function chartAverageOverTime(render_div, value_label, value_units, avg_label) {
-    var chartStudyMeanDLPOverTime = new Highcharts.Chart({
+    var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
