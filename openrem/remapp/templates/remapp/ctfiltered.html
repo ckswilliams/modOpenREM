@@ -185,6 +185,7 @@
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
         <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -844,7 +845,7 @@
 
         {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
             <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-            <script src="{{ STATIC_URL }}js/ctChartStudyWorkload.js"></script>
+            <script>result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');</script>
             <!-- End of JavaScript for studies per week day pie chart -->
         {% endif %}
 

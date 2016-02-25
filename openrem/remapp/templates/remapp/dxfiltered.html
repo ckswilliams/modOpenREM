@@ -683,6 +683,7 @@
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
         <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -981,7 +982,7 @@
 
         {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
             <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-            <script src="{{ STATIC_URL }}js/dxChartStudyWorkload.js"></script>
+            <script>result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');</script>
             <!-- End of JavaScript for studies per week day pie chart -->
         {% endif %}
 
