@@ -180,6 +180,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(max_length=64, null=True, blank=True)),
                 ('run', models.BooleanField(default=False)),
                 ('keep_alive', models.BooleanField(default=False, verbose_name=b"Should this server be kept auto-started and kept alive (using celery beat)")),
+                ('controlled', models.BooleanField(default=False, verbose_name=b"Is this server controlled by OpenREM")),
             ],
         ),
         migrations.CreateModel(
