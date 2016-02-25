@@ -681,6 +681,7 @@
         <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
         <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -987,9 +988,13 @@
         {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
             <!-- JavaScript for mean kvp per acquisition protocol per time period -->
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script src="{{ STATIC_URL }}js/dxChartMeankVpperAcquisitionOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Mean');
+                </script>
             {% else %}
-                <script src="{{ STATIC_URL }}js/dxChartMediankVpperAcquisitionOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Median');
+                </script>
             {% endif %}
             <!-- End of JavaScript for mean kVp per acquisition protocol per time period -->
         {% endif %}
@@ -998,9 +1003,13 @@
         {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
             <!-- JavaScript for mean mAs per acquisition protocol per time period -->
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script src="{{ STATIC_URL }}js/dxChartMeanmAsperAcquisitionOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Mean');
+                </script>
             {% else %}
-                <script src="{{ STATIC_URL }}js/dxChartMedianmAsperAcquisitionOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Median');
+                </script>
             {% endif %}
             <!-- End of JavaScript for mean mAs per acquisition protocol per time period -->
         {% endif %}
@@ -1009,9 +1018,13 @@
         {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
             <!-- JavaScript for mean DAP per acquisition protocol per time period -->
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script src="{{ STATIC_URL }}js/dxChartMeanDAPperAcquisitionOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('AcquisitionMeanDAPOverTimeDIV', 'DAP', 'cGy.cm<sup>2</sup>', 'Mean');
+                </script>
             {% else %}
-                <script src="{{ STATIC_URL }}js/dxChartMedianDAPperAcquisitionOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('AcquisitionMeanDAPOverTimeDIV', 'DAP', 'cGy.cm<sup>2</sup>', 'Median');
+                </script>
             {% endif %}
             <!-- End of JavaScript for mean DAP per acquisition protocol per time period -->
         {% endif %}

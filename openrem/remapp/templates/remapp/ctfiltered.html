@@ -183,6 +183,7 @@
         <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
         <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
         <script>
             var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
@@ -854,9 +855,13 @@
             </script>
 
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script src="{{ STATIC_URL }}js/ctChartMeanDLPperStudyOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Mean');
+                </script>
             {% else %}
-                <script src="{{ STATIC_URL }}js/ctChartMedianDLPperStudyOverTime.js"></script>
+                <script>
+                    result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Median');
+                </script>
             {% endif %}
             <!-- End of JavaScript for mean DLP per study description -->
         {% endif %}
