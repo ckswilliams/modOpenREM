@@ -126,7 +126,8 @@ PuTTY from Windows. To save and exit from nano, use ``Ctrl-o`` ``y`` followed by
     # Get the name of the RDSR as variable 'rdsr'
     rdsr="$1"
 
-    # Setup the python virtual environment -  change to suit your path or remove if not using virtualenv
+    # Setup the python virtual environment -  change to suit your path or remove if
+    # you are not using virtualenv
     . /var/dose/venv/bin/activate
 
     # Import RDSR into OpenREM
