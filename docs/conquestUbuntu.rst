@@ -82,25 +82,20 @@ Click to ``Submit``, and you will return to the summary page which should inform
 Configure Conquest to work with OpenREM
 ***************************************
 
-The next stage is to configure Conquest to store the incoming object and ask OpenREM to process them. How
-you do this depends on whether you are using a virtualenv for your OpenREM install or not.
-
-With virtualenv
-===============
+The next stage is to configure Conquest to store the incoming object and ask OpenREM to process them.
 
 Bash scripts
-------------
+============
 
 Create a bash script for each of RDSR, mammo, DX and Philips CT dose images, as required. They should have
 content something like the following. The examples that follow assume the files have been saved in the folder
 ``/etc/conquest-dicom-server`` but you can save them where you like and change the ``dicom.ini`` commands accordingly.
 
+These scripts have a line in them to activate the virtual environment; this is done in the line
+``. /var/dose/venv/bin/activate`` - you should change the path to your virtualenv or remove it if you have installed
+without using a virtualenv.
 
-The key step in these scripts is to activate the virtual environment.
-This is done on the line with ``. /var/dose/venv/bin/activate`` - you should change the path to your virtualenv
-appropriately.
-
-Eash script has a line to delete the object after it has been imported - OpenREM can also do this by
+Eash script also has a line to delete the object after it has been imported - OpenREM can also do this by
 configuration, but the file will be written by the ``_conquest`` user, and OpenREM will not be running as that
 user. Therefore it is easier to have conquest delete the file. If you don't want them to be deleted, remove
 or comment out that line (add a ``#`` character to the start of the line).
@@ -199,7 +194,7 @@ And repeat for the other modality scripts below:
     rm ${philipsim}
 
 Conquest configuration
-----------------------
+======================
 
 At the end of the ``/etc/conquest-dicom-server/dicom.ini`` file, add the following lines. You will need
 to tailor them to save the file to an appropriate place. The ``_conquest`` user will need to be able to
@@ -212,6 +207,9 @@ follows:
 
     sudo mkdir /var/lib/conquest-dicom-server/incoming
     sudo chown _conquest:_conquest /var/lib/conquest-dicom-server/incoming
+
+Each instruction in the ``dicom.ini`` file below has a ``destroy`` instruction to delete Conquest's copy of the file
+and to remove it from it's database. This isn't the version we've saved in ``incoming`` to process.
 
 .. sourcecode:: console
 
