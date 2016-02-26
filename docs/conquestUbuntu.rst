@@ -232,6 +232,10 @@ and to remove it from it's database. This isn't the version we've saved in ``inc
 
 .. sourcecode:: console
 
+    sudo nano /etc/conquest-dicom-server/dicom.ini
+
+.. sourcecode:: console
+
     # RDSR
     ImportConverter0  = ifequal "%V0008,0016","1.2.840.10008.5.1.4.1.1.88.67"; {save to /var/lib/conquest-dicom-server/incoming/%o.dcm; system /etc/conquest-dicom-server/openrem-rdsr.sh /var/lib/conquest-dicom-server/incoming/%o.dcm; destroy}
     # Import arguments for GE CT - uses Enhanced SR instead of Radiation Dose SR
