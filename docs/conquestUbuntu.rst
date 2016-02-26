@@ -9,15 +9,12 @@ Installation
 Ubuntu has reasonably up to date versions of the Conquest DICOM server `in its repositories,`_ so this makes
 installation very easy.
 
-There are options to install with different database options - for OpenREM we're not really going to use the
+There are options to install with different databases - for OpenREM we're not really going to use the
 database so the easiest option is to use SQLite:
 
 .. sourcecode:: console
 
     sudo apt-get install conquest-sqlite
-
-The install process will create a folder ``/etc/conquest-dicom-server``, then create the database file and
-settings files there.
 
 
 *******************
@@ -43,7 +40,11 @@ It isn't critical where it goes, but I tend to add it where it belongs between
 ``KeyObjectSelectionDocument`` and ``PETStorage``. I also add in the spaces to make it line up, but
 again this is just for aesthetic reasons!
 
-Save the file and exit - if you used nano the commands are ``Ctrl-o`` and ``Ctrl-x``.
+If you are pasting from the clipboard into nano from within Linux, use ``Shift-Ctrl-v``. If you are using
+PuTTY in Windows to interact with Ubuntu, a right click on the mouse or ``Shift-Insert`` should paste the text into the
+terminal.
+
+To save and exit from nano, use ``Ctrl-o`` (out) ``y`` (yes) followed by ``Ctrl-x`` (exit).
 
 Configure the Store SCP
 =======================
@@ -108,9 +109,6 @@ or comment out that line (add a ``#`` character to the start of the line).
 
     sudo nano /etc/conquest-dicom-server/openrem-rdsr.sh
 
-If you are pasting from the clipboard into nano from within Linux, use ``Shift-Ctrl-v``. It is different if you are using
-PuTTY from Windows. To save and exit from nano, use ``Ctrl-o`` ``y`` followed by ``Ctrl-x``.
-
 .. sourcecode:: bash
 
     #!/bin/sh
@@ -131,7 +129,7 @@ PuTTY from Windows. To save and exit from nano, use ``Ctrl-o`` ``y`` followed by
     # Delete RDSR file - remove or comment (#) this line if you want the file to remain
     rm ${rdsr}
 
-Now set the script to be executable:
+Save and exit, then set the script to be executable:
 
 .. sourcecode:: console
 
