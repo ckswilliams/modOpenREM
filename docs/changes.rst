@@ -7,9 +7,11 @@ OpenREM version history
 
 * `#365`_  Tube filtration is now displayed in the RF detail view
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
+* `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
+* `#351`_  Charts: simplified chart JavaScript and Python code
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
 * `#343`_  Charts: user can now specify number of histogram bins in the range of 2 to 40
