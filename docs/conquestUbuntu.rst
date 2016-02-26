@@ -44,7 +44,7 @@ If you are pasting from the clipboard into nano from within Linux, use ``Shift-C
 PuTTY in Windows to interact with Ubuntu, a right click on the mouse or ``Shift-Insert`` should paste the text into the
 terminal.
 
-To save and exit from nano, use ``Ctrl-o`` (out) ``y`` (yes) followed by ``Ctrl-x`` (exit).
+To save and exit from nano, use ``Ctrl-o`` (out), press return to confirm the filename and then ``Ctrl-x`` (exit).
 
 Configure the Store SCP
 =======================
