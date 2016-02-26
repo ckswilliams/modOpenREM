@@ -9,7 +9,7 @@ Installation
 Ubuntu has reasonably up to date versions of the Conquest DICOM server `in its repositories,`_ so this makes
 installation very easy.
 
-There are options to install with different databases - for OpenREM we're not really going to use the
+There are options to install with different databases – for OpenREM we're not really going to use the
 database so the easiest option is to use SQLite:
 
 .. sourcecode:: console
@@ -55,8 +55,8 @@ Edit the ``dicom.ini`` file in the ``/etc/conquest-dicom-server`` folder, for ex
 
     sudo nano /etc/conquest-dicom-server/dicom.ini
 
-Modify the following lines as required. The server name field, with the Conquest default of ``CONQUESTSRV1`` is the AE
-Title, so should be 16 characters or less and consist of letters and numbers with no spaces. It is case
+Modify the following lines as required. The server name field – with the Conquest default of ``CONQUESTSRV1`` – is the
+AE Title, so should be 16 characters or less and consist of letters and numbers with no spaces. It is case
 insensitive. The ``TCPPort`` is normally either 104, the standard DICOM port, or any number greater than
 1023.
 
@@ -93,17 +93,17 @@ content something like the following. The examples that follow assume the files 
 ``/etc/conquest-dicom-server`` but you can save them where you like and change the ``dicom.ini`` commands accordingly.
 
 These scripts have a line in them to activate the virtual environment; this is done in the line
-``. /var/dose/venv/bin/activate`` - you should change the path to your virtualenv or remove it if you have installed
+``. /var/dose/venv/bin/activate`` – you should change the path to your virtualenv or remove it if you have installed
 without using a virtualenv.
 
-Eash script also has a line to delete the object after it has been imported - OpenREM can also do this by
+Eash script also has a line to delete the object after it has been imported – OpenREM can also do this by
 configuration, but the file will be written by the ``_conquest`` user, and OpenREM will not be running as that
 user. Therefore it is easier to have conquest delete the file. If you don't want them to be deleted, remove
 or comment out that line (add a ``#`` character to the start of the line).
 
 * Radiation Dose Structured Reports
 * ``openrem-rdsr.sh``
-* Use which ever editor you are comfortable with - a good choice might be nano. For example:
+* Use which ever editor you are comfortable with – a good choice might be nano. For example:
 
 .. sourcecode:: console
 
@@ -119,7 +119,7 @@ or comment out that line (add a ``#`` character to the start of the line).
     # Get the name of the RDSR as variable 'rdsr'
     rdsr="$1"
 
-    # Setup the python virtual environment -  change to suit your path or remove if
+    # Setup the python virtual environment - change to suit your path or remove if
     # you are not using virtualenv
     . /var/dose/venv/bin/activate
 
