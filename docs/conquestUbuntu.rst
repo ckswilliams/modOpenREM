@@ -102,7 +102,6 @@ user. Therefore it is easier to have conquest delete the file. If you don't want
 or comment out that line (add a ``#`` character to the start of the line).
 
 * Radiation Dose Structured Reports
-* ``openrem-rdsr.sh``
 * Use which ever editor you are comfortable with – a good choice might be nano. For example:
 
 .. sourcecode:: console
@@ -138,7 +137,10 @@ Save and exit, then set the script to be executable:
 And repeat for the other modality scripts below:
 
 * Mammography images
-* ``openrem-mg.sh``
+
+.. sourcecode:: console
+
+    sudo nano /etc/conquest-dicom-server/openrem-mg.sh
 
 .. sourcecode:: bash
 
@@ -155,8 +157,15 @@ And repeat for the other modality scripts below:
 
     rm ${mamim}
 
+.. sourcecode:: console
+
+    sudo chmod +x /etc/conquest-dicom-server/openrem-mg.sh
+
 * Radiography images (DX, and CR that might be DX)
-* ``openrem-dx.sh``
+
+.. sourcecode:: console
+
+    sudo nano /etc/conquest-dicom-server/openrem-dx.sh
 
 .. sourcecode:: bash
 
@@ -173,8 +182,15 @@ And repeat for the other modality scripts below:
 
     rm ${dxim}
 
+.. sourcecode:: console
+
+    sudo chmod +x /etc/conquest-dicom-server/openrem-dx.sh
+
 * Philips CT dose info images for Philips CT systems with no RDSR
-* ``openrem-ctphilips.sh``
+
+.. sourcecode:: console
+
+    sudo nano /etc/conquest-dicom-server/openrem-ctphilips.sh
 
 .. sourcecode:: bash
 
@@ -190,6 +206,11 @@ And repeat for the other modality scripts below:
     openrem_ctphilips.py ${philipsim}
 
     rm ${philipsim}
+
+.. sourcecode:: console
+
+    sudo chmod +x /etc/conquest-dicom-server/openrem-ctphilips.sh
+
 
 Conquest configuration
 ======================
