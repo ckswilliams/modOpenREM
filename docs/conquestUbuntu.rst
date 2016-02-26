@@ -68,6 +68,13 @@ insensitive. The ``TCPPort`` is normally either 104, the standard DICOM port, or
 
 Again, save and exit.
 
+If you've changed the AE Title and/or port, restart conquest:
+
+.. sourcecode:: console
+
+    sudo /etc/init.d/dgate restart
+
+
 ***************************
 Testing basic configuration
 ***************************
@@ -258,6 +265,11 @@ and to remove it from it's database. This isn't the version we've saved in ``inc
     # Other objects
     ImportConverter6  = destroy
 
+Finally, restart conquest to make use of the new settings:
+
+.. sourcecode:: console
+
+    sudo /etc/init.d/dgate restart
 
 
 .. _`in its repositories,`: http://packages.ubuntu.com/search?keywords=conquest
