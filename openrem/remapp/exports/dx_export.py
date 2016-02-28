@@ -126,8 +126,15 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'DAP total (cGy.cm^2)',
     ]
 
-    from django.db.models import Max
+    from django.db.models import Max, Count
     max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
+    max_filters = e.annotate(num_filters=Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__xrayfilters__xray_filter_thickness_minimum')).aggregate(Max('num_filters'))
+
+    filter_header = []
+    for h in xrange(max_filters.values()[0]):
+        filter_header += ['E' + str(h+1) + ' Filter',
+                          'E' + str(h+1) + ' Thickness']
+
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
@@ -141,6 +148,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
             ]
+        headers += filter_header
     writer.writerow(headers)
 
     tsk.progress = 'CSV header row written.'
