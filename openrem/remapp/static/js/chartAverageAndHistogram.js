@@ -9,6 +9,9 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
         exporting: {
             fallbackToExportServer: false
         },
+        lang: {
+            drillUpText: '◁ Back to ' + default_title
+        },
         chart: {
             type: 'column',
             renderTo: render_div,
