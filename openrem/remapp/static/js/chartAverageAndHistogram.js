@@ -10,7 +10,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             fallbackToExportServer: false
         },
         lang: {
-            drillUpText: '◁ Back to ' + default_title
+            drillUpText: '◁ Back to ' + default_title.charAt(0).toLowerCase() + default_title.slice(1)
         },
         chart: {
             type: 'column',
