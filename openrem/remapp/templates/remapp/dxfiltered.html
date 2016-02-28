@@ -20,7 +20,7 @@
             {% if admin.exportgroup %}
                 <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
                 <p>
-                    <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
+                    <a href="/openrem/exportdxcsv1/0/0/?{{ request.GET.urlencode }}"
                        class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
                     {% if admin.pidgroup %}
                         <a href="/openrem/exportdxcsv1/1/0/?{{ request.GET.urlencode }}"
