@@ -9,6 +9,7 @@ OpenREM version history
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
 * `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
+* `#357`_  Charts: button to return from histogram now displays the name of the main chart
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
 * `#351`_  Charts: simplified chart JavaScript and Python code
