@@ -126,14 +126,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'DAP total (cGy.cm^2)',
     ]
 
-    from django.db.models import Max, Count
+    from django.db.models import Max
     max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
-    max_filters = e.annotate(num_filters=Count('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__xrayfilters__xray_filter_thickness_minimum')).aggregate(Max('num_filters'))
-
-    filter_header = []
-    for h in xrange(max_filters.values()[0]):
-        filter_header += ['E' + str(h+1) + ' Filter',
-                          'E' + str(h+1) + ' Thickness']
 
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         headers += [
@@ -144,11 +138,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' mAs',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
+            'E' + str(h+1) + ' Filters',
+            'E' + str(h+1) + ' Filter thicknesses (mm)',
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
             ]
-        headers += filter_header
     writer.writerow(headers)
 
     tsk.progress = 'CSV header row written.'
@@ -256,6 +251,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 average_xray_tube_current = None
                 exposure_time = None
                 mas = None
+                filters = None
+                filter_thicknesses = None
             else:
                 exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
                 average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
@@ -278,6 +275,26 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     else:
                         mas = None
 
+                try:
+                    s.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+                except ObjectDoesNotExist:
+                    filters = None
+                    filter_thicknesses = None
+                else:
+                    filters = ''
+                    filter_thicknesses = ''
+                    for index, current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.get():
+                        if current_filter.get().xray_filter_material_code_value == 'C-120F9':
+                            filters += 'Al'
+                        elif current_filter.get().xray_filter_material_code_value == 'C-127F9':
+                            filters += 'Cu'
+
+                        filter_thicknesses += current_filter.get().xray_filter_thickness_maximum
+
+                        if index != len(s.irradeventxraysourcedata_set.get().xrayfilters_set.get()):
+                            filters += ' | '
+                            filter_thicknesses += ' | '
+
             try:
                 s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:
@@ -297,6 +314,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 mas,
                 average_xray_tube_current,
                 exposure_time,
+                filters,
+                filter_thicknesses,
                 exposure_index,
                 relative_xray_exposure,
                 cgycm2,
