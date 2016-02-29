@@ -284,11 +284,25 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if current_filter.xray_filter_material == 'C-120F9':
+                        if str(current_filter.xray_filter_material) == 'Aluminum or Aluminum compound':
                             filters += 'Al'
-                        elif current_filter.xray_filter_material == 'C-127F9':
+                        elif str(current_filter.xray_filter_material) == 'Copper or Copper compound':
                             filters += 'Cu'
-                        filters += str(current_filter.xray_filter_material) + ' | '
+                        elif str(current_filter.xray_filter_material) == 'Tantalum or Tantalum compound':
+                            filters += 'Ta'
+                        elif str(current_filter.xray_filter_material) == 'Molybdenum or Molybdenum compound':
+                            filters += 'Mo'
+                        elif str(current_filter.xray_filter_material) == 'Rhodium or Rhodium compound':
+                            filters += 'Rh'
+                        elif str(current_filter.xray_filter_material) == 'Silver or Silver compound':
+                            filters += 'Ag'
+                        elif str(current_filter.xray_filter_material) == 'Niobium or Niobium compound':
+                            filters += 'Nb'
+                        elif str(current_filter.xray_filter_material) == 'Europium or Europium compound':
+                            filters += 'Eu'
+                        elif str(current_filter.xray_filter_material) == 'Lead or Lead compound':
+                            filters += 'Pb'
+                        filters += ' | '
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
@@ -693,11 +707,25 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if current_filter.xray_filter_material == 'C-120F9':
+                        if str(current_filter.xray_filter_material) == 'Aluminum or Aluminum compound':
                             filters += 'Al'
-                        elif current_filter.xray_filter_material == 'C-127F9':
+                        elif str(current_filter.xray_filter_material) == 'Copper or Copper compound':
                             filters += 'Cu'
-                        filters += str(current_filter.xray_filter_material) + ' | '
+                        elif str(current_filter.xray_filter_material) == 'Tantalum or Tantalum compound':
+                            filters += 'Ta'
+                        elif str(current_filter.xray_filter_material) == 'Molybdenum or Molybdenum compound':
+                            filters += 'Mo'
+                        elif str(current_filter.xray_filter_material) == 'Rhodium or Rhodium compound':
+                            filters += 'Rh'
+                        elif str(current_filter.xray_filter_material) == 'Silver or Silver compound':
+                            filters += 'Ag'
+                        elif str(current_filter.xray_filter_material) == 'Niobium or Niobium compound':
+                            filters += 'Nb'
+                        elif str(current_filter.xray_filter_material) == 'Europium or Europium compound':
+                            filters += 'Eu'
+                        elif str(current_filter.xray_filter_material) == 'Lead or Lead compound':
+                            filters += 'Pb'
+                        filters += ' | '
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
@@ -904,11 +932,25 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if current_filter.xray_filter_material == 'C-120F9':
+                        if str(current_filter.xray_filter_material) == 'Aluminum or Aluminum compound':
                             filters += 'Al'
-                        elif current_filter.xray_filter_material == 'C-127F9':
+                        elif str(current_filter.xray_filter_material) == 'Copper or Copper compound':
                             filters += 'Cu'
-                        filters += str(current_filter.xray_filter_material) + ' | '
+                        elif str(current_filter.xray_filter_material) == 'Tantalum or Tantalum compound':
+                            filters += 'Ta'
+                        elif str(current_filter.xray_filter_material) == 'Molybdenum or Molybdenum compound':
+                            filters += 'Mo'
+                        elif str(current_filter.xray_filter_material) == 'Rhodium or Rhodium compound':
+                            filters += 'Rh'
+                        elif str(current_filter.xray_filter_material) == 'Silver or Silver compound':
+                            filters += 'Ag'
+                        elif str(current_filter.xray_filter_material) == 'Niobium or Niobium compound':
+                            filters += 'Nb'
+                        elif str(current_filter.xray_filter_material) == 'Europium or Europium compound':
+                            filters += 'Eu'
+                        elif str(current_filter.xray_filter_material) == 'Lead or Lead compound':
+                            filters += 'Pb'
+                        filters += ' | '
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
