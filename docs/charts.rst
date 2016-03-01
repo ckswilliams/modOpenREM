@@ -7,8 +7,11 @@ data. The user can configure which plots are shown using the ``Chart options``
 on the CT and radiographic pages.
 
 *New in 0.7.0*
-    * Chart average values can be either mean or median. Bar charts can plot
-      both mean and median values together.
+    * Chart plotting options can be configured by choosing ``Chart options``
+      from the ``User options`` menu at the top of the OpenREM homepage.
+
+    * Chart average values can be set to either mean or median. Bar charts can
+      be configured to plot both mean and median values as seperate series.
 
     * Bar charts can be plotted with a series per x-ray system. This option can
       be switched on or off via the ``Chart options``.
@@ -20,18 +23,13 @@ on the CT and radiographic pages.
       ``Toggle Normalised histograms`` button that is visible when viewing a
       histogram plot.
 
-    * The data in many of the charts can be sorted interactively by the user by
-      clicking on one of the sorting options below the individual chart. The
-      user can set the default sorting type and direction by choosing the
-      ``Chart options`` item from the ``User options`` menu on the OpenREM
-      homepage.
+    * The data in the bar charts can be sorted interactively by clicking on the
+      sorting options below the individual chart. The default sorting type and
+      direction can be set by choosing the ``Chart options`` item from the
+      ``User options`` menu on the OpenREM homepage.
 
     * Individual charts can be displayed full-screen by clicking on the
       ``Toggle fullscreen`` button that is positioned below each chart.
-
-    * Chart plotting options can be configured by choosing the
-      ``Chart options`` item on the ``User options`` menu at the top of the
-      OpenREM homepage.
 
     * The chart plotting status is displayed on the OpenREM homepage.
 
@@ -73,8 +71,10 @@ The user can switch off all chart plotting by clicking on the
 at the top of any OpenREM page. Clicking on this link takes the user back to
 the home page.
 
-The user can choose whether the data displayed on the charts is the mean, the
-median or both by using the drop-down ``Average to use`` selection.
+The user can choose whether the data displayed on the charts is the mean, 
+median or both by using the drop-down ``Average to use`` selection. Only the
+bar charts can display both mean and median together. Other charts display just
+median data when this option is selected.
 
 The charts can be sorted by either bar height, frequency or alphabetically by
 category. The default sorting direction can be set to ascending or descending
