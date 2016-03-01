@@ -26,6 +26,9 @@ on the CT and radiographic pages.
 
     * Colours used for plotting have been updated.
 
+    * The data in many of the charts can now be sorted interactively
+      by the user by clicking on one of the sorting options below the individual chart:
+
 .. figure:: img/ChartCTSortingOptions.png
    :width: 185px
    :align: right
@@ -33,9 +36,6 @@ on the CT and radiographic pages.
    :alt: OpenREM CT chart sorting options screenshot
 
    CT chart sorting options
-
-    * The data in many of the charts can now be sorted interactively
-      by the user by clicking on one of the sorting options below the individual chart:
 
       The user can set the default sorting type and direction by choosing the 
       ``Chart options`` item from the ``User options`` menu on the OpenREM homepage.
