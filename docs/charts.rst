@@ -102,17 +102,18 @@ of studies that contain the acquisitions represented by that histogram bar:
 Bar chart of average DLP for each acquisition protocol (one series per system)
 ==============================================================================
 
+Ticking the `Plot a series per system` box in the ``Chart options`` will result
+in plots that have a data series per x-ray system for all charts that plot
+dose, mAs or kVp against some category.
+
 .. image:: img/ChartCTMeanDLPperSystem.png
    :width: 930px
    :align: center
    :height: 592px
    :alt: OpenREM chart of mean DLP (one system per series) screenshot
 
-Ticking the `Plot a series per system` box in the ``Chart options`` will result
-in plots with one series per x-ray system for some charts.
-
-Clicking on an x-axis label will take you to a plot with a histogram per x-ray
-system:
+Clicking on an x-axis label of one of a plot with a series per x-ray system
+will take you to a plot with a histogram per x-ray system:
 
 .. image:: img/ChartCTMeanDLPhistogramPerSystem.png
    :width: 930px
@@ -121,14 +122,26 @@ system:
    :alt: OpenREM histogram of acquisition DLP (one series per system) screenshot
 
 Clicking on the `Toggle normalisation` button when viewing a histogram will
-normalise all of the series. This can sometimes make it easier to compare one
-distribution with another:
+normalise all of the series to a maximum value of 1.0. This can sometimes make
+it easier to compare one distribution with another:
 
 .. image:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
    :width: 926px
    :align: center
    :height: 515px
    :alt: OpenREM normalised histogram of acquisition DLP (one series per system) screenshot
+
+===================================================================
+Bar chart of average CTDI\ :sub:`vol` for each acquisition protocol
+===================================================================
+
+The tooltip of each bar shows the user the name of the protocol, the number of
+acquisitions of that type and also the mean or median CTDI\ :sub:`vol`.
+
+Clicking on an individual bar takes the user to a histogram of CTDI\ :sub:`vol`
+for that protocol. The tooltip for each histogram bar shows the number of
+acquisitions. The histogram tooltip also includes a link that will take the
+user to the list of studies that contain the acquisitions represented by that histogram bar:
 
 =======================================================
 Pie chart of the frequency of each acquisition protocol
@@ -144,7 +157,7 @@ that contain the acquisitions in that segment.
    :alt: OpenREM chart of acquisition frequency screenshot
 
 =========================================
-Bar chart of mean DLP for each study name
+Bar chart of average DLP for each study name
 =========================================
 
 Clicking on a bar takes the user to a histogram of DLP for that study name.
@@ -165,7 +178,7 @@ Clicking on a segment of the pie chart takes the user to the list of studies
 that correspond to the data in that segment.
 
 ==================================================
-Bar chart of mean DLP for each requested procedure
+Bar chart of average DLP for each requested procedure
 ==================================================
 
 Clicking on a bar takes the user to a histogram of DLP for that procedure.
@@ -199,7 +212,7 @@ the studies for that weekday broken down per hour:
    :alt: OpenREM pie chart of study workload per hour in a day screenshot
 
 ============================================================   
-Line chart showing the mean DLP of each study name over time
+Line chart showing the average DLP of each study name over time
 ============================================================
 
 The time period per data point is chosen by the user in the ``Chart options``.
@@ -225,14 +238,13 @@ median or both by using the drop-down `Average to use` selection.
 Chart types - radiography
 *************************
 
-===================================================
-Bar chart of mean DAP for each acquisition protocol
-===================================================
+======================================================
+Bar chart of average DAP for each acquisition protocol
+======================================================
 
-Clicking on a bar
-takes the user to a histogram of DAP for that protocol. Clicking on the tooltip
-link of a histogram bar takes the user to the list of studies that contain the
-acquisitions in the histogram bar.
+Clicking on a bar takes the user to a histogram of DAP for that protocol.
+Clicking on the tooltip link of a histogram bar takes the user to the list of
+studies that contain the acquisitions in the histogram bar.
 
 =======================================================
 Pie chart of the frequency of each acquisition protocol
@@ -242,7 +254,37 @@ Clicking on a segment of the pie chart takes the user to the list of studies
 that contain the acquisitions in that segment.
 
 ===================================================
-Bar chart of mean kVp for each acquisition protocol
+Bar chart of average DAP for each study description
+===================================================
+
+Clicking on a bar takes the user to a histogram of DAP for that study
+description. Clicking on the tooltip link of a histogram bar takes the user to
+the list of studies of that description in the histogram bar.
+
+====================================================
+Pie chart of the frequency of each study description
+====================================================
+
+Clicking on a segment of the pie chart takes the user to the list of studies
+that contain the study description in that segment.
+
+=====================================================
+Bar chart of average DAP for each requested procedure
+=====================================================
+
+Clicking on a bar takes the user to a histogram of DAP for that requested
+procedure. Clicking on the tooltip link of a histogram bar takes the user to
+the list of studies of that request type in the histogram bar.
+
+======================================================
+Pie chart of the frequency of each requested procedure
+======================================================
+
+Clicking on a segment of the pie chart takes the user to the list of studies
+that contain the requested procedure in that segment.
+
+===================================================
+Bar chart of average kVp for each acquisition protocol
 ===================================================
 
 Clicking on a bar takes the user to a histogram of kVp for that protocol.
@@ -250,7 +292,7 @@ Clicking on the tooltip link of a histogram bar takes the user to the list of
 studies that contain the acquisitions in the histogram bar.
 
 ===================================================
-Bar chart of mean mAs for each acquisition protocol
+Bar chart of average mAs for each acquisition protocol
 ===================================================
 
 Clicking on a bar takes the user to a histogram of mAs for that protocol.
@@ -266,6 +308,26 @@ the studies for that weekday broken down per hour.
 
 ================================================================
 Line chart of average DAP of each acquisition protocol over time
+================================================================
+
+The time period per data point can be chosen by the user in
+the ``Chart options``. Note that selecting a short time period may result
+in long calculation times. The user can zoom in to the plot by clicking
+and dragging the mouse to select a date range. The user can also click on
+items in the legend to show or hide individual lines.
+
+================================================================
+Line chart of average mAs of each acquisition protocol over time
+================================================================
+
+The time period per data point can be chosen by the user in
+the ``Chart options``. Note that selecting a short time period may result
+in long calculation times. The user can zoom in to the plot by clicking
+and dragging the mouse to select a date range. The user can also click on
+items in the legend to show or hide individual lines.
+
+================================================================
+Line chart of average kVp of each acquisition protocol over time
 ================================================================
 
 The time period per data point can be chosen by the user in
