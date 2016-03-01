@@ -30,14 +30,6 @@ on the CT and radiographic pages.
       The user can set the default sorting type and direction by choosing the 
       ``Chart options`` item from the ``User options`` menu on the OpenREM homepage.
 
-      .. figure:: img/ChartCTSortingOptions.png
-         :width: 185px
-         :align: right
-         :height: 95px
-         :alt: OpenREM CT chart sorting options screenshot
-
-         CT chart sorting options
-
 The charts are automatically updated to reflect any filters that the user
 applies to the data.
 
@@ -45,7 +37,7 @@ applies to the data.
 Chart options
 *************
 
-*New in 0.7.0*  Chart options can now be configured by choosing the
+*New in 0.7.0*    Chart options can now be configured by choosing the
 ``Chart options`` item from the ``User options`` menu on the OpenREM homepage:
 
 .. image:: img/ChartOptions.png
