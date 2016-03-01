@@ -9,7 +9,7 @@ on the CT and radiographic pages.
 *New in 0.7.0*
 
     * Some charts can now be plotted with a series per x-ray system.
-	  This option can be switched on or off via the ``Chart options``.
+      This option can be switched on or off via the ``Chart options``.
 
     * Chart plotting options can also be configured by choosing the
       ``Chart options`` item on the ``User options`` menu at the top of the OpenREM
