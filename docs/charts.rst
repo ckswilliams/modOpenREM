@@ -7,7 +7,6 @@ data. The user can configure which plots are shown using the ``Chart options``
 on the CT and radiographic pages.
 
 *New in 0.7.0*
-
     * Some charts can now be plotted with a series per x-ray system.
       This option can be switched on or off via the ``Chart options``.
 
@@ -27,18 +26,17 @@ on the CT and radiographic pages.
     * Colours used for plotting have been updated.
 
     * The data in many of the charts can now be sorted interactively
-      by the user by clicking on one of the sorting options below the individual chart:
-
-.. figure:: img/ChartCTSortingOptions.png
-   :width: 185px
-   :align: right
-   :height: 95px
-   :alt: OpenREM CT chart sorting options screenshot
-
-   CT chart sorting options
-
+      by the user by clicking on one of the sorting options below the individual chart.
       The user can set the default sorting type and direction by choosing the 
       ``Chart options`` item from the ``User options`` menu on the OpenREM homepage.
+
+      .. figure:: img/ChartCTSortingOptions.png
+         :width: 185px
+         :align: right
+         :height: 95px
+         :alt: OpenREM CT chart sorting options screenshot
+
+         CT chart sorting options
 
 The charts are automatically updated to reflect any filters that the user
 applies to the data.
