@@ -37,8 +37,8 @@ applies to the data.
 Chart options
 *************
 
-*New in 0.7.0*    Chart options can now be configured by choosing the
-``Chart options`` item from the ``User options`` menu on the OpenREM homepage:
+Chart options can now be configured by choosing the ``Chart options`` item from
+the ``User options`` menu on the OpenREM homepage:
 
 .. image:: img/ChartOptions.png
    :width: 352px
@@ -75,61 +75,63 @@ Chart types
 
 The available charts for CT data are as follows:
 
-    * Bar chart of mean DLP for each acquisition protocol (all systems combined):
+==========================================================================
+Bar chart of mean DLP for each acquisition protocol (all systems combined)
+==========================================================================
 
-      .. image:: img/ChartCTMeanDLP.png
-         :width: 925px
-         :align: center
-         :height: 587px
-         :alt: OpenREM chart of mean DLP screenshot
+.. image:: img/ChartCTMeanDLP.png
+   :width: 925px
+   :align: center
+   :height: 587px
+   :alt: OpenREM chart of mean DLP screenshot
 
-      The tooltip of each bar shows the user the name of the protocol, the
-      number of acquisitions of that type and also the mean DLP and/or
-      CTDI\ :sub:`vol` value.
+The tooltip of each bar shows the user the name of the protocol, the
+number of acquisitions of that type and also the mean DLP and/or
+CTDI\ :sub:`vol` value.
 
-      Clicking on an individual bar takes the user to a histogram of DLP
-      for that protocol. The tooltip for each histogram bar shows the
-      number of acquisitions. The histogram tooltip also includes a link
-      that will take the user to the list of studies that contain the
-      acquisitions represented by that histogram bar:
+Clicking on an individual bar takes the user to a histogram of DLP
+for that protocol. The tooltip for each histogram bar shows the
+number of acquisitions. The histogram tooltip also includes a link
+that will take the user to the list of studies that contain the
+acquisitions represented by that histogram bar:
 
-      .. image:: img/ChartCTMeanDLPhistogram.png
-         :width: 930px
-         :align: center
-         :height: 511px
-         :alt: OpenREM histogram of acquisition DLP screenshot
+.. image:: img/ChartCTMeanDLPhistogram.png
+   :width: 930px
+   :align: center
+   :height: 511px
+   :alt: OpenREM histogram of acquisition DLP screenshot
 
+===========================================================================
+Bar chart of mean DLP for each acquisition protocol (one series per system)
+===========================================================================
 
-    * Bar chart of mean DLP for each acquisition protocol (one series per system):
+.. image:: img/ChartCTMeanDLPperSystem.png
+   :width: 930px
+   :align: center
+   :height: 592px
+   :alt: OpenREM chart of mean DLP (one system per series) screenshot
 
-      .. image:: img/ChartCTMeanDLPperSystem.png
-         :width: 930px
-         :align: center
-         :height: 592px
-         :alt: OpenREM chart of mean DLP (one system per series) screenshot
+Ticking the `Plot a series per system` box in the ``Chart options`` will
+result in plots with one series per x-ray system for some charts.
 
-      Ticking the `Plot a series per system` box in the ``Chart options`` will
-      result in plots with one series per x-ray system for some charts.
+Clicking on an x-axis label will take you to a plot with a histogram per
+x-ray system:
 
-      Clicking on an x-axis label will take you to a plot with a histogram per
-      x-ray system:
+.. image:: img/ChartCTMeanDLPhistogramPerSystem.png
+   :width: 930px
+   :align: center
+   :height: 515px
+   :alt: OpenREM histogram of acquisition DLP (one series per system) screenshot
 
-      .. image:: img/ChartCTMeanDLPhistogramPerSystem.png
-         :width: 930px
-         :align: center
-         :height: 515px
-         :alt: OpenREM histogram of acquisition DLP (one series per system) screenshot
+Clicking on the `Toggle normalisation` button when viewing a histogram will
+normalise all of the series. This can sometimes make it easier to compare one
+distribution with another:
 
-      Clicking on the `Toggle normalisation` button when viewing a histogram will
-      normalise all of the series. This can sometimes make it easier to compare one
-      distribution with another:
-
-      .. image:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
-         :width: 926px
-         :align: center
-         :height: 515px
-         :alt: OpenREM normalised histogram of acquisition DLP (one series per system) screenshot
-
+.. image:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
+   :width: 926px
+   :align: center
+   :height: 515px
+   :alt: OpenREM normalised histogram of acquisition DLP (one series per system) screenshot
 
     * Pie chart of the frequency of each acquisition protocol. Clicking on a
       segment of the pie chart takes the user to the list of studies that
@@ -157,7 +159,6 @@ The available charts for CT data are as follows:
     * Pie chart of the frequency of each study name. Clicking on a segment of
       the pie chart takes the user to the list of studies that correspond to
       the data in that segment.
-
 
     * *New in 0.7.0*  Bar chart of mean DLP for each requested procedure. Clicking
       on a bar takes the user to a histogram of DLP for that procedure. Clicking
