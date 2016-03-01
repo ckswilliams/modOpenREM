@@ -174,18 +174,18 @@ The available charts for CT data are as follows:
     * Pie chart showing the number of studies carried on each day of the week:
 
       .. image:: img/ChartCTworkload.png
-         :width: 831px
+         :width: 930px
          :align: center
-         :height: 711px
+         :height: 540px
          :alt: OpenREM pie chart of study workload per day of the week screenshot
 
       Clicking on a segment of the pie chart takes the user to a pie chart
       showing the studies for that weekday broken down per hour:
 
       .. image:: img/ChartCTworkload24hours.png
-         :width: 1084px
+         :width: 932px
          :align: center
-         :height: 714px
+         :height: 542px
          :alt: OpenREM pie chart of study workload per hour in a day screenshot
 
     * Line chart showing the mean DLP of each study name over time. The time
@@ -196,9 +196,9 @@ The available charts for CT data are as follows:
       chart legend to show or hide individual lines.
 
       .. image:: img/ChartCTMeanDLPoverTime.png
-         :width: 1139px
+         :width: 932px
          :align: center
-         :height: 716px
+         :height: 542px
          :alt: OpenREM line chart of mean DLP per study type over time screenshot
 
     * *New in 0.7.0* The user can choose whether the data displayed on the charts
