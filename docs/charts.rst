@@ -76,6 +76,10 @@ the home page.
 The user can choose whether the data displayed on the charts is the mean, the
 median or both by using the drop-down ``Average to use`` selection.
 
+The charts can be sorted by either bar height, frequency or alphabetically by
+category. The default sorting direction can be set to ascending or descending
+using the drop-down list near the top of the ``chart options``.
+
 A user's chart options can also be configured by an administrator via OpenREM's
 user administration page.
 
