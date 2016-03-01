@@ -284,23 +284,23 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if str(current_filter.xray_filter_material) == 'Aluminum or Aluminum compound':
+                        if 'Aluminum' in str(current_filter.xray_filter_material):
                             filters += 'Al'
-                        elif str(current_filter.xray_filter_material) == 'Copper or Copper compound':
+                        elif 'Copper' in str(current_filter.xray_filter_material):
                             filters += 'Cu'
-                        elif str(current_filter.xray_filter_material) == 'Tantalum or Tantalum compound':
+                        elif 'Tantalum' in str(current_filter.xray_filter_material):
                             filters += 'Ta'
-                        elif str(current_filter.xray_filter_material) == 'Molybdenum or Molybdenum compound':
+                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
                             filters += 'Mo'
-                        elif str(current_filter.xray_filter_material) == 'Rhodium or Rhodium compound':
+                        elif 'Rhodium' in str(current_filter.xray_filter_material):
                             filters += 'Rh'
-                        elif str(current_filter.xray_filter_material) == 'Silver or Silver compound':
+                        elif 'Silver' in str(current_filter.xray_filter_material):
                             filters += 'Ag'
-                        elif str(current_filter.xray_filter_material) == 'Niobium or Niobium compound':
+                        elif 'Niobium' in str(current_filter.xray_filter_material):
                             filters += 'Nb'
-                        elif str(current_filter.xray_filter_material) == 'Europium or Europium compound':
+                        elif 'Europium' in str(current_filter.xray_filter_material):
                             filters += 'Eu'
-                        elif str(current_filter.xray_filter_material) == 'Lead or Lead compound':
+                        elif 'Lead' in str(current_filter.xray_filter_material):
                             filters += 'Pb'
                         filters += ' | '
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
@@ -707,23 +707,23 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if str(current_filter.xray_filter_material) == 'Aluminum or Aluminum compound':
+                        if 'Aluminum' in str(current_filter.xray_filter_material):
                             filters += 'Al'
-                        elif str(current_filter.xray_filter_material) == 'Copper or Copper compound':
+                        elif 'Copper' in str(current_filter.xray_filter_material):
                             filters += 'Cu'
-                        elif str(current_filter.xray_filter_material) == 'Tantalum or Tantalum compound':
+                        elif 'Tantalum' in str(current_filter.xray_filter_material):
                             filters += 'Ta'
-                        elif str(current_filter.xray_filter_material) == 'Molybdenum or Molybdenum compound':
+                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
                             filters += 'Mo'
-                        elif str(current_filter.xray_filter_material) == 'Rhodium or Rhodium compound':
+                        elif 'Rhodium' in str(current_filter.xray_filter_material):
                             filters += 'Rh'
-                        elif str(current_filter.xray_filter_material) == 'Silver or Silver compound':
+                        elif 'Silver' in str(current_filter.xray_filter_material):
                             filters += 'Ag'
-                        elif str(current_filter.xray_filter_material) == 'Niobium or Niobium compound':
+                        elif 'Niobium' in str(current_filter.xray_filter_material):
                             filters += 'Nb'
-                        elif str(current_filter.xray_filter_material) == 'Europium or Europium compound':
+                        elif 'Europium' in str(current_filter.xray_filter_material):
                             filters += 'Eu'
-                        elif str(current_filter.xray_filter_material) == 'Lead or Lead compound':
+                        elif 'Lead' in str(current_filter.xray_filter_material):
                             filters += 'Pb'
                         filters += ' | '
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
@@ -932,23 +932,23 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if str(current_filter.xray_filter_material) == 'Aluminum or Aluminum compound':
+                        if 'Aluminum' in str(current_filter.xray_filter_material):
                             filters += 'Al'
-                        elif str(current_filter.xray_filter_material) == 'Copper or Copper compound':
+                        elif 'Copper' in str(current_filter.xray_filter_material):
                             filters += 'Cu'
-                        elif str(current_filter.xray_filter_material) == 'Tantalum or Tantalum compound':
+                        elif 'Tantalum' in str(current_filter.xray_filter_material):
                             filters += 'Ta'
-                        elif str(current_filter.xray_filter_material) == 'Molybdenum or Molybdenum compound':
+                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
                             filters += 'Mo'
-                        elif str(current_filter.xray_filter_material) == 'Rhodium or Rhodium compound':
+                        elif 'Rhodium' in str(current_filter.xray_filter_material):
                             filters += 'Rh'
-                        elif str(current_filter.xray_filter_material) == 'Silver or Silver compound':
+                        elif 'Silver' in str(current_filter.xray_filter_material):
                             filters += 'Ag'
-                        elif str(current_filter.xray_filter_material) == 'Niobium or Niobium compound':
+                        elif 'Niobium' in str(current_filter.xray_filter_material):
                             filters += 'Nb'
-                        elif str(current_filter.xray_filter_material) == 'Europium or Europium compound':
+                        elif 'Europium' in str(current_filter.xray_filter_material):
                             filters += 'Eu'
-                        elif str(current_filter.xray_filter_material) == 'Lead or Lead compound':
+                        elif 'Lead' in str(current_filter.xray_filter_material):
                             filters += 'Pb'
                         filters += ' | '
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
