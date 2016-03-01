@@ -115,8 +115,10 @@ The available charts for CT data are as follows:
          :height: 592px
          :alt: OpenREM chart of mean DLP (one system per series) screenshot
 
+
       Ticking the `Plot a series per system` box in the ``Chart options`` will
 	  result in plots with one series per x-ray system for some charts.
+
 
       Clicking on an x-axis label will take you to a plot with a histogram per
 	  x-ray system:
@@ -126,6 +128,7 @@ The available charts for CT data are as follows:
          :align: center
          :height: 515px
          :alt: OpenREM histogram of acquisition DLP (one series per system) screenshot
+
 
       Clicking on the `Toggle normalisation` button when viewing a histogram will
 	  normalise all of the series. This can sometimes make it easier to compare one
