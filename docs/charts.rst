@@ -67,6 +67,9 @@ The user can switch off all chart plotting by clicking on the
 at the top of any OpenREM page. Clicking on this link takes the user back to
 the home page.
 
+The user can choose whether the data displayed on the charts is the mean, the
+median or both by using the drop-down `Average to use` selection.
+
 A user's chart options can also be configured by an administrator via OpenREM's
 user administration page.
 
@@ -226,13 +229,6 @@ hide individual lines.
    :align: center
    :height: 542px
    :alt: OpenREM line chart of mean DLP per study type over time screenshot
-
-========================================
-Mean, median or both displayed on charts
-========================================
-
-The user can choose whether the data displayed on the charts is the mean, the
-median or both by using the drop-down `Average to use` selection.
       
 *************************
 Chart types - radiography
