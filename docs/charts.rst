@@ -49,17 +49,17 @@ Chart options
 ``Chart options`` item from the ``User options`` menu on the OpenREM homepage:
 
 .. image:: img/ChartOptions.png
-   :width: 390px
+   :width: 352px
    :align: center
-   :height: 847px
+   :height: 944px
    :alt: OpenREM chart options screenshot
 
 They can also be set via the CT and Radiographic summary pages:
 
 .. image:: img/ChartCTOptions.png
-   :width: 321px
+   :width: 297px
    :align: center
-   :height: 443px
+   :height: 376px
    :alt: OpenREM CT chart options screenshot
 
 The first option, ``Plot charts?``, determines whether any plots are shown.
@@ -142,9 +142,9 @@ The available charts for CT data are as follows:
       contain the acquisitions in that segment.
 
       .. image:: img/ChartCTacquisitionFreq.png
-         :width: 835px
+         :width: 932px
          :align: center
-         :height: 687px
+         :height: 510px
          :alt: OpenREM chart of acquisition frequency screenshot
 
     * Bar chart of mean DLP for each study name. Clicking on a bar takes the
