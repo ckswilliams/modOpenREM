@@ -7,17 +7,11 @@ data. The user can configure which plots are shown using the ``Chart options``
 on the CT and radiographic pages.
 
 *New in 0.7.0*
-    * Some charts can now be plotted with a series per x-ray system.
-      This option can be switched on or off via the ``Chart options``.
+    * Chart average values can be either mean or median. Bar charts can plot
+      both mean and median values together.
 
-    * Chart plotting options can also be configured by choosing the
-      ``Chart options`` item on the ``User options`` menu at the top of the
-      OpenREM homepage.
-
-    * Individual charts can be displayed full-screen by clicking on
-      the ``Toggle fullscreen`` button that is positioned below each chart.
-
-    * The chart plotting status is displayed on the OpenREM homepage.
+    * Bar charts can be plotted with a series per x-ray system. This option can
+      be switched on or off via the ``Chart options``.
 
     * The the number of histogram data bins can be set to a value between 2 and
       40 in ``Chart options``. The default value is 20.
@@ -26,16 +20,22 @@ on the CT and radiographic pages.
       ``Toggle Normalised histograms`` button that is visible when viewing a
       histogram plot.
 
-    * Colours used for plotting have been updated.
+    * The data in many of the charts can be sorted interactively by the user by
+      clicking on one of the sorting options below the individual chart. The
+      user can set the default sorting type and direction by choosing the
+      ``Chart options`` item from the ``User options`` menu on the OpenREM
+      homepage.
 
-    * The data in many of the charts can now be sorted interactively by the
-      user by clicking on one of the sorting options below the individual
-      chart. The user can set the default sorting type and direction by
-      choosing the ``Chart options`` item from the ``User options`` menu on the
+    * Individual charts can be displayed full-screen by clicking on the
+      ``Toggle fullscreen`` button that is positioned below each chart.
+
+    * Chart plotting options can be configured by choosing the
+      ``Chart options`` item on the ``User options`` menu at the top of the
       OpenREM homepage.
 
-    * Charts can be viewed full-screen by clicking on the ``Toggle fullscreen``
-      button below each chart.
+    * The chart plotting status is displayed on the OpenREM homepage.
+
+    * The colours used for plotting have been updated.
 
 The charts are automatically updated to reflect any filters that the user
 applies to the data.
@@ -165,9 +165,9 @@ that contain the acquisitions in that segment.
    :height: 510px
    :alt: OpenREM chart of acquisition frequency screenshot
 
-=========================================
+============================================
 Bar chart of average DLP for each study name
-=========================================
+============================================
 
 Clicking on a bar takes the user to a histogram of DLP for that study name.
 Clicking on a histogram bar tooltip link takes the user to the list of studies
