@@ -6,6 +6,9 @@ Charts of the currently filtered data can now be shown for CT and radiographic
 data. The user can configure which plots are shown using the ``Chart options``
 on the CT and radiographic pages.
 
+*New in 0.7.0* Some charts can now be plotted with a series per x-ray system.
+This option can be switched on or off via the ``Chart options``.
+
 *New in 0.7.0* Chart plotting options can also be configured by choosing the
 ``Chart options`` item on the ``User options`` menu at the top of the OpenREM
 homepage.
@@ -14,6 +17,12 @@ homepage.
 the ``Toggle fullscreen`` button that is positioned below each chart.
 
 *New in 0.7.0* The chart plotting status is displayed on the OpenREM homepage.
+
+*New in 0.7.0* The the number of histogram data bins can be set in ``Chart options``.
+
+*New in 0.7.0* Histogram plots can display absolute or normalised values.
+
+*New in 0.7.0* Colours used for plotting have been updated.
 
 .. figure:: img/ChartCTSortingOptions.png
    :width: 185px
