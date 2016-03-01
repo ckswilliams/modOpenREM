@@ -2,7 +2,7 @@
 Charts
 ######
 
-Charts of the currently filtered data can now be shown for CT and radiographic
+Charts of the currently filtered data can be shown for CT and radiographic
 data. The user can configure which plots are shown using the ``Chart options``
 on the CT and radiographic pages.
 
@@ -12,24 +12,30 @@ on the CT and radiographic pages.
 
     * Chart plotting options can also be configured by choosing the
       ``Chart options`` item on the ``User options`` menu at the top of the
-	  OpenREM homepage.
+      OpenREM homepage.
 
     * Individual charts can be displayed full-screen by clicking on
       the ``Toggle fullscreen`` button that is positioned below each chart.
 
     * The chart plotting status is displayed on the OpenREM homepage.
 
-    * The the number of histogram data bins can be set in ``Chart options``.
+    * The the number of histogram data bins can be set to a value between 2 and
+      40 in ``Chart options``. The default value is 20.
 
-    * Histogram plots can display absolute or normalised values.
+    * Histogram plots can toggle between absolute or normalised values via the
+      ``Toggle Normalised histograms`` button that is visible when viewing a
+      histogram plot.
 
     * Colours used for plotting have been updated.
 
-    * The data in many of the charts can now be sorted interactively
-      by the user by clicking on one of the sorting options below the
-	  individual chart. The user can set the default sorting type and direction
-	  by choosing the ``Chart options`` item from the ``User options`` menu on
-	  the OpenREM homepage.
+    * The data in many of the charts can now be sorted interactively by the
+      user by clicking on one of the sorting options below the individual
+      chart. The user can set the default sorting type and direction by
+      choosing the ``Chart options`` item from the ``User options`` menu on the
+      OpenREM homepage.
+
+    * Charts can be viewed full-screen by clicking on the ``Toggle fullscreen``
+      button below each chart.
 
 The charts are automatically updated to reflect any filters that the user
 applies to the data.
@@ -60,7 +66,7 @@ This also controls whether the data for the plots is calculated by OpenREM.
 Some plot data is slow to calculate when there is a large amount of data: some
 users may prefer to leave ``Plot charts?`` off for performance reasons.
 ``Plot charts?`` can be switched on and activated with a click of the
-``submit`` button after the data has been filtered.
+``Submit`` button after the data has been filtered.
 
 The user can switch off all chart plotting by clicking on the
 ``Switch charts off`` link in the ``User options`` menu in the navigation bar
@@ -68,7 +74,7 @@ at the top of any OpenREM page. Clicking on this link takes the user back to
 the home page.
 
 The user can choose whether the data displayed on the charts is the mean, the
-median or both by using the drop-down `Average to use` selection.
+median or both by using the drop-down ``Average to use`` selection.
 
 A user's chart options can also be configured by an administrator via OpenREM's
 user administration page.
@@ -105,7 +111,7 @@ of studies that contain the acquisitions represented by that histogram bar:
 Bar chart of average DLP for each acquisition protocol (one series per system)
 ==============================================================================
 
-Ticking the `Plot a series per system` box in the ``Chart options`` will result
+Ticking the ``Plot a series per system`` box in the ``Chart options`` will result
 in plots that have a data series per x-ray system for all charts that plot
 dose, mAs or kVp against some category.
 
@@ -124,7 +130,7 @@ will take you to a plot with a histogram per x-ray system:
    :height: 515px
    :alt: OpenREM histogram of acquisition DLP (one series per system) screenshot
 
-Clicking on the `Toggle normalisation` button when viewing a histogram will
+Clicking on the ``Toggle normalisation`` button when viewing a histogram will
 normalise all of the series to a maximum value of 1.0. This can sometimes make
 it easier to compare one distribution with another:
 
@@ -166,12 +172,6 @@ Bar chart of average DLP for each study name
 Clicking on a bar takes the user to a histogram of DLP for that study name.
 Clicking on a histogram bar tooltip link takes the user to the list of studies
 that correspond to the data represented by that bar.
-
-.. image:: img/ChartCTMeanStudyDLP.png
-   :width: 835px
-   :align: center
-   :height: 769px
-   :alt: OpenREM chart of mean study DLP screenshot
 
 =============================================
 Pie chart of the frequency of each study name
