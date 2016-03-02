@@ -388,13 +388,14 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
             # will break if text instead of code?
             accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-    if (accumproj.fluoro_dose_area_product_total != "" or
-        accumproj.total_fluoro_time != "" or
-        accumproj.acquisition_dose_area_product_total != "" or
-        accumproj.total_acquisition_time != ""):
-            accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type = 'RF'
-    elif accumproj.total_number_of_radiographic_frames != "":
-        accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type = "DX"
+    if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == 'RF,DX':
+        if (accumproj.fluoro_dose_area_product_total != "" or
+            accumproj.total_fluoro_time != "" or
+            accumproj.acquisition_dose_area_product_total != "" or
+            accumproj.total_acquisition_time != ""):
+                accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type = 'RF'
+        elif accumproj.total_number_of_radiographic_frames != "":
+            accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type = "DX"
     accumproj.save()
 
 
@@ -582,6 +583,10 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Has Intent':
                         proj.has_intent = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
+            if 'Mammography' in proj.procedure_reported.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'MG'
+            elif 'Projection X-Ray' in proj.procedure_reported.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'RF,DX'
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'start of x-ray irradiation':
             proj.start_of_xray_irradiation = make_date_time(cont.DateTime)
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'end of x-ray irradiation':
@@ -603,7 +608,6 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
 
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated X-Ray Dose Data':
-                proj.general_study_module_attributes.modality_type = 'RF,DX'
                 _accumulatedxraydose(cont,proj)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event X-Ray Data':
                 _irradiationeventxraydata(cont,proj)
