@@ -436,18 +436,22 @@ def _accumulatedxraydose(dataset,proj): # TID 10002
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont,accum)
-    if ('Fluoroscopy-Guided' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning or
-            ('Projection X-Ray' in accum.projection_xray_radiation_dose.procedure_reported and not
+    if ((accum.projection_xray_radiation_dose.acquisition_device_type and
+            'Fluoroscopy-Guided' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning) or
+            ('Projection X-Ray' in accum.projection_xray_radiation_dose.procedure_reported.code_meaning and not
             accum.projection_xray_radiation_dose.acquisition_device_type)):
         _accumulatedprojectionxraydose(dataset,accum)
     if accum.projection_xray_radiation_dose.procedure_reported.code_value == 'P5-40010':
         _accumulatedmammoxraydose(dataset,accum)
-    if ('Integrated' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning or
-            'Fluoroscopy-Guided' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning or
-            ('Projection X-Ray' in accum.projection_xray_radiation_dose.procedure_reported and not
+    if ((accum.projection_xray_radiation_dose.acquisition_device_type and
+            'Integrated' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning) or
+            (accum.projection_xray_radiation_dose.acquisition_device_type and
+                'Fluoroscopy-Guided' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning) or
+            ('Projection X-Ray' in accum.projection_xray_radiation_dose.procedure_reported.code_meaning and not
             accum.projection_xray_radiation_dose.acquisition_device_type)):
         _accumulatedintegratedprojectionradiographydose(dataset,accum)
-    if 'Cassette-based' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning:
+    if (accum.projection_xray_radiation_dose.acquisition_device_type and
+            'Cassette-based' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning):
         _accumulatedcassettebasedprojectionradiographydose(dataset,accum)
     accum.save()
 
