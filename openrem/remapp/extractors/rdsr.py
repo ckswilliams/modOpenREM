@@ -361,6 +361,7 @@ def _accumulatedmammoxraydose(dataset,accum): # TID 10005
             accummammo.laterality = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
     accummammo.save()
 
+
 def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumProjXRayDose
@@ -435,9 +436,10 @@ def _accumulatedxraydose(dataset,proj): # TID 10002
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont,accum)
-    _accumulatedprojectionxraydose(dataset,accum)
     if accum.projection_xray_radiation_dose.procedure_reported == 'P5-40010':
         _accumulatedmammoxraydose(dataset,accum)
+    else:
+        _accumulatedprojectionxraydose(dataset,accum)
     _accumulatedcassettebasedprojectionradiographydose(dataset,accum)
     _accumulatedintegratedprojectionradiographydose(dataset,accum)
     accum.save()

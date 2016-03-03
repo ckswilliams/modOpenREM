@@ -407,6 +407,7 @@ class ProjectionXRayRadiationDose(models.Model):  # TID 10001
     has_intent = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_intent')
     acquisition_device_type = models.CharField(max_length=16, blank=True)
+    acquisition_device_type_cid = models.ForeignKey(ContextID, blank=True, null=True, related_name='tid10001_type')
     scope_of_accumulation = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_scope')
     xray_detector_data_available = models.ForeignKey(
