@@ -40,7 +40,7 @@ the data by ticking the appropriate option in `Chart options` (figure 3).
 
 .. figure:: img/ChartCTMeanDLPperSystem.png
    :figwidth: 50%
-   :align: left
+   :align: right
    :alt: Bar chart of mean DLP (one system per series)
 
    Figure 3: Bar chart of mean DLP (one system per series)
