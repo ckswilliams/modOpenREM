@@ -10,27 +10,51 @@ Chart types
 1. Bar chart of average values across a number of categories
 =========================================================
 
-For example, median DAP per requested procedure name. Below each bar chart
-there are options to sort the order of the data. This can be by average value,
-size of data sample, or alphabetically.
-
 .. figure:: img/ChartCTMeanDLP.png
    :figwidth: 50%
    :align: right
-   :alt: Bar chart of mean DLP per acquisition type
+   :alt: Bar chart of mean DLP per acquisition
 
-   Figure 1: bar chart of mean DLP per acquisition type
+   Figure 1: bar chart of mean DLP per acquisition
+
+For example, mean DAP per acquisition type (figure 1). Below each bar chart
+there are options to sort the order of the data. This can be by average value,
+size of data sample, or alphabetically.
 
 Clicking on an entry in the bar chart entry toggles the display of the
 corresponding series on the chart.
 
+.. figure:: img/ChartCTMeanDLPhistogram.png
+   :figwidth: 50%
+   :align: right
+   :alt: Histogram of acquisition DLP
+
+   Figure 2: histogram of abdomen DLP values
+
 Clicking on an individual data point on one of these charts will take you to a
 histogram of the data for that point so that you can see the shape of the
-value's distribution.
+value's distribution (figure 2).
+
+It is possible to create a chart with one series per x-ray system present in
+the data by ticking the appropriate option in `Chart options` (figure 3).
+
+.. figure:: img/ChartCTMeanDLPperSystem.png
+   :figwidth: 50%
+   :align: left
+   :alt: Bar chart of mean DLP (one system per series)
+
+   Figure 3: Bar chart of mean DLP (one system per series)
 
 If the the bar chart that you are viewing shows more than one series then
 clicking on a category name on the x-axis will take you to a plot that shows
-multiple histograms: one for each series.
+multiple histograms: one for each series (figure 4).
+
+.. figure:: img/ChartCTMeanDLPhistogramPerSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Histogram of abdomen DLP (one series per system)
+
+   Figure 4: Histogram of abdomen DLP values, one series per system
 
 The histogram data can be plotted as absolute values, or be normalised to a
 value of 1.0. This can be toggled by clicking on the button that is shown below
