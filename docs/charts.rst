@@ -11,14 +11,14 @@ Chart types
 =========================================================
 
 .. figure:: img/ChartCTMeanDLP.png
-   :figwidth: 50%
+   :figwidth: 45%
    :align: left
    :alt: Bar chart of mean DLP per acquisition
 
    Figure 1: Bar chart of mean DLP per acquisition
 
 .. figure:: img/ChartCTMeanDLPhistogram.png
-   :figwidth: 50%
+   :figwidth: 45%
    :align: right
    :alt: Histogram of acquisition DLP
 
@@ -39,14 +39,14 @@ You may want to plot a bar chart series for each x-ray system (figure 3). This
 can be done by activating `Plot a series per system` in the `Chart options`.
 
 .. figure:: img/ChartCTMeanDLPperSystem.png
-   :figwidth: 50%
+   :figwidth: 45%
    :align: left
    :alt: Bar chart of mean DLP (one system per series)
 
    Figure 3: Bar chart of mean DLP (one system per series)
 
 .. figure:: img/ChartCTMeanDLPhistogramPerSystem.png
-   :figwidth: 50%
+   :figwidth: 45%
    :align: right
    :alt: Histogram of abdomen DLP (one series per system)
 
@@ -63,7 +63,7 @@ compare the shape of several histograms, especially when some histograms have
 much less data than others.
 
 .. figure:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
-   :figwidth:50%
+   :figwidth: 45%
    :align: right
    :alt: Normalised histogram of abdomen DLP (one series per system)
 
@@ -85,8 +85,8 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
 2. Pie chart showing the frequency of each item in a category
 =============================================================
 
-For example, the number of aquisitions made for every acquisition protocol
-present in the tablulated data.
+For example, the number of acquisitions made for every acquisition protocol
+present in the tabulated data.
 
 Clicking on any of the pie chart segments will filter the displayed studies,
 showing only the studies that correspond to what is contained in that segment.
