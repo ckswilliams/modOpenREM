@@ -17,16 +17,16 @@ Chart types
 
    Figure 1: Bar chart of mean DLP per acquisition
 
+An example of mean DAP per acquisition type is shown in figure 1. Below each
+bar chart there are options to sort the order of the data. This can be by
+average value, size of data sample, or alphabetically (figure 2).
+
 .. figure:: img/ChartCTSortingOptions.png
    :figwidth: 25%
    :align: right
    :alt: Bar chart sorting options
 
    Figure 2: Bar chart sorting options
-
-An example of mean DAP per acquisition type is shown in figure 1. Below each
-bar chart there are options to sort the order of the data. This can be by
-average value, size of data sample, or alphabetically (figure 2).
 
 Clicking on an entry in the bar chart legend toggles the display of the
 corresponding series on the chart.
