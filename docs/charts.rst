@@ -10,6 +10,13 @@ Chart types
 1. Bar chart of average values across a number of categories
 ============================================================
 
+.. figure:: img/ChartCTSortingOptions.png
+   :figwidth: 25%
+   :align: right
+   :alt: Bar chart sorting options
+
+   Figure 2: Bar chart sorting options
+
 .. figure:: img/ChartCTMeanDLP.png
    :figwidth: 50%
    :align: right
@@ -20,13 +27,6 @@ Chart types
 An example of mean DAP per acquisition type is shown in figure 1. Below each
 bar chart there are options to sort the order of the data. This can be by
 average value, size of data sample, or alphabetically (figure 2).
-
-.. figure:: img/ChartCTSortingOptions.png
-   :figwidth: 25%
-   :align: right
-   :alt: Bar chart sorting options
-
-   Figure 2: Bar chart sorting options
 
 Clicking on an entry in the bar chart legend toggles the display of the
 corresponding series on the chart.
