@@ -17,9 +17,9 @@ Chart types
 
    Figure 1: Bar chart of mean DLP per acquisition
 
-For example, mean DAP per acquisition type (figure 1). Below each bar chart
-there are options to sort the order of the data. This can be by average value,
-size of data sample, or alphabetically.
+An example of mean DAP per acquisition type is shown in figure 1. Below each
+bar chart there are options to sort the order of the data. This can be by
+average value, size of data sample, or alphabetically.
 
 Clicking on an entry in the bar chart legend toggles the display of the
 corresponding series on the chart.
@@ -35,8 +35,8 @@ Clicking on an individual data point on a bar chart will take you to a
 histogram of the data for that point so that you can see the shape of the
 value's distribution (figure 2).
 
-You may want to plot a bar chart series for each x-ray system (figure 3). This
-can be done by activating `Plot a series per system` in the `Chart options`.
+Bar charts can be plotted with a series per x-ray system (figure 3). This can
+be done by activating `Plot a series per system` in the `Chart options`.
 
 .. figure:: img/ChartCTMeanDLPperSystem.png
    :figwidth: 50%
@@ -71,13 +71,7 @@ much less data than others.
 
 Each histogram data point includes a text link that appears when the mouse
 pointer moves over it. Clicking on this link will filter the displayed studies,
-showing only the studies that correspond to what is contained in that histogram
-point. This doesn't work perfectly, as the category filtering isn't exact. For
-example, the histogram data point may be for requests called "CT chest" with a
-DLP between 100 and 150 mGy.cm. Clicking on this point's link will show you all
-studies you expect, but it will also include any request for "CT chest with
-contrast" that have a DLP between 100 and 150 mGy.cm, together with any other
-studies who's requests begin with "CT chest" and match the DLP criteria.
+showing those that correspond to what is contained in the histogram bin.
 
 Clicking on a legend entry toggles the visibility of the corresponding series.
 
@@ -92,8 +86,8 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
 
    Figure 6: Pie chart of acquisition frequency
 
-For example, the number of acquisitions made for every acquisition protocol
-present in the tabulated data (figure 6).
+Figure 6 shows a pie chart of the number of acquisitions made for every
+acquisition protocol present in the tabulated data.
 
 Clicking on any of the pie chart segments will filter the displayed studies,
 showing only the studies that correspond to what is contained in that segment.
@@ -111,12 +105,10 @@ isn't exact.
 
    Figure 7: Line chart of mean DLP per study type over time
 
-For example, the mean DLP of each study type, calculated with a
-data point per month (figure 7).
-
 A line is plotted for each category, with a point calculated every day, week,
 month or year. This can be a good way of looking at how things have changed
-over time.
+over time. For example, the mean DLP of each study type, calculated with a
+data point per month is shown in figure 7.
 
 Clicking the left-hand mouse button on the chart and dragging left or right
 across a range of dates and then releasing the mouse button will zoom in on
@@ -142,11 +134,9 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
 
    Figure 9: Pie chart of study workload per hour in a day
    
-For example, the number of studies carried out on each day of the week (figures
-8 and 9).
-
-Clicking on a segment takes you to a pie chart that shows the number of events
-per hour over that day.
+Each segment represents a day of the week, and shows the number of events that
+have taken place on that day (figure 8). Clicking on one of the segments will take you to
+a pie chart that shows the number of events per on that day (figure 9).
 
 ********************
 Exporting chart data
@@ -193,7 +183,7 @@ Chart options
 *************
 
 .. figure:: img/ChartOptions.png
-   :width: 50 %
+   :figwidth: 50 %
    :align: right
    :alt: OpenREM chart options
 
@@ -203,7 +193,7 @@ Chart options can be configured by choosing the ``Chart options`` item from the
 ``User options`` menu on the OpenREM homepage (figure 10).
 
 .. figure:: img/ChartCTOptions.png
-   :width: 50 %
+   :figwidth: 50 %
    :align: right
    :alt: OpenREM CT chart options
 
