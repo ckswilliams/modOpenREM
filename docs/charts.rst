@@ -15,11 +15,11 @@ there are options to sort the order of the data. This can be by average value,
 size of data sample, or alphabetically.
 
 .. figure:: img/ChartCTMeanDLP.png
-   :figwidth: 25%
+   :figwidth: 50%
    :align: right
    :alt: Bar chart of mean DLP per acquisition type
 
-   Bar chart of mean DLP per acquisition type
+   Figure 1: bar chart of mean DLP per acquisition type
 
 Clicking on an entry in the bar chart entry toggles the display of the
 corresponding series on the chart.
