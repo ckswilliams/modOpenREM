@@ -17,9 +17,16 @@ Chart types
 
    Figure 1: Bar chart of mean DLP per acquisition
 
+.. figure:: img/ChartCTSortingOptions.png
+   :figwidth: 25%
+   :align: right
+   :alt: Bar chart sorting options
+
+   Figure 2: Bar chart sorting options
+
 An example of mean DAP per acquisition type is shown in figure 1. Below each
 bar chart there are options to sort the order of the data. This can be by
-average value, size of data sample, or alphabetically.
+average value, size of data sample, or alphabetically (figure 2).
 
 Clicking on an entry in the bar chart legend toggles the display of the
 corresponding series on the chart.
@@ -29,13 +36,13 @@ corresponding series on the chart.
    :align: right
    :alt: Histogram of acquisition DLP
 
-   Figure 2: Histogram of abdomen DLP values
+   Figure 3: Histogram of abdomen DLP values
 
 Clicking on an individual data point on a bar chart will take you to a
 histogram of the data for that point so that you can see the shape of the
-value's distribution (figure 2).
+value's distribution (figure 3).
 
-Bar charts can be plotted with a series per x-ray system (figure 3). This can
+Bar charts can be plotted with a series per x-ray system (figure 4). This can
 be done by activating `Plot a series per system` in the `Chart options`.
 
 .. figure:: img/ChartCTMeanDLPperSystem.png
@@ -43,21 +50,21 @@ be done by activating `Plot a series per system` in the `Chart options`.
    :align: right
    :alt: Bar chart of mean DLP (one system per series)
 
-   Figure 3: Bar chart of mean DLP (one system per series)
+   Figure 4: Bar chart of mean DLP (one system per series)
 
 If the the bar chart that you are viewing shows more than one series then
 clicking on a category name on the x-axis will take you to a plot that shows
-multiple histograms: one for each series (figure 4).
+multiple histograms: one for each series (figure 5).
 
 .. figure:: img/ChartCTMeanDLPhistogramPerSystem.png
    :figwidth: 50%
    :align: right
    :alt: Histogram of abdomen DLP (one series per system)
 
-   Figure 4: Histogram of abdomen DLP values, one series per system
+   Figure 5: Histogram of abdomen DLP values, one series per system
 
 The histogram data can be plotted as absolute values, or be normalised to a
-value of 1.0 (figure 5). This can be toggled by clicking on the button that is
+value of 1.0 (figure 6). This can be toggled by clicking on the button that is
 shown below the histogram plots. The normalisation can be useful when trying to
 compare the shape of several histograms, especially when some histograms have
 much less data than others.
@@ -67,7 +74,7 @@ much less data than others.
    :align: right
    :alt: Normalised histogram of abdomen DLP (one series per system)
 
-   Figure 5: Normalised histogram of abdomen DLP, one series per system
+   Figure 6: Normalised histogram of abdomen DLP, one series per system
 
 Each histogram data point includes a text link that appears when the mouse
 pointer moves over it. Clicking on this link will filter the displayed studies,
@@ -84,9 +91,9 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
    :align: right
    :alt: Pie chart of acquisition frequency
 
-   Figure 6: Pie chart of acquisition frequency
+   Figure 7: Pie chart of acquisition frequency
 
-Figure 6 shows a pie chart of the number of acquisitions made for every
+Figure 7 shows a pie chart of the number of acquisitions made for every
 acquisition protocol present in the tabulated data.
 
 Clicking on any of the pie chart segments will filter the displayed studies,
@@ -103,12 +110,12 @@ isn't exact.
    :align: right
    :alt: Line chart of mean DLP per study type over time
 
-   Figure 7: Line chart of mean DLP per study type over time
+   Figure 8: Line chart of mean DLP per study type over time
 
 A line is plotted for each category, with a point calculated every day, week,
 month or year. This can be a good way of looking at how things have changed
 over time. For example, the mean DLP of each study type, calculated with a
-data point per month is shown in figure 7.
+data point per month is shown in figure 8.
 
 Clicking the left-hand mouse button on the chart and dragging left or right
 across a range of dates and then releasing the mouse button will zoom in on
@@ -125,18 +132,19 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
    :align: right
    :alt: Pie chart of study workload per day of the week
 
-   Figure 8: Pie chart of study workload per day of the week
+   Figure 9: Pie chart of study workload per day of the week
 
 .. figure:: img/ChartCTworkload24hours.png
    :figwidth: 50%
    :align: right
    :alt: Pie chart of study workload per hour in a day
 
-   Figure 9: Pie chart of study workload per hour in a day
+   Figure 10: Pie chart of study workload per hour in a day
    
 Each segment represents a day of the week, and shows the number of events that
-have taken place on that day (figure 8). Clicking on one of the segments will take you to
-a pie chart that shows the number of events per on that day (figure 9).
+have taken place on that day (figure 9). Clicking on one of the segments will
+take you to a pie chart that shows the number of events per on that day (figure
+10).
 
 ********************
 Exporting chart data
@@ -187,19 +195,13 @@ Chart options
    :align: right
    :alt: OpenREM chart options
 
-   Figure 10: OpenREM chart options
+   Figure 11: OpenREM chart options
 
 Chart options can be configured by choosing the ``Chart options`` item from the
-``User options`` menu on the OpenREM homepage (figure 10).
+``User options`` menu on the OpenREM homepage (figure 11).
 
-.. figure:: img/ChartCTOptions.png
-   :figwidth: 50 %
-   :align: right
-   :alt: OpenREM CT chart options
-
-   Figure 11: OpenREM CT chart options
-
-They can also be set via the CT and Radiographic summary pages (figure 11).
+CT and radiographic plot options can also be set from their respective
+summary pages.
 
 The first option, ``Plot charts?``, determines whether any plots are shown.
 This also controls whether the data for the plots is calculated by OpenREM.
@@ -208,10 +210,16 @@ users may prefer to leave ``Plot charts?`` off for performance reasons.
 ``Plot charts?`` can be switched on and activated with a click of the
 ``Submit`` button after the data has been filtered.
 
-The user can switch off all chart plotting by clicking on the
+.. figure:: img/UserOptionsMenu.png
+   :figwidth: 25 %
+   :align: right
+   :alt: Switching charts off
+
+   Figure 12: Switching charts off
+
+The user can also switch off chart plotting by clicking on the
 ``Switch charts off`` link in the ``User options`` menu in the navigation bar
-at the top of any OpenREM page. Clicking on this link takes the user back to
-the home page.
+at the top of any OpenREM page, as shown in figure 12.
 
 The user can choose whether the data displayed on the charts is the mean, 
 median or both by using the drop-down ``Average to use`` selection. Only the
