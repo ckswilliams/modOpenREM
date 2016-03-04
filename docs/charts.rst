@@ -93,7 +93,7 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
    Figure 6: Pie chart of acquisition frequency
 
 For example, the number of acquisitions made for every acquisition protocol
-present in the tabulated data.
+present in the tabulated data (figure 6).
 
 Clicking on any of the pie chart segments will filter the displayed studies,
 showing only the studies that correspond to what is contained in that segment.
@@ -105,14 +105,14 @@ isn't exact.
 ============================================================
 
 .. figure:: img/ChartCTMeanDLPoverTime.png
-   :width: 50%
+   :figwidth: 50%
    :align: right
    :alt: Line chart of mean DLP per study type over time
 
    Figure 7: Line chart of mean DLP per study type over time
 
-For example, the mean DAP of each requested procedure name, calculated with a
-data point per month.
+For example, the mean DLP of each study type, calculated with a
+data point per month (figure 7).
 
 A line is plotted for each category, with a point calculated every day, week,
 month or year. This can be a good way of looking at how things have changed
@@ -129,20 +129,21 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
 =============================================================
 
 .. figure:: img/ChartCTworkload.png
-   :width: 50%
+   :figwidth: 50%
    :align: right
    :alt: Pie chart of study workload per day of the week
 
    Figure 8: Pie chart of study workload per day of the week
 
 .. figure:: img/ChartCTworkload24hours.png
-   :width: 50%
+   :figwidth: 50%
    :align: right
    :alt: Pie chart of study workload per hour in a day
 
    Figure 9: Pie chart of study workload per hour in a day
    
-For example, the number of studies carried out on each day of the week.
+For example, the number of studies carried out on each day of the week (figures
+8 and 9).
 
 Clicking on a segment takes you to a pie chart that shows the number of events
 per hour over that day.
