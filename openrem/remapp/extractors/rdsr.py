@@ -441,17 +441,14 @@ def _accumulatedxraydose(dataset,proj): # TID 10002
             ('Projection X-Ray' in accum.projection_xray_radiation_dose.procedure_reported.code_meaning and not
             accum.projection_xray_radiation_dose.acquisition_device_type)):
         _accumulatedprojectionxraydose(dataset,accum)
-    if accum.projection_xray_radiation_dose.procedure_reported.code_value == 'P5-40010':
+    if proj.procedure_reported and (proj.procedure_reported.code_meaning == 'Mammography'):
         _accumulatedmammoxraydose(dataset,accum)
-    if ((accum.projection_xray_radiation_dose.acquisition_device_type and
-            'Integrated' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning) or
-            (accum.projection_xray_radiation_dose.acquisition_device_type and
-                'Fluoroscopy-Guided' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning) or
-            ('Projection X-Ray' in accum.projection_xray_radiation_dose.procedure_reported.code_meaning and not
-            accum.projection_xray_radiation_dose.acquisition_device_type)):
+    if ((proj.acquisition_device_type and ('Integrated' in proj.acquisition_device_type.code_meaning)) or
+        (proj.acquisition_device_type and ('Fluoroscopy-Guided' in proj.acquisition_device_type.code_meaning)) or
+        (proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type)
+        ):
         _accumulatedintegratedprojectionradiographydose(dataset,accum)
-    if (accum.projection_xray_radiation_dose.acquisition_device_type and
-            'Cassette-based' in accum.projection_xray_radiation_dose.acquisition_device_type.code_meaning):
+    if (proj.acquisition_device_type and ('Cassette-based' in proj.acquisition_device_type.code_meaning)):
         _accumulatedcassettebasedprojectionradiographydose(dataset,accum)
     accum.save()
 
