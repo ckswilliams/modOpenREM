@@ -146,8 +146,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
             ('generalequipmentmoduleattr__manufacturer_model_name', 'Model name'),
             ('generalequipmentmoduleattr__station_name', 'Station name'),
             ('study_description', 'Study description'),
-            ('-projectionxrayradiationdose__accumxraydose__accumprojxraydose__dose_area_product_total','Total DAP'),
-            ('-projectionxrayradiationdose__accumxraydose__accumprojxraydose__dose_rp_total','Total RP Dose'),
+            ('-projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total','Total DAP'),
+            ('-projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_rp_total','Total RP Dose'),
             )
     def get_order_by(self, order_value):
         if order_value == 'study_date':
