@@ -6,39 +6,81 @@ Charts
 Chart types
 ***********
 
-=========================================================
+============================================================
 1. Bar chart of average values across a number of categories
-=========================================================
+============================================================
 
-For example, median DAP per requested procedure name. Below each bar chart
-there are options to sort the order of the data. This can be by average value,
-size of data sample, or alphabetically.
+.. figure:: img/ChartCTMeanDLP.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart of mean DLP per acquisition
 
-Clicking on an entry in the bar chart entry toggles the display of the
+   Figure 1: Bar chart of mean DLP per acquisition
+
+An example of mean DAP per acquisition type is shown in figure 1.
+
+.. figure:: img/ChartCTSortingOptions.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart sorting options
+
+   Figure 2: Bar chart sorting options
+
+Below each bar chart there are options to sort the order of the data. This can
+be ascending or descending by average value, size of data sample, or
+alphabetically (figure 2).
+
+Clicking on an entry in the bar chart legend toggles the display of the
 corresponding series on the chart.
 
-Clicking on an individual data point on one of these charts will take you to a
+.. figure:: img/ChartCTMeanDLPhistogram.png
+   :figwidth: 50%
+   :align: right
+   :alt: Histogram of acquisition DLP
+
+   Figure 3: Histogram of abdomen DLP values
+
+Clicking on an individual data point on a bar chart will take you to a
 histogram of the data for that point so that you can see the shape of the
-value's distribution.
+value's distribution (figure 3).
+
+Bar charts can be plotted with a series per x-ray system (figure 4). This can
+be done by activating `Plot a series per system` in the `Chart options`.
+
+.. figure:: img/ChartCTMeanDLPperSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart of mean DLP (one system per series)
+
+   Figure 4: Bar chart of mean DLP (one system per series)
 
 If the the bar chart that you are viewing shows more than one series then
 clicking on a category name on the x-axis will take you to a plot that shows
-multiple histograms: one for each series.
+multiple histograms: one for each series (figure 5).
+
+.. figure:: img/ChartCTMeanDLPhistogramPerSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Histogram of abdomen DLP (one series per system)
+
+   Figure 5: Histogram of abdomen DLP values, one series per system
 
 The histogram data can be plotted as absolute values, or be normalised to a
-value of 1.0. This can be toggled by clicking on the button that is shown below
-the histogram plots. The normalisation can be useful when trying to compare the
-shape of several histograms.
+value of 1.0 (figure 6). This can be toggled by clicking on the button that is
+shown below the histogram plots. The normalisation can be useful when trying to
+compare the shape of several histograms, especially when some histograms have
+much less data than others.
+
+.. figure:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
+   :figwidth: 50%
+   :align: right
+   :alt: Normalised histogram of abdomen DLP (one series per system)
+
+   Figure 6: Normalised histogram of abdomen DLP, one series per system
 
 Each histogram data point includes a text link that appears when the mouse
 pointer moves over it. Clicking on this link will filter the displayed studies,
-showing only the studies that correspond to what is contained in that histogram
-point. This doesn't work perfectly, as the category filtering isn't exact. For
-example, the histogram data point may be for requests called "CT chest" with a
-DLP between 100 and 150 mGy.cm. Clicking on this point's link will show you all
-studies you expect, but it will also include any request for "CT chest with
-contrast" that have a DLP between 100 and 150 mGy.cm, together with any other
-studies who's requests begin with "CT chest" and match the DLP criteria.
+showing those that correspond to what is contained in the histogram bin.
 
 Clicking on a legend entry toggles the visibility of the corresponding series.
 
@@ -46,8 +88,15 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
 2. Pie chart showing the frequency of each item in a category
 =============================================================
 
-For example, the number of aquisitions made for every acquisition protocol
-present in the tablulated data.
+.. figure:: img/ChartCTacquisitionFreq.png
+   :figwidth: 50%
+   :align: right
+   :alt: Pie chart of acquisition frequency
+
+   Figure 7: Pie chart of acquisition frequency
+
+Figure 7 shows a pie chart of the number of acquisitions made for every
+acquisition protocol present in the tabulated data.
 
 Clicking on any of the pie chart segments will filter the displayed studies,
 showing only the studies that correspond to what is contained in that segment.
@@ -58,12 +107,17 @@ isn't exact.
 3. Line chart showing how an average value changes over time
 ============================================================
 
-For example, the mean DAP of each requested procedure name, calculated with a
-data point per month.
+.. figure:: img/ChartCTMeanDLPoverTime.png
+   :figwidth: 50%
+   :align: right
+   :alt: Line chart of mean DLP per study type over time
+
+   Figure 8: Line chart of mean DLP per study type over time
 
 A line is plotted for each category, with a point calculated every day, week,
 month or year. This can be a good way of looking at how things have changed
-over time.
+over time. For example, the mean DLP of each study type, calculated with a
+data point per month is shown in figure 8.
 
 Clicking the left-hand mouse button on the chart and dragging left or right
 across a range of dates and then releasing the mouse button will zoom in on
@@ -75,10 +129,24 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
 4. Pie chart showing the number of events per day of the week
 =============================================================
 
-For example, the number of studies carried out on each day of the week.
+.. figure:: img/ChartCTworkload.png
+   :figwidth: 50%
+   :align: right
+   :alt: Pie chart of study workload per day of the week
 
-Clicking on a segment takes you to a pie chart that shows the number of events
-per hour over that day.
+   Figure 9: Pie chart of study workload per day of the week
+
+.. figure:: img/ChartCTworkload24hours.png
+   :figwidth: 50%
+   :align: right
+   :alt: Pie chart of study workload per hour in a day
+
+   Figure 10: Pie chart of study workload per hour in a day
+   
+Each segment represents a day of the week, and shows the number of events that
+have taken place on that day (figure 9). Clicking on one of the segments will
+take you to a pie chart that shows the number of events per on that day (figure
+10).
 
 ********************
 Exporting chart data
@@ -124,22 +192,18 @@ New in 0.7.0
 Chart options
 *************
 
+.. figure:: img/ChartOptions.png
+   :figwidth: 50 %
+   :align: right
+   :alt: OpenREM chart options
+
+   Figure 11: OpenREM chart options
+
 Chart options can be configured by choosing the ``Chart options`` item from the
-``User options`` menu on the OpenREM homepage:
+``User options`` menu on the OpenREM homepage (figure 11).
 
-.. image:: img/ChartOptions.png
-   :width: 352px
-   :align: center
-   :height: 944px
-   :alt: OpenREM chart options screenshot
-
-They can also be set via the CT and Radiographic summary pages:
-
-.. image:: img/ChartCTOptions.png
-   :width: 297px
-   :align: center
-   :height: 376px
-   :alt: OpenREM CT chart options screenshot
+CT and radiographic plot options can also be set from their respective
+summary pages.
 
 The first option, ``Plot charts?``, determines whether any plots are shown.
 This also controls whether the data for the plots is calculated by OpenREM.
@@ -148,10 +212,16 @@ users may prefer to leave ``Plot charts?`` off for performance reasons.
 ``Plot charts?`` can be switched on and activated with a click of the
 ``Submit`` button after the data has been filtered.
 
-The user can switch off all chart plotting by clicking on the
+.. figure:: img/UserOptionsMenu.png
+   :figwidth: 25 %
+   :align: right
+   :alt: Switching charts off
+
+   Figure 12: Switching charts off
+
+The user can also switch off chart plotting by clicking on the
 ``Switch charts off`` link in the ``User options`` menu in the navigation bar
-at the top of any OpenREM page. Clicking on this link takes the user back to
-the home page.
+at the top of any OpenREM page, as shown in figure 12.
 
 The user can choose whether the data displayed on the charts is the mean, 
 median or both by using the drop-down ``Average to use`` selection. Only the
@@ -169,114 +239,15 @@ user administration page.
 Chart types - CT
 ****************
 
-=============================================================================
-Bar chart of average DLP for each acquisition protocol (all systems combined)
-=============================================================================
+* Bar chart of average DLP for each acquisition protocol (all systems combined)
 
-.. image:: img/ChartCTMeanDLP.png
-   :width: 925px
-   :align: center
-   :height: 587px
-   :alt: OpenREM chart of mean DLP screenshot
+* Bar chart of average DLP for each acquisition protocol (one series per system)
 
-The tooltip of each bar shows the user the name of the protocol, the number of
-acquisitions of that type and also the mean or median DLP.
+* Pie chart of the frequency of each acquisition protocol
 
-Clicking on an individual bar takes the user to a histogram of DLP for that
-protocol. The tooltip for each histogram bar shows the number of acquisitions.
-The histogram tooltip also includes a link that will take the user to the list
-of studies that contain the acquisitions represented by that histogram bar:
+* Pie chart showing the number of studies carried on each day of the week
 
-.. image:: img/ChartCTMeanDLPhistogram.png
-   :width: 930px
-   :align: center
-   :height: 511px
-   :alt: OpenREM histogram of acquisition DLP screenshot
-
-==============================================================================
-Bar chart of average DLP for each acquisition protocol (one series per system)
-==============================================================================
-
-Ticking the ``Plot a series per system`` box in the ``Chart options`` will result
-in plots that have a data series per x-ray system for all charts that plot
-dose, mAs or kVp against some category.
-
-.. image:: img/ChartCTMeanDLPperSystem.png
-   :width: 930px
-   :align: center
-   :height: 592px
-   :alt: OpenREM chart of mean DLP (one system per series) screenshot
-
-Clicking on an x-axis label of one of a plot with a series per x-ray system
-will take you to a plot with a histogram per x-ray system:
-
-.. image:: img/ChartCTMeanDLPhistogramPerSystem.png
-   :width: 930px
-   :align: center
-   :height: 515px
-   :alt: OpenREM histogram of acquisition DLP (one series per system) screenshot
-
-Clicking on the ``Toggle normalisation`` button when viewing a histogram will
-normalise all of the series to a maximum value of 1.0. This can sometimes make
-it easier to compare one distribution with another:
-
-.. image:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
-   :width: 926px
-   :align: center
-   :height: 515px
-   :alt: OpenREM normalised histogram of acquisition DLP (one series per system) screenshot
-
-=======================================================
-Pie chart of the frequency of each acquisition protocol
-=======================================================
-
-Clicking on a segment of the pie chart takes the user to the list of studies
-that contain the acquisitions in that segment.
-
-.. image:: img/ChartCTacquisitionFreq.png
-   :width: 932px
-   :align: center
-   :height: 510px
-   :alt: OpenREM chart of acquisition frequency screenshot
-
-=======================================================================
-Pie chart showing the number of studies carried on each day of the week
-=======================================================================
-
-.. image:: img/ChartCTworkload.png
-   :width: 930px
-   :align: center
-   :height: 540px
-   :alt: OpenREM pie chart of study workload per day of the week screenshot
-
-Clicking on a segment of the pie chart takes the user to a pie chart showing
-the studies for that weekday broken down per hour:
-
-.. image:: img/ChartCTworkload24hours.png
-   :width: 932px
-   :align: center
-   :height: 542px
-   :alt: OpenREM pie chart of study workload per hour in a day screenshot
-
-===============================================================   
-Line chart showing the average DLP of each study name over time
-===============================================================
-
-The time period per data point is chosen by the user in the ``Chart options``.
-Note that selecting a short time period may result in long calculation times.
-The user can zoom in to the plot by clicking and dragging the mouse to select a
-date range. The user can also click on items in the chart legend to show or
-hide individual lines.
-
-.. image:: img/ChartCTMeanDLPoverTime.png
-   :width: 932px
-   :align: center
-   :height: 542px
-   :alt: OpenREM line chart of mean DLP per study type over time screenshot
-      
-===============
-Other CT charts
-===============
+* Line chart showing the average DLP of each study name over time
 
 * Bar chart of average CTDI\ :sub:`vol` for each acquisition protocol
 
