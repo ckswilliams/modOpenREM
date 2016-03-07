@@ -49,18 +49,54 @@
         </div>
         <div class="col-md-7">
             <h2>OpenSkin radiation exposure incidence map</h2>
-            <p>
-                You can export this study to a csv file in the format required by Jonathan
-                Cole's OpenSkin software. The OpenSkin software can be downloaded from the
-                <a href="https://bitbucket.org/openskin/openskin/downloads">OpenSkin BitBucket project</a> and there is
-                more information available in the
-                <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>. Future releases of
-                OpenREM will display the exposure incidence map and peak skin dose values integrated into this page.
-            </p>
-            <h4>
-                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>. <small>(Not
-                available if you don't have export permissions.)</small>
-            </h4>
+
+
+            <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
+            <div class="skinDoseMap">
+                <canvas id="skinDoseMap" width="280" height="360"></canvas>
+            </div>
+
+            <div class="colourScale">
+                <canvas id="colourScale" width="50" height="360"></canvas>
+            </div>
+
+            <div class="noFloat">
+                <table>
+                    <tr>
+                        <td>Max dose:</td>
+                        <td id="maxDose">0.000 Gy</td>
+                    </tr>
+                    <tr>
+                        <td>Min dose:</td>
+                        <td id="minDose">0.000 Gy</td>
+                    </tr>
+                    <tr>
+                        <td>Cursor value:</td>
+                        <td id="hoverDose">0.000 Gy</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                Window level:
+                <input type="range" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.005"
+                       oninput="updateWindowLevel(this.value)"/>
+                <input type="text" name="currentWindowLevel" id="currentWindowLevel" size="1" onchange="updateWindowLevel(this.value)"/> Gy
+
+                <br/>
+
+                Window width:
+                <input type="range" name="windowWidthSlider" id="windowWidthSlider" min="0" max="4" value="0.2" step="0.005"
+                       oninput="updateWindowWidth(this.value)"/>
+                <input type="text" name="currentWindowWidth" id="currentWindowWidth" size="1" onchange="updateWindowWidth(this.value)"/> Gy
+
+                <br/>
+
+                <input type="button" onclick="reset()" value="Reset"/>
+            </div>
+            <script src="{{ STATIC_URL }}js/mouseOver.js"></script>
+
+
         </div>
   </div>
 

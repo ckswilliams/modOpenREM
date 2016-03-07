@@ -115,3 +115,19 @@ div.fullscreen{
   padding: 2px;
   z-index: 9999 !important;
 }
+
+.skinDoseMap {
+  float: left;
+  text-align: left;
+  padding: 8px;
+}
+
+.colourScale {
+  float: left;
+  text-align: left;
+  padding: 8px;
+}
+
+.noFloat {
+  clear: left;
+}
