@@ -482,23 +482,28 @@ def rf_detail_view(request, pk=None):
         if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position:
             delta_x = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position) / 10.0
         else:
-            delta_x = None
+            #delta_x = None
+            delta_x = 0
         if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position:
             delta_y = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position) / 10.0
         else:
-            delta_y = None
+            #delta_y = None
+            delta_y = 0
         if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position:
             delta_z = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position) / 10.0
         else:
-            delta_z = None
+            #delta_z = None
+            delta_z = 0
         if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle:
             angle_x = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle)
         else:
-            angle_x = None
+            #angle_x = None
+            angle_x = 0
         if irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle:
             angle_y = float(irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle)
         else:
-            angle_y = None
+            #angle_y = None
+            angle_y = 0
         if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter:
             d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter) / 10.0 - 15.0
         else:
@@ -518,7 +523,7 @@ def rf_detail_view(request, pk=None):
         if irrad.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum:
             filter_cu = float(irrad.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum)
         else:
-            filter_cu = None
+            filter_cu = 0.0
         if irrad.irradiation_event_type:
             run_type = str(irrad.irradiation_event_type)
         else:
@@ -532,11 +537,12 @@ def rf_detail_view(request, pk=None):
         else:
             end_angle = None
 
-        my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
-                            angle_x=angle_x, angle_y=angle_y,
-                            d_ref=d_ref, dap=dap, ref_ak=ref_ak,
-                            kvp=kvp, filter_cu=filter_cu,
-                            run_type=run_type, frames=frames, end_angle=end_angle)
+        if ref_ak:
+            my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
+                                angle_x=angle_x, angle_y=angle_y,
+                                d_ref=d_ref, dap=dap, ref_ak=ref_ak,
+                                kvp=kvp, filter_cu=filter_cu,
+                                run_type=run_type, frames=frames, end_angle=end_angle)
 
     return render_to_response(
         'remapp/rfdetail.html',
