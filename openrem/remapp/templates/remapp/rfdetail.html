@@ -52,6 +52,13 @@
 
 
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
+
+            <script>
+                var skin_map = [
+                    {% for row in skinmap.my_dose.totalDose %}{% for element in row %}{{ element }},{% endfor %}{% endfor %}
+                ];
+            </script>
+
             <div class="skinDoseMap">
                 <canvas id="skinDoseMap" width="280" height="360"></canvas>
             </div>

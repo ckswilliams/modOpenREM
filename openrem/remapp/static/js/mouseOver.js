@@ -15,9 +15,17 @@ function rgbToDoseInGy(r, g, b) {
     return doseUpperLimit * ((r * b) + g) / 65535.0;
 }
 
+function doseInGyToRGB(dose) {
+    var r, g, b;
+    dose = dose / 10. * 65535;
+    r = Math.floor(dose / 255);
+    g = Math.round(dose % 255);
+    b = 255;
+    return 'rgb(' + r.toString() + ',' + g.toString() + ',' + b.toString() + ')';
+}
 
 function setPixel(imageData, x, y, r, g, b, a) {
-    index = (x + y * imageData.width) * 4;
+    var index = (x + y * imageData.width) * 4;
     imageData.data[index + 0] = r;
     imageData.data[index + 1] = g;
     imageData.data[index + 2] = b;
@@ -27,7 +35,7 @@ function setPixel(imageData, x, y, r, g, b, a) {
 
 function applyColourScale(wl, ww) {
     var x, y, dose, newColour, scaledDose;
-    imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     for (x = 0; x < canvas.width; x++) {
         for (y = 0; y < canvas.height; y++) {
             dose = skinDoses[y * canvas.width + x];
@@ -93,7 +101,7 @@ function updateColourScale() {
     colourScaleContext.clearRect(0, 0, colourScaleCanvas.width, colourScaleCanvas.height);
 
     heightOffset = 20;
-    imageData = colourScaleContext.getImageData(0, heightOffset / 2, colourScaleCanvas.width, colourScaleCanvas.height - heightOffset);
+    var imageData = colourScaleContext.getImageData(0, heightOffset / 2, colourScaleCanvas.width, colourScaleCanvas.height - heightOffset);
 
     for (y = 0; y < colourScaleCanvas.height - heightOffset; y++) {
         for (x = 35; x < 50; x++) {
@@ -169,7 +177,7 @@ $("#skinDoseMap").on('mousedown', function (e) {
 
 var canvas = document.getElementById('skinDoseMap');
 var context = canvas.getContext('2d');
-var skinDoses = [];
+var skinDoses = new Array(100800);
 var mag = 4;
 var doseUpperLimit = 10.0;
 var windowWidth, windowLevel;
@@ -181,18 +189,28 @@ var isDragging = false;
 
 var colourScale = chroma.scale('RdYlBu');
 
-var imageObj = new Image();
-imageObj.onload = function () {
-    var i, dose, originalValues;
+$(document).ready(function () {
+    var i, j;
 
     // Draw the skin dose map onto the canvas
-    context.drawImage(imageObj, 0, 0, imageObj.width, imageObj.height, 0, 0, imageObj.width * mag, imageObj.height * mag);
+    for (i=0; i<70; i++) {
+        for (j=0; j<90; j++) {
+            context.fillStyle = doseInGyToRGB(skin_map[j*context.canvas.width+i]);
+            context.fillRect(i*4, j*4, 4, 4);
+        }
+    }
 
-    // Calculate the skin doses from the initial pixel value data
-    originalValues = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    for (i = 0; i < originalValues.length; i += 4) {
-        dose = rgbToDoseInGy(originalValues[i], originalValues[i + 1], originalValues[i + 2]).toFixed(3);
-        skinDoses.push(dose);
+    // Initialise the skin doses from skin_map
+    var current_dose, k, l;
+    for (i=0; i<70; i++) {
+        for (j=0; j<90; j++) {
+            current_dose = skin_map[j*70+i];
+            for (k=i*4; k<(i+1)*4; k++) {
+                for (l=j*4; l<(j+1)*4; l++) {
+                    skinDoses[l*280+k] = current_dose;
+                }
+            }
+        }
     }
 
     // Apply a colour scale to the image
@@ -213,5 +231,4 @@ imageObj.onload = function () {
     document.getElementById("windowLevelSlider").max = parseFloat(windowWidth).toFixed(3);
 
     updateColourScale();
-};
-imageObj.src = './skin_dose_map.png';
+});
