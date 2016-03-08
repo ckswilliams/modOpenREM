@@ -597,23 +597,23 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
                 proj.general_study_module_attributes.modality_type = 'MG'
             elif 'Projection X-Ray' in proj.procedure_reported.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF,DX'
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'acquisition device type':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'acquisition device type':
             proj.acquisition_device_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'start of x-ray irradiation':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'start of x-ray irradiation':
             proj.start_of_xray_irradiation = make_date_time(cont.DateTime)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'end of x-ray irradiation':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'end of x-ray irradiation':
             proj.end_of_xray_irradiation = make_date_time(cont.DateTime) 
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Scope of Accumulation':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Scope of Accumulation':
             proj.scope_of_accumulation = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Detector Data Available':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Detector Data Available':
             proj.xray_detector_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Source Data Available':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Source Data Available':
             proj.xray_source_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Mechanical Data Available':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Mechanical Data Available':
             proj.xray_mechanical_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
             proj.comment = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         proj.save()
         
