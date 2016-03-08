@@ -16,12 +16,11 @@
 
 """
 
-import skinMap
 import csv
-from tkFileDialog import askopenfilename
-from tkFileDialog import askdirectory
 from Tkinter import *
-import os.path
+from tkFileDialog import askdirectory
+from tkFileDialog import askopenfilename
+
 import calc_exp_map
 
 root = Tk()

@@ -64,7 +64,6 @@ class CalcExpMap(object):
                                                  self.table_length, self.table_width,
                                                  self.matt_trans * self.table_trans,
                                                  self.table_thick + self.matt_thick))
-        pass
 
     def get_map(self):
         # not sure about how this works
@@ -78,71 +77,3 @@ class CalcExpMap(object):
         # obtain the info that I need from the self.my_dose.totalDose
         # array.
         pass
-
-
-# From Ed (https://bitbucket.org/openrem/openskin/issues/1/check-if-cleaned-up-code-still-works):
-# In OpenREM we'll need something like:
-#
-# from openskin import CalcExpMap
-# from remapp.models import GeneralStudyModuleAttr
-#
-# study = GeneralStudyModuleAttr.objects.get(pk=studyid)
-# pat_mass = study.patientstudymoduleattr_set.get().patient_weight # plus test to see if present
-# pat_height = study.patientstudymoduleattr_set.get().patient_size # plus test to see if present
-#
-# map = CalcExpMap(phantom='3D', pat_mass=pat_mass, pat_height=pat_height)
-#
-# for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-#     map.add_view(
-#         deltax = irrad.irradeventxraymechanicaldata_set.get().
-#             doserelateddistancemeasurements_set.get().table_longitudinal_position,
-#         deltay = irrad.irradeventxraymechanicaldata_set.get().
-#             doserelateddistancemeasurements_set.get().table_lateral_position,
-#         # etc
-#     )
-#
-# django_store_image_thingy = map.get_map()
-# data = map.get_results()
-
-
-# From Jon (https://bitbucket.org/openrem/openskin/issues/1/check-if-cleaned-up-code-still-works):
-# ** Inputs **
-#
-# The skin dose map requires the following per run:
-#
-#     testPhantom # An openSkin phantom instance
-#     tableTrans  # The table transmission (not yet implemented)
-#
-#     typeOfRun   # Acquisition, Fluoroscopy, Rotational etc. Needed to separate spins from normal use
-#     deltax      # Table longitudinal position in cm. Isocentre to the patient's right is positive
-#     deltay      # Table lateral position in cm. Isocentre towards the patient's feet is positive
-#     deltaz      # Table height position in cm. Table below the isocentre is positive
-#     anglex     # Positioner primary angle in degrees. +90 is detector to the patient's left, 180 is tube above patient
-#     angley      # Positioner secondary angle in degrees. +90 is detector to the head, -90 is detector to the feet
-#     Dref        # Distance from the focus to the interventional reference point
-#     * One of *
-#         dap     # Used to calculate the area of the beam in Gy.m^2
-#         area    # Area of the beam in cm^2
-#     refAK       # Air kerma at the interventional reference point in Gy
-#     kV          # kV reported for the run
-#     filterCu    # Copper filter thickness reported for the run in mm
-#     endAngle    # *Rotational only* Angle where the spin stops in degrees
-#     frames      # *Rotational only* Number of frames in the rotational acquisition
-#
-#
-# A 3D testPhantom can be generated using:
-#
-#     mass        # The patient mass in kg
-#     height      # The patient height in cm
-# We also need to decide a few things about outputs. OpenSkin currently prints
-# peak dose (in Gy) and the number of cm^2 over 3, 5 and 10 Gy to a file. It
-# also generates a 16 bit greyscale PNG scaled so that white is 10 Gy. However,
-# it is fairly simple to change those outputs to whatever is desired (colour or
-# greyscale, different scaling, per run images or data, acquisition versus fluoro
-# etc). It depends what is sensible to give OpenREM.
-#
-# 2015-06-26
-# Jonathan Cole
-# I've added table and mattress transmission correction, so the thickness and
-# attenuation will need to be included somewhere in the call to openskin or a
-# config file too.
