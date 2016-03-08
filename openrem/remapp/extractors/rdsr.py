@@ -605,6 +605,12 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
             proj.end_of_xray_irradiation = make_date_time(cont.DateTime) 
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Scope of Accumulation':
             proj.scope_of_accumulation = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Detector Data Available':
+            proj.xray_detector_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Source Data Available':
+            proj.xray_source_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Mechanical Data Available':
+            proj.xray_mechanical_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
             proj.comment = cont.TextValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
