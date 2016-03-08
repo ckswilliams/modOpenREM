@@ -357,8 +357,9 @@ def _accumulatedmammoxraydose(dataset,accum): # TID 10005
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated Average Glandular Dose':
             accummammo.accumulated_average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
-            accummammo.laterality = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            for cont2 in cont.ContentSequence:
+                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
+                    accummammo.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
     accummammo.save()
 
 
