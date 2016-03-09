@@ -70,21 +70,21 @@
             <div class="noFloat">
                 <table>
                     <tr>
-                        <td>Max dose:</td>
+                        <td>Max dose in whole map:</td>
                         <td id="maxDose">0.000 Gy</td>
                     </tr>
                     <tr>
-                        <td>Min dose:</td>
+                        <td>Min dose in whole map:</td>
                         <td id="minDose">0.000 Gy</td>
                     </tr>
                     <tr>
-                        <td>Cursor value:</td>
+                        <td>Dose at mouse pointer:</td>
                         <td id="hoverDose">0.000 Gy</td>
                     </tr>
                 </table>
             </div>
 
-            <div>
+            <div id="skin_map_wwwl_controls">
                 Window level:
                 <input type="range" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.001"
                        oninput="updateWindowLevel(this.value)"/>
@@ -99,6 +99,11 @@
 
                 <br/>
 
+                <input type="button" onclick="reset()" value="Reset" class="btn btn-default btn-sm" role="button" />
+                <a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm" role="button">Swap to max/min controls</a>
+            </div>
+
+            <div id="skin_map_maxmin_controls">
                 Minimum displayed dose:
                 <input type="range" name="minDoseSlider" id="minDoseSlider" min="0" max="2" value="0.1" step="0.001"
                        oninput="updateMinDisplayedDose(this.value)"/>
@@ -113,10 +118,15 @@
 
                 <br/>
 
-                <input type="button" onclick="reset()" value="Reset"/>
+                <input type="button" onclick="reset()" value="Reset" class="btn btn-default btn-sm" role="button" />
+                <a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm" role="button">Swap to WW/WL controls</a>
             </div>
             <script src="{{ STATIC_URL }}js/mouseOver.js"></script>
 
+            <script>
+                $('#skin_map_maxmin_controls').show();
+                $('#skin_map_wwwl_controls').hide();
+            </script>
 
         </div>
   </div>
