@@ -46,6 +46,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^rf/$',
         'rf_summary_list_filter'),
     url(r'^rf/(?P<pk>\d+)/$', 'rf_detail_view', name='rf_detail_view'),
+    url(r'^rf/(?P<pk>\d+)/skin_map/$', 'rf_detail_view_skin_map', name='rf_detail_view_skin_map'),
 
     url(r'^ct/$',
         'ct_summary_list_filter'),

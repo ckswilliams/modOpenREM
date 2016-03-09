@@ -555,6 +555,116 @@ def rf_detail_view(request, pk=None):
 
 
 @login_required
+def rf_detail_view_skin_map(request, pk=None):
+    """View to calculate a skin dose map. Currently just a copy of rf_detail_view
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+    import tools.openskin.calc_exp_map as calc_exp_map
+
+    try:
+        study = GeneralStudyModuleAttr.objects.get(pk=pk)
+    except:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/rf/')
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    # Calculate skin dose map. Will be moved to an Ajax request at some point,
+    # but here for the time being.
+    pat_mass = study.patientstudymoduleattr_set.get().patient_weight
+    if not pat_mass:
+        pat_mass = 73.2
+
+    pat_height = study.patientstudymoduleattr_set.get().patient_size
+    if not pat_height:
+        pat_height = 178.6
+
+    my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D',
+                                         pat_mass=pat_mass, pat_height=pat_height,
+                                         table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
+                                         matt_thick=4.0, matt_trans=0.75)
+
+    for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position:
+            delta_x = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position) / 10.0
+        else:
+            #delta_x = None
+            delta_x = 0
+        if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position:
+            delta_y = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position) / 10.0
+        else:
+            #delta_y = None
+            delta_y = 0
+        if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position:
+            delta_z = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position) / 10.0
+        else:
+            #delta_z = None
+            delta_z = 0
+        if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle:
+            angle_x = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle)
+        else:
+            #angle_x = None
+            angle_x = 0
+        if irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle:
+            angle_y = float(irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle)
+        else:
+            #angle_y = None
+            angle_y = 0
+        if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter:
+            d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter) / 10.0 - 15.0
+        else:
+            d_ref = None
+        if irrad.dose_area_product:
+            dap = float(irrad.dose_area_product)
+        else:
+            dap = None
+        if irrad.irradeventxraysourcedata_set.get().dose_rp:
+            ref_ak = float(irrad.irradeventxraysourcedata_set.get().dose_rp)
+        else:
+            ref_ak = None
+        if irrad.irradeventxraysourcedata_set.get().kvp_set.get().kvp:
+            kvp = float(irrad.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
+        else:
+            kvp = None
+        if irrad.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum:
+            filter_cu = float(irrad.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum)
+        else:
+            filter_cu = 0.0
+        if irrad.irradiation_event_type:
+            run_type = str(irrad.irradiation_event_type)
+        else:
+            run_type = None
+        if irrad.irradeventxraysourcedata_set.get().number_of_pulses:
+            frames = float(irrad.irradeventxraysourcedata_set.get().number_of_pulses)
+        else:
+            frames = None
+        if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle:
+            end_angle=float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle)
+        else:
+            end_angle = None
+
+        if ref_ak:
+            my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
+                                angle_x=angle_x, angle_y=angle_y,
+                                d_ref=d_ref, dap=dap, ref_ak=ref_ak,
+                                kvp=kvp, filter_cu=filter_cu,
+                                run_type=run_type, frames=frames, end_angle=end_angle)
+
+    import numpy as np
+    my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
+
+    return render_to_response(
+        'remapp/rfdetail.html',
+        {'generalstudymoduleattr': study, 'admin': admin, 'skinmap': my_exp_map},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
 def ct_summary_list_filter(request):
     from remapp.interface.mod_filters import ct_acq_filter
     from remapp.forms import CTChartOptionsForm
