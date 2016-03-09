@@ -55,7 +55,7 @@ $('#skinDoseMap').mousemove(function (e) {
     var x = e.pageX - pos.x;
     var y = e.pageY - pos.y;
     var coord = "x=" + x + ", y=" + y;
-    $('#hoverDose').html(skinDoses[y * this.width + x] + " Gy");
+    $('#hoverDose').html(skinDoses[y * this.width + x].toFixed(3) + " Gy");
 });
 
 
@@ -193,21 +193,21 @@ $(document).ready(function () {
     var i, j;
 
     // Draw the skin dose map onto the canvas
-    for (i=0; i<70; i++) {
-        for (j=0; j<90; j++) {
-            context.fillStyle = doseInGyToRGB(skin_map[j*context.canvas.width+i]);
+    for (i=0; i<90; i++) {
+        for (j=0; j<70; j++) {
+            context.fillStyle = doseInGyToRGB(skin_map[j*90+i]);
             context.fillRect(i*4, j*4, 4, 4);
         }
     }
 
     // Initialise the skin doses from skin_map
     var current_dose, k, l;
-    for (i=0; i<70; i++) {
-        for (j=0; j<90; j++) {
-            current_dose = skin_map[j*70+i];
+    for (i=0; i<90; i++) {
+        for (j=0; j<70; j++) {
+            current_dose = skin_map[j*90+i];
             for (k=i*4; k<(i+1)*4; k++) {
                 for (l=j*4; l<(j+1)*4; l++) {
-                    skinDoses[l*280+k] = current_dose;
+                    skinDoses[l*360+k] = current_dose;
                 }
             }
         }

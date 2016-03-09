@@ -544,6 +544,9 @@ def rf_detail_view(request, pk=None):
                                 kvp=kvp, filter_cu=filter_cu,
                                 run_type=run_type, frames=frames, end_angle=end_angle)
 
+    import numpy as np
+    my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
+
     return render_to_response(
         'remapp/rfdetail.html',
         {'generalstudymoduleattr': study, 'admin': admin, 'skinmap': my_exp_map},

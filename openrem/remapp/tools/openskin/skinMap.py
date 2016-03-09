@@ -16,11 +16,7 @@
     
 """
 
-import numpy as np
-import math
-from geomclass import *
 from geomfunc import *
-import png
 import time
 
 
@@ -149,7 +145,8 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
         Nothing.
 
     """
-    maxDose = np.amax(totalDose)
+
+    import png
 
     if colour:
         threshDose = 5.
@@ -175,7 +172,7 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
     elif encode_16_bit_colour:
         # White at 10 Gy
         threshDose = 10.
-        totalDose = totalDose / 10. * 65535.
+        totalDose = totalDose / threshDose * 65535.
 
         r, g = divmod(totalDose, 255)
         # r is the number of times 255 goes into totalDose; g is the remainder
@@ -196,7 +193,8 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
 
     else:
         # White at 10 Gy
-        totalDose = totalDose / 10. * 65535.
+        threshDose = 10.
+        totalDose = totalDose / threshDose * 65535.
 
         f = open(filename, 'wb')
 
