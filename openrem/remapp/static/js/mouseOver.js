@@ -60,9 +60,9 @@ $('#skinDoseMap').mousemove(function (e) {
 
 
 function reset() {
-    var minDose, maxDose;
-    minDose = Math.min.apply(null, skinDoses);
-    maxDose = Math.max.apply(null, skinDoses);
+    var minDose = Math.min.apply(null, skinDoses);
+    var maxDose = Math.max.apply(null, skinDoses);
+
     windowWidth = maxDose - minDose;
     windowLevel = minDose + (windowWidth/2.0);
 
@@ -70,6 +70,11 @@ function reset() {
     document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
     document.getElementById("windowLevelSlider").value = parseFloat(windowLevel);
     document.getElementById("windowWidthSlider").value = parseFloat(windowWidth);
+
+    document.getElementById("minDoseSlider").value = minDose;
+    document.getElementById("currentMinDisplayedDose").value = minDose.toFixed(3);
+    document.getElementById("maxDoseSlider").value = maxDose;
+    document.getElementById("currentMaxDisplayedDose").value = maxDose.toFixed(3);
 
     applyColourScale(windowLevel, windowWidth);
     updateColourScale();
@@ -81,6 +86,32 @@ function updateWindowLevel(newWindowLevel) {
     windowLevel = parseFloat(newWindowLevel);
     document.getElementById("currentWindowLevel").value = parseFloat(windowLevel).toFixed(3);
     document.getElementById("windowLevelSlider").value = parseFloat(windowLevel);
+
+    var minDisplayedDose = windowLevel - (windowWidth/2.0);
+    var maxDisplayedDose = windowLevel + (windowWidth/2.0);
+
+    var minDose = parseFloat(document.getElementById("minDoseSlider").min);
+    var maxDose = parseFloat(document.getElementById("minDoseSlider").max);
+
+    if (minDisplayedDose<=minDose) {
+        minDisplayedDose = minDose;
+    }
+    else if(minDisplayedDose>=maxDose) {
+        minDisplayedDose = maxDose;
+    }
+
+    if (maxDisplayedDose<=minDose) {
+        maxDisplayedDose = minDose;
+    }
+    else if(maxDisplayedDose>=maxDose) {
+        maxDisplayedDose = maxDose;
+    }
+
+    document.getElementById("minDoseSlider").value = minDisplayedDose;
+    document.getElementById("currentMinDisplayedDose").value = minDisplayedDose.toFixed(3);
+    document.getElementById("maxDoseSlider").value = maxDisplayedDose;
+    document.getElementById("currentMaxDisplayedDose").value = maxDisplayedDose.toFixed(3);
+
     applyColourScale(windowLevel, windowWidth);
     updateColourScale();
 }
@@ -90,6 +121,96 @@ function updateWindowWidth(newWindowWidth) {
     windowWidth = newWindowWidth;
     document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
     document.getElementById("windowWidthSlider").value = parseFloat(windowWidth);
+
+    var minDisplayedDose = windowLevel - (windowWidth/2.0);
+    var maxDisplayedDose = windowLevel + (windowWidth/2.0);
+
+    var minDose = parseFloat(document.getElementById("minDoseSlider").min);
+    var maxDose = parseFloat(document.getElementById("minDoseSlider").max);
+
+    if (minDisplayedDose<=minDose) {
+        minDisplayedDose = minDose;
+    }
+    else if(minDisplayedDose>=maxDose) {
+        minDisplayedDose = maxDose;
+    }
+
+    if (maxDisplayedDose<=minDose) {
+        maxDisplayedDose = minDose;
+    }
+    else if(maxDisplayedDose>=maxDose) {
+        maxDisplayedDose = maxDose;
+    }
+
+    document.getElementById("minDoseSlider").value = minDisplayedDose;
+    document.getElementById("currentMinDisplayedDose").value = minDisplayedDose.toFixed(3);
+    document.getElementById("maxDoseSlider").value = maxDisplayedDose;
+    document.getElementById("currentMaxDisplayedDose").value = maxDisplayedDose.toFixed(3);
+
+    applyColourScale(windowLevel, windowWidth);
+    updateColourScale();
+}
+
+
+function updateMinDisplayedDose(minDisplayedDose) {
+    minDisplayedDose = parseFloat(minDisplayedDose);
+
+    var minDose = parseFloat(document.getElementById("minDoseSlider").min);
+    var maxDose = parseFloat(document.getElementById("minDoseSlider").max);
+
+    if (minDisplayedDose <= minDose) {
+        minDisplayedDose = minDose;
+    }
+    else if (minDisplayedDose >= maxDose) {
+        minDisplayedDose = maxDose;
+    }
+
+    var maxDisplayedDose = parseFloat(document.getElementById("currentMaxDisplayedDose").value);
+
+    windowWidth = maxDisplayedDose - minDisplayedDose;
+    windowLevel = minDisplayedDose +  (windowWidth / 2.0);
+
+    document.getElementById("minDoseSlider").value = minDisplayedDose;
+    document.getElementById("currentMinDisplayedDose").value = minDisplayedDose.toFixed(3);
+
+    document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
+    document.getElementById("windowWidthSlider").value = parseFloat(windowWidth);
+
+    document.getElementById("currentWindowLevel").value = parseFloat(windowLevel).toFixed(3);
+    document.getElementById("windowLevelSlider").value = parseFloat(windowLevel);
+
+    applyColourScale(windowLevel, windowWidth);
+    updateColourScale();
+}
+
+
+function updateMaxDisplayedDose(maxDisplayedDose) {
+    maxDisplayedDose = parseFloat(maxDisplayedDose);
+
+    var minDose = parseFloat(document.getElementById("minDoseSlider").min);
+    var maxDose = parseFloat(document.getElementById("minDoseSlider").max);
+
+    if (maxDisplayedDose <= minDose) {
+        maxDisplayedDose = minDose;
+    }
+    else if (maxDisplayedDose >= maxDose) {
+        maxDisplayedDose = maxDose;
+    }
+
+    var minDisplayedDose = parseFloat(document.getElementById("currentMinDisplayedDose").value);
+
+    windowWidth = maxDisplayedDose - minDisplayedDose;
+    windowLevel = minDisplayedDose +  (windowWidth / 2.0);
+
+    document.getElementById("maxDoseSlider").value = maxDisplayedDose;
+    document.getElementById("currentMaxDisplayedDose").value = maxDisplayedDose.toFixed(3);
+
+    document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
+    document.getElementById("windowWidthSlider").value = parseFloat(windowWidth);
+
+    document.getElementById("currentWindowLevel").value = parseFloat(windowLevel).toFixed(3);
+    document.getElementById("windowLevelSlider").value = parseFloat(windowLevel);
+
     applyColourScale(windowLevel, windowWidth);
     updateColourScale();
 }
@@ -227,8 +348,21 @@ $(document).ready(function () {
     document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
     document.getElementById("currentWindowLevel").value = parseFloat(windowLevel).toFixed(3);
 
-    document.getElementById("windowWidthSlider").max = parseFloat(windowWidth).toFixed(3);
-    document.getElementById("windowLevelSlider").max = parseFloat(windowWidth).toFixed(3);
+    document.getElementById("windowWidthSlider").max = parseFloat(windowWidth);
+    document.getElementById("windowLevelSlider").max = parseFloat(windowWidth);
+
+    document.getElementById("windowWidthSlider").value = parseFloat(windowWidth);
+    document.getElementById("windowLevelSlider").value = parseFloat(windowLevel);
+
+    document.getElementById("minDoseSlider").min = minDose;
+    document.getElementById("minDoseSlider").max = maxDose;
+    document.getElementById("minDoseSlider").value = minDose;
+    document.getElementById("currentMinDisplayedDose").value = minDose.toFixed(3);
+
+    document.getElementById("maxDoseSlider").min = minDose;
+    document.getElementById("maxDoseSlider").max = maxDose;
+    document.getElementById("maxDoseSlider").value = maxDose;
+    document.getElementById("currentMaxDisplayedDose").value = maxDose.toFixed(3);
 
     updateColourScale();
 });

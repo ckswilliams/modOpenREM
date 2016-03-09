@@ -86,16 +86,30 @@
 
             <div>
                 Window level:
-                <input type="range" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.005"
+                <input type="range" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.001"
                        oninput="updateWindowLevel(this.value)"/>
                 <input type="text" name="currentWindowLevel" id="currentWindowLevel" size="1" onchange="updateWindowLevel(this.value)"/> Gy
 
                 <br/>
 
                 Window width:
-                <input type="range" name="windowWidthSlider" id="windowWidthSlider" min="0" max="4" value="0.2" step="0.005"
+                <input type="range" name="windowWidthSlider" id="windowWidthSlider" min="0" max="4" value="0.2" step="0.001"
                        oninput="updateWindowWidth(this.value)"/>
                 <input type="text" name="currentWindowWidth" id="currentWindowWidth" size="1" onchange="updateWindowWidth(this.value)"/> Gy
+
+                <br/>
+
+                Minimum displayed dose:
+                <input type="range" name="minDoseSlider" id="minDoseSlider" min="0" max="2" value="0.1" step="0.001"
+                       oninput="updateMinDisplayedDose(this.value)"/>
+                <input type="text" name="currentMinDisplayedDose" id="currentMinDisplayedDose" size="1" onchange="updateMinDisplayedDose(this.value)"/> Gy
+
+                <br/>
+
+                Maximum displayed dose:
+                <input type="range" name="maxDoseSlider" id="maxDoseSlider" min="0" max="4" value="0.2" step="0.001"
+                       oninput="updateMaxDisplayedDose(this.value)"/>
+                <input type="text" name="currentMaxDisplayedDose" id="currentMaxDisplayedDose" size="1" onchange="updateMaxDisplayedDose(this.value)"/> Gy
 
                 <br/>
 
