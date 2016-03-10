@@ -570,7 +570,9 @@ def rf_detail_view_skin_map(request, pk=None):
     my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
 
     return_structure = {
-        'skin_map': my_exp_map.my_dose.totalDose.flatten().tolist()
+        'skin_map': my_exp_map.my_dose.totalDose.flatten().tolist(),
+        'width': my_exp_map.phantom.width,
+        'height': my_exp_map.phantom.height
     }
 
     return JsonResponse(return_structure, safe=False)

@@ -34,26 +34,29 @@ $(document).ready(function() {
         dataType: "json",
         success: function( json ) {
 
-            skin_map = json.skin_map;
+            skinDoses = new Array(json.height*json.width);
+
+            canvas.width = json.width*mag;
+            canvas.height = json.height*mag;
 
             var i, j;
 
             // Draw the skin dose map onto the canvas
-            for (i=0; i<90; i++) {
-                for (j=0; j<70; j++) {
-                    context.fillStyle = doseInGyToRGB(skin_map[j*90+i]);
-                    context.fillRect(i*4, j*4, 4, 4);
+            for (i=0; i<json.width; i++) {
+                for (j=0; j<json.height; j++) {
+                    context.fillStyle = doseInGyToRGB(json.skin_map[j*json.width+i]);
+                    context.fillRect(i*mag, j*mag, mag, mag);
                 }
             }
 
-            // Initialise the skin doses from skin_map
+            // Initialise the skin doses from json.skin_map
             var current_dose, k, l;
-            for (i=0; i<90; i++) {
-                for (j=0; j<70; j++) {
-                    current_dose = skin_map[j*90+i];
-                    for (k=i*4; k<(i+1)*4; k++) {
-                        for (l=j*4; l<(j+1)*4; l++) {
-                            skinDoses[l*360+k] = current_dose;
+            for (i=0; i<json.width; i++) {
+                for (j=0; j<json.height; j++) {
+                    current_dose = json.skin_map[j*json.width+i];
+                    for (k=i*mag; k<(i+1)*mag; k++) {
+                        for (l=j*mag; l<(j+1)*mag; l++) {
+                            skinDoses[l*mag*json.width+k] = current_dose;
                         }
                     }
                 }

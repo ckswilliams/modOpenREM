@@ -318,11 +318,10 @@ $("#skinDoseMap").on('mousedown', function (e) {
 
 var canvas = document.getElementById('skinDoseMap');
 var context = canvas.getContext('2d');
-var skinDoses = new Array(100800);
-var mag = 4;
+var mag = 6;
+var skinDoses;
 var doseUpperLimit = 10.0;
 var windowWidth, windowLevel;
-var skin_map;
 
 var colourScaleCanvas = document.getElementById('colourScale');
 var colourScaleContext = colourScaleCanvas.getContext('2d');
