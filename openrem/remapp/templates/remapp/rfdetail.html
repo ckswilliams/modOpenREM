@@ -48,16 +48,12 @@
             </ul>
         </div>
         <div class="col-md-7">
+            <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
             <h2>OpenSkin radiation exposure incidence map</h2>
 
 
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
-
-            <script>
-                var skin_map = [
-                    {% for row in skinmap.my_dose.totalDose %}{% for element in row %}{{ element }},{% endfor %}{% endfor %}
-                ];
-            </script>
 
             <div class="skinDoseMap">
                 <canvas id="skinDoseMap" width="360" height="280"></canvas>
@@ -119,6 +115,8 @@
                 $('#skin_map_maxmin_controls').show();
                 $('#skin_map_wwwl_controls').hide();
             </script>
+
+            <script src="{{ STATIC_URL }}js/rfSkinMapAjax.js"></script>
 
         </div>
   </div>
