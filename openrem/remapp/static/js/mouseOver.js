@@ -354,7 +354,7 @@ $(document).ready(function () {
     windowLevel = minDose + (windowWidth/2.0);
     applyColourScale(windowLevel, windowWidth);
 
-    $('#minDose').html(minDose.toFixed(3) + " Gy");
+    //$('#minDose').html(minDose.toFixed(3) + " Gy");
     $('#maxDose').html(maxDose.toFixed(3) + " Gy");
 
     document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
