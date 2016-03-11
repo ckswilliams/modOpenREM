@@ -10,19 +10,6 @@ function colourScaleSelection(div) {
     var num_shades = 11;
     var html;
 
-    html = '<form onsubmit="updateColourScale(this);">';
-    html = '<table>';
-    for (i=0; i<colour_scales.length; i++) {
-        html += '<tr><td><input type="radio" name="colour_choice" value="' + colour_scales[i] + '"></td>';
-        html += '<td><canvas id="' + colour_scales[i] + '"></canvas></td>';
-        html += '</tr>';
-    }
-    html += '<tr><td><input type="submit"></td></tr>'
-    html += '</table>';
-    html += '</form>';
-
-    $('#'+div).html(html);
-
     for (i=0; i<colour_scales.length; i++) {
         canvas = document.getElementById(colour_scales[i]);
         context = canvas.getContext('2d');
@@ -37,8 +24,10 @@ function colourScaleSelection(div) {
 }
 
 
-function updateColourScale(new_scale) {
-    $('.colour_scale_selection').hide();
+function useNewColourScale(new_scale) {
+    colourScale = chroma.scale(new_scale);
+    applyColourScale(windowLevel, windowWidth);
+    updateColourScale();
 }
 
 
@@ -86,7 +75,7 @@ function applyColourScale(wl, ww) {
             scaledDose = dose - (wl-(ww/2.0));
             if (scaledDose < 0) scaledDose = 0;
             if (scaledDose > ww) scaledDose = ww;
-            newColour = colourScale(1 - (scaledDose / ww)).rgb();
+            newColour = colourScale(scaledDose / ww).rgb();
             setPixel(imageData, x, y, newColour[0], newColour[1], newColour[2], 255);
         }
     }
@@ -287,7 +276,7 @@ function updateColourScale() {
     for (y = 0; y < colourScaleCanvas.height - heightOffset; y++) {
         for (x = 35; x < 50; x++) {
             dose = y / (colourScaleCanvas.height - heightOffset) * doseUpperLimit;
-            colour = colourScale(dose / doseUpperLimit).rgb();
+            colour = colourScale(1-(dose / doseUpperLimit)).rgb();
             setPixel(imageData, x, y, colour[0], colour[1], colour[2], 255);
         }
     }
@@ -372,7 +361,7 @@ var colourScaleContext = colourScaleCanvas.getContext('2d');
 
 var isDragging = false;
 
-var colourScale = chroma.scale('RdYlBu');
+var colourScale = chroma.scale('Greys');
 
 $('.colour_scale_selection').hide();
 colourScaleSelection('colour_scale_selection');

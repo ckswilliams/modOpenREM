@@ -63,7 +63,128 @@
                 <canvas id="colourScale" width="50" height="280"></canvas>
             </div>
 
-            <div class="colour_scale_selection" id="colour_scale_selection"></div>
+            <div class="colour_scale_selection" id="colour_scale_selection">
+                <form id="colour_scale_form" onsubmit="updateColourScale(this); return false;">
+                    <table>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="OrRd"></td>
+                            <td><canvas id="OrRd"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="PuBu"></td>
+                            <td><canvas id="PuBu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="BuPu"></td>
+                            <td><canvas id="BuPu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Oranges"></td>
+                            <td><canvas id="Oranges"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="BuGn"></td>
+                            <td><canvas id="BuGn"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="YlOrBr"></td>
+                            <td><canvas id="YlOrBr"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="YlGn"></td>
+                            <td><canvas id="YlGn"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Reds"></td>
+                            <td><canvas id="Reds"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="RdPu"></td>
+                            <td><canvas id="RdPu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Greens"></td>
+                            <td><canvas id="Greens"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="YlGnBu"></td>
+                            <td><canvas id="YlGnBu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Purples"></td>
+                            <td><canvas id="Purples"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="GnBu"></td>
+                            <td><canvas id="GnBu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Greys"></td>
+                            <td><canvas id="Greys"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="YlOrRd"></td>
+                            <td><canvas id="YlOrRd"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="PuRd"></td>
+                            <td><canvas id="PuRd"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Blues"></td>
+                            <td><canvas id="Blues"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="PuBuGn"></td>
+                            <td><canvas id="PuBuGn"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="Spectral"></td>
+                            <td><canvas id="Spectral"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="RdYlGn"></td>
+                            <td><canvas id="RdYlGn"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="RdBu"></td>
+                            <td><canvas id="RdBu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="PiYG"></td>
+                            <td><canvas id="PiYG"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="PRGn"></td>
+                            <td><canvas id="PRGn"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="RdYlBu"></td>
+                            <td><canvas id="RdYlBu"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="BrBG"></td>
+                            <td><canvas id="BrBG"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="RdGy"></td>
+                            <td><canvas id="RdGy"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" name="colour_choice" value="PuOr"></td>
+                            <td><canvas id="PuOr"></canvas></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><a onclick="$('.colour_scale_selection').hide();" class="btn btn-default btn-sm" role="button">Hide colour scales</a></td>
+                        </tr>
+                    </table>
+                </form>
+                <script>
+                    $('#colour_scale_form input[type=radio]').change(function() {
+                        useNewColourScale(this.value);
+                    });
+                </script>
+            </div>
 
             <div class="noFloat">
                 <table>
