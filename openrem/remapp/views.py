@@ -494,7 +494,7 @@ def rf_detail_view_skin_map(request, pk=None):
         admin[group.name] = True
 
     # Check to see if there is already a skin map pickle with the same study ID.
-    skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'p')
+    skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
     if os.path.exists(skin_map_path):
         return_structure = pickle.load(open(skin_map_path, 'rb'))
 
@@ -581,7 +581,10 @@ def rf_detail_view_skin_map(request, pk=None):
         return_structure = {
             'skin_map': my_exp_map.my_dose.totalDose.flatten().tolist(),
             'width': my_exp_map.phantom.width,
-            'height': my_exp_map.phantom.height
+            'height': my_exp_map.phantom.height,
+            'phantom_width': my_exp_map.phantom.phantom_width,
+            'phantom_height': my_exp_map.phantom.phantom_height,
+            'phantom_depth': my_exp_map.phantom.phantom_depth
         }
 
         # Save the return_structure as a pickle in a skin_maps sub-folder of the MEDIA_ROOT folder
@@ -589,7 +592,7 @@ def rf_detail_view_skin_map(request, pk=None):
         if not os.path.exists(skin_map_path):
             os.makedirs(skin_map_path)
 
-        pickle.dump(return_structure, open(os.path.join(skin_map_path, 'skin_map_'+str(pk)+'p'), 'wb'))
+        pickle.dump(return_structure, open(os.path.join(skin_map_path, 'skin_map_'+str(pk)+'.p'), 'wb'))
 
     return JsonResponse(return_structure, safe=False)
 
