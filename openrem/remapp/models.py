@@ -715,12 +715,6 @@ class AccumProjXRayDose(models.Model):  # TID 10004
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
 
-    # def convert_gym2_to_cgycm2(self):
-    #     """Converts Gy.m2 to cGy.cm2 for display in web interface
-    #     """
-    #     if self.dose_area_product_total:
-    #         return 1000000*self.dose_area_product_total
-
 
 class AccumMammographyXRayDose(models.Model):  # TID 10005
     """Accumulated Mammography X-Ray Dose TID 10005
