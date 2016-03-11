@@ -39,8 +39,8 @@
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}</td>
             <td>{{ exam.performing_physician_name }}</td>
 {% elif exam.modality_type == "DX" or exam.modality_type == "CR" %}
             <td>
