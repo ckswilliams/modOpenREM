@@ -63,6 +63,8 @@
                 <canvas id="colourScale" width="50" height="280"></canvas>
             </div>
 
+            <div class="colour_scale_selection" id="colour_scale_selection"></div>
+
             <div class="noFloat">
                 <table>
                     <tr>
@@ -91,6 +93,7 @@
                 </table>
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm" role="button">Swap to max/min controls</a>
+                <a onclick="$('.colour_scale_selection').show();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
             </div>
 
             <div id="skin_map_maxmin_controls">
@@ -108,7 +111,9 @@
                 </table>
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm" role="button">Swap to WW/WL controls</a>
+                <a onclick="$('.colour_scale_selection').show();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
             </div>
+
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapping.js"></script>
 
             <script>

@@ -1,3 +1,47 @@
+function colourScaleSelection(div) {
+    var colour_scales = ['OrRd','PuBu','BuPu','Oranges','BuGn','YlOrBr',
+        'YlGn','Reds','RdPu','Greens','YlGnBu','Purples','GnBu','Greys',
+        'YlOrRd','PuRd','Blues','PuBuGn','Spectral','RdYlGn','RdBu','PiYG',
+        'PRGn', 'RdYlBu','BrBG','RdGy','PuOr'];
+    var i, j;
+    var colour_scale;
+    var canvas, context;
+    var side_length = 15;
+    var num_shades = 11;
+    var html;
+
+    html = '<form onsubmit="updateColourScale(this);">';
+    html = '<table>';
+    for (i=0; i<colour_scales.length; i++) {
+        html += '<tr><td><input type="radio" name="colour_choice" value="' + colour_scales[i] + '"></td>';
+        html += '<td><canvas id="' + colour_scales[i] + '"></canvas></td>';
+        html += '</tr>';
+    }
+    html += '<tr><td><input type="submit"></td></tr>'
+    html += '</table>';
+    html += '</form>';
+
+    $('#'+div).html(html);
+
+    for (i=0; i<colour_scales.length; i++) {
+        canvas = document.getElementById(colour_scales[i]);
+        context = canvas.getContext('2d');
+        canvas.height = side_length;
+        canvas.width = side_length * num_shades;
+        colour_scale = chroma.scale(colour_scales[i]);
+        for (j=0; j<num_shades; j++) {
+            context.fillStyle = colour_scale(j/(num_shades-1));
+            context.fillRect(j*side_length, 0, side_length, side_length);
+        }
+    }
+}
+
+
+function updateColourScale(new_scale) {
+    $('.colour_scale_selection').hide();
+}
+
+
 function findPos(obj) {
     var curleft = 0, curtop = 0;
     if (obj.offsetParent) {
@@ -329,3 +373,6 @@ var colourScaleContext = colourScaleCanvas.getContext('2d');
 var isDragging = false;
 
 var colourScale = chroma.scale('RdYlBu');
+
+$('.colour_scale_selection').hide();
+colourScaleSelection('colour_scale_selection');
