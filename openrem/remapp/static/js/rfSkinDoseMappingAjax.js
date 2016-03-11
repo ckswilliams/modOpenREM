@@ -38,6 +38,7 @@ $(document).ready(function() {
 
             canvas.width = json.width*mag;
             canvas.height = json.height*mag;
+            colourScaleCanvas.height = json.height*mag;
 
             var i, j;
 
