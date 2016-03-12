@@ -138,6 +138,8 @@ class Phantom_3:
         phantom_width: the horizontal distance across the 3D phantom
         phantom_height: the height of the 3D phantom
         phantom_depth: the depth of the 3D phantom
+        phantom_flat_dist: the width of the flat part of the phantom (same for front and back)
+        phantom_curved_dist: the distance around one curved side of the phantom (same for left and right sides)
         phantomMap: an array containing a list of points which represent each cell in the phantom surface to be evaluated
         normalMap: an array containing line segments (Segment_3) indicating the outward facing surface of the cell
         phantomType: set to "3d"
@@ -164,6 +166,8 @@ class Phantom_3:
         self.phantom_width = round(flatWidth + 2 * radius, 0)
         self.phantom_height = round(torso, 0)
         self.phantom_depth = round(radius * 2, 0)
+        self.phantom_flat_dist = roundFlat
+        self.phantom_curved_dist = roundCircumference
 
         self.width = 2 * roundCircumference + 2 * roundFlat
         self.height = round(torso, 0)
