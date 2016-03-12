@@ -93,8 +93,8 @@ $('#skinDoseMap').mousemove(function (e) {
 
 
 function reset() {
-    var minDose = Math.min.apply(null, skinDoses);
-    var maxDose = Math.max.apply(null, skinDoses);
+    var minDose = document.getElementById("minDoseSlider").min;
+    var maxDose = document.getElementById("maxDoseSlider").max;
 
     windowWidth = maxDose - minDose;
     windowLevel = minDose + (windowWidth/2.0);
