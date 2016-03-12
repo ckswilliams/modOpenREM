@@ -8,7 +8,6 @@ function colourScaleSelection(div) {
     var canvas, context;
     var side_length = 15;
     var num_shades = 11;
-    var html;
 
     for (i=0; i<colour_scales.length; i++) {
         canvas = document.getElementById(colour_scales[i]);
@@ -274,7 +273,7 @@ function updateColourScale() {
     var imageData = colourScaleContext.getImageData(0, heightOffset / 2, colourScaleCanvas.width, colourScaleCanvas.height - heightOffset);
 
     for (y = 0; y < colourScaleCanvas.height - heightOffset; y++) {
-        for (x = 35; x < 50; x++) {
+        for (x = 55; x < 70; x++) {
             dose = y / (colourScaleCanvas.height - heightOffset) * doseUpperLimit;
             colour = colourScale(1-(dose / doseUpperLimit)).rgb();
             setPixel(imageData, x, y, colour[0], colour[1], colour[2], 255);
@@ -283,11 +282,11 @@ function updateColourScale() {
 
     i = 0;
     for (y = 0; y < colourScaleCanvas.height; y += Math.floor((colourScaleCanvas.height - heightOffset) / 10)) {
-        for (x = 30; x < 35; x++) {
+        for (x = 50; x < 55; x++) {
             setPixel(imageData, x, y, 0, 0, 0, 255);
         }
     }
-    for (x = 30; x < 35; x++) {
+    for (x = 50; x < 55; x++) {
         setPixel(imageData, x, colourScaleCanvas.height - heightOffset - 1, 0, 0, 0, 255);
     }
     colourScaleContext.putImageData(imageData, 0, heightOffset / 2);
@@ -295,7 +294,7 @@ function updateColourScale() {
     i = parseFloat(windowLevel - windowWidth/2.0);
     increment = (windowWidth) / 10;
     for (y = 0; y < colourScaleCanvas.height; y += Math.floor((colourScaleCanvas.height - heightOffset) / 10)) {
-        colourScaleContext.fillText(i.toFixed(3), 0, colourScaleCanvas.height - y - 7);
+        colourScaleContext.fillText(i.toFixed(3), 15, colourScaleCanvas.height - y - 7);
         i += increment;
     }
 }
