@@ -34,7 +34,7 @@ $(document).ready(function() {
         dataType: "json",
         success: function( json ) {
 
-            skinDoses = new Array(json.height*json.width);
+            skin_map = json.skin_map;
 
             canvas.width = json.width*mag;
             canvas.height = json.height*mag;
@@ -45,33 +45,19 @@ $(document).ready(function() {
             // Draw the skin dose map onto the canvas
             for (i=0; i<json.width; i++) {
                 for (j=0; j<json.height; j++) {
-                    context.fillStyle = doseInGyToRGB(json.skin_map[j*json.width+i]);
+                    context.fillStyle = doseInGyToRGB(skin_map[j*json.width+i]);
                     context.fillRect(i*mag, j*mag, mag, mag);
-                }
-            }
-
-            // Initialise the skin doses from json.skin_map
-            var current_dose, k, l;
-            for (i=0; i<json.width; i++) {
-                for (j=0; j<json.height; j++) {
-                    current_dose = json.skin_map[j*json.width+i];
-                    for (k=i*mag; k<(i+1)*mag; k++) {
-                        for (l=j*mag; l<(j+1)*mag; l++) {
-                            skinDoses[l*mag*json.width+k] = current_dose;
-                        }
-                    }
                 }
             }
 
             // Apply a colour scale to the image
             var minDose, maxDose;
-            minDose = Math.min.apply(null, json.skin_map);
-            maxDose = Math.max.apply(null, json.skin_map);
+            minDose = Math.min.apply(null, skin_map);
+            maxDose = Math.max.apply(null, skin_map);
             windowWidth = maxDose - minDose;
             windowLevel = minDose + (windowWidth/2.0);
             applyColourScale(windowLevel, windowWidth);
 
-            //$('#minDose').html(minDose.toFixed(3) + " Gy");
             $('#maxDose').html(maxDose.toFixed(3) + " Gy");
 
             document.getElementById("currentWindowWidth").value = parseFloat(windowWidth).toFixed(3);
