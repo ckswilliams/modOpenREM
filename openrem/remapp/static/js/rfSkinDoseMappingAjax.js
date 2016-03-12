@@ -65,8 +65,8 @@ $(document).ready(function() {
 
             // Apply a colour scale to the image
             var minDose, maxDose;
-            minDose = Math.min.apply(null, skinDoses);
-            maxDose = Math.max.apply(null, skinDoses);
+            minDose = Math.min.apply(null, json.skin_map);
+            maxDose = Math.max.apply(null, json.skin_map);
             windowWidth = maxDose - minDose;
             windowLevel = minDose + (windowWidth/2.0);
             applyColourScale(windowLevel, windowWidth);
