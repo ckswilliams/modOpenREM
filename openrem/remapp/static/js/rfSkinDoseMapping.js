@@ -341,5 +341,6 @@ $('[data-tooltip="skin_dose_map"]').qtip({
             x: 15,
             y: 15
         }
-    }
+    },
+    style: { classes: 'qtip-bootstrap' }
 });
