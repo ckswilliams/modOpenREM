@@ -1,4 +1,4 @@
-{% extends "remapp/base.html" %}
+{% extends "remapp/rfdetailbase.html" %}
 
 {% block navrf %}<li class="active">{% endblock %}
 
@@ -56,7 +56,7 @@
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
 
             <div class="skinDoseMap">
-                <canvas id="skinDoseMap" width="360" height="280" class="table-bordered"></canvas>
+                <canvas id="skinDoseMap" width="360" height="280" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
             </div>
 
             <div class="colourScale">

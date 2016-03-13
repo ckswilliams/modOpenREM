@@ -89,7 +89,9 @@ $('#skinDoseMap').mousemove(function (e) {
     var x = e.pageX - pos.x;
     var y = e.pageY - pos.y;
     var coord = "x=" + x + ", y=" + y;
-    $('#hoverDose').html(skin_map[Math.floor(y/mag) * Math.floor(this.width/mag) + Math.floor(x/mag)].toFixed(3) + " Gy");
+    var current_dose = skin_map[Math.floor(y/mag) * Math.floor(this.width/mag) + Math.floor(x/mag)].toFixed(3) + " Gy";
+    $('#hoverDose').html(current_dose);
+    $('[data-tooltip="skin_dose_map"]').qtip('option', 'content.text', current_dose);
 });
 
 
@@ -328,3 +330,17 @@ var colourScale = chroma.scale('Greys');
 
 $('.colour_scale_selection').hide();
 colourScaleSelection('colour_scale_selection');
+
+$('[data-tooltip="skin_dose_map"]').qtip({
+    content: {
+        text: ''
+    },
+    position: {
+        target: 'mouse',
+        adjust: {
+            mouse: true,
+            x: 15,
+            y: 15
+        }
+    }
+});
