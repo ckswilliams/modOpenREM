@@ -23,7 +23,6 @@ function ArrayToURL(array) {
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
-    var i, j, temp;
 
     $(".ajax-progress").show();
 

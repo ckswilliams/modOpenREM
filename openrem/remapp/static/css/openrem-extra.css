@@ -28,6 +28,11 @@ a.sorting-option {
     cursor: hand;
 }
 
+a.no-decoration {
+    text-decoration: none;
+    color: black;
+}
+
 div.ajax-progress {
   position: fixed;
   display: none;
