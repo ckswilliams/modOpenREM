@@ -32,13 +32,13 @@
                 <li>
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
                         Total dose at RP, {{ record.acquisition_plane }}:
-                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }} Gy
+                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:3 }} Gy
                         <br>
                     {% endfor %}
                 </li>
                 <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
                 <li>
-                    Scanner:
+                    Equipment:
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}

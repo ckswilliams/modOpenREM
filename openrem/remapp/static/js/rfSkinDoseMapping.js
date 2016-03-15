@@ -174,18 +174,29 @@ $("#skinDoseMap").on('mousedown', function (e) {
 
     if (isDragging) {
         var maxWL = parseFloat(document.getElementById("windowLevelSlider").max);
-        var newWL = windowLevel * (100-deltaMove.y)/100;
+        var newWL = skinDoseMapObj.windowLevel * (100-deltaMove.y)/100;
         if (newWL == 0) newWL += 0.01;
         if (newWL < 0) newWL = 0;
         if (newWL > maxWL) newWL = maxWL;
-        updateWindowLevel(newWL);
+        skinDoseMapObj.updateWindowLevel(newWL);
+
 
         var maxWW = parseFloat(document.getElementById("windowWidthSlider").max);
-        var newWW = windowWidth + windowWidth * deltaMove.x/100;
+        var newWW = skinDoseMapObj.windowWidth + skinDoseMapObj.windowWidth * deltaMove.x/100;
         if (newWW == 0) newWW += 0.01;
         if (newWW < 0) newWW = 0;
         if (newWW > maxWW) newWW = maxWW;
-        updateWindowWidth(newWW);
+        skinDoseMapObj.updateWindowWidth(newWW);
+
+        document.getElementById("windowLevelSlider").value = newWL;
+        document.getElementById("windowWidthSlider").value = newWW;
+        document.getElementById("currentWindowLevel").value = newWL.toFixed(3);
+        document.getElementById("currentWindowWidth").value = newWW.toFixed(3);
+
+        document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
+        document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
+        document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+        document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
     }
 
     previousMousePosition = {
