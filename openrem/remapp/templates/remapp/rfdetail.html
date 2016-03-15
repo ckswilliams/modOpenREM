@@ -55,17 +55,20 @@
 
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
 
-            <div class="skinDoseMap">
-                <canvas id="skinDoseMap" width="360" height="280" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
+            <div class="noWrap">
+                <div class="skinDoseMap">
+                    <canvas id="skinDoseMap" width="360" height="280" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
+                </div>
+
+                <div class="colourScale">
+                    <canvas id="colourScale" width="70" height="280"></canvas>
+                </div>
             </div>
 
-            <div class="colourScale">
-                <canvas id="colourScale" width="70" height="280"></canvas>
-            </div>
-
-            <div class="colour_scale_selection" id="colour_scale_selection">
-                <form id="colour_scale_form" onsubmit="updateColourScale(this); return false;">
+            <div class="colour_scale_selection table-bordered" id="colour_scale_selection">
+                <form id="colour_scale_form" onsubmit="useNewColourScale(this); return false;">
                     <table>
+                        <th colspan="2" class="centred">Colour scale choice</th>
                         <tr>
                             <td><input type="radio" name="colour_choice" value="OrRd"></td>
                             <td><canvas id="OrRd"></canvas></td>
@@ -175,7 +178,7 @@
                             <td><canvas id="PuOr"></canvas></td>
                         </tr>
                         <tr>
-                            <td colspan="2"><a onclick="$('.colour_scale_selection').hide();" class="btn btn-default btn-sm" role="button">Hide colour scales</a></td>
+                            <td colspan="2" class="centred"><a onclick="$('.colour_scale_selection').hide();" class="btn btn-default btn-sm" role="button">Hide colour scales</a></td>
                         </tr>
                     </table>
                 </form>
@@ -205,7 +208,7 @@
                 </table>
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm" role="button">Swap to max/min controls</a>
-                <a onclick="$('.colour_scale_selection').show();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
+                <a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
             </div>
 
             <div id="skin_map_maxmin_controls">
@@ -223,14 +226,22 @@
                 </table>
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm" role="button">Swap to WW/WL controls</a>
-                <a onclick="$('.colour_scale_selection').show();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
+                <a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
             </div>
 
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapColourScaleObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapping.js"></script>
+
+            <script>
+                var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
+                var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
+            </script>
 
             <script>
                 $('#skin_map_maxmin_controls').show();
                 $('#skin_map_wwwl_controls').hide();
+                $('#colour_scale_selection').hide();
             </script>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMappingAjax.js"></script>

@@ -125,14 +125,41 @@ div.fullscreen{
   float: left;
   text-align: left;
   padding: 8px;
+  display: inline-block;
+  white-space: normal;
 }
 
 .colourScale {
   float: left;
   text-align: left;
   padding: 8px;
+  display: inline-block;
+  white-space: normal;
+}
+
+div.noWrap {
+  white-space: nowrap;
 }
 
 .noFloat {
   clear: left;
+}
+
+div.colour_scale_selection {
+  position:absolute;
+  top: 0px;
+  right: 15px;
+  background-color: white;
+  padding: inherit;
+  z-index: 9999 !important;
+}
+
+th.centred  {
+  text-align: center;
+  vertical-align: middle;
+}
+
+td.centred {
+  text-align: center;
+  vertical-align: middle;
 }
