@@ -265,7 +265,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     :param filterdict: Query parameters from the RF filtered page URL.
     :type filterdict: HTTP get
-    
+
     """
 
     import os, sys, datetime
@@ -326,7 +326,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         date_column += 1
     wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
     if pid and (name or patid):
-        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
+        wsalldata.set_column(date_column+1, date_column+1, 10) # Date of birth column, exported if either pid option is chosen
 
     ##################
     # All data sheet
@@ -344,8 +344,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         inst = IrradEventXRayData.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
 
         num_groups_this_exam = 0
-        while inst:
+        while inst:  # ie while there are events still left that haven't been matched into a group
             num_groups_this_exam += 1
+            plane = _get_db_value(_get_db_value(inst[0], "acquisition_plane"), "code_meaning")
             try:
                 inst[0].irradeventxraymechanicaldata_set.get()
             except ObjectDoesNotExist:
@@ -377,6 +378,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
 
             similarexposures = inst
+            if plane:
+                similarexposures = similarexposures.filter(
+                    acquisition_plane__code_meaning__exact = plane)
             if anglei:
                 similarexposures = similarexposures.filter(
                     irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
@@ -443,6 +447,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 event_type,
                 protocol,
                 str(similarexposures.count()),
+                str(plane),
                 str(pulse_rate),
                 str(fieldsize),
                 filter_material,
@@ -488,6 +493,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'G' + str(h+1) + ' Type',
             'G' + str(h+1) + ' Protocol',
             'G' + str(h+1) + ' No. exposures',
+            'G' + str(h+1) + ' Plane',
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
             'G' + str(h+1) + ' Filter material',
