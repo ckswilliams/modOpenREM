@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b12 (2015-12-18)
 ---------------------
 
+* `#370`_  Added study description to mammography export
 * `#365`_  Tube filtration is now displayed in the RF detail view
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
 * `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
