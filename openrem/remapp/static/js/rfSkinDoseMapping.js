@@ -25,7 +25,10 @@ function colourScaleSelection(div) {
 
 function useNewColourScale(new_scale) {
     skinDoseMapObj.useNewColourScale(new_scale);
+    skinDoseMapObj.draw();
+
     skinDoseMapColourScaleObj.useNewColourScale(new_scale);
+    skinDoseMapColourScaleObj.draw();
 }
 
 
@@ -60,9 +63,11 @@ function doseInGyToRGB(dose) {
 function reset() {
     skinDoseMapObj.updateWindowWidth(skinDoseMapObj.maxDose - skinDoseMapObj.minDose);
     skinDoseMapObj.updateWindowLevel(skinDoseMapObj.minDose + (skinDoseMapObj.windowWidth/2.0));
+    skinDoseMapObj.draw();
+
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.updateColourScale();
+    skinDoseMapColourScaleObj.draw();
 
     document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
     document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
@@ -77,15 +82,18 @@ function reset() {
 
 
 function updateWindowLevel(newWindowLevel) {
+    newWindowLevel = parseFloat(newWindowLevel);
     if (newWindowLevel < 0) newWindowLevel = 0;
 
-    document.getElementById("currentWindowLevel").value = parseFloat(newWindowLevel).toFixed(3);
-    document.getElementById("windowLevelSlider").value = parseFloat(newWindowLevel);
+    document.getElementById("currentWindowLevel").value = newWindowLevel.toFixed(3);
+    document.getElementById("windowLevelSlider").value = newWindowLevel;
 
     skinDoseMapObj.updateWindowLevel(newWindowLevel);
+    skinDoseMapObj.draw();
+
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.updateColourScale();
+    skinDoseMapColourScaleObj.draw();
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
@@ -95,13 +103,16 @@ function updateWindowLevel(newWindowLevel) {
 
 
 function updateWindowWidth(newWindowWidth) {
-    document.getElementById("currentWindowWidth").value = parseFloat(newWindowWidth).toFixed(3);
-    document.getElementById("windowWidthSlider").value = parseFloat(newWindowWidth);
+    newWindowWidth = parseFloat(newWindowWidth);
+    document.getElementById("currentWindowWidth").value = newWindowWidth.toFixed(3);
+    document.getElementById("windowWidthSlider").value = newWindowWidth;
 
     skinDoseMapObj.updateWindowWidth(newWindowWidth);
+    skinDoseMapObj.draw();
+
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.updateColourScale();
+    skinDoseMapColourScaleObj.draw();
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
@@ -111,9 +122,13 @@ function updateWindowWidth(newWindowWidth) {
 
 
 function updateMinDisplayedDose(minDisplayedDose) {
-    skinDoseMapObj.updateMinDisplayedDose(parseFloat(minDisplayedDose))
+    minDisplayedDose = parseFloat(minDisplayedDose);
+
+    skinDoseMapObj.updateMinDisplayedDose(minDisplayedDose);
+    skinDoseMapObj.draw();
+
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.updateColourScale();
+    skinDoseMapColourScaleObj.draw();
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
@@ -130,9 +145,13 @@ function updateMinDisplayedDose(minDisplayedDose) {
 
 
 function updateMaxDisplayedDose(maxDisplayedDose) {
-    skinDoseMapObj.updateMaxDisplayedDose(parseFloat(maxDisplayedDose))
+    maxDisplayedDose = parseFloat(maxDisplayedDose);
+
+    skinDoseMapObj.updateMaxDisplayedDose(maxDisplayedDose)
+    skinDoseMapObj.draw();
+
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.updateColourScale();
+    skinDoseMapColourScaleObj.draw();
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
@@ -180,13 +199,15 @@ $("#skinDoseMap").on('mousedown', function (e) {
         if (newWL > maxWL) newWL = maxWL;
         skinDoseMapObj.updateWindowLevel(newWL);
 
-
         var maxWW = parseFloat(document.getElementById("windowWidthSlider").max);
         var newWW = skinDoseMapObj.windowWidth + skinDoseMapObj.windowWidth * deltaMove.x/100;
         if (newWW == 0) newWW += 0.01;
         if (newWW < 0) newWW = 0;
         if (newWW > maxWW) newWW = maxWW;
         skinDoseMapObj.updateWindowWidth(newWW);
+
+        skinDoseMapObj.draw();
+        skinDoseMapColourScaleObj.draw();
 
         document.getElementById("windowLevelSlider").value = newWL;
         document.getElementById("windowWidthSlider").value = newWW;

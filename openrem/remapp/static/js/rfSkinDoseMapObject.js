@@ -3,7 +3,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.useNewColourScale = useNewColourScale;
     function useNewColourScale(new_scale) {
         this.colourScale = chroma.scale(new_scale);
-        this.applyColourScale();
     }
 
 
@@ -17,8 +16,8 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     }
 
 
-    this.applyColourScale = applyColourScale;
-    function applyColourScale() {
+    this.draw = draw;
+    function draw() {
         var x, y, dose, newColour, scaledDose;
         var imageData = this.skinDoseMapContext.getImageData(0, 0, this.skinDoseMapCanvas.width, this.skinDoseMapCanvas.height);
         for (x = 0; x < this.skinDoseMapCanvas.width; x++) {
@@ -39,7 +38,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     function resizeSkinDoseMap() {
         this.skinDoseMapCanvas.width = this.skinDoseMapWidth * this.mag;
         this.skinDoseMapCanvas.height = this.skinDoseMapHeight * this.mag;
-        this.applyColourScale();
     }
 
 
@@ -47,7 +45,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     function reset() {
         this.updateWindowWidth(this.maxDose - this.minDose);
         this.updateWindowLevel(this.minDose + (this.windowWidth / 2.0));
-        this.applyColourScale();
     }
 
 
@@ -58,8 +55,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
         this.minDisplayedDose = this.windowLevel - (this.windowWidth / 2.0);
         this.maxDisplayedDose = this.windowLevel + (this.windowWidth / 2.0);
-
-        this.applyColourScale();
     }
 
 
@@ -69,8 +64,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
         this.minDisplayedDose = this.windowLevel - (this.windowWidth / 2.0);
         this.maxDisplayedDose = this.windowLevel + (this.windowWidth / 2.0);
-        
-        this.applyColourScale();
     }
 
 
@@ -94,8 +87,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
         this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
         this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
-
-        this.applyColourScale();
     }
 
 
@@ -119,8 +110,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
         this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
         this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
-        
-        this.applyColourScale();
     }
 
 
@@ -137,7 +126,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
         this.maxDisplayedDose = this.maxDose;
 
         this.resizeSkinDoseMap();
-        this.applyColourScale();
     }
 
     this.skinDoseMapCanvasName = skinDoseMapCanvasName;
@@ -155,7 +143,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
     this.minDose = 0.0;
     this.maxDose = 10.0;
-    this.doseUpperLimit = 10.0;
 
     this.windowWidth = this.maxDose - this.minDose;
     this.windowLevel = this.minDose + (this.windowWidth / 2.0);

@@ -34,23 +34,21 @@ $(document).ready(function() {
         success: function( json ) {
 
             skinDoseMapObj.initialise(json.skin_map, 90, 70);
+            skinDoseMapObj.draw();
 
             skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height);
-            //skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDose;
-            //skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDose;
-            //skinDoseMapColourScaleObj.height = skinDoseMapObj.skinDoseMapCanvas.height;
-            //skinDoseMapColourScaleObj.resizeColourScale();
+            skinDoseMapColourScaleObj.draw();
 
             $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(3) + " Gy");
 
-            document.getElementById("currentWindowWidth").value = parseFloat(skinDoseMapObj.windowWidth).toFixed(3);
-            document.getElementById("currentWindowLevel").value = parseFloat(skinDoseMapObj.windowLevel).toFixed(3);
+            document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
+            document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
 
-            document.getElementById("windowWidthSlider").max = parseFloat(skinDoseMapObj.windowWidth);
-            document.getElementById("windowLevelSlider").max = parseFloat(skinDoseMapObj.windowWidth);
+            document.getElementById("windowWidthSlider").max = skinDoseMapObj.windowWidth;
+            document.getElementById("windowLevelSlider").max = skinDoseMapObj.windowWidth;
 
-            document.getElementById("windowWidthSlider").value = parseFloat(skinDoseMapObj.windowWidth);
-            document.getElementById("windowLevelSlider").value = parseFloat(skinDoseMapObj.windowLevel);
+            document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
+            document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
 
             document.getElementById("minDoseSlider").min = skinDoseMapObj.minDose;
             document.getElementById("minDoseSlider").max = skinDoseMapObj.maxDose;
