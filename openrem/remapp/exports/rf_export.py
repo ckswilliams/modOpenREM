@@ -76,6 +76,7 @@ def _get_db_value(qs, location):
 
 
 def _rf_common_get_data(source, pid=None, name=None, patid=None):
+    from exportcsv import _get_accumulated_data
     if pid and (name or patid):
         try:
             source.patientmoduleattr_set.get()
@@ -126,47 +127,47 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         patient_size = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_size')
         patient_weight = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_weight')
 
-    try:
-        source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
-    except ObjectDoesNotExist:
-        dose_area_product_total = None
-        dose_rp_total = None
-    else:
-        dose_area_product_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
-            'dose_area_product_total')
-        dose_rp_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
-            'dose_rp_total')
-
-    try:
-        source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
-    except ObjectDoesNotExist:
-        fluoro_dose_area_product_total = None
-        fluoro_dose_rp_total = None
-        total_fluoro_time = None
-        acquisition_dose_area_product_total = None
-        acquisition_dose_rp_total = None
-        total_acquisition_time = None
-    else:
-        fluoro_dose_area_product_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'fluoro_dose_area_product_total')
-        fluoro_dose_rp_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'fluoro_dose_rp_total')
-        total_fluoro_time = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'total_fluoro_time')
-        acquisition_dose_area_product_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'acquisition_dose_area_product_total')
-        acquisition_dose_rp_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'acquisition_dose_rp_total')
-        total_acquisition_time = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'total_acquisition_time')
+    # try:
+    #     source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+    # except ObjectDoesNotExist:
+    #     dose_area_product_total = None
+    #     dose_rp_total = None
+    # else:
+    #     dose_area_product_total = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
+    #         'dose_area_product_total')
+    #     dose_rp_total = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
+    #         'dose_rp_total')
+    #
+    # try:
+    #     source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
+    # except ObjectDoesNotExist:
+    #     fluoro_dose_area_product_total = None
+    #     fluoro_dose_rp_total = None
+    #     total_fluoro_time = None
+    #     acquisition_dose_area_product_total = None
+    #     acquisition_dose_rp_total = None
+    #     total_acquisition_time = None
+    # else:
+    #     fluoro_dose_area_product_total = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+    #         'fluoro_dose_area_product_total')
+    #     fluoro_dose_rp_total = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+    #         'fluoro_dose_rp_total')
+    #     total_fluoro_time = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+    #         'total_fluoro_time')
+    #     acquisition_dose_area_product_total = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+    #         'acquisition_dose_area_product_total')
+    #     acquisition_dose_rp_total = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+    #         'acquisition_dose_rp_total')
+    #     total_acquisition_time = return_for_export(
+    #         source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
+    #         'total_acquisition_time')
 
     try:
         source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
@@ -204,16 +205,35 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         not_patient_indicator,
         return_for_export(source, 'study_description'),
         return_for_export(source, 'requested_procedure_code_meaning'),
-        dose_area_product_total,
-        dose_rp_total,
-        fluoro_dose_area_product_total,
-        fluoro_dose_rp_total,
-        total_fluoro_time,
-        acquisition_dose_area_product_total,
-        acquisition_dose_rp_total,
-        total_acquisition_time,
-        eventcount,
+        # dose_area_product_total,
+        # dose_rp_total,
+        # fluoro_dose_area_product_total,
+        # fluoro_dose_rp_total,
+        # total_fluoro_time,
+        # acquisition_dose_area_product_total,
+        # acquisition_dose_rp_total,
+        # total_acquisition_time,
+        # eventcount,
     ]
+    for plane in source.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+        accum = _get_accumulated_data(plane)
+        examdata += [
+            accum['plane'],
+            accum['dose_area_product_total'],
+            accum['dose_rp_total'],
+            accum['fluoro_dose_area_product_total'],
+            accum['fluoro_dose_rp_total'],
+            accum['total_fluoro_time'],
+            accum['acquisition_dose_area_product_total'],
+            accum['acquisition_dose_rp_total'],
+            accum['total_acquisition_time'],
+            accum['reference_point_definition_code'],
+        ]
+        if 'Single' in accum['plane']:
+            examdata += [
+                '','','','','','','','','',''
+            ]
+
     return examdata
 
 
@@ -246,6 +266,17 @@ def _rf_common_headers(pid=None, name=None, patid=None):
         'Test patient?',
         'Study description',
         'Requested procedure',
+        'Plane',
+        'DAP total (Gy.m^2)',
+        'Dose RP total',
+        'Fluoro DAP total',
+        'Fluoro dose RP total',
+        'Fluoro time total',
+        'Acquisition DAP total',
+        'Acquisition dose RP total',
+        'Acquisition time total',
+        'Number of events',
+        'Plane',
         'DAP total (Gy.m^2)',
         'Dose RP total',
         'Fluoro DAP total',
