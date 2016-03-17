@@ -219,6 +219,8 @@ function init(mass, height, canvasWidth, canvasHeight) {
     var refRadius = 10.0;
     var refWidth = 14.4;
 
+    var aspectRatio = canvasWidth / canvasHeight;
+
     var torso = refTorso * height / refHeight;
     var radius = refRadius / Math.sqrt(height / refHeight) * Math.sqrt(mass / refMass);
     var flatWidth = refWidth / refRadius * radius;
@@ -226,7 +228,7 @@ function init(mass, height, canvasWidth, canvasHeight) {
     scene = new THREE.Scene();
 
     // Set up the camera
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+    camera = new THREE.PerspectiveCamera(50, aspectRatio, 1, 10000);
     camera.position.x = torso;
     camera.position.y = 0;
     camera.position.z = 100;
@@ -344,8 +346,10 @@ function init(mass, height, canvasWidth, canvasHeight) {
     // Put the animation into a canvas called skinDoseMap3d
     // and resize the DIV to window.innerWidth/4, window.innerHeight/4
     var canvas = document.getElementById( 'skinDoseMap3d' );
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     renderer = new THREE.WebGLRenderer({ canvas: canvas });
-    renderer.setSize(90*6, 70*6);
+//    renderer.setSize(90*6, 70*6);
     renderer.setClearColor( 0xffffff );
 
     $('#skinDoseMap3d').hide();

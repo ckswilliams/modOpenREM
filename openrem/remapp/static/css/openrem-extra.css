@@ -124,7 +124,7 @@ div.fullscreen{
 .skinDoseMap {
   float: left;
   text-align: left;
-  padding: 8px;
+  padding: 0px;
   display: inline-block;
   white-space: normal;
 }
