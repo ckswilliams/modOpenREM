@@ -52,7 +52,6 @@
 
             <h2>OpenSkin radiation exposure incidence map</h2>
 
-
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
 
             <div class="noWrap">
@@ -60,10 +59,18 @@
                     <canvas id="skinDoseMap" width="360" height="280" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
                 </div>
 
+                <div class="skinDoseMap">
+                    <canvas id="skinDoseMap3d" width="540" height="420" class="table-bordered"></canvas>
+                </div>
+
                 <div class="colourScale">
                     <canvas id="colourScale" width="70" height="280"></canvas>
                 </div>
+
+                <script src="{{ STATIC_URL }}js/rfSkinDoseMapping3d.js"></script>
             </div>
+
+
 
             <div class="colour_scale_selection table-bordered" id="colour_scale_selection">
                 <form id="colour_scale_form" onsubmit="useNewColourScale(this); return false;">
@@ -209,6 +216,7 @@
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm" role="button">Swap to max/min controls</a>
                 <a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
+                <a onclick="$('#skinDoseMap3d').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm" role="button">Swap between 2D and 3D view</a>
             </div>
 
             <div id="skin_map_maxmin_controls">
@@ -227,6 +235,7 @@
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm" role="button">Swap to WW/WL controls</a>
                 <a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
+                <a onclick="$('#skinDoseMap3d').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm" role="button">Swap between 2D and 3D view</a>
             </div>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapColourScaleObject.js"></script>
@@ -245,6 +254,13 @@
             </script>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMappingAjax.js"></script>
+
+            <div style="display:none">
+                <canvas id="phantomFront" width="70"  height="350"></canvas>
+                <canvas id="phantomBack"  width="70"  height="350"></canvas>
+                <canvas id="phantomLeft"  width="155" height="350"></canvas>
+                <canvas id="phantomRight" width="155" height="350"></canvas>
+            </div>
 
         </div>
   </div>
