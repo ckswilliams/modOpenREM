@@ -37,11 +37,15 @@ Version specific information
 Contributing authors
 ********************
 
-The following people have contributed to OpenREM - either with code, documentation or ideas.
+Many people have contributed to OpenREM - either with code, documentation, bugs, examples or ideas, including:
 
+* Elly Castellano
+* `Jonathan Cole <https://bitbucket.org/jacole>`_
+* `Daniel Gordon <https://bitbucket.org/dan_gordon/>`_
+* `Hamid Khosravi <https://bitbucket.org/hrkhosravi/>`_
+* Laurence King
+* `Eivind Larsen <https://bitbucket.org/leivind>`_
+* `John Loveland <https://bitbucket.org/JLMPO/>`_
 * `Ed McDonagh <https://bitbucket.org/edmcdonagh>`_
 * `David Platten <https://bitbucket.org/dplatten>`_
-* `Jonathan Cole <https://bitbucket.org/jacole>`_
-* Elly Castellano
-* Laurence King
-* Daniel Gordon
+*  Erik-Jan Rijkhorst
