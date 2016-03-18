@@ -7,6 +7,7 @@ OpenREM version history
 
 * `#370`_  Added study description to mammography export
 * `#369`_  Bi-plane fluoroscopy studies now export correctly
+* `#368`_  Mammo RDSR now imports correctly
 * `#365`_  Tube filtration is now displayed in the RF detail view
 * `#364`_  Philips Allura fluorscopy RDSRs now import correctly
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface

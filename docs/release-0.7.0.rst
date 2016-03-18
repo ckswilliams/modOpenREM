@@ -37,6 +37,7 @@ Headline changes
 
 * Imports
 
+    * Mammography RDSRs import correctly
     * Philips Allura fluoroscopy RDSRs import correctly
     * Bi-plane fluoroscopy imports can now be displayed in the web interface
 
@@ -82,6 +83,7 @@ Updates since beta 12
 =====================
 **Requires database migration**
 
+* Mammography RDSRs now import correctly
 * Added study description to mammography exports
 * Philips Allura fluoro RDSRs import fixed
 * Bi-plane fluoro exports fixed
