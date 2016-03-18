@@ -202,15 +202,6 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         not_patient_indicator,
         return_for_export(source, 'study_description'),
         return_for_export(source, 'requested_procedure_code_meaning'),
-        # dose_area_product_total,
-        # dose_rp_total,
-        # fluoro_dose_area_product_total,
-        # fluoro_dose_rp_total,
-        # total_fluoro_time,
-        # acquisition_dose_area_product_total,
-        # acquisition_dose_rp_total,
-        # total_acquisition_time,
-        # eventcount,
     ]
     for plane in source.projectionxrayradiationdose_set.get().accumxraydose_set.all():
         accum = _get_accumulated_data(plane)
@@ -579,6 +570,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         'Time',
         'Type',
         'Protocol',
+        'Plane',
         'Pulse rate',
         'Field size',
         'Filter material',
@@ -617,6 +609,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     str(event.date_time_started),
                     event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
+                    event.acquisition_plane.code_meaning,
                     str(event.irradeventxraysourcedata_set.get().pulse_rate),
                     str(event.irradeventxraysourcedata_set.get().ii_field_size),
                     filter_material,
@@ -631,7 +624,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     str(event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle),
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
-        tabcolumns = (37)
+        tabcolumns = (52)
         tabrows = sheetlist[tab]['count']
         sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
         sheetlist[tab]['sheet'].set_column(date_column, date_column, 10) # allow date to be displayed.
@@ -656,7 +649,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = 'OpenREM is copyright 2015 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    linetwostring = 'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 
