@@ -15,15 +15,15 @@ imageBack.src  = '/static/img/1-1.png';
 imageLeft.src  = '/static/img/2-1.png';
 imageRight.src = '/static/img/4-1.png';
 
-var frontData = new Uint8Array( 70*350*4);
-var backData  = new Uint8Array( 70*350*4);
-var leftData  = new Uint8Array(155*350*4);
-var rightData = new Uint8Array(155*350*4);
+var frontData = new Uint8Array(14*70*4);
+var backData  = new Uint8Array(14*70*4);
+var leftData  = new Uint8Array(31*70*4);
+var rightData = new Uint8Array(31*70*4);
 
-var dataTextureFront = new THREE.DataTexture( frontData, 70, 350,  THREE.RGBAFormat );
-var dataTextureBack  = new THREE.DataTexture( backData,  70, 350,  THREE.RGBAFormat );
-var dataTextureLeft  = new THREE.DataTexture( leftData,  155, 350, THREE.RGBAFormat );
-var dataTextureRight = new THREE.DataTexture( rightData, 155, 350, THREE.RGBAFormat );
+var dataTextureFront = new THREE.DataTexture( frontData, 14, 70,  THREE.RGBAFormat );
+var dataTextureBack  = new THREE.DataTexture( backData,  14, 70,  THREE.RGBAFormat );
+var dataTextureLeft  = new THREE.DataTexture( leftData,  31, 70, THREE.RGBAFormat );
+var dataTextureRight = new THREE.DataTexture( rightData, 31, 70, THREE.RGBAFormat );
 
 dataTextureFront.needsUpdate = true;
 dataTextureBack.needsUpdate = true;
@@ -64,19 +64,19 @@ window.onload = function() {
 function initialiseDataTextures() {
     var example = document.getElementById('phantomFront');
     var context = example.getContext('2d');
-    var tempFrontData = context.getImageData(0, 0, 70, 350).data;
+    var tempFrontData = context.getImageData(0, 0, 14, 70).data;
 
     example = document.getElementById('phantomBack');
     context = example.getContext('2d');
-    var tempBackData = context.getImageData(0, 0, 70, 350).data;
+    var tempBackData = context.getImageData(0, 0, 14, 70).data;
 
     example = document.getElementById('phantomLeft');
     context = example.getContext('2d');
-    var tempLeftData = context.getImageData(0, 0, 155, 350).data;
+    var tempLeftData = context.getImageData(0, 0, 31, 70).data;
 
     example = document.getElementById('phantomRight');
     context = example.getContext('2d');
-    var tempRightData = context.getImageData(0, 0, 155, 350).data;
+    var tempRightData = context.getImageData(0, 0, 31, 70).data;
 
     for (var i = 0; i < frontData.length; i++) {
         dataTextureFront.image.data[i] = tempFrontData[i];
