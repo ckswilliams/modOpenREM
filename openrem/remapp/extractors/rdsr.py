@@ -202,8 +202,10 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
             source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            # this will fail if the text value is present instead of the code
-            source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            try:
+                source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                source.reference_point_definition = cont.TextValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
             source.average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
@@ -314,7 +316,10 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Entrance Exposure at RP':
             event.entrance_exposure_at_rp = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            event.reference_point_definition = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            try:
+                event.reference_point_definition = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                event.reference_point_definition_text = cont.TextValue
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Mammography CAD Breast Composition':
                 for cont2 in cont.ContentSequence:
@@ -388,8 +393,10 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            # will break if text instead of code?
-            accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            try:
+                accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                accumproj.reference_point_definition = cont.TextValue
     if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == 'RF,DX':
         if (accumproj.fluoro_dose_area_product_total != "" or
             accumproj.total_fluoro_time != "" or
@@ -424,7 +431,10 @@ def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumint.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            accumint.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning) # will fail if text
+            try:
+                accumint.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                accumint.reference_point_definition = cont.TextValue
     accumint.save()
 
 def _accumulatedxraydose(dataset,proj): # TID 10002
