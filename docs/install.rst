@@ -12,7 +12,7 @@ Install OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b12
+    pip install openrem==0.7.0b13
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -47,6 +47,8 @@ Edit local_settings.py
 ..  Important::
     In local_settings.py, always use forward slashes and not backslashes, even for paths on
     Windows systems.
+
+    The directories in this local_settings.py file must already exist - OpenREM will not create them for you.
 
 Database
 ^^^^^^^^

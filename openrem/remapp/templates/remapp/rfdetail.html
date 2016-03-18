@@ -23,11 +23,19 @@
                 <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
                 <li>Patient weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
                 <li>
-                    Total DAP:
-                    {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}
-                    cGy.cm2
+                    {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                        Total DAP, {{ record.acquisition_plane }}:
+                        {{ record.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }} cGy.cm<sup>2</sup>
+                        <br>
+                    {% endfor %}
                 </li>
-                <li>Total dose at RP: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }} Gy</li>
+                <li>
+                    {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
+                        Total dose at RP, {{ record.acquisition_plane }}:
+                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }} Gy
+                        <br>
+                    {% endfor %}
+                </li>
                 <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
                 <li>
                     Scanner:
@@ -44,7 +52,7 @@
             <p>
                 You can export this study to a csv file in the format required by Jonathan
                 Cole's OpenSkin software. The OpenSkin software can be downloaded from the
-                <a href="https://bitbucket.org/jacole/openskin/downloads">OpenSkin BitBucket project</a> and there is
+                <a href="https://bitbucket.org/openskin/openskin/downloads">OpenSkin BitBucket project</a> and there is
                 more information available in the
                 <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>. Future releases of
                 OpenREM will display the exposure incidence map and peak skin dose values integrated into this page.
@@ -57,22 +65,32 @@
   </div>
 
 <table class="table table-striped table-bordered">
-    <th>Time</th><th>Acquisition protocol</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Angle</th><th>II Diameter</th>
+    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time</th><th>kVp</th><th>mA</th><th>Filters</th><th>Angle</th><th>II Diameter</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
+        <td>{{ event.acquisition_plane }}</td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:3 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
+        <td>
+            {% for xrayfilt in event.irradeventxraysourcedata_set.get.xrayfilters_set.all %}
+                {% if xrayfilt.xray_filter_material.code_value == 'C-120F9' %}
+                    Al: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+                {% elif xrayfilt.xray_filter_material.code_value == 'C-127F9' %}
+                    Cu: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+                {% else %}
+                    {{ xrayfilt.xray_filter_material.code_meaning }}: {{ xrayfilt.xray_filter_thickness_minimum|floatformat:2 }} - {{ xrayfilt.xray_filter_thickness_maximum|floatformat:2 }} <br>
+                {% endif %}
+            {% endfor %}
+        </td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
     </tr>
     {% endfor %}
 </table>
-
-<a href="../list">Back to list</a>
 
 {% if is_paginated %}
 <p class="pagination">

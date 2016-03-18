@@ -4,161 +4,160 @@
 
 {% block toprow %}
 
-  {% load pagination_tags %}
+    {% load pagination_tags %}
 
-  <p>
-    There are {{ filter.count }} studies in this list.
-  </p>
+    <p>
+        There are {{ filter.count }} studies in this list.
+    </p>
 
 {% endblock %}
 
 {% block col2 %}
-  <div class="panel panel-info">
-  <div class="panel-heading">
-      <h3 class="panel-title">Data export</h3>
-  </div>
-  <div class="panel-body">
-    {% if admin.exportgroup %}
-        <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
-    <p>
-      <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
-             class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
-          {% if admin.pidgroup %}
-              <a href="/openrem/exportctcsv1/1/0/?{{ request.GET.urlencode }}"
-                 class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/openrem/exportctcsv1/0/1/?{{ request.GET.urlencode }}"
-                 class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/openrem/exportctcsv1/1/1/?{{ request.GET.urlencode }}"
-                 class="btn btn-default btn-sm" role="button">With both</a>
-    </p>
-    <p>
-          {% endif %}
-          <a href="/openrem/exportctxlsx1/0/0/?{{ request.GET.urlencode }}"
-             class="btn btn-default btn-sm" role="button">Export to XLSX</a>
-          {% if admin.pidgroup %}
-              <a href="/openrem/exportctxlsx1/1/0/?{{ request.GET.urlencode }}"
-                 class="btn btn-default btn-sm" role="button">With names</a>
-              <a href="/openrem/exportctxlsx1/0/1/?{{ request.GET.urlencode }}"
-                 class="btn btn-default btn-sm" role="button">With ID</a>
-              <a href="/openrem/exportctxlsx1/1/1/?{{ request.GET.urlencode }}"
-                 class="btn btn-default btn-sm" role="button">With both</a>
-          {% endif %}
-    </p>
-
-  {% else %}
-    <p>
-      No export permissions
-    </p>
-  {% endif %}
-
-
-  </div>
-  </div>
-
-  {{ studyfilter }}
-
-  <form action="" method="get" class="form-horizontal" role="form">
     <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title">Exam filter</h3>
-      </div>
-      <div class="panel-body">
-        <i>Date format yyyy-mm-dd</i>
-        {% for field in filter.form.visible_fields %}
-          <div class="form-group">
-            <div class="col-xs-4">
-              <label>{{ field.label_tag }}</label>
-            </div>
-            <div class="col-xs-8">
-              {{ field.errors }}
-              {{ field }}
-            </div>
-          </div>
-        {% endfor %}
-        {% for field in filter.form.hidden_fields %}
-          <div style="display:none">{{ field }}</div>
-        {% endfor %}
-        <input class="btn btn-default" name="submit" type="submit" />
-      </div>
-      <div class="panel-heading">
-        <h3 class="panel-title">Chart options</h3>
-      </div>
-      <div class="panel-body">
-        <table>
-          {% csrf_token %}
-          {{ chartOptionsForm }}
-        </table>
-        <input class="btn btn-default" name="submit" type="submit" />
-      </div>
-    </div>
-  </form>
+        <div class="panel-heading">
+            <h3 class="panel-title">Data export</h3>
+        </div>
+        <div class="panel-body">
+            {% if admin.exportgroup %}
+                <p><strong>Note:</strong> Apply the exam filter first to refine what is exported.</p>
+                <p>
+                    <a href="/openrem/exportctcsv1/0/0/?{{ request.GET.urlencode }}"
+                       class="btn btn-default btn-sm" role="button">Export to CSV&nbsp;</a>
+                    {% if admin.pidgroup %}
+                        <a href="/openrem/exportctcsv1/1/0/?{{ request.GET.urlencode }}"
+                           class="btn btn-default btn-sm" role="button">With names</a>
+                        <a href="/openrem/exportctcsv1/0/1/?{{ request.GET.urlencode }}"
+                           class="btn btn-default btn-sm" role="button">With ID</a>
+                        <a href="/openrem/exportctcsv1/1/1/?{{ request.GET.urlencode }}"
+                           class="btn btn-default btn-sm" role="button">With both</a>
+                        </p>
+                        <p>
+                    {% endif %}
+                    <a href="/openrem/exportctxlsx1/0/0/?{{ request.GET.urlencode }}"
+                       class="btn btn-default btn-sm" role="button">Export to XLSX</a>
+                    {% if admin.pidgroup %}
+                        <a href="/openrem/exportctxlsx1/1/0/?{{ request.GET.urlencode }}"
+                           class="btn btn-default btn-sm" role="button">With names</a>
+                        <a href="/openrem/exportctxlsx1/0/1/?{{ request.GET.urlencode }}"
+                           class="btn btn-default btn-sm" role="button">With ID</a>
+                        <a href="/openrem/exportctxlsx1/1/1/?{{ request.GET.urlencode }}"
+                           class="btn btn-default btn-sm" role="button">With both</a>
+                    {% endif %}
+                    </p>
 
-  <script src="{{ STATIC_URL }}js/datepicker.js"></script>
-  <script src="{{ STATIC_URL }}js/formatDate.js"></script>
-  <script src="{{ STATIC_URL }}js/getColours.js"></script>
+            {% else %}
+                <p>
+                    No export permissions
+                </p>
+            {% endif %}
+
+
+        </div>
+    </div>
+
+    {{ studyfilter }}
+
+    <form action="" method="get" class="form-horizontal" role="form">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Exam filter</h3>
+            </div>
+            <div class="panel-body">
+                <i>Date format yyyy-mm-dd</i>
+                {% for field in filter.form.visible_fields %}
+                    <div class="form-group">
+                        <div class="col-xs-4">
+                            <label>{{ field.label_tag }}</label>
+                        </div>
+                        <div class="col-xs-8">
+                            {{ field.errors }}
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+                {% for field in filter.form.hidden_fields %}
+                    <div style="display:none">{{ field }}</div>
+                {% endfor %}
+                <input class="btn btn-default" name="submit" type="submit" />
+            </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Chart options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {% csrf_token %}
+                    {{ chartOptionsForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
+            </div>
+        </div>
+    </form>
+
+    <script src="{{ STATIC_URL }}js/datepicker.js"></script>
+    <script src="{{ STATIC_URL }}js/formatDate.js"></script>
 
 {% endblock %}
 
 {% block col1 %}
 
 
-  {% autopaginate filter.qs 25 as filter_list %}
-  {% paginate %}
+    {% autopaginate filter.qs 25 as filter_list %}
+    {% paginate %}
 
-  <table class="table table-bordered table-hover row-clickable">
-    <tr>
-      <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
-      {% if admin.admingroup %}
-        <th>Delete?</th>
-      {% endif %}
-    </tr>
-    {% for exam in filter_list %}
-      <tr>
-        <td>
-          <a href="/openrem/ct/{{ exam.id }}/">
-            {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/ct/{{ exam.id }}/">
-            {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-            {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-            {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/ct/{{ exam.id }}/">
-            {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
-        </a>
-        <td>
-          <a href="/openrem/ct/{{ exam.id }}/">
-            {{ exam.study_description }}</a> |
-          {{ exam.requested_procedure_code_meaning }} |
-          {% if not exam.accession_hashed %}
-            {{ exam.accession_number }}
-          {% endif %}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/ct/{{ exam.id }}/">
-            {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
-          </a>
-        </td>
-        <td>
-          <a href="/openrem/ct/{{ exam.id }}/">
-            {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
-          </a>
-        </td>
-        {% if admin.admingroup %}
-          <td>
-            <a href="{% url 'study_delete' exam.id %}">Delete</a>
-          </td>
-        {% endif %}
-      </tr>
-    {% endfor %}
-  </table>
+    <table class="table table-bordered table-hover row-clickable">
+        <tr>
+            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Dose Length Product Total (mGy.cm)</th>
+            {% if admin.admingroup %}
+                <th>Delete?</th>
+            {% endif %}
+        </tr>
+        {% for exam in filter_list %}
+            <tr>
+                <td>
+                    <a href="/openrem/ct/{{ exam.id }}/">
+                        {{ exam.generalequipmentmoduleattr_set.get.institution_name }}
+                    </a>
+                </td>
+                <td>
+                    <a href="/openrem/ct/{{ exam.id }}/">
+                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
+                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
+                        {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+                    </a>
+                </td>
+                <td>
+                    <a href="/openrem/ct/{{ exam.id }}/">
+                        {{ exam.study_date|date:"Y-m-d" }} {{ exam.study_time|date:"H:i" }}</td>
+                </a>
+                <td>
+                    <a href="/openrem/ct/{{ exam.id }}/">
+                        {{ exam.study_description }}</a> |
+                    {{ exam.requested_procedure_code_meaning }} |
+                    {% if not exam.accession_hashed %}
+                        {{ exam.accession_number }}
+                    {% endif %}
+                    </a>
+                </td>
+                <td>
+                    <a href="/openrem/ct/{{ exam.id }}/">
+                        {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
+                    </a>
+                </td>
+                <td>
+                    <a href="/openrem/ct/{{ exam.id }}/">
+                        {{ exam.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
+                    </a>
+                </td>
+                {% if admin.admingroup %}
+                    <td>
+                        <a href="{% url 'study_delete' exam.id %}">Delete</a>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
 
-  {% paginate %}
+    {% paginate %}
 
 {% endblock %}
 
@@ -167,799 +166,708 @@
 
 {% block plotdata %}
 
-  {% if request.user.userprofile.plotCharts %}
+    {% if request.user.userprofile.plotCharts %}
 
-    <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
-    <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
+        <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
+        <script src="{{ STATIC_URL }}js/chartUpdateData.js"></script>
 
-    <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+        <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
-    <!-- Include JavaScript to enable highcharts plots -->
-    <script src="{{ STATIC_URL }}js/highcharts.js"></script>
-    <script src="{{ STATIC_URL }}js/exporting.js"></script>
-    <script src="{{ STATIC_URL }}js/export-csv.js"></script>
-    <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
-    <script>
-        var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
-        var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
-    </script>
+        <!-- Include JavaScript to enable highcharts plots -->
+        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script>
+            var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
+            var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
-    <!-- End of include JavaScript to enable highcharts plots -->
+            var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+        </script>
 
-    <!-- JavaScript to enable bootstrap tooltips -->
-    <script>
-        $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
-    <!-- End of JavaScript to enable bootstrap tooltips -->
+        <!-- End of include JavaScript to enable highcharts plots -->
 
-    <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
-    <script src="{{ STATIC_URL }}js/sorting.js"></script>
-    <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
+        <!-- JavaScript to enable bootstrap tooltips -->
+        <script>
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+        <!-- End of JavaScript to enable bootstrap tooltips -->
 
-    <!-- JavaScript chart AJAX code. -->
-    <script src="{{ STATIC_URL }}js/ctChartAjax.js"></script>
-    <!-- End of JavaScript chart AJAX code. -->
+        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
+        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
 
-    <!-- Flags to determine if charts should be plotted -->
-    {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
-    <script>var plotCTAcquisitionMeanDLP = true;</script>
-    {% endif %}
+        <!-- JavaScript chart AJAX code. -->
+        <script src="{{ STATIC_URL }}js/ctChartAjax.js"></script>
+        <!-- End of JavaScript chart AJAX code. -->
 
-    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-    <script>var plotCTAcquisitionMeanCTDI = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTAcquisitionFreq %}
-    <script>var plotCTAcquisitionFreq = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTStudyMeanDLP %}
-    <script>var plotCTStudyMeanDLP = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTStudyFreq %}
-    <script>var plotCTStudyFreq = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
-    <script>var plotCTStudyPerDayAndHour = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-    <script>var plotCTStudyMeanDLPOverTime = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTRequestMeanDLP %}
-    <script>var plotCTRequestMeanDLP = true;</script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTRequestFreq %}
-    <script>var plotCTRequestFreq = true;</script>
-    {% endif %}
-
-    <script>var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';</script>
-
-    <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
-    <!-- End of flags to determine if charts should be plotted -->
-
-    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI and request.user.userprofile.plotCTAcquisitionMeanDLP %}
-      <!-- HTML to include div container for acquisition DLP and CTDI plot -->
-
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('histogramPlotDLPandCTDIdiv');
-      });
-      </script>
-
-      <div class="panel-group" id="accordion1">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion1" href="#collapseDLPandCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Plot of mean DLP and CTDI<sub>vol</sub> for each acquisition protocol.
-                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                Plot of median DLP and CTDI<sub>vol</sub> for each acquisition protocol.
-                {% else %}
-                Plot of mean and median DLP and CTDI<sub>vol</sub> for each acquisition protocol.
-                {% endif %}
-              </a>
-            </h4>
-          </div>
-          <div id="collapseDLPandCTDI" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="histogramPlotDLPandCTDIdiv" style="height: auto; margin: 0 0"></div>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-              <table style="border:none">
-                  <tr>
-                      <th colspan="4" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
-                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                          Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                          more data than shown in the histogram bin.</td>
-                  </tr>
-                  <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-                  </tr>
-                  <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, 1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-                  </tr>
-              </table>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-              <table style="border:none">
-                  <tr>
-                      <th colspan="4" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
-                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                          Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                          more data than shown in the histogram bin.</td>
-                  </tr>
-                  <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-                  <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, 1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-                  </tr>
-              </table>
-              {% else %}
-              <table style="border:none">
-                  <tr>
-                      <th colspan="4" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
-                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin.
-                          Note that this will include acquisitions at the upper bin boundary, so in some cases may display
-                          more data than shown in the histogram bin.</td>
-                  </tr>
-                  <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, [0,1,2,3])" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', 1, [2,3,0,1])" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', 1, [0,1,2,3])" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', 1, [0,1,2,3])" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-                  </tr>
-                  <tr>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, [0,1,2,3])" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'y', -1, [2,3,0,1])" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'freq', -1, [0,1,2,3])" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="fourSeriesSort('#histogramPlotDLPandCTDIdiv', 'name', -1, [0,1,2,3])" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-                  </tr>
-              </table>
-              {% endif %}
-              <a onclick="enterFullScreen('collapseDLPandCTDI', 'histogramPlotDLPandCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for acquisition DLP and CTDI plot -->
-
-
-    {% elif request.user.userprofile.plotCTAcquisitionMeanDLP %}
-      <!-- HTML to include div container for acquisition plot -->
-
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('histogramPlotDIV');
-      });
-      </script>
-
-      <div class="panel-group" id="accordion2">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Plot of mean DLP for each acquisition protocol.
-                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                Plot of median DLP for each acquisition protocol.
-                {% else %}
-                Plot of mean and median DLP for each acquisition protocol.
-                {% endif %}
-              </a>
-            </h4>
-          </div>
-          <div id="collapseTwo" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="histogramPlotDIV" style="height: auto; margin: 0 0"></div>
-
-              <table style="border:none">
-                  <tr>
-                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
-                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
-                          this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                          shown in the histogram bin.</td>
-                  </tr>
-
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDIV', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% endif %}
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% endif %}
-                  </tr>
-              </table>
-              <a onclick="enterFullScreen('collapseTwo', 'histogramPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for acquisition plot -->
-
-
-    {% elif request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-      <!-- HTML to include div container for acquisition CTDI plot -->
-
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('histogramPlotCTDIdiv');
-      });
-      </script>
-
-      <div class="panel-group" id="accordion3">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Plot of mean CTDI<sub>vol</sub> for each acquisition protocol.
-                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                Plot of median CTDI<sub>vol</sub> for each acquisition protocol.
-                {% else %}
-                Plot of mean and median CTDI<sub>vol</sub> for each acquisition protocol.
-                {% endif %}
-              </a>
-            </h4>
-          </div>
-          <div id="collapseCTDI" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="histogramPlotCTDIdiv" style="height: auto; margin: 0 0"></div>
-
-              <table style="border:none">
-                  <tr>
-                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
-                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
-                          this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                          shown in the histogram bin.</td>
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotCTDIdiv', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotCTDIdiv', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotCTDIdiv', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% endif %}
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramPlotCTDIdiv', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotCTDIdiv', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotCTDIdiv', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramPlotCTDIdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% endif %}
-                  </tr>
-              </table>
-              <a onclick="enterFullScreen('collapseCTDI', 'histogramPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for acquisition CTDI plot -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTAcquisitionFreq %}
-      <!-- HTML to include div container for acquisition pie chart -->
-
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('piechartProtocolDIV');
-      });
-      </script>
-
-      <div class="panel-group" id="accordion4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                Pie chart showing a breakdown of acquisition protocol frequency.
-              </a>
-            </h4>
-          </div>
-          <div id="collapseProtocolPieChart" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
-              <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartProtocolDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- HTML to include div container for acquisition pie chart -->
-    {% endif %}
-
-    <!-- Include JavaScript to enable highcharts drilldown plots -->
-    <script src="{{ STATIC_URL }}js/drilldown.js"></script>
-    <!-- End of include JavaScript to enable highcharts drilldown plots -->
-
-
-    {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
-      <!-- JavaScript for acquisition mean DLP plot -->
-      <script>
-        var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-
-      {% if not request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-          {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisitionMeanAndMedian.js"></script>
-          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisitionMean.js"></script>
-          {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperAcquisitionMedian.js"></script>
-          {% endif %}
-      {% endif %}
-      <!-- End of JavaScript for acquisition plot -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-      <!-- JavaScript for acquisition mean CTDI plot -->
-      <script>
-        var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-
-      {% if not request.user.userprofile.plotCTAcquisitionMeanDLP %}
-          {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisitionMeanAndMedian.js"></script>
-          {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisitionMean.js"></script>
-          {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartCTDIperAcquisitionMedian.js"></script>
-          {% endif %}
-      {% endif %}
-      <!-- End of JavaScript for acquisition CTDI plot -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTAcquisitionMeanDLP and request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-      <!-- JavaScript for acquisition mean DLP and CTDI plot -->
-        {% if request.user.userprofile.plotAverageChoice == 'both' %}
-        <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisitionMeanAndMedian.js"></script>
-        {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-        <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisitionMean.js"></script>
-        {% else %}
-        <script src="{{ STATIC_URL }}js/ctChartDLPandCTDIperAcquisitionMedian.js"></script>
+        <!-- Flags to determine if charts should be plotted -->
+        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+            <script>var plotCTAcquisitionMeanDLP = true;</script>
         {% endif %}
-      <!-- End of JavaScript for acquisition CTDI plot -->
-    {% endif %}
 
+        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+            <script>var plotCTAcquisitionMeanCTDI = true;</script>
+        {% endif %}
 
-    {% if request.user.userprofile.plotCTAcquisitionFreq %}
-      <!-- JavaScript for acquisition pie chart -->
-      <script>
-        var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-      </script>
+        {% if request.user.userprofile.plotCTAcquisitionFreq %}
+            <script>var plotCTAcquisitionFreq = true;</script>
+        {% endif %}
 
-      <script src="{{ STATIC_URL }}js/ctChartAcquisitionFrequency.js"></script>
-      <!-- End of JavaScript for acquisition pie chart -->
-    {% endif %}
+        {% if request.user.userprofile.plotCTStudyMeanDLP %}
+            <script>var plotCTStudyMeanDLP = true;</script>
+        {% endif %}
 
+        {% if request.user.userprofile.plotCTStudyFreq %}
+            <script>var plotCTStudyFreq = true;</script>
+        {% endif %}
 
-    {% if request.user.userprofile.plotCTStudyMeanDLP %}
-      <!-- HTML to include div container for study plot -->
+        {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
+            <script>var plotCTStudyPerDayAndHour = true;</script>
+        {% endif %}
 
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('histogramStudyPlotDIV');
-      });
-      </script>
+        {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+            <script>var plotCTStudyMeanDLPOverTime = true;</script>
+        {% endif %}
 
-      <div class="panel-group" id="accordion5">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Plot of mean DLP for each study description.
-                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                Plot of median DLP for each study description.
-                {% else %}
-                Plot of mean and median DLP for each study description.
-                {% endif %}
-              </a>
-            </h4>
-          </div>
-          <div id="collapseThree" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="histogramStudyPlotDIV" style="height: auto; margin: 0 0"></div>
+        {% if request.user.userprofile.plotCTRequestMeanDLP %}
+            <script>var plotCTRequestMeanDLP = true;</script>
+        {% endif %}
 
+        {% if request.user.userprofile.plotCTRequestFreq %}
+            <script>var plotCTRequestFreq = true;</script>
+        {% endif %}
 
+        <script>var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';</script>
 
-              <table style="border:none">
-                  <tr>
-                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that study.<br>
-                          Click on a histogram bin tooltip to see the studies in the bin. Note that this will
-                          include studies at the upper bin boundary, so in some cases may display more data than
-                          shown in the histogram bin.</td>
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% endif %}
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramStudyPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% endif %}
-                  </tr>
-              </table>
-              <a onclick="enterFullScreen('collapseThree', 'histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+        <!-- End of flags to determine if charts should be plotted -->
+
+        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+            <!-- HTML to include div container for acquisition plot -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('histogramAcquisitionPlotDLPdiv');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean DLP for each acquisition protocol.
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median DLP for each acquisition protocol.
+                                {% else %}
+                                    Plot of mean and median DLP for each acquisition protocol.
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="histogramAcquisitionPlotDLPdiv" style="height: auto; margin: 0 0"></div>
+
+                            <div class="acq-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                            Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                                            this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                                            shown in the histogram bin.</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotDLPdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="enterFullScreen('collapseTwo', 'histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for study plot -->
-    {% endif %}
+            <!-- End of HTML to include div container for acquisition plot -->
+        {% endif %}
 
 
-    {% if request.user.userprofile.plotCTStudyFreq %}
-      <!-- HTML to include div container for study pie chart -->
+        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+            <!-- HTML to include div container for acquisition CTDI plot -->
 
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('piechartStudyDIV');
-      });
-      </script>
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('histogramAcquisitionPlotCTDIdiv');
+                });
+            </script>
 
-      <div class="panel-group" id="accordion6">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                Pie chart showing a breakdown of study frequency.
-              </a>
-            </h4>
-          </div>
-          <div id="collapseStudyPieChart" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
-              <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            <div class="panel-group" id="accordion3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean CTDI<sub>vol</sub> for each acquisition protocol.
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median CTDI<sub>vol</sub> for each acquisition protocol.
+                                {% else %}
+                                    Plot of mean and median CTDI<sub>vol</sub> for each acquisition protocol.
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseCTDI" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="histogramAcquisitionPlotCTDIdiv" style="height: auto; margin: 0 0"></div>
+
+                            <div class="acq-ctdi-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                            Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                                            this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                                            shown in the histogram bin.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="enterFullScreen('collapseCTDI', 'histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div class="acqctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for study pie chart -->
-    {% endif %}
+            <!-- End of HTML to include div container for acquisition CTDI plot -->
+        {% endif %}
 
 
-    {% if request.user.userprofile.plotCTRequestMeanDLP %}
-      <!-- HTML to include div container for request plot -->
+        {% if request.user.userprofile.plotCTAcquisitionFreq %}
+            <!-- HTML to include div container for acquisition pie chart -->
 
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('histogramRequestPlotDIV');
-      });
-      </script>
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartAcquisitionDIV');
+                });
+            </script>
 
-      <div class="panel-group" id="accordion7">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Plot of mean DLP for each requested procedure type.
-                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                Plot of median DLP for each requested procedure type.
-                {% else %}
-                Plot of mean and median DLP for each requested procedure type.
-                {% endif %}
-              </a>
-            </h4>
-          </div>
-          <div id="collapseRequestMeanDLP" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="histogramRequestPlotDIV" style="height: auto; margin: 0 0"></div>
-
-
-
-              <table style="border:none">
-                  <tr>
-                      <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                      <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that requested exam type.<br>
-                          Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
-                          this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                          shown in the histogram bin.</td>
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'y', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'freq', 1)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'name', 1)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramRequestPlotDIV', 'y', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramRequestPlotDIV', 'freq', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramRequestPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
-              {% endif %}
-                  </tr>
-                  <tr>
-              {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% elif request.user.userprofile.plotAverageChoice == 'median' %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'y', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'freq', -1)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="seriesSort('#histogramRequestPlotDIV', 'name', -1)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% else %}
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramRequestPlotDIV', 'y', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
-                      <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="twoSeriesSort('#histogramRequestPlotDIV', 'freq', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
-                      <td style="padding: 0px; vertical-align: top"><a onclick="twoSeriesSort('#histogramRequestPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
-              {% endif %}
-                  </tr>
-              </table>
-              <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            <div class="panel-group" id="accordion4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of acquisition protocol frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartAcquisitionDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartAcquisitionDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for request plot -->
-    {% endif %}
+            <!-- HTML to include div container for acquisition pie chart -->
+        {% endif %}
+
+        <!-- Include JavaScript to enable highcharts drilldown plots -->
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <!-- End of include JavaScript to enable highcharts drilldown plots -->
 
 
-    {% if request.user.userprofile.plotCTRequestFreq %}
-      <!-- HTML to include div container for request pie chart -->
+        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+            <!-- JavaScript for acquisition mean DLP plot -->
+            <script>
+                var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.acq-hist-norm-btn';
+                instr_class = '.acq-instructions';
+                render_div = 'histogramAcquisitionPlotDLPdiv';
+                val_label = 'DLP';
+                val_units = 'mGy.cm';
+                cat_label = 'Acquisition protocol';
+                cat_counter = 'exposures';
+                field_name_min = 'acquisition_dlp_min';
+                field_name_max = 'acquisition_dlp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'acquisition_protocol';
+                tooltip_filters = tooltipFiltersAcq;
+                href_start = '/openrem/ct/?acquisitionhist=1&';
+            </script>
 
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('piechartRequestDIV');
-      });
-      </script>
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                <script>avg_label = 'Mean and median';</script>
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                <script>avg_label = 'Mean';</script>
+            {% else %}
+                <script>avg_label = 'Median';</script>
+            {% endif %}
 
-      <div class="panel-group" id="accordion8">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                Pie chart showing a breakdown of requested procedure type frequency.
-              </a>
-            </h4>
-          </div>
-          <div id="collapseRequestPieChart" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
-              <a onclick="enterFullScreen('collapseRequestPieChart', 'piechartRequestDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            <script>
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+            <!-- End of JavaScript for acquisition plot -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+            <!-- JavaScript for acquisition mean CTDI plot -->
+            <script>
+                var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.acqctdi-hist-norm-btn';
+                instr_class = '.acq-ctdi-instructions';
+                render_div = 'histogramAcquisitionPlotCTDIdiv';
+                val_label = 'CTDI<sub>vol</sub>';
+                val_units = 'mGy';
+                cat_label = 'Acquisition protocol';
+                cat_counter = 'exposures';
+                field_name_min = 'acquisition_ctdi_min';
+                field_name_max = 'acquisition_ctdi_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'acquisition_protocol';
+                tooltip_filters = tooltipFiltersAcqCTDI;
+                href_start = '/openrem/ct/?acquisitionhist=1&';
+            </script>
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                <script>avg_label = 'Mean and median';</script>
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                <script>avg_label = 'Mean';</script>
+            {% else %}
+                <script>avg_label = 'Median';</script>
+            {% endif %}
+
+            <script>
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+            <!-- End of JavaScript for acquisition CTDI plot -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTAcquisitionFreq %}
+            <!-- JavaScript for acquisition pie chart -->
+            <script>
+                var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+            </script>
+
+            <script>result = chartFrequency('piechartAcquisitionDIV', 'Acquisition protocol frequency');</script>
+            <!-- End of JavaScript for acquisition pie chart -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyMeanDLP %}
+            <!-- HTML to include div container for study plot -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('histogramStudyPlotDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean DLP for each study description.
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median DLP for each study description.
+                                {% else %}
+                                    Plot of mean and median DLP for each study description.
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseThree" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="histogramStudyPlotDIV" style="height: auto; margin: 0 0"></div>
+
+                            <div class="stu-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that study.<br>
+                                            Click on a histogram bin tooltip to see the studies in the bin. Note that this will
+                                            include studies at the upper bin boundary, so in some cases may display more data than
+                                            shown in the histogram bin.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="enterFullScreen('collapseThree', 'histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for request pie chart -->
-    {% endif %}
+            <!-- End of HTML to include div container for study plot -->
+        {% endif %}
 
 
-    {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
-      <!-- HTML to include div container for pie chart of studies per week day pie chart -->
+        {% if request.user.userprofile.plotCTStudyFreq %}
+            <!-- HTML to include div container for study pie chart -->
 
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('piechartStudyWorkloadDIV');
-      });
-      </script>
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyDIV');
+                });
+            </script>
 
-      <div class="panel-group" id="accordion9">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                Pie chart showing a breakdown of number of studies per weekday.
-              </a>
-            </h4>
-          </div>
-          <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
-              <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
-              <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            <div class="panel-group" id="accordion6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of study frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for studies per week day pie chart -->
-    {% endif %}
+            <!-- End of HTML to include div container for study pie chart -->
+        {% endif %}
 
 
-    {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-      <!-- HTML to include div container for mean study DLP per week -->
+        {% if request.user.userprofile.plotCTRequestMeanDLP %}
+            <!-- HTML to include div container for request plot -->
 
-      <script>
-      $(window).resize(function() {
-          chartSetExportSize('studyMeanDLPOverTimeDIV');
-      });
-      </script>
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('histogramRequestPlotDIV');
+                });
+            </script>
 
-      <div class="panel-group" id="accordion10">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
-                {% else %}
-                Line plot showing median DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
-                {% endif %}
-              </a>
-            </h4>
-          </div>
-          <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="studyMeanDLPOverTimeDIV" style="height: auto; margin: 0 0"></div>
-              <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
-              <a onclick="enterFullScreen('collapseWeeklyStudyMeanChart', 'studyMeanDLPOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+            <div class="panel-group" id="accordion7">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean DLP for each requested procedure type.
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median DLP for each requested procedure type.
+                                {% else %}
+                                    Plot of mean and median DLP for each requested procedure type.
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseRequestMeanDLP" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="histogramRequestPlotDIV" style="height: auto; margin: 0 0"></div>
+
+                            <div class="req-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that requested exam type.<br>
+                                            Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
+                                            this will include acquisitions at the upper bin boundary, so in some cases may display more data than
+                                            shown in the histogram bin.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'avg_value', 1, 0, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'total_counts', 1, 0, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'name', 1, 0, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DLP">&darr;DLP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!-- End of HTML to include div container for mean study DLP per week -->
+            <!-- End of HTML to include div container for request plot -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTRequestFreq %}
+            <!-- HTML to include div container for request pie chart -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartRequestDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of requested procedure type frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseRequestPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseRequestPieChart', 'piechartRequestDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for request pie chart -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
+            <!-- HTML to include div container for pie chart of studies per week day pie chart -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of number of studies per weekday.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for studies per week day pie chart -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+            <!-- HTML to include div container for mean study DLP per week -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('studyMeanDLPOverTimeDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
+                                {% else %}
+                                    Line plot showing median DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseWeeklyStudyMeanChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="studyMeanDLPOverTimeDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+                            <a onclick="enterFullScreen('collapseWeeklyStudyMeanChart', 'studyMeanDLPOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for mean study DLP per week -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyMeanDLP %}
+            <!-- JavaScript for study DLP plot -->
+            <script>
+                var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.stu-hist-norm-btn';
+                instr_class = '.stu-instructions';
+                render_div = 'histogramStudyPlotDIV';
+                val_label = 'DLP';
+                val_units = 'mGy.cm';
+                cat_label = 'Study description';
+                cat_counter = 'studies';
+                field_name_min = 'study_dlp_min';
+                field_name_max = 'study_dlp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'study_description';
+                tooltip_filters = tooltipFiltersStudy;
+                href_start = '/openrem/ct/?studyhist=1&';
+            </script>
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                <script>avg_label = 'Mean and median';</script>
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                <script>avg_label = 'Mean';</script>
+            {% else %}
+                <script>avg_label = 'Median';</script>
+            {% endif %}
+
+            <script>
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+            <!-- End of JavaScript for study plot -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+            <!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
+            <script>
+                var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTStudyFreq %}
+            <script>result = chartFrequency('piechartStudyDIV', 'Study description frequency');</script>
+            <!-- End of JavaScript for study pie chart -->
+        {% endif %}
+
+
+
+
+        {% if request.user.userprofile.plotCTRequestMeanDLP or request.user.userprofile.plotCTRequestFreq %}
+            <!-- JavaScript for request mean DLP and request frequency plot. -->
+            <script>
+                var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTRequestMeanDLP %}
+            <script>
+                norm_btn_class = '.req-hist-norm-btn';
+                instr_class = '.req-instructions';
+                render_div = 'histogramRequestPlotDIV';
+                val_label = 'DLP';
+                val_units = 'mGy.cm';
+                cat_label = 'Requested procedure';
+                cat_counter = 'studies';
+                field_name_min = 'study_dlp_min';
+                field_name_max = 'study_dlp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'requested_procedure';
+                tooltip_filters = tooltipFiltersRequest;
+                href_start = '/openrem/ct/?requesthist=1&';
+            </script>
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                <script>avg_label = 'Mean and median';</script>
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                <script>avg_label = 'Mean';</script>
+            {% else %}
+                <script>avg_label = 'Median';</script>
+            {% endif %}
+
+            <script>
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+            <!-- End of JavaScript for request plot -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTRequestFreq %}
+            <!-- JavaScript for request pie chart. -->
+            <script>
+                var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTRequestFreq %}
+            <script>result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');</script>
+            <!-- End of JavaScript for request pie chart -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
+            <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
+            <script>result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');</script>
+            <!-- End of JavaScript for studies per week day pie chart -->
+        {% endif %}
+
+
+        {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+            <!-- JavaScript for mean DLP per study description -->
+            <script>
+                var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+            </script>
+
+            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                <script>
+                    result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Mean');
+                </script>
+            {% else %}
+                <script>
+                    result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Median');
+                </script>
+            {% endif %}
+            <!-- End of JavaScript for mean DLP per study description -->
+        {% endif %}
+
+
     {% endif %}
-
-
-    {% if request.user.userprofile.plotCTStudyMeanDLP %}
-      <script>
-        var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperStudyMedian.js"></script>
-      {% endif %}
-      <!-- End of JavaScript for study plot -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-      <!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
-      <script>
-        var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-      </script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTStudyFreq %}
-      <script src="{{ STATIC_URL }}js/ctChartStudyFrequency.js"></script>
-      <!-- End of JavaScript for study pie chart -->
-    {% endif %}
-
-
-
-
-    {% if request.user.userprofile.plotCTRequestMeanDLP or request.user.userprofile.plotCTRequestFreq %}
-      <!-- JavaScript for request mean DLP and request frequency plot. -->
-      <script>
-        var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-      </script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTRequestMeanDLP %}
-
-      {% if request.user.userprofile.plotAverageChoice == 'both' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMeanAndMedian.js"></script>
-      {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMean.js"></script>
-      {% else %}
-          <script src="{{ STATIC_URL }}js/ctChartDLPperRequestMedian.js"></script>
-      {% endif %}
-      <!-- End of JavaScript for request plot -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTRequestFreq %}
-      <!-- JavaScript for request pie chart. -->
-      <script>
-        var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
-      </script>
-    {% endif %}
-
-    {% if request.user.userprofile.plotCTRequestFreq %}
-      <script src="{{ STATIC_URL }}js/ctChartRequestFrequency.js"></script>
-      <!-- End of JavaScript for request pie chart -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
-      <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-      <script src="{{ STATIC_URL }}js/ctChartStudyWorkload.js"></script>
-      <!-- End of JavaScript for studies per week day pie chart -->
-    {% endif %}
-
-
-    {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-      <!-- JavaScript for mean DLP per study description -->
-      <script>
-        var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-      </script>
-
-      {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-      <script src="{{ STATIC_URL }}js/ctChartMeanDLPperStudyOverTime.js"></script>
-      {% else %}
-      <script src="{{ STATIC_URL }}js/ctChartMedianDLPperStudyOverTime.js"></script>
-      {% endif %}
-      <!-- End of JavaScript for mean DLP per study description -->
-    {% endif %}
-
-
-  {% endif %}
 {% endblock %}

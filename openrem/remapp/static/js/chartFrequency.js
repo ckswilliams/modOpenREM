@@ -1,7 +1,10 @@
-$(function () {
-    var chartRequestFreq = new Highcharts.Chart({
+function chartFrequency(render_div, series_name) {
+    var chart = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
-            renderTo: 'piechartRequestDIV',
+            renderTo: render_div,
             plotBackgroundColor: null,
             plotShadow: false
         },
@@ -13,7 +16,7 @@ $(function () {
         },
         plotOptions: {
             pie: {
-                allowPointSelect: true,
+                allowPointSelect: false,
                 cursor: 'pointer',
                 dataLabels: {
                     useHTML: true,
@@ -27,12 +30,11 @@ $(function () {
         },
         series: [{
             type: 'pie',
-            name: 'Requested procedure frequency',
+            name: series_name,
             point: {
                 events: {
                     click: function(e) {
-                        var linkText = 'requested_procedure=' + (this.name).replace('&amp;', '%26');
-                        location.href = '/openrem/ct/?requestfreq=1&' + linkText + tooltipFiltersRequest;
+                        location.href = e.point.url;
                         e.preventDefault();
                     }
                 }
@@ -40,4 +42,4 @@ $(function () {
             data: []
         }]
     });
-});
+}

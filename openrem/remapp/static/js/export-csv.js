@@ -35,18 +35,25 @@
         each(this.series, function (series) {
             if (series.options.includeInCSVExport !== false) {
                 names.push(series.name);
+                if (series.points[0].hasOwnProperty('freq')) {
+                    names.push('Frequency');
+                }
                 each(series.points, function (point) {
                     if (!rows[point.x]) {
                         rows[point.x] = [];
                     }
                     rows[point.x].x = point.x;
 
-                    // Pies, funnels etc. use point name in X row
                     if (!series.xAxis || point.name) {
                         rows[point.x].name = point.name;
                     }
 
-                    rows[point.x][i] = point.y;
+                    rows[point.x][i] = [];
+                    rows[point.x][i][0] = point.y;
+
+                    if (point.hasOwnProperty('freq')) {
+                        rows[point.x][i][1] = point.freq;
+                    }
                 });
                 i += 1;
             }
@@ -127,13 +134,27 @@
             var tag = i ? 'td' : 'th',
                 val,
                 j,
+                arr_i,
                 n = useLocalDecimalPoint ? (1.1).toLocaleString()[1] : '.';
 
             html += '<tr>';
             for (j = 0; j < row.length; j++) {
                 val = row[j];
                 // Add the cell
-                if (typeof val === 'number') {
+                if (typeof val === 'object') {
+                    for (arr_i = 0; arr_i < val.length; arr_i++) {
+                        if (typeof val[arr_i] === 'number') {
+                            if (n === ',') {
+                                html += '<' + tag + (typeof val[arr_i] === 'number' ? ' class="number"' : '') + '>' + val[arr_i].toString().replace(".", ",") + '</' + tag + '>';
+                            } else {
+                                html += '<' + tag + (typeof val[arr_i] === 'number' ? ' class="number"' : '') + '>' + val[arr_i].toString() + '</' + tag + '>';
+                            }
+                        } else {
+                            html += '<' + tag + '>' + val[arr_i] + '</' + tag + '>';
+                        }
+                    }
+                }
+                else if (typeof val === 'number') {
                     if (n === ',') {
                         html += '<' + tag + (typeof val === 'number' ? ' class="number"' : '') + '>' + val.toString().replace(".", ",") + '</' + tag + '>';
                     } else {

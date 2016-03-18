@@ -33,6 +33,8 @@ import sys
 import django
 import logging
 
+logger = logging.getLogger(__name__)
+
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -355,7 +357,7 @@ def _generalstudymoduleattributes(dataset, g):
     from remapp.tools.hash_id import hash_id
 
     g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
-    logging.debug("Populating mammo study %s", g.study_instance_uid)
+    logger.debug("Populating mammo study %s", g.study_instance_uid)
     g.study_date = get_date('StudyDate',dataset)
     g.study_time = get_time('StudyTime',dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), datetime.time(g.study_time))
@@ -406,10 +408,10 @@ def _create_event(dataset):
 
     study_uid = get_value_kw('StudyInstanceUID',dataset)
     event_uid = get_value_kw('SOPInstanceUID',dataset)
-    logging.debug("In _create_event. Study %s, event %s", study_uid, event_uid)
+    logger.debug("In _create_event. Study %s, event %s", study_uid, event_uid)
     inst_in_db = check_uid.check_uid(event_uid,'Event')
     if inst_in_db:
-        logging.debug("Instance %s already in db", event_uid)
+        logger.debug("Instance %s already in db", event_uid)
         return 0
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
     if same_study_uid.count() != 1:
@@ -430,7 +432,7 @@ def _create_event(dataset):
                 if event_date_time == events.date_time_started:
                     return 0
         except Exception as e:
-            logging.warning("MG study UID %s, event UID %s failed at check for identical event. Error %s",
+            logger.warning("MG study UID %s, event UID %s failed at check for identical event. Error %s",
                          study_uid, event_uid, e)
     # study exists, but event doesn't
     _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
@@ -456,7 +458,7 @@ def _mammo2db(dataset):
     if not study_uid:
         sys.exit('No UID returned')  
     study_in_db = check_uid.check_uid(study_uid)
-    logging.info("In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
+    logger.info("In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
 
     if study_in_db == 1:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
@@ -468,7 +470,7 @@ def _mammo2db(dataset):
         g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
         g.save()
         event_uid = get_value_kw('SOPInstanceUID',dataset)
-        logging.debug("Created new mammo study %s, event %s", study_uid, event_uid)
+        logger.debug("Created new mammo study %s, event %s", study_uid, event_uid)
         # check again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
@@ -544,17 +546,17 @@ def mam(mg_file):
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
         if RM_DCM_MG:
-            logging.debug("%s id not a mammo file, deleting", mg_file)
+            logger.debug("%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
         return (1)
 
     _mammo2db(dataset)
 
     if del_mg_im:
-        logging.debug("Mammo %s processing complete, deleting file", mg_file)
+        logger.debug("Mammo %s processing complete, deleting file", mg_file)
         os.remove(mg_file)
     else:
-        logging.debug("Mammo %s processing complete, file remains", mg_file)
+        logger.debug("Mammo %s processing complete, file remains", mg_file)
 
     return 0
 

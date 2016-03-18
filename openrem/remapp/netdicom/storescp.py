@@ -38,8 +38,8 @@ from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt
 
+logger = logging.getLogger(name='remapp.netdicom.storescp')
 
-logger = logging.getLogger(__name__)
 
 # callbacks
 def OnAssociateRequest(association):
@@ -98,28 +98,63 @@ def OnReceiveStore(SOPClass, DS):
     )
     mkdir_p(path)
     filename = os.path.join(path, "{0}.dcm".format(DS.SOPInstanceUID))
-    ds = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
-    ds.update(DS)
-    ds.is_little_endian = True
-    ds.is_implicit_VR = True
+    ds_new = FileDataset(filename, {}, file_meta=file_meta, preamble="\0" * 128)
+    ds_new.update(DS)
+    ds_new.is_little_endian = True
+    ds_new.is_implicit_VR = True
 
-    try:
-        ds.save_as(filename)
-    except ValueError as e:
+    while True:
         try:
             station_name = DS.StationName
         except:
             station_name = "missing"
-        logger.error(
-            "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
-                e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
-                DS.SOPInstanceUID))
-        return SOPClass.Success
-    except:
-        logger.error(
-            "Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
-                sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
-        return SOPClass.Success
+        try:
+            ds_new.save_as(filename)
+            break
+        except ValueError as e:
+            # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+            if "Invalid tag (0018, 7052)" in e.message or "Invalid tag (0018, 7054)" in e.message:
+                logger.info("Found illegal use of multiple values of filter thickness using comma. Changing before saving.")
+                thickmin = dict.__getitem__(ds_new, 0x187052)
+                thickvalmin = thickmin.__getattribute__('value')
+                if ',' in thickvalmin:
+                    thickvalmin = thickvalmin.replace(',', '\\')
+                    thicknewmin = thickmin._replace(value = thickvalmin)
+                    dict.__setitem__(ds_new, 0x187052, thicknewmin)
+                thickmax = dict.__getitem__(ds_new, 0x187054)
+                thickvalmax = thickmax.__getattribute__('value')
+                if ',' in thickvalmax:
+                    thickvalmax = thickvalmax.replace(',', '\\')
+                    thicknewmax = thickmax._replace(value = thickvalmax)
+                    dict.__setitem__(ds_new, 0x187054, thicknewmax)
+            elif "Invalid tag (01f1, 1027)" in e.message:
+                logger.warning("Invalid value in tag (01f1,1027), 'exposure time per rotation'. Tag value deleted. Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
+                    station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                priv_exp_time = dict.__getitem__(ds_new, 0x1f11027)
+                blank_val = priv_exp_time._replace(value='')
+                dict.__setitem__(ds_new, 0x1f11027, blank_val)
+            elif "Invalid tag (01f1, 1033)" in e.message:
+                logger.warning("Invalid value in unknown private tag (01f1,1033). Tag value deleted. Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
+                    station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                priv_tag = dict.__getitem__(ds_new, 0x1f11033)
+                blank_val = priv_tag._replace(value='')
+                dict.__setitem__(ds_new, 0x1f11033, blank_val)
+            else:
+                logger.error(
+                    "ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                        e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                return SOPClass.Success
+        except IOError as e:
+            logger.error(
+                    "IOError on DCM save {0} - does the user running storescp have write rights in the {1} folder?".format(
+                        e.message, path
+                    ))
+            return SOPClass.Success
+        except:
+            logger.error(
+                "Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                    sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+            return SOPClass.Success
 
     logger.info("File %s written", filename)
     if (DS.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.67'  # X-Ray Radiation Dose SR
@@ -166,6 +201,7 @@ def OnReceiveStore(SOPClass, DS):
 
 
 def web_store(store_pk=None):
+    import socket
     import time
     from remapp.models import DicomStoreSCP
     from django.core.exceptions import ObjectDoesNotExist
@@ -182,34 +218,42 @@ def web_store(store_pk=None):
     # logging.basicConfig(level=logging.INFO)
 
     # setup AE
-    MyAE = AE(
-        aet, port, [],
-        [StorageSOPClass, VerificationSOPClass],
-        [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
-    )
-    MyAE.OnAssociateRequest = OnAssociateRequest
-    MyAE.OnAssociateResponse = OnAssociateResponse
-    MyAE.OnReceiveStore = OnReceiveStore
-    MyAE.OnReceiveEcho = OnReceiveEcho
+    try:
+        MyAE = AE(
+            aet, port, [],
+            [StorageSOPClass, VerificationSOPClass],
+            [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
+        )
+        MyAE.MaxAssociationIdleSeconds = 120
+        MyAE.MaxNumberOfAssociations = 25
+        MyAE.OnAssociateRequest = OnAssociateRequest
+        MyAE.OnAssociateResponse = OnAssociateResponse
+        MyAE.OnReceiveStore = OnReceiveStore
+        MyAE.OnReceiveEcho = OnReceiveEcho
 
-    # start AE
-    conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
-    conf.save()
-    logger.info("Starting AE... AET:{0}, port:{1}".format(aet, port))
-    MyAE.start()
-    conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
-    conf.save()
-    logger.info("Started AE... AET:%s, port:%s", aet, port)
-    #    print "Started AE... AET:{0}, port:{1}".format(aet, port)
+        # start AE
+        conf.status = "Starting AE... AET:{0}, port:{1}".format(aet, port)
+        conf.save()
+        logger.info("Starting AE... AET:{0}, port:{1}".format(aet, port))
+        MyAE.start()
+        conf.status = "Started AE... AET:{0}, port:{1}".format(aet, port)
+        conf.save()
+        logger.info("Started AE... AET:%s, port:%s", aet, port)
 
-    while 1:
-        time.sleep(1)
-        stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
-        if not stay_alive.run:
-            MyAE.Quit()
-            logger.info("Stopped AE... AET:%s, port:%s", aet, port)
-            #            print "AE Stopped... AET:{0}, port:{1}".format(aet, port)
-            break
+        while 1:
+            time.sleep(1)
+            stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
+            if not stay_alive.run:
+                MyAE.Quit()
+                logger.info("Stopped AE... AET:%s, port:%s", aet, port)
+                break
+    except socket.error as serr:
+        if serr.errno != errno.EADDRINUSE:
+            conf.status = "Starting AE AET:{0}, port:{1} failed; see logfile".format(aet, port)
+            logger.error("Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+        else:
+            conf.status = "Starting AE AET:{0}, port:{1} failed; address already in use!".format(aet, port)
+            logger.warning("Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
 
 
 def _interrupt(store_pk=None):

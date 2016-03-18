@@ -26,7 +26,7 @@ link to create the OpenSkin export:
 Instructions for OpenSkin
 *************************
 
-Download the latest version as a zip file from https://bitbucket.org/jacole/openskin/downloads. At the time of release
+Download the latest version as a zip file from https://bitbucket.org/openskin/openskin/downloads. At the time of release
 for OpenREM 0.6.0, the current OpenSkin release was 0.4, 26th March 2015. The application referred to here will only
 work on Windows. When OpenSkin is built into OpenREM, it will work on both Linux and Windows servers.
 

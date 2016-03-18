@@ -169,7 +169,7 @@ def flcsv1(request, name=None, patid=None):
     :type request: GET
     """
     from django.shortcuts import redirect
-    from remapp.exports.exportcsv import exportFL2excel
+    from remapp.exports.rf_export import exportFL2excel
 
     if request.user.groups.filter(name='pidgroup'):
         pid = True

@@ -1,20 +1,23 @@
-$(function () {
-    var chartWorkload = new Highcharts.Chart({
+function chartWorkload(render_div, category_type) {
+    var chart = new Highcharts.Chart({
+        exporting: {
+            fallbackToExportServer: false
+        },
         chart: {
-            renderTo: 'piechartStudyWorkloadDIV',
+            renderTo: render_div,
             plotBackgroundColor: null,
             plotShadow: false,
             events: {
                 drilldown: function(e) {
-                    chartWorkload.setTitle({ text: 'Studies per hour,<br>'+e.point.name, align:'left', verticalAlign:'top', y:50, x:50 });
+                    this.setTitle({ text: category_type + ' per hour,<br>'+e.point.name, align:'left', verticalAlign:'top', y:50, x:50 });
                 },
                 drillup: function(e) {
-                    chartWorkload.setTitle({ text: 'Studies per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
+                    this.setTitle({ text: category_type + ' per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
                 }
             }
         },
         title: {
-            text: 'Studies per<br>day of the week',
+            text: category_type + ' per<br>day of the week',
             align: 'center',
             verticalAlign: 'middle',
             y: 70
@@ -38,7 +41,7 @@ $(function () {
         },
         series: [{
             type: 'pie',
-            name: 'Studies per weekday',
+            name: category_type + ' per weekday',
             startAngle:-90,
             endAngle:90,
             center: ['50%','75%'],
@@ -46,7 +49,7 @@ $(function () {
             data: []
         }],
         drilldown: {
-            series: []
+            series:[]
         }
     });
-});
+}

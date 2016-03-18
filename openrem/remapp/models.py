@@ -223,6 +223,10 @@ class UserProfile(models.Model):
     plotCharts = models.BooleanField(default=False)
     plotDXAcquisitionMeanDAP = models.BooleanField(default=True)
     plotDXAcquisitionFreq = models.BooleanField(default=False)
+    plotDXStudyMeanDAP = models.BooleanField(default=True)
+    plotDXStudyFreq = models.BooleanField(default=True)
+    plotDXRequestMeanDAP = models.BooleanField(default=True)
+    plotDXRequestFreq = models.BooleanField(default=True)
     plotDXAcquisitionMeankVp = models.BooleanField(default=False)
     plotDXAcquisitionMeanmAs = models.BooleanField(default=False)
     plotDXStudyPerDayAndHour = models.BooleanField(default=False)
@@ -256,6 +260,10 @@ class UserProfile(models.Model):
     displayRF = models.BooleanField(default=True)
     displayMG = models.BooleanField(default=True)
     displayDX = models.BooleanField(default=True)
+
+    plotSeriesPerSystem = models.BooleanField(default=False)
+
+    plotHistogramBins = models.PositiveSmallIntegerField(default=20)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
@@ -398,7 +406,7 @@ class ProjectionXRayRadiationDose(models.Model):  # TID 10001
         ContextID, blank=True, null=True, related_name='tid10001_procedure')
     has_intent = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_intent')
-    acquisition_device_type = models.CharField(max_length=16, blank=True)
+    acquisition_device_type = models.ForeignKey(ContextID, blank=True, null=True, related_name='tid10001_acqtype')
     scope_of_accumulation = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_scope')
     xray_detector_data_available = models.ForeignKey(
@@ -484,6 +492,7 @@ class IrradEventXRayData(models.Model):  # TID 10003
     half_value_layer = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     patient_equivalent_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     entrance_exposure_at_rp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    reference_point_definition_text = models.TextField(blank=True, null=True) # in other models the code version is _code
     reference_point_definition = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10003_rpdefinition')  # CID 10025
     # Another char field that should be a cid
@@ -706,12 +715,6 @@ class AccumProjXRayDose(models.Model):  # TID 10004
     total_number_of_radiographic_frames  = models.DecimalField(max_digits=6, decimal_places=0, blank=True, null=True)
     reference_point_definition = models.TextField(blank=True, null=True)
     reference_point_definition_code = models.ForeignKey(ContextID, blank=True, null=True)
-
-    def convert_gym2_to_cgycm2(self):
-        """Converts Gy.m2 to cGy.cm2 for display in web interface
-        """
-        if self.dose_area_product_total:
-            return 1000000*self.dose_area_product_total
 
 
 class AccumMammographyXRayDose(models.Model):  # TID 10005

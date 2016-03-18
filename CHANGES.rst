@@ -2,12 +2,36 @@
 OpenREM version history
 =======================
 
-0.7.0b12 (2015-12-18)
+0.7.0b13 (2016-03-18)
 ---------------------
 
+* `#370`_  Added study description to mammography export
+* `#369`_  Bi-plane fluoroscopy studies now export correctly
+* `#368`_  Mammo RDSR now imports correctly
+* `#365`_  Tube filtration is now displayed in the RF detail view
+* `#364`_  Philips Allura fluorscopy RDSRs now import correctly
+* `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
+* `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
+* `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
+* `#357`_  Charts: button to return from histogram now displays the name of the main chart
+* `#356`_  Charts: histogram normalise button appears for all appropriate charts
+* `#355`_  Charts: sorting now works as expected for plots with a series per system
+* `#352`_  Fixed CT xlsx exports that had complete study data in each series protocol sheet (from earlier beta)
+* `#351`_  Charts: simplified chart JavaScript and Python code
+* `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
+* `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
+* `#343`_  Charts: user can now specify number of histogram bins in the range of 2 to 40
+* `#342`_  Charts: improved the colours used for plotting chart data
+* `#340`_  Fixed store failure to save due to illegal values in Philips private tags, improved exception code
+* `#339`_  Improved extraction of requested procedure information for radiographic studies
+* `#338`_  Fix Kodak illegally using comma in filter thickness values
 * `#335`_  DICOM Store keep_alive and echo_scu functions now log correctly
 * `#334`_  Fixed issue with tasks needing to be explicitly named
 * `#333`_  Fixed StoreSCP not starting in beta 11 error
+* `#332`_  Charts: some charts can now be plotted with a series per x-ray system
+* `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
+* `#329`_  All existing logging is now done via the same log files
+* `#328`_  Store SCP no longer uses Celery tasks
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
@@ -89,6 +113,7 @@ OpenREM version history
 * `#151`_  Suspected non-patient studies can now be filtered out
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
+* `#70`_   User is returned to the filtered view after deleting a study
 
 0.6.1 (2015-10-30)
 ------------------

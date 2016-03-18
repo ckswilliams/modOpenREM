@@ -39,6 +39,8 @@ import sys
 import django
 import logging
 
+logger = logging.getLogger(__name__)
+
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -517,7 +519,7 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 def _generalstudymoduleattributes(dataset,g):
     from datetime import datetime
     from remapp.models import PatientIDSettings
-    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
+    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value, get_value_num
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
@@ -545,6 +547,16 @@ def _generalstudymoduleattributes(dataset,g):
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription',dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
+    if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value('RequestAttributesSequence',dataset)
+    if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value('PerformedProtocolCodeSequence',dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning('RequestAttributesSequence',dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(0x00321060,dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning('PerformedProtocolCodeSequence',dataset)
+    if not g.requested_procedure_code_meaning:
+        manufacturer = get_value_kw("Manufacturer",dataset)
+        model = get_value_kw("ManufacturerModelName",dataset)
+        if manufacturer and model and 'canon' in manufacturer.lower() and 'cxdi' in model.lower():
+            g.requested_procedure_code_meaning = get_value_num(0x00081030,dataset)
     g.save()
     
     _generalequipmentmoduleattributes(dataset,g)
@@ -601,7 +613,7 @@ def _create_event(dataset):
             if event_date_time == events.date_time_started:
                 return 0
     except Exception as e:
-        logging.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
+        logger.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
                          study_uid, event_uid, e)
     # study exists, but event doesn't
     _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
