@@ -52,7 +52,7 @@
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
-        <td>{{ event.image_view }}</td>
+        <td>{{ event.laterality.code_meaning }} breast, {{ event.image_view }}</td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.compression_thickness|floatformat:0  }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.anode_target_material }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.xrayfilters_set.get.xray_filter_material }}</td>

@@ -33,6 +33,35 @@ import logging
 from celery import shared_task
 from django.conf import settings
 
+def _get_accumulated_data(accumXrayDose):
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.tools.get_values import return_for_export
+    accum = {}
+    accum['plane'] = accumXrayDose.acquisition_plane.code_meaning
+    try:
+        accum['dose_area_product_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+        accum['dose_rp_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_rp_total')
+        accum['reference_point_definition_code'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+    except ObjectDoesNotExist:
+        accum['dose_area_product_total'] = None
+        accum['dose_rp_total'] = None
+        accum['reference_point_definition_code'] = None
+    try:
+        accum['fluoro_dose_area_product_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_area_product_total')
+        accum['fluoro_dose_rp_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_rp_total')
+        accum['total_fluoro_time'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'total_fluoro_time')
+        accum['acquisition_dose_area_product_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_area_product_total')
+        accum['acquisition_dose_rp_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_rp_total')
+        accum['total_acquisition_time'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'total_acquisition_time')
+    except ObjectDoesNotExist:
+        accum['fluoro_dose_area_product_total'] = None
+        accum['fluoro_dose_rp_total'] = None
+        accum['total_fluoro_time'] = None
+        accum['acquisition_dose_area_product_total'] = None
+        accum['acquisition_dose_rp_total'] = None
+        accum['total_acquisition_time'] = None
+    return accum
+
 
 @shared_task
 def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
@@ -121,7 +150,10 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Patient mass (kg)',
         'Not patient?',
         'Study description',
+        'Physician',
+        'Operator',
         'Number of events',
+        'Plane',
         'DAP total (Gy.m2)',
         'RP dose total (Gy)',
         'Fluoro DAP total (Gy.m2)',
@@ -131,8 +163,17 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Acquisition RP dose total (Gy)',
         'Total acquisition time (ms)',
         'RP definition',
-        'Physician',
-        'Operator']
+        'Plane (if bi-plane)',
+        'DAP total (Gy.m2)',
+        'RP dose total (Gy)',
+        'Fluoro DAP total (Gy.m2)',
+        'Fluoro RP dose total (Gy)',
+        'Total fluoro time (ms)',
+        'Acquisition DAP total (Gy.m2)',
+        'Acquisition RP dose total (Gy)',
+        'Total acquisition time (ms)',
+        'RP definition',
+    ]
     writer.writerow(headings)
     for i, exams in enumerate(e):
 
@@ -202,34 +243,6 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         else:
             count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
 
-        try:
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
-        except ObjectDoesNotExist:
-            dose_area_product_total = None
-            dose_rp_total = None
-        else:
-            dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
-            dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_rp_total')
-
-        try:
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
-        except ObjectDoesNotExist:
-            fluoro_dose_area_product_total = None
-            fluoro_dose_rp_total = None
-            total_fluoro_time = None
-            acquisition_dose_area_product_total = None
-            acquisition_dose_rp_total = None
-            total_acquisition_time = None
-            reference_point_definition_code = None
-        else:
-            fluoro_dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'fluoro_dose_area_product_total')
-            fluoro_dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'fluoro_dose_rp_total')
-            total_fluoro_time = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'total_fluoro_time')
-            acquisition_dose_area_product_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'acquisition_dose_area_product_total')
-            acquisition_dose_rp_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'acquisition_dose_rp_total')
-            total_acquisition_time = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(), 'total_acquisition_time')
-            reference_point_definition_code = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
-
         row = []
         if pid and name:
             row += [patient_name]
@@ -254,18 +267,24 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_weight,
             not_patient,
             exams.study_description,
-            count,
-            dose_area_product_total,
-            dose_rp_total,
-            fluoro_dose_area_product_total,
-            fluoro_dose_rp_total,
-            total_fluoro_time,
-            acquisition_dose_area_product_total,
-            acquisition_dose_rp_total,
-            total_acquisition_time,
-            reference_point_definition_code,
             exams.performing_physician_name,
             exams.operator_name,
+            count,
+        ]
+
+        for plane in exams.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+            accum = _get_accumulated_data(plane)
+            row += [
+                accum['plane'],
+                accum['dose_area_product_total'],
+                accum['dose_rp_total'],
+                accum['fluoro_dose_area_product_total'],
+                accum['fluoro_dose_rp_total'],
+                accum['total_fluoro_time'],
+                accum['acquisition_dose_area_product_total'],
+                accum['acquisition_dose_rp_total'],
+                accum['total_acquisition_time'],
+                accum['reference_point_definition_code'],
             ]
         writer.writerow(row)
         tsk.progress = "{0} of {1}".format(i+1, numresults)
@@ -686,10 +705,11 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Patient age',
         'Patient sex',
         'Number of events',
+        'Study description',
         'View',
         'Acquisition',
         'Thickness',
-        'Radiological Thickness',
+        'Radiological thickness',
         'Force',
         'Mag',
         'Area',
@@ -703,8 +723,8 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'uAs',
         'ESD',
         'AGD',
-        '% Fibroglandular Tissue'
-        'Exposure Mode Description'
+        '% Fibroglandular tissue',
+        'Exposure mode description'
         ]
 
     writer.writerow(headings)
@@ -837,6 +857,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 patient_age_decimal,
                 patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
+                exp.projection_xray_radiation_dose.general_study_module_attributes.study_description,
                 exp.image_view,
                 exp.acquisition_protocol,
                 compression_thickness,
