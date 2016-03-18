@@ -707,10 +707,11 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'Patient age',
         'Patient sex',
         'Number of events',
+        'Study description',
         'View',
         'Acquisition',
         'Thickness',
-        'Radiological Thickness',
+        'Radiological thickness',
         'Force',
         'Mag',
         'Area',
@@ -724,8 +725,8 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         'uAs',
         'ESD',
         'AGD',
-        '% Fibroglandular Tissue'
-        'Exposure Mode Description'
+        '% Fibroglandular tissue',
+        'Exposure mode description'
         ]
 
     writer.writerow(headings)
@@ -858,6 +859,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 patient_age_decimal,
                 patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
+                exp.projection_xray_radiation_dose.general_study_module_attributes.study_description,
                 exp.image_view,
                 exp.acquisition_protocol,
                 compression_thickness,
