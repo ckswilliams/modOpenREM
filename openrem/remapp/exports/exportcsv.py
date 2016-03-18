@@ -41,7 +41,9 @@ def _get_accumulated_data(accumXrayDose):
     try:
         accum['dose_area_product_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
         accum['dose_rp_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_rp_total')
-        accum['reference_point_definition_code'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+        accum['reference_point_definition'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+        if not accum['reference_point_definition']:
+            accum['reference_point_definition'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition')
     except ObjectDoesNotExist:
         accum['dose_area_product_total'] = None
         accum['dose_rp_total'] = None
@@ -284,7 +286,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 accum['acquisition_dose_area_product_total'],
                 accum['acquisition_dose_rp_total'],
                 accum['total_acquisition_time'],
-                accum['reference_point_definition_code'],
+                accum['reference_point_definition'],
             ]
         writer.writerow(row)
         tsk.progress = "{0} of {1}".format(i+1, numresults)

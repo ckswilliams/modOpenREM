@@ -492,6 +492,7 @@ class IrradEventXRayData(models.Model):  # TID 10003
     half_value_layer = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     patient_equivalent_thickness = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     entrance_exposure_at_rp = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    reference_point_definition_text = models.TextField(blank=True, null=True) # in other models the code version is _code
     reference_point_definition = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10003_rpdefinition')  # CID 10025
     # Another char field that should be a cid

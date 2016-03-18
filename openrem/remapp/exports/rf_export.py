@@ -227,7 +227,7 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
             accum['acquisition_dose_area_product_total'],
             accum['acquisition_dose_rp_total'],
             accum['total_acquisition_time'],
-            accum['reference_point_definition_code'],
+            accum['reference_point_definition'],
         ]
         if 'Single' in accum['plane']:
             examdata += [
