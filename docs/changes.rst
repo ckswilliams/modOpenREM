@@ -16,6 +16,7 @@ OpenREM version history
 * `#357`_  Charts: button to return from histogram now displays the name of the main chart
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
+* `#352`_  Fixed CT xlsx exports that had complete study data in each series protocol sheet (from earlier beta)
 * `#351`_  Charts: simplified chart JavaScript and Python code
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
