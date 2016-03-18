@@ -35,6 +35,9 @@ Headline changes
     * Configuring and running DICOM Store SCP is now managed in the web interface
     * Query retrieve function is now built in to query PACS systems or modalities via the Import menu
 
+* Imports
+    * Philips Allura fluoroscopy RDSRs import correctly
+
 * Exports
 
     * Patient sex is included in all exports

@@ -6,6 +6,7 @@ OpenREM version history
 ---------------------
 
 * `#365`_  Tube filtration is now displayed in the RF detail view
+* `#364`_  Philips Allura fluorscopy RDSRs now import correctly
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
 * `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
