@@ -36,6 +36,7 @@ Headline changes
     * Query retrieve function is now built in to query PACS systems or modalities via the Import menu
 
 * Imports
+
     * Philips Allura fluoroscopy RDSRs import correctly
 
 * Exports
@@ -77,9 +78,10 @@ Updates since beta 11
 
 Updates since beta 12
 =====================
+**Requires database migration**
+
 * Added study description to mammography exports
 * Philips Allura fluoro RDSRs import fixed
-* **Requires database migration**
 
 ****************************
 Upgrading from version 0.6.0
