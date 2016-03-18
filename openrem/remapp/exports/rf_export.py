@@ -56,7 +56,6 @@ def _create_sheets(book, protocolslist, protocolheaders):
                 'count':0,
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -206,7 +205,6 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
     for plane in source.projectionxrayradiationdose_set.get().accumxraydose_set.all():
         accum = _get_accumulated_data(plane)
         examdata += [
-            accum['plane'],
             accum['dose_area_product_total'],
             accum['dose_rp_total'],
             accum['fluoro_dose_area_product_total'],
@@ -219,7 +217,7 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         ]
         if 'Single' in accum['plane']:
             examdata += [
-                '','','','','','','','','',''
+                '','','','','','','','',''
             ]
 
     return examdata
@@ -254,26 +252,24 @@ def _rf_common_headers(pid=None, name=None, patid=None):
         'Test patient?',
         'Study description',
         'Requested procedure',
-        'Plane',
-        'DAP total (Gy.m^2)',
-        'Dose RP total',
-        'Fluoro DAP total',
-        'Fluoro dose RP total',
-        'Fluoro time total',
-        'Acquisition DAP total',
-        'Acquisition dose RP total',
-        'Acquisition time total',
-        'Number of events',
-        'Plane',
-        'DAP total (Gy.m^2)',
-        'Dose RP total',
-        'Fluoro DAP total',
-        'Fluoro dose RP total',
-        'Fluoro time total',
-        'Acquisition DAP total',
-        'Acquisition dose RP total',
-        'Acquisition time total',
-        'Number of events',
+        'A DAP total (Gy.m^2)',
+        'A Dose RP total',
+        'A Fluoro DAP total',
+        'A Fluoro dose RP total',
+        'A Fluoro time total',
+        'A Acquisition DAP total',
+        'A Acquisition dose RP total',
+        'A Acquisition time total',
+        'A Number of events',
+        'B DAP total (Gy.m^2)',
+        'B Dose RP total',
+        'B Fluoro DAP total',
+        'B Fluoro dose RP total',
+        'B Fluoro time total',
+        'B Acquisition DAP total',
+        'B Acquisition dose RP total',
+        'B Acquisition time total',
+        'B Number of events',
     ]
     return commonheaders
 
@@ -543,7 +539,14 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (31 * num_groups_max + 23 - 1)
+    common_header_columns = 32
+    if pid and name:
+        common_header_columns += 1
+    if pid and patid:
+        common_header_columns += 1
+    if pid and (name or patid):
+        common_header_columns += 1
+    numcolumns = (31 * (num_groups_max + 1) + common_header_columns)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -624,12 +627,18 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     str(event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle),
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
-        tabcolumns = (52)
+        tabcolumns = 49
+        if pid and name:
+            tabcolumns += 1
+        if pid and patid:
+            tabcolumns += 1
+        if pid and (name or patid):
+            tabcolumns += 1
         tabrows = sheetlist[tab]['count']
         sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
         sheetlist[tab]['sheet'].set_column(date_column, date_column, 10) # allow date to be displayed.
         if pid and (name or patid):
-            sheetlist[tab]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
+            sheetlist[tab]['sheet'].set_column(date_column+1, date_column+1, 10) # DOB column
 
     # Populate summary sheet
     tsk.progress = 'Now populating the summary sheet...'
