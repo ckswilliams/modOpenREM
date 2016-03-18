@@ -350,7 +350,7 @@ function init(mass, height, canvasWidth, canvasHeight) {
     canvas.height = canvasHeight;
     renderer = new THREE.WebGLRenderer({ canvas: canvas });
 //    renderer.setSize(90*6, 70*6);
-    renderer.setClearColor( 0xffffff );
+    renderer.setClearColor( 0xdddddd );
 
     $('#skinDoseMap3d').hide();
 }
