@@ -78,6 +78,8 @@ Updates since beta 11
 Updates since beta 12
 =====================
 * Added study description to mammography exports
+* Philips Allura fluoro RDSRs import fixed
+* **Requires database migration**
 
 ****************************
 Upgrading from version 0.6.0
