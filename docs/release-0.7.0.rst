@@ -103,7 +103,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b12
+    pip install openrem==0.7.0b13
 
 In a shell/command window, move into the openrem folder:
 
@@ -154,11 +154,11 @@ Upgrading from version 0.7.0 beta 7 or later
 
 * Stop any Celery workers
 
-* You might need to do a database migration.
+* You will need to do a database migration.
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b12
+    pip install openrem==0.7.0b13
 
 From the openrem folder (see above):
 

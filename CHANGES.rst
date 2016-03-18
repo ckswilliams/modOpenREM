@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0b12 (2015-12-18)
+0.7.0b13 (2016-03-18)
 ---------------------
 
 * `#370`_  Added study description to mammography export
