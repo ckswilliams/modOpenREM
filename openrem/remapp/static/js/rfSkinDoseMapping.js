@@ -29,6 +29,8 @@ function useNewColourScale(new_scale) {
 
     skinDoseMapColourScaleObj.useNewColourScale(new_scale);
     skinDoseMapColourScaleObj.draw();
+
+    update3dSkinMap();
 }
 
 
@@ -69,6 +71,8 @@ function reset() {
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
     skinDoseMapColourScaleObj.draw();
 
+    update3dSkinMap();
+
     document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
     document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
     document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
@@ -95,6 +99,8 @@ function updateWindowLevel(newWindowLevel) {
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
     skinDoseMapColourScaleObj.draw();
 
+    update3dSkinMap();
+
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
@@ -114,6 +120,8 @@ function updateWindowWidth(newWindowWidth) {
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
     skinDoseMapColourScaleObj.draw();
 
+    update3dSkinMap();
+
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
@@ -129,6 +137,8 @@ function updateMinDisplayedDose(minDisplayedDose) {
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.draw();
+
+    update3dSkinMap();
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
@@ -152,6 +162,8 @@ function updateMaxDisplayedDose(maxDisplayedDose) {
 
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
     skinDoseMapColourScaleObj.draw();
+
+    update3dSkinMap();
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
     document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);

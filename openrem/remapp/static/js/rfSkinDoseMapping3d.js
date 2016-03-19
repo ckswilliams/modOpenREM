@@ -1,19 +1,4 @@
 var camera, scene, renderer, mesh;
-var dosesFront, dosesBack, dosesLeft, dosesRight; // Need to initialise these
-// at the same time as first drawing the dataTextures on the phantom.
-
-//------------------------------------------------------------------------------
-// Display the image of each phantom side on a canvas so that the pixel values
-// can be obtained for use in DataTextures later on.
-var imageFront = new Image();
-var imageBack  = new Image();
-var imageLeft  = new Image();
-var imageRight = new Image();
-
-imageFront.src = '/static/img/3-1.png';
-imageBack.src  = '/static/img/1-1.png';
-imageLeft.src  = '/static/img/2-1.png';
-imageRight.src = '/static/img/4-1.png';
 
 var frontData = new Uint8Array(14*70*4);
 var backData  = new Uint8Array(14*70*4);
@@ -37,64 +22,78 @@ var materialRight = new THREE.MeshBasicMaterial( { map: dataTextureRight } );
 
 init(73.2, 178.6, 90*6, 70*6);
 
-window.onload = function() {
-    // Display each image in the corresponding canvas
-    var example = document.getElementById('phantomFront');
-    var context = example.getContext('2d');
-    context.drawImage(imageFront, 0, 0);
 
-    example = document.getElementById('phantomBack');
-    context = example.getContext('2d');
-    context.drawImage(imageBack, 0, 0);
+function update3dSkinMap() {
+    var currentDose, scaledDose, newColour, i, j, k;
+    k = 0;
+    for (i = 69; i >= 0; i--) {
+        for (j = 0; j < 14; j++) {
+            currentDose = skinDoseMap3dData[j * 70 + i];
+            scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
+            if (scaledDose < 0) scaledDose = 0;
+            if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
+            newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
 
-    example = document.getElementById('phantomLeft');
-    context = example.getContext('2d');
-    context.drawImage(imageLeft, 0, 0);
-
-    example = document.getElementById('phantomRight');
-    context = example.getContext('2d');
-    context.drawImage(imageRight, 0, 0);
-
-    initialiseDataTextures();
-}
-// End of getting the pixel data of the four phantom images
-//------------------------------------------------------------------------------
-
-
-function initialiseDataTextures() {
-    var example = document.getElementById('phantomFront');
-    var context = example.getContext('2d');
-    var tempFrontData = context.getImageData(0, 0, 14, 70).data;
-
-    example = document.getElementById('phantomBack');
-    context = example.getContext('2d');
-    var tempBackData = context.getImageData(0, 0, 14, 70).data;
-
-    example = document.getElementById('phantomLeft');
-    context = example.getContext('2d');
-    var tempLeftData = context.getImageData(0, 0, 31, 70).data;
-
-    example = document.getElementById('phantomRight');
-    context = example.getContext('2d');
-    var tempRightData = context.getImageData(0, 0, 31, 70).data;
-
-    for (var i = 0; i < frontData.length; i++) {
-        dataTextureFront.image.data[i] = tempFrontData[i];
-        dataTextureBack.image.data[i]  = tempBackData[i];
+            dataTextureFront.image.data[k] = newColour[0];
+            dataTextureFront.image.data[k+1] = newColour[1];
+            dataTextureFront.image.data[k+2] = newColour[2];
+            dataTextureFront.image.data[k+3] = 0;
+            k += 4;
+        }
     }
-    for (i = 0; i < leftData.length; i++) {
-        dataTextureLeft.image.data[i]  = tempLeftData[i];
-        dataTextureRight.image.data[i] = tempRightData[i];
+    k = 0;
+    for (i = 69; i >= 0; i--) {
+        for (j = 14; j < 45; j++) {
+            currentDose = skinDoseMap3dData[j * 70 + i];
+            scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
+            if (scaledDose < 0) scaledDose = 0;
+            //if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
+            newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
+
+            dataTextureLeft.image.data[k] = newColour[0];
+            dataTextureLeft.image.data[k+1] = newColour[1];
+            dataTextureLeft.image.data[k+2] = newColour[2];
+            dataTextureLeft.image.data[k+3] = 0;
+            k += 4;
+        }
     }
+    k = 0;
+    for (i = 69; i >= 0; i--) {
+        for (j = 45; j < 59; j++) {
+            currentDose = skinDoseMap3dData[j * 70 + i];
+            scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
+            if (scaledDose < 0) scaledDose = 0;
+            //if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
+            newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
+
+            dataTextureBack.image.data[k] = newColour[0];
+            dataTextureBack.image.data[k+1] = newColour[1];
+            dataTextureBack.image.data[k+2] = newColour[2];
+            dataTextureBack.image.data[k+3] = 0;
+            k += 4;
+        }
+    }
+    k = 0;
+    for (i = 69; i >= 0; i--) {
+        for (j = 59; j < 90; j++) {
+            currentDose = skinDoseMap3dData[j * 70 + i];
+            scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
+            if (scaledDose < 0) scaledDose = 0;
+            if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
+            newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
+
+            dataTextureRight.image.data[k] = newColour[0];
+            dataTextureRight.image.data[k+1] = newColour[1];
+            dataTextureRight.image.data[k+2] = newColour[2];
+            dataTextureRight.image.data[k+3] = 0;
+            k += 4;
+        }
+    }
+
     dataTextureFront.needsUpdate = true;
     dataTextureBack.needsUpdate  = true;
     dataTextureLeft.needsUpdate  = true;
     dataTextureRight.needsUpdate = true;
-
-    // Code here to initilise the dose value arrays - need to calculate
-    // the doses from the initial pixel values. These will then be used
-    // to recalculate the texture colours when using the window / level
-    // controls and also for the mouse-over display of dose.
 }
 
 
@@ -239,39 +238,7 @@ function init(mass, height, canvasWidth, canvasHeight) {
 
     THREE.ImageUtils.crossOrigin = 'anonymous';
 
-
-    /*
-     var texture1 = THREE.ImageUtils.loadTexture( './images/1-1.png' );
-     var material1 = new THREE.MeshBasicMaterial( { map: texture1 } );
-     var texture2 = THREE.ImageUtils.loadTexture( './images/2-1.png' );
-     var material2 = new THREE.MeshBasicMaterial( { map: texture2 } );
-     var texture3 = THREE.ImageUtils.loadTexture( './images/3-1.png' );
-     var material3 = new THREE.MeshBasicMaterial( { map: texture3 } );
-     var texture4 = THREE.ImageUtils.loadTexture( './images/4-1.png' );
-     var material4 = new THREE.MeshBasicMaterial( { map: texture4 } );
-     */
     var endMaterial = new THREE.MeshNormalMaterial( { color: 0x7777ff } );
-
-    /*
-     // Generate random noise texture using a DataTexture
-     // See http://threejs.org/docs/#Reference/Textures/DataTexture
-     // This may be useful when it comes to updating the DataTexture
-     // when I implement the window / levelling and different colour
-     // mapping:
-     // http://stackoverflow.com/questions/25108574/update-texture-map-in-threejs
-     var noiseSize = 256;
-     var size = noiseSize * noiseSize;
-     var data = new Uint8Array( 4 * size );
-     for ( var i = 0; i < size * 4; i ++ ) {
-     data[ i ] = 128; //Math.random() * 255 | 0;
-     }
-     var dt = new THREE.DataTexture( data, noiseSize, noiseSize, THREE.RGBAFormat );
-     dt.wrapS = THREE.RepeatWrapping;
-     dt.wrapT = THREE.RepeatWrapping;
-     dt.needsUpdate = true;
-     var dataMaterial = new THREE.MeshBasicMaterial( { map: dt } );
-     */
-    //var materials = [materialBack, materialLeft, materialFront, materialRight, dataMaterial, dataMaterial, dataMaterial, dataMaterial, dataMaterial, dataMaterial];
     var materials = [materialBack, materialLeft, materialFront, materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];
     var meshFaceMaterial = new THREE.MeshFaceMaterial(materials);
 
@@ -349,8 +316,7 @@ function init(mass, height, canvasWidth, canvasHeight) {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     renderer = new THREE.WebGLRenderer({ canvas: canvas });
-//    renderer.setSize(90*6, 70*6);
-    renderer.setClearColor( 0xdddddd );
+    renderer.setClearColor( 0xeeeeee );
 
     $('#skinDoseMap3d').hide();
 }

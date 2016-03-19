@@ -245,6 +245,7 @@
             <script>
                 var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
                 var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
+                var skinDoseMap3dData;
             </script>
 
             <script>
@@ -254,14 +255,6 @@
             </script>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMappingAjax.js"></script>
-
-            <div style="display:none">
-                <canvas id="phantomFront" width="70"  height="350"></canvas>
-                <canvas id="phantomBack"  width="70"  height="350"></canvas>
-                <canvas id="phantomLeft"  width="155" height="350"></canvas>
-                <canvas id="phantomRight" width="155" height="350"></canvas>
-            </div>
-
         </div>
   </div>
 

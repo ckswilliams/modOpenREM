@@ -62,6 +62,7 @@ $(document).ready(function() {
 
             // 3D skin map stuff
             var currentDose, scaledDose, newColour, i, j, k;
+            skinDoseMap3dData = json.skin_map_not_rotated;
             k = 0;
             for (i = 69; i >= 0; i--) {
                 for (j = 0; j < 14; j++) {
