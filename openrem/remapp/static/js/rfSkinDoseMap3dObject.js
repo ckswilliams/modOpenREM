@@ -128,6 +128,10 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         this.materialBack  = new THREE.MeshBasicMaterial( { map: this.dataTextureBack  } );
         this.materialLeft  = new THREE.MeshBasicMaterial( { map: this.dataTextureLeft  } );
         this.materialRight = new THREE.MeshBasicMaterial( { map: this.dataTextureRight } );
+        this.materialFront.map.minFilter = THREE.LinearFilter;
+        this.materialBack.map.minFilter = THREE.LinearFilter;
+        this.materialLeft.map.minFilter = THREE.LinearFilter;
+        this.materialRight.map.minFilter = THREE.LinearFilter;
 
         var aspectRatio = this.canvas.width / this.canvas.height;
 
