@@ -240,18 +240,21 @@
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapColourScaleObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMap3dObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapping.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapping3d.js"></script>
 
             <script>
                 var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
                 var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
-                var skinDoseMap3dData;
+                var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
             </script>
 
             <script>
                 $('#skin_map_maxmin_controls').show();
                 $('#skin_map_wwwl_controls').hide();
                 $('#colour_scale_selection').hide();
+                $('#skinDoseMap3d').hide();
             </script>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMappingAjax.js"></script>

@@ -60,79 +60,13 @@ $(document).ready(function() {
             document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDose;
             document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(3);
 
-            // 3D skin map stuff
-            var currentDose, scaledDose, newColour, i, j, k;
-            skinDoseMap3dData = json.skin_map_not_rotated;
-            k = 0;
-            for (i = 69; i >= 0; i--) {
-                for (j = 0; j < 14; j++) {
-                    currentDose = json.skin_map_not_rotated[j * 70 + i];
-                    scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
-                    if (scaledDose < 0) scaledDose = 0;
-                    if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
-                    newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
-
-                    dataTextureFront.image.data[k] = newColour[0];
-                    dataTextureFront.image.data[k+1] = newColour[1];
-                    dataTextureFront.image.data[k+2] = newColour[2];
-                    dataTextureFront.image.data[k+3] = 0;
-                    k += 4;
-                }
-            }
-            k = 0;
-            for (i = 69; i >= 0; i--) {
-                for (j = 14; j < 45; j++) {
-                    currentDose = json.skin_map_not_rotated[j * 70 + i];
-                    scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
-                    if (scaledDose < 0) scaledDose = 0;
-                    //if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
-                    newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
-
-                    dataTextureLeft.image.data[k] = newColour[0];
-                    dataTextureLeft.image.data[k+1] = newColour[1];
-                    dataTextureLeft.image.data[k+2] = newColour[2];
-                    dataTextureLeft.image.data[k+3] = 0;
-                    k += 4;
-                }
-            }
-            k = 0;
-            for (i = 69; i >= 0; i--) {
-                for (j = 45; j < 59; j++) {
-                    currentDose = json.skin_map_not_rotated[j * 70 + i];
-                    scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
-                    if (scaledDose < 0) scaledDose = 0;
-                    //if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
-                    newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
-
-                    dataTextureBack.image.data[k] = newColour[0];
-                    dataTextureBack.image.data[k+1] = newColour[1];
-                    dataTextureBack.image.data[k+2] = newColour[2];
-                    dataTextureBack.image.data[k+3] = 0;
-                    k += 4;
-                }
-            }
-            k = 0;
-            for (i = 69; i >= 0; i--) {
-                for (j = 59; j < 90; j++) {
-                    currentDose = json.skin_map_not_rotated[j * 70 + i];
-                    scaledDose = currentDose - (skinDoseMapObj.windowLevel - (skinDoseMapObj.windowWidth / 2.0));
-                    if (scaledDose < 0) scaledDose = 0;
-                    if (scaledDose > skinDoseMapObj.windowWidth) scaledDose = skinDoseMapObj.windowWidth;
-                    newColour = skinDoseMapObj.colourScale(scaledDose / skinDoseMapObj.windowWidth).rgb();
-
-                    dataTextureRight.image.data[k] = newColour[0];
-                    dataTextureRight.image.data[k+1] = newColour[1];
-                    dataTextureRight.image.data[k+2] = newColour[2];
-                    dataTextureRight.image.data[k+3] = 0;
-                    k += 4;
-                }
-            }
-
-            dataTextureFront.needsUpdate = true;
-            dataTextureBack.needsUpdate  = true;
-            dataTextureLeft.needsUpdate  = true;
-            dataTextureRight.needsUpdate = true;
-            // End of 3D skin map stuff
+            skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
+            skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
+            skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
+            skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
+            skinDoseMap3dObj.initialise(json.skin_map_not_rotated, 14, 31, 70, 10);
+            skinDoseMap3dObj.draw();
+            render();
 
             $(".ajax-progress").hide();
         },
