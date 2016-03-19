@@ -576,10 +576,12 @@ def rf_detail_view_skin_map(request, pk=None):
                                     run_type=run_type, frames=frames, end_angle=end_angle)
 
         import numpy as np
+        skin_map_not_rotated = my_exp_map.my_dose.totalDose.flatten().tolist()
         my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
 
         return_structure = {
             'skin_map': my_exp_map.my_dose.totalDose.flatten().tolist(),
+            'skin_map_not_rotated': skin_map_not_rotated,
             'width': my_exp_map.phantom.width,
             'height': my_exp_map.phantom.height,
             'phantom_width': my_exp_map.phantom.phantom_width,
