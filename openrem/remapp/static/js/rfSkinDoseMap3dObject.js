@@ -18,10 +18,10 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
                 if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
                 newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
 
-                this.dataTextureFront.image.data[k] = newColour[0];
-                this.dataTextureFront.image.data[k+1] = newColour[1];
-                this.dataTextureFront.image.data[k+2] = newColour[2];
-                this.dataTextureFront.image.data[k+3] = 0;
+                dataTextureFront.image.data[k] = newColour[0];
+                dataTextureFront.image.data[k+1] = newColour[1];
+                dataTextureFront.image.data[k+2] = newColour[2];
+                dataTextureFront.image.data[k+3] = 0;
                 k += 4;
             }
         }
@@ -34,10 +34,10 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
                 if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
                 newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
 
-                this.dataTextureLeft.image.data[k] = newColour[0];
-                this.dataTextureLeft.image.data[k+1] = newColour[1];
-                this.dataTextureLeft.image.data[k+2] = newColour[2];
-                this.dataTextureLeft.image.data[k+3] = 0;
+                dataTextureLeft.image.data[k] = newColour[0];
+                dataTextureLeft.image.data[k+1] = newColour[1];
+                dataTextureLeft.image.data[k+2] = newColour[2];
+                dataTextureLeft.image.data[k+3] = 0;
                 k += 4;
             }
         }
@@ -50,10 +50,10 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
                 if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
                 newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
 
-                this.dataTextureBack.image.data[k] = newColour[0];
-                this.dataTextureBack.image.data[k+1] = newColour[1];
-                this.dataTextureBack.image.data[k+2] = newColour[2];
-                this.dataTextureBack.image.data[k+3] = 0;
+                dataTextureBack.image.data[k] = newColour[0];
+                dataTextureBack.image.data[k+1] = newColour[1];
+                dataTextureBack.image.data[k+2] = newColour[2];
+                dataTextureBack.image.data[k+3] = 0;
                 k += 4;
             }
         }
@@ -66,18 +66,18 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
                 if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
                 newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
 
-                this.dataTextureRight.image.data[k] = newColour[0];
-                this.dataTextureRight.image.data[k+1] = newColour[1];
-                this.dataTextureRight.image.data[k+2] = newColour[2];
-                this.dataTextureRight.image.data[k+3] = 0;
+                dataTextureRight.image.data[k] = newColour[0];
+                dataTextureRight.image.data[k+1] = newColour[1];
+                dataTextureRight.image.data[k+2] = newColour[2];
+                dataTextureRight.image.data[k+3] = 0;
                 k += 4;
             }
         }
 
-        this.dataTextureFront.needsUpdate = true;
-        this.dataTextureBack.needsUpdate  = true;
-        this.dataTextureLeft.needsUpdate  = true;
-        this.dataTextureRight.needsUpdate = true;
+        dataTextureFront.needsUpdate = true;
+        dataTextureBack.needsUpdate  = true;
+        dataTextureLeft.needsUpdate  = true;
+        dataTextureRight.needsUpdate = true;
     }
 
 
@@ -109,29 +109,29 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         this.phantomHeight = phantomHeight;
         this.phantomCurvedRadius = phantomCurvedRadius;
 
-        this.frontData = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
-        this.backData  = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
-        this.leftData  = new Uint8Array(this.phantomCurvedEdgeWidth*this.phantomHeight*4);
-        this.rightData = new Uint8Array(this.phantomCurvedEdgeWidth*this.phantomHeight*4);
+        frontData = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
+        backData  = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
+        leftData  = new Uint8Array(this.phantomCurvedEdgeWidth*this.phantomHeight*4);
+        rightData = new Uint8Array(this.phantomCurvedEdgeWidth*this.phantomHeight*4);
 
-        this.dataTextureFront = new THREE.DataTexture( this.frontData, this.phantomFlatWidth, this.phantomHeight,  THREE.RGBAFormat );
-        this.dataTextureBack  = new THREE.DataTexture( this.backData,  this.phantomFlatWidth, this.phantomHeight,  THREE.RGBAFormat );
-        this.dataTextureLeft  = new THREE.DataTexture( this.leftData,  this.phantomCurvedEdgeWidth, this.phantomHeight, THREE.RGBAFormat );
-        this.dataTextureRight = new THREE.DataTexture( this.rightData, this.phantomCurvedEdgeWidth, this.phantomHeight, THREE.RGBAFormat );
+        dataTextureFront = new THREE.DataTexture( frontData, this.phantomFlatWidth, this.phantomHeight,  THREE.RGBAFormat );
+        dataTextureBack  = new THREE.DataTexture( backData,  this.phantomFlatWidth, this.phantomHeight,  THREE.RGBAFormat );
+        dataTextureLeft  = new THREE.DataTexture( leftData,  this.phantomCurvedEdgeWidth, this.phantomHeight, THREE.RGBAFormat );
+        dataTextureRight = new THREE.DataTexture( rightData, this.phantomCurvedEdgeWidth, this.phantomHeight, THREE.RGBAFormat );
 
-        this.dataTextureFront.needsUpdate = true;
-        this.dataTextureBack.needsUpdate = true;
-        this.dataTextureLeft.needsUpdate = true;
-        this.dataTextureRight.needsUpdate = true;
+        dataTextureFront.needsUpdate = true;
+        dataTextureBack.needsUpdate = true;
+        dataTextureLeft.needsUpdate = true;
+        dataTextureRight.needsUpdate = true;
 
-        this.materialFront = new THREE.MeshBasicMaterial( { map: this.dataTextureFront } );
-        this.materialBack  = new THREE.MeshBasicMaterial( { map: this.dataTextureBack  } );
-        this.materialLeft  = new THREE.MeshBasicMaterial( { map: this.dataTextureLeft  } );
-        this.materialRight = new THREE.MeshBasicMaterial( { map: this.dataTextureRight } );
-        this.materialFront.map.minFilter = THREE.LinearFilter;
-        this.materialBack.map.minFilter = THREE.LinearFilter;
-        this.materialLeft.map.minFilter = THREE.LinearFilter;
-        this.materialRight.map.minFilter = THREE.LinearFilter;
+        materialFront = new THREE.MeshBasicMaterial( { map: dataTextureFront } );
+        materialBack  = new THREE.MeshBasicMaterial( { map: dataTextureBack  } );
+        materialLeft  = new THREE.MeshBasicMaterial( { map: dataTextureLeft  } );
+        materialRight = new THREE.MeshBasicMaterial( { map: dataTextureRight } );
+        materialFront.map.minFilter = THREE.LinearFilter;
+        materialBack.map.minFilter = THREE.LinearFilter;
+        materialLeft.map.minFilter = THREE.LinearFilter;
+        materialRight.map.minFilter = THREE.LinearFilter;
 
         var aspectRatio = this.canvas.width / this.canvas.height;
 
@@ -151,7 +151,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         THREE.ImageUtils.crossOrigin = 'anonymous';
 
         var endMaterial = new THREE.MeshNormalMaterial( { color: 0x7777ff } );
-        var materials = [this.materialBack, this.materialLeft, this.materialFront, this.materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];
+        var materials = [materialBack, materialLeft, materialFront, materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];
         var meshFaceMaterial = new THREE.MeshFaceMaterial(materials);
 
         geometry = new THREE.PlaneGeometry(this.phantomFlatWidth, this.phantomHeight);
@@ -242,38 +242,36 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     this.canvasName = skinDoseMap3dCanvasName;
     this.canvas = document.getElementById(this.canvasName);
 
-    this.colourScaleName = colourScaleName;
-    this.colourScale = chroma.scale(this.colourScaleName);
-
-    this.mag = 6;
+    var colourScaleName = colourScaleName;
+    this.colourScale = chroma.scale(colourScaleName);
 
     this.windowWidth = 10.0;
     this.windowLevel = 5.0;
 
-    this.skinDoseMap = [];
+    var skinDoseMap = [];
 
     this.phantomHeight = 10;
     this.phantomFlatWidth = 10;
     this.phantomCurvedEdgeWidth = 10;
     this.phantomCurvedRadius = 10;
 
-    this.frontData = [];
-    this.backData = [];
-    this.leftData = [];
-    this.rightData = [];
+    var frontData = [];
+    var backData = [];
+    var leftData = [];
+    var rightData = [];
 
     this.camera = 0;
     this.scene = 0;
     this.renderer = 0;
     this.mesh = 0;
 
-    this.dataTextureFront = 0;
-    this.dataTextureBack = 0;
-    this.dataTextureLeft = 0;
-    this.dataTextureRight = 0;
+    var dataTextureFront = 0;
+    var dataTextureBack = 0;
+    var dataTextureLeft = 0;
+    var dataTextureRight = 0;
 
-    this.materialFront = 0;
-    this.materialBack = 0;
-    this.materialLeft = 0;
-    this.materialRight = 0;
+    var materialFront = 0;
+    var materialBack = 0;
+    var materialLeft = 0;
+    var materialRight = 0;
 }
