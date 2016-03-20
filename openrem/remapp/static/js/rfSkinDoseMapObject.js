@@ -134,6 +134,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
     this.colourScaleName = colourScaleName;
     this.colourScale = chroma.scale(colourScaleName);
+    this.colourScaleReverse = false;
 
     this.mag = 6;
 

@@ -1,8 +1,7 @@
 function colourScaleSelection(div) {
     var colour_scales = ['OrRd','PuBu','BuPu','Oranges','BuGn','YlOrBr',
         'YlGn','Reds','RdPu','Greens','YlGnBu','Purples','GnBu','Greys',
-        'YlOrRd','PuRd','Blues','PuBuGn','Spectral','RdYlGn','RdBu','PiYG',
-        'PRGn', 'RdYlBu','BrBG','RdGy','PuOr'];
+        'YlOrRd','PuRd','Blues','PuBuGn'];
     var i, j;
     var colour_scale;
     var canvas, context;

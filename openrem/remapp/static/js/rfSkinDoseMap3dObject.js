@@ -244,6 +244,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
     var colourScaleName = colourScaleName;
     this.colourScale = chroma.scale(colourScaleName);
+    this.colourScaleReverse = false;
 
     this.windowWidth = 10.0;
     this.windowLevel = 5.0;
