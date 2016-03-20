@@ -18,19 +18,17 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
     this.draw = draw;
     function draw() {
-        var x, y, dose, newColour, scaledDose;
-        var imageData = this.skinDoseMapContext.getImageData(0, 0, this.skinDoseMapCanvas.width, this.skinDoseMapCanvas.height);
-        for (x = 0; x < this.skinDoseMapCanvas.width; x++) {
-            for (y = 0; y < this.skinDoseMapCanvas.height; y++) {
-                dose = this.skinDoseMap[Math.floor(y / this.mag) * Math.floor(this.skinDoseMapCanvas.width / this.mag) + Math.floor(x / this.mag)];
+        var x, y, dose, scaledDose;
+        for (x = 0; x < this.skinDoseMapWidth; x++) {
+            for (y = 0; y < this.skinDoseMapHeight; y++) {
+                dose = this.skinDoseMap[y * this.skinDoseMapWidth + x];
                 scaledDose = dose - (this.windowLevel - (this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
                 if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
-                newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
-                this.setPixel(imageData, x, y, newColour[0], newColour[1], newColour[2], 255);
+                this.skinDoseMapContext.fillStyle = this.colourScale(scaledDose / this.windowWidth).hex();
+                this.skinDoseMapContext.fillRect(x*this.mag, y*this.mag, this.mag, this.mag);
             }
         }
-        this.skinDoseMapContext.putImageData(imageData, 0, 0);
     }
 
 
