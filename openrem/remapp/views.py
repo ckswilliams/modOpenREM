@@ -586,7 +586,9 @@ def rf_detail_view_skin_map(request, pk=None):
             'height': my_exp_map.phantom.height,
             'phantom_width': my_exp_map.phantom.phantom_width,
             'phantom_height': my_exp_map.phantom.phantom_height,
-            'phantom_depth': my_exp_map.phantom.phantom_depth
+            'phantom_depth': my_exp_map.phantom.phantom_depth,
+            'phantom_flat_dist': my_exp_map.phantom.phantom_flat_dist,
+            'phantom_curved_dist': my_exp_map.phantom.phantom_curved_dist
         }
 
         # Save the return_structure as a pickle in a skin_maps sub-folder of the MEDIA_ROOT folder

@@ -81,7 +81,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     }
 
 
-    this.mergeMeshes =mergeMeshes;
+    this.mergeMeshes = mergeMeshes;
     function mergeMeshes (meshes) {
         var combined = new THREE.Geometry();
 
