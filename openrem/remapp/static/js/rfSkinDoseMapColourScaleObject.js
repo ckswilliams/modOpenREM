@@ -62,6 +62,26 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
     }
 
 
+    this.redrawValues = redrawValues;
+    function redrawValues() {
+        var y, i, increment, heightOffset, scaleHeight;
+
+        this.colourScaleContext.clearRect(0, 0, 50, this.colourScaleCanvas.height);
+
+        heightOffset = 20;
+        scaleHeight = this.colourScaleCanvas.height - heightOffset;
+
+        var imageData = this.colourScaleContext.getImageData(0, heightOffset / 2, this.colourScaleCanvas.width, scaleHeight);
+
+        i = this.minDose;
+        increment = (this.maxDose - this.minDose) / 10;
+        for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
+            this.colourScaleContext.fillText(i.toFixed(3), 15, this.colourScaleCanvas.height - y - 7);
+            i += increment;
+        }
+    }
+
+
     this.initialise = initialise;
     function initialise(minDose, maxDose, width, height) {
         this.resizeColourScale(width, height);

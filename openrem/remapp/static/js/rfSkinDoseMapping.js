@@ -69,7 +69,7 @@ function reset() {
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.draw();
+    skinDoseMapColourScaleObj.redrawValues();
 
     skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
     skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
@@ -99,7 +99,7 @@ function updateWindowLevel(newWindowLevel) {
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.draw();
+    skinDoseMapColourScaleObj.redrawValues();
 
     skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
     skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
@@ -122,7 +122,7 @@ function updateWindowWidth(newWindowWidth) {
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.draw();
+    skinDoseMapColourScaleObj.redrawValues();
 
     skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
     skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
@@ -142,7 +142,7 @@ function updateMinDisplayedDose(minDisplayedDose) {
     skinDoseMapObj.draw();
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
-    skinDoseMapColourScaleObj.draw();
+    skinDoseMapColourScaleObj.redrawValues();
 
     skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
     skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
@@ -169,7 +169,7 @@ function updateMaxDisplayedDose(maxDisplayedDose) {
     skinDoseMapObj.draw();
 
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
-    skinDoseMapColourScaleObj.draw();
+    skinDoseMapColourScaleObj.redrawValues();
 
     skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
     skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
@@ -229,11 +229,14 @@ $("#skinDoseMap").on('mousedown', function (e) {
         skinDoseMapObj.updateWindowWidth(newWW);
 
         skinDoseMapObj.draw();
-        skinDoseMapColourScaleObj.draw();
+
+        skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
+        skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
+        skinDoseMapColourScaleObj.redrawValues();
 
         skinDoseMap3dObj.windowLevel = newWL;
         skinDoseMap3dObj.windowWidth = newWW;
-        skinDoseMap3dObj.update3dSkinMap();
+        skinDoseMap3dObj.draw();
 
         document.getElementById("windowLevelSlider").value = newWL;
         document.getElementById("windowWidthSlider").value = newWW;
