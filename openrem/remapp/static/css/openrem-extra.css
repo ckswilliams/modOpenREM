@@ -127,6 +127,12 @@ div.fullscreen{
   padding: 0px;
   display: inline-block;
   white-space: normal;
+  position: relative;
+}
+
+.skinDoseMapPerson {
+  position: absolute;
+  z-index: 10;
 }
 
 .colourScale {
@@ -139,6 +145,7 @@ div.fullscreen{
 
 div.noWrap {
   white-space: nowrap;
+  position: relative;
 }
 
 .noFloat {

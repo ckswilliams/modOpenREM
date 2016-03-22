@@ -25,6 +25,7 @@ $("#skinDoseMap3d").on('mousedown', function(e) {
                 ));
 
             skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
+            skinDoseMap3dPersonObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dPersonObj.mesh.quaternion);
         }
 
         previousMousePosition3d = {
@@ -92,5 +93,6 @@ function toDegrees(angle) {
 
 function render() {
     skinDoseMap3dObj.renderer.render(skinDoseMap3dObj.scene, skinDoseMap3dObj.camera);
+    skinDoseMap3dPersonObj.renderer.render(skinDoseMap3dPersonObj.scene, skinDoseMap3dPersonObj.camera);
     requestAnimFrame(render);
 }
