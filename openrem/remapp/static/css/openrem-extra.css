@@ -122,25 +122,24 @@ div.fullscreen{
 }
 
 .skinDoseMap {
-  float: left;
   text-align: left;
   padding: 0px;
+  left: 0px;
   display: inline-block;
-  white-space: normal;
-  position: relative;
 }
 
 .skinDoseMapPerson {
   position: absolute;
+  text-align: left;
+  padding: 0px;
+  bottom: 0px;
+  left: 4px;
   z-index: 10;
 }
 
 .colourScale {
-  float: left;
   text-align: left;
-  padding: 8px;
   display: inline-block;
-  white-space: normal;
 }
 
 div.noWrap {
