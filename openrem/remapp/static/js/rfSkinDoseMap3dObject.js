@@ -124,10 +124,10 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         dataTextureLeft.needsUpdate = true;
         dataTextureRight.needsUpdate = true;
 
-        materialFront = new THREE.MeshBasicMaterial( { map: dataTextureFront } );
-        materialBack  = new THREE.MeshBasicMaterial( { map: dataTextureBack  } );
-        materialLeft  = new THREE.MeshBasicMaterial( { map: dataTextureLeft  } );
-        materialRight = new THREE.MeshBasicMaterial( { map: dataTextureRight } );
+        materialFront = new THREE.MeshLambertMaterial( { map: dataTextureFront } );
+        materialBack  = new THREE.MeshLambertMaterial( { map: dataTextureBack  } );
+        materialLeft  = new THREE.MeshLambertMaterial( { map: dataTextureLeft  } );
+        materialRight = new THREE.MeshLambertMaterial( { map: dataTextureRight } );
         materialFront.map.minFilter = THREE.LinearFilter;
         materialBack.map.minFilter = THREE.LinearFilter;
         materialLeft.map.minFilter = THREE.LinearFilter;

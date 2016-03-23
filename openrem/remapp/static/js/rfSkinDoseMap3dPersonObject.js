@@ -41,7 +41,7 @@ function skinDoseMap3dPersonObject(skinDoseMap3dPersonCanvasName) {
         var endMaterial = new THREE.MeshLambertMaterial( { color: 0x7092be } );
 
         // A light source is needed for the MehLambertMaterial
-        var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.75 );
         directionalLight.position.set( 0, 0, 1 );
         this.scene.add( directionalLight );
 
