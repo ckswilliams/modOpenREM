@@ -366,14 +366,14 @@ def _calibration(dataset,accum):
 def _accumulatedmammoxraydose(dataset,accum): # TID 10005
     from remapp.models import AccumMammographyXRayDose
     from remapp.tools.get_values import get_or_create_cid
-    accummammo = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated Average Glandular Dose':
+            accummammo = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
             accummammo.accumulated_average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
             for cont2 in cont.ContentSequence:
                 if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
                     accummammo.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-    accummammo.save()
+            accummammo.save()
 
 
 def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
