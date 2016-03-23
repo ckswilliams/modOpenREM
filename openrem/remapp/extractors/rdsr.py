@@ -241,7 +241,7 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     except:
         pass
     source.save()
-    if not source.average_xray_tube_current:
+    if not source.average_xray_tube_current and source.average_glandular_dose:  # AGD to test for mammo
         try:
             source.average_xray_tube_current = source.xraytubecurrent_set.all().aggregate(Avg('xray_tube_current'))['xray_tube_current__avg']
             source.save()
