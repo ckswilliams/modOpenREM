@@ -150,7 +150,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
         THREE.ImageUtils.crossOrigin = 'anonymous';
 
-        var endMaterial = new THREE.MeshNormalMaterial( { color: 0x7777ff } );
+        var endMaterial = new THREE.MeshLambertMaterial( { color: 0x7092be } );
         var materials = [materialBack, materialLeft, materialFront, materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];
         var meshFaceMaterial = new THREE.MeshFaceMaterial(materials);
 
@@ -221,6 +221,11 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         geometry = mergeMeshes(this.meshes);
         this.mesh = new THREE.Mesh(geometry, meshFaceMaterial);
         this.scene.add(this.mesh);
+
+        // A light source is needed for the MehLambertMaterial
+        var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        directionalLight.position.set( 0, 0, 1 );
+        this.scene.add( directionalLight );
 
         // Put the animation into a canvas called skinDoseMap3d
         // and resize the DIV to window.innerWidth/4, window.innerHeight/4
