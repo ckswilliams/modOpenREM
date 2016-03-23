@@ -187,6 +187,8 @@ def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
 
 def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     # TODO: review model to convert to cid where appropriate, and add additional fields
+    from django.core.exceptions import ObjectDoesNotExist
+    from django.db.models import Avg
     from remapp.models import IrradEventXRaySourceData
     from remapp.tools.get_values import get_or_create_cid
     from xml.etree import ElementTree as ET
@@ -239,6 +241,12 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     except:
         pass
     source.save()
+    if not source.average_xray_tube_current:
+        try:
+            source.average_xray_tube_current = source.xraytubecurrent_set.all().aggregate(Avg('xray_tube_current'))
+        except ObjectDoesNotExist:
+            pass
+
 
 
 def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
