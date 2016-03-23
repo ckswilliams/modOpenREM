@@ -79,8 +79,6 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
         device = DeviceParticipant.objects.create(ct_accumulated_dose_data=foreignkey)
     elif eventdatatype == 'ct_event':
         device = DeviceParticipant.objects.create(ct_irradiation_event_data=foreignkey)
-    else:
-        print "Doh"
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Role in Procedure':
             device.device_role_in_procedure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -97,53 +95,48 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
                     device.device_observer_uid = cont2.UID
     device.save()
 
-def _pulsewidth(dataset,source):
+
+def _pulsewidth(pulse_width_value, source):
     from remapp.models import PulseWidth
     pulse = PulseWidth.objects.create(irradiation_event_xray_source_data=source)
-    for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Width':
-            pulse.pulse_width = cont.MeasuredValueSequence[0].NumericValue
+    pulse.pulse_width = pulse_width_value
     pulse.save()
 
-def _kvptable(dataset,source):
+
+def _kvptable(kvp_value,source):
     from remapp.models import Kvp
     kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
-    for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
-            kvpdata.kvp = cont.MeasuredValueSequence[0].NumericValue
+    kvpdata.kvp = kvp_value
     kvpdata.save()
 
-def _xraytubecurrent(dataset,source):
+
+def _xraytubecurrent(current_value,source):
     from remapp.models import XrayTubeCurrent
     tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
-    for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
-            tubecurrent.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+    tubecurrent.xray_tube_current = current_value
     tubecurrent.save()
 
-def _exposure(dataset,source):
+
+def _exposure(exposure_value,source):
     from remapp.models import Exposure
     exposure = Exposure.objects.create(irradiation_event_xray_source_data=source)
-    for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure':
-            exposure.exposure = cont.MeasuredValueSequence[0].NumericValue
+    exposure.exposure = exposure_value
     exposure.save()
 
-def _xrayfilters(dataset,source):
+
+def _xrayfilters(content_sequence,source):
     from remapp.models import XrayFilters
     from remapp.tools.get_values import get_or_create_cid
     filters = XrayFilters.objects.create(irradiation_event_xray_source_data=source)
-    for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
-            for cont2 in cont.ContentSequence:
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Type':
-                    filters.xray_filter_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Material':
-                    filters.xray_filter_material = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Minimum':
-                    filters.xray_filter_thickness_minimum = cont2.MeasuredValueSequence[0].NumericValue
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Maximum':
-                    filters.xray_filter_thickness_maximum = cont2.MeasuredValueSequence[0].NumericValue
+    for cont2 in content_sequence:
+        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Type':
+            filters.xray_filter_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
+        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Material':
+            filters.xray_filter_material = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
+        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Minimum':
+            filters.xray_filter_thickness_minimum = cont2.MeasuredValueSequence[0].NumericValue
+        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Maximum':
+            filters.xray_filter_thickness_maximum = cont2.MeasuredValueSequence[0].NumericValue
     filters.save()
 
 
@@ -201,46 +194,52 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
             source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
             try:
                 source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             except AttributeError:
                 source.reference_point_definition = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
             source.average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
             source.fluoro_mode = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Rate':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Rate':
             source.pulse_rate = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
             source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
             # should be a derivation thing in here for when the no. pulses is estimated
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Duration':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Duration':
             source.irradiation_duration = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average X-Ray Tube Current':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average X-Ray Tube Current':
             source.average_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
             source.exposure_time = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Focal Spot Size':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Focal Spot Size':
             source.focal_spot_size = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anode Target Material':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anode Target Material':
             source.anode_target_material = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
             source.collimated_field_area = cont.MeasuredValueSequence[0].NumericValue
         # TODO: xray_grid no longer exists in this table - it is a model on its own... See https://bitbucket.org/openrem/openrem/issue/181
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
             source.xray_grid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-    _pulsewidth(dataset,source)
-    _kvptable(dataset,source)
-    _xraytubecurrent(dataset,source)
-    _exposure(dataset,source)
-    _xrayfilters(dataset,source)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Width':
+            _pulsewidth(cont.MeasuredValueSequence[0].NumericValue, source)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
+            _kvptable(cont.MeasuredValueSequence[0].NumericValue, source)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
+            _xraytubecurrent(cont.MeasuredValueSequence[0].NumericValue, source)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure':
+            _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
+            _xrayfilters(cont.ContentSequence,source)
     _deviceparticipant(dataset,'source',source)
     try:
         source.ii_field_size = ET.fromstring(source.irradiation_event_xray_data.comment).find('iiDiameter').get('SRData')
     except:
         pass
     source.save()
+
 
 def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
     from remapp.models import IrradEventXRayDetectorData
