@@ -103,7 +103,7 @@ def _pulsewidth(pulse_width_value, source):
     pulse.save()
 
 
-def _kvptable(kvp_value,source):
+def _kvptable(kvp_value, source):
     from remapp.models import Kvp
     kvpdata = Kvp.objects.create(irradiation_event_xray_source_data=source)
     kvpdata.kvp = kvp_value

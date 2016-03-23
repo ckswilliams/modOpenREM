@@ -92,6 +92,13 @@ def _xraygrid(gridcode,source):
     grid.save()
 
 
+def _xraytubecurrent(current_value, source):
+    from remapp.models import XrayTubeCurrent
+    tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
+    tubecurrent.xray_tube_current = current_value
+    tubecurrent.save()
+
+
 def _irradiationeventxraysourcedata(dataset,event):
     # TODO: review model to convert to cid where appropriate, and add additional fields, such as height and width
     from remapp.models import IrradEventXRaySourceData
@@ -102,6 +109,7 @@ def _irradiationeventxraysourcedata(dataset,event):
     if agd_dgy:
         source.average_glandular_dose = float(agd_dgy) * 100.0 #AGD in mGy
     source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
+    _xraytubecurrent(source.average_xray_tube_current, source)
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
     anode_target_material = get_value_kw('AnodeTargetMaterial',dataset)
