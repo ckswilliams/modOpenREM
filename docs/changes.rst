@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b13 (2016-03-18)
 ---------------------
 
+* `#371`_  Mammo RDSR generates average mA where not recorded, mammo image populates mA
 * `#370`_  Added study description to mammography export
 * `#369`_  Bi-plane fluoroscopy studies now export correctly
 * `#368`_  Mammo RDSR now imports correctly
