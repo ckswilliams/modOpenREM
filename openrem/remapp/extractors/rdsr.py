@@ -33,7 +33,6 @@ import os
 import sys
 import logging
 import django
-import logging
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
