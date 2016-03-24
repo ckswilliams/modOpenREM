@@ -299,3 +299,22 @@ $('#skinDoseMap').mousemove(function (e) {
     var current_dose = skinDoseMapObj.skinDoseMap[Math.floor(y/mag) * Math.floor(this.width/mag) + Math.floor(x/mag)].toFixed(3) + " Gy";
     $('[data-tooltip="skin_dose_map"]').qtip('option', 'content.text', current_dose);
 });
+
+
+function downloadCanvas(link, canvasId, filename) {
+    link.href = document.getElementById(canvasId).toDataURL();
+    link.download = filename;
+}
+
+function download3dCanvas(link, filename) {
+    link.href = skinDoseMap3dObj.renderer.domElement.toDataURL('image/png');
+    link.download = filename;
+}
+
+document.getElementById('save2dSkinMap').addEventListener('click', function() {
+    downloadCanvas(this, 'skinDoseMap', '2dSkinMap.png');
+}, false);
+
+document.getElementById('save3dSkinMap').addEventListener('click', function() {
+    download3dCanvas(this, '3dSkinMap.png');
+}, false);

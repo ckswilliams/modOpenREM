@@ -227,12 +227,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         directionalLight.position.set( 0, 0, 1 );
         this.scene.add( directionalLight );
 
-        // Put the animation into a canvas called skinDoseMap3d
-        // and resize the DIV to window.innerWidth/4, window.innerHeight/4
-        //var canvas = document.getElementById( 'skinDoseMap3d' );
-        //canvas.width = canvasWidth;
-        //canvas.height = canvasHeight;
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
+        // Put the animation into the canvas
+        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, preserveDrawingBuffer: true });
         this.renderer.setClearColor( 0xeeeeee );
     }
 
