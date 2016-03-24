@@ -70,11 +70,7 @@
                 <div class="colourScale">
                     <canvas id="colourScale" width="70" height="280"></canvas>
                 </div>
-
-                <script src="{{ STATIC_URL }}js/rfSkinDoseMapping3d.js"></script>
             </div>
-
-
 
             <div class="colour_scale_selection table-bordered" id="colour_scale_selection">
                 <form id="colour_scale_form" onsubmit="useNewColourScale(this); return false;">
@@ -184,7 +180,7 @@
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm" role="button">Swap to max/min controls</a>
                 <a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
-                <a onclick="$('#skinDoseMap3d').toggle();$('#skinDoseMap3dPerson').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm" role="button">Swap between 2D and 3D view</a>
+                <a onclick="$('#skinDoseMap3d').toggle();$('#skinDoseMap3dPerson').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm" role="button" id="swap3dButton1">Swap between 2D and 3D view</a>
             </div>
 
             <div id="skin_map_maxmin_controls">
@@ -203,7 +199,7 @@
                 <input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm" role="button" />
                 <a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm" role="button">Swap to WW/WL controls</a>
                 <a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm" role="button">Change colour scale</a>
-                <a onclick="$('#skinDoseMap3d').toggle();$('#skinDoseMap3dPerson').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm" role="button">Swap between 2D and 3D view</a>
+                <a onclick="$('#skinDoseMap3d').toggle();$('#skinDoseMap3dPerson').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm" role="button" id="swap3dButton2">Swap between 2D and 3D view</a>
             </div>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapColourScaleObject.js"></script>
@@ -216,8 +212,14 @@
             <script>
                 var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
                 var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
-                var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
-                var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject('skinDoseMap3dPerson');
+                if (webglAvailable()) {
+                    var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
+                    var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject('skinDoseMap3dPerson');
+                }
+                else {
+                    $('#swap3dButton1').hide()
+                    $('#swap3dButton2').hide()
+                }
             </script>
 
             <script>

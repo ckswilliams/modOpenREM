@@ -99,3 +99,16 @@ function render() {
     skinDoseMap3dPersonObj.renderer.render(skinDoseMap3dPersonObj.scene, skinDoseMap3dPersonObj.camera);
     requestAnimFrame(render);
 }
+
+
+function webglAvailable() {
+    try {
+        var canvas = document.createElement('canvas');
+        return !!( window.WebGLRenderingContext && (
+            canvas.getContext('webgl') ||
+            canvas.getContext('experimental-webgl') )
+        );
+    } catch (e) {
+        return false;
+    }
+}
