@@ -41,6 +41,9 @@ $(document).on('mouseup', function(e) {
 
 
 $("#skinDoseMap3d").on('mousewheel', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
     var d = ((typeof e.originalEvent.wheelDelta != "undefined")?(-e.originalEvent.wheelDelta):e.originalEvent.detail);
     d = 10 * ((d>0)?1:-1);
 
