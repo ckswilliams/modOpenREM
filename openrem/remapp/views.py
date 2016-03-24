@@ -501,12 +501,14 @@ def rf_detail_view_skin_map(request, pk=None):
     else:
         # Calculate skin dose map. Will be moved to an Ajax request at some point,
         # but here for the time being.
-        pat_mass = study.patientstudymoduleattr_set.get().patient_weight
-        if not pat_mass:
+        try:
+            pat_mass = float(study.patientstudymoduleattr_set.get().patient_weight)
+        except ValueError:
             pat_mass = 73.2
 
-        pat_height = study.patientstudymoduleattr_set.get().patient_size
-        if not pat_height:
+        try:
+            pat_height = float(study.patientstudymoduleattr_set.get().patient_size)
+        except ValueError:
             pat_height = 178.6
 
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D',
