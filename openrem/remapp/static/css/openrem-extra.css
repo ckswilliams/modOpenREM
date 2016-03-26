@@ -145,7 +145,7 @@ div.skinDoseMapPerson {
 div.skinMapSaveBtn {
   position: absolute;
   padding: 0px;
-  bottom: 4px;
+  bottom: 5px;
   right: 78px;
   z-index: 10;
 }
@@ -183,4 +183,76 @@ th.centred  {
 td.centred {
   text-align: center;
   vertical-align: middle;
+}
+
+
+input[type=range] {
+  -webkit-appearance: none;
+  margin: 12px 0;
+  width: 100%;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #7092be;
+  border-radius: 1px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  border: 1px solid #000000;
+  height: 24px;
+  width: 12px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -10px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #7092be;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #7092be;
+  border-radius: 1px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-moz-range-thumb {
+  border: 1px solid #000000;
+  height: 24px;
+  width: 12px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 12px 0;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #7092be;
+  border: 0.2px solid #010101;
+  border-radius: 3px;
+}
+input[type=range]::-ms-fill-upper {
+  background: #7092be;
+  border: 0.2px solid #010101;
+  border-radius: 3px;
+}
+input[type=range]::-ms-thumb {
+  border: 1px solid #000000;
+  height: 24px;
+  width: 12px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
 }

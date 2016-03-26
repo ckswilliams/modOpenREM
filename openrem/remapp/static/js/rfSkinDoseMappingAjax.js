@@ -33,7 +33,9 @@ $(document).ready(function() {
         dataType: "json",
         success: function( json ) {
 
-            skinDoseMapObj.initialise(json.skin_map, 90, 70);
+            skinDoseMapObj.initialise(json.skin_map, json.width, json.height);
+            $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + 'px');
+            $('#skinDoseMapGroup').height(skinDoseMapObj.skinDoseMapCanvas.height + 'px');
             skinDoseMapObj.draw();
 
             skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height);
