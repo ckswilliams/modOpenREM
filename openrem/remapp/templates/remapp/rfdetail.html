@@ -54,134 +54,132 @@
 
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
 
-            <div class="noWrap">
+            <div class="skinDoseMapGroup">
                 <div class="skinDoseMap">
-                    <canvas id="skinDoseMap" width="360" height="280" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
+                    <canvas id="skinDoseMap" width="540" height="420" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
                 </div>
 
                 <div class="skinDoseMap">
-                    <canvas id="skinDoseMap3d" width="360" height="280" class="table-bordered"></canvas>
+                    <canvas id="skinDoseMap3d" width="540" height="420" class="table-bordered"></canvas>
                 </div>
 
                 <div class="skinDoseMapPerson">
                     <canvas id="skinDoseMap3dPerson" width="75" height="75" class="table-bordered"></canvas>
                 </div>
 
+                <div class="skinMapSaveBtn">
+                    <a class="btn btn-default btn-sm" role="button" id="save2dSkinMap">Save 2D map</a>
+                    <a class="btn btn-default btn-sm" role="button" id="save3dSkinMap">Save 3D map</a>
+                </div>
 
                 <div class="colourScale">
-                    <canvas id="colourScale" width="70" height="280"></canvas>
+                    <canvas id="colourScale" width="70" height="420"></canvas>
+                </div>
+
+                <div class="colour_scale_selection table-bordered" id="colour_scale_selection">
+                    <form id="colour_scale_form" onsubmit="useNewColourScale(this); return false;">
+                        <table>
+                            <th colspan="2" class="centred">Colour scale choice</th>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="OrRd"></td>
+                                <td><canvas id="OrRd"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="PuBu"></td>
+                                <td><canvas id="PuBu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="BuPu"></td>
+                                <td><canvas id="BuPu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="Oranges"></td>
+                                <td><canvas id="Oranges"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="BuGn"></td>
+                                <td><canvas id="BuGn"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="YlOrBr"></td>
+                                <td><canvas id="YlOrBr"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="YlGn"></td>
+                                <td><canvas id="YlGn"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="Reds"></td>
+                                <td><canvas id="Reds"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="RdPu"></td>
+                                <td><canvas id="RdPu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="Greens"></td>
+                                <td><canvas id="Greens"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="YlGnBu"></td>
+                                <td><canvas id="YlGnBu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="Purples"></td>
+                                <td><canvas id="Purples"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="GnBu"></td>
+                                <td><canvas id="GnBu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="Greys" checked></td>
+                                <td><canvas id="Greys"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="YlOrRd"></td>
+                                <td><canvas id="YlOrRd"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="PuRd"></td>
+                                <td><canvas id="PuRd"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="Blues"></td>
+                                <td><canvas id="Blues"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" name="colour_choice" value="PuBuGn"></td>
+                                <td><canvas id="PuBuGn"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="centred"><a onclick="$('.colour_scale_selection').hide();" class="btn btn-default btn-sm" role="button">Hide colour scales</a></td>
+                            </tr>
+                        </table>
+                    </form>
+                    <script>
+                        $('#colour_scale_form input[type=radio]').change(function() {
+                            useNewColourScale(this.value);
+                        });
+                    </script>
                 </div>
             </div>
 
-            <div class="colour_scale_selection table-bordered" id="colour_scale_selection">
-                <form id="colour_scale_form" onsubmit="useNewColourScale(this); return false;">
-                    <table>
-                        <th colspan="2" class="centred">Colour scale choice</th>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="OrRd"></td>
-                            <td><canvas id="OrRd"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="PuBu"></td>
-                            <td><canvas id="PuBu"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="BuPu"></td>
-                            <td><canvas id="BuPu"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="Oranges"></td>
-                            <td><canvas id="Oranges"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="BuGn"></td>
-                            <td><canvas id="BuGn"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="YlOrBr"></td>
-                            <td><canvas id="YlOrBr"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="YlGn"></td>
-                            <td><canvas id="YlGn"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="Reds"></td>
-                            <td><canvas id="Reds"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="RdPu"></td>
-                            <td><canvas id="RdPu"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="Greens"></td>
-                            <td><canvas id="Greens"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="YlGnBu"></td>
-                            <td><canvas id="YlGnBu"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="Purples"></td>
-                            <td><canvas id="Purples"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="GnBu"></td>
-                            <td><canvas id="GnBu"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="Greys" checked></td>
-                            <td><canvas id="Greys"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="YlOrRd"></td>
-                            <td><canvas id="YlOrRd"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="PuRd"></td>
-                            <td><canvas id="PuRd"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="Blues"></td>
-                            <td><canvas id="Blues"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td><input type="radio" name="colour_choice" value="PuBuGn"></td>
-                            <td><canvas id="PuBuGn"></canvas></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="centred"><a onclick="$('.colour_scale_selection').hide();" class="btn btn-default btn-sm" role="button">Hide colour scales</a></td>
-                        </tr>
-                    </table>
-                </form>
-                <script>
-                    $('#colour_scale_form input[type=radio]').change(function() {
-                        useNewColourScale(this.value);
-                    });
-                </script>
-            </div>
-
-            <div class="noFloat">
-                Maximum dose in whole map: <a id="maxDose" class="no-decoration">0.000 Gy</a>
-                <a class="btn btn-default btn-sm" role="button" id="save2dSkinMap">Save 2d map</a>
-                <a class="btn btn-default btn-sm" role="button" id="save3dSkinMap">Save 3d map</a>
-            </div>
+            Maximum dose in whole map: <a id="maxDose" class="no-decoration">0.000 Gy</a>
 
             <div id="skin_map_wwwl_controls">
                 <table>
                     <tr>
                         <td><input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm btn-block" role="button" /></td>
                         <td style="padding-right: 20px"><a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm btn-block" role="button">Use max/min</a></td>
-                        <td>Window level:</td>
-                        <td><input type="range" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.001" oninput="updateWindowLevel(this.value)"/></td>
-                        <td><input type="text" name="currentWindowLevel" id="currentWindowLevel" size="5" onchange="updateWindowLevel(this.value)"/> Gy</td>
+                        <td><input type="range" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.001" oninput="updateWindowLevel(this.value)" class="skinMapControlSlider" /></td>
+                        <td><input type="text" name="currentWindowLevel" id="currentWindowLevel" size="5" onchange="updateWindowLevel(this.value)" class="skinMapControls" /> Gy window level</td>
                     </tr>
                     <tr>
                         <td><a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm btn-block" role="button">Colour scales</a></td>
                         <td style="padding-right: 20px"><a onclick="$('#save2dSkinMap').toggle();$('#save3dSkinMap').toggle();$('#skinDoseMap3d').toggle();$('#skinDoseMap3dPerson').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm btn-block" role="button" id="swap3dButton1">Toggle 2D/3D view</a></td>
-                        <td>Window width:</td>
-                        <td><input type="range" name="windowWidthSlider" id="windowWidthSlider" min="0" max="4" value="0.2" step="0.001" oninput="updateWindowWidth(this.value)"/></td>
-                        <td><input type="text" name="currentWindowWidth" id="currentWindowWidth" size="5" onchange="updateWindowWidth(this.value)"/> Gy</td>
+                        <td><input type="range" name="windowWidthSlider" id="windowWidthSlider" min="0" max="4" value="0.2" step="0.001" oninput="updateWindowWidth(this.value)" class="skinMapControlSlider" /></td>
+                        <td><input type="text" name="currentWindowWidth" id="currentWindowWidth" size="5" onchange="updateWindowWidth(this.value)" class="skinMapControls" /> Gy window width</td>
                     </tr>
                 </table>
             </div>
@@ -191,16 +189,14 @@
                     <tr>
                         <td><input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm btn-block" role="button" /></td>
                         <td style="padding-right: 20px"><a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm btn-block" role="button">Use WW/WL</a></td>
-                        <td>Minimum displayed dose:</td>
-                        <td><input type="range" name="minDoseSlider" id="minDoseSlider" min="0" max="2" value="0.1" step="0.001" oninput="updateMinDisplayedDose(this.value)"/></td>
-                        <td><input type="text" name="currentMinDisplayedDose" id="currentMinDisplayedDose" size="5" onchange="updateMinDisplayedDose(this.value)"/> Gy</td>
+                        <td><input type="range" name="minDoseSlider" id="minDoseSlider" min="0" max="2" value="0.1" step="0.001" oninput="updateMinDisplayedDose(this.value)" class="skinMapControlSlider" /></td>
+                        <td><input type="text" name="currentMinDisplayedDose" id="currentMinDisplayedDose" size="5" onchange="updateMinDisplayedDose(this.value)"class="skinMapControls" /> Gy min. displayed dose</td>
                     </tr>
                     <tr>
                         <td><a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm btn-block" role="button">Colour scales</a></td>
                         <td style="padding-right: 20px"><a onclick="$('#save2dSkinMap').toggle();$('#save3dSkinMap').toggle();$('#skinDoseMap3d').toggle();$('#skinDoseMap3dPerson').toggle();$('#skinDoseMap').toggle();" class="btn btn-default btn-sm btn-block" role="button" id="swap3dButton2">Toggle 2D/3D view</a></td>
-                        <td>Maximum displayed dose:</td>
-                        <td><input type="range" name="maxDoseSlider" id="maxDoseSlider" min="0" max="4" value="0.2" step="0.001" oninput="updateMaxDisplayedDose(this.value)"/></td>
-                        <td><input type="text" name="currentMaxDisplayedDose" id="currentMaxDisplayedDose" size="5" onchange="updateMaxDisplayedDose(this.value)"/> Gy</td>
+                        <td><input type="range" name="maxDoseSlider" id="maxDoseSlider" min="0" max="4" value="0.2" step="0.001" oninput="updateMaxDisplayedDose(this.value)" class="skinMapControlSlider" /></td>
+                        <td><input type="text" name="currentMaxDisplayedDose" id="currentMaxDisplayedDose" size="5" onchange="updateMaxDisplayedDose(this.value)" class="skinMapControls" /> Gy max. displayed dose</td>
                     </tr>
                 </table>
             </div>

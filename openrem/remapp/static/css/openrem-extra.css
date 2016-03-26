@@ -121,43 +121,58 @@ div.fullscreen{
   z-index: 9999 !important;
 }
 
-.skinDoseMap {
-  text-align: left;
-  padding: 0px;
-  left: 0px;
-  display: inline-block;
+div.skinDoseMapGroup {
+  position: relative;
+  height:420px;
+  width: 620px;
 }
 
-.skinDoseMapPerson {
+div.skinDoseMap {
   position: absolute;
-  text-align: left;
   padding: 0px;
   bottom: 0px;
-  left: 4px;
+  left: 0px;
+}
+
+div.skinDoseMapPerson {
+  position: absolute;
+  padding: 0px;
+  bottom: 0px;
+  left: 0px;
   z-index: 10;
 }
 
-.colourScale {
-  text-align: left;
-  display: inline-block;
+div.skinMapSaveBtn {
+  position: absolute;
+  padding: 0px;
+  bottom: 4px;
+  right: 78px;
+  z-index: 10;
 }
 
-div.noWrap {
-  white-space: nowrap;
-  position: relative;
-}
-
-.noFloat {
-  clear: left;
+div.colourScale {
+  position: absolute;
+  padding: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 10;
 }
 
 div.colour_scale_selection {
   position:absolute;
-  top: 0px;
-  right: 15px;
+  padding: 5px;
+  top: -6px;
+  right: -1px;
   background-color: white;
-  padding: inherit;
-  z-index: 9999 !important;
+  z-index: 20 !important;
+}
+
+input.skinMapControls {
+  border: none;
+  text-align: right;
+}
+
+input.skinMapControlSlider {
 }
 
 th.centred  {
