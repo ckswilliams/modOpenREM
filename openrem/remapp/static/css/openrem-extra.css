@@ -175,6 +175,14 @@ input.skinMapControls {
 input.skinMapControlSlider {
 }
 
+td.rangeCell {
+  width: 150px;
+}
+
+tr {
+  height: auto;
+}
+
 th.centred  {
   text-align: center;
   vertical-align: middle;
