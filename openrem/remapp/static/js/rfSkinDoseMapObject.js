@@ -29,12 +29,6 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
                 this.skinDoseMapContext.fillRect(x*this.mag, y*this.mag, this.mag, this.mag);
             }
         }
-/*        this.skinDoseMapContext.fillStyle = this.colourScale(0.5).hex();;
-        this.skinDoseMapContext.fillText('Superior', (this.skinDoseMapWidth*this.mag)/2, 15);
-        this.skinDoseMapContext.fillText('Inferior', (this.skinDoseMapWidth*this.mag)/2, (this.skinDoseMapHeight*this.mag-10));
-        this.skinDoseMapContext.fillText('Anterior', 15, (this.skinDoseMapHeight*this.mag/2));
-        this.skinDoseMapContext.fillText('Anterior', (this.skinDoseMapWidth*this.mag)-45, (this.skinDoseMapHeight*this.mag/2));
-        this.skinDoseMapContext.fillText('Posterior', (this.skinDoseMapWidth*this.mag)/2, (this.skinDoseMapHeight*this.mag/2));*/
     }
 
 
