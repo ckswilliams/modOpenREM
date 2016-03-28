@@ -9,21 +9,32 @@ function skinDoseMapOverlayObject(canvasName, colourScaleName) {
     this.draw = draw;
     function draw() {
         this.overlayContext.textAlign = 'center';
+        this.overlayContext.font = '12pt arial';
 
-        this.overlayContext.fillStyle = 'Green';
+        this.overlayContext.fillStyle = 'rgba(0, 80, 0, 0.85)';
         this.overlayContext.fillText('Superior', this.canvas.width/2, 15);
         this.overlayContext.fillText('Inferior', this.canvas.width/2, this.canvas.height-10);
 
-        this.overlayContext.fillStyle = 'Red';
-        this.overlayContext.fillText('Anterior', this.frontLeftBoundary/2, this.canvas.height/2);
-        this.overlayContext.fillText('Anterior', this.canvas.width-this.frontLeftBoundary/2, this.canvas.height/2);
-        this.overlayContext.fillText('Posterior', this.canvas.width/2, this.canvas.height/2);
-        this.overlayContext.fillText('Left', this.frontLeftBoundary + (this.leftBackBoundary-this.frontLeftBoundary)/2, this.canvas.height/2);
-        this.overlayContext.fillText('Right', this.rightFrontBoundary - (this.rightFrontBoundary-this.backRightBoundary)/2, this.canvas.height/2);
+        this.overlayContext.save();
+
+        this.overlayContext.rotate(0.5*Math.PI);
+        this.overlayContext.fillStyle = 'rgba(255, 0, 0, 0.85)';
+        this.overlayContext.fillText('Anterior', this.canvas.height/2, -this.frontLeftBoundary/2);
+        this.overlayContext.fillText('Anterior', this.canvas.height/2, -this.canvas.width+this.frontLeftBoundary/2);
+        this.overlayContext.fillText('Posterior', this.canvas.height/2, -this.canvas.width/2);
+        this.overlayContext.fillText('Left', this.canvas.height/2, -this.frontLeftBoundary - (this.leftBackBoundary-this.frontLeftBoundary)/2);
+        this.overlayContext.fillText('Right', this.canvas.height/2, -this.rightFrontBoundary + (this.rightFrontBoundary-this.backRightBoundary)/2);
+//        this.overlayContext.fillText('Anterior', this.frontLeftBoundary/2, this.canvas.height/2);
+//        this.overlayContext.fillText('Anterior', this.canvas.width-this.frontLeftBoundary/2, this.canvas.height/2);
+//        this.overlayContext.fillText('Posterior', this.canvas.width/2, this.canvas.height/2);
+//        this.overlayContext.fillText('Left', this.frontLeftBoundary + (this.leftBackBoundary-this.frontLeftBoundary)/2, this.canvas.height/2);
+//        this.overlayContext.fillText('Right', this.rightFrontBoundary - (this.rightFrontBoundary-this.backRightBoundary)/2, this.canvas.height/2);
+
+        this.overlayContext.restore();
 
         this.overlayContext.lineWidth = 1;
         this.overlayContext.setLineDash([5, 15]);
-        this.overlayContext.strokeStyle = 'Red';
+        this.overlayContext.strokeStyle = 'rgba(255, 0, 0, 0.25)';
 
         this.overlayContext.beginPath();
         this.overlayContext.moveTo(this.frontLeftBoundary, 0);
