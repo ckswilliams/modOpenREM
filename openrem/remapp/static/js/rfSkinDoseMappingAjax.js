@@ -38,6 +38,9 @@ $(document).ready(function() {
             $('#skinDoseMapGroup').height(skinDoseMapObj.skinDoseMapCanvas.height + 'px');
             skinDoseMapObj.draw();
 
+            skinDoseMapOverlayObj.initialise(skinDoseMapObj.skinDoseMapCanvas.width, skinDoseMapObj.skinDoseMapCanvas.height);
+            skinDoseMapOverlayObj.draw();
+
             skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height);
             skinDoseMapColourScaleObj.draw();
 
