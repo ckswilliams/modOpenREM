@@ -44,11 +44,6 @@ function skinDoseMapOverlayObject(canvasName, colourScaleName) {
         this.overlayContext.moveTo(this.backRightBoundary, 0);
         this.overlayContext.lineTo(this.backRightBoundary, this.canvas.height-1);
         this.overlayContext.stroke();
-
-        this.overlayContext.beginPath();
-        this.overlayContext.moveTo(this.rightFrontBoundary, 0);
-        this.overlayContext.lineTo(this.rightFrontBoundary, this.canvas.height-1);
-        this.overlayContext.stroke();
     }
 
 
