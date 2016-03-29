@@ -32,6 +32,47 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     }
 
 
+    this.drawOverlay = drawOverlay;
+    function drawOverlay() {
+        this.skinDoseMapContext.textAlign = 'center';
+        this.skinDoseMapContext.font = '12pt arial';
+
+        this.skinDoseMapContext.fillStyle = 'rgba(0, 80, 0, 0.85)';
+        this.skinDoseMapContext.fillText('Superior', this.skinDoseMapCanvas.width/2, 15);
+        this.skinDoseMapContext.fillText('Inferior', this.skinDoseMapCanvas.width/2, this.skinDoseMapCanvas.height-10);
+
+        this.skinDoseMapContext.save();
+
+        this.skinDoseMapContext.rotate(0.5*Math.PI);
+        this.skinDoseMapContext.fillStyle = 'rgba(255, 0, 0, 0.85)';
+        this.skinDoseMapContext.fillText('Anterior', this.skinDoseMapCanvas.height/2, -this.frontLeftBoundary/2);
+        this.skinDoseMapContext.fillText('Posterior', this.skinDoseMapCanvas.height/2, -this.leftBackBoundary - (this.backRightBoundary-this.leftBackBoundary)/2);
+        this.skinDoseMapContext.fillText('Left', this.skinDoseMapCanvas.height/2, -this.frontLeftBoundary - (this.leftBackBoundary-this.frontLeftBoundary)/2);
+        this.skinDoseMapContext.fillText('Right', this.skinDoseMapCanvas.height/2, -this.rightFrontBoundary + (this.rightFrontBoundary-this.backRightBoundary)/2);
+
+        this.skinDoseMapContext.restore();
+
+        this.skinDoseMapContext.lineWidth = 1;
+        this.skinDoseMapContext.setLineDash([5, 15]);
+        this.skinDoseMapContext.strokeStyle = 'rgba(255, 0, 0, 0.25)';
+
+        this.skinDoseMapContext.beginPath();
+        this.skinDoseMapContext.moveTo(this.frontLeftBoundary, 0);
+        this.skinDoseMapContext.lineTo(this.frontLeftBoundary, this.skinDoseMapCanvas.height-1);
+        this.skinDoseMapContext.stroke();
+
+        this.skinDoseMapContext.beginPath();
+        this.skinDoseMapContext.moveTo(this.leftBackBoundary, 0);
+        this.skinDoseMapContext.lineTo(this.leftBackBoundary, this.skinDoseMapCanvas.height-1);
+        this.skinDoseMapContext.stroke();
+
+        this.skinDoseMapContext.beginPath();
+        this.skinDoseMapContext.moveTo(this.backRightBoundary, 0);
+        this.skinDoseMapContext.lineTo(this.backRightBoundary, this.skinDoseMapCanvas.height-1);
+        this.skinDoseMapContext.stroke();
+    }
+
+
     this.resizeSkinDoseMap = resizeSkinDoseMap;
     function resizeSkinDoseMap() {
         this.skinDoseMapCanvas.width = this.skinDoseMapWidth * this.mag;
@@ -43,6 +84,18 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     function reset() {
         this.updateWindowWidth(this.maxDose - this.minDose);
         this.updateWindowLevel(this.minDose + (this.windowWidth / 2.0));
+    }
+
+
+    this.toggleOverlay = toggleOverlay;
+    function toggleOverlay() {
+        this.showOverlay = this.showOverlay ? this.showOverlay = false : this.showOverlay = true;
+
+        if (this.showOverlay) {
+            this.drawOverlay();
+        } else {
+            this.draw();
+        }
     }
 
 
@@ -144,7 +197,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.initialise = initialise;
-    function initialise(skinMapData, skinMapWidth, skinMapHeight) {
+    function initialise(skinMapData, skinMapWidth, skinMapHeight, phantomFlatWidth, phantomCurvedEdgeWidth) {
         this.skinDoseMap = skinMapData;
         this.skinDoseMapWidth = skinMapWidth;
         this.skinDoseMapHeight = skinMapHeight;
@@ -155,8 +208,21 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
         this.minDisplayedDose = this.minDose;
         this.maxDisplayedDose = this.maxDose;
 
+        this.phantomFlatWidth = phantomFlatWidth;
+        this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
+
         this.resizeSkinDoseMap();
+        updateBoundaries();
     }
+
+
+    function updateBoundaries () {
+        this.frontLeftBoundary = this.phantomFlatWidth * this.mag;
+        this.leftBackBoundary = this.frontLeftBoundary + (this.phantomCurvedEdgeWidth * this.mag);
+        this.backRightBoundary = this.leftBackBoundary + (this.phantomFlatWidth * this.mag);
+        this.rightFrontBoundary = this.backRightBoundary + (this.phantomCurvedEdgeWidth * this.mag);
+    }
+
 
     this.skinDoseMapCanvasName = skinDoseMapCanvasName;
     this.skinDoseMapCanvas = document.getElementById(this.skinDoseMapCanvasName);
@@ -170,6 +236,16 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     this.skinDoseMap = [];
     this.skinDoseMapWidth = 10;
     this.skinDoseMapHeight = 10;
+
+    this.phantomFlatWidth = 14;
+    this.phantomCurvedEdgeWidth = 31;
+
+    this.showOverlay = false;
+
+    this.frontLeftBoundary = this.phantomFlatWidth * this.mag;
+    this.leftBackBoundary = this.frontLeftBoundary + (this.phantomCurvedEdgeWidth * this.mag);
+    this.backRightBoundary = this.leftBackBoundary + (this.phantomFlatWidth * this.mag);
+    this.rightFrontBoundary = this.backRightBoundary + (this.phantomCurvedEdgeWidth * this.mag);
 
     this.minDose = 0.0;
     this.maxDose = 10.0;

@@ -25,6 +25,7 @@ function colourScaleSelection(div) {
 function useNewColourScale(new_scale) {
     skinDoseMapObj.useNewColourScale(new_scale);
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.useNewColourScale(new_scale);
     skinDoseMapColourScaleObj.draw();
@@ -68,6 +69,7 @@ function reset() {
     skinDoseMapObj.updateWindowWidth(skinDoseMapObj.maxDose - skinDoseMapObj.minDose);
     skinDoseMapObj.updateWindowLevel(skinDoseMapObj.minDose + (skinDoseMapObj.windowWidth/2.0));
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
@@ -100,6 +102,7 @@ function updateWindowLevel(newWindowLevel) {
 
     skinDoseMapObj.updateWindowLevel(newWindowLevel);
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
@@ -125,6 +128,7 @@ function updateWindowWidth(newWindowWidth) {
 
     skinDoseMapObj.updateWindowWidth(newWindowWidth);
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
@@ -148,6 +152,7 @@ function updateMinDisplayedDose(minDisplayedDose) {
 
     skinDoseMapObj.updateMinDisplayedDose(minDisplayedDose);
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.redrawValues();
@@ -177,6 +182,7 @@ function updateMaxDisplayedDose(maxDisplayedDose) {
 
     skinDoseMapObj.updateMaxDisplayedDose(maxDisplayedDose)
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
     skinDoseMapColourScaleObj.redrawValues();
@@ -206,6 +212,7 @@ function updateMinDisplayedDoseManual(minDisplayedDose) {
 
     skinDoseMapObj.updateMinDisplayedDoseManual(minDisplayedDose);
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
     skinDoseMapColourScaleObj.redrawValues();
@@ -235,6 +242,7 @@ function updateMaxDisplayedDoseManual(maxDisplayedDose) {
 
     skinDoseMapObj.updateMaxDisplayedDoseManual(maxDisplayedDose)
     skinDoseMapObj.draw();
+    if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
     skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
     skinDoseMapColourScaleObj.redrawValues();
@@ -275,7 +283,7 @@ var previousMousePosition = {
 };
 
 
-$("#skinDoseMap, #skinDoseMapOverlay").on('mousedown', function (e) {
+$("#skinDoseMap").on('mousedown', function (e) {
     isDragging = true;
 }).on('mousemove', function (e) {
     var deltaMove = {
@@ -299,6 +307,7 @@ $("#skinDoseMap, #skinDoseMapOverlay").on('mousedown', function (e) {
         skinDoseMapObj.updateWindowWidth(newWW);
 
         skinDoseMapObj.draw();
+        if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 
         skinDoseMapColourScaleObj.minDose = skinDoseMapObj.minDisplayedDose;
         skinDoseMapColourScaleObj.maxDose = skinDoseMapObj.maxDisplayedDose;
@@ -348,7 +357,7 @@ $('[data-tooltip="skin_dose_map"]').qtip({
 });
 
 
-$('#skinDoseMap, #skinDoseMapOverlay').mousemove(function (e) {
+$('#skinDoseMap').mousemove(function (e) {
     var pos = findPos(this);
     var x = e.pageX - pos.x;
     var y = e.pageY - pos.y;
@@ -378,13 +387,13 @@ document.getElementById('save3dSkinMap').addEventListener('click', function() {
 }, false);
 
 document.getElementById('skinDoseMapOverlayShow').addEventListener('click', function() {
-    $('#skinDoseMapOverlay').toggle();
     $('#skinDoseMapOverlayHide').toggle();
     $('#skinDoseMapOverlayShow').toggle();
+    skinDoseMapObj.toggleOverlay();
 }, false);
 
 document.getElementById('skinDoseMapOverlayHide').addEventListener('click', function() {
-    $('#skinDoseMapOverlay').toggle();
     $('#skinDoseMapOverlayHide').toggle();
     $('#skinDoseMapOverlayShow').toggle();
+    skinDoseMapObj.toggleOverlay();
 }, false);

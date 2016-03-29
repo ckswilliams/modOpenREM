@@ -33,13 +33,10 @@ $(document).ready(function() {
         dataType: "json",
         success: function( json ) {
 
-            skinDoseMapObj.initialise(json.skin_map, json.width, json.height);
+            skinDoseMapObj.initialise(json.skin_map, json.width, json.height, json.phantom_flat_dist, json.phantom_curved_dist);
             $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + 'px');
             $('#skinDoseMapGroup').height(skinDoseMapObj.skinDoseMapCanvas.height + 'px');
             skinDoseMapObj.draw();
-
-            skinDoseMapOverlayObj.initialise(skinDoseMapObj.skinDoseMapCanvas.width, skinDoseMapObj.skinDoseMapCanvas.height, json.phantom_flat_dist, json.phantom_curved_dist, json.phantom_height);
-            skinDoseMapOverlayObj.draw();
 
             skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height);
             skinDoseMapColourScaleObj.draw();

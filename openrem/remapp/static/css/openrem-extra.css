@@ -142,14 +142,6 @@ div.skinDoseMap3d {
   z-index: 10;
 }
 
-div.skinDoseMapOverlay {
-  position: absolute;
-  padding: 0px;
-  bottom: 0px;
-  left: 0px;
-  z-index: 5;
-}
-
 div.skinDoseMapPerson {
   position: absolute;
   padding: 0px;
