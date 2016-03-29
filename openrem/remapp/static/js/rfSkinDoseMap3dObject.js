@@ -11,7 +11,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         var currentDose, scaledDose, newColour, i, j, k;
         k = 0;
         for (i = this.phantomHeight-1; i >= 0; i--) {
-            for (j = 0; j < 14; j++) {
+            for (j = 0; j < this.phantomFlatWidth; j++) {
                 currentDose = this.skinDoseMap[j * this.phantomHeight + i];
                 scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
@@ -27,7 +27,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         }
         k = 0;
         for (i = this.phantomHeight-1; i >= 0; i--) {
-            for (j = 14; j < 45; j++) {
+            for (j = this.phantomFlatWidth; j < this.phantomFlatWidth+this.phantomCurvedEdgeWidth; j++) {
                 currentDose = this.skinDoseMap[j * this.phantomHeight + i];
                 scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
@@ -43,7 +43,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         }
         k = 0;
         for (i = this.phantomHeight-1; i >= 0; i--) {
-            for (j = 45; j < 59; j++) {
+            for (j = this.phantomFlatWidth+this.phantomCurvedEdgeWidth; j < this.phantomFlatWidth*2+this.phantomCurvedEdgeWidth; j++) {
                 currentDose = this.skinDoseMap[j * this.phantomHeight + i];
                 scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
@@ -59,7 +59,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         }
         k = 0;
         for (i = this.phantomHeight-1; i >= 0; i--) {
-            for (j = 59; j < 90; j++) {
+            for (j = this.phantomFlatWidth*2+this.phantomCurvedEdgeWidth; j < this.phantomFlatWidth*2+this.phantomCurvedEdgeWidth*2; j++) {
                 currentDose = this.skinDoseMap[j * this.phantomHeight + i];
                 scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
