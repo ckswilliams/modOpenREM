@@ -111,6 +111,38 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
     }
 
 
+    this.updateMinDisplayedDoseManual = updateMinDisplayedDose;
+    function updateMinDisplayedDose(minDisplayedDose) {
+        minDisplayedDose = parseFloat(minDisplayedDose);
+
+        this.minDisplayedDose = minDisplayedDose;
+
+        // Prevent the minDisplatedDose exceeding the maxDisplayedDose
+        if (minDisplayedDose >= this.maxDisplayedDose) {
+            this.maxDisplayedDose = minDisplayedDose;
+        }
+
+        this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
+        this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
+    }
+
+
+    this.updateMaxDisplayedDoseManual = updateMaxDisplayedDose;
+    function updateMaxDisplayedDose(maxDisplayedDose) {
+        maxDisplayedDose = parseFloat(maxDisplayedDose);
+
+        this.maxDisplayedDose = maxDisplayedDose;
+
+        // Prevent the maxDisplatedDose being smaller than the minDisplayedDose
+        if (maxDisplayedDose <= this.minDisplayedDose) {
+            this.minDisplayedDose = maxDisplayedDose;
+        }
+
+        this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
+        this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
+    }
+
+
     this.initialise = initialise;
     function initialise(skinMapData, skinMapWidth, skinMapHeight) {
         this.skinDoseMap = skinMapData;
