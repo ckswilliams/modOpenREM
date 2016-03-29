@@ -70,7 +70,7 @@ $(document).ready(function() {
                 skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
                 skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
                 skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
-                skinDoseMap3dObj.initialise(json.skin_map_not_rotated, json.phantom_flat_dist, json.phantom_curved_dist, json.phantom_height, json.phantom_depth/2);
+                skinDoseMap3dObj.initialise(json.skin_map, json.phantom_flat_dist, json.phantom_curved_dist, json.phantom_height, json.phantom_depth/2);
                 skinDoseMap3dObj.draw();
                 skinDoseMap3dPersonObj.initialise(json.phantom_height);
                 render();

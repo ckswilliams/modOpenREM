@@ -103,11 +103,21 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     this.initialise = initialise;
     function initialise(skinDoseMap, phantomFlatWidth, phantomCurvedEdgeWidth, phantomHeight, phantomCurvedRadius) {
 
-        this.skinDoseMap = skinDoseMap;
+        this.skinDoseMap = new Array(skinDoseMap.length);
+        this.skinDoseMapWidth = 2*phantomFlatWidth + 2*phantomCurvedEdgeWidth;
+        this.skinDoseMapHeight = phantomHeight;
         this.phantomFlatWidth = phantomFlatWidth;
         this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
         this.phantomHeight = phantomHeight;
         this.phantomCurvedRadius = phantomCurvedRadius;
+
+        var x, y, offset;
+        for (x = 0; x < this.skinDoseMapWidth; x++) {
+            for (y = 0; y < this.skinDoseMapHeight; y++) {
+                offset = this.skinDoseMapHeight * x + y;
+                this.skinDoseMap[offset] = skinDoseMap[this.skinDoseMapWidth * (this.skinDoseMapHeight - 1 - y) + x];
+            }
+        }
 
         frontData = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
         backData  = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
@@ -255,6 +265,9 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     this.phantomFlatWidth = 10;
     this.phantomCurvedEdgeWidth = 10;
     this.phantomCurvedRadius = 10;
+
+    this.skinDoseMapWidth = 10;
+    this.skinDoseMapHeight = 10;
 
     var frontData = [];
     var backData = [];
