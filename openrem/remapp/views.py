@@ -573,7 +573,7 @@ def rf_detail_view_skin_map(request, pk=None):
             else:
                 end_angle = None
 
-            if ref_ak:
+            if ref_ak and d_ref:
                 my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
                                     angle_x=angle_x, angle_y=angle_y,
                                     d_ref=d_ref, dap=dap, ref_ak=ref_ak,
@@ -583,7 +583,10 @@ def rf_detail_view_skin_map(request, pk=None):
         import numpy as np
 
         my_exp_map.my_dose.totalDose = np.roll(my_exp_map.my_dose.totalDose, int(my_exp_map.phantom.phantom_flat_dist/2), axis=0)
-        my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
+        try:
+            my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
+        except ValueError:
+            pass
 
         return_structure = {
             'skin_map': my_exp_map.my_dose.totalDose.flatten().tolist(),
