@@ -95,8 +95,13 @@ function toDegrees(angle) {
 
 
 function render() {
-    skinDoseMap3dObj.renderer.render(skinDoseMap3dObj.scene, skinDoseMap3dObj.camera);
-    skinDoseMap3dPersonObj.renderer.render(skinDoseMap3dPersonObj.scene, skinDoseMap3dPersonObj.camera);
+    renderer.clear();
+    renderer.setViewport(0, 0, skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
+    renderer.render(skinDoseMap3dObj.scene, skinDoseMap3dObj.camera);
+
+    renderer.clearDepth();
+    renderer.setViewport(10, 10, 75, 75);
+    renderer.render(skinDoseMap3dPersonObj.scene, skinDoseMap3dPersonObj.camera);
     requestAnimFrame(render);
 }
 
@@ -112,3 +117,9 @@ function webglAvailable() {
         return false;
     }
 }
+
+
+skinDoseMap3dCanvas = document.getElementById('skinDoseMap3d');
+renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true });
+renderer.autoClear = false;
+renderer.setClearColor( 0x000000, 0 );

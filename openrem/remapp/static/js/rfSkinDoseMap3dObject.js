@@ -236,10 +236,6 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
         directionalLight.position.set( 0, 0, 1 );
         this.scene.add( directionalLight );
-
-        // Put the animation into the canvas
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, preserveDrawingBuffer: true });
-        this.renderer.setClearColor( 0xeeeeee );
     }
 
 
@@ -276,7 +272,6 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
     this.camera = 0;
     this.scene = 0;
-    this.renderer = 0;
     this.mesh = 0;
 
     var dataTextureFront = 0;

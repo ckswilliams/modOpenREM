@@ -374,7 +374,7 @@ function downloadCanvas(link, canvasId, filename) {
 }
 
 function download3dCanvas(link, filename) {
-    link.href = skinDoseMap3dObj.renderer.domElement.toDataURL('image/png');
+    link.href = renderer.domElement.toDataURL('image/png');
     link.download = filename;
 }
 

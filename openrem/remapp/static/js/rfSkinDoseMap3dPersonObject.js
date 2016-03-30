@@ -1,4 +1,4 @@
-function skinDoseMap3dPersonObject(skinDoseMap3dPersonCanvasName) {
+function skinDoseMap3dPersonObject() {
 
     this.mergeMeshes = mergeMeshes;
     function mergeMeshes (meshes) {
@@ -27,7 +27,7 @@ function skinDoseMap3dPersonObject(skinDoseMap3dPersonCanvasName) {
         this.scene = new THREE.Scene();
 
         // Set up the camera
-        this.camera = new THREE.PerspectiveCamera(50, this.canvas.width / this.canvas.height, 1, 10000);
+        this.camera = new THREE.PerspectiveCamera(50, 1.0, 1, 10000);
         this.camera.position.x = this.phantomHeight;
         this.camera.position.y = 0;
         this.camera.position.z = 100;
@@ -121,19 +121,12 @@ function skinDoseMap3dPersonObject(skinDoseMap3dPersonCanvasName) {
         geometry = this.mergeMeshes(meshes);
         this.mesh = new THREE.Mesh(geometry, meshFaceMaterial);
         this.scene.add(this.mesh);
-
-        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
-        this.renderer.setClearColor( 0xffffff );
     }
 
-
-    this.canvasName = skinDoseMap3dPersonCanvasName;
-    this.canvas = document.getElementById(this.canvasName);
 
     this.phantomHeight = 10;
 
     this.camera = 0;
     this.scene = 0;
-    this.renderer = 0;
     this.mesh = 0;
 }
