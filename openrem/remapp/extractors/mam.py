@@ -165,22 +165,48 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _accumulatedmammo_update(dataset,event): # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
+    from remapp.models import AccumMammographyXRayDose
     accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
-    if event.irradeventxraysourcedata_set.get().average_glandular_dose:
-        accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
-    if event.laterality:
-        if accummam.laterality:
-            if accummam.laterality.code_meaning == 'Left breast':
-                if event.laterality.code_meaning == 'Right':
-                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-            if accummam.laterality.code_meaning == 'Right breast':
-                if event.laterality.code_meaning == 'Left':
-                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-        else:
+    accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
+    accummams = accum.accummammographyxraydose_set.all()
+    event_added = False
+    for accummam in accummams:
+        if not accummam.laterality:
             if event.laterality.code_meaning == 'Right':
                 accummam.laterality = get_or_create_cid('T-04020','Right breast')
-            if event.laterality.code_meaning == 'Left':
+            elif event.laterality.code_meaning == 'Left':
                 accummam.laterality = get_or_create_cid('T-04030','Left breast')
+            accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
+            accummam.save()
+            event_added = True
+        elif event.laterality.code_meaning in accummam.laterality.code_meaning:
+            accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
+            accummam.save()
+            event_added = True
+    if not event_added:
+        accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
+        if event.laterality.code_meaning == 'Right':
+            accummam.laterality = get_or_create_cid('T-04020', 'Right breast')
+        elif event.laterality.code_meaning == 'Left':
+            accummam.laterality = get_or_create_cid('T-04030', 'Left breast')
+        accummam.accumulated_average_glandular_dose = event.irradeventxraysourcedata_set.get().average_glandular_dose
+        accummam.save()
+
+    # if event.irradeventxraysourcedata_set.get().average_glandular_dose:
+    #     accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
+    # if event.laterality:
+    #     if accummam.laterality:
+    #         if accummam.laterality.code_meaning == 'Left breast':
+    #             if event.laterality.code_meaning == 'Right':
+    #                 accummam.laterality = get_or_create_cid('T-04080','Both breasts')
+    #         if accummam.laterality.code_meaning == 'Right breast':
+    #             if event.laterality.code_meaning == 'Left':
+    #                 accummam.laterality = get_or_create_cid('T-04080','Both breasts')
+    #     else:
+    #         if event.laterality.code_meaning == 'Right':
+    #             accummam.laterality = get_or_create_cid('T-04020','Right breast')
+    #         if event.laterality.code_meaning == 'Left':
+    #             accummam.laterality = get_or_create_cid('T-04030','Left breast')
     accummam.save()
 
 
@@ -220,7 +246,8 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
 #    irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
-    _accumulatedmammo_update(dataset,event)
+    if event.laterality and event.irradeventxraysourcedata_set.get().average_glandular_dose:
+        _accumulatedmammo_update(dataset,event)
 
 
 def _accumulatedxraydose(dataset,proj):
