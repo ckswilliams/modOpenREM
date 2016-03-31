@@ -2,17 +2,22 @@
 OpenREM version history
 =======================
 
-0.7.0b12 (2015-12-18)
+0.7.0b13 (2016-03-18)
 ---------------------
 
+* `#374`_  CTDIw phantom size now displayed in CT detail view
 * `#370`_  Added study description to mammography export
+* `#369`_  Bi-plane fluoroscopy studies now export correctly
+* `#368`_  Mammo RDSR now imports correctly
 * `#365`_  Tube filtration is now displayed in the RF detail view
+* `#364`_  Philips Allura fluorscopy RDSRs now import correctly
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
 * `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
 * `#357`_  Charts: button to return from histogram now displays the name of the main chart
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
+* `#352`_  Fixed CT xlsx exports that had complete study data in each series protocol sheet (from earlier beta)
 * `#351`_  Charts: simplified chart JavaScript and Python code
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
