@@ -397,3 +397,53 @@ document.getElementById('skinDoseMapOverlayHide').addEventListener('click', func
     $('#skinDoseMapOverlayShow').toggle();
     skinDoseMapObj.toggleOverlay();
 }, false);
+
+var skinMapFullScreen = false;
+var skinDoseMapGroupOrigWidth, skinDoseMapGroupOrigHeight;
+document.getElementById('skinDoseMapFullscreenBtn').addEventListener('click', function() {
+    skinMapFullScreen = (skinMapFullScreen == true) ? skinMapFullScreen = false : skinMapFullScreen = true;
+    $('#skinDoseMapContainer').toggleClass('fullscreen');
+
+    if (skinMapFullScreen) {
+        var skinDoseMapGroupWidth = $(window).width();
+        var skinDoseMapGroupHeight = $(window).height() - 3*$('#skin_map_wwwl_controls').height();
+
+        $('#skinDoseMapGroup').width(skinDoseMapGroupWidth);
+        $('#skinDoseMapGroup').height(skinDoseMapGroupHeight);
+
+        var maxMagWidth = Math.floor(skinDoseMapGroupWidth / skinDoseMapObj.skinDoseMapWidth);
+        var maxMagHeight = Math.floor(skinDoseMapGroupHeight / skinDoseMapObj.skinDoseMapHeight);
+
+        skinDoseMapObj.mag = (maxMagHeight <= maxMagWidth) ? maxMagHeight : maxMagWidth;
+        skinDoseMapObj.resizeSkinDoseMap();
+        skinDoseMapObj.draw();
+        skinDoseMapObj.updateBoundaries();
+        if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+
+        skinDoseMapColourScaleObj.resizeColourScale(70, skinDoseMapObj.skinDoseMapCanvas.height);
+        skinDoseMapColourScaleObj.draw();
+
+        if (show3dSkinDoseMap) {
+            skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
+            skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
+            skinDoseMap3dObj.draw();
+        }
+    } else {
+        $('#skinDoseMapGroup').width(skinDoseMapGroupOrigWidth);
+        $('#skinDoseMapGroup').height(skinDoseMapGroupOrigHeight);
+        skinDoseMapObj.mag = 6;
+        skinDoseMapObj.resizeSkinDoseMap();
+        skinDoseMapObj.draw();
+        skinDoseMapObj.updateBoundaries();
+        if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
+
+        skinDoseMapColourScaleObj.resizeColourScale(70, skinDoseMapObj.skinDoseMapCanvas.height);
+        skinDoseMapColourScaleObj.draw();
+
+        if (show3dSkinDoseMap) {
+            skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
+            skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
+            skinDoseMap3dObj.draw();
+        }
+    }
+}, false);

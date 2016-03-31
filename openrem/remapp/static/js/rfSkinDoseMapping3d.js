@@ -123,3 +123,5 @@ skinDoseMap3dCanvas = document.getElementById('skinDoseMap3d');
 renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true });
 renderer.autoClear = false;
 renderer.setClearColor( 0x000000, 0 );
+
+var show3dSkinDoseMap = webglAvailable() ? true : false;

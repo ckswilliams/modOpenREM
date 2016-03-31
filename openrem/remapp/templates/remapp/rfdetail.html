@@ -47,7 +47,7 @@
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
             </ul>
         </div>
-        <div class="col-md-7">
+        <div class="col-md-7" id="skinDoseMapContainer">
             <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
             <h2>OpenSkin radiation exposure incidence map</h2>
@@ -74,6 +74,10 @@
                 <div class="skinMapSaveBtn">
                     <a class="btn btn-default btn-sm" role="button" id="save2dSkinMap">Save 2D map</a>
                     <a class="btn btn-default btn-sm" role="button" id="save3dSkinMap">Save 3D map</a>
+                </div>
+
+                <div class="skinDoseMapFullscreenBtn">
+                    <a class="btn btn-default btn-sm" role="button" id="skinDoseMapFullscreenBtn">Toggle fullscreen</a>
                 </div>
 
                 <div class="colourScale">
@@ -215,7 +219,7 @@
             <script>
                 var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
                 var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
-                if (webglAvailable()) {
+                if (show3dSkinDoseMap) {
                     var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
                     var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject();
                 }

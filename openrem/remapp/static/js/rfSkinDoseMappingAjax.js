@@ -41,6 +41,9 @@ $(document).ready(function() {
             skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height);
             skinDoseMapColourScaleObj.draw();
 
+            skinDoseMapGroupOrigWidth = $('#skinDoseMapGroup').width();
+            skinDoseMapGroupOrigHeight = $('#skinDoseMapGroup').height();
+
             $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(3) + " Gy");
 
             document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
@@ -62,7 +65,7 @@ $(document).ready(function() {
             document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDose;
             document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(3);
 
-            if (webglAvailable()) {
+            if (show3dSkinDoseMap) {
                 skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
                 skinDoseMap3dObj.canvas.height = skinDoseMapObj.skinDoseMapCanvas.height;
                 skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;

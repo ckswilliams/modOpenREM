@@ -166,6 +166,14 @@ div.skinDoseMapOverlayHide {
   z-index: 5;
 }
 
+div.skinDoseMapFullscreenBtn {
+  position: absolute;
+  padding: 0px;
+  top: -7px;
+  right: 78px;
+  z-index: 15;
+}
+
 div.colourScale {
   position: absolute;
   padding: 0px;
