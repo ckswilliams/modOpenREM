@@ -63,7 +63,14 @@
                 <tr>
                     <td rowspan="2">{{ event.acquisition_protocol }}</td>
                     <td rowspan="2">{{ event.ct_acquisition_type }}</td>
-                    <td rowspan="2">{{ event.mean_ctdivol|floatformat:2 }}</td>
+                    <td rowspan="2">
+                      {{ event.mean_ctdivol|floatformat:2 }}
+                      {% if event.ctdiw_phantom_type.code_value == "113691" %}
+                        (32 cm)
+                      {% elif event.ctdiw_phantom_type.code_value == "113690" %}
+                        (16 cm)
+                      {% endif %}
+                    </td>
                     <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>        
                     <td rowspan="2">{{ event.scanninglength_set.get.scanning_length|floatformat:0 }}</td>
                     {% if event.number_of_xray_sources < 2 %}
