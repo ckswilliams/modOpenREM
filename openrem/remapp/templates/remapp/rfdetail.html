@@ -217,15 +217,19 @@
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapping3d.js"></script>
 
             <script>
-                var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
-                var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
-                if (show3dSkinDoseMap) {
-                    var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
-                    var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject();
-                }
-                else {
-                    $('#swap3dButton1').hide();
-                    $('#swap3dButton2').hide();
+                if (isCanvasSupported()) {
+                    var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
+                    var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
+                    if (show3dSkinDoseMap) {
+                        var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
+                        var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject();
+                    }
+                    else {
+                        $('#swap3dButton1').hide();
+                        $('#swap3dButton2').hide();
+                    }
+                } else {
+                    $('#skinDoseMapContainer').hide();
                 }
             </script>
 
