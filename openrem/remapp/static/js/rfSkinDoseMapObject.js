@@ -212,10 +212,11 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
         this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
 
         this.resizeSkinDoseMap();
-        updateBoundaries();
+        this.updateBoundaries();
     }
 
 
+    this.updateBoundaries = updateBoundaries;
     function updateBoundaries () {
         this.frontLeftBoundary = this.phantomFlatWidth * this.mag;
         this.leftBackBoundary = this.frontLeftBoundary + (this.phantomCurvedEdgeWidth * this.mag);
