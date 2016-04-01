@@ -92,6 +92,13 @@ def _xraygrid(gridcode,source):
     grid.save()
 
 
+def _xraytubecurrent(current_value, source):
+    from remapp.models import XrayTubeCurrent
+    tubecurrent = XrayTubeCurrent.objects.create(irradiation_event_xray_source_data=source)
+    tubecurrent.xray_tube_current = current_value
+    tubecurrent.save()
+
+
 def _irradiationeventxraysourcedata(dataset,event):
     # TODO: review model to convert to cid where appropriate, and add additional fields, such as height and width
     from remapp.models import IrradEventXRaySourceData
@@ -102,6 +109,7 @@ def _irradiationeventxraysourcedata(dataset,event):
     if agd_dgy:
         source.average_glandular_dose = float(agd_dgy) * 100.0 #AGD in mGy
     source.average_xray_tube_current = get_value_kw('XRayTubeCurrent',dataset)
+    _xraytubecurrent(source.average_xray_tube_current, source)
     source.exposure_time = get_value_kw('ExposureTime',dataset)
     source.focal_spot_size = get_value_kw('FocalSpots',dataset)
     anode_target_material = get_value_kw('AnodeTargetMaterial',dataset)
@@ -157,22 +165,31 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 
 def _accumulatedmammo_update(dataset,event): # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
-    accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
-    if event.irradeventxraysourcedata_set.get().average_glandular_dose:
-        accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
-    if event.laterality:
-        if accummam.laterality:
-            if accummam.laterality.code_meaning == 'Left breast':
-                if event.laterality.code_meaning == 'Right':
-                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-            if accummam.laterality.code_meaning == 'Right breast':
-                if event.laterality.code_meaning == 'Left':
-                    accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-        else:
+    from remapp.models import AccumMammographyXRayDose
+    accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
+    accummams = accum.accummammographyxraydose_set.all()
+    event_added = False
+    for accummam in accummams:
+        if not accummam.laterality:
             if event.laterality.code_meaning == 'Right':
                 accummam.laterality = get_or_create_cid('T-04020','Right breast')
-            if event.laterality.code_meaning == 'Left':
+            elif event.laterality.code_meaning == 'Left':
                 accummam.laterality = get_or_create_cid('T-04030','Left breast')
+            accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
+            accummam.save()
+            event_added = True
+        elif event.laterality.code_meaning in accummam.laterality.code_meaning:
+            accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
+            accummam.save()
+            event_added = True
+    if not event_added:
+        accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
+        if event.laterality.code_meaning == 'Right':
+            accummam.laterality = get_or_create_cid('T-04020', 'Right breast')
+        elif event.laterality.code_meaning == 'Left':
+            accummam.laterality = get_or_create_cid('T-04030', 'Left breast')
+        accummam.accumulated_average_glandular_dose = event.irradeventxraysourcedata_set.get().average_glandular_dose
+        accummam.save()
     accummam.save()
 
 
@@ -212,7 +229,8 @@ def _irradiationeventxraydata(dataset,proj): # TID 10003
 #    irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
     _irradiationeventxraymechanicaldata(dataset,event)
-    _accumulatedmammo_update(dataset,event)
+    if event.laterality and event.irradeventxraysourcedata_set.get().average_glandular_dose:
+        _accumulatedmammo_update(dataset,event)
 
 
 def _accumulatedxraydose(dataset,proj):

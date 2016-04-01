@@ -33,6 +33,14 @@ import logging
 from celery import shared_task
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
+
+
+def _replace_comma(comma_string):
+    if comma_string:
+        no_comma_string = comma_string.replace(","," ").replace(";"," ")
+        return no_comma_string
+    return comma_string
 
 
 @shared_task
@@ -182,11 +190,11 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             station_name = None
             display_name = None
         else:
-            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            institution_name = _replace_comma(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
+            manufacturer = _replace_comma(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
             manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
-            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+            station_name = _replace_comma(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
+            display_name = _replace_comma(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
 
         try:
             exams.patientmoduleattr_set.get()
@@ -477,10 +485,10 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 station_name = None
                 display_name = None
             else:
-                institution_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name')
-                manufacturer = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer')
-                station_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name')
-                display_name = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+                institution_name = _replace_comma(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name'))
+                manufacturer = _replace_comma(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer'))
+                station_name = _replace_comma(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name'))
+                display_name = _replace_comma(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
 
             try:
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get()

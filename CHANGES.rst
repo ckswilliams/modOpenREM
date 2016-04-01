@@ -6,6 +6,9 @@ OpenREM version history
 ---------------------
 
 * `#374`_  CTDIw phantom size now displayed in CT detail view
+* `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
+  changed. Ordering by Accumulated AGD now creates an entry per accumulated AGD, one per breast
+* `#371`_  Mammo RDSR generates average mA where not recorded, mammo image populates mA
 * `#370`_  Added study description to mammography export
 * `#369`_  Bi-plane fluoroscopy studies now export correctly
 * `#368`_  Mammo RDSR now imports correctly
@@ -13,6 +16,7 @@ OpenREM version history
 * `#364`_  Philips Allura fluorscopy RDSRs now import correctly
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
 * `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
+* `#359`_  Added missing 'y' to query retrieve command line help
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
 * `#357`_  Charts: button to return from histogram now displays the name of the main chart
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
