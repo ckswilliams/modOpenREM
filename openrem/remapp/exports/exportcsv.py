@@ -37,9 +37,10 @@ logger = logging.getLogger(__name__)
 
 
 def _replace_comma(comma_string):
-    no_comma_string = comma_string.replace(","," ").replace(";"," ")
-    return no_comma_string
-
+    if comma_string:
+        no_comma_string = comma_string.replace(","," ").replace(";"," ")
+        return no_comma_string
+    return comma_string
 
 
 @shared_task
