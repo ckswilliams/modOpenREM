@@ -374,16 +374,20 @@ function downloadCanvas(link, canvasId, filename) {
     if (canvas.msToBlob) { //for IE
         var blob = canvas.msToBlob();
         window.navigator.msSaveBlob(blob, filename);
-    } else {
-        //other browsers
+    } else { //other browsers
         link.href = canvas.toDataURL();
         link.download = filename;
     }
 }
 
 function download3dCanvas(link, filename) {
-    link.href = renderer.domElement.toDataURL('image/png');
-    link.download = filename;
+    if (renderer.domElement.msToBlob) { //for IE
+        var blob = renderer.domElement.msToBlob();
+        window.navigator.msSaveBlob(blob, filename);
+    } else { //other browsers
+        link.href = renderer.domElement.toDataURL('image/png');
+        link.download = filename;
+    }
 }
 
 document.getElementById('save2dSkinMap').addEventListener('click', function() {
