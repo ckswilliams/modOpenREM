@@ -13,6 +13,7 @@ OpenREM version history
 * `#364`_  Philips Allura fluorscopy RDSRs now import correctly
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
 * `#360`_  Charts: saving data from average data charts as csv or xls now includes frequency values
+* `#359`_  Added missing 'y' to query retrieve command line help
 * `#358`_  Charts: chart sorting links and instructions now hidden when viewing histograms
 * `#357`_  Charts: button to return from histogram now displays the name of the main chart
 * `#356`_  Charts: histogram normalise button appears for all appropriate charts
