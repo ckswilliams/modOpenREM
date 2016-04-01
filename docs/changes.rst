@@ -5,6 +5,8 @@ OpenREM version history
 0.7.0b13 (2016-03-18)
 ---------------------
 
+* `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
+  changed. Ordering by Accumulated AGD now creates an entry per accumulated AGD, one per breast
 * `#371`_  Mammo RDSR generates average mA where not recorded, mammo image populates mA
 * `#370`_  Added study description to mammography export
 * `#369`_  Bi-plane fluoroscopy studies now export correctly

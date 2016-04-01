@@ -38,6 +38,7 @@ Headline changes
 * Imports
 
     * Mammography RDSRs import correctly
+    * Mammography imports from images **now create an accumulated AGD value per breast**
     * Philips Allura fluoroscopy RDSRs import correctly
     * Bi-plane fluoroscopy imports can now be displayed in the web interface
 

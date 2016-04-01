@@ -5,10 +5,12 @@ OpenREM version history
 0.7.0b13 (2016-03-18)
 ---------------------
 
+* `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
+  changed. Ordering by Accumulated AGD now creates an entry per accumulated AGD, one per breast
 * `#371`_  Mammo RDSR generates average mA where not recorded, mammo image populates mA
 * `#370`_  Added study description to mammography export
 * `#369`_  Bi-plane fluoroscopy studies now export correctly
-* `#368`_  Mammo RDSR now imports
+* `#368`_  Mammo RDSR now imports correctly
 * `#365`_  Tube filtration is now displayed in the RF detail view
 * `#364`_  Philips Allura fluorscopy RDSRs now import correctly
 * `#362`_  Display of RF where bi-plane RDSRs have been imported no longer crash the interface
