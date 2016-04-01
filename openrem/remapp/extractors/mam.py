@@ -191,22 +191,6 @@ def _accumulatedmammo_update(dataset,event): # TID 10005
             accummam.laterality = get_or_create_cid('T-04030', 'Left breast')
         accummam.accumulated_average_glandular_dose = event.irradeventxraysourcedata_set.get().average_glandular_dose
         accummam.save()
-
-    # if event.irradeventxraysourcedata_set.get().average_glandular_dose:
-    #     accummam.accumulated_average_glandular_dose += event.irradeventxraysourcedata_set.get().average_glandular_dose
-    # if event.laterality:
-    #     if accummam.laterality:
-    #         if accummam.laterality.code_meaning == 'Left breast':
-    #             if event.laterality.code_meaning == 'Right':
-    #                 accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-    #         if accummam.laterality.code_meaning == 'Right breast':
-    #             if event.laterality.code_meaning == 'Left':
-    #                 accummam.laterality = get_or_create_cid('T-04080','Both breasts')
-    #     else:
-    #         if event.laterality.code_meaning == 'Right':
-    #             accummam.laterality = get_or_create_cid('T-04020','Right breast')
-    #         if event.laterality.code_meaning == 'Left':
-    #             accummam.laterality = get_or_create_cid('T-04030','Left breast')
     accummam.save()
 
 
