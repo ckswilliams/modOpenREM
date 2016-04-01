@@ -369,8 +369,16 @@ $('#skinDoseMap').mousemove(function (e) {
 
 
 function downloadCanvas(link, canvasId, filename) {
-    link.href = document.getElementById(canvasId).toDataURL();
-    link.download = filename;
+    var canvas = document.getElementById(canvasId);
+
+    if (canvas.msToBlob) { //for IE
+        var blob = canvas.msToBlob();
+        window.navigator.msSaveBlob(blob, filename);
+    } else {
+        //other browsers
+        link.href = canvas.toDataURL();
+        link.download = filename;
+    }
 }
 
 function download3dCanvas(link, filename) {
