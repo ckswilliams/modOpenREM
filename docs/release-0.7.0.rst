@@ -41,7 +41,8 @@ Headline changes
     * Philips Allura fluoroscopy RDSRs import correctly
     * Bi-plane fluoroscopy imports can now be displayed in the web interface
     * Patient height imports from csv **now convert from cm to m** - previously height was assumed to be cm and inserted
-      into database without change. Existing height data will remain in cm for csv imports, and m for RDSR imports
+      into database without change. Existing height data will remain as cm value for csv imports, and m value for RDSR
+      imports
 
 * Exports
 
