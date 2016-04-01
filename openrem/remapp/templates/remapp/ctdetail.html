@@ -20,7 +20,7 @@
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
-    <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
+    <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
     <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
         Scanner: 
