@@ -166,7 +166,7 @@ def _irradiationeventxraymechanicaldata(dataset,event):
 def _accumulatedmammo_update(dataset,event): # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
-    accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
+    # accummam = event.projection_xray_radiation_dose.accumxraydose_set.get().accummammographyxraydose_set.get()
     accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     accummams = accum.accummammographyxraydose_set.all()
     event_added = False

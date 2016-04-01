@@ -55,8 +55,8 @@
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.laterality }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.accumulated_average_glandular_dose }}</td>
+{#            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.laterality }}</td>#}
+{#            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.accumulated_average_glandular_dose }}</td>#}
 {% endif %}
         </tr>
 </table>
