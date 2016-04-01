@@ -39,7 +39,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
     patientatt = exam.patientstudymoduleattr_set.get()
     if height:
         if not patientatt.patient_size:
-            patientatt.patient_size = height
+            patientatt.patient_size = (height / 100.)
             if verbose:
                 if imp_log:
                     imp_log.file.open("ab")
@@ -50,10 +50,10 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size))
+                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, (patientatt.patient_size*100.)))
                 imp_log.file.close()
             else:
-                print "    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, patientatt.patient_size)
+                print "    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, (patientatt.patient_size*100.))
 
     if weight:
         if not patientatt.patient_weight:
@@ -186,14 +186,14 @@ def csv2db(*args, **kwargs):
     :type csvfile: str
     :param id: Accession number column header or header if -u or --si-uid is set. Quote if necessary.
     :type id: str
-    :param height: Patient height column header. Create if necessary, quote if necessary.
+    :param height: Patient height column header. Create if necessary, quote if necessary. Values in cm.
     :type height: str
-    :param weight: Patient weight column header. Create if necessary, quote if necessary.
+    :param weight: Patient weight column header. Create if necessary, quote if necessary. Values in kg.
     :type weight: str
 
     Example::
         
-        openrem_ptsizecsv.py -s MyRISExport.csv StudyInstanceUID HEIGHT weight
+        openrem_ptsizecsv.py -s MyRISExport.csv StudyInstanceUID height weight
 
     """
 
@@ -209,8 +209,8 @@ def csv2db(*args, **kwargs):
     parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
     parser.add_argument("csvfile", help="csv file containing the height and/or weight information and study identifier")
     parser.add_argument("id", help="Column title for the accession number or study instance UID")
-    parser.add_argument("height", help="Column title for the patient height (DICOM size)")
-    parser.add_argument("weight", help="Column title for the patient weight")
+    parser.add_argument("height", help="Column title for the patient height, values in cm")
+    parser.add_argument("weight", help="Column title for the patient weight, values in kg")
     args=parser.parse_args()
     
     os.environ['DJANGO_SETTINGS_MODULE'] = 'openrem.openremproject.settings'
