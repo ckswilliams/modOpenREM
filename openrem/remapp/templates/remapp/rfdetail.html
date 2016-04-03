@@ -80,6 +80,26 @@
                     <a class="btn btn-default btn-sm" role="button" id="skinDoseMapFullscreenBtn">Toggle fullscreen</a>
                 </div>
 
+                <div class="skinDoseMapInformation">
+                    <table>
+                        <tr>
+                            <td>Calculated peak skin dose:</td>
+                            <td><a id="maxDose" class="no-decoration">0.000</a> Gy</td>
+                        </tr>
+                        <tr>
+                            <td>Phantom dimensions:</td>
+                            <td><a id="phantomDimensions" class="no-decoration"></a> cm (HxWxD)</td>
+                        </tr>
+                        <tr>
+                            <td>Patient height: </td>
+                            <td><a id="patientHeight" class="no-decoration"></a> m</td>
+                        </tr>
+                        <tr>
+                            <td>Patient mass: </td>
+                            <td><a id="patientMass" class="no-decoration"></a> kg</td>
+                        </tr>
+                    </table>
+                </div>
                 <div class="colourScale">
                     <canvas id="colourScale" width="70" height="420"></canvas>
                 </div>
@@ -172,8 +192,6 @@
                     </script>
                 </div>
             </div>
-
-            Maximum dose in whole map: <a id="maxDose" class="no-decoration">0.000 Gy</a>
 
             <div id="skin_map_wwwl_controls">
                 <table>

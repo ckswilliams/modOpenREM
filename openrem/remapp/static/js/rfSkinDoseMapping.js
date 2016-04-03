@@ -240,7 +240,7 @@ function updateMinDisplayedDoseManual(minDisplayedDose) {
 function updateMaxDisplayedDoseManual(maxDisplayedDose) {
     maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-    skinDoseMapObj.updateMaxDisplayedDoseManual(maxDisplayedDose)
+    skinDoseMapObj.updateMaxDisplayedDoseManual(maxDisplayedDose);
     skinDoseMapObj.draw();
     if (skinDoseMapObj.showOverlay) skinDoseMapObj.drawOverlay();
 

@@ -44,7 +44,10 @@ $(document).ready(function() {
                 skinDoseMapGroupOrigWidth = $('#skinDoseMapGroup').width();
                 skinDoseMapGroupOrigHeight = $('#skinDoseMapGroup').height();
 
-                $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(3) + " Gy");
+                $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(3));
+                $('#phantomDimensions').html(json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth);
+                $('#patientHeight').html((json.patient_height/100).toFixed(2));
+                $('#patientMass').html(json.patient_mass.toFixed(1));
 
                 document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
                 document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
