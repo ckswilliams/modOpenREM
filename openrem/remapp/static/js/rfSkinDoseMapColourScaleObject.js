@@ -35,7 +35,7 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
         var imageData = this.colourScaleContext.getImageData(0, heightOffset / 2, this.colourScaleCanvas.width, scaleHeight);
 
         for (y = 0; y < scaleHeight; y++) {
-            for (x = 55; x < 70; x++) {
+            for (x = 0; x < 15; x++) {
                 fraction = y / scaleHeight;
                 colour = this.colourScale(1.0 - fraction).rgb();
                 this.setPixel(imageData, x, y, colour[0], colour[1], colour[2], 255);
@@ -44,11 +44,11 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
         i = 0;
         for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
-            for (x = 50; x < 55; x++) {
+            for (x = 15; x < 20; x++) {
                 this.setPixel(imageData, x, y, 0, 0, 0, 255);
             }
         }
-        for (x = 50; x < 55; x++) {
+        for (x = 15; x < 20; x++) {
             this.setPixel(imageData, x, scaleHeight - 1, 0, 0, 0, 255);
         }
         this.colourScaleContext.putImageData(imageData, 0, heightOffset / 2);
@@ -56,7 +56,7 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
         i = this.minDose;
         increment = (this.maxDose - this.minDose) / 10;
         for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
-            this.colourScaleContext.fillText(i.toFixed(3), 15, this.colourScaleCanvas.height - y - 7);
+            this.colourScaleContext.fillText(i.toFixed(this.decimalPlaces), 23, this.colourScaleCanvas.height - y - 7);
             i += increment;
         }
     }
@@ -66,7 +66,7 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
     function redrawValues() {
         var y, i, increment, heightOffset, scaleHeight;
 
-        this.colourScaleContext.clearRect(0, 0, 50, this.colourScaleCanvas.height);
+        this.colourScaleContext.clearRect(23, 0, 50, this.colourScaleCanvas.height);
 
         heightOffset = 20;
         scaleHeight = this.colourScaleCanvas.height - heightOffset;
@@ -76,14 +76,15 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
         i = this.minDose;
         increment = (this.maxDose - this.minDose) / 10;
         for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
-            this.colourScaleContext.fillText(i.toFixed(3), 15, this.colourScaleCanvas.height - y - 7);
+            this.colourScaleContext.fillText(i.toFixed(this.decimalPlaces), 23, this.colourScaleCanvas.height - y - 7);
             i += increment;
         }
     }
 
 
     this.initialise = initialise;
-    function initialise(minDose, maxDose, width, height) {
+    function initialise(minDose, maxDose, width, height, decimalPlaces) {
+        this.decimalPlaces = decimalPlaces;
         this.resizeColourScale(width, height);
 
         this.minDose = minDose;
@@ -102,4 +103,6 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
     this.minDose = 0.0;
     this.maxDose = 10.0;
+    
+    this.decimalPlaces = 3;
 }

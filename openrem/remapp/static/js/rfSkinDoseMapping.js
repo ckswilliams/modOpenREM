@@ -81,15 +81,15 @@ function reset() {
         skinDoseMap3dObj.draw();
     }
 
-    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
-    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
+    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
+    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
     document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 }
 
 
@@ -97,7 +97,7 @@ function updateWindowLevel(newWindowLevel) {
     newWindowLevel = parseFloat(newWindowLevel);
     if (newWindowLevel < 0) newWindowLevel = 0;
 
-    document.getElementById("currentWindowLevel").value = newWindowLevel.toFixed(3);
+    document.getElementById("currentWindowLevel").value = newWindowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowLevelSlider").value = newWindowLevel;
 
     skinDoseMapObj.updateWindowLevel(newWindowLevel);
@@ -115,15 +115,15 @@ function updateWindowLevel(newWindowLevel) {
     }
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 }
 
 
 function updateWindowWidth(newWindowWidth) {
     newWindowWidth = parseFloat(newWindowWidth);
-    document.getElementById("currentWindowWidth").value = newWindowWidth.toFixed(3);
+    document.getElementById("currentWindowWidth").value = newWindowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowWidthSlider").value = newWindowWidth;
 
     skinDoseMapObj.updateWindowWidth(newWindowWidth);
@@ -141,9 +141,9 @@ function updateWindowWidth(newWindowWidth) {
     }
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 }
 
 
@@ -164,15 +164,15 @@ function updateMinDisplayedDose(minDisplayedDose) {
     }
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
-    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
+    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
 
-    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
+    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
 }
 
@@ -194,15 +194,15 @@ function updateMaxDisplayedDose(maxDisplayedDose) {
     }
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
-    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
+    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
 
-    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
+    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
 }
 
@@ -224,15 +224,15 @@ function updateMinDisplayedDoseManual(minDisplayedDose) {
     }
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
-    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
+    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
 
-    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
+    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
 }
 
@@ -254,15 +254,15 @@ function updateMaxDisplayedDoseManual(maxDisplayedDose) {
     }
 
     document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
-    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
+    document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
     document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+    document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
-    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
+    document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
 
-    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
+    document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
 }
 
@@ -321,13 +321,13 @@ $("#skinDoseMap").on('mousedown', function (e) {
 
         document.getElementById("windowLevelSlider").value = newWL;
         document.getElementById("windowWidthSlider").value = newWW;
-        document.getElementById("currentWindowLevel").value = newWL.toFixed(3);
-        document.getElementById("currentWindowWidth").value = newWW.toFixed(3);
+        document.getElementById("currentWindowLevel").value = newWL.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
+        document.getElementById("currentWindowWidth").value = newWW.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
 
         document.getElementById("minDoseSlider").value = skinDoseMapObj.minDisplayedDose;
         document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDisplayedDose;
-        document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(3);
-        document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(3);
+        document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
+        document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDisplayedDose.toFixed(skinDoseMapColourScaleObj.decimalPlaces);
     }
 
     previousMousePosition = {
@@ -363,7 +363,7 @@ $('#skinDoseMap').mousemove(function (e) {
     var y = e.pageY - pos.y;
     var p = skinDoseMapObj.skinDoseMapContext.getImageData(x, y, 1, 1).data;
     var mag = skinDoseMapObj.mag;
-    var current_dose = skinDoseMapObj.skinDoseMap[Math.floor(y/mag) * Math.floor(this.width/mag) + Math.floor(x/mag)].toFixed(3) + " Gy";
+    var current_dose = skinDoseMapObj.skinDoseMap[Math.floor(y/mag) * Math.floor(this.width/mag) + Math.floor(x/mag)].toFixed(skinDoseMapColourScaleObj.decimalPlaces) + " Gy";
     $('[data-tooltip="skin_dose_map"]').qtip('option', 'content.text', current_dose);
 });
 

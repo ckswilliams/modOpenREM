@@ -34,23 +34,26 @@ $(document).ready(function() {
         success: function( json ) {
             if (isCanvasSupported()) {
                 skinDoseMapObj.initialise(json.skin_map, json.width, json.height, json.phantom_flat_dist, json.phantom_curved_dist);
+
+                var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 3;
+
                 $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + 'px');
                 $('#skinDoseMapGroup').height(skinDoseMapObj.skinDoseMapCanvas.height + 'px');
                 skinDoseMapObj.draw();
 
-                skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height);
+                skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height, decimalPlaces);
                 skinDoseMapColourScaleObj.draw();
 
                 skinDoseMapGroupOrigWidth = $('#skinDoseMapGroup').width();
                 skinDoseMapGroupOrigHeight = $('#skinDoseMapGroup').height();
 
-                $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(3));
+                $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(decimalPlaces));
                 $('#phantomDimensions').html(json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth);
                 $('#patientHeight').html((json.patient_height/100).toFixed(2));
                 $('#patientMass').html(json.patient_mass.toFixed(1));
 
-                document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(3);
-                document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(3);
+                document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(decimalPlaces);
+                document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(decimalPlaces);
 
                 document.getElementById("windowWidthSlider").max = skinDoseMapObj.windowWidth;
                 document.getElementById("windowLevelSlider").max = skinDoseMapObj.windowWidth;
@@ -61,12 +64,12 @@ $(document).ready(function() {
                 document.getElementById("minDoseSlider").min = skinDoseMapObj.minDose;
                 document.getElementById("minDoseSlider").max = skinDoseMapObj.maxDose;
                 document.getElementById("minDoseSlider").value = skinDoseMapObj.minDose;
-                document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDose.toFixed(3);
+                document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDose.toFixed(decimalPlaces);
 
                 document.getElementById("maxDoseSlider").min = skinDoseMapObj.minDose;
                 document.getElementById("maxDoseSlider").max = skinDoseMapObj.maxDose;
                 document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDose;
-                document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(3);
+                document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(decimalPlaces);
 
                 if (show3dSkinDoseMap) {
                     skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;

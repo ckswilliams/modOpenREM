@@ -177,9 +177,10 @@ div.skinDoseMapFullscreenBtn {
 div.skinDoseMapInformation {
   position: absolute;
   padding: 0px;
-  top: -7px;
+  top: -5px;
   left: 5px;
   z-index: 15;
+  font-size: x-small;
 }
 
 div.colourScale {
