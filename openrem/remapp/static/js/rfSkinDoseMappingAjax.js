@@ -37,8 +37,11 @@ $(document).ready(function() {
 
                 var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 3;
 
-                $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80 + 'px');
-                $('#skinDoseMapGroup').height(skinDoseMapObj.skinDoseMapCanvas.height + 'px');
+                $('#skinDoseMapGroup').prop({
+                    width: skinDoseMapObj.skinDoseMapCanvas.width + 80 + 'px',
+                    height: skinDoseMapObj.skinDoseMapCanvas.height + 'px'
+                });
+
                 skinDoseMapObj.draw();
 
                 skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height, decimalPlaces);
@@ -52,24 +55,35 @@ $(document).ready(function() {
                 $('#patientHeight').html((json.patient_height/100).toFixed(2));
                 $('#patientMass').html(json.patient_mass.toFixed(1));
 
-                document.getElementById("currentWindowWidth").value = skinDoseMapObj.windowWidth.toFixed(decimalPlaces);
-                document.getElementById("currentWindowLevel").value = skinDoseMapObj.windowLevel.toFixed(decimalPlaces);
+                $('input[name=windowWidthSlider]').prop({
+                    'max': skinDoseMapObj.windowWidth,
+                    'step': Math.pow(10, -decimalPlaces),
+                    'value': skinDoseMapObj.windowWidth
+                });
+                $('input[name=currentWindowWidth]').val(skinDoseMapObj.windowWidth.toFixed(decimalPlaces));
 
-                document.getElementById("windowWidthSlider").max = skinDoseMapObj.windowWidth;
-                document.getElementById("windowLevelSlider").max = skinDoseMapObj.windowWidth;
+                $('input[name=windowLevelSlider]').prop({
+                    'max': skinDoseMapObj.windowWidth,
+                    'step': Math.pow(10, -decimalPlaces),
+                    'value': skinDoseMapObj.windowLevel
+                });
+                $('input[name=currentWindowLevel]').val(skinDoseMapObj.windowLevel.toFixed(decimalPlaces));
 
-                document.getElementById("windowWidthSlider").value = skinDoseMapObj.windowWidth;
-                document.getElementById("windowLevelSlider").value = skinDoseMapObj.windowLevel;
+                $('input[name=minDoseSlider]').prop({
+                    'min': skinDoseMapObj.minDose,
+                    'max': skinDoseMapObj.maxDose,
+                    'step': Math.pow(10, -decimalPlaces),
+                    'value': skinDoseMapObj.minDose
+                });
+                $('input[name=currentMinDisplayedDose]').val(skinDoseMapObj.minDose.toFixed(decimalPlaces));
 
-                document.getElementById("minDoseSlider").min = skinDoseMapObj.minDose;
-                document.getElementById("minDoseSlider").max = skinDoseMapObj.maxDose;
-                document.getElementById("minDoseSlider").value = skinDoseMapObj.minDose;
-                document.getElementById("currentMinDisplayedDose").value = skinDoseMapObj.minDose.toFixed(decimalPlaces);
-
-                document.getElementById("maxDoseSlider").min = skinDoseMapObj.minDose;
-                document.getElementById("maxDoseSlider").max = skinDoseMapObj.maxDose;
-                document.getElementById("maxDoseSlider").value = skinDoseMapObj.maxDose;
-                document.getElementById("currentMaxDisplayedDose").value = skinDoseMapObj.maxDose.toFixed(decimalPlaces);
+                $('input[name=maxDoseSlider]').prop({
+                    'min': skinDoseMapObj.minDose,
+                    'max': skinDoseMapObj.maxDose,
+                    'step': Math.pow(10, -decimalPlaces),
+                    'value': skinDoseMapObj.maxDose
+                });
+                $('input[name=currentMaxDisplayedDose]').val(skinDoseMapObj.maxDose.toFixed(decimalPlaces));
 
                 if (show3dSkinDoseMap) {
                     skinDoseMap3dObj.canvas.width = skinDoseMapObj.skinDoseMapCanvas.width;
