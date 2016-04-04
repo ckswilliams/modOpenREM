@@ -124,6 +124,15 @@ function skinDoseMap3dPersonObject() {
     }
 
 
+    this.reset = reset;
+    function reset() {
+        this.mesh.position.set( 0, 0, 0 );
+        this.mesh.rotation.set( 0, 0, 0 );
+        this.mesh.scale.set( 1, 1, 1 );
+        this.mesh.updateMatrix();
+    }
+
+
     this.phantomHeight = 10;
 
     this.camera = 0;

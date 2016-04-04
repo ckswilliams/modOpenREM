@@ -79,6 +79,9 @@ function reset() {
         skinDoseMap3dObj.windowWidth = skinDoseMapObj.windowWidth;
         skinDoseMap3dObj.windowLevel = skinDoseMapObj.windowLevel;
         skinDoseMap3dObj.draw();
+
+        skinDoseMap3dObj.reset();
+        skinDoseMap3dPersonObj.reset();
     }
 
     $('input[name=currentWindowLevel]').val(skinDoseMapObj.windowLevel.toFixed(skinDoseMapColourScaleObj.decimalPlaces));

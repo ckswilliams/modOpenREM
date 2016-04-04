@@ -239,6 +239,20 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     }
 
 
+    this.reset = reset;
+    function reset() {
+        this.mesh.position.set( 0, 0, 0 );
+        this.mesh.rotation.set( 0, 0, 0 );
+        this.mesh.scale.set( 1, 1, 1 );
+        this.mesh.updateMatrix();
+
+        this.camera.position.x = this.phantomHeight;
+        this.camera.position.y = 0;
+        this.camera.position.z = 100;
+        this.camera.lookAt( this.scene.position );
+    }
+
+
     this.animate = animate;
     function animate() {
         requestAnimationFrame(animate);
