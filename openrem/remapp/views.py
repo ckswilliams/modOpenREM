@@ -508,7 +508,7 @@ def rf_detail_view_skin_map(request, pk=None):
             pat_mass = 73.2
 
         try:
-            pat_height = float(study.patientstudymoduleattr_set.get().patient_size)
+            pat_height = float(study.patientstudymoduleattr_set.get().patient_size) * 100
         except ValueError:
             pat_height = 178.6
         except TypeError:
