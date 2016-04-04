@@ -38,6 +38,7 @@ $(document).ready(function() {
                 var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 3;
 
                 $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
+                $('#openskin_info').width($('#skinDoseMapGroup').width());
 
                 skinDoseMapObj.draw();
 

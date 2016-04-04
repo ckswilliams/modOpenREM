@@ -200,6 +200,12 @@ div.colour_scale_selection {
   z-index: 20 !important;
 }
 
+div.openskin_info {
+  font-size: x-small;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
 input.skinMapControls {
   border: none;
   text-align: right;

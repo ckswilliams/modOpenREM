@@ -50,7 +50,7 @@
         <div class="col-md-7" id="skinDoseMapContainer">
             <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
-            <h2>OpenSkin radiation exposure incidence map</h2>
+            <h2>Radiation exposure incidence map</h2>
 
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
 
@@ -226,6 +226,9 @@
                     </tr>
                 </table>
             </div>
+
+            <div class="openskin_info" id="openskin_info">Skin dose maps are calculated using openSkin, and are for indication only: openSkin calculations have not
+            been validated. Contributions are welcome, see <a href="http://bitbucket.org/openskin/openskin">openSkin website</a> for details.</div>
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapColourScaleObject.js"></script>
             <script src="{{ STATIC_URL }}js/rfSkinDoseMapObject.js"></script>
