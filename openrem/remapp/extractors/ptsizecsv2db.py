@@ -31,6 +31,7 @@
 
 
 def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
+    from decimal import *
 
     imp_log = None
     if 'imp_log' in kwargs:
@@ -39,7 +40,7 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
     patientatt = exam.patientstudymoduleattr_set.get()
     if height:
         if not patientatt.patient_size:
-            patientatt.patient_size = (height / 100.)
+            patientatt.patient_size = (Decimal(height) / Decimal(100.))
             if verbose:
                 if imp_log:
                     imp_log.file.open("ab")
@@ -50,10 +51,10 @@ def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *arg
         elif verbose:
             if imp_log:
                 imp_log.file.open("ab")
-                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, (patientatt.patient_size*100.)))
+                imp_log.write("\r\n    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (patientatt.patient_size*Decimal(100.))))
                 imp_log.file.close()
             else:
-                print "    Height of {0} cm not inserted as {1:.0f} cm already in the database".format(height, (patientatt.patient_size*100.))
+                print "    Height of {0} cm not inserted as {1:.2f} cm already in the database".format(height, (patientatt.patient_size*Decimal(100.)))
 
     if weight:
         if not patientatt.patient_weight:
