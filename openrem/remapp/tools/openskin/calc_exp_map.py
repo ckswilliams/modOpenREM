@@ -64,16 +64,3 @@ class CalcExpMap(object):
                                                  self.table_length, self.table_width,
                                                  self.matt_trans * self.table_trans,
                                                  self.table_thick + self.matt_thick))
-
-    def get_map(self):
-        # not sure about how this works
-        # DJP: I'm not sure that this is needed, as the dose map is
-        # stored at self.my_dose.totalDose already.
-        pass
-
-    def get_results(self):
-        # not sure about this either
-        # DJP: I'm not interested in this at the moment, as I can
-        # obtain the info that I need from the self.my_dose.totalDose
-        # array.
-        pass

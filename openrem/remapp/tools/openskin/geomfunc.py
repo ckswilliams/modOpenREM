@@ -1,5 +1,5 @@
 """ 
-    Copyright 2015 Jonathan Cole
+    Copyright 2016 Jonathan Cole
 
     This program is free software: you can redistribute it and/or modify
        it under the terms of the GNU General Public License as published by
@@ -283,3 +283,63 @@ def rotateRayY(segment1, angle):
     newSource = np.array([myX, myY, myZ])
     newRay = Segment_3(newSource + isocentre, isocentre)
     return newRay
+    
+    
+def getTableTrans(kV, Cu):
+    """ This function gives just the table transmission factor based
+    on measurements made at the Royal Free Hospital on a Siemens Artis Zeego
+    in early 2016.
+
+    Args:
+        kV: The peak kilovoltage
+        Cu: the added copper filtration. In addition, 3.1 mm Al is assumed by default
+
+    Returns:
+        A transmission factor for the table without a mattress.
+    """
+    kVTable = np.array([60, 80, 110, 125])
+    CuTable = np.array([0, 0.1, 0.2, 0.3, 0.6, 0.9])
+
+    lookup_kV = find_nearest(kVTable, kV)
+    lookup_Cu = find_nearest(CuTable, Cu)
+
+    lookupArray = np.array([
+        [0.80, 0.82, 0.82, 0.82],
+        [0.84, 0.84, 0.86, 0.87],
+        [0.86, 0.86, 0.88, 0.88],
+        [0.84, 0.86, 0.88, 0.89],
+        [0.86, 0.87, 0.88, 0.90],
+        [0.86, 0.87, 0.89, 0.90]   
+    ])
+
+    return lookupArray[lookup_Cu, lookup_kV]
+
+def getTableMattressTrans(kV, Cu):
+    """ This function gives a table and mattress transmission factor based
+    on measurements made at the Royal Free Hospital on a Siemens Artis Zeego
+    in early 2016.
+
+    Args:
+        kV: The peak kilovoltage
+        Cu: the added copper filtration. In addition, 3.1 mm Al is assumed by default
+
+    Returns:
+        A combined transmission factor for table and mattress.
+    """
+    kVTable = np.array([60, 80, 110, 125])
+    CuTable = np.array([0, 0.1, 0.2, 0.3, 0.6, 0.9])
+
+    lookup_kV = find_nearest(kVTable, kV)
+    lookup_Cu = find_nearest(CuTable, Cu)
+
+    lookupArray = np.array([
+        [0.66, 0.68, 0.71, 0.72],
+        [0.73, 0.75, 0.78, 0.78],
+        [0.75, 0.78, 0.81, 0.81],
+        [0.76, 0.79, 0.83, 0.83],
+        [0.79, 0.81, 0.85, 0.85],
+        [0.80, 0.82, 0.85, 0.86]   
+    ])
+
+    return lookupArray[lookup_Cu, lookup_kV]
+
