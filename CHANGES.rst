@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b13 (2016-03-18)
 ---------------------
 
+* `#376`_  Corrected an ill-advised model change
 * `#374`_  CTDIw phantom size now displayed in CT detail view
 * `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
   changed. Ordering by Accumulated AGD now creates an entry per accumulated AGD, one per breast
@@ -25,6 +26,7 @@ OpenREM version history
 * `#351`_  Charts: simplified chart JavaScript and Python code
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
+* `#345`_  CSV size imports in cm are now stored as m in the database. Interface display of size corrected.
 * `#343`_  Charts: user can now specify number of histogram bins in the range of 2 to 40
 * `#342`_  Charts: improved the colours used for plotting chart data
 * `#340`_  Fixed store failure to save due to illegal values in Philips private tags, improved exception code
