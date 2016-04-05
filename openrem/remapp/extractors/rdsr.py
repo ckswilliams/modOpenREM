@@ -454,18 +454,18 @@ def _accumulatedxraydose(dataset,proj): # TID 10002
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont,accum)
-    if ((proj.acquisition_device_type and ('Fluoroscopy-Guided' in proj.acquisition_device_type.code_meaning)) or
-        (proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type)
+    if ((proj.acquisition_device_type_cid and ('Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
+        (proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
         ):
         _accumulatedprojectionxraydose(dataset,accum)
     if proj.procedure_reported and (proj.procedure_reported.code_meaning == 'Mammography'):
         _accumulatedmammoxraydose(dataset,accum)
-    if ((proj.acquisition_device_type and ('Integrated' in proj.acquisition_device_type.code_meaning)) or
-        (proj.acquisition_device_type and ('Fluoroscopy-Guided' in proj.acquisition_device_type.code_meaning)) or
-        (proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type)
+    if ((proj.acquisition_device_type_cid and ('Integrated' in proj.acquisition_device_type_cid.code_meaning)) or
+        (proj.acquisition_device_type_cid and ('Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
+        (proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
         ):
         _accumulatedintegratedprojectionradiographydose(dataset,accum)
-    if (proj.acquisition_device_type and ('Cassette-based' in proj.acquisition_device_type.code_meaning)):
+    if (proj.acquisition_device_type_cid and ('Cassette-based' in proj.acquisition_device_type_cid.code_meaning)):
         _accumulatedcassettebasedprojectionradiographydose(dataset,accum)
     accum.save()
 
@@ -615,7 +615,7 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
             elif 'Projection X-Ray' in proj.procedure_reported.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF,DX'
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'acquisition device type':
-            proj.acquisition_device_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
+            proj.acquisition_device_type_cid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'start of x-ray irradiation':
             proj.start_of_xray_irradiation = make_date_time(cont.DateTime)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'end of x-ray irradiation':
