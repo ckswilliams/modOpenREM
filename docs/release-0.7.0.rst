@@ -22,13 +22,14 @@ Headline changes
     * System can now accept non-ASCII characters in protocol names etc
     * Menus have been tidied up
 
-* Charts
+* Charts and interface
 
     * Bar chart data points sorted by frequency, value or name in ascending or descending order
     * New chart of DLP per requested procedure type and requested procedure frequency
     * Chart data returned using AJAX to make pages more responsive
     * Chart plotting options available via Config menu
     * Charts can now be made full-screen
+    * CTDIw phantom size is displayed with the CTDIvol measurement on the CT study detail page
 
 * DICOM Networking
 
@@ -91,6 +92,15 @@ Updates since beta 12
 * Added study description to mammography exports
 * Philips Allura fluoro RDSRs import fixed
 * Bi-plane fluoro exports fixed
+
+Updates since beta 13
+=====================
+**Requires database migration**
+
+* Mammography RDSRs and images now record an Accumulated AGD per breast
+* Mammography RDSRs and images now record mA in the same way as each other
+* CTDIw phantom size now displayed in the detail view
+* Patient size imports from CSV are now assumed to be cm and converted to m to store. Interface now assumes m
 
 ****************************
 Upgrading from version 0.6.0
