@@ -429,6 +429,20 @@ document.getElementById('skinDoseMapFullscreenBtn').addEventListener('click', fu
 
 
 function isCanvasSupported(){
-  var elem = document.createElement('canvas');
-  return !!(elem.getContext && elem.getContext('2d'));
+    var elem = document.createElement('canvas');
+    return !!(elem.getContext && elem.getContext('2d'));
+}
+
+
+function switch2d3dSkinDoseMap() {
+    $('#save2dSkinMap').toggle();
+    $('#save3dSkinMap').toggle();
+    $('#skinDoseMap3d').toggle();
+    $('#skinDoseMap').toggle();
+
+    $('#skinDoseMapInformation').toggleClass('whiteText');
+    $('#maxDose').toggleClass('whiteText');
+    $('#phantomDimensions').toggleClass('whiteText');
+    $('#patientHeight').toggleClass('whiteText');
+    $('#patientMass').toggleClass('whiteText');
 }
