@@ -532,23 +532,23 @@ def rf_detail_view_skin_map(request, pk=None):
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position:
                 delta_x = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position) / 10.0
             else:
-                delta_x = 0
+                delta_x = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position:
                 delta_y = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position) / 10.0
             else:
-                delta_y = 0
+                delta_y = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position:
                 delta_z = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position) / 10.0
             else:
-                delta_z = 0
+                delta_z = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle:
                 angle_x = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle)
             else:
-                angle_x = 0
+                angle_x = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle:
                 angle_y = float(irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle)
             else:
-                angle_y = 0
+                angle_y = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter:
                 d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter) / 10.0 - 15.0
             else:
