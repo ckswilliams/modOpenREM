@@ -495,10 +495,19 @@ def rf_detail_view_skin_map(request, pk=None):
 
     # Check to see if there is already a skin map pickle with the same study ID.
     skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
-    if os.path.exists(skin_map_path):
-        return_structure = pickle.load(open(skin_map_path, 'rb'))
 
-    else:
+    from remapp.version import __skin_map_version__
+    loaded_existing_data = False
+    if os.path.exists(skin_map_path):
+        existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+        try:
+            if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
+                return_structure = existing_skin_map_data
+                loaded_existing_data = True
+        except AttributeError:
+            pass
+
+    if not loaded_existing_data:
         # Calculate skin dose map.
         try:
             pat_mass = float(study.patientstudymoduleattr_set.get().patient_weight)
@@ -598,7 +607,8 @@ def rf_detail_view_skin_map(request, pk=None):
             'phantom_flat_dist': my_exp_map.phantom.phantom_flat_dist,
             'phantom_curved_dist': my_exp_map.phantom.phantom_curved_dist,
             'patient_height': pat_height,
-            'patient_mass': pat_mass
+            'patient_mass': pat_mass,
+            'skin_map_version': __skin_map_version__
         }
 
         # Save the return_structure as a pickle in a skin_maps sub-folder of the MEDIA_ROOT folder
