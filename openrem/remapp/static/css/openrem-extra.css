@@ -183,6 +183,14 @@ div.skinDoseMapInformation {
   font-size: x-small;
 }
 
+.whiteText {
+  color: white;
+}
+
+a.whiteText {
+  color: white;
+}
+
 div.colourScale {
   position: absolute;
   padding: 0px;
