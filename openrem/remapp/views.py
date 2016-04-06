@@ -504,7 +504,7 @@ def rf_detail_view_skin_map(request, pk=None):
             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
                 return_structure = existing_skin_map_data
                 loaded_existing_data = True
-        except AttributeError:
+        except KeyError:
             pass
 
     if not loaded_existing_data:
