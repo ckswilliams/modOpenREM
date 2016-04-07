@@ -571,10 +571,13 @@ def rf_detail_view_skin_map(request, pk=None):
                 kvp = float(irrad.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
             else:
                 kvp = None
-            if irrad.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum:
-                filter_cu = float(irrad.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum)
-            else:
-                filter_cu = 0.0
+
+            filter_cu = 0.0
+            if irrad.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                for xray_filter in irrad.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                    if xray_filter.xray_filter_material.code_value == 'C-127F9':
+                        filter_cu += float(xray_filter.xray_filter_thickness_minimum)
+
             if irrad.irradiation_event_type:
                 run_type = str(irrad.irradiation_event_type)
             else:
