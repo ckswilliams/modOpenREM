@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0b13 (2016-03-18)
+0.7.0b14 (2016-04-07)
 ---------------------
 
 * `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
