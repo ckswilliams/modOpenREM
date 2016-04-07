@@ -92,3 +92,6 @@ body {
     border: 1px solid #000;
 }
 
+.status-red {
+  color: #d43f3a;
+}
