@@ -565,8 +565,8 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-mg', action="store_true", help='Query for mammography studies')
     parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies')
     parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies')
-    parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyy-mm-dd')
-    parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyy-mm-dd')
+    parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyyy-mm-dd')
+    parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyyy-mm-dd')
     parser.add_argument('-e', '--desc_exclude',
                         help='Terms to exclude in study description, comma separated, quote whole string',
                         metavar='string')

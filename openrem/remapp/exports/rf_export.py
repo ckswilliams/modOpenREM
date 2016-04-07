@@ -56,7 +56,6 @@ def _create_sheets(book, protocolslist, protocolheaders):
                 'count':0,
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column('G:G', 10) # Date column
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -73,6 +72,46 @@ def _get_db_value(qs, location):
         return v
     except:
         pass
+
+
+def _get_accumulated_data(accumXrayDose):
+    from django.core.exceptions import ObjectDoesNotExist
+    from remapp.tools.get_values import return_for_export
+    accum = {}
+    accum['plane'] = accumXrayDose.acquisition_plane.code_meaning
+    try:
+        accum['dose_area_product_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+        accum['dose_rp_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_rp_total')
+        accum['reference_point_definition'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+        if not accum['reference_point_definition']:
+            accum['reference_point_definition'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition')
+    except ObjectDoesNotExist:
+        accum['dose_area_product_total'] = None
+        accum['dose_rp_total'] = None
+        accum['reference_point_definition_code'] = None
+    try:
+        accum['fluoro_dose_area_product_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_area_product_total')
+        accum['fluoro_dose_rp_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_rp_total')
+        accum['total_fluoro_time'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'total_fluoro_time')
+        accum['acquisition_dose_area_product_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_area_product_total')
+        accum['acquisition_dose_rp_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_rp_total')
+        accum['total_acquisition_time'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'total_acquisition_time')
+    except ObjectDoesNotExist:
+        accum['fluoro_dose_area_product_total'] = None
+        accum['fluoro_dose_rp_total'] = None
+        accum['total_fluoro_time'] = None
+        accum['acquisition_dose_area_product_total'] = None
+        accum['acquisition_dose_rp_total'] = None
+        accum['total_acquisition_time'] = None
+
+    try:
+        accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.all()
+    except ObjectDoesNotExist:
+        accum['eventcount'] = None
+    else:
+        accum['eventcount'] = str(accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.filter(acquisition_plane__code_meaning__exact = accum['plane']).count())
+
+    return accum
 
 
 def _rf_common_get_data(source, pid=None, name=None, patid=None):
@@ -127,48 +166,6 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         patient_weight = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_weight')
 
     try:
-        source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
-    except ObjectDoesNotExist:
-        dose_area_product_total = None
-        dose_rp_total = None
-    else:
-        dose_area_product_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
-            'dose_area_product_total')
-        dose_rp_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
-            'dose_rp_total')
-
-    try:
-        source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get()
-    except ObjectDoesNotExist:
-        fluoro_dose_area_product_total = None
-        fluoro_dose_rp_total = None
-        total_fluoro_time = None
-        acquisition_dose_area_product_total = None
-        acquisition_dose_rp_total = None
-        total_acquisition_time = None
-    else:
-        fluoro_dose_area_product_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'fluoro_dose_area_product_total')
-        fluoro_dose_rp_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'fluoro_dose_rp_total')
-        total_fluoro_time = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'total_fluoro_time')
-        acquisition_dose_area_product_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'acquisition_dose_area_product_total')
-        acquisition_dose_rp_total = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'acquisition_dose_rp_total')
-        total_acquisition_time = return_for_export(
-            source.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumprojxraydose_set.get(),
-            'total_acquisition_time')
-
-    try:
         source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
     except ObjectDoesNotExist:
         eventcount = None
@@ -204,16 +201,25 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         not_patient_indicator,
         return_for_export(source, 'study_description'),
         return_for_export(source, 'requested_procedure_code_meaning'),
-        dose_area_product_total,
-        dose_rp_total,
-        fluoro_dose_area_product_total,
-        fluoro_dose_rp_total,
-        total_fluoro_time,
-        acquisition_dose_area_product_total,
-        acquisition_dose_rp_total,
-        total_acquisition_time,
-        eventcount,
     ]
+    for plane in source.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+        accum = _get_accumulated_data(plane)
+        examdata += [
+            accum['dose_area_product_total'],
+            accum['dose_rp_total'],
+            accum['fluoro_dose_area_product_total'],
+            accum['fluoro_dose_rp_total'],
+            accum['total_fluoro_time'],
+            accum['acquisition_dose_area_product_total'],
+            accum['acquisition_dose_rp_total'],
+            accum['total_acquisition_time'],
+            accum['eventcount'],
+        ]
+        if 'Single' in accum['plane']:
+            examdata += [
+                '','','','','','','','',''
+            ]
+
     return examdata
 
 
@@ -246,15 +252,24 @@ def _rf_common_headers(pid=None, name=None, patid=None):
         'Test patient?',
         'Study description',
         'Requested procedure',
-        'DAP total (Gy.m^2)',
-        'Dose RP total',
-        'Fluoro DAP total',
-        'Fluoro dose RP total',
-        'Fluoro time total',
-        'Acquisition DAP total',
-        'Acquisition dose RP total',
-        'Acquisition time total',
-        'Number of events',
+        'A DAP total (Gy.m^2)',
+        'A Dose RP total',
+        'A Fluoro DAP total',
+        'A Fluoro dose RP total',
+        'A Fluoro time total',
+        'A Acquisition DAP total',
+        'A Acquisition dose RP total',
+        'A Acquisition time total',
+        'A Number of events',
+        'B DAP total (Gy.m^2)',
+        'B Dose RP total',
+        'B Fluoro DAP total',
+        'B Fluoro dose RP total',
+        'B Fluoro time total',
+        'B Acquisition DAP total',
+        'B Acquisition dose RP total',
+        'B Acquisition time total',
+        'B Number of events',
     ]
     return commonheaders
 
@@ -265,7 +280,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     :param filterdict: Query parameters from the RF filtered page URL.
     :type filterdict: HTTP get
-    
+
     """
 
     import os, sys, datetime
@@ -326,7 +341,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         date_column += 1
     wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
     if pid and (name or patid):
-        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
+        wsalldata.set_column(date_column+1, date_column+1, 10) # Date of birth column, exported if either pid option is chosen
 
     ##################
     # All data sheet
@@ -344,8 +359,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         inst = IrradEventXRayData.objects.filter(projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__exact=studyiuid)
 
         num_groups_this_exam = 0
-        while inst:
+        while inst:  # ie while there are events still left that haven't been matched into a group
             num_groups_this_exam += 1
+            plane = _get_db_value(_get_db_value(inst[0], "acquisition_plane"), "code_meaning")
             try:
                 inst[0].irradeventxraymechanicaldata_set.get()
             except ObjectDoesNotExist:
@@ -377,6 +393,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
 
             similarexposures = inst
+            if plane:
+                similarexposures = similarexposures.filter(
+                    acquisition_plane__code_meaning__exact = plane)
             if anglei:
                 similarexposures = similarexposures.filter(
                     irradeventxraymechanicaldata__positioner_primary_angle__range=(float(anglei) - angle_range, float(anglei) + angle_range))
@@ -443,6 +462,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 event_type,
                 protocol,
                 str(similarexposures.count()),
+                str(plane),
                 str(pulse_rate),
                 str(fieldsize),
                 filter_material,
@@ -488,6 +508,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'G' + str(h+1) + ' Type',
             'G' + str(h+1) + ' Protocol',
             'G' + str(h+1) + ' No. exposures',
+            'G' + str(h+1) + ' Plane',
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
             'G' + str(h+1) + ' Filter material',
@@ -518,7 +539,14 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'G' + str(h+1) + ' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (31 * num_groups_max + 23 - 1)
+    common_header_columns = 32
+    if pid and name:
+        common_header_columns += 1
+    if pid and patid:
+        common_header_columns += 1
+    if pid and (name or patid):
+        common_header_columns += 1
+    numcolumns = (31 * (num_groups_max + 1) + common_header_columns)
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
@@ -545,6 +573,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         'Time',
         'Type',
         'Protocol',
+        'Plane',
         'Pulse rate',
         'Field size',
         'Filter material',
@@ -583,6 +612,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     str(event.date_time_started),
                     event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
+                    event.acquisition_plane.code_meaning,
                     str(event.irradeventxraysourcedata_set.get().pulse_rate),
                     str(event.irradeventxraysourcedata_set.get().ii_field_size),
                     filter_material,
@@ -597,12 +627,18 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     str(event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle),
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
-        tabcolumns = (37)
+        tabcolumns = 49
+        if pid and name:
+            tabcolumns += 1
+        if pid and patid:
+            tabcolumns += 1
+        if pid and (name or patid):
+            tabcolumns += 1
         tabrows = sheetlist[tab]['count']
         sheetlist[tab]['sheet'].autofilter(0,0,tabrows,tabcolumns)
         sheetlist[tab]['sheet'].set_column(date_column, date_column, 10) # allow date to be displayed.
         if pid and (name or patid):
-            sheetlist[tab]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
+            sheetlist[tab]['sheet'].set_column(date_column+1, date_column+1, 10) # DOB column
 
     # Populate summary sheet
     tsk.progress = 'Now populating the summary sheet...'
@@ -622,7 +658,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
     toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = 'OpenREM is copyright 2015 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    linetwostring = 'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 
@@ -685,6 +721,258 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
 
 @shared_task
+def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
+    """Export filtered fluoro database data to a single-sheet CSV file.
+
+    :param request: Query parameters from the fluoro filtered page URL.
+    :type request: HTTP get
+
+    """
+
+    import os, sys, datetime
+    from tempfile import TemporaryFile
+    from django.conf import settings
+    from django.core.files import File
+    from django.shortcuts import redirect
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+    from remapp.models import Exports
+    from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
+    from remapp.tools.get_values import return_for_export
+    from django.core.exceptions import ObjectDoesNotExist
+
+    tsk = Exports.objects.create()
+
+    tsk.task_id = exportFL2excel.request.id
+    tsk.modality = "RF"
+    tsk.export_type = "CSV export"
+    datestamp = datetime.datetime.now()
+    tsk.export_date = datestamp
+    tsk.progress = 'Query filters imported, task started'
+    tsk.status = 'CURRENT'
+    if pid and (name or patid):
+        tsk.includes_pid = True
+    else:
+        tsk.includes_pid = False
+    tsk.export_user_id = user
+    tsk.save()
+
+    try:
+        tmpfile = TemporaryFile()
+        writer = csv.writer(tmpfile)
+
+        tsk.progress = 'CSV file created'
+        tsk.save()
+    except:
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return redirect('/openrem/export/')
+
+    # Get the data!
+
+    if pid:
+        df_filtered_qs = RFFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    else:
+        df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+    e = df_filtered_qs.qs
+
+    tsk.progress = 'Required study filter complete.'
+    tsk.save()
+
+    numresults = e.count()
+
+    tsk.num_records = numresults
+    tsk.save()
+
+    headings = []
+    if pid and name:
+        headings += ['Patient name']
+    if pid and patid:
+        headings += ['Patient ID']
+    headings += [
+        'Manufacturer',
+        'Model name',
+        'Institution name',
+        'Display name',
+        'Accession number',
+        'Study date',
+    ]
+    if pid and (name or patid):
+        headings += [
+            'Date of birth',
+        ]
+    headings += [
+        'Patient age',
+        'Patient sex',
+        'Patient height',
+        'Patient mass (kg)',
+        'Not patient?',
+        'Study description',
+        'Physician',
+        'Operator',
+        'Number of events',
+        'Plane',
+        'DAP total (Gy.m2)',
+        'RP dose total (Gy)',
+        'Fluoro DAP total (Gy.m2)',
+        'Fluoro RP dose total (Gy)',
+        'Total fluoro time (ms)',
+        'Acquisition DAP total (Gy.m2)',
+        'Acquisition RP dose total (Gy)',
+        'Total acquisition time (ms)',
+        'RP definition',
+        'Plane (if bi-plane)',
+        'DAP total (Gy.m2)',
+        'RP dose total (Gy)',
+        'Fluoro DAP total (Gy.m2)',
+        'Fluoro RP dose total (Gy)',
+        'Total fluoro time (ms)',
+        'Acquisition DAP total (Gy.m2)',
+        'Acquisition RP dose total (Gy)',
+        'Total acquisition time (ms)',
+        'RP definition',
+    ]
+    writer.writerow(headings)
+    for i, exams in enumerate(e):
+
+        if pid and (name or patid):
+            try:
+                exams.patientmoduleattr_set.get()
+            except ObjectDoesNotExist:
+                patient_birth_date = None
+                if name:
+                    patient_name = None
+                if patid:
+                    patient_id = None
+            else:
+                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
+                if name:
+                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                if patid:
+                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
+
+        try:
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            manufacturer = None
+        else:
+            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().observercontext_set.get()
+        except ObjectDoesNotExist:
+            device_observer_name = None
+        else:
+            device_observer_name = return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name')
+
+        try:
+            exams.generalequipmentmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            institution_name = None
+            display_name = None
+        else:
+            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
+            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+
+        try:
+            exams.patientmoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_sex = None
+            not_patient = None
+        else:
+            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
+            not_patient = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
+
+        try:
+            exams.patientstudymoduleattr_set.get()
+        except ObjectDoesNotExist:
+            patient_age_decimal = None
+            patient_size = None
+            patient_weight = None
+        else:
+            patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
+            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
+            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+
+        try:
+            exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
+        except ObjectDoesNotExist:
+            count = None
+        else:
+            count = exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.count()
+
+        row = []
+        if pid and name:
+            row += [patient_name]
+        if pid and patid:
+            row += [patient_id]
+        row += [
+            manufacturer,
+            device_observer_name,
+            institution_name,
+            display_name,
+            exams.accession_number,
+            exams.study_date,
+        ]
+        if pid and (name or patid):
+            row += [
+                patient_birth_date,
+            ]
+        row += [
+            patient_age_decimal,
+            patient_sex,
+            patient_size,
+            patient_weight,
+            not_patient,
+            exams.study_description,
+            exams.performing_physician_name,
+            exams.operator_name,
+            count,
+        ]
+
+        for plane in exams.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+            accum = _get_accumulated_data(plane)
+            row += [
+                accum['plane'],
+                accum['dose_area_product_total'],
+                accum['dose_rp_total'],
+                accum['fluoro_dose_area_product_total'],
+                accum['fluoro_dose_rp_total'],
+                accum['total_fluoro_time'],
+                accum['acquisition_dose_area_product_total'],
+                accum['acquisition_dose_rp_total'],
+                accum['total_acquisition_time'],
+                accum['reference_point_definition'],
+            ]
+        writer.writerow(row)
+        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.save()
+
+
+    tsk.progress = 'All study data written.'
+    tsk.save()
+
+    csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+
+    try:
+        tsk.filename.save(csvfilename,File(tmpfile))
+    except OSError as e:
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+    except:
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = 'ERROR'
+        tsk.save()
+        return
+
+
+    tsk.status = 'COMPLETE'
+    tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
+    tsk.save()
+
+
+@shared_task
 def rfopenskin(studyid):
     """Export filtered RF database data to multi-sheet Microsoft XSLX files.
 
@@ -695,6 +983,7 @@ def rfopenskin(studyid):
 
     import sys, datetime
     from tempfile import TemporaryFile
+    from django.contrib import messages
     from django.core.files import File
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr

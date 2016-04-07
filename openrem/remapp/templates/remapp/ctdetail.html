@@ -20,7 +20,7 @@
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
     <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
-    <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:0 }} cm, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
+    <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
     <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
         Scanner: 
@@ -63,7 +63,14 @@
                 <tr>
                     <td rowspan="2">{{ event.acquisition_protocol }}</td>
                     <td rowspan="2">{{ event.ct_acquisition_type }}</td>
-                    <td rowspan="2">{{ event.mean_ctdivol|floatformat:2 }}</td>
+                    <td rowspan="2">
+                      {{ event.mean_ctdivol|floatformat:2 }}
+                      {% if event.ctdiw_phantom_type.code_value == "113691" %}
+                        (32 cm)
+                      {% elif event.ctdiw_phantom_type.code_value == "113690" %}
+                        (16 cm)
+                      {% endif %}
+                    </td>
                     <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>        
                     <td rowspan="2">{{ event.scanninglength_set.get.scanning_length|floatformat:0 }}</td>
                     {% if event.number_of_xray_sources < 2 %}
