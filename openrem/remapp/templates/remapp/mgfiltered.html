@@ -67,6 +67,7 @@
                                 </div>
                             </div>
                         {% endfor %}
+                    Caution: Ordering by AGD will duplicate bilateral studies in filtered list<br>
                     </table>
                     <input class="btn btn-default" type="submit" />
                 </form> 
@@ -90,7 +91,7 @@ $('.datepicker').datepicker({
 
     <table class="table table-bordered table-hover row-clickable">
         <tr>
-            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Laterality</th><th>Accumulated AGD (mGy)</th>
+            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Accumulated AGD</th>
             {% if admin.admingroup %}
             <th>Delete?</th>
             {% endif %}
@@ -128,14 +129,15 @@ $('.datepicker').datepicker({
                 </a>
             </td>
             <td>
-                <a href="/openrem/mg/{{ exam.id }}/">
-                    {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.laterality }}
-                </a>
-            </td>
-            <td>
-                <a href="/openrem/mg/{{ exam.id }}/">
-                    {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.accumulated_average_glandular_dose }}
-                </a>
+                {% for breast in exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all %}
+                    {% if breast.laterality.code_meaning == "Left breast" %}
+                        Left:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}&nbsp;mGy<br>
+                    {% elif breast.laterality.code_meaning == "Right breast" %}
+                        Right:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}&nbsp;mGy<br>
+                    {% elif breast.laterality.code_meaning == "Both breasts" %}
+                        Both:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}&nbsp;mGy<br>
+                    {% endif %}
+                {% endfor %}
             </td>
             {% if admin.admingroup %}
             <td>

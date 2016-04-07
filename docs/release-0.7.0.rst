@@ -22,24 +22,30 @@ Headline changes
     * System can now accept non-ASCII characters in protocol names etc
     * Menus have been tidied up
 
-* Charts
+* Charts and interface
 
     * Bar chart data points sorted by frequency, value or name in ascending or descending order
     * New chart of DLP per requested procedure type and requested procedure frequency
     * Chart data returned using AJAX to make pages more responsive
     * Chart plotting options available via Config menu
     * Charts can now be made full-screen
+    * CTDIw phantom size is displayed with the CTDIvol measurement on the CT study detail page
 
 * DICOM Networking
 
-    * Configuring and running DICOM Store SCP is now managed in the web interface
     * Query retrieve function is now built in to query PACS systems or modalities via the Import menu
+    * Configuring and running DICOM Store SCP is available and managed in the web interface, but not recommended
+    * Documentation improved
 
 * Imports
 
     * Mammography RDSRs import correctly
-    * Philips Allura fluoroscopy RDSRs import correctly
+    * Mammography imports from images **now create an accumulated AGD value per breast**
+    * Philips Allura fluoroscopy RDSRs import correctly, including calculating the exposure time
     * Bi-plane fluoroscopy imports can now be displayed in the web interface
+    * Patient height imports from csv **now convert from cm to m** - previously height was assumed to be cm and inserted
+      into database without change. Existing height data will remain as cm value for csv imports, and m value for RDSR
+      imports
 
 * Exports
 
@@ -88,6 +94,18 @@ Updates since beta 12
 * Philips Allura fluoro RDSRs import fixed
 * Bi-plane fluoro exports fixed
 
+Updates since beta 13
+=====================
+**Requires database migration**
+
+* Mammography RDSRs and images now record an Accumulated AGD per breast
+* Mammography RDSRs and images now record mA in the same way as each other
+* CTDIw phantom size now displayed in the detail view
+* Patient size imports from CSV are now assumed to be cm and converted to m to store. Interface now assumes m
+* Exposure time is now populated when not supplied for fluoro RDSRs
+* DICOM Store and QR documentation updated, but not complete. Forms and text changed to demote OpenREM native DICOM
+  Store and QR functionality
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
@@ -103,7 +121,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b13
+    pip install openrem==0.7.0b14
 
 In a shell/command window, move into the openrem folder:
 
@@ -158,7 +176,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b13
+    pip install openrem==0.7.0b14
 
 From the openrem folder (see above):
 

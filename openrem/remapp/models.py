@@ -85,6 +85,7 @@ class DicomStoreSCP(models.Model):
     status = models.CharField(max_length=64, blank=True, null=True)
     run = models.BooleanField(default=False)
     keep_alive = models.BooleanField(default=False, verbose_name="Should this server be kept auto-started and kept alive (using celery beat)")
+    controlled = models.BooleanField(default=False, verbose_name="Is this server controlled by OpenREM")
 
     def get_absolute_url(self):
         return reverse('dicom_summary')
@@ -406,7 +407,7 @@ class ProjectionXRayRadiationDose(models.Model):  # TID 10001
         ContextID, blank=True, null=True, related_name='tid10001_procedure')
     has_intent = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_intent')
-    acquisition_device_type = models.ForeignKey(ContextID, blank=True, null=True, related_name='tid10001_acqtype')
+    acquisition_device_type_cid = models.ForeignKey(ContextID, blank=True, null=True, related_name='tid10001_type')
     scope_of_accumulation = models.ForeignKey(
         ContextID, blank=True, null=True, related_name='tid10001_scope')
     xray_detector_data_available = models.ForeignKey(
