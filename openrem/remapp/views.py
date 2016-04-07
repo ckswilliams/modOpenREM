@@ -516,11 +516,17 @@ def rf_detail_view_skin_map(request, pk=None):
         except TypeError:
             pat_mass = 73.2
 
+        if pat_mass == 0.0:
+            pat_mass = 73.2
+
         try:
             pat_height = float(study.patientstudymoduleattr_set.get().patient_size) * 100
         except ValueError:
             pat_height = 178.6
         except TypeError:
+            pat_height = 178.6
+
+        if pat_height == 0.0:
             pat_height = 178.6
 
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D',
