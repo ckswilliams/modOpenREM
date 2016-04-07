@@ -33,8 +33,9 @@ Headline changes
 
 * DICOM Networking
 
-    * Configuring and running DICOM Store SCP is now managed in the web interface
     * Query retrieve function is now built in to query PACS systems or modalities via the Import menu
+    * Configuring and running DICOM Store SCP is available and managed in the web interface, but not recommended
+    * Documentation improved
 
 * Imports
 
@@ -102,6 +103,8 @@ Updates since beta 13
 * CTDIw phantom size now displayed in the detail view
 * Patient size imports from CSV are now assumed to be cm and converted to m to store. Interface now assumes m
 * Exposure time is now populated when not supplied for fluoro RDSRs
+* DICOM Store and QR documentation updated, but not complete. Forms and text changed to demote OpenREM native DICOM
+  Store and QR functionality
 
 ****************************
 Upgrading from version 0.6.0
