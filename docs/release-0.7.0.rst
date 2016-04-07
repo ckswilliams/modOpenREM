@@ -40,7 +40,7 @@ Headline changes
 
     * Mammography RDSRs import correctly
     * Mammography imports from images **now create an accumulated AGD value per breast**
-    * Philips Allura fluoroscopy RDSRs import correctly
+    * Philips Allura fluoroscopy RDSRs import correctly, including calculating the exposure time
     * Bi-plane fluoroscopy imports can now be displayed in the web interface
     * Patient height imports from csv **now convert from cm to m** - previously height was assumed to be cm and inserted
       into database without change. Existing height data will remain as cm value for csv imports, and m value for RDSR
@@ -101,6 +101,7 @@ Updates since beta 13
 * Mammography RDSRs and images now record mA in the same way as each other
 * CTDIw phantom size now displayed in the detail view
 * Patient size imports from CSV are now assumed to be cm and converted to m to store. Interface now assumes m
+* Exposure time is now populated when not supplied for fluoro RDSRs
 
 ****************************
 Upgrading from version 0.6.0
