@@ -128,6 +128,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     from django.db.models import Max
     max_events = e.aggregate(Max('projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames'))
+
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         headers += [
             'E' + str(h+1) + ' Protocol',
@@ -137,6 +138,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' mAs',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
+            'E' + str(h+1) + ' Filters',
+            'E' + str(h+1) + ' Filter thicknesses (mm)',
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
@@ -248,6 +251,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 average_xray_tube_current = None
                 exposure_time = None
                 mas = None
+                filters = None
+                filter_thicknesses = None
             else:
                 exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
                 average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
@@ -270,6 +275,38 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     else:
                         mas = None
 
+                try:
+                    s.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+                except ObjectDoesNotExist:
+                    filters = None
+                    filter_thicknesses = None
+                else:
+                    filters = ''
+                    filter_thicknesses = ''
+                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                        if 'Aluminum' in str(current_filter.xray_filter_material):
+                            filters += 'Al'
+                        elif 'Copper' in str(current_filter.xray_filter_material):
+                            filters += 'Cu'
+                        elif 'Tantalum' in str(current_filter.xray_filter_material):
+                            filters += 'Ta'
+                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
+                            filters += 'Mo'
+                        elif 'Rhodium' in str(current_filter.xray_filter_material):
+                            filters += 'Rh'
+                        elif 'Silver' in str(current_filter.xray_filter_material):
+                            filters += 'Ag'
+                        elif 'Niobium' in str(current_filter.xray_filter_material):
+                            filters += 'Nb'
+                        elif 'Europium' in str(current_filter.xray_filter_material):
+                            filters += 'Eu'
+                        elif 'Lead' in str(current_filter.xray_filter_material):
+                            filters += 'Pb'
+                        filters += ' | '
+                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
+                    filters = filters[:-3]
+                    filter_thicknesses = filter_thicknesses[:-3]
+
             try:
                 s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:
@@ -289,6 +326,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 mas,
                 average_xray_tube_current,
                 exposure_time,
+                filters,
+                filter_thicknesses,
                 exposure_index,
                 relative_xray_exposure,
                 cgycm2,
@@ -427,6 +466,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         'mAs',
         'mA',
         'Exposure time (ms)',
+        'Filters',
+        'Filter thicknesses (mm)',
         'Exposure index',
         'Relative x-ray exposure',
         'DAP (cGy.cm^2)',
@@ -498,6 +539,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' mAs',
             'E' + str(h+1) + ' mA',
             'E' + str(h+1) + ' Exposure time (ms)',
+            'E' + str(h+1) + ' Filters',
+            'E' + str(h+1) + ' Filter thicknesses (mm)',
             'E' + str(h+1) + ' Exposure index',
             'E' + str(h+1) + ' Relative x-ray exposure',
             'E' + str(h+1) + ' DAP (cGy.cm^2)',
@@ -631,6 +674,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 average_xray_tube_current = None
                 exposure_time = None
                 mas = None
+                filters = None
+                filter_thicknesses = None
             else:
                 exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
                 average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
@@ -652,6 +697,38 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
                     else:
                         mas = None
+
+                try:
+                    s.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+                except ObjectDoesNotExist:
+                    filters = None
+                    filter_thicknesses = None
+                else:
+                    filters = ''
+                    filter_thicknesses = ''
+                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                        if 'Aluminum' in str(current_filter.xray_filter_material):
+                            filters += 'Al'
+                        elif 'Copper' in str(current_filter.xray_filter_material):
+                            filters += 'Cu'
+                        elif 'Tantalum' in str(current_filter.xray_filter_material):
+                            filters += 'Ta'
+                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
+                            filters += 'Mo'
+                        elif 'Rhodium' in str(current_filter.xray_filter_material):
+                            filters += 'Rh'
+                        elif 'Silver' in str(current_filter.xray_filter_material):
+                            filters += 'Ag'
+                        elif 'Niobium' in str(current_filter.xray_filter_material):
+                            filters += 'Nb'
+                        elif 'Europium' in str(current_filter.xray_filter_material):
+                            filters += 'Eu'
+                        elif 'Lead' in str(current_filter.xray_filter_material):
+                            filters += 'Pb'
+                        filters += ' | '
+                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
+                    filters = filters[:-3]
+                    filter_thicknesses = filter_thicknesses[:-3]
 
             try:
                 s.irradeventxraydetectordata_set.get()
@@ -689,6 +766,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 mas,
                 average_xray_tube_current,
                 exposure_time,
+                filters,
+                filter_thicknesses,
                 exposure_index,
                 relative_xray_exposure,
                 cgycm2,
@@ -820,6 +899,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 average_xray_tube_current = None
                 exposure_time = None
                 mas = None
+                filters = None
+                filter_thicknesses = None
             else:
                 exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
                 average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
@@ -841,6 +922,38 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
                     else:
                         mas = None
+
+                try:
+                    s.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+                except ObjectDoesNotExist:
+                    filters = None
+                    filter_thicknesses = None
+                else:
+                    filters = ''
+                    filter_thicknesses = ''
+                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                        if 'Aluminum' in str(current_filter.xray_filter_material):
+                            filters += 'Al'
+                        elif 'Copper' in str(current_filter.xray_filter_material):
+                            filters += 'Cu'
+                        elif 'Tantalum' in str(current_filter.xray_filter_material):
+                            filters += 'Ta'
+                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
+                            filters += 'Mo'
+                        elif 'Rhodium' in str(current_filter.xray_filter_material):
+                            filters += 'Rh'
+                        elif 'Silver' in str(current_filter.xray_filter_material):
+                            filters += 'Ag'
+                        elif 'Niobium' in str(current_filter.xray_filter_material):
+                            filters += 'Nb'
+                        elif 'Europium' in str(current_filter.xray_filter_material):
+                            filters += 'Eu'
+                        elif 'Lead' in str(current_filter.xray_filter_material):
+                            filters += 'Pb'
+                        filters += ' | '
+                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
+                    filters = filters[:-3]
+                    filter_thicknesses = filter_thicknesses[:-3]
 
             try:
                 s.irradeventxraydetectordata_set.get()
@@ -877,6 +990,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 mas,
                 average_xray_tube_current,
                 exposure_time,
+                filters,
+                filter_thicknesses,
                 exposure_index,
                 relative_xray_exposure,
                 cgycm2,

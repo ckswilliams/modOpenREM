@@ -39,8 +39,8 @@
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumprojxraydose_set.get.dose_rp_total|floatformat:6 }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.convert_gym2_to_cgycm2|floatformat:1 }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}</td>
             <td>{{ exam.performing_physician_name }}</td>
 {% elif exam.modality_type == "DX" or exam.modality_type == "CR" %}
             <td>
@@ -55,10 +55,26 @@
                 {{ exam.accession_number }}
             </td>
             <td>{{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.laterality }}</td>
-            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.get.accumulated_average_glandular_dose }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all.0.laterality }}</td>
+            <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all.0.accumulated_average_glandular_dose }}</td>
 {% endif %}
         </tr>
+{% if exam.modality_type == "MG" %}
+        {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all.count < 2 %}
+            <tr></tr>
+        {% else %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all.1.laterality }}</td>
+                <td>{{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all.1.accumulated_average_glandular_dose }}</td>
+            </tr>
+        {% endif %}
+
+{% endif %}
 </table>
 
     Are you sure you want to delete the above study with UID {{ exam }}?

@@ -1,11 +1,10 @@
-$(function () {
-
-var chartAcqFrequency = new Highcharts.Chart({
+function chartFrequency(render_div, series_name) {
+    var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
-            renderTo: 'piechartProtocolDIV',
+            renderTo: render_div,
             plotBackgroundColor: null,
             plotShadow: false
         },
@@ -31,7 +30,7 @@ var chartAcqFrequency = new Highcharts.Chart({
         },
         series: [{
             type: 'pie',
-            name: 'Acquisition protocol frequency',
+            name: series_name,
             point: {
                 events: {
                     click: function(e) {
@@ -43,5 +42,4 @@ var chartAcqFrequency = new Highcharts.Chart({
             data: []
         }]
     });
-});
-
+}

@@ -2,206 +2,151 @@
 Charts
 ######
 
-Charts of the currently filtered data can now be shown for CT and radiographic
-data. The user can configure which plots are shown using the ``Chart options``
-on the CT and radiographic pages.
-
-*New in 0.7.0* Chart plotting options can also be configured by choosing the
-``Chart options`` item on the ``User options`` menu at the top of the OpenREM
-homepage.
-
-*New in 0.7.0* Individual charts can be displayed full-screen by clicking on
-the ``Toggle fullscreen`` button that is positioned below each chart.
-
-*New in 0.7.0* The chart plotting status is displayed on the OpenREM homepage.
-
-.. figure:: img/ChartCTSortingOptions.png
-   :width: 185px
-   :align: right
-   :height: 95px
-   :alt: OpenREM CT chart sorting options screenshot
-
-   CT chart sorting options
-
-*New in 0.7.0* The data in many of the charts can now be sorted interactively
-by the user by clicking on one of the sorting options below the individual chart:
-
-The user can set the default sorting type and direction by choosing the 
-``Chart options`` item from the ``User options`` menu on the OpenREM homepage.
-
-The charts are automatically updated to reflect any filters that the user
-applies to the data.
-
-*************
-Chart options
-*************
-
-*New in 0.7.0* Chart options can now be configured by choosing the
-``Chart options`` item from the ``User options`` menu on the OpenREM homepage:
-
-.. image:: img/ChartOptions.png
-   :width: 390px
-   :align: center
-   :height: 847px
-   :alt: OpenREM chart options screenshot
-
-They can also be set via the CT and Radiographic summary pages:
-
-.. image:: img/ChartCTOptions.png
-   :width: 321px
-   :align: center
-   :height: 443px
-   :alt: OpenREM CT chart options screenshot
-
-The first option, ``Plot charts?``, determines whether any plots are shown.
-This also controls whether the data for the plots is calculated by OpenREM.
-Some plot data is slow to calculate when there is a large amount of data: some
-users may prefer to leave ``Plot charts?`` off for performance reasons.
-``Plot charts?`` can be switched on and activated with a click of the
-``submit`` button after the data has been filtered.
-
-The user can switch off all chart plotting by clicking on the
-``Switch charts off`` link in the ``User options`` menu in the navigation bar
-at the top of any OpenREM page. Clicking on this link takes the user back to
-the home page.
-
-A user's chart options can also be configured by an administrator via OpenREM's
-user administration page.
-
 ***********
 Chart types
 ***********
 
-The available charts for CT data are as follows:
+============================================================
+1. Bar chart of average values across a number of categories
+============================================================
 
-    * Bar chart of mean DLP and CTDI\ :sub:`vol` for each acquisition protocol:
+.. figure:: img/ChartCTMeanDLP.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart of mean DLP per acquisition
 
-      .. image:: img/ChartCTMeanDLPandCTDI.png
-         :width: 831px
-         :align: center
-         :height: 765px
-         :alt: OpenREM chart of mean DLP and CTDI\ :sub:`vol` screenshot
+   Figure 1: Bar chart of mean DLP per acquisition
 
-      The tooltip of each bar shows the user the name of the protocol, the
-      number of acquisitions of that type and also the mean DLP and/or
-      CTDI\ :sub:`vol` value.
+An example of mean DAP per acquisition type is shown in figure 1.
 
-      Clicking on an individual bar takes the user to a histogram of DLP or
-      CTDI\ :sub:`vol` for that protocol. The tooltip for each histogram bar shows the
-      number of acquisitions. The DLP histogram tooltip also includes a link
-      that will take the user to the list of studies that contain the
-      acquisitions represented by that histogram bar:
+.. figure:: img/ChartCTSortingOptions.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart sorting options
 
-      .. image:: img/ChartCTHistogramDLP.png
-         :width: 833px
-         :align: center
-         :height: 768px
-         :alt: OpenREM histogram of acquisition DLP screenshot
+   Figure 2: Bar chart sorting options
 
-    * Pie chart of the frequency of each acquisition protocol. Clicking on a
-      segment of the pie chart takes the user to the list of studies that
-      contain the acquisitions in that segment.
+Below each bar chart there are options to sort the order of the data. This can
+be ascending or descending by average value, size of data sample, or
+alphabetically (figure 2).
 
-      .. image:: img/ChartCTacquisitionFreq.png
-         :width: 835px
-         :align: center
-         :height: 687px
-         :alt: OpenREM chart of acquisition frequency screenshot
+Clicking on an entry in the bar chart legend toggles the display of the
+corresponding series on the chart.
 
-    * Bar chart of mean DLP for each study name. Clicking on a bar takes the
-      user to a histogram of DLP for that study name. Clicking on a histogram
-      bar tooltip link takes the user to the list of studies that correspond to
-      the data represented by that bar.
+.. figure:: img/ChartCTMeanDLPhistogram.png
+   :figwidth: 50%
+   :align: right
+   :alt: Histogram of acquisition DLP
 
-      .. image:: img/ChartCTMeanStudyDLP.png
-         :width: 835px
-         :align: center
-         :height: 769px
-         :alt: OpenREM chart of mean study DLP screenshot
+   Figure 3: Histogram of abdomen DLP values
 
-    * Pie chart of the frequency of each study name. Clicking on a segment of
-      the pie chart takes the user to the list of studies that correspond to
-      the data in that segment.
+Clicking on an individual data point on a bar chart will take you to a
+histogram of the data for that point so that you can see the shape of the
+value's distribution (figure 3).
 
-    * *New in 0.7.0* Bar chart of mean DLP for each requested procedure. Clicking
-      on a bar takes the user to a histogram of DLP for that procedure. Clicking
-      on a histogram bar tooltip link takes the user to the list of procedures
-      that correspond to the data represented by that bar.
+Bar charts can be plotted with a series per x-ray system (figure 4). This can
+be done by activating `Plot a series per system` in the `Chart options`.
 
-    * *New in 0.7.0* Pie chart of the frequency of each requested procedure.
-      Clicking on a segment of the pie chart takes the user to the list of
-      procedures that correspond to the data in that segment.
+.. figure:: img/ChartCTMeanDLPperSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Bar chart of mean DLP (one system per series)
 
-    * Pie chart showing the number of studies carried on each day of the week:
+   Figure 4: Bar chart of mean DLP (one system per series)
 
-      .. image:: img/ChartCTworkload.png
-         :width: 831px
-         :align: center
-         :height: 711px
-         :alt: OpenREM pie chart of study workload per day of the week screenshot
+If the the bar chart that you are viewing shows more than one series then
+clicking on a category name on the x-axis will take you to a plot that shows
+multiple histograms: one for each series (figure 5).
 
-      Clicking on a segment of the pie chart takes the user to a pie chart
-      showing the studies for that weekday broken down per hour:
+.. figure:: img/ChartCTMeanDLPhistogramPerSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Histogram of abdomen DLP (one series per system)
 
-      .. image:: img/ChartCTworkload24hours.png
-         :width: 1084px
-         :align: center
-         :height: 714px
-         :alt: OpenREM pie chart of study workload per hour in a day screenshot
+   Figure 5: Histogram of abdomen DLP values, one series per system
 
-    * Line chart showing the mean DLP of each study name over time. The time
-      period per data point is chosen by the user in the ``Chart options``.
-      Note that selecting a short time period may result in long calculation
-      times. The user can zoom in to the plot by clicking and dragging the
-      mouse to select a date range. The user can also click on items in the
-      chart legend to show or hide individual lines.
+The histogram data can be plotted as absolute values, or be normalised to a
+value of 1.0 (figure 6). This can be toggled by clicking on the button that is
+shown below the histogram plots. The normalisation can be useful when trying to
+compare the shape of several histograms, especially when some histograms have
+much less data than others.
 
-      .. image:: img/ChartCTMeanDLPoverTime.png
-         :width: 1139px
-         :align: center
-         :height: 716px
-         :alt: OpenREM line chart of mean DLP per study type over time screenshot
+.. figure:: img/ChartCTMeanDLPhistogramPerSystemNorm.png
+   :figwidth: 50%
+   :align: right
+   :alt: Normalised histogram of abdomen DLP (one series per system)
 
-    * *New in 0.7.0* The user can choose whether the data displayed on the charts
-      is the mean, the median or both by using the drop-down `Average to use`
-      selection.
-      
+   Figure 6: Normalised histogram of abdomen DLP, one series per system
 
-The available charts for radiographic data are as follows:
+Each histogram data point includes a text link that appears when the mouse
+pointer moves over it. Clicking on this link will filter the displayed studies,
+showing those that correspond to what is contained in the histogram bin.
 
-    * Bar chart of mean DAP for each acquisition protocol. Clicking on a bar
-      takes the user to a histogram of DAP for that protocol. Clicking on the
-      tooltip link of a histogram bar takes the user to the list of studies
-      that contain the acquisitions in the histogram bar.
+Clicking on a legend entry toggles the visibility of the corresponding series.
 
-    * Pie chart of the frequency of each acquisition protocol. Clicking on a
-      segment of the pie chart takes the user to the list of studies that
-      contain the acquisitions in that segment.
+=============================================================
+2. Pie chart showing the frequency of each item in a category
+=============================================================
 
-    * Bar chart of mean kVp for each acquisition protocol. Clicking on a bar
-      takes the user to a histogram of kVp for that protocol. Clicking on the
-      tooltip link of a histogram bar takes the user to the list of studies
-      that contain the acquisitions in the histogram bar.
+.. figure:: img/ChartCTacquisitionFreq.png
+   :figwidth: 50%
+   :align: right
+   :alt: Pie chart of acquisition frequency
 
-    * Bar chart of mean mAs for each acquisition protocol. Clicking on a bar
-      takes the user to a histogram of mAs for that protocol. Clicking on the
-      tooltip link of a histogram bar takes the user to the list of studies
-      that contain the acquisitions in the histogram bar.
+   Figure 7: Pie chart of acquisition frequency
 
-    * Pie chart showing the number of studies carried out per weekday. Clicking
-      on a segment of the pie chart takes the user to a pie chart showing the 
-      studies for that weekday broken down per hour.
+Figure 7 shows a pie chart of the number of acquisitions made for every
+acquisition protocol present in the tabulated data.
 
-    * Line chart showing how the mean DAP of each acquisition protocol varies
-      over time. The time period per data point can be chosen by the user in
-      the ``Chart options``. Note that selecting a short time period may result
-      in long calculation times. The user can zoom in to the plot by clicking
-      and dragging the mouse to select a date range. The user can also click on
-      items in the legend to show or hide individual lines.
+Clicking on any of the pie chart segments will filter the displayed studies,
+showing only the studies that correspond to what is contained in that segment.
+As for the bar charts, this doesn't work perfectly, as the category filtering
+isn't exact.
 
-    * *New in 0.7.0* The user can choose whether the data displayed on the charts
-      is the mean, the median or both by using the drop-down `Average to use`
-      selection.
+============================================================
+3. Line chart showing how an average value changes over time
+============================================================
+
+.. figure:: img/ChartCTMeanDLPoverTime.png
+   :figwidth: 50%
+   :align: right
+   :alt: Line chart of mean DLP per study type over time
+
+   Figure 8: Line chart of mean DLP per study type over time
+
+A line is plotted for each category, with a point calculated every day, week,
+month or year. This can be a good way of looking at how things have changed
+over time. For example, the mean DLP of each study type, calculated with a
+data point per month is shown in figure 8.
+
+Clicking the left-hand mouse button on the chart and dragging left or right
+across a range of dates and then releasing the mouse button will zoom in on
+that selection.
+
+Clicking on a legend entry toggles the visibility of the corresponding series.
+
+=============================================================
+4. Pie chart showing the number of events per day of the week
+=============================================================
+
+.. figure:: img/ChartCTworkload.png
+   :figwidth: 50%
+   :align: right
+   :alt: Pie chart of study workload per day of the week
+
+   Figure 9: Pie chart of study workload per day of the week
+
+.. figure:: img/ChartCTworkload24hours.png
+   :figwidth: 50%
+   :align: right
+   :alt: Pie chart of study workload per hour in a day
+
+   Figure 10: Pie chart of study workload per hour in a day
+   
+Each segment represents a day of the week, and shows the number of events that
+have taken place on that day (figure 9). Clicking on one of the segments will
+take you to a pie chart that shows the number of events per on that day (figure
+10).
 
 ********************
 Exporting chart data
@@ -210,3 +155,134 @@ Exporting chart data
 An image file of a chart can be saved using the menu in the top-right hand side
 of any of the charts. The same menu can be used to save the data used to plot a
 chart: the data can be downloaded in either csv or xls format.
+
+************
+New in 0.7.0
+************
+
+* Chart plotting options can be configured by choosing ``Chart options`` from
+  the ``User options`` menu at the top of the OpenREM homepage.
+
+* Chart average values can be set to either mean or median. Bar charts can be
+  configured to plot both mean and median values as seperate series.
+
+* Bar charts can be plotted with a series per x-ray system. This option can be
+  switched on or off via the ``Chart options``.
+
+* The the number of histogram data bins can be set to a value between 2 and 40
+  in ``Chart options``. The default value is 20.
+
+* Histogram plots can toggle between absolute or normalised values via the
+  ``Toggle Normalised histograms`` button that is visible when viewing a
+  histogram plot.
+
+* The data in the bar charts can be sorted interactively by clicking on the
+  sorting options below the individual chart. The default sorting type and
+  direction can be set by choosing the ``Chart options`` item from the
+  ``User options`` menu on the OpenREM homepage.
+
+* Individual charts can be displayed full-screen by clicking on the
+  ``Toggle fullscreen`` button that is positioned below each chart.
+
+* The chart plotting status is displayed on the OpenREM homepage.
+
+* The colours used for plotting have been updated.
+
+*************
+Chart options
+*************
+
+.. figure:: img/ChartOptions.png
+   :figwidth: 50 %
+   :align: right
+   :alt: OpenREM chart options
+
+   Figure 11: OpenREM chart options
+
+Chart options can be configured by choosing the ``Chart options`` item from the
+``User options`` menu on the OpenREM homepage (figure 11).
+
+CT and radiographic plot options can also be set from their respective
+summary pages.
+
+The first option, ``Plot charts?``, determines whether any plots are shown.
+This also controls whether the data for the plots is calculated by OpenREM.
+Some plot data is slow to calculate when there is a large amount of data: some
+users may prefer to leave ``Plot charts?`` off for performance reasons.
+``Plot charts?`` can be switched on and activated with a click of the
+``Submit`` button after the data has been filtered.
+
+.. figure:: img/UserOptionsMenu.png
+   :figwidth: 25 %
+   :align: right
+   :alt: Switching charts off
+
+   Figure 12: Switching charts off
+
+The user can also switch off chart plotting by clicking on the
+``Switch charts off`` link in the ``User options`` menu in the navigation bar
+at the top of any OpenREM page, as shown in figure 12.
+
+The user can choose whether the data displayed on the charts is the mean, 
+median or both by using the drop-down ``Average to use`` selection. Only the
+bar charts can display both mean and median together. Other charts display just
+median data when this option is selected.
+
+The charts can be sorted by either bar height, frequency or alphabetically by
+category. The default sorting direction can be set to ascending or descending
+using the drop-down list near the top of the ``chart options``.
+
+A user's chart options can also be configured by an administrator via OpenREM's
+user administration page.
+
+****************
+Chart types - CT
+****************
+
+* Bar chart of average DLP for each acquisition protocol (all systems combined)
+
+* Bar chart of average DLP for each acquisition protocol (one series per system)
+
+* Pie chart of the frequency of each acquisition protocol
+
+* Pie chart showing the number of studies carried on each day of the week
+
+* Line chart showing the average DLP of each study name over time
+
+* Bar chart of average CTDI\ :sub:`vol` for each acquisition protocol
+
+* Bar chart of average DLP for each study name
+
+* Pie chart of the frequency of each study name
+
+* Bar chart of average DLP for each requested procedure
+
+* Pie chart of the frequency of each requested procedure
+
+*************************
+Chart types - radiography
+*************************
+
+* Bar chart of average DAP for each acquisition protocol
+
+* Pie chart of the frequency of each acquisition protocol
+
+* Bar chart of average DAP for each study description
+
+* Pie chart of the frequency of each study description
+
+* Bar chart of average DAP for each requested procedure
+
+* Pie chart of the frequency of each requested procedure
+
+* Bar chart of average kVp for each acquisition protocol
+
+* Bar chart of average mAs for each acquisition protocol
+
+* Pie chart showing the number of studies carried out per weekday
+
+* Line chart of average DAP of each acquisition protocol over time
+
+* Line chart of average mAs of each acquisition protocol over time
+
+* Line chart of average kVp of each acquisition protocol over time

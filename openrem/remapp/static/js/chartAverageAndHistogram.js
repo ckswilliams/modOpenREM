@@ -1,21 +1,24 @@
-
-
-$(function () {
-    var defaultmAsTitle = 'Mean mAs per acquisition protocol';
+function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, render_div,
+                                  value_label, value_units, avg_label, cat_label, cat_counter,
+                                  fld_min, fld_max, fld_multiplier, fld_cat_name,
+                                  tooltip_filters, href_start) {
     var bins = [];
     var name = '';
 
-    var chartmAsPerAcquisition = new Highcharts.Chart({
+    var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
+        lang: {
+            drillUpText: '◁ Back to ' + default_title.charAt(0).toLowerCase() + default_title.slice(1)
+        },
         chart: {
             type: 'column',
-            renderTo: 'chartAcquisitionMeanmAs',
+            renderTo: render_div,
             events: {
-                drilldown: function(e) {
-                    $('.mas-hist-norm-btn').css('display','inline-block');
-                    $('.mas-instructions').css('display','none');
+                drilldown: function (e) {
+                    $(norm_btn_class).css('display','inline-block');
+                    $(instr_class).css('display','none');
 
 
                     bins = e.point.bins;
@@ -25,7 +28,7 @@ $(function () {
 
                     var drilldownTitle;
                     if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
-                    drilldownTitle += e.point.name + ' mAs values';
+                    drilldownTitle += e.point.name + ' ' + value_label + ' values';
                     if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
 
                     this.setTitle({
@@ -42,28 +45,28 @@ $(function () {
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text:'mAs range'
+                            text: value_label + ' range (' + value_units + ')'
                         },
                         categories: []
                     }, false);
-                    this.tooltip.options.formatter = function(e) {
-                        var linkText = 'acquisition_mas_min=' + (bins[this.x])*1000 + '&acquisition_mas_max=' + (bins[this.x+1])*1000 + '&acquisition_protocol=' + name;
+                    this.tooltip.options.formatter = function (e) {
+                        var linkText = fld_min + '=' + (bins[this.x])*fld_multiplier + '&' + fld_max + '=' + (bins[this.x + 1])*fld_multiplier + '&' + fld_cat_name + '=' + name;
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
-                        returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' exposures</td></tr><tr><td><a href="/openrem/dx/?acquisitionhist=1&' + linkText + tooltipFiltersmAs + '">Click to view</a></td></tr></table>';
+                        var returnValue = '<table style="text-align: center"><tr><td>' + this.y.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + href_start + linkText + tooltip_filters + '">Click to view</a></td></tr></table>';
                         return returnValue;
                     }
                 },
-                drillup: function(e) {
-                    $('.mas-hist-norm-btn').css('display','none');
-                    $('.mas-instructions').css('display','block');
+                drillup: function (e) {
+                    $(norm_btn_class).css('display','none');
+                    $(instr_class).css('display','block');
 
 
                     this.setTitle({
-                        text: defaultmAsTitle
+                        text: default_title
                     });
                     this.yAxis[0].update({
                         title: {
-                            text:'Mean mAs'
+                            text: avg_label + ' ' + value_label + ' (' + value_units + ')'
                         },
                         max: null,
                         labels: {
@@ -72,7 +75,7 @@ $(function () {
                     }, false);
                     this.xAxis[0].update({
                         title: {
-                            text:'Protocol name'
+                            text: cat_label
                         },
                         categories: {
                             formatter: function (args) {
@@ -80,7 +83,7 @@ $(function () {
                             }
                         }
                     });
-                    this.tooltip.options.formatter = function() {
+                    this.tooltip.options.formatter = function () {
                         return this.point.tooltip;
                     }
                 }
@@ -88,27 +91,27 @@ $(function () {
         },
         title: {
             useHTML: true,
-            text: defaultmAsTitle
+            text: default_title
         },
         legend: {
             enabled: true
         },
         xAxis: {
-            categories: [],
+            categories: [1,2,3,4,5],
             title: {
                 useHTML: true,
-                text: 'Protocol name'
+                text: cat_label
             },
             labels: {
                 useHTML: true,
-                rotation:90
+                rotation: 90
             }
         },
         yAxis: {
             min: 0,
             title: {
                 useHTML: true,
-                text: 'Mean mAs'
+                text: avg_label + ' ' + value_label + ' (' + value_units + ')'
             }
         },
         tooltip: {
@@ -129,4 +132,4 @@ $(function () {
             series: []
         }
     });
-});
+}
