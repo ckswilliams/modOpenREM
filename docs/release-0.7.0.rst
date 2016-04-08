@@ -41,6 +41,7 @@ Headline changes
 
     * Mammography RDSRs import correctly
     * Mammography imports from images **now create an accumulated AGD value per breast**
+    * GE Senographe DS compression **now recorded correctly in Newtons** for new imports
     * Philips Allura fluoroscopy RDSRs import correctly, including calculating the exposure time
     * Bi-plane fluoroscopy imports can now be displayed in the web interface
     * Patient height imports from csv **now convert from cm to m** - previously height was assumed to be cm and inserted
@@ -105,6 +106,10 @@ Updates since beta 13
 * Exposure time is now populated when not supplied for fluoro RDSRs
 * DICOM Store and QR documentation updated, but not complete. Forms and text changed to demote OpenREM native DICOM
   Store and QR functionality
+
+Updates since beta 14
+=====================
+* Senographe DS compression force now stored correctly in Newtons for new imports
 
 ****************************
 Upgrading from version 0.6.0
