@@ -12,25 +12,26 @@
 
 {% block toprow %}
   {% load pagination_tags %}
-  <p>{% if admin.admingroup %} Click on a row to edit the display name.{% endif %}</p>
+  <p>{% if admin.admingroup %}Check one or more boxes and click an Update button to be taken to a page where you can
+      update all of the selected systems to the same display name.</p>
+      <p>The boxes can be checked or unchecked by clicking anywhere on the row{% endif %}</p>
 {% endblock %}
 
 
 {% block mainblock %}
-  {% if admin.admingroup %}
-  <script>
-//  jQuery(document).ready(function($) {
-//    $(".clickable-row").click(function() {
-//        window.document.location = $(this).data("href");
-//    });
-//  });
-  </script>
-  {% endif %}
 
   {% paginate %}
 
 {% if admin.admingroup %}
 <form action="/openrem/updatemultipledisplaynames/" method="get">
+<script>
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            var row_name = $(this).attr('row_name');
+            $('input[name='+row_name+']').prop("checked", !$('input[name='+row_name+']').prop("checked"));
+        });
+    });
+</script>
 {% endif %}
 
 <h3>CT</h3>
@@ -38,12 +39,12 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       {% if admin.admingroup %}
-        <th>Update?</th>
+        <th style="text-align: center;">Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
     {% for eachrow in ct_names %}
-      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+      <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
           <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
         {% endif %}
@@ -68,7 +69,7 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       {% if admin.admingroup %}
-        <th>Update?</th>
+        <th style="text-align: center;">Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
@@ -98,7 +99,7 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       {% if admin.admingroup %}
-        <th>Update?</th>
+        <th style="text-align: center;">Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
@@ -128,7 +129,7 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       {% if admin.admingroup %}
-        <th>Update?</th>
+        <th style="text-align: center;">Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
@@ -158,7 +159,7 @@
   <table class="table table-bordered table-hover row-clickable">
     <row>
       {% if admin.admingroup %}
-        <th>Update?</th>
+        <th style="text-align: center;">Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>

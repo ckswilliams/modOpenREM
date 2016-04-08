@@ -1352,17 +1352,23 @@ def display_name_update_multiple(request):
 
     if request.method == 'POST':
         # Need to update this to make it cope with being passed multiple pk values
-        form = UpdateDisplayNameForm(request.POST)
-        if form.is_valid():
-            new_display_name = form.cleaned_data['display_name']
-            display_name_data = UniqueEquipmentNames.objects.get(pk=pk)
+        #form = UpdateMultipleDisplayNamesForm(request.POST)
+        #if form.is_valid():
+        ##new_display_name = form.cleaned_data['display_names']
+        new_display_name = request.POST.get('new_display_name')
+        for pk in request.POST.get('pks').split(','):
+            display_name_data = UniqueEquipmentNames.objects.get(pk=int(pk))
             if not display_name_data.hash_generated:
                 display_name_gen_hash(display_name_data)
             display_name_data.display_name = new_display_name
             display_name_data.save()
-            return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+        return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
     else:
+        if request.GET.__len__() == 0:
+            return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
         max_pk = UniqueEquipmentNames.objects.all().order_by('-pk').values_list('pk')[0][0]
         for current_pk in request.GET:
             if int(current_pk) > max_pk:
