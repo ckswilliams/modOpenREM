@@ -167,6 +167,10 @@ class UpdateDisplayNameForm(forms.Form):
     display_name = forms.CharField()
 
 
+class UpdateMultipleDisplayNamesForm(forms.Form):
+    display_names = forms.CharField()
+
+
 class DicomQueryForm(forms.Form):
     """Form for launching DICOM Query
     """

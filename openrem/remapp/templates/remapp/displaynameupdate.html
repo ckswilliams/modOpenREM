@@ -10,6 +10,8 @@
         </li>
 {% endblock %}
 
+
+<!-- Need to update this page to enable it to cope with multiple display names that can all be updated at once -->
 {% block mainblock %}
   {% if admin.admingroup %}
   <form action="/openrem/updatedisplayname/{{ name_list.values.get.id }}" method="post">{% csrf_token %}

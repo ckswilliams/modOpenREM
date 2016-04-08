@@ -19,15 +19,19 @@
 {% block mainblock %}
   {% if admin.admingroup %}
   <script>
-  jQuery(document).ready(function($) {
-    $(".clickable-row").click(function() {
-        window.document.location = $(this).data("href");
-    });
-  });
+//  jQuery(document).ready(function($) {
+//    $(".clickable-row").click(function() {
+//        window.document.location = $(this).data("href");
+//    });
+//  });
   </script>
   {% endif %}
 
   {% paginate %}
+
+{% if admin.admingroup %}
+<form action="/openrem/updatemultipledisplaynames/" method="get">
+{% endif %}
 
 <h3>CT</h3>
   <p>There are {{ ct_names.count }} entries in this table.</p>
@@ -178,5 +182,9 @@
   {% if admin.admingroup %}
   <input class="btn btn-default" type="submit" value="Update">
   {% endif %}
+
+{% if admin.admingroup %}
+</form>
+{% endif %}
 
 {% endblock %}

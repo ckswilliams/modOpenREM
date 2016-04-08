@@ -1346,6 +1346,45 @@ def display_name_update(request, pk):
 
 
 @login_required
+def display_name_update_multiple(request):
+    from remapp.models import UniqueEquipmentNames
+    from remapp.forms import UpdateMultipleDisplayNamesForm
+
+    if request.method == 'POST':
+        # Need to update this to make it cope with being passed multiple pk values
+        form = UpdateDisplayNameForm(request.POST)
+        if form.is_valid():
+            new_display_name = form.cleaned_data['display_name']
+            display_name_data = UniqueEquipmentNames.objects.get(pk=pk)
+            if not display_name_data.hash_generated:
+                display_name_gen_hash(display_name_data)
+            display_name_data.display_name = new_display_name
+            display_name_data.save()
+            return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+    else:
+        max_pk = UniqueEquipmentNames.objects.all().order_by('-pk').values_list('pk')[0][0]
+        for current_pk in request.GET:
+            if int(current_pk) > max_pk:
+                return HttpResponseRedirect('/openrem/viewdisplaynames/')
+
+        f = UniqueEquipmentNames.objects.filter(pk__in=map(int, request.GET.values()))
+
+        form = UpdateMultipleDisplayNamesForm(initial={'display_names': [x.encode('utf-8') for x in f.values_list('display_name', flat=True)]}, auto_id=False)
+
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+        for group in request.user.groups.all():
+            admin[group.name] = True
+
+        return_structure = {'name_list': f, 'admin': admin, 'form': form}
+
+    return render_to_response('remapp/displaynameupdate.html',
+                              return_structure,
+                              context_instance=RequestContext(request))
+
+
+@login_required
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm
     from openremproject import settings
