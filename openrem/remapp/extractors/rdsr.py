@@ -246,7 +246,14 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
             source.save()
         except ObjectDoesNotExist:
             pass
-
+    if not source.exposure_time and source.number_of_pulses:
+        try:
+            avg_pulse_width = source.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
+            if avg_pulse_width:
+                source.exposure_time = avg_pulse_width * source.number_of_pulses
+                source.save()
+        except ObjectDoesNotExist:
+            pass
 
 
 def _irradiationeventxraydetectordata(dataset,event): #TID 10003a

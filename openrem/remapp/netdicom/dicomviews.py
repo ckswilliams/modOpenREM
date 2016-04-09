@@ -86,12 +86,14 @@ def status_update_store(request):
     store = DicomStoreSCP.objects.get(pk=scp_pk)
 
     if echo is "Success":
-        resp['message'] = "<button class='btn btn-success' type='button'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Store server is alive</button><div>Last status: {0}</div>".format(store.status)
+        resp['message'] = "<div>Last status: {0}</div>".format(store.status)
+        resp['statusindicator'] = "<h3 class='pull-right panel-title'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span><span class='sr-only'>OK:</span> Server is alive</h3>"
         resp['delbutton'] = "<button type='button' class='btn btn-primary' disabled='disabled'>Delete</button>"
         resp['startbutton'] = ""
         resp['stopbutton'] = "<a class='btn btn-danger' href='/openrem/admin/dicomstore/{0}/stop/' role='button'>Stop server</a>".format(scp_pk)
     elif echo is "AssocFail":
-        resp['message'] = "<button class='btn btn-danger' type='button'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Cannot start an association</button><div>Last status: {0}</div>".format(store.status)
+        resp['message'] = "<div>Last status: {0}</div>".format(store.status)
+        resp['statusindicator'] = "<h3 class='pull-right panel-title status-red'><span class='glyphicon glyphicon-exclamation-sign' aria-hidden='true'></span><span class='sr-only'>Error:</span> Association fail - server not running?</h3>"
         resp['delbutton'] = "<a class='btn btn-primary' href='/openrem/admin/dicomstore/{0}/delete/' role='button'>Delete</a>".format(scp_pk)
         resp['startbutton'] = "<a class='btn btn-success' href='/openrem/admin/dicomstore/{0}/start/' role='button'>Start server</a>".format(scp_pk)
         resp['stopbutton'] = ""

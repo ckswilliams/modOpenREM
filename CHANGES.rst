@@ -2,9 +2,10 @@
 OpenREM version history
 =======================
 
-0.7.0b13 (2016-03-18)
+0.7.0b14 (2016-04-07)
 ---------------------
 
+* `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
 * `#376`_  Corrected an ill-advised model change
 * `#374`_  CTDIw phantom size now displayed in CT detail view
 * `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
@@ -118,6 +119,7 @@ OpenREM version history
 * `#183`_  Added options to store patient name and ID, and options to hash name, ID and accession number
 * `#171`_  Root URL now resolves so ``/openrem`` is not necessary
 * `#151`_  Suspected non-patient studies can now be filtered out
+* `#135`_  GE Senographe DS now correctly records compression force in Newtons for new imports
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
 * `#70`_   User is returned to the filtered view after deleting a study
