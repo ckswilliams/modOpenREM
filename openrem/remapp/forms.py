@@ -320,13 +320,32 @@ class DicomStoreForm(forms.ModelForm):
         super(DicomStoreForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-4'
-        self.helper.field_class = 'col-lg-2'
+        self.helper.label_class = 'col-md-8'
+        self.helper.field_class = 'col-md-4'
         self.helper.layout = Layout(
             Div(
                 'name', 'aetitle', 'port',
             ),
-            PrependedText('keep_alive', ''),  # Trick to force label to join the other labels, otherwise sits to right
+            Accordion(
+                AccordionGroup(
+                    'Advanced - test/development use only',
+                    Div(
+                        HTML("""
+                        <p>
+                          DICOM store node built in to OpenREM is not yet ready for production. See
+                            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/netdicom-nodes.html"
+                                target="_blank" data-toggle="tooltip"
+                                title="DICOM store documentation - opens in a new tab">
+                                DICOM store documentation (Advanced)
+                            </a>
+                        </p>
+                        """)
+                    ),
+                    PrependedText('controlled', ''),  # Trick to force label to join the other labels, otherwise sits to right
+                    PrependedText('keep_alive', ''),
+                    active=False
+                )
+            ),
             FormActions(
                 Submit('submit', 'Submit')
             ),
@@ -343,8 +362,9 @@ class DicomStoreForm(forms.ModelForm):
 
     class Meta:
         model = DicomStoreSCP
-        fields = ['name', 'aetitle', 'port', 'keep_alive']
+        fields = ['name', 'aetitle', 'port', 'controlled', 'keep_alive']
         labels = {
             'port': "Port: 104 is standard for DICOM but ports higher than 1024 requires fewer admin rights",
-            'keep_alive': "Tick the box to auto-start this server and restart it if it dies. Uses celery beat"
+            'controlled': "Advanced use only: tick this box to control the server using OpenREM",
+            'keep_alive': "Advanced use only: tick this box to auto-start this server using celery beat"
         }

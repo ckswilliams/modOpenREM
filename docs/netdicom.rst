@@ -7,4 +7,5 @@ DICOM Store and QR
     :maxdepth: 2
 
     netdicom-nodes
+    conquestUbuntu
     netdicom-qr
