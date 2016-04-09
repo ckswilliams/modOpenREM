@@ -23,12 +23,15 @@
   {% paginate %}
 
 {% if admin.admingroup %}
-<form action="/openrem/updatemultipledisplaynames/" method="get">
+<form action="/openrem/updatedisplaynames/" method="get">
 <script>
     jQuery(document).ready(function($) {
         $(".clickable-row").click(function() {
             var row_name = $(this).attr('row_name');
             $('input[name='+row_name+']').prop("checked", !$('input[name='+row_name+']').prop("checked"));
+        });
+        $('input').click(function() {
+            $(this).prop("checked", !$(this).prop("checked"));
         });
     });
 </script>
@@ -74,7 +77,7 @@
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
     {% for eachrow in mg_names %}
-      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+      <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
           <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
         {% endif %}
@@ -104,7 +107,7 @@
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
     {% for eachrow in dx_names %}
-      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+      <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
           <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
         {% endif %}
@@ -134,7 +137,7 @@
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
     {% for eachrow in rf_names %}
-      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+      <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
           <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
         {% endif %}
@@ -164,7 +167,7 @@
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
     {% for eachrow in ot_names %}
-      <tr class="clickable-row" data-href="{% url 'display_name_update' eachrow.id %}">
+      <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
           <td style="text-align: center; vertical-align: middle;"><input type="checkbox" title="" name="{{ eachrow.id }}" value="{{ eachrow.id }}" /></td>
         {% endif %}

@@ -163,11 +163,7 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
 
 
-class UpdateDisplayNameForm(forms.Form):
-    display_name = forms.CharField()
-
-
-class UpdateMultipleDisplayNamesForm(forms.Form):
+class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()
 
 
