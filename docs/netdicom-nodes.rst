@@ -19,7 +19,7 @@ Native DICOM store nodes
 .. Warning::
 
     Native DICOM store functionality has not proved to be stable over long periods. Therefore we cannot recommend that
-    you use this feature in a production environment. However, please do test it an help us to improve it if you are
+    you use this feature in a production environment. However, please do test it and help us to improve it if you are
     able to!
 
 OpenREM DICOM Store SCPs (service class provider) enable modalities or PACS to send DICOM structured reports and images
