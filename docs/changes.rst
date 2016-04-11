@@ -6,6 +6,7 @@ OpenREM version history
 ---------------------
 
 * `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
+* `#378`_  The display name of multiple systems can now be updated together using a single new name
 * `#376`_  Corrected an ill-advised model change
 * `#374`_  CTDIw phantom size now displayed in CT detail view
 * `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be

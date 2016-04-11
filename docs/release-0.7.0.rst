@@ -110,6 +110,7 @@ Updates since beta 13
 Updates since beta 14
 =====================
 * Senographe DS compression force now stored correctly in Newtons for new imports
+* The display name of multiple systems can now be updated together using a single new name
 
 ****************************
 Upgrading from version 0.6.0
