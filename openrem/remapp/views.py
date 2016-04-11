@@ -558,7 +558,7 @@ def rf_detail_view_skin_map(request, pk=None):
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter:
                 d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter) / 10.0 - 15.0
             else:
-                d_ref = 60.0
+                d_ref = None # This will result in failure to calculate skin dose map. Need a sensible default, or a lookup to a user-entered value
             if irrad.dose_area_product:
                 dap = float(irrad.dose_area_product)
             else:
@@ -588,7 +588,7 @@ def rf_detail_view_skin_map(request, pk=None):
             if irrad.irradeventxraysourcedata_set.get().number_of_pulses:
                 frames = float(irrad.irradeventxraysourcedata_set.get().number_of_pulses)
             else:
-                frames = 1.0
+                frames = None
             if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle:
                 end_angle=float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle)
             else:
