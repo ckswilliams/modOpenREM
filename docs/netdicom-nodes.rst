@@ -6,16 +6,26 @@ DICOM Network Configuration
 General
 *******
 
-sdfasdf
+OpenREM can operate in the following ways regarding DICOM network interfaces:
 
-*****************
-DICOM store nodes
-*****************
+* Native DICOM store node with direct import
+* Third-party DICOM store node with scripted import to OpenREM
+* Query retrieve of third-party system, such as a PACS or modality
+
+************************
+Native DICOM store nodes
+************************
+
+.. Warning::
+
+    Native DICOM store functionality has not proved to be stable over long periods. Therefore we cannot recommend that
+    you use this feature in a production environment. However, please do test it an help us to improve it if you are
+    able to!
 
 OpenREM DICOM Store SCPs (service class provider) enable modalities or PACS to send DICOM structured reports and images
 directly to OpenREM where they are imported into the database.
 
-The Store SCP service recieves the data, checks whether it is one of the objects that OpenREM can extract data from,
+The Store SCP service receives the data, checks whether it is one of the objects that OpenREM can extract data from,
 and starts an import task if applicable.
 
 The object is then left in the ``dicom_in`` folder in the ``media`` folder, or it is deleted, depending on the policy
