@@ -51,6 +51,10 @@ logger = logging.getLogger('remapp.extractors.rdsr')  # Explicitly named so that
 def make_skin_map(study_pk=None):
     import remapp.tools.openskin.calc_exp_map as calc_exp_map
     from remapp.models import GeneralStudyModuleAttr
+    from openremproject.settings import MEDIA_ROOT
+    import os
+    import cPickle as pickle
+    from remapp.version import __skin_map_version__
 
     logger.error("In make_skin_map. Study_pk is {0}".format(study_pk))
     if study_pk:
@@ -182,7 +186,7 @@ def make_skin_map(study_pk=None):
         if not os.path.exists(skin_map_path):
             os.makedirs(skin_map_path)
 
-        pickle.dump(return_structure, open(os.path.join(skin_map_path, 'skin_map_' + str(pk) + '.p'), 'wb'))
+        pickle.dump(return_structure, open(os.path.join(skin_map_path, 'skin_map_' + str(study_pk) + '.p'), 'wb'))
 
 
 def _observercontext(dataset,obs): # TID 1002
