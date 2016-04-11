@@ -9,14 +9,11 @@ General
 OpenREM can operate in the following ways regarding DICOM network interfaces:
 
 .. contents::
+   :local:
 
-* Native DICOM store node with direct import
-* Third-party DICOM store node with scripted import to OpenREM
-* Query retrieve of third-party system, such as a PACS or modality
-
-************************
-Native DICOM store nodes
-************************
+******************************************
+Native DICOM store node with direct import
+******************************************
 
 .. Warning::
 
