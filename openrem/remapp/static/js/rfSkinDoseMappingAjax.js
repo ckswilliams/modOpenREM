@@ -96,6 +96,11 @@ $(document).ready(function() {
                 }
             }
             $(".ajax-progress-skin-dose").hide();
+
+            $('#skinDoseMapGroup').show();
+            $('#skin_map_maxmin_controls').show();
+            $('#openskin_info').show();
+
         },
         error: function( xhr, status, errorThrown ) {
             $(".ajax-progress-skin-dose").hide();

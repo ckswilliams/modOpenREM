@@ -558,7 +558,7 @@ def rf_detail_view_skin_map(request, pk=None):
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter:
                 d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter) / 10.0 - 15.0
             else:
-                d_ref = None
+                d_ref = 60.0
             if irrad.dose_area_product:
                 dap = float(irrad.dose_area_product)
             else:
@@ -575,8 +575,11 @@ def rf_detail_view_skin_map(request, pk=None):
             filter_cu = 0.0
             if irrad.irradeventxraysourcedata_set.get().xrayfilters_set.all():
                 for xray_filter in irrad.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                    if xray_filter.xray_filter_material.code_value == 'C-127F9':
-                        filter_cu += float(xray_filter.xray_filter_thickness_minimum)
+                    try:
+                        if xray_filter.xray_filter_material.code_value == 'C-127F9':
+                            filter_cu += float(xray_filter.xray_filter_thickness_minimum)
+                    except AttributeError:
+                        pass
 
             if irrad.irradiation_event_type:
                 run_type = str(irrad.irradiation_event_type)
@@ -585,7 +588,7 @@ def rf_detail_view_skin_map(request, pk=None):
             if irrad.irradeventxraysourcedata_set.get().number_of_pulses:
                 frames = float(irrad.irradeventxraysourcedata_set.get().number_of_pulses)
             else:
-                frames = None
+                frames = 1.0
             if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle:
                 end_angle=float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle)
             else:
