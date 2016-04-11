@@ -16,3 +16,4 @@ from remapp.extractors.mam import mam
 from remapp.extractors.ct_philips import ct_philips
 from remapp.netdicom.qrscu import qrscu, movescu
 from remapp.netdicom.keepalive import keep_alive
+from remapp.tools.openskin.calc_exp_map import CalcExpMap

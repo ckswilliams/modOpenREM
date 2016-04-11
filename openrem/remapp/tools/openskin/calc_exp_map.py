@@ -1,8 +1,9 @@
+from celery import shared_task
 import geomclass
 import geomfunc
 import skinMap
 
-
+@shared_task(name='remapp.tools.openskin.calc_exp_map.CalcExpMap')
 class CalcExpMap(object):
 
     def __init__(self, phantom_type=None,

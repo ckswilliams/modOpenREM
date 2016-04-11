@@ -820,6 +820,7 @@ def _rsdr2db(dataset):
 
     openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
+    import remapp.tools.openskin.calc_exp_map as calc_exp_map
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
@@ -832,6 +833,33 @@ def _rsdr2db(dataset):
     _generalequipmentmoduleattributes(dataset,g)
     _patientstudymoduleattributes(dataset,g)
     _patientmoduleattributes(dataset,g)
+
+
+    if g.modality_type == "RF":
+        try:
+            pat_mass = float(g.patientstudymoduleattr_set.get().patient_weight)
+        except ValueError:
+            pat_mass = 73.2
+        except TypeError:
+            pat_mass = 73.2
+
+        if pat_mass == 0.0:
+            pat_mass = 73.2
+
+        try:
+            pat_height = float(g.patientstudymoduleattr_set.get().patient_size) * 100
+        except ValueError:
+            pat_height = 178.6
+        except TypeError:
+            pat_height = 178.6
+
+        if pat_height == 0.0:
+            pat_height = 178.6
+
+        my_exp_map = calc_exp_map.CalcExpMap.delay(phantom_type='3D',
+                                             pat_mass=pat_mass, pat_height=pat_height,
+                                             table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
+                                             matt_thick=4.0, matt_trans=0.75)
 
 
 @shared_task
