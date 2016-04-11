@@ -48,13 +48,13 @@
             </ul>
         </div>
         <div class="col-md-7" id="skinDoseMapContainer">
-            <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
-
             <h2>Radiation exposure incidence map</h2>
 
             <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
 
             <div class="skinDoseMapGroup" id="skinDoseMapGroup">
+                <div class="ajax-progress-skin-dose"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
                 <div class="skinDoseMap">
                     <canvas id="skinDoseMap" width="540" height="420" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
                 </div>

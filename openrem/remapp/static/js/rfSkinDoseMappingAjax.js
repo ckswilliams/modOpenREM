@@ -24,7 +24,7 @@ function ArrayToURL(array) {
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
 
-    $(".ajax-progress").show();
+    $(".ajax-progress-skin-dose").show();
 
     $.ajax({
         type: "GET",
@@ -95,10 +95,10 @@ $(document).ready(function() {
                     render();
                 }
             }
-            $(".ajax-progress").hide();
+            $(".ajax-progress-skin-dose").hide();
         },
         error: function( xhr, status, errorThrown ) {
-            $(".ajax-progress").hide();
+            $(".ajax-progress-skin-dose").hide();
             $(".ajax-error").show();
             console.log( "Error: " + errorThrown );
             console.log( "Status: " + status );
