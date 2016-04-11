@@ -56,10 +56,8 @@ def make_skin_map(study_pk=None):
     import cPickle as pickle
     from remapp.version import __skin_map_version__
 
-    logger.error("In make_skin_map. Study_pk is {0}".format(study_pk))
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)
-        logger.error("g is {0}".format(study))
         try:
             pat_mass = float(study.patientstudymoduleattr_set.get().patient_weight)
         except ValueError:
@@ -84,7 +82,6 @@ def make_skin_map(study_pk=None):
                                                    pat_mass=pat_mass, pat_height=pat_height,
                                                    table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
                                                    matt_thick=4.0, matt_trans=0.75)
-        logger.error("my_exp_map is {0}".format(my_exp_map))
 
 
         for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
@@ -980,7 +977,6 @@ def _rsdr2db(dataset):
 
 
     if g.modality_type == "RF":
-        logger.error("modality matched, about to call make_skin_map")
         make_skin_map.delay(g.pk)
 
 
