@@ -32,7 +32,7 @@
                 <li>
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
                         Total dose at RP, {{ record.acquisition_plane }}:
-                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:3 }} Gy
+                        <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script> Gy
                         <br>
                     {% endfor %}
                 </li>

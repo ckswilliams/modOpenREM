@@ -154,7 +154,7 @@ $('.datepicker').datepicker({
                         {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.all.count > 1 %}
                             {{ record.acquisition_plane }}:
                         {% endif %}
-                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }}
+                        <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script>
                         <br>
                     {% endfor %}
                 </a>
