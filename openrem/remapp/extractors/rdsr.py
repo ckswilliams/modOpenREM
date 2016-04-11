@@ -44,6 +44,45 @@ django.setup()
 
 from celery import shared_task
 
+logger = logging.getLogger('remapp.extractors.rdsr')  # Explicitly named so that it is still handled when using __main__
+
+
+@shared_task(name='remapp.extractors.rdsr.make_skin_map')
+def make_skin_map(study_pk=None):
+    import remapp.tools.openskin.calc_exp_map as calc_exp_map
+    from remapp.models import GeneralStudyModuleAttr
+
+    logger.error("In make_skin_map. Study_pk is {0}".format(study_pk))
+    if study_pk:
+        g = GeneralStudyModuleAttr.objects.get(pk=study_pk)
+        logger.error("g is {0}".format(g))
+        try:
+            pat_mass = float(g.patientstudymoduleattr_set.get().patient_weight)
+        except ValueError:
+            pat_mass = 73.2
+        except TypeError:
+            pat_mass = 73.2
+
+        if pat_mass == 0.0:
+            pat_mass = 73.2
+
+        try:
+            pat_height = float(g.patientstudymoduleattr_set.get().patient_size) * 100
+        except ValueError:
+            pat_height = 178.6
+        except TypeError:
+            pat_height = 178.6
+
+        if pat_height == 0.0:
+            pat_height = 178.6
+
+        my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D',
+                                                   pat_mass=pat_mass, pat_height=pat_height,
+                                                   table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
+                                                   matt_thick=4.0, matt_trans=0.75)
+        logger.error("my_exp_map is {0}".format(my_exp_map))
+
+
 def _observercontext(dataset,obs): # TID 1002
     from remapp.tools.get_values import get_or_create_cid
     for cont in dataset.ContentSequence:
@@ -820,7 +859,6 @@ def _rsdr2db(dataset):
 
     openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
-    import remapp.tools.openskin.calc_exp_map as calc_exp_map
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
@@ -836,30 +874,8 @@ def _rsdr2db(dataset):
 
 
     if g.modality_type == "RF":
-        try:
-            pat_mass = float(g.patientstudymoduleattr_set.get().patient_weight)
-        except ValueError:
-            pat_mass = 73.2
-        except TypeError:
-            pat_mass = 73.2
-
-        if pat_mass == 0.0:
-            pat_mass = 73.2
-
-        try:
-            pat_height = float(g.patientstudymoduleattr_set.get().patient_size) * 100
-        except ValueError:
-            pat_height = 178.6
-        except TypeError:
-            pat_height = 178.6
-
-        if pat_height == 0.0:
-            pat_height = 178.6
-
-        my_exp_map = calc_exp_map.CalcExpMap.delay(phantom_type='3D',
-                                             pat_mass=pat_mass, pat_height=pat_height,
-                                             table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
-                                             matt_thick=4.0, matt_trans=0.75)
+        logger.error("modality matched, about to call make_skin_map")
+        make_skin_map.delay(g.pk)
 
 
 @shared_task
@@ -907,3 +923,5 @@ if __name__ == "__main__":
         sys.exit('Error: Supply exactly one argument - the DICOM RDSR file')
 
     sys.exit(rdsr(sys.argv[1]))
+
+
