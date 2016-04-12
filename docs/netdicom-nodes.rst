@@ -8,8 +8,11 @@ General
 
 OpenREM can operate in the following ways regarding DICOM network interfaces:
 
-.. contents::
-    :local:
+* :ref:`native-store`
+* :ref:`third-party-store`
+* :ref:`qr`
+
+.. _native-store:
 
 ******************************************
 Native DICOM store node with direct import
@@ -49,12 +52,17 @@ For native DICOM store nodes, you need to open the ``Advanced - test/development
 * Auto-start the server using celery beat: if checked, and if :ref:`celery-beat` is running, then OpenREM will attempt
   to start the store node whenever it finds it not to be running.
 
+
+.. _third-party-store:
+
 ************************************************************
 Third-party DICOM store node with scripted import to OpenREM
 ************************************************************
 
 asdf
 
+
+.. _qr:
 
 ****************************************************************
 Query retrieve of third-party system, such as a PACS or modality
