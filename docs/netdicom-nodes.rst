@@ -8,8 +8,7 @@ General
 
 OpenREM can operate in the following ways regarding DICOM network interfaces:
 
-.. contents::
-   :local:
+.. contents:: :local:
 
 ******************************************
 Native DICOM store node with direct import
