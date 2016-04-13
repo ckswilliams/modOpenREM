@@ -838,7 +838,7 @@ def _rsdr2db(dataset):
 
 
     if g.modality_type == "RF":
-        import remapp.tools.make_skin_map as make_skin_map
+        from remapp.tools.make_skin_map import make_skin_map
         make_skin_map.delay(g.pk)
 
 
