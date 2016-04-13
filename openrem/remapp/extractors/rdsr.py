@@ -836,8 +836,10 @@ def _rsdr2db(dataset):
     _patientstudymoduleattributes(dataset,g)
     _patientmoduleattributes(dataset,g)
 
-
-    if g.modality_type == "RF":
+    from remapp.models import SkinDoseMapCalcSettings
+    enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
+    calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
+    if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:
         from remapp.tools.make_skin_map import make_skin_map
         make_skin_map.delay(g.pk)
 

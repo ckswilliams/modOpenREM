@@ -36,6 +36,12 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+
+class SkinDoseMapCalcSettings(SingletonModel):
+    enable_skin_dose_maps = models.BooleanField(default=False)
+    calc_on_import = models.BooleanField(default=True)
+
+
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")

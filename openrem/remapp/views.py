@@ -450,7 +450,6 @@ def rf_detail_view(request, pk=None):
     """
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
-    import tools.openskin.calc_exp_map as calc_exp_map
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -458,7 +457,10 @@ def rf_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+    from remapp.models import SkinDoseMapCalcSettings
+    admin = {'openremversion': remapp.__version__,
+             'docsversion': remapp.__docs_version__,
+             'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -476,7 +478,6 @@ def rf_detail_view_skin_map(request, pk=None):
     """
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
-    import tools.openskin.calc_exp_map as calc_exp_map
     from django.http import JsonResponse
     from openremproject.settings import MEDIA_ROOT
     import os
