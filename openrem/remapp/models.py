@@ -41,6 +41,9 @@ class SkinDoseMapCalcSettings(SingletonModel):
     enable_skin_dose_maps = models.BooleanField(default=False)
     calc_on_import = models.BooleanField(default=True)
 
+    def get_absolute_url(self):
+        return reverse('home')
+
 
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,

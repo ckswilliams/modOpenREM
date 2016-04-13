@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
 from openremproject import settings
-from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP
+from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -368,3 +368,43 @@ class DicomStoreForm(forms.ModelForm):
             'controlled': "Advanced use only: tick this box to control the server using OpenREM",
             'keep_alive': "Advanced use only: tick this box to auto-start this server using celery beat"
         }
+
+
+class SkinDoseMapCalcSettingsForm(forms.ModelForm):
+    """Form for configuring whether skin dose maps are shown / calculated
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(SkinDoseMapCalcSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-lg-2'
+        self.helper.field_class = 'col-lg-8'
+        self.helper.layout = Layout(
+            Div(
+                HTML("""
+                     <h4>Do you want skin dose maps to be shown in OpenREM?</h4>
+                """),
+                'enable_skin_dose_maps',
+                HTML("""
+                     <h4>Do you want skin dose map data to be calculated on RDSR import?</h4>
+                """),
+                'calc_on_import'
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-2">
+                    <a href="/openrem/" role="button" class="btn btn-default">
+                        Cancel and return to the OpenREM home page
+                    </a>
+                </div>
+                """)
+            )
+        )
+
+    class Meta:
+        model = SkinDoseMapCalcSettings
+        fields = ['enable_skin_dose_maps', 'calc_on_import']

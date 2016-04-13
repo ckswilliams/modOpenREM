@@ -1656,3 +1656,19 @@ class DicomDeleteSettingsUpdate(UpdateView):
             admin[group.name] = True
         context['admin'] = admin
         return context
+
+
+class SkinDoseMapCalcSettingsUpdate(UpdateView):
+    from remapp.models import SkinDoseMapCalcSettings
+    from remapp.forms import SkinDoseMapCalcSettingsForm
+
+    model = SkinDoseMapCalcSettings
+    form_class = SkinDoseMapCalcSettingsForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
