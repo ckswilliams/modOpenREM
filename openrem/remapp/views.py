@@ -1661,6 +1661,13 @@ class DicomDeleteSettingsUpdate(UpdateView):
 class SkinDoseMapCalcSettingsUpdate(UpdateView):
     from remapp.models import SkinDoseMapCalcSettings
     from remapp.forms import SkinDoseMapCalcSettingsForm
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        skin_map_settings = SkinDoseMapCalcSettings.objects.get()
+    except ObjectDoesNotExist:
+        SkinDoseMapCalcSettings.objects.create()
+        skin_map_settings = SkinDoseMapCalcSettings.objects.get()
 
     model = SkinDoseMapCalcSettings
     form_class = SkinDoseMapCalcSettingsForm
