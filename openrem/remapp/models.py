@@ -38,11 +38,11 @@ from solo.models import SingletonModel
 
 
 class SkinDoseMapCalcSettings(SingletonModel):
-    enable_skin_dose_maps = models.BooleanField(default=False)
-    calc_on_import = models.BooleanField(default=True)
+    enable_skin_dose_maps = models.BooleanField(default=False, verbose_name="Enable skin dose maps?")
+    calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
 
-    def get_absolute_url(self):
-        return reverse('home')
+    #def get_absolute_url(self):
+    #    return reverse('home')
 
 
 class DicomDeleteSettings(SingletonModel):

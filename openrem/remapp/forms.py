@@ -378,30 +378,13 @@ class SkinDoseMapCalcSettingsForm(forms.ModelForm):
         super(SkinDoseMapCalcSettingsForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.form_class = 'form-horizontal'
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-8'
         self.helper.layout = Layout(
             Div(
-                HTML("""
-                     <h4>Do you want skin dose maps to be shown in OpenREM?</h4>
-                """),
                 'enable_skin_dose_maps',
-                HTML("""
-                     <h4>Do you want skin dose map data to be calculated on RDSR import?</h4>
-                """),
                 'calc_on_import'
             ),
             FormActions(
                 Submit('submit', 'Submit')
-            ),
-            Div(
-                HTML("""
-                <div class="col-lg-4 col-lg-offset-2">
-                    <a href="/openrem/" role="button" class="btn btn-default">
-                        Cancel and return to the OpenREM home page
-                    </a>
-                </div>
-                """)
             )
         )
 
