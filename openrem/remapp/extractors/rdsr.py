@@ -837,6 +837,12 @@ def _rsdr2db(dataset):
     _patientmoduleattributes(dataset,g)
 
     from remapp.models import SkinDoseMapCalcSettings
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        SkinDoseMapCalcSettings.objects.get()
+    except ObjectDoesNotExist:
+        SkinDoseMapCalcSettings.objects.create()
+
     enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
     calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
     if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:

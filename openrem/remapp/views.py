@@ -458,6 +458,12 @@ def rf_detail_view(request, pk=None):
         return redirect('/openrem/rf/')
 
     from remapp.models import SkinDoseMapCalcSettings
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        SkinDoseMapCalcSettings.objects.get()
+    except ObjectDoesNotExist:
+        SkinDoseMapCalcSettings.objects.create()
+
     admin = {'openremversion': remapp.__version__,
              'docsversion': remapp.__docs_version__,
              'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
@@ -483,9 +489,10 @@ def rf_detail_view_skin_map(request, pk=None):
     import os
     import cPickle as pickle
 
+    from django.core.exceptions import ObjectDoesNotExist
     try:
-        study = GeneralStudyModuleAttr.objects.get(pk=pk)
-    except:
+        GeneralStudyModuleAttr.objects.get(pk=pk)
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
 
@@ -1664,10 +1671,9 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
     from django.core.exceptions import ObjectDoesNotExist
 
     try:
-        skin_map_settings = SkinDoseMapCalcSettings.objects.get()
+        SkinDoseMapCalcSettings.objects.get()
     except ObjectDoesNotExist:
         SkinDoseMapCalcSettings.objects.create()
-        skin_map_settings = SkinDoseMapCalcSettings.objects.get()
 
     model = SkinDoseMapCalcSettings
     form_class = SkinDoseMapCalcSettingsForm
