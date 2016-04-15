@@ -1,4 +1,3 @@
-
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -284,7 +283,7 @@ def _imageviewmodifier(dataset,event):
 def _irradiationeventxraydata(dataset,proj):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import IrradEventXRayData
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
     event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
@@ -302,7 +301,7 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Type':
             event.irradiation_event_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
-            event.acquisition_protocol = cont.TextValue
+            event.acquisition_protocol = safe_strings(cont.TextValue)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
             event.anatomical_structure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             for cont2 in cont.ContentSequence:
@@ -603,7 +602,7 @@ def _ctaccumulateddosedata(dataset,ct): # TID 10012
 
 def _projectionxrayradiationdose(dataset,g,reporttype):
     from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, ObserverContext
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
     if reporttype == 'projection':
         proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
@@ -636,7 +635,7 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Mechanical Data Available':
             proj.xray_mechanical_data_available = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
-            proj.comment = cont.TextValue
+            proj.comment = safe_strings(cont.TextValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
         proj.save()

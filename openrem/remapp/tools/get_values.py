@@ -79,7 +79,15 @@ def get_seq_code_value(sequence,dataset):
         seq = getattr(dataset,sequence)
         if seq and hasattr(seq[0],'CodeValue'):
             return seq[0].CodeValue
-			
+
+
+def safe_strings(str):
+    try:
+        return str.decode('latin-1', 'replace')
+    except AttributeError:
+        return None
+
+
 def get_seq_code_meaning(sequence,dataset):
     """From a DICOM sequence, get the code meaning.
 
@@ -92,7 +100,11 @@ def get_seq_code_meaning(sequence,dataset):
     if (sequence in dataset):
         seq = getattr(dataset,sequence)
         if seq and hasattr(seq[0],'CodeMeaning'):
-            return seq[0].CodeMeaning
+            meaning = seq[0].CodeMeaning
+            if meaning != '':
+                if type(meaning) is str:
+                    meaning = meaning.decode('latin-1', 'replace')
+            return meaning
 
 def get_or_create_cid(codevalue, codemeaning):
     """Create a code_value code_meaning pair entry in the ContextID
