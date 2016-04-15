@@ -81,13 +81,6 @@ def get_seq_code_value(sequence,dataset):
             return seq[0].CodeValue
 
 
-def safe_strings(str):
-    try:
-        return str.decode('latin-1', 'replace')
-    except AttributeError:
-        return None
-
-
 def get_seq_code_meaning(sequence,dataset):
     """From a DICOM sequence, get the code meaning.
 
@@ -146,4 +139,11 @@ def return_for_export(model, field):
             val = unicode(val)
         return val
     except ObjectDoesNotExist:
+        return None
+
+
+def safe_strings(str):
+    try:
+        return str.decode('latin-1', 'replace')
+    except AttributeError:
         return None
