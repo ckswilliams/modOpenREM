@@ -11,7 +11,7 @@ Functionality available
 * Phantom dimensions calculated from the height and mass of the patient
 * Data can be calculated on import to OpenREM, or on demand when a study is
   viewed
-* Skin dose map data shown graphically as a 2D image and a 3D model
+* 3D skin dose map data shown graphically as a 2D image and a 3D model
 * The user can change the maximum and minimum displayed dose; alternatively,
   window level and width can be adjusted
 * A colour dose scale is shown with a selection of colour schemes
@@ -25,34 +25,39 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
 default height of 1.786 m and mass of 73.2 kg are used if patient-specific data
 are unavailable.
 
-================
-2D visualisation
-================
+===============================
+2D visualisation of the 3D data
+===============================
 
-The 2D skin dose map section displays:
+This is a 2D view of the whole surface of the 3D phantom, as though the phantom
+surface has been peeled off and laid out flat.
 
-* The skin dose at the mouse pointer when moved over the map
+The 2D visualisation includes the following features:
+
+* The skin dose at the mouse pointer is shown as a tooltip
 * Moving the mouse whilst holding down the left-hand mouse button changes the
   window level and width of the displayed skin dose map
-* An overlay indicating the phantom regions and orientation: anterior, left,
-  posterior, right, superior and inferior
-* A save button, which enables the current view to be saved as a png file
+* An overlay indicating the phantom regions and orientation can be toggled on
+  and off. This indicates the phantom anterior, left, posterior and right
+  sides, and also shows the superior and inferior ends
+* The current view can be saved as a png file
 
 ================
 3D visualisation
 ================
 
-The 3D skin dose map section displays:
+This is a 3D view of the phantom that was used for the calculations, with the
+skin dose map overlaid onto the surface.
 
-* The skin dose map wrapped around a 3D model of the same dimensions as the
-  phantom used to calculate the map
+The 3D visualisation includes the following features:
+
 * Moving the mouse whilst holding down the left-hand mouse button rotates the
   3D model
-* Turning the mouse wheel zooms in and out
+* Using the mouse wheel zooms in and out
 * A simple 3D model of a person is displayed in the bottom left corner. This is
   to enable the viewer to orientate themselves when viewing the 3D skin dose
   map
-* A save button, which enables the current view to be saved as a png file
+* The current can be saved as a png file
 
 **********************
 Skin dose map settings
