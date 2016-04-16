@@ -276,7 +276,33 @@
 
             <script src="{{ STATIC_URL }}js/rfSkinDoseMappingAjax.js"></script>
         </div>
+        {% else %}
+        <div class="col-md-7">
+            <h2>openSkin radiation exposure incidence map</h2>
+            <p>
+                You can export this study to a csv file in the format required by Jonathan Cole's openSkin software. The
+                openSkin software can be downloaded from the
+                <a href="https://bitbucket.org/openskin/openskin/downloads">openSkin BitBucket project</a> and there is
+                more information available in the
+                <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>.
+            </p>
+            {% url 'skin_dose_map_settings_update' 1 as the_url %}
+            <p>
+                This version of OpenREM has openSkin built-in, and is able to calculate and display skin dose maps for
+                some x-ray systems. However, this option is switched off for your installation at the moment. It can be
+                enabled by an administrator by changing the <a href="{{ the_url }}">Skin dose map settings</a>.
+            </p>
+            <p>
+                <strong>Warning:</strong> Only copper filters are considered in this export - aluminium or other filters
+                are not considered. This is related to the way OpenSkin works.
+            </p>
+            <h4>
+                Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>. <small>(Not
+                available if you don't have export permissions.)</small>
+            </h4>
+        </div>
         {% endif %}
+
     </div>
 
 <table class="table table-striped table-bordered">
