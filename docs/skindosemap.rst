@@ -7,7 +7,7 @@ Functionality available
 ***********************
 
 * Skin dose map data calculated to the surface of a simple geometric phantom
-  using in-built `openSkin`_ routines
+  using the in-built `openSkin`_ routines (3D phantom)
 * Phantom dimensions calculated from the height and mass of the patient
 * Data can be calculated on import to OpenREM, or on demand when a study is
   viewed
@@ -21,8 +21,9 @@ Functionality available
   dose map.
 
 The phantom consists of a cuboid with one semi-cylinder on each side (see
-`phantom design`_ for details). A default height of 1.786 m and mass of
-73.2 kg are used if patient-specific data are unavailable.
+3D phantom section of `phantom design`_ on the openSkin website for details). A
+default height of 1.786 m and mass of 73.2 kg are used if patient-specific data
+are unavailable.
 
 ================
 2D visualisation
@@ -101,7 +102,7 @@ want to do, please do go ahead and feed back your findings to Jonathan Cole at
 `jacole`_.
 
 
-.. _`phantom design`: http://bitbucket.org/jacole/openskin/wiki/Phantom%20design
+.. _`phantom design`: http://bitbucket.org/openskin/openskin/wiki/Phantom%20design
 .. _`openSkin`: http://bitbucket.org/openskin/openskin
 .. _`jacole`: http://bitbucket.org/jacole/
 .. _`OpenREM Google Group`: http://groups.google.com/forum/#!forum/openrem
