@@ -24,7 +24,7 @@
     <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
     <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
     <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
-    <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }}</li>
+    <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
     <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
         Scanner: 
@@ -40,13 +40,13 @@
     <th>Time</th>
     <th>Acquisition protocol</th>
     <th>View</th>
-    <th>Compression thickness</th>
+    <th>Compression thickness (mm)</th>
     <th>Target</th>
     <th>Filter</th>
     <th>kVp</th>
     <th>mA</th>
-    <th>Exposure time</th>
-    <th>ESD</th>
+    <th>Exposure time (ms)</th>
+    <th>ESD (mGy)</th>
     <th>AGD (mGy)</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
@@ -58,7 +58,7 @@
         <td>{{ event.irradeventxraysourcedata_set.get.xrayfilters_set.get.xray_filter_material }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.average_xray_tube_current|floatformat:1 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:0 }}</td>
         <td>{{ event.entrance_exposure_at_rp|floatformat:3 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.average_glandular_dose|floatformat:3 }}</td>
     </tr>
