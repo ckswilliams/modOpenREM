@@ -44,29 +44,29 @@ django.setup()
 from celery import shared_task
 
 def _observercontext(dataset,obs): # TID 1002
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
             obs.observer_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
             obs.device_observer_uid = cont.UID
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Name':
-            obs.device_observer_name = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Manufacturer':
-            obs.device_observer_manufacturer = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Model Name':
-            obs.device_observer_model_name = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Serial Number':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Name':
+            obs.device_observer_name = safe_strings(cont.TextValue)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Manufacturer':
+            obs.device_observer_manufacturer = safe_strings(cont.TextValue)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Model Name':
+            obs.device_observer_model_name = safe_strings(cont.TextValue)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Serial Number':
             obs.device_observer_serial_number = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Physical Location during observation':
-            obs.device_observer_physical_location_during_observation = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Role in Procedure':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Physical Location during observation':
+            obs.device_observer_physical_location_during_observation = safe_strings(cont.TextValue)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Role in Procedure':
             obs.device_role_in_procedure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
     obs.save()
     
 def _deviceparticipant(dataset,eventdatatype,foreignkey):
     from remapp.models import DeviceParticipant
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     if eventdatatype == 'detector':
         device = DeviceParticipant.objects.create(irradiation_event_xray_detector_data=foreignkey)
     elif eventdatatype == 'source':
@@ -82,14 +82,14 @@ def _deviceparticipant(dataset,eventdatatype,foreignkey):
             device.device_role_in_procedure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             for cont2 in cont.ContentSequence:
                 if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Name':
-                    device.device_name = cont2.TextValue
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Manufacturer':
-                    device.device_manufacturer = cont2.TextValue
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Model Name':
-                    device.device_model_name = cont2.TextValue
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Serial Number':
-                    device.device_serial_number = cont2.TextValue
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
+                    device.device_name = safe_strings(cont2.TextValue)
+                elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Manufacturer':
+                    device.device_manufacturer = safe_strings(cont2.TextValue)
+                elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Model Name':
+                    device.device_model_name = safe_strings(cont2.TextValue)
+                elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Serial Number':
+                    device.device_serial_number = safe_strings(cont2.TextValue)
+                elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
                     device.device_observer_uid = cont2.UID
     device.save()
 
@@ -129,11 +129,11 @@ def _xrayfilters(content_sequence,source):
     for cont2 in content_sequence:
         if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Type':
             filters.xray_filter_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Material':
+        elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Material':
             filters.xray_filter_material = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Minimum':
+        elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Minimum':
             filters.xray_filter_thickness_minimum = cont2.MeasuredValueSequence[0].NumericValue
-        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Maximum':
+        elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filter Thickness Maximum':
             filters.xray_filter_thickness_maximum = cont2.MeasuredValueSequence[0].NumericValue
     filters.save()
 
@@ -162,23 +162,23 @@ def _irradiationeventxraymechanicaldata(dataset,event): #TID 10003c
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CR/DR Mechanical Configuration':
             mech.crdr_mechanical_configuration = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary Angle':
             mech.positioner_primary_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary Angle':
             mech.positioner_secondary_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary End Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Primary End Angle':
             mech.positioner_primary_end_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary End Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Positioner Secondary End Angle':
             mech.positioner_secondary_end_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Column Angulation':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Column Angulation':
             mech.column_angulation = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Head Tilt Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Head Tilt Angle':
             mech.table_head_tilt_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Horizontal Rotation Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Horizontal Rotation Angle':
             mech.table_horizontal_rotation_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Cradle Tilt Angle':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Table Cradle Tilt Angle':
             mech.table_cradle_tilt_angle = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Compression Thickness':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Compression Thickness':
             mech.compression_thickness = cont.MeasuredValueSequence[0].NumericValue
     _doserelateddistancemeasurements(dataset,mech)
     mech.save()
@@ -188,7 +188,7 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
     from django.core.exceptions import ObjectDoesNotExist
     from django.db.models import Avg
     from remapp.models import IrradEventXRaySourceData
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     from xml.etree import ElementTree as ET
     source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
@@ -198,7 +198,7 @@ def _irradiationeventxraysourcedata(dataset,event): #TID 10003b
             try:
                 source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             except AttributeError:
-                source.reference_point_definition = cont.TextValue
+                source.reference_point_definition = safe_strings(cont.TextValue)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
             source.average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
@@ -261,9 +261,9 @@ def _irradiationeventxraydetectordata(dataset,event): #TID 10003a
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Index':
             detector.exposure_index = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Exposure Index':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Exposure Index':
             detector.target_exposure_index = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Deviation Index':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Deviation Index':
             detector.deviation_index = cont.MeasuredValueSequence[0].NumericValue
     _deviceparticipant(dataset,'detector',detector)
     detector.save()
@@ -289,59 +289,59 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
             event.acquisition_plane = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
             event.irradiation_event_uid = cont.UID
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Label':
-            event.irradiation_event_label = cont.TextValue
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Label':
+            event.irradiation_event_label = safe_strings(cont.TextValue)
             for cont2 in cont.ContentSequence:
                 if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Label Type':
                     event.label_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'DateTime Started':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'DateTime Started':
             event.date_time_started = make_date_time(cont.DateTime)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Type':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event Type':
             event.irradiation_event_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = safe_strings(cont.TextValue)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
             event.anatomical_structure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             for cont2 in cont.ContentSequence:
                 if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
                     event.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View':
             event.image_view = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             _imageviewmodifier(cont,event)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Table Relationship':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Table Relationship':
             event.patient_table_relationship_cid = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation':
             event.patient_orientation_cid = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation Modifier':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Orientation Modifier':
             event.patient_orientation_modifier_cid = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
             event.target_region = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product':
             event.dose_area_product = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Half Value Layer':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Half Value Layer':
             event.half_value_layer = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Entrance Exposure at RP':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Entrance Exposure at RP':
             event.entrance_exposure_at_rp = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
             try:
                 event.reference_point_definition = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             except AttributeError:
-                event.reference_point_definition_text = cont.TextValue
+                event.reference_point_definition_text = safe_strings(cont.TextValue)
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Mammography CAD Breast Composition':
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNamesCodes[0].CodeMeaning == 'Breast Composition':
                         event.breast_composition = cont2.CodeValue
-                    if cont2.ConceptNamesCodes[0].CodeMeaning == 'Percent Fibroglandular Tissue':
+                    elif cont2.ConceptNamesCodes[0].CodeMeaning == 'Percent Fibroglandular Tissue':
                         event.percent_fibroglandular_tissue = cont2.NumericValue 
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
-            event.comment = cont.TextValue
+            event.comment = safe_strings(cont.TextValue)
     
     # needs include for optional multiple person participant
     _irradiationeventxraydetectordata(dataset,event)
@@ -352,20 +352,20 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
 
 def _calibration(dataset,accum): 
     from remapp.models import Calibration
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
     cal = Calibration.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Measurement Device':
             cal.dose_measurement_device = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Date':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Date':
             cal.calibration_date = make_date_time(cont.DateTime)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Factor':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Factor':
             cal.calibration_factor = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Uncertainty':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Uncertainty':
             cal.calibration_uncertainty = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Responsible Party':
-            cal.calibration_responsible_party = cont.TextValue
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration Responsible Party':
+            cal.calibration_responsible_party = safe_strings(cont.TextValue)
     cal.save()
 
 def _accumulatedmammoxraydose(dataset,accum): # TID 10005
@@ -388,24 +388,24 @@ def _accumulatedprojectionxraydose(dataset,accum): # TID 10004
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
             accumproj.fluoro_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
             accumproj.fluoro_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
             accumproj.total_fluoro_time = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose Area Product Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose Area Product Total':
             accumproj.acquisition_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose (RP) Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose (RP) Total':
             accumproj.acquisition_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
             accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
         # TODO: Remove the following four items, as they are also imported (correctly) into _accumulatedintegratedprojectionradiographydose
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
             accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
             accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
             try:
                 accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             except AttributeError:
@@ -428,26 +428,26 @@ def _accumulatedcassettebasedprojectionradiographydose(dataset,accum): # TID 100
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Detector Type':
             accumcass.detector_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumcass.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
     accumcass.save()
 
 def _accumulatedintegratedprojectionradiographydose(dataset,accum): # TID 10007
     from remapp.models import AccumIntegratedProjRadiogDose
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
             accumint.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
             accumint.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
             accumint.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
             try:
                 accumint.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
             except AttributeError:
-                accumint.reference_point_definition = cont.TextValue
+                accumint.reference_point_definition = safe_strings(cont.TextValue)
     accumint.save()
 
 def _accumulatedxraydose(dataset,proj): # TID 10002
@@ -481,19 +481,19 @@ def _scanninglength(dataset,event): # TID 10014
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'scanning length':
             scanlen.scanning_length = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'length of reconstructable volume':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'length of reconstructable volume':
             scanlen.length_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'exposed range':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'exposed range':
             scanlen.exposed_range = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of reconstructable volume':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of reconstructable volume':
             scanlen.top_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of reconstructable volume':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of reconstructable volume':
             scanlen.bottom_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of scanning length':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of scanning length':
             scanlen.top_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of scanning length':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of scanning length':
             scanlen.bottom_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'irradiation event uid':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'irradiation event uid':
             scanlen.irradiation_event_uid = cont.UID
     scanlen.save()
 
@@ -503,33 +503,33 @@ def _ctxraysourceparameters(dataset,event):
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification of the x-ray source' or cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'identification number of the x-ray source':
             param.identification_of_the_xray_source = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
             param.kvp = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'maximum x-ray tube current':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'maximum x-ray tube current':
             param.maximum_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray tube current':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray tube current':
             param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time per Rotation':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time per Rotation':
             param.exposure_time_per_rotation = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray filter aluminum equivalent':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray filter aluminum equivalent':
             param.xray_filter_aluminum_equivalent = cont.MeasuredValueSequence[0].NumericValue
     param.save()
 
 
 def _ctirradiationeventdata(dataset,ct): # TID 10013
     from remapp.models import CtIrradiationEventData
-    from remapp.tools.get_values import get_or_create_cid
+    from remapp.tools.get_values import get_or_create_cid, safe_strings
     event = CtIrradiationEventData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
-            event.acquisition_protocol = cont.TextValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'TargetRegion':
+            event.acquisition_protocol = safe_strings(cont.TextValue)
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'TargetRegion':
             event.target_region = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Type':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Type':
             event.ct_acquisition_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'ProcedureContext':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'ProcedureContext':
             event.procedure_context = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
             event.irradiation_event_uid = cont.UID
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
@@ -537,37 +537,37 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
                         event.exposure_time = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Single Collimation Width':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Single Collimation Width':
                         event.nominal_single_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Total Collimation Width':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Total Collimation Width':
                         event.nominal_total_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Pitch Factor':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Pitch Factor':
                         event.pitch_factor = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'number of x-ray sources':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'number of x-ray sources':
                         event.number_of_xray_sources = cont2.MeasuredValueSequence[0].NumericValue
                     if cont2.ValueType == 'CONTAINER':
                         if cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'ct x-ray source parameters':
                             _ctxraysourceparameters(cont2,event)
-            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose':
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose':
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIvol':
                         event.mean_ctdivol = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
                         event.ctdiw_phantom_type = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue, cont2.ConceptCodeSequence[0].CodeMeaning)
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIfreeair Calculation Factor':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIfreeair Calculation Factor':
                         event.ctdifreeair_calculation_factor = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIfreeair':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIfreeair':
                         event.mean_ctdifreeair = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'DLP':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'DLP':
                         event.dlp = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Effective Dose':
+                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Effective Dose':
                         event.effective_dose = cont2.MeasuredValueSequence[0].NumericValue
                     ## Effective dose measurement method and conversion factor
                     ## CT Dose Check details here
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray modulation type':
-            event.xray_modulation_type = cont.TextValue
+            event.xray_modulation_type = safe_strings(cont.TextValue)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
-            event.comment = cont.TextValue
+            event.comment = safe_strings(cont.TextValue)
     if not event.xray_modulation_type and event.comment:
         comments = event.comment.split(",")
         for comm in comments:
@@ -582,19 +582,20 @@ def _ctirradiationeventdata(dataset,ct): # TID 10013
 
 def _ctaccumulateddosedata(dataset,ct): # TID 10012
     from remapp.models import CtAccumulatedDoseData, ContextID
+    from remapp.tools.get_values import safe_strings
     ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
             ctacc.total_number_of_irradiation_events = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
             ctacc.ct_dose_length_product_total = cont.MeasuredValueSequence[0].NumericValue
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Effective Dose Total':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Effective Dose Total':
             ctacc.ct_effective_dose_total = cont.MeasuredValueSequence[0].NumericValue
         #
         # Reference authority code or name belongs here, followed by the effective dose details
         #
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
-            ctacc.comment = cont.TextValue
+            ctacc.comment = safe_strings(cont.TextValue)
     _deviceparticipant(dataset,'ct_accumulated',ctacc)
 
     ctacc.save()
