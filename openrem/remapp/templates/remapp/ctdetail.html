@@ -45,8 +45,8 @@
 <table class="table table-striped table-bordered">
     <th>Acquisition protocol</th>
     <th>Type</th>
-    <th>CTDIvol mGy</th>
-    <th>DLP mGy.cm</th>
+    <th>CTDI<sub>vol<sub> (mGy)</th>
+    <th>DLP (mGy.cm)</th>
     <th>Scanning length (mm)</th>
     <th>kVp</th>
     <th>mA</th>
@@ -66,9 +66,9 @@
                     <td rowspan="2">
                       {{ event.mean_ctdivol|floatformat:2 }}
                       {% if event.ctdiw_phantom_type.code_value == "113691" %}
-                        (32 cm)
+                        (32&nbsp;cm)
                       {% elif event.ctdiw_phantom_type.code_value == "113690" %}
-                        (16 cm)
+                        (16&nbsp;cm)
                       {% endif %}
                     </td>
                     <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>        
