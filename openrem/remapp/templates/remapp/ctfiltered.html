@@ -100,13 +100,12 @@
 
 {% block col1 %}
 
-
     {% autopaginate filter.qs 25 as filter_list %}
     {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable">
         <tr>
-            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Total DLP (mGy.cm)</th>
+            <th>Institution</th><th><table><tr><td>Make</td></tr><tr><td>Model</td></tr><tr><td>Display name</td></tr></table></th><th>Date</th><th><table><tr><td>Study description</td></tr><tr><td>Requested procedure</td></tr><tr><td>Accession number</td></tr></table></th><th>Number of events</th><th>Total DLP (mGy.cm)</th>
             {% if admin.admingroup %}
                 <th>Delete?</th>
             {% endif %}
@@ -120,9 +119,11 @@
                 </td>
                 <td>
                     <a href="/openrem/ct/{{ exam.id }}/">
-                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                        {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+                        <table>
+                            <tr><td>{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
+                            <tr><td>{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
+                            <tr><td>{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                        </table>
                     </a>
                 </td>
                 <td>
@@ -131,11 +132,13 @@
                 </a>
                 <td>
                     <a href="/openrem/ct/{{ exam.id }}/">
-                        {{ exam.study_description }}</a> |
-                    {{ exam.requested_procedure_code_meaning }} |
+                    <table>
+                        <tr><td>{{ exam.study_description }}</td></tr>
+                        <tr><td>{{ exam.requested_procedure_code_meaning }}</td></tr>
                     {% if not exam.accession_hashed %}
-                        {{ exam.accession_number }}
+                        <tr><td>{{ exam.accession_number }}</td></tr>
                     {% endif %}
+                    </table>
                     </a>
                 </td>
                 <td>
