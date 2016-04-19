@@ -35,7 +35,7 @@ $(document).ready(function() {
             if (isCanvasSupported()) {
                 skinDoseMapObj.initialise(json.skin_map, json.width, json.height, json.phantom_flat_dist, json.phantom_curved_dist);
 
-                var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 3;
+                var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 2;//3;
                 if (!isFinite(decimalPlaces)) decimalPlaces = 0;
 
                 $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
