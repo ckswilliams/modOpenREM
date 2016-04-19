@@ -47,6 +47,7 @@ Headline changes
     * Patient height imports from csv **now convert from cm to m** - previously height was assumed to be cm and inserted
       into database without change. Existing height data will remain as cm value for csv imports, and m value for RDSR
       imports
+    * Better handling of non-ASCII characters
 
 * Exports
 
@@ -111,6 +112,7 @@ Updates since beta 14
 =====================
 * Senographe DS compression force now stored correctly in Newtons for new imports
 * The display name of multiple systems can now be updated together using a single new name
+* Non-ASCII characters can now be imported from TextValue fields in RDSR sequences
 
 ****************************
 Upgrading from version 0.6.0
