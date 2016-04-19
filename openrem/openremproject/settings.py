@@ -87,17 +87,6 @@ STATICFILES_DIRS = (
     os.path.join(ROOT_PROJECT,'static'),
 )
 
-# # List of finder classes that know how to find static files in
-# # various locations.
-# STATICFILES_FINDERS = (
-#     'django.contrib.staticfiles.finders.FileSystemFinder',
-#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-# #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-# )
-
-# URL of the login page
-# LOGIN_URL = '/login/'
-
 #
 # SECRET_KEY moved to local_settings.py
 #
@@ -125,23 +114,6 @@ TEMPLATES = [
         },
     },
 ]
-
-# #to get url in template http://stackoverflow.com/questions/2882490/get-the-current-url-within-a-django-template
-# from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
-# TEMPLATE_CONTEXT_PROCESSORS = TCP + (
-#     'django.core.context_processors.request',
-# )
-
-# # List of callables that know how to import templates from various sources.
-# TEMPLATE_LOADERS = (
-#     'django.template.loaders.filesystem.Loader',
-#     'django.template.loaders.app_directories.Loader',
-# #     'django.template.loaders.eggs.Loader',
-# )
-
-# TEMPLATE_DIRS = (
-# #    "rmphysics/templates",
-# )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -176,7 +148,6 @@ INSTALLED_APPS = (
     'django_filters',
     'pagination',
     'django.contrib.humanize',
-    #'south',
     'solo',
     'crispy_forms',
 )
