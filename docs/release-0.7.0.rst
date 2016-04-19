@@ -21,6 +21,7 @@ Headline changes
     * Permission system has become more granular
     * System can now accept non-ASCII characters in protocol names etc
     * Menus have been tidied up
+    * Settings file has been updated
 
 * Charts and interface
 
@@ -113,6 +114,7 @@ Updates since beta 14
 * Senographe DS compression force now stored correctly in Newtons for new imports
 * The display name of multiple systems can now be updated together using a single new name
 * Non-ASCII characters can now be imported from TextValue fields in RDSR sequences
+* Settings file has been updated
 
 ****************************
 Upgrading from version 0.6.0
