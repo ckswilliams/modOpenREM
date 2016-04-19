@@ -36,12 +36,6 @@ CELERYBEAT_SCHEDULE = {
 import os
 ROOT_PROJECT = os.path.join(os.path.split(__file__)[0],"..")
 
-#to get url in template http://stackoverflow.com/questions/2882490/get-the-current-url-within-a-django-template
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
-TEMPLATE_CONTEXT_PROCESSORS = TCP + (
-    'django.core.context_processors.request',
-)
-
 # **********************************************************************
 #
 # Database settings have been moved to local_settings.py
@@ -78,7 +72,7 @@ USE_TZ = False
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 
 #
 # STATIC_ROOT filepath has been moved to local_settings.py
@@ -93,36 +87,43 @@ STATICFILES_DIRS = (
     os.path.join(ROOT_PROJECT,'static'),
 )
 
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
-
-# URL of the login page
-LOGIN_URL = '/login/'
-
 #
 # SECRET_KEY moved to local_settings.py
 #
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            # insert your TEMPLATE_DIRS here
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
+                # list if you haven't customized them:
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.request',  # Added by ETM
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'pagination.middleware.PaginationMiddleware',
 )
 
@@ -131,9 +132,6 @@ ROOT_URLCONF = 'openremproject.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'openremproject.wsgi.application'
 
-TEMPLATE_DIRS = (
-#    "rmphysics/templates",
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -150,7 +148,6 @@ INSTALLED_APPS = (
     'django_filters',
     'pagination',
     'django.contrib.humanize',
-    #'south',
     'solo',
     'crispy_forms',
 )
