@@ -116,6 +116,7 @@ Updates since beta 14
 * Non-ASCII characters can now be imported from TextValue fields in RDSR sequences
 * Settings file has been updated
 * Mammo laterality has been added to mammo exports
+* Fixed in one of the beta versions was charts using greater than rather than greater than or equal to
 
 ****************************
 Upgrading from version 0.6.0
