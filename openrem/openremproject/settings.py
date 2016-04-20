@@ -91,6 +91,9 @@ STATICFILES_DIRS = (
 # SECRET_KEY moved to local_settings.py
 #
 
+# URL of the login page
+LOGIN_URL = '/login/'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
