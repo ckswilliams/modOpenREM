@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b14 (2016-04-07)
 ---------------------
 
+* `#387`_  Added laterality to mammography exports
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now
 * `#383`_  Refreshed settings.py to django 1.8 including updating template settings and TEMPLATE_CONTEXT_PROCESSORS
