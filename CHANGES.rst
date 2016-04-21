@@ -5,10 +5,15 @@ OpenREM version history
 0.7.0b14 (2016-04-07)
 ---------------------
 
+* `#387`_  Added laterality to mammography exports
+* `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
+* `#384`_  Fluoro exports for OpenSkin only consider copper filters now
+* `#383`_  Refreshed settings.py to django 1.8 including updating template settings and TEMPLATE_CONTEXT_PROCESSORS
 * `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
 * `#378`_  The display name of multiple systems can now be updated together using a single new name
 * `#376`_  Corrected an ill-advised model change
 * `#374`_  CTDIw phantom size now displayed in CT detail view
+* `#373`_  Charts in some releases used GT rather than greater than or equal to for start date, now fixed
 * `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
   changed. Ordering by Accumulated AGD now creates an entry per accumulated AGD, one per breast
 * `#371`_  Mammo RDSR generates average mA where not recorded, mammo image populates mA

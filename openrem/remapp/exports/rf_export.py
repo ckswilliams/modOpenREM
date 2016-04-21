@@ -703,7 +703,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = 'XLSX book written.'
     tsk.save()
 
-    xlsxfilename = "dxexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfilename = "rfexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
