@@ -2,16 +2,6 @@
 DICOM Network Configuration
 ###########################
 
-*******
-General
-*******
-
-OpenREM can operate in the following ways regarding DICOM network interfaces:
-
-* :ref:`native-store`
-* :ref:`third-party-store`
-* :ref:`qr`
-
 ****************************************
 Configuring DICOM store nodes in OpenREM
 ****************************************
@@ -26,6 +16,10 @@ the following:
 To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
 ``Add new Store`` and fill in the details:
 
+.. image:: img/netdicomstorescp.png
+    :align: center
+    :alt: DICOM Store SCP configuration
+
 * Name of local store node: This is the *friendly name*, such as ``OpenREM store``
 * Application Entity Title of the node: This is the DICOM name for the store, and must be letters or numbers only, no
   spaces, and a maximum of 16 characters
@@ -34,7 +28,6 @@ To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network co
   between the remote nodes (modalities, PACS) and the OpenREM server, then you need to make sure that the firewall is
   configured to allow the port you choose here
 
-.. _native-store:
 
 ******************************************
 Native DICOM store node with direct import
@@ -66,7 +59,6 @@ For native DICOM store nodes, you need to open the ``Advanced - test/development
   to start the store node whenever it finds it not to be running.
 
 
-.. _third-party-store:
 
 ************************************************************
 Third-party DICOM store node with scripted import to OpenREM
@@ -77,7 +69,6 @@ above without configuring the settings in the ``Advanced`` section. This will en
 data to your Store SCP in the *retrieve* part of the query-retrieve operation.
 
 
-.. _qr:
 
 ****************************************************************
 Query retrieve of third-party system, such as a PACS or modality
