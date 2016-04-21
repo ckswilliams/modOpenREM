@@ -89,6 +89,7 @@ For each server, the basic details are displayed, including the Database ID whic
 use of the query-retrieve function.
 
 In the title row of the Store SCP config panel, the status will be reported:
+
 .. image:: img/netdicomstorealive.png
     :align: right
     :alt: DICOM Store SCP status "Alive"
