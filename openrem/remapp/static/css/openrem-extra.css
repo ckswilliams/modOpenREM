@@ -317,3 +317,7 @@ input[type=range]::-ms-thumb {
   cursor: pointer;
   margin-top: 0px;
 }
+
+td.nowrap {
+  white-space: nowrap;
+}

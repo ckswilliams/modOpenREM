@@ -91,7 +91,23 @@ $('.datepicker').datepicker({
 
     <table class="table table-bordered table-hover row-clickable">
         <tr>
-            <th>Institution</th><th><table><tr><td>Make</td></tr><tr><td>Model</td></tr><tr><td>Display name</td></tr></table></th><th>Date</th><th><table><tr><td>Acquisition protocol</td></tr><tr><td>Accession number</td></tr></table></th><th>Number of events</th><th>Accumulated AGD (mGy)</th>
+            <th>Institution</th>
+            <th>
+                <table>
+                    <tr><td>Make</td></tr>
+                    <tr><td>Model</td></tr>
+                    <tr><td class="nowrap">Display name</td></tr>
+                </table>
+            </th>
+            <th>Date</th>
+            <th>
+                <table>
+                    <tr><td class="nowrap">Acquisition protocol</td></tr>
+                    <tr><td class="nowrap">Accession number</td></tr>
+                </table>
+            </th>
+            <th>Number of events</th>
+            <th>Accumulated AGD (mGy)</th>
             {% if admin.admingroup %}
             <th>Delete?</th>
             {% endif %}
@@ -106,9 +122,9 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
                     <table>
-                        <tr><td>{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
-                        <tr><td>{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
-                        <tr><td>{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
                     </table>
                 </a>
             </td>
@@ -120,9 +136,9 @@ $('.datepicker').datepicker({
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
                     <table>
-                        <tr><td>{{ exam.procedure_code_meaning }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
                   {% if not exam.accession_hashed %}
-                        <tr><td>{{ exam.accession_number }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                   {% endif %}
                     </table>
                 </a>
