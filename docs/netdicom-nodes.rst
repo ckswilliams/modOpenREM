@@ -39,9 +39,15 @@ Native DICOM store node with direct import
     you use this feature in a production environment. However, please do test it and help us to improve it if you are
     able to!
 
+.. Warning::
 
-An OpenREM DICOM Store SCP (service class provider) enable modalities or PACS to send DICOM structured reports and images
-directly to OpenREM where they are imported into the database.
+    If you use supervisord or similar on Linux, then you might not be able to use the web interface or possibly the
+    auto-start service as new threads spawned for the Store SCP tend to get killed. This wouldn't prevent you starting
+    the SCP in a shell. See `Issue #337`_
+
+
+An OpenREM DICOM Store SCP (service class provider) enables modalities or PACS to send DICOM structured reports and
+images directly to OpenREM where they are imported into the database.
 
 The Store SCP service receives the data, checks whether it is one of the objects that OpenREM can extract data from,
 and starts an import task if applicable.
@@ -52,11 +58,16 @@ set in :doc:`i_deletesettings`.
 
 For native DICOM store nodes, you need to open the ``Advanced - test/development use only`` section:
 
+.. image:: img/netdicomstorescpadvanced.png
+    :align: center
+    :alt: DICOM Store SCP advanced configuration
+
 * Control the server using OpenREM: this checkbox will enable OpenREM to create and control the node
-* Autostart and keep-alive: Using celery beat the server can be started automatically and restarted automatically if
-  this box is ticked..
 * Auto-start the server using celery beat: if checked, and if :ref:`celery-beat` is running, then OpenREM will attempt
   to start the store node whenever it finds it not to be running.
+
+Starting, stopping and status of DICOM Store SCP nodes
+======================================================
 
 
 
@@ -68,6 +79,20 @@ If you are using Conquest or another third-party Store SCP to collect DICOM data
 above without configuring the settings in the ``Advanced`` section. This will enable you to request remote hosts send
 data to your Store SCP in the *retrieve* part of the query-retrieve operation.
 
+See :doc:`conquestUbuntu` and :doc:`conquestAsWindowsService` for more information about using Conquest with OpenREM
+
+Status of third party DICOM Store SCP nodes
+===========================================
+
+DICOM Store SCP nodes that have been configured are listed in the left column of the DICOM network configuration page.
+For each server, the basic details are displayed, including the Database ID which is required for command line/scripted
+use of the query-retrieve function.
+
+In the title row of the Store SCP config panel, the status will be reported:
+.. image:: img/netdicomstorealive.png
+    :align: right
+    :alt: DICOM Store SCP status "Alive"
+
 
 
 ****************************************************************
@@ -75,3 +100,7 @@ Query retrieve of third-party system, such as a PACS or modality
 ****************************************************************
 
 To Query-Retrieve a remote host, you will need both a local Store SCP configured as well as a remote host.
+
+
+
+.. _`Issue #337`: https://bitbucket.org/openrem/openrem/issues/337/storescp-is-killed-if-daemonized-when
