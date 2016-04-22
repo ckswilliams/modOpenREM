@@ -31,22 +31,8 @@ are unavailable.
 2D visualisation of the 3D data
 ===============================
 
-.. figure:: img/skinDoseMap2D.png
-   :figwidth: 100%
-   :align: right
-   :alt: 2D visualisation of the 3D skin dose map data
-
-   Figure 1: 2D visualisation of the 3D data
-
 This is a 2D view of the whole surface of the 3D phantom, as though the phantom
 surface has been peeled off and laid out flat.
-
-.. figure:: img/skinDoseMap2DincOverlay.png
-   :figwidth: 100%
-   :align: right
-   :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
-
-   Figure 2: Phantom region overlay
 
 The 2D visualisation includes the following features:
 
@@ -58,12 +44,19 @@ The 2D visualisation includes the following features:
   sides, and also shows the superior and inferior ends
 * The current view can be saved as a png file
 
-.. figure:: img/skinDoseMapColourScales.png
-   :figwidth: 20%
+.. figure:: img/skinDoseMap2D.png
+   :figwidth: 100%
    :align: right
-   :alt: Colour scale choices
+   :alt: 2D visualisation of the 3D skin dose map data
 
-   Figure 3: Colour scale choices
+   Figure 1: 2D visualisation of the 3D data
+
+.. figure:: img/skinDoseMap2DincOverlay.png
+   :figwidth: 100%
+   :align: right
+   :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
+
+   Figure 2: Phantom region overlay
 
 ================
 3D visualisation
@@ -74,7 +67,7 @@ The 2D visualisation includes the following features:
    :align: right
    :alt: 3D visualisation of the skin dose map data
 
-   Figure 4: 3D visualisation of the data
+   Figure 3: 3D visualisation of the data
 
 This is a 3D view of the phantom that was used for the calculations, with the
 skin dose map overlaid onto the surface.
@@ -88,6 +81,13 @@ The 3D visualisation includes the following features:
   to enable the viewer to orientate themselves when viewing the 3D skin dose
   map
 * The current can be saved as a png file
+
+.. figure:: img/skinDoseMapColourScales.png
+   :figwidth: 20%
+   :align: right
+   :alt: Colour scale choices
+
+   Figure 4: Colour scale choices
 
 **********************
 Skin dose map settings
