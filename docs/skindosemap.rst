@@ -1,5 +1,5 @@
 ########################################
-Calulation and display of skin dose maps
+Calculation and display of skin dose maps
 ########################################
 
 ***********************
@@ -35,7 +35,7 @@ This is a 2D view of the whole surface of the 3D phantom, as though the phantom
 surface has been peeled off and laid out flat. The 2D visualisation includes
 the following features:
 
-* The skin dose at the mouse pointer is shown as a tooltip
+* The skin dose at the mouse pointer is shown as a tool-tip
 * Moving the mouse whilst holding down the left-hand mouse button changes the
   window level and width of the displayed skin dose map
 * An overlay indicating the phantom regions and orientation can be toggled on
