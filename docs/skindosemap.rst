@@ -62,13 +62,6 @@ The 2D visualisation includes the following features:
 3D visualisation
 ================
 
-.. figure:: img/skinDoseMap3D.png
-   :figwidth: 100%
-   :align: right
-   :alt: 3D visualisation of the skin dose map data
-
-   Figure 3: 3D visualisation of the data
-
 This is a 3D view of the phantom that was used for the calculations, with the
 skin dose map overlaid onto the surface.
 
@@ -81,6 +74,13 @@ The 3D visualisation includes the following features:
   to enable the viewer to orientate themselves when viewing the 3D skin dose
   map
 * The current can be saved as a png file
+
+.. figure:: img/skinDoseMap3D.png
+   :figwidth: 100%
+   :align: right
+   :alt: 3D visualisation of the skin dose map data
+
+   Figure 3: 3D visualisation of the data
 
 .. figure:: img/skinDoseMapColourScales.png
    :figwidth: 20%
