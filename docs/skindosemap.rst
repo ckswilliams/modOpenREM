@@ -32,7 +32,7 @@ are unavailable.
 ===============================
 
 .. figure:: img/skinDoseMap2D.png
-   :figwidth: 50%
+   :figwidth: 100%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map data
 
@@ -42,7 +42,7 @@ This is a 2D view of the whole surface of the 3D phantom, as though the phantom
 surface has been peeled off and laid out flat.
 
 .. figure:: img/skinDoseMap2DincOverlay.png
-   :figwidth: 50%
+   :figwidth: 100%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
 
@@ -59,7 +59,7 @@ The 2D visualisation includes the following features:
 * The current view can be saved as a png file
 
 .. figure:: img/skinDoseMapColourScales.png
-   :figwidth: 50%
+   :figwidth: 20%
    :align: right
    :alt: Colour scale choices
 
@@ -70,7 +70,7 @@ The 2D visualisation includes the following features:
 ================
 
 .. figure:: img/skinDoseMap3D.png
-   :figwidth: 50%
+   :figwidth: 100%
    :align: right
    :alt: 3D visualisation of the skin dose map data
 
@@ -93,22 +93,8 @@ The 3D visualisation includes the following features:
 Skin dose map settings
 **********************
 
-.. figure:: img/skinDoseMapSettingsMenu.png
-   :figwidth: 50%
-   :align: right
-   :alt: Skin dose map settings menu item
-
-   Figure 5: Skin dose map settings menu item
-
-.. figure:: img/skinDoseMapSettings.png
-   :figwidth: 50%
-   :align: right
-   :alt: Skin dose map settings
-
-   Figure 6: Skin dose map settings
-
 There are two skin dose map options that can be set by an OpenREM
-administrator:
+administrator via the ``Skin dose map settings`` option in the ``Config menu``:
 
 * Enable skin dose maps
 * Calculate skin dose maps on import
@@ -126,7 +112,7 @@ When skin dose maps are enabled:
   shown whilst the calculations are carried out
 * On successful calculation of the data the skin dose map is displayed
 * The calculated skin dose map data is saved as a pickle file on the OpenREM
-  server in a **skin_maps** subfolder of **MEDIA_ROOT**
+  server in a ``skin_maps`` subfolder of ``MEDIA_ROOT``
 * For subsequent views of the same study the data in the pickle file is loaded,
   rather than re-calculating the data, making the display of the skin dose map
   much quicker
@@ -150,11 +136,11 @@ incidence map for and go to the detail view. Then click on the link to create
 the OpenSkin export:
 
 .. figure:: img/OpenSkinExport.png
-   :figwidth: 50%
+   :figwidth: 100%
    :align: right
    :alt: Export from OpenREM to openSkin
 
-   Figure 7: Export from OpenREM to openSkin
+   Figure 5: Export from OpenREM to openSkin
 
 *************************
 Instructions for openSkin
