@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block col2 %}
-    <div class="panel panel-info">
+    <div class="panel panel-info small">
         <div class="panel-heading">
             <h3 class="panel-title">Data export</h3>
         </div>
@@ -58,7 +58,7 @@
     {{ studyfilter }}
 
     <form action="" method="get" class="form-horizontal" role="form">
-        <div class="panel panel-info">
+        <div class="panel panel-info small">
             <div class="panel-heading">
                 <h3 class="panel-title">Exam filter</h3>
             </div>
@@ -103,7 +103,7 @@
     {% autopaginate filter.qs 25 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered table-hover row-clickable">
+    <table class="table table-bordered table-hover row-clickable small">
         <tr>
             <th>Institution</th>
             <th>
