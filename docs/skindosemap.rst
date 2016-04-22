@@ -29,8 +29,22 @@ are unavailable.
 2D visualisation of the 3D data
 ===============================
 
+.. figure:: img/skinDoseMap2D.png
+   :figwidth: 50%
+   :align: right
+   :alt: 2D visualisation of the 3D skin dose map data
+
+   Figure 1: 2D visualisation of the 3D data
+
 This is a 2D view of the whole surface of the 3D phantom, as though the phantom
 surface has been peeled off and laid out flat.
+
+.. figure:: img/skinDoseMap2DincOverlay.png
+   :figwidth: 50%
+   :align: right
+   :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
+
+   Figure 2: Phantom region overlay
 
 The 2D visualisation includes the following features:
 
@@ -42,9 +56,23 @@ The 2D visualisation includes the following features:
   sides, and also shows the superior and inferior ends
 * The current view can be saved as a png file
 
+.. figure:: img/skinDoseMapColourScales.png
+   :figwidth: 50%
+   :align: right
+   :alt: Colour scale choices
+
+   Figure 3: Colour scale choices
+
 ================
 3D visualisation
 ================
+
+.. figure:: img/skinDoseMap3D.png
+   :figwidth: 50%
+   :align: right
+   :alt: 3D visualisation of the skin dose map data
+
+   Figure 4: 3D visualisation of the data
 
 This is a 3D view of the phantom that was used for the calculations, with the
 skin dose map overlaid onto the surface.
@@ -62,6 +90,20 @@ The 3D visualisation includes the following features:
 **********************
 Skin dose map settings
 **********************
+
+.. figure:: img/skinDoseMapSettingsMenu.png
+   :figwidth: 50%
+   :align: right
+   :alt: Skin dose map settings menu item
+
+   Figure 5: Skin dose map settings menu item
+
+.. figure:: img/skinDoseMapSettings.png
+   :figwidth: 50%
+   :align: right
+   :alt: Skin dose map settings
+
+   Figure 6: Skin dose map settings
 
 There are two skin dose map options that can be set by an OpenREM
 administrator:
