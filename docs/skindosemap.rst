@@ -32,9 +32,8 @@ are unavailable.
 ===============================
 
 This is a 2D view of the whole surface of the 3D phantom, as though the phantom
-surface has been peeled off and laid out flat.
-
-The 2D visualisation includes the following features:
+surface has been peeled off and laid out flat. The 2D visualisation includes
+the following features:
 
 * The skin dose at the mouse pointer is shown as a tooltip
 * Moving the mouse whilst holding down the left-hand mouse button changes the
@@ -63,9 +62,8 @@ The 2D visualisation includes the following features:
 ================
 
 This is a 3D view of the phantom that was used for the calculations, with the
-skin dose map overlaid onto the surface.
-
-The 3D visualisation includes the following features:
+skin dose map overlaid onto the surface. The 3D visualisation includes the
+following features:
 
 * Moving the mouse whilst holding down the left-hand mouse button rotates the
   3D model
@@ -73,7 +71,7 @@ The 3D visualisation includes the following features:
 * A simple 3D model of a person is displayed in the bottom left corner. This is
   to enable the viewer to orientate themselves when viewing the 3D skin dose
   map
-* The current can be saved as a png file
+* The current view can be saved as a png file
 
 .. figure:: img/skinDoseMap3D.png
    :figwidth: 100%
