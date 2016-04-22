@@ -31,7 +31,7 @@ Contents:
     patientid
     i_navigate
     charts
-	skindosemap
+    skindosemap
     i_exporting
     i_administration
     troubleshooting
