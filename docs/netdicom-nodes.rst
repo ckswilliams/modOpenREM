@@ -96,7 +96,6 @@ In the title row of the Store SCP config panel, the status will be reported eith
 Association fail - server not running?'
 
 
-<div class="clearfix"></div>
 
 
 ****************************************************************
@@ -110,7 +109,11 @@ To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM 
 
 * Name of QR node: This is the *friendly name*, such as ``PACS QR``
 * AE Title of the remote node: This is the DICOM name of the remote node, 16 or fewer letters and numbers, no spaces
-* AE Title
+* AE Title this server: This is the DICOM name that the query (DICOM C-Find) will come from. This may be important if
+  the remote node filters access based on *calling aet*. Normal rules of 16 or fewer letters and numbers, no spaces
+* Remote port: Enter the port the remote node is using (eg 104)
+* Remote IP address: The IP address of the remote node, for example ``192.168.1.100``
+* Remote hostname: Alternatively, if your network has a DNS server that can resolve the hostnames,
 
 
 .. _`Issue #337`: https://bitbucket.org/openrem/openrem/issues/337/storescp-is-killed-if-daemonized-when
