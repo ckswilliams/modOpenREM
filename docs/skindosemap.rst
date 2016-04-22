@@ -18,7 +18,9 @@ Functionality available
 * The skin dose map section can be displayed full-screen
 * The calculated peak skin dose, phantom dimensions and patient height and mass
   used for the calculations are shown in the top left hand corner of the skin
-  dose map.
+  dose map
+* If skin dose map display is disabled then fluoroscopy study data can be
+  exported in a format suitable for the stand-alone openSkin routines
 
 The phantom consists of a cuboid with one semi-cylinder on each side (see
 3D phantom section of `phantom design`_ on the openSkin website for details). A
@@ -136,6 +138,95 @@ When calculation on import is enabled:
 * Users viewing the details of a study won't have to wait for the skin dose map
   data to be calculated
 
+
+**************************
+Exporting data to openSkin
+**************************
+
+If skin dose maps are disabled you are presented with the option of exporting
+the study data as a csv file for use with a stand-alone installation of
+openSkin. Select the fluoroscopy study you wish to create the exposure
+incidence map for and go to the detail view. Then click on the link to create
+the OpenSkin export:
+
+.. figure:: img/OpenSkinExport.png
+   :figwidth: 50%
+   :align: right
+   :alt: Export from OpenREM to openSkin
+
+   Figure 7: Export from OpenREM to openSkin
+
+*************************
+Instructions for openSkin
+*************************
+
+Download the latest version as a zip file from
+http://bitbucket.org/openskin/openskin/downloads. At the time of release for
+OpenREM 0.7.0 the current openSkin beta was dated 14th September 2016. The
+application referred to here will only work on Windows.
+
+* Extract the contents of the zip file into a folder on your computer and run
+  the openSkin.exe executable
+* Choose a phantom type: 3D or flat. See `phantom design`_ for details
+* Select the source csv file - this should be the one exported from OpenREM
+* Select the output folder - this should already exist as it can't be created
+  in the dialogue
+* Wait! Depending on the number of events in the export and the power of your
+  machine, this can take a few minutes
+
+Two files will be produced - a textfile called ``skin_dose_results.txt`` and a
+small image called ``skin_dose_map.png``
+
+Results text file
+=================
+
+It should look something like this::
+
+    File created    : 04/21/15 17:42:45
+    Data file       : C:/Users/[...]/exports-2015-04-21-OpenSkinExport20150421-162805246134.csv
+    Phantom         : 90.0x70.0 3d phantom
+    Peak dose (Gy)  :                  0.50844405521
+    Cells > 3 Gy    :                              0
+    Cells > 5 Gy    :                              0
+    Cells > 10 Gy   :                              0
+
+The peak dose is the peak incident dose delivered to any one-cm-square area. If
+any of these 1 cm\ :sup:`2` areas (referred to as cells) are above 3 Gy, then
+the number of cells in this category, or the two higher dose categories, are
+listed in the table accordingly.
+
+Incidence map image file
+========================
+
+The image file will be a small 70x90 px PNG image if you used the 3D phantom,
+or 150 x 50 px PNG if you used the 2D phantom. With both, the head end of the
+table is on the left.
+
+The image is scaled so that black is 0 Gy and white is 10 Gy. For most studies,
+this results in an incidence map that is largely black. However, if you use
+`GIMP`_ or `ImageJ`_ or similar to increase the contrast, you will find that
+the required map is there.
+
+A native and 'colour equalised' version of the same export are shown below:
+
+.. raw:: html
+
+   <div class="clearfix">
+
+.. image:: img/skin_dose_map.png
+    :width: 210px
+    :align: left
+    :alt: OpenSkin incidence map, unscaled
+
+.. image:: img/skin_dose_map_scaled.png
+    :width: 210px
+    :align: right
+    :alt: OpenSkin incidence map, scaled
+
+.. raw:: html
+
+    </div>
+
 ***********
 Limitations
 ***********
@@ -153,3 +244,5 @@ want to do, please do go ahead and feed back your findings to Jonathan Cole at
 .. _`openSkin`: http://bitbucket.org/openskin/openskin
 .. _`jacole`: http://bitbucket.org/jacole/
 .. _`OpenREM Google Group`: http://groups.google.com/forum/#!forum/openrem
+.. _`GIMP`: http://www.gimp.org/
+.. _ImageJ: http://imagej.nih.gov/ij/download.html

@@ -31,8 +31,8 @@ Contents:
     patientid
     i_navigate
     charts
+	skindosemap
     i_exporting
-    openskin
     i_administration
     troubleshooting
     code
