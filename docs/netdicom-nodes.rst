@@ -84,24 +84,33 @@ See :doc:`conquestUbuntu` and :doc:`conquestAsWindowsService` for more informati
 Status of third party DICOM Store SCP nodes
 ===========================================
 
-DICOM Store SCP nodes that have been configured are listed in the left column of the DICOM network configuration page.
-For each server, the basic details are displayed, including the Database ID which is required for command line/scripted
-use of the query-retrieve function.
-
-In the title row of the Store SCP config panel, the status will be reported:
-
 .. image:: img/netdicomstorealive.png
     :align: right
     :alt: DICOM Store SCP status "Alive"
 
+DICOM Store SCP nodes that have been configured are listed in the left column of the DICOM network configuration page.
+For each server, the basic details are displayed, including the Database ID which is required for command line/scripted
+use of the query-retrieve function.
+
+In the title row of the Store SCP config panel, the status will be reported either as 'Server is alive' or 'Error:
+Association fail - server not running?'
+
+
+<div class="clearfix"></div>
 
 
 ****************************************************************
 Query retrieve of third-party system, such as a PACS or modality
 ****************************************************************
 
-To Query-Retrieve a remote host, you will need both a local Store SCP configured as well as a remote host.
+To Query-Retrieve a remote host, you will need to configure both a local Store SCP and the remote host.
 
+To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
+``Add new QR Node`` and fill in the details:
+
+* Name of QR node: This is the *friendly name*, such as ``PACS QR``
+* AE Title of the remote node: This is the DICOM name of the remote node, 16 or fewer letters and numbers, no spaces
+* AE Title
 
 
 .. _`Issue #337`: https://bitbucket.org/openrem/openrem/issues/337/storescp-is-killed-if-daemonized-when
