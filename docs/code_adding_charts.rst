@@ -7,8 +7,10 @@ To add a new CT or DX chart several files need to be updated:
 * ``models.py``
 * ``forms.py``
 * ``views.py``
-* The ``xxfiltered.html`` and ``xxChartAjax.js`` files corresponding to the
-  modality, where xx is one of ``ct`` or ``dx``
+* ``xxfiltered.html``
+* ``xxChartAjax.js``
+
+Where xx is one of ``ct`` or ``dx``
 
 The process is probably best illustrated via an example. What follows is a
 description of how to add a new chart that displays acquisition protocol
@@ -194,7 +196,7 @@ After:
 ``XX_plot_calculations`` additions
 ----------------------------------
 
-A new item needs to be added to the parameters.
+A new item needs to be added to this method's parameters.
 
 Before:
 
@@ -214,3 +216,56 @@ After:
                              plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                              request_results, median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                              plot_acquisition_ctdi_over_time):
+
+Our new chart makes use of ``acquisition events`` (rather than ``study_events``
+or ``request_events``). We therefore need to ensure that ``acquisition_events``
+are available if the user has chosen to show the new chart.
+
+Before:
+
+.. sourcecode:: python
+
+    if plot_acquisition_mean_dlp or plot_acquisition_mean_ctdi or plot_acquisition_freq:
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact=u'Constant Angle Acquisition').exclude(
+            **{'dlp__isnull': True}).exclude(
+            **{'acquisition_protocol__isnull': True}).exclude(
+            **{'acquisition_protocol': ''}).filter(
+            **acquisition_filters
+        )
+
+After:
+
+.. sourcecode:: python
+
+    if plot_acquisition_mean_dlp or plot_acquisition_mean_ctdi or plot_acquisition_freq or plot_acquisition_ctdi_over_time:
+        acquisition_events = CtIrradiationEventData.objects.exclude(
+            ct_acquisition_type__code_meaning__exact=u'Constant Angle Acquisition').exclude(
+            **{'dlp__isnull': True}).exclude(
+            **{'acquisition_protocol__isnull': True}).exclude(
+            **{'acquisition_protocol': ''}).filter(
+            **acquisition_filters
+        )
+
+We now need to add code that will calculate the data for the new chart. This
+uses one of the methods in the ``chart_functions.py`` file, located in the
+``interface`` folder of the OpenREM project.
+
+.. sourcecode:: python
+
+    if plot_acquisition_ctdi_over_time:
+        result = average_chart_over_time_data(f, acquisition_events,
+                                              'acquisition_protocol',
+                                              'mean_ctdivol',
+                                              'study_date', 'date_time_started',
+                                              median_available, plot_average_choice,
+                                              1, plot_study_mean_dlp_over_time_period)
+        if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
+            return_structure['acquisitionCTDIoverTime'] = result['median_over_time']
+        if plot_average_choice == 'mean' or plot_average_choice == 'both':
+            return_structure['acquisitionCTDIoverTime'] = result['mean_over_time']
+        if not plot_acquisition_mean_ctdi:
+            return_structure['acquisitionNameListCTDI'] = result['series_names']
+
+This data will now be available to the browser (JavaScript), and can be used
+to populate the chart itself.
