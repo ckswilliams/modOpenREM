@@ -104,21 +104,28 @@ imported into OpenREM.
 
 When skin dose maps are enabled:
 
-* OpenREM attempts to calculate skin dose map data when a user views the
-  details of a fluoroscopy study. These calculations can take some time
-* The calculations are carried out in the background: an animated graphic is
-  shown whilst the calculations are carried out
-* On successful calculation of the data the skin dose map is displayed
-* The calculated skin dose map data is saved as a pickle file on the OpenREM
-  server in a ``skin_maps`` subfolder of ``MEDIA_ROOT``
+* When a user views the details of a fluoroscopy study OpenREM looks for a skin
+  dose map pickle file on the OpenREM server in the ``skin_maps`` subfolder of
+  ``MEDIA_ROOT`` that corresponds to the study being viewed. If found, the skin
+  dose map data in the pickle file is loaded and displayed. The ``skin_maps``
+  folder is created if it does not exist
+* If a pickle file is not found then OpenREM calculates skin dose map data.
+  These calculations can take some time. They are carried out in the
+  background: an animated graphic is shown during the calculations. On
+  successful calculation of the data the skin dose map is displayed. A pickle
+  file containing the data is in the server's ``skin_maps`` subfolder of
+  ``MEDIA_ROOT``. The file name is of the form ``skin_map_XXXX.p``, where
+  ``XXXX`` is the database primary key of the study
 * For subsequent views of the same study the data in the pickle file is loaded,
   rather than re-calculating the data, making the display of the skin dose map
   much quicker
 
 When calculation on import is enabled:
 
-* OpenREM calculates the skin dose map data as soon as it arrives in the system
-* A pickle file containing the data is saved
+* OpenREM calculates the skin dose map data for a fluoroscopy study as soon as
+  it arrives in the system
+* A pickle file containing the data is saved in the ``skin_maps`` subfolder of
+  ``MEDIA_ROOT``
 * Users viewing the details of a study won't have to wait for the skin dose map
   data to be calculated
 
@@ -127,7 +134,7 @@ When calculation on import is enabled:
 Exporting data to openSkin
 **************************
 
-If skin dose maps are disabled you are presented with the option of exporting
+If skin dose maps are disabled the user you are presented with the option of exporting
 the study data as a csv file for use with a stand-alone installation of
 openSkin. Select the fluoroscopy study you wish to create the exposure
 incidence map for and go to the detail view. Then click on the link to create
