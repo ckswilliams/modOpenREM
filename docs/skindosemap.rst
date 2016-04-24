@@ -113,7 +113,7 @@ When skin dose maps are enabled:
   These calculations can take some time. They are carried out in the
   background: an animated graphic is shown during the calculations. On
   successful calculation of the data the skin dose map is displayed. A pickle
-  file containing the data is in the server's ``skin_maps`` subfolder of
+  file containing the data is saved in the server's ``skin_maps`` subfolder of
   ``MEDIA_ROOT``. The file name is of the form ``skin_map_XXXX.p``, where
   ``XXXX`` is the database primary key of the study
 * For subsequent views of the same study the data in the pickle file is loaded,
