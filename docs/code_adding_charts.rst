@@ -267,5 +267,146 @@ uses one of the methods in the ``chart_functions.py`` file, located in the
         if not plot_acquisition_mean_ctdi:
             return_structure['acquisitionNameListCTDI'] = result['series_names']
 
-This data will now be available to the browser (JavaScript), and can be used
+This data will now be available to the browser via JavaScript, and can be used
 to populate the chart itself.
+
+================================
+Additions to ``ctfiltered.html``
+================================
+
+A section of this file sets a JavaScript variable per chart. A new one needs to
+be added.
+
+Before:
+
+.. sourcecode:: html
+
+        <!-- Flags to determine if charts should be plotted -->
+        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+            <script>var plotCTAcquisitionMeanDLP = true;</script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+            <script>var plotCTAcquisitionMeanCTDI = true;</script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTAcquisitionFreq %}
+            <script>var plotCTAcquisitionFreq = true;</script>
+        {% endif %}
+
+        ...
+        ...
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+        <!-- End of flags to determine if charts should be plotted -->
+
+After:
+
+.. sourcecode:: html
+
+        <!-- Flags to determine if charts should be plotted -->
+        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
+            <script>var plotCTAcquisitionMeanDLP = true;</script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
+            <script>var plotCTAcquisitionMeanCTDI = true;</script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTAcquisitionFreq %}
+            <script>var plotCTAcquisitionFreq = true;</script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTAcquisitionCTDIOverTime %}
+            <script>var plotCTAcquisitionCTDIOverTime = true;</script>
+        {% endif %}
+
+        ...
+        ...
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+        <!-- End of flags to determine if charts should be plotted -->
+
+A second section of code needs to be added to ``ctfiltered.html`` to include a
+DIV for the new chart:
+
+.. sourcecode:: html
+
+        {% if request.user.userprofile.plotCTAcquisitionCTDIOverTime %}
+            <!-- HTML to include div container for acquisition CTDI over time -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('acqCTDIOverTimeDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion10">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseAcqCTDIOverTimeChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Line plot showing mean CTDI<sub>vol</sub> of each acquisition type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
+                                {% else %}
+                                    Line plot showing median CTDI<sub>vol</sub> of each acquisition type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseAcqCTDIOverTimeChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="acqCTDIOverTimeDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
+                            <a onclick="enterFullScreen('collapseAcqCTDIOverTimeChart', 'acqCTDIOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for acquisition CTDI over time -->
+        {% endif %}
+
+
+And finally a third section:
+
+.. sourcecode:: html
+
+        {% if request.user.userprofile.plotCTAcquisitionCTDIOverTime %}
+            <!-- JavaScript for CTDI over time -->
+            <script>
+                var urlStartAcqCTDIOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+            </script>
+
+            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                <script>
+                    result = chartAverageOverTime('acqCTDIOverTimeDIV', 'CTDI<sub>vol</sub>', 'mGy', 'Mean');
+                </script>
+            {% else %}
+                <script>
+                    result = chartAverageOverTime('acqCTDIOverTimeDIV', 'CTDI<sub>vol</sub>', 'mGy', 'Median');
+                </script>
+            {% endif %}
+            <!-- End of JavaScript for CTDI over time -->
+        {% endif %}
+
+===============================
+Additions to ``ctChartAjax.js``
+===============================
+
+.. sourcecode:: javascript
+
+            // CTDI over time chart data
+            if(typeof plotCTAcquisitionCTDIOverTime !== 'undefined') {
+                var acq_line_colours = new Array(json.acquisitionNameListCTDI.length);
+                if (typeof plotCTAcquisitionFreq !== 'undefined') {
+                    acq_line_colours = [];
+                    for (i = 0; i < $('#piechartAcquisitionDIV').highcharts().series[0].data.length; i++) {
+                        acq_line_colours.push($('#piechartAcquisitionDIV').highcharts().series[0].data.sort(sort_by_name)[i].color);
+                    }
+                    $('#piechartAcquisitionDIV').highcharts().series[0].data.sort(sort_by_y);
+                }
+                else acq_line_colours = colour_scale.colors(json.acquisitionNameListCTDI.length);
+
+                var acq_ctdi_over_time = json.acquisitionCTDIoverTime;
+                updateOverTimeChart(json.acquisitionNameListCTDI, acq_ctdi_over_time, acq_line_colours, urlStartAcq, 'acqCTDIOverTimeDIV');
+            }
