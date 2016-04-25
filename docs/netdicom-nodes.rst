@@ -66,14 +66,10 @@ For native DICOM store nodes, you need to open the ``Advanced - test/development
 * Auto-start the server using celery beat: if checked, and if :ref:`celery-beat` is running, then OpenREM will attempt
   to start the store node whenever it finds it not to be running.
 
-Starting, stopping and status of DICOM Store SCP nodes
-======================================================
 
-
-
-************************************************************
-Third-party DICOM store node with scripted import to OpenREM
-************************************************************
+***********************************************************
+Third-party DICOM store node for scripted import to OpenREM
+***********************************************************
 
 If you are using Conquest or another third-party Store SCP to collect DICOM data, simply fill in the basic details as
 above without configuring the settings in the ``Advanced`` section. This will enable you to request remote hosts send
@@ -81,18 +77,30 @@ data to your Store SCP in the *retrieve* part of the query-retrieve operation.
 
 See :doc:`conquestUbuntu` and :doc:`conquestAsWindowsService` for more information about using Conquest with OpenREM
 
-Status of third party DICOM Store SCP nodes
-===========================================
+*******************************
+Status of DICOM Store SCP nodes
+*******************************
+
+.. image:: img/netdicomstorealive.png
+    :align: right
+    :alt: DICOM Store SCP status "Alive"
 
 DICOM Store SCP nodes that have been configured are listed in the left column of the DICOM network configuration page.
 For each server, the basic details are displayed, including the Database ID which is required for command line/scripted
 use of the query-retrieve function.
 
-In the title row of the Store SCP config panel, the status will be reported:
+In the title row of the Store SCP config panel, the status will be reported either as 'Server is alive' or 'Error:
+Association fail - server not running?'
 
-.. image:: img/netdicomstorealive.png
-    :align: right
-    :alt: DICOM Store SCP status "Alive"
+Controlling native Store SCP nodes
+==================================
+
+If a native Store SCP node is not running, then a ``Start server`` button will be presented at teh bottom right. If it
+is running, this buttin will change to ``Stop server``, and the ``Delete``button will become inactive.
+
+If the node is configured to be auto-started, and if :ref:`celery-beat` is running, then each minute if the server is
+not started Celery will try to start the node. If you intend to stop the node for some reason, modify the configuration
+so that auto-start is not selected, then stop the server.
 
 
 
@@ -100,8 +108,22 @@ In the title row of the Store SCP config panel, the status will be reported:
 Query retrieve of third-party system, such as a PACS or modality
 ****************************************************************
 
-To Query-Retrieve a remote host, you will need both a local Store SCP configured as well as a remote host.
+To Query-Retrieve a remote host, you will need to configure both a local Store SCP and the remote host.
 
+To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
+``Add new QR Node`` and fill in the details:
+
+* Name of QR node: This is the *friendly name*, such as ``PACS QR``
+* AE Title of the remote node: This is the DICOM name of the remote node, 16 or fewer letters and numbers, no spaces
+* AE Title this server: This is the DICOM name that the query (DICOM C-Find) will come from. This may be important if
+  the remote node filters access based on *calling aet*. Normal rules of 16 or fewer letters and numbers, no spaces
+* Remote port: Enter the port the remote node is using (eg 104)
+* Remote IP address: The IP address of the remote node, for example ``192.168.1.100``
+* Remote hostname: Alternatively, if your network has a DNS server that can resolve the hostnames, you can enter the
+  hostname instead. If the hostname is entered, it will be used in preference to the IP address, so only enter it if
+  you know it will be resolved.
+
+Now go to the :doc:`netdicom-qr` documentation to learn how to use it.
 
 
 .. _`Issue #337`: https://bitbucket.org/openrem/openrem/issues/337/storescp-is-killed-if-daemonized-when
