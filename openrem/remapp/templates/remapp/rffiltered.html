@@ -56,30 +56,39 @@
 
     {{ studyfilter }}
 
-          <div class="panel panel-info">
+    <form action="" method="get" class="form-horizontal" role="form">
+         <div class="panel panel-info">
             <div class="panel-heading">
               <h3 class="panel-title">Exam filter</h3>
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal" role="form">
-                        {% for field in filter.form %}
-                            <div class="form-group">
-                                <div class="col-xs-4">
-                                    <label>{{ field.label_tag }}</label>
-                                </div>
-                                <div class="col-xs-8">
-                                  {{ field.errors }}
-                                  {{ field }}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </table>
-                    <input class="btn btn-default" type="submit" />
-                </form> 
+                {% for field in filter.form %}
+                    <div class="form-group">
+                        <div class="col-xs-4">
+                            <label>{{ field.label_tag }}</label>
+                        </div>
+                        <div class="col-xs-8">
+                            {{ field.errors }}
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <input class="btn btn-default" type="submit" />
+            </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Chart options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {% csrf_token %}
+                    {{ chartOptionsForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
             </div>
           </div>
-          
+    </form>
+
 <script>
 $('.datepicker').datepicker({
     format: "yyyy-mm-dd",
