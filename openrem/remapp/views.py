@@ -426,22 +426,111 @@ def dx_detail_view(request, pk=None):
 @login_required
 def rf_summary_list_filter(request):
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
+    from openremproject import settings
+    from remapp.forms import RFChartOptionsForm
 
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
     else:
         f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
 
+    try:
+        # See if the user has plot settings in userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    if user_profile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        user_profile.median_available = True
+        user_profile.save()
+        median_available = True
+    else:
+        user_profile.median_available = False
+        user_profile.save()
+        median_available = False
+
+    # Obtain the chart options from the request
+    chart_options_form = RFChartOptionsForm(request.GET)
+    # Check whether the form data is valid
+    if chart_options_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
+            if median_available:
+                user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.save()
+
+        else:
+            form_data = {'plotCharts': user_profile.plotCharts,
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+            chart_options_form = RFChartOptionsForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+
     return render_to_response(
         'remapp/rffiltered.html',
-        {'filter': f, 'admin': admin},
+        return_structure,
         context_instance=RequestContext(request)
     )
+
+
+@login_required
+def rf_summary_chart_data(request):
+    from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
+    from openremproject import settings
+    from django.http import JsonResponse
+
+    request_results = request.GET
+
+    if request.user.groups.filter(name='pidgroup'):
+        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact='RF').order_by().distinct())
+    else:
+        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact='RF').order_by().distinct())
+
+    try:
+        # See if the user has plot settings in userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    if user_profile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        user_profile.median_available = True
+        user_profile.save()
+        median_available = True
+    else:
+        user_profile.median_available = False
+        user_profile.save()
+        median_available = False
+
+    return_structure =\
+        rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
+
+    return JsonResponse(return_structure, safe=False)
+
+
+def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins):
+    from remapp.models import CtIrradiationEventData, Median
+    from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+
+    return_structure = {}
+
+    return return_structure
 
 
 @login_required

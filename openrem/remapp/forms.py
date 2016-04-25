@@ -119,6 +119,12 @@ class CTChartOptionsForm(forms.Form):
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
 
+class RFChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
 class DXChartOptionsDisplayForm(forms.Form):
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
