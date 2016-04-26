@@ -121,8 +121,13 @@ class CTChartOptionsForm(forms.Form):
 
 class RFChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class RFChartOptionsDisplayForm(forms.Form):
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
 
 
 class DXChartOptionsDisplayForm(forms.Form):

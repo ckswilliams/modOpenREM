@@ -461,12 +461,14 @@ def rf_summary_list_filter(request):
         if "submit" in request.GET:
             # process the data in form.cleaned_data as required
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
+            user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
 
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
+                         'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
             chart_options_form = RFChartOptionsForm(form_data)
 
@@ -519,16 +521,32 @@ def rf_summary_chart_data(request):
         median_available = False
 
     return_structure =\
-        rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
+        rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
+                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
+                             user_profile.plotRFStudyPerDayAndHour)
 
     return JsonResponse(return_structure, safe=False)
 
 
-def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins):
-    from remapp.models import CtIrradiationEventData, Median
+def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
+                         plot_histogram_bins, plot_study_per_day_and_hour):
+    from remapp.models import IrradEventXRayData, Median
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
     return_structure = {}
+
+    exp_include = [o.study_instance_uid for o in f]
+
+    if plot_study_per_day_and_hour:
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in=exp_include
+        )
+
+    if plot_study_per_day_and_hour:
+        result = workload_chart_data(study_events)
+        return_structure['studiesPerHourInWeekdays'] = result['workload']
 
     return return_structure
 
@@ -1439,14 +1457,16 @@ def display_name_update(request):
 
 @login_required
 def chart_options_view(request):
-    from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm
+    from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm,\
+        RFChartOptionsDisplayForm
     from openremproject import settings
 
     if request.method == 'POST':
         general_form = GeneralChartOptionsDisplayForm(request.POST)
         ct_form = CTChartOptionsDisplayForm(request.POST)
         dx_form = DXChartOptionsDisplayForm(request.POST)
-        if general_form.is_valid() and ct_form.is_valid() and dx_form.is_valid():
+        rf_form = RFChartOptionsDisplayForm(request.POST)
+        if general_form.is_valid() and ct_form.is_valid() and dx_form.is_valid() and rf_form.is_valid():
             try:
                 # See if the user has plot settings in userprofile
                 user_profile = request.user.userprofile
@@ -1483,6 +1503,8 @@ def chart_options_view(request):
             user_profile.plotDXAcquisitionMeanDAPOverTimePeriod = dx_form.cleaned_data[
                 'plotDXAcquisitionMeanDAPOverTimePeriod']
             user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
+
+            user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
 
             user_profile.save()
 
@@ -1528,14 +1550,18 @@ def chart_options_view(request):
                     'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
                     'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
 
+    rf_form_data = {'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour}
+
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
     dx_chart_options_form = DXChartOptionsDisplayForm(dx_form_data)
+    rf_chart_options_form = RFChartOptionsDisplayForm(rf_form_data)
 
     return_structure = {'admin': admin,
                         'GeneralChartOptionsForm': general_chart_options_form,
                         'CTChartOptionsForm': ct_chart_options_form,
                         'DXChartOptionsForm': dx_chart_options_form,
+                        'RFChartOptionsForm': rf_chart_options_form,
                         }
 
     return render_to_response(

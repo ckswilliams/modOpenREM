@@ -2,23 +2,24 @@
 Adding a new chart
 ##################
 
-To add a new CT or DX chart several files need to be updated:
+To add a new chart several files need to be updated:
 
 * ``models.py``
 * ``forms.py``
 * ``views.py``
 * ``xxfiltered.html``
 * ``xxChartAjax.js``
+* ``displaychartoptions.html``
 
-Where xx is one of ``ct`` or ``dx``
+Where xx is one of ``ct``, ``dx``, ``mg`` or ``rf``
 
 The process is probably best illustrated via an example. What follows is a
-description of how to add a new chart that displays acquisition protocol
-CTDI\ :sub:`vol`\ over time.
+description of how to add a new chart that displays study workload for
+fluoroscopy.
 
-*********************************************
-Adding a chart of CTDI\ :sub:`vol`\ over time
-*********************************************
+********************************************
+Adding a chart of fluoroscopy study workload
+********************************************
 
 ==========================
 Additions to ``models.py``
@@ -51,7 +52,7 @@ as:
 
 .. sourcecode:: python
 
-    plotCTAcquisitionCTDIOverTime = models.BooleanField(default=False)
+    plotRFStudyPerDayAndHour = models.BooleanField(default=False)
 
 Adding a new field to ``models.py`` requires that a database migration is carried
 out to add the field to the database. This is done via the command line::
@@ -63,7 +64,7 @@ The first command should result in a response similar to::
 
     Migrations for 'remapp':
       0004_auto_20160424_1116.py:
-        - Add field plotCTAcquisitionCTDIOverTime to userprofile
+        - Add field plotRFAcquisitionCTDIOverTime to userprofile
 
 The second command should result in a response similar to::
 
@@ -80,15 +81,23 @@ Additions to ``forms.py``
 =========================
 
 An additional line needs to be added to the ``XXChartOptionsForm`` and
-``XXChartOptionsDisplayForm`` methods in ``forms.py``, where ``XX`` is either
-``CT`` or ``DX``.
+``XXChartOptionsDisplayForm`` methods in ``forms.py``, where ``XX`` is one of
+``CT``, ``DX``, ``MG`` or ``RF``.
 
 For our new chart the following line needs to be added to both
-``CTChartOptionsForm`` and ``CTChartOptionsDisplayForm``:
+``RFChartOptionsForm`` and ``RFChartOptionsDisplayForm``:
 
 .. sourcecode:: python
 
-    plotCTAcquisitionCTDIOverTime = forms.BooleanField(label='Acquisition CTDI over time', required=False)
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+
+In addition, a new method needs to be added so that the RF chart options are
+shown when the user goes to Config -> Chart options:
+
+.. sourcecode:: python
+
+    class RFChartOptionsDisplayForm(forms.Form):
+        plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
 
 That's the end of the changes required in ``models.py``
 
@@ -96,15 +105,15 @@ That's the end of the changes required in ``models.py``
 Additions to ``views.py``
 =========================
 
-Three methods in this file need to be updated.
+Four methods in this file need to be updated.
 
 ------------------------------------
 ``xx_summary_list_filter`` additions
 ------------------------------------
 
 Some additions need to be made to the ``xx_summary_list_filter`` method in
-``views.py``, where ``xx`` is either ``ct`` or ``dx``. As we're adding a
-new CT chart, we need to edit ``ct_summary_list_filter``.
+``views.py``, where ``xx`` is one of ``ct``, ``dx``, ``mg`` or ``rf``. As we're
+adding a new RF chart, we need to edit ``rf_summary_list_filter``.
 
 A section of this method examines the user's chart plotting preferences. Code
 must be added to include the new chart in these checks. An abbreviated version
@@ -113,27 +122,21 @@ of the section is shown below.
 .. sourcecode:: python
 
     # Obtain the chart options from the request
-    chart_options_form = CTChartOptionsForm(request.GET)
+    chart_options_form = RFChartOptionsForm(request.GET)
     # Check whether the form data is valid
     if chart_options_form.is_valid():
         # Use the form data if the user clicked on the submit button
         if "submit" in request.GET:
             # process the data in form.cleaned_data as required
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
-            user_profile.plotCTAcquisitionMeanDLP = chart_options_form.cleaned_data['plotCTAcquisitionMeanDLP']
-            user_profile.plotCTAcquisitionMeanCTDI = chart_options_form.cleaned_data['plotCTAcquisitionMeanCTDI']
-            ...
-            ...
+            if median_available:
+                user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
 
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
-                        'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
-                        'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
-                        'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
-                        ...
-                        ...
-            chart_options_form = CTChartOptionsForm(form_data)
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+            chart_options_form = RFChartOptionsForm(form_data)
 
 A new line needs to be inserted into the ``if`` and ``else`` sections for the
 new chart:
@@ -141,29 +144,23 @@ new chart:
 .. sourcecode:: python
 
     # Obtain the chart options from the request
-    chart_options_form = CTChartOptionsForm(request.GET)
+    chart_options_form = RFChartOptionsForm(request.GET)
     # Check whether the form data is valid
     if chart_options_form.is_valid():
         # Use the form data if the user clicked on the submit button
         if "submit" in request.GET:
             # process the data in form.cleaned_data as required
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
-            user_profile.plotCTAcquisitionMeanDLP = chart_options_form.cleaned_data['plotCTAcquisitionMeanDLP']
-            user_profile.plotCTAcquisitionMeanCTDI = chart_options_form.cleaned_data['plotCTAcquisitionMeanCTDI']
-            user_profile.plotCTAcquisitionCTDIOverTime = chart_options_form.cleaned_data['plotCTAcquisitionCTDIOverTime']
-            ...
-            ...
+            user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
+            if median_available:
+                user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
 
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
-                        'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
-                        'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
-                        'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
-                        'plotCTAcquisitionCTDIOverTime': user_profile.plotCTAcquisitionCTDIOverTime,
-                        ...
-                        ...
-            chart_options_form = CTChartOptionsForm(form_data)
+                         'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+            chart_options_form = RFChartOptionsForm(form_data)
 
 -----------------------------------
 ``xx_summary_chart_data`` additions
@@ -176,24 +173,20 @@ Before:
 .. sourcecode:: python
 
     return_structure =\
-        ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
-                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
-                             user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
-                             request_results, median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
+        rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
+                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
 
 After:
 
 .. sourcecode:: python
 
     return_structure =\
-        ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
-                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
-                             user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
-                             request_results, median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotCTAcquisitionCTDIOverTime)
+        rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
+                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
+                             user_profile.plotRFStudyPerDayAndHour)
 
 ----------------------------------
-``XX_plot_calculations`` additions
+``xx_plot_calculations`` additions
 ----------------------------------
 
 A new item needs to be added to this method's parameters.
@@ -202,49 +195,29 @@ Before:
 
 .. sourcecode:: python
 
-    def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
-                             plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
-                             plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
-                             request_results, median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins):
+    def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
+                             plot_histogram_bins):
 
 After:
 
 .. sourcecode:: python
 
-    def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
-                             plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
-                             plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
-                             request_results, median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
-                             plot_acquisition_ctdi_over_time):
+    def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
+                             plot_histogram_bins, plot_study_per_day_and_hour):
 
-Our new chart makes use of ``acquisition events`` (rather than ``study_events``
-or ``request_events``). We therefore need to ensure that ``acquisition_events``
+Our new chart makes use of ``study_events`` (rather than ``acquisition_events``
+or ``request_events``). We therefore need to ensure that ``study_events``
 are available if the user has chosen to show the new chart.
 
-Before:
+After additions:
 
 .. sourcecode:: python
 
-    if plot_acquisition_mean_dlp or plot_acquisition_mean_ctdi or plot_acquisition_freq:
-        acquisition_events = CtIrradiationEventData.objects.exclude(
-            ct_acquisition_type__code_meaning__exact=u'Constant Angle Acquisition').exclude(
-            **{'dlp__isnull': True}).exclude(
-            **{'acquisition_protocol__isnull': True}).exclude(
-            **{'acquisition_protocol': ''}).filter(
-            **acquisition_filters
-        )
-
-After:
-
-.. sourcecode:: python
-
-    if plot_acquisition_mean_dlp or plot_acquisition_mean_ctdi or plot_acquisition_freq or plot_acquisition_ctdi_over_time:
-        acquisition_events = CtIrradiationEventData.objects.exclude(
-            ct_acquisition_type__code_meaning__exact=u'Constant Angle Acquisition').exclude(
-            **{'dlp__isnull': True}).exclude(
-            **{'acquisition_protocol__isnull': True}).exclude(
-            **{'acquisition_protocol': ''}).filter(
-            **acquisition_filters
+    if plot_study_per_day_and_hour:
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in=exp_include
         )
 
 We now need to add code that will calculate the data for the new chart. This
@@ -253,22 +226,190 @@ uses one of the methods in the ``chart_functions.py`` file, located in the
 
 .. sourcecode:: python
 
-    if plot_acquisition_ctdi_over_time:
-        result = average_chart_over_time_data(f, acquisition_events,
-                                              'acquisition_protocol',
-                                              'mean_ctdivol',
-                                              'study_date', 'date_time_started',
-                                              median_available, plot_average_choice,
-                                              1, plot_study_mean_dlp_over_time_period)
-        if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
-            return_structure['acquisitionCTDIoverTime'] = result['median_over_time']
-        if plot_average_choice == 'mean' or plot_average_choice == 'both':
-            return_structure['acquisitionCTDIoverTime'] = result['mean_over_time']
-        if not plot_acquisition_mean_ctdi:
-            return_structure['acquisitionNameListCTDI'] = result['series_names']
+    if plot_study_per_day_and_hour:
+        result = workload_chart_data(study_events)
+        return_structure['studiesPerHourInWeekdays'] = result['workload']
 
 This data will now be available to the browser via JavaScript, and can be used
 to populate the chart itself.
+
+----------------------------------
+``chart_options_view`` additions
+----------------------------------
+
+The RF options form need to be imported
+
+Before:
+
+.. sourcecode:: python
+
+    from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm
+
+After:
+
+.. sourcecode:: python
+
+    from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm,\
+        RFChartOptionsDisplayForm
+
+The RF form items need to be included
+
+Before (abbreviated):
+
+.. sourcecode:: python
+
+    if request.method == 'POST':
+        general_form = GeneralChartOptionsDisplayForm(request.POST)
+        ct_form = CTChartOptionsDisplayForm(request.POST)
+        dx_form = DXChartOptionsDisplayForm(request.POST)
+        if general_form.is_valid() and ct_form.is_valid() and dx_form.is_valid() and rf_form.is_valid():
+            try:
+                # See if the user has plot settings in userprofile
+                user_profile = request.user.userprofile
+            except:
+                # Create a default userprofile for the user if one doesn't exist
+                create_user_profile(sender=request.user, instance=request.user, created=True)
+                user_profile = request.user.userprofile
+
+            user_profile.plotCharts = general_form.cleaned_data['plotCharts']
+            ...
+            ...
+            user_profile.plotHistogramBins = general_form.cleaned_data['plotHistogramBins']
+
+            user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
+            ...
+            ...
+            user_profile.plotCTInitialSortingChoice = ct_form.cleaned_data['plotCTInitialSortingChoice']
+
+            user_profile.plotDXAcquisitionMeanDAP = dx_form.cleaned_data['plotDXAcquisitionMeanDAP']
+            ...
+            ...
+            user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
+
+            user_profile.save()
+
+        messages.success(request, "Chart options have been updated")
+
+    ...
+    ...
+
+    general_form_data = {'plotCharts': user_profile.plotCharts,
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
+                         'plotInitialSortingDirection': user_profile.plotInitialSortingDirection,
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
+                         'plotHistogramBins': user_profile.plotHistogramBins}
+
+    ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
+                    ...
+                    ...
+                    'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice}
+
+    dx_form_data = {'plotDXAcquisitionMeanDAP': user_profile.plotDXAcquisitionMeanDAP,
+                    ...
+                    ...
+                    'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
+
+
+    general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
+    ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
+    dx_chart_options_form = DXChartOptionsDisplayForm(dx_form_data)
+
+    return_structure = {'admin': admin,
+                        'GeneralChartOptionsForm': general_chart_options_form,
+                        'CTChartOptionsForm': ct_chart_options_form,
+                        'DXChartOptionsForm': dx_chart_options_form
+                        }
+
+After (abbreviated):
+
+.. sourcecode:: python
+
+    if request.method == 'POST':
+        general_form = GeneralChartOptionsDisplayForm(request.POST)
+        ct_form = CTChartOptionsDisplayForm(request.POST)
+        dx_form = DXChartOptionsDisplayForm(request.POST)
+        rf_form = RFChartOptionsDisplayForm(request.POST)
+        if general_form.is_valid() and ct_form.is_valid() and dx_form.is_valid() and rf_form.is_valid():
+            try:
+                # See if the user has plot settings in userprofile
+                user_profile = request.user.userprofile
+            except:
+                # Create a default userprofile for the user if one doesn't exist
+                create_user_profile(sender=request.user, instance=request.user, created=True)
+                user_profile = request.user.userprofile
+
+            user_profile.plotCharts = general_form.cleaned_data['plotCharts']
+            ...
+            ...
+            user_profile.plotHistogramBins = general_form.cleaned_data['plotHistogramBins']
+
+            user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
+            ...
+            ...
+            user_profile.plotCTInitialSortingChoice = ct_form.cleaned_data['plotCTInitialSortingChoice']
+
+            user_profile.plotDXAcquisitionMeanDAP = dx_form.cleaned_data['plotDXAcquisitionMeanDAP']
+            ...
+            ...
+            user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
+
+            user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
+
+            user_profile.save()
+
+        messages.success(request, "Chart options have been updated")
+
+    ...
+    ...
+    
+    general_form_data = {'plotCharts': user_profile.plotCharts,
+                         ...
+                         ...
+                         'plotHistogramBins': user_profile.plotHistogramBins}
+
+    ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
+                    ...
+                    ...
+                    'plotCTInitialSortingChoice': user_profile.plotCTInitialSortingChoice}
+
+    dx_form_data = {'plotDXAcquisitionMeanDAP': user_profile.plotDXAcquisitionMeanDAP,
+                    ...
+                    ...
+                    'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
+
+    rf_form_data = {'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour}
+
+    general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
+    ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
+    dx_chart_options_form = DXChartOptionsDisplayForm(dx_form_data)
+    rf_chart_options_form = RFChartOptionsDisplayForm(rf_form_data)
+
+    return_structure = {'admin': admin,
+                        'GeneralChartOptionsForm': general_chart_options_form,
+                        'CTChartOptionsForm': ct_chart_options_form,
+                        'DXChartOptionsForm': dx_chart_options_form,
+                        'RFChartOptionsForm': rf_chart_options_form,
+                        }
+
+
+=========================================
+Additions to ``displaychartoptions.html``
+=========================================
+
+A new div needs to be added for the fluoroscopy chart options:
+
+.. sourcecode:: html
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Fluoroscopy chart options</h3>
+      </div>
+      <div class="panel-body">
+        <table>
+          {% csrf_token %}
+          {{ RFChartOptionsForm }}
+        </table>
+        <input class="btn btn-default" name="submit" type="submit" />
+      </div>
 
 ================================
 Additions to ``ctfiltered.html``
@@ -277,136 +418,70 @@ Additions to ``ctfiltered.html``
 A section of this file sets a JavaScript variable per chart. A new one needs to
 be added.
 
-Before:
+Additions:
 
 .. sourcecode:: html
 
-        <!-- Flags to determine if charts should be plotted -->
-        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
-            <script>var plotCTAcquisitionMeanDLP = true;</script>
+        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
+            <script>
+                // Flags to determine if charts should be plotted
+                var plotRFStudyPerDayAndHour = true;
+
+                // JavaScript for studies per weekday pie chart with drilldown to hourly breakdown
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
         {% endif %}
 
-        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-            <script>var plotCTAcquisitionMeanCTDI = true;</script>
-        {% endif %}
 
-        {% if request.user.userprofile.plotCTAcquisitionFreq %}
-            <script>var plotCTAcquisitionFreq = true;</script>
-        {% endif %}
-
-        ...
-        ...
-
-        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
-        <!-- End of flags to determine if charts should be plotted -->
-
-After:
-
-.. sourcecode:: html
-
-        <!-- Flags to determine if charts should be plotted -->
-        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
-            <script>var plotCTAcquisitionMeanDLP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-            <script>var plotCTAcquisitionMeanCTDI = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTAcquisitionFreq %}
-            <script>var plotCTAcquisitionFreq = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTAcquisitionCTDIOverTime %}
-            <script>var plotCTAcquisitionCTDIOverTime = true;</script>
-        {% endif %}
-
-        ...
-        ...
-
-        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
-        <!-- End of flags to determine if charts should be plotted -->
-
-A second section of code needs to be added to ``ctfiltered.html`` to include a
+A second section of code needs to be added to ``rffiltered.html`` to include a
 DIV for the new chart:
 
 .. sourcecode:: html
 
-        {% if request.user.userprofile.plotCTAcquisitionCTDIOverTime %}
-            <!-- HTML to include div container for acquisition CTDI over time -->
+        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
+            <!-- HTML to include div container for study workload -->
 
             <script>
                 $(window).resize(function() {
-                    chartSetExportSize('acqCTDIOverTimeDIV');
+                    chartSetExportSize('piechartStudyWorkloadDIV');
                 });
             </script>
 
-            <div class="panel-group" id="accordion10">
+            <div class="panel-group" id="accordion5">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseAcqCTDIOverTimeChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                                    Line plot showing mean CTDI<sub>vol</sub> of each acquisition type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
-                                {% else %}
-                                    Line plot showing median CTDI<sub>vol</sub> of each acquisition type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
-                                {% endif %}
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of number of studies per weekday.
                             </a>
                         </h4>
                     </div>
-                    <div id="collapseAcqCTDIOverTimeChart" class="panel-collapse collapse">
+                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <div id="acqCTDIOverTimeDIV" style="height: auto; margin: 0 0"></div>
-                            <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
-                            <a onclick="enterFullScreen('collapseAcqCTDIOverTimeChart', 'acqCTDIOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- End of HTML to include div container for acquisition CTDI over time -->
-        {% endif %}
-
-
-And finally a third section:
-
-.. sourcecode:: html
-
-        {% if request.user.userprofile.plotCTAcquisitionCTDIOverTime %}
-            <!-- JavaScript for CTDI over time -->
-            <script>
-                var urlStartAcqCTDIOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>
-                    result = chartAverageOverTime('acqCTDIOverTimeDIV', 'CTDI<sub>vol</sub>', 'mGy', 'Mean');
-                </script>
-            {% else %}
-                <script>
-                    result = chartAverageOverTime('acqCTDIOverTimeDIV', 'CTDI<sub>vol</sub>', 'mGy', 'Median');
-                </script>
-            {% endif %}
-            <!-- End of JavaScript for CTDI over time -->
+            <!-- End of HTML to include div container for studies per week day pie chart -->
         {% endif %}
 
 ===============================
-Additions to ``ctChartAjax.js``
+Additions to ``rfChartAjax.js``
 ===============================
+
+This file needs to update the skeleton chart with the data that has been
+provided by ``views.py``. It does this via the appropriate routine contained in
+the ``chartUpdateData.js`` file. In this case, ``updateWorkloadChart``:
 
 .. sourcecode:: javascript
 
-            // CTDI over time chart data
-            if(typeof plotCTAcquisitionCTDIOverTime !== 'undefined') {
-                var acq_line_colours = new Array(json.acquisitionNameListCTDI.length);
-                if (typeof plotCTAcquisitionFreq !== 'undefined') {
-                    acq_line_colours = [];
-                    for (i = 0; i < $('#piechartAcquisitionDIV').highcharts().series[0].data.length; i++) {
-                        acq_line_colours.push($('#piechartAcquisitionDIV').highcharts().series[0].data.sort(sort_by_name)[i].color);
-                    }
-                    $('#piechartAcquisitionDIV').highcharts().series[0].data.sort(sort_by_y);
-                }
-                else acq_line_colours = colour_scale.colors(json.acquisitionNameListCTDI.length);
-
-                var acq_ctdi_over_time = json.acquisitionCTDIoverTime;
-                updateOverTimeChart(json.acquisitionNameListCTDI, acq_ctdi_over_time, acq_line_colours, urlStartAcq, 'acqCTDIOverTimeDIV');
+            // Study workload chart data
+            if(typeof plotRFStudyPerDayAndHour !== 'undefined') {
+                updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
             }
+
+That's it - you should now have a new chart visible in the fluoroscopy filtered
+page.

@@ -38,7 +38,12 @@ $(document).ready(function() {
 
             // Initialise some colours to use for plotting
             var colour_scale = chroma.scale('RdYlBu');
-            
+
+            // Study workload chart data
+            if(typeof plotRFStudyPerDayAndHour !== 'undefined') {
+                updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
+            }
+
             $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {

@@ -196,11 +196,42 @@ $('.datepicker').datepicker({
 
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
+        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
+            <!-- HTML to include div container for study workload -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordion5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of number of studies per weekday.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for studies per week day pie chart -->
+        {% endif %}
+
         <!-- Include JavaScript to enable highcharts plots -->
         <script src="{{ STATIC_URL }}js/highcharts.js"></script>
         <script src="{{ STATIC_URL }}js/exporting.js"></script>
         <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
         <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
         <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
         <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
@@ -231,6 +262,16 @@ $('.datepicker').datepicker({
         <!-- JavaScript chart AJAX code. -->
         <script src="{{ STATIC_URL }}js/rfChartAjax.js"></script>
         <!-- End of JavaScript chart AJAX code. -->
+
+        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
+            <script>
+                // Flags to determine if charts should be plotted
+                var plotRFStudyPerDayAndHour = true;
+
+                // JavaScript for studies per weekday pie chart with drilldown to hourly breakdown
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
 
     {% endif %}
 

@@ -257,6 +257,8 @@ class UserProfile(models.Model):
                                                   choices=SORTING_CHOICES_CT,
                                                   default=FREQ)
 
+    plotRFStudyPerDayAndHour = models.BooleanField(default=False)
+
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)
     displayMG = models.BooleanField(default=True)
