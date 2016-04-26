@@ -412,7 +412,7 @@ A new div needs to be added for the fluoroscopy chart options:
       </div>
 
 ================================
-Additions to ``ctfiltered.html``
+Additions to ``rffiltered.html``
 ================================
 
 A section of this file sets a JavaScript variable per chart. A new one needs to
