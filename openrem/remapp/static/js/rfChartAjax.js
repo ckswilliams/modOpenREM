@@ -49,6 +49,12 @@ $(document).ready(function() {
                 updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, 'piechartStudyDIV', colour_scale);
             }
 
+            // DAP per study description data
+            if( typeof plotRFStudyDAP !== 'undefined') {
+                updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, 'plotRFStudyDAPContainer', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'plotRFStudyDAPContainer');
+            }
+
             $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {

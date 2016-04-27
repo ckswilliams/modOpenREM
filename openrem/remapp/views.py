@@ -463,6 +463,7 @@ def rf_summary_list_filter(request):
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
             user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = chart_options_form.cleaned_data['plotRFStudyFreq']
+            user_profile.plotRFStudyDAP = chart_options_form.cleaned_data['plotRFStudyDAP']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
@@ -471,6 +472,7 @@ def rf_summary_list_filter(request):
             form_data = {'plotCharts': user_profile.plotCharts,
                          'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                          'plotRFStudyFreq': user_profile.plotRFStudyFreq,
+                         'plotRFStudyDAP': user_profile.plotRFStudyDAP,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
             chart_options_form = RFChartOptionsForm(form_data)
 
@@ -525,13 +527,14 @@ def rf_summary_chart_data(request):
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq)
+                             user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq,
+                             user_profile.plotRFStudyDAP)
 
     return JsonResponse(return_structure, safe=False)
 
 
 def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq):
+                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap):
     from remapp.models import IrradEventXRayData, Median
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
@@ -539,7 +542,7 @@ def rf_plot_calculations(f, request_results, median_available, plot_average_choi
 
     exp_include = [o.study_instance_uid for o in f]
 
-    if plot_study_per_day_and_hour:
+    if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
         study_events = GeneralStudyModuleAttr.objects.exclude(
             study_description__isnull=True
         ).filter(
@@ -550,17 +553,21 @@ def rf_plot_calculations(f, request_results, median_available, plot_average_choi
         result = workload_chart_data(study_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
 
-    if plot_study_freq:
+    if plot_study_freq or plot_study_dap:
         result = average_chart_inc_histogram_data(study_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
-                                                  1, 0, plot_study_freq, plot_series_per_systems, plot_average_choice,
+                                                  1000000,
+                                                  plot_study_dap, plot_study_freq,
+                                                  plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
         return_structure['studySummary'] = result['summary']
+        if plot_study_dap:
+            return_structure['studyHistogramData'] = result['histogram_data']
 
     return return_structure
 

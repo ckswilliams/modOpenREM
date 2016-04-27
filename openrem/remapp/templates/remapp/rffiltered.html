@@ -196,6 +196,64 @@ $('.datepicker').datepicker({
 
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
+        {% if request.user.userprofile.plotRFStudyDAP %}
+            <!-- HTML to include div container for study plot -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('plotRFStudyDAPContainer');
+                });
+            </script>
+
+            <div class="panel-group" id="plotRFStudyDAPAccordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#plotRFStudyDAPAccordion" href="#collapsePlotRFStudyDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean DAP for each study description.
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median DAP for each study description.
+                                {% else %}
+                                    Plot of mean and median DAP for each study description.
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapsePlotRFStudyDAPAccordion" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="plotRFStudyDAPContainer" style="height: auto; margin: 0 0"></div>
+
+                            <div class="stu-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that study description.<br>
+                                            Click on a histogram bin tooltip to see the studies that contain the study names in the bin. Note that
+                                            this will include studies at the upper bin boundary, so in some cases may display more data than
+                                            shown in the histogram bin.</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending DAP">&darr;DAP</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="enterFullScreen('collapsePlotRFStudyDAPAccordion','plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div for study name plot -->
+        {% endif %}
+
         {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
             <!-- HTML to include div container for study workload -->
 
@@ -292,6 +350,8 @@ $('.datepicker').datepicker({
         <script src="{{ STATIC_URL }}js/rfChartAjax.js"></script>
         <!-- End of JavaScript chart AJAX code. -->
 
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
         {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
             <script>
                 var plotRFStudyPerDayAndHour = true;
@@ -304,6 +364,39 @@ $('.datepicker').datepicker({
                 var plotRFStudyFreq = true;
                 var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotRFStudyDAP %}
+            <script>
+                var plotRFStudyDAP = true;
+                var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.stu-hist-norm-btn';
+                instr_class = '.stu-instructions';
+                render_div = 'plotRFStudyDAPContainer';
+                val_label = 'DAP';
+                val_units = 'cGy.cm<sup>2</sup>';
+                cat_label = 'Study description';
+                cat_counter = 'studies';
+                field_name_min = 'study_dap_min';
+                field_name_max = 'study_dap_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'study_description';
+                tooltip_filters = tooltipFiltersStudy;
+                href_start = '/openrem/rf/';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
             </script>
         {% endif %}
 
