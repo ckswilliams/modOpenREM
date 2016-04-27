@@ -44,6 +44,11 @@ $(document).ready(function() {
                 updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
             }
 
+            // Study description frequency chart data start
+            if(typeof plotRFStudyFreq !== 'undefined') {
+                updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, 'piechartStudyDIV', colour_scale);
+            }
+
             $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {

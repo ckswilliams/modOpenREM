@@ -462,6 +462,7 @@ def rf_summary_list_filter(request):
             # process the data in form.cleaned_data as required
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
             user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
+            user_profile.plotRFStudyFreq = chart_options_form.cleaned_data['plotRFStudyFreq']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
@@ -469,6 +470,7 @@ def rf_summary_list_filter(request):
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
                          'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
+                         'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
             chart_options_form = RFChartOptionsForm(form_data)
 
@@ -523,13 +525,13 @@ def rf_summary_chart_data(request):
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour)
+                             user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq)
 
     return JsonResponse(return_structure, safe=False)
 
 
 def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour):
+                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq):
     from remapp.models import IrradEventXRayData, Median
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
@@ -547,6 +549,18 @@ def rf_plot_calculations(f, request_results, median_available, plot_average_choi
     if plot_study_per_day_and_hour:
         result = workload_chart_data(study_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
+
+    if plot_study_freq:
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                                                  1, 0, plot_study_freq, plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
+
+        return_structure['studySystemList'] = result['system_list']
+        return_structure['studyNameList'] = result['series_names']
+        return_structure['studySummary'] = result['summary']
 
     return return_structure
 
@@ -1505,6 +1519,7 @@ def chart_options_view(request):
             user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
 
             user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
+            user_profile.plotRFStudyFreq = rf_form.cleaned_data['plotRFStudyFreq']
 
             user_profile.save()
 
@@ -1550,7 +1565,8 @@ def chart_options_view(request):
                     'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
                     'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
 
-    rf_form_data = {'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour}
+    rf_form_data = {'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
+                    'plotRFStudyFreq': user_profile.plotRFStudyFreq}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)

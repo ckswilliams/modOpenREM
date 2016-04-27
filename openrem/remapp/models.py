@@ -258,6 +258,7 @@ class UserProfile(models.Model):
                                                   default=FREQ)
 
     plotRFStudyPerDayAndHour = models.BooleanField(default=False)
+    plotRFStudyFreq = models.BooleanField(default=False)
 
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)

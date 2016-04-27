@@ -226,6 +226,35 @@ $('.datepicker').datepicker({
             <!-- End of HTML to include div container for studies per week day pie chart -->
         {% endif %}
 
+        {% if request.user.userprofile.plotRFStudyFreq %}
+            <!-- HTML to include div container for study name pie chart -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordionPiechartStudy">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of study name frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for study name pie chart -->
+        {% endif %}
+
         <!-- Include JavaScript to enable highcharts plots -->
         <script src="{{ STATIC_URL }}js/highcharts.js"></script>
         <script src="{{ STATIC_URL }}js/exporting.js"></script>
@@ -265,11 +294,16 @@ $('.datepicker').datepicker({
 
         {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
             <script>
-                // Flags to determine if charts should be plotted
                 var plotRFStudyPerDayAndHour = true;
-
-                // JavaScript for studies per weekday pie chart with drilldown to hourly breakdown
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotRFStudyFreq %}
+            <script>
+                var plotRFStudyFreq = true;
+                var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
         {% endif %}
 

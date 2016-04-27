@@ -1,6 +1,6 @@
-##################
-Adding a new chart
-##################
+#################
+Adding new charts
+#################
 
 To add a new chart several files need to be updated:
 
@@ -15,19 +15,15 @@ Where xx is one of ``ct``, ``dx``, ``mg`` or ``rf``
 
 The process is probably best illustrated via an example. What follows is a
 description of how to add a new chart that displays study workload for
-fluoroscopy.
-
-********************************************
-Adding a chart of fluoroscopy study workload
-********************************************
+fluoroscopy, and a pie chart of study description frequency.
 
 ==========================
 Additions to ``models.py``
 ==========================
 
-A field needs to be added to the ``UserProfile`` section in ``models.py`` to
-control whether the new chart should be plotted. There is a section of this
-file that looks like the following:
+A field per chart needs to be added to the ``UserProfile`` section in
+``models.py`` to control whether the new charts should be plotted. There is a
+section of this file that looks like the following:
 
 .. sourcecode:: python
 
@@ -47,15 +43,16 @@ file that looks like the following:
                                                   choices=SORTING_CHOICES_CT,
                                                   default=FREQ)
 
-A new line needs to be added to this section, using an appropriate name such
+Two new lines needs to be added to this section, using appropriate names such
 as:
 
 .. sourcecode:: python
 
     plotRFStudyPerDayAndHour = models.BooleanField(default=False)
+    plotRFStudyFreq = models.BooleanField(default=False)
 
-Adding a new field to ``models.py`` requires that a database migration is carried
-out to add the field to the database. This is done via the command line::
+Adding new fields to ``models.py`` requires that a database migration is carried
+out to add the fields to the database. This is done via the command line::
 
     python manage.py makemigrations remapp
     python manage.py migrate remapp
@@ -65,6 +62,7 @@ The first command should result in a response similar to::
     Migrations for 'remapp':
       0004_auto_20160424_1116.py:
         - Add field plotRFAcquisitionCTDIOverTime to userprofile
+        - Add field plotRFStudyFreq to userprofile
 
 The second command should result in a response similar to::
 
@@ -80,16 +78,17 @@ That's the end of the changes required in ``models.py``
 Additions to ``forms.py``
 =========================
 
-An additional line needs to be added to the ``XXChartOptionsForm`` and
+Two additional lines need to be added to the ``XXChartOptionsForm`` and
 ``XXChartOptionsDisplayForm`` methods in ``forms.py``, where ``XX`` is one of
 ``CT``, ``DX``, ``MG`` or ``RF``.
 
-For our new chart the following line needs to be added to both
+For our new charts the following lines needs to be added to both
 ``RFChartOptionsForm`` and ``RFChartOptionsDisplayForm``:
 
 .. sourcecode:: python
 
     plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
 
 In addition, a new method needs to be added so that the RF chart options are
 shown when the user goes to Config -> Chart options:
@@ -98,8 +97,9 @@ shown when the user goes to Config -> Chart options:
 
     class RFChartOptionsDisplayForm(forms.Form):
         plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+        plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
 
-That's the end of the changes required in ``models.py``
+That's the end of the changes required in ``forms.py``
 
 =========================
 Additions to ``views.py``
@@ -113,7 +113,7 @@ Four methods in this file need to be updated.
 
 Some additions need to be made to the ``xx_summary_list_filter`` method in
 ``views.py``, where ``xx`` is one of ``ct``, ``dx``, ``mg`` or ``rf``. As we're
-adding a new RF chart, we need to edit ``rf_summary_list_filter``.
+adding new RF charts, we need to edit ``rf_summary_list_filter``.
 
 A section of this method examines the user's chart plotting preferences. Code
 must be added to include the new chart in these checks. An abbreviated version
@@ -138,7 +138,7 @@ of the section is shown below.
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
             chart_options_form = RFChartOptionsForm(form_data)
 
-A new line needs to be inserted into the ``if`` and ``else`` sections for the
+Two new lines needs to be inserted into the ``if`` and ``else`` sections for the
 new chart:
 
 .. sourcecode:: python
@@ -152,6 +152,7 @@ new chart:
             # process the data in form.cleaned_data as required
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
             user_profile.plotRFStudyPerDayAndHour = chart_options_form.cleaned_data['plotRFStudyPerDayAndHour']
+            user_profile.plotRFStudyFreq = chart_options_form.cleaned_data['plotRFStudyFreq']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
@@ -159,6 +160,7 @@ new chart:
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
                          'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
+                         'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
             chart_options_form = RFChartOptionsForm(form_data)
 
@@ -166,7 +168,7 @@ new chart:
 ``xx_summary_chart_data`` additions
 -----------------------------------
 
-The ``return_structure`` variable needs the new user_profile field adding.
+The ``return_structure`` variable needs the new user_profile fields adding.
 
 Before:
 
@@ -183,13 +185,13 @@ After:
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour)
+                             user_profile.plotRFStudyPerDayAndHour,  user_profile.plotRFStudyFreq)
 
 ----------------------------------
 ``xx_plot_calculations`` additions
 ----------------------------------
 
-A new item needs to be added to this method's parameters.
+Two items needs to be added to this method's parameters.
 
 Before:
 
@@ -203,11 +205,11 @@ After:
 .. sourcecode:: python
 
     def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                             plot_histogram_bins, plot_study_per_day_and_hour):
+                             plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq):
 
-Our new chart makes use of ``study_events`` (rather than ``acquisition_events``
-or ``request_events``). We therefore need to ensure that ``study_events``
-are available if the user has chosen to show the new chart.
+Our new charts makes use of ``study_events`` (rather than ``acquisition_events``
+or ``request_events``). We therefore need to ensure that ``study_events`` are
+available if the user has chosen to show the new chart.
 
 After additions:
 
@@ -220,7 +222,7 @@ After additions:
             study_instance_uid__in=exp_include
         )
 
-We now need to add code that will calculate the data for the new chart. This
+We now need to add code that will calculate the data for the new charts. This
 uses one of the methods in the ``chart_functions.py`` file, located in the
 ``interface`` folder of the OpenREM project.
 
@@ -230,8 +232,20 @@ uses one of the methods in the ``chart_functions.py`` file, located in the
         result = workload_chart_data(study_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
 
-This data will now be available to the browser via JavaScript, and can be used
-to populate the chart itself.
+    if plot_study_freq:
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
+                                                  1, 0, plot_study_freq, plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins)
+
+        return_structure['studySystemList'] = result['system_list']
+        return_structure['studyNameList'] = result['series_names']
+        return_structure['studySummary'] = result['summary']
+
+The data in ``return_structure`` will now be available to the browser via
+JavaScript, and can be used to populate the charts themselves.
 
 ----------------------------------
 ``chart_options_view`` additions
@@ -354,6 +368,7 @@ After (abbreviated):
             user_profile.plotDXInitialSortingChoice = dx_form.cleaned_data['plotDXInitialSortingChoice']
 
             user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
+            user_profile.plotRFStudyFreq = rf_form.cleaned_data['plotRFStudyFreq']
 
             user_profile.save()
 
@@ -377,7 +392,8 @@ After (abbreviated):
                     ...
                     'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
 
-    rf_form_data = {'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour}
+    rf_form_data = {'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour,
+                    'plotRFStudyFreq': user_profile.plotRFStudyFreq}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
@@ -415,8 +431,8 @@ A new div needs to be added for the fluoroscopy chart options:
 Additions to ``rffiltered.html``
 ================================
 
-A section of this file sets a JavaScript variable per chart. A new one needs to
-be added.
+A section of this file sets a JavaScript variable per chart. Two new ones needs
+to be added.
 
 Additions:
 
@@ -424,17 +440,22 @@ Additions:
 
         {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
             <script>
-                // Flags to determine if charts should be plotted
                 var plotRFStudyPerDayAndHour = true;
-
-                // JavaScript for studies per weekday pie chart with drilldown to hourly breakdown
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotRFStudyFreq %}
+            <script>
+                var plotRFStudyFreq = true;
+                var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
         {% endif %}
 
 
 A second section of code needs to be added to ``rffiltered.html`` to include a
-DIV for the new chart:
+DIV for the new charts:
 
 .. sourcecode:: html
 
@@ -468,13 +489,43 @@ DIV for the new chart:
             <!-- End of HTML to include div container for studies per week day pie chart -->
         {% endif %}
 
+        {% if request.user.userprofile.plotRFStudyFreq %}
+            <!-- HTML to include div container for study name pie chart -->
+
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyDIV');
+                });
+            </script>
+
+            <div class="panel-group" id="accordionPiechartStudy">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Pie chart showing a breakdown of study name frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for study name pie chart -->
+        {% endif %}
+
 ===============================
 Additions to ``rfChartAjax.js``
 ===============================
 
 This file needs to update the skeleton chart with the data that has been
-provided by ``views.py``. It does this via the appropriate routine contained in
-the ``chartUpdateData.js`` file. In this case, ``updateWorkloadChart``:
+provided by ``views.py``. It does this via the appropriate routines contained
+in the ``chartUpdateData.js`` file. In this case, ``updateWorkloadChart`` and
+``updateFrequencyChart``:
 
 .. sourcecode:: javascript
 
@@ -483,5 +534,10 @@ the ``chartUpdateData.js`` file. In this case, ``updateWorkloadChart``:
                 updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
             }
 
-That's it - you should now have a new chart visible in the fluoroscopy filtered
-page.
+            // Study description frequency chart data start
+            if(typeof plotRFStudyFreq !== 'undefined') {
+                updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, 'piechartStudyDIV', colour_scale);
+            }
+
+That's it - you should now have two new charts visible in the fluoroscopy
+filtered page.
