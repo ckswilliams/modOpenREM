@@ -327,7 +327,7 @@ $('.datepicker').datepicker({
         <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
         <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
         <script>
-            var chartSorting = '{{ request.user.userprofile.plotCTInitialSortingChoice }}';
+            var chartSorting = '{{ request.user.userprofile.plotRFInitialSortingChoice }}';
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
             var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,

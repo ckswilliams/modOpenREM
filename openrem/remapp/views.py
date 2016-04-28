@@ -902,6 +902,9 @@ def ct_detail_view(request, pk=None):
 @login_required
 def mg_summary_list_filter(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
+    from openremproject import settings
+    from remapp.forms import MGChartOptionsForm
+
     filter_data = request.GET.copy()
     if 'page' in filter_data:
         del filter_data['page']
@@ -911,16 +914,121 @@ def mg_summary_list_filter(request):
     else:
         f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
 
+    try:
+        # See if the user has plot settings in userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    if user_profile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        user_profile.median_available = True
+        user_profile.save()
+        median_available = True
+    else:
+        user_profile.median_available = False
+        user_profile.save()
+        median_available = False
+
+    # Obtain the chart options from the request
+    chart_options_form = MGChartOptionsForm(request.GET)
+    # Check whether the form data is valid
+    if chart_options_form.is_valid():
+        # Use the form data if the user clicked on the submit button
+        if "submit" in request.GET:
+            # process the data in form.cleaned_data as required
+            user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
+            user_profile.plotMGStudyPerDayAndHour = chart_options_form.cleaned_data['plotMGStudyPerDayAndHour']
+            if median_available:
+                user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.save()
+
+        else:
+            form_data = {'plotCharts': user_profile.plotCharts,
+                         'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+            chart_options_form = MGChartOptionsForm(form_data)
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
+    return_structure = {'filter': f, 'admin': admin, 'chartOptionsForm': chart_options_form}
+
     return render_to_response(
         'remapp/mgfiltered.html',
-        {'filter': f, 'admin': admin},
+        return_structure,
         context_instance=RequestContext(request)
     )
+
+
+@login_required
+def mg_summary_chart_data(request):
+    from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
+    from openremproject import settings
+    from django.http import JsonResponse
+
+    request_results = request.GET
+
+    if request.user.groups.filter(name='pidgroup'):
+        f = MGFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact='MG').order_by().distinct())
+    else:
+        f = MGSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact='MG').order_by().distinct())
+
+    try:
+        # See if the user has plot settings in userprofile
+        user_profile = request.user.userprofile
+    except:
+        # Create a default userprofile for the user if one doesn't exist
+        create_user_profile(sender=request.user, instance=request.user, created=True)
+        user_profile = request.user.userprofile
+
+    if user_profile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        median_available = True
+    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        user_profile.median_available = True
+        user_profile.save()
+        median_available = True
+    else:
+        user_profile.median_available = False
+        user_profile.save()
+        median_available = False
+
+    return_structure =\
+        mg_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
+                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
+                             user_profile.plotMGStudyPerDayAndHour)
+
+    return JsonResponse(return_structure, safe=False)
+
+
+def mg_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
+                         plot_histogram_bins, plot_study_per_day_and_hour):
+    from remapp.models import IrradEventXRayData, Median
+    from interface.chart_functions import workload_chart_data
+
+    return_structure = {}
+
+    exp_include = [o.study_instance_uid for o in f]
+
+    if plot_study_per_day_and_hour:
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            study_description__isnull=True
+        ).filter(
+            study_instance_uid__in=exp_include
+        )
+
+    if plot_study_per_day_and_hour:
+        result = workload_chart_data(study_events)
+        return_structure['studiesPerHourInWeekdays'] = result['workload']
+
+    return return_structure
 
 
 @login_required
@@ -946,6 +1054,7 @@ def mg_detail_view(request, pk=None):
         {'generalstudymoduleattr': study, 'admin': admin},
         context_instance=RequestContext(request)
     )
+
 
 
 def openrem_home(request):
@@ -1479,7 +1588,7 @@ def display_name_update(request):
 @login_required
 def chart_options_view(request):
     from remapp.forms import GeneralChartOptionsDisplayForm, DXChartOptionsDisplayForm, CTChartOptionsDisplayForm,\
-        RFChartOptionsDisplayForm
+        RFChartOptionsDisplayForm, MGChartOptionsDisplayForm
     from openremproject import settings
 
     if request.method == 'POST':
@@ -1487,7 +1596,10 @@ def chart_options_view(request):
         ct_form = CTChartOptionsDisplayForm(request.POST)
         dx_form = DXChartOptionsDisplayForm(request.POST)
         rf_form = RFChartOptionsDisplayForm(request.POST)
-        if general_form.is_valid() and ct_form.is_valid() and dx_form.is_valid() and rf_form.is_valid():
+        mg_form = MGChartOptionsDisplayForm(request.POST)
+        if general_form.is_valid()\
+                and ct_form.is_valid() and dx_form.is_valid()\
+                and rf_form.is_valid() and mg_form.is_valid():
             try:
                 # See if the user has plot settings in userprofile
                 user_profile = request.user.userprofile
@@ -1527,6 +1639,9 @@ def chart_options_view(request):
 
             user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = rf_form.cleaned_data['plotRFStudyFreq']
+            user_profile.plotRFInitialSortingChoice = rf_form.cleaned_data['plotRFInitialSortingChoice']
+
+            user_profile.plotMGStudyPerDayAndHour = mg_form.cleaned_data['plotMGStudyPerDayAndHour']
 
             user_profile.save()
 
@@ -1573,18 +1688,24 @@ def chart_options_view(request):
                     'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
 
     rf_form_data = {'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
-                    'plotRFStudyFreq': user_profile.plotRFStudyFreq}
+                    'plotRFStudyFreq': user_profile.plotRFStudyFreq,
+                    'plotRFStudyDAP': user_profile.plotRFStudyDAP,
+                    'plotRFInitialSortingChoice': user_profile.plotRFInitialSortingChoice}
+
+    mg_form_data = {'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
     dx_chart_options_form = DXChartOptionsDisplayForm(dx_form_data)
     rf_chart_options_form = RFChartOptionsDisplayForm(rf_form_data)
+    mg_chart_options_form = MGChartOptionsDisplayForm(mg_form_data)
 
     return_structure = {'admin': admin,
                         'GeneralChartOptionsForm': general_chart_options_form,
                         'CTChartOptionsForm': ct_chart_options_form,
                         'DXChartOptionsForm': dx_chart_options_form,
                         'RFChartOptionsForm': rf_chart_options_form,
+                        'MGChartOptionsForm': mg_chart_options_form,
                         }
 
     return render_to_response(

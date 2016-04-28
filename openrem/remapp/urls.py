@@ -63,6 +63,8 @@ urlpatterns = patterns('remapp.views',
 
     url(r'^mg/$',
         'mg_summary_list_filter'),
+    url(r'^mg/chart/$',
+        'mg_summary_chart_data', name='mg_summary_chart_data'),
     url(r'^mg/(?P<pk>\d+)/$', 'mg_detail_view', name='mg_detail_view'),
 
     url(r'^viewdisplaynames/$',

@@ -132,6 +132,19 @@ class RFChartOptionsDisplayForm(forms.Form):
     plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
     plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
+    plotRFInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX,
+                                               required=False)
+
+
+class MGChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class MGChartOptionsDisplayForm(forms.Form):
+    plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
 
 
 class DXChartOptionsDisplayForm(forms.Form):
