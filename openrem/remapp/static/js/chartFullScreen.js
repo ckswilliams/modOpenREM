@@ -16,5 +16,6 @@ function enterFullScreen(div_id, chart_div) {
 
     $('#'+div_id).toggleClass('fullscreen');
 
-    setTimeout(function() {$(document).resize();}, 0);
+    var chart = $('#'+chart_div).highcharts();
+    chart.setSize($('#'+chart_div).width(), $('#'+chart_div).height());
 }
