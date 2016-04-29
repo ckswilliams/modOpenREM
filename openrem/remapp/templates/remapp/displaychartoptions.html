@@ -54,6 +54,17 @@
         <input class="btn btn-default" name="submit" type="submit" />
       </div>
 
+      <div class="panel-heading">
+        <h3 class="panel-title">Mammography chart options</h3>
+      </div>
+      <div class="panel-body">
+        <table>
+          {% csrf_token %}
+          {{ MGChartOptionsForm }}
+        </table>
+        <input class="btn btn-default" name="submit" type="submit" />
+      </div>
+
     </div>
   </form>
 
