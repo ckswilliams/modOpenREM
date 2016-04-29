@@ -197,7 +197,7 @@ def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system,
         return_structure['scatterData'].append(database_events.values_list(x_field, y_field))
 
     for index in range(len(return_structure['scatterData'])):
-        return_structure['scatterData'][index] = [[float(i[0]), float(i[1])] for i in return_structure['scatterData'][index]]
+        return_structure['scatterData'][index] = [[floatIfValue(i[0]), floatIfValue(i[1])] for i in return_structure['scatterData'][index]]
 
     import numpy as np
     max_data = [0, 0]
@@ -208,3 +208,8 @@ def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system,
     return_structure['maxXandY'] = max_data
 
     return return_structure
+
+
+def floatIfValue(val):
+    import numbers
+    return float(val) if isinstance(val, numbers.Number) else 0.0
