@@ -179,14 +179,32 @@ def workload_chart_data(database_events):
     return return_structure
 
 
-def scatter_plot_data(database_events, x_field, y_field):
+def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system, db_display_name_relationship):
     return_structure = dict()
 
-    return_structure['scatterData'] = database_events.values_list(x_field, y_field)
-    return_structure['scatterData'] = [[float(i[0]), float(i[1])] for i in return_structure['scatterData']]
+    if plot_series_per_system:
+        return_structure['system_list'] = list(database_events.values_list(db_display_name_relationship, flat=True)
+                                               .distinct().order_by(db_display_name_relationship))
+    else:
+        return_structure['system_list'] = ['All systems']
+
+    return_structure['scatterData'] = []
+    if plot_series_per_system:
+        for system in return_structure['system_list']:
+            return_structure['scatterData'].append(database_events.filter(
+                **{db_display_name_relationship: system}).values_list(x_field, y_field))
+    else:
+        return_structure['scatterData'].append(database_events.values_list(x_field, y_field))
+
+    for index in range(len(return_structure['scatterData'])):
+        return_structure['scatterData'][index] = [[float(i[0]), float(i[1])] for i in return_structure['scatterData'][index]]
 
     import numpy as np
-
-    return_structure['maxXandY'] = np.amax(return_structure['scatterData'], 0).tolist()
+    max_data = [0, 0]
+    for index in range(len(return_structure['scatterData'])):
+        current_max = np.amax(return_structure['scatterData'][index], 0).tolist()
+        if current_max[0] > max_data[0]: max_data[0] = current_max[0]
+        if current_max[1] > max_data[1]: max_data[1] = current_max[1]
+    return_structure['maxXandY'] = max_data
 
     return return_structure

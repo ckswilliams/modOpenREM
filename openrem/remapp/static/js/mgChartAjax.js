@@ -46,7 +46,7 @@ $(document).ready(function() {
 
             // AGD vs compressed thickness scatter plot
             if(typeof plotMGAGDvsThickness !== 'undefined') {
-                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV');
+                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV', json.AGDvsThicknessSystems, colour_scale);
             }
 
             $(".ajax-progress").hide();

@@ -32,20 +32,12 @@ function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
             title: {
                 useHTML: true,
                 text: y_axis_title
-            }
-        },
-        series: [{
-            type: 'scatter',
-            name: 'All systems',
-            color: 'rgba(152,0,67,0.1)',
-            data: [],
-            marker: {
-                radius: 1
             },
-            tooltip: {
-                followPointer: false,
-                pointFormat: '[{point.x:.1f}, {point.y:.1f}]'
+            labels: {
+                format: '{value:.1f}'
             }
-        }]
+
+        },
+        series: []
     });
 }

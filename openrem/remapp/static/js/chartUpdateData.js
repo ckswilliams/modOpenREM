@@ -304,9 +304,44 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
 }
 
 
-function updateScatterChart(scatter_data, max_values, chart_div) {
+function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
     var chart = $('#'+chart_div).highcharts();
-    chart.series[0].setData(scatter_data);
+    var colour_max = system_list.length;
+
+    for (i = 0; i < system_list.length; i++) {
+        if (chart.series.length > i) {
+            chart.series[i].update({
+                type: 'scatter',
+                name: system_list[i],
+                data: scatter_data[i],
+                color: colour_scale(i/colour_max).alpha(1.0).css(),
+                marker: {
+                    radius: 5
+                },
+                tooltip: {
+                    followPointer: false,
+                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                }
+            });
+        }
+        else {
+            chart.addSeries({
+                type: 'scatter',
+                name: system_list[i],
+                data: scatter_data[i],
+                color: colour_scale(i/colour_max).alpha(1.0).css(),
+                marker: {
+                    radius: 2
+                },
+                tooltip: {
+                    followPointer: false,
+                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                }
+            });
+        }
+
+    }
+
     chart.xAxis[0].update({
         max: max_values[0]
     });

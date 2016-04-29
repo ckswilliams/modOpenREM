@@ -1038,9 +1038,14 @@ def mg_plot_calculations(f, request_results, median_available, plot_average_choi
             **acquisition_filters
         )
 
-        result = scatter_plot_data(acquisition_events, 'irradeventxraymechanicaldata__compression_thickness', 'irradeventxraysourcedata__average_glandular_dose')
+        result = scatter_plot_data(acquisition_events,
+                                   'irradeventxraymechanicaldata__compression_thickness',
+                                   'irradeventxraysourcedata__average_glandular_dose',
+                                   plot_series_per_systems,
+                                   'projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name_id__display_name')
         return_structure['AGDvsThickness'] = result['scatterData']
         return_structure['maxThicknessAndAGD'] = result['maxXandY']
+        return_structure['AGDvsThicknessSystems'] = result['system_list']
 
     return return_structure
 
