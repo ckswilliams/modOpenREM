@@ -942,6 +942,7 @@ def mg_summary_list_filter(request):
             # process the data in form.cleaned_data as required
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
             user_profile.plotMGStudyPerDayAndHour = chart_options_form.cleaned_data['plotMGStudyPerDayAndHour']
+            user_profile.plotMGAGDvsThickness = chart_options_form.cleaned_data['plotMGAGDvsThickness']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
@@ -949,6 +950,7 @@ def mg_summary_list_filter(request):
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
                          'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
+                         'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness,
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
             chart_options_form = MGChartOptionsForm(form_data)
 
@@ -1003,15 +1005,15 @@ def mg_summary_chart_data(request):
     return_structure =\
         mg_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotMGStudyPerDayAndHour)
+                             user_profile.plotMGStudyPerDayAndHour, user_profile.plotMGAGDvsThickness)
 
     return JsonResponse(return_structure, safe=False)
 
 
 def mg_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour):
+                         plot_histogram_bins, plot_study_per_day_and_hour, plot_agd_vs_thickness):
     from remapp.models import IrradEventXRayData, Median
-    from interface.chart_functions import workload_chart_data
+    from interface.chart_functions import workload_chart_data, scatter_plot_data
 
     return_structure = {}
 
@@ -1027,6 +1029,18 @@ def mg_plot_calculations(f, request_results, median_available, plot_average_choi
     if plot_study_per_day_and_hour:
         result = workload_chart_data(study_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
+
+    if plot_agd_vs_thickness:
+        acquisition_filters = {
+            'projection_xray_radiation_dose__general_study_module_attributes__study_instance_uid__in': exp_include}
+
+        acquisition_events = IrradEventXRayData.objects.filter(
+            **acquisition_filters
+        )
+
+        result = scatter_plot_data(acquisition_events, 'irradeventxraymechanicaldata__compression_thickness', 'irradeventxraysourcedata__average_glandular_dose')
+        return_structure['AGDvsThickness'] = result['scatterData']
+        return_structure['maxThicknessAndAGD'] = result['maxXandY']
 
     return return_structure
 
@@ -1642,6 +1656,7 @@ def chart_options_view(request):
             user_profile.plotRFInitialSortingChoice = rf_form.cleaned_data['plotRFInitialSortingChoice']
 
             user_profile.plotMGStudyPerDayAndHour = mg_form.cleaned_data['plotMGStudyPerDayAndHour']
+            user_profile.plotMGAGDvsThickness = mg_form.cleaned_data['plotMGAGDvsThickness']
 
             user_profile.save()
 
@@ -1692,7 +1707,8 @@ def chart_options_view(request):
                     'plotRFStudyDAP': user_profile.plotRFStudyDAP,
                     'plotRFInitialSortingChoice': user_profile.plotRFInitialSortingChoice}
 
-    mg_form_data = {'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour}
+    mg_form_data = {'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
+                    'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)

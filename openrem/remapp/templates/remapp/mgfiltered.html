@@ -166,6 +166,40 @@ $('.datepicker').datepicker({
 
     {% if request.user.userprofile.plotCharts %}
 
+        <!-- Include JavaScript to enable highcharts plots -->
+        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script src="{{ STATIC_URL }}js/chartScatter.js"></script>
+        <!-- End of include JavaScript to enable highcharts plots -->
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
+        <!-- JavaScript to enable bootstrap tooltips -->
+        <script>
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+        <!-- End of JavaScript to enable bootstrap tooltips -->
+
+        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
+        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
+
+        <!-- JavaScript chart AJAX code. -->
+        <script src="{{ STATIC_URL }}js/mgChartAjax.js"></script>
+        <!-- End of JavaScript chart AJAX code. -->
+
         <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
         <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
         <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
@@ -173,15 +207,43 @@ $('.datepicker').datepicker({
 
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
-        {% if request.user.userprofile.plotMGStudyPerDayAndHour %}
-            <!-- HTML to include div container for study workload -->
 
+
+        {% if request.user.userprofile.plotMGAGDvsThickness %}
+            <!-- HTML to include div container for scatter plot -->
+
+            <div class="panel-group" id="accordionScatter">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionScatter" href="#collapseScatter" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                                Scatter plot chart showing AGD vs. compressed breast thickness.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseScatter" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="scatterDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseScatter', 'scatterDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for scatter plot -->
+            <script>
+                var plotMGAGDvsThickness = true;
+                result = chartScatter('Average glandular dose vs. compressed thickness', 'scatterDIV', 'Compressed thickness (mm)', 'Average glandular dose (mGy)');
+            </script>
             <script>
                 $(window).resize(function() {
-                    chartSetExportSize('piechartStudyWorkloadDIV');
+                    chartSetExportSize('scatterDIV');
                 });
             </script>
+        {% endif %}
 
+
+        {% if request.user.userprofile.plotMGStudyPerDayAndHour %}
+            <!-- HTML to include div container for study workload -->
             <div class="panel-group" id="accordion5">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -201,45 +263,14 @@ $('.datepicker').datepicker({
                 </div>
             </div>
             <!-- End of HTML to include div container for studies per week day pie chart -->
-        {% endif %}
-
-        <!-- Include JavaScript to enable highcharts plots -->
-        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
-        <script src="{{ STATIC_URL }}js/boost.js"></script>
-        <script src="{{ STATIC_URL }}js/exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
-        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
-        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
-        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
-        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
-        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
-        <!-- End of include JavaScript to enable highcharts plots -->
-
-        <!-- JavaScript to enable bootstrap tooltips -->
-        <script>
-            $(document).ready(function(){
-                $('[data-toggle="tooltip"]').tooltip();
-            });
-        </script>
-        <!-- End of JavaScript to enable bootstrap tooltips -->
-
-        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
-        <script src="{{ STATIC_URL }}js/sorting.js"></script>
-        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
-
-        <!-- JavaScript chart AJAX code. -->
-        <script src="{{ STATIC_URL }}js/mgChartAjax.js"></script>
-        <!-- End of JavaScript chart AJAX code. -->
-
-        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
-
-        {% if request.user.userprofile.plotMGStudyPerDayAndHour %}
             <script>
                 var plotMGStudyPerDayAndHour = true;
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+            <script>
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
             </script>
         {% endif %}
 

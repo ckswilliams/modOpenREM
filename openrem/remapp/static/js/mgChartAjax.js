@@ -44,6 +44,11 @@ $(document).ready(function() {
                 updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
             }
 
+            // AGD vs compressed thickness scatter plot
+            if(typeof plotMGAGDvsThickness !== 'undefined') {
+                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV');
+            }
+
             $(".ajax-progress").hide();
         },
         error: function( xhr, status, errorThrown ) {

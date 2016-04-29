@@ -139,12 +139,14 @@ class RFChartOptionsDisplayForm(forms.Form):
 class MGChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
     if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
 
 class MGChartOptionsDisplayForm(forms.Form):
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
 
 
 class DXChartOptionsDisplayForm(forms.Form):

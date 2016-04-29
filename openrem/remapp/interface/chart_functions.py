@@ -177,3 +177,16 @@ def workload_chart_data(database_events):
                 return_structure['workload'][day][hour] = hourly_breakdown[hour][1]
 
     return return_structure
+
+
+def scatter_plot_data(database_events, x_field, y_field):
+    return_structure = dict()
+
+    return_structure['scatterData'] = database_events.values_list(x_field, y_field)
+    return_structure['scatterData'] = [[float(i[0]), float(i[1])] for i in return_structure['scatterData']]
+
+    import numpy as np
+
+    return_structure['maxXandY'] = np.amax(return_structure['scatterData'], 0).tolist()
+
+    return return_structure

@@ -302,3 +302,16 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     }
     chart.redraw({duration: 1000});
 }
+
+
+function updateScatterChart(scatter_data, max_values, chart_div) {
+    var chart = $('#'+chart_div).highcharts();
+    chart.series[0].setData(scatter_data);
+    chart.xAxis[0].update({
+        max: max_values[0]
+    });
+    chart.yAxis[0].update({
+        max: max_values[1]
+    });
+    chart.redraw({duration: 1000});
+}

@@ -265,6 +265,7 @@ class UserProfile(models.Model):
                                                   default=FREQ)
 
     plotMGStudyPerDayAndHour = models.BooleanField(default=False)
+    plotMGAGDvsThickness = models.BooleanField(default=False)
 
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)
