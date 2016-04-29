@@ -308,6 +308,21 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
     var chart = $('#'+chart_div).highcharts();
     var colour_max = system_list.length;
 
+    /*
+    // Prepare some dummy data
+    var data = [],
+        n = 100000,
+        i;
+    for (i = 0; i < n; i += 1) {
+        data.push([
+            Math.pow(Math.random(), 2) * 100,
+            Math.pow(Math.random(), 2) * 100
+        ]);
+    }
+    max_values = [100,100];
+    system_list = ['Dummy data'];
+    */
+
     for (i = 0; i < system_list.length; i++) {
         if (chart.series.length > i) {
             chart.series[i].update({
@@ -316,7 +331,7 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 data: scatter_data[i],
                 color: colour_scale(i/colour_max).alpha(1.0).css(),
                 marker: {
-                    radius: 5
+                    radius: 1
                 },
                 tooltip: {
                     followPointer: false,
@@ -331,7 +346,7 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 data: scatter_data[i],
                 color: colour_scale(i/colour_max).alpha(1.0).css(),
                 marker: {
-                    radius: 2
+                    radius: 1
                 },
                 tooltip: {
                     followPointer: false,

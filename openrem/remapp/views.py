@@ -1047,6 +1047,11 @@ def mg_plot_calculations(f, request_results, median_available, plot_average_choi
         return_structure['maxThicknessAndAGD'] = result['maxXandY']
         return_structure['AGDvsThicknessSystems'] = result['system_list']
 
+        # import numpy as np
+        # return_structure['AGDvsThickness'] = [np.random.rand(1000000,2).tolist()]
+        # return_structure['maxThicknessAndAGD'] = [1.0, 1.0]
+        # return_structure['AGDvsThicknessSystems'] = ['Dummy data']
+
     return return_structure
 
 
