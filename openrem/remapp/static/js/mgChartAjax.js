@@ -37,7 +37,8 @@ $(document).ready(function() {
             var plotting_info = URLToArray(this.url);
 
             // Initialise some colours to use for plotting
-            var colour_scale = chroma.scale('RdYlBu');
+            //var colour_scale = chroma.scale('RdYlBu');
+            var colour_scale = chroma.scale('Dark2');
 
             // Study workload chart data
             if(typeof plotMGStudyPerDayAndHour !== 'undefined') {

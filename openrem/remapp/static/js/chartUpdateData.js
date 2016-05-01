@@ -329,9 +329,9 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 type: 'scatter',
                 name: system_list[i],
                 data: scatter_data[i],
-                color: colour_scale(i/colour_max).alpha(1.0).css(),
+                color: colour_scale(i/colour_max).alpha(0.5).css(),
                 marker: {
-                    radius: 1
+                    radius: 2
                 },
                 tooltip: {
                     followPointer: false,
@@ -344,9 +344,9 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 type: 'scatter',
                 name: system_list[i],
                 data: scatter_data[i],
-                color: colour_scale(i/colour_max).alpha(1.0).css(),
+                color: colour_scale(i/colour_max).alpha(0.5).css(),
                 marker: {
-                    radius: 1
+                    radius: 2
                 },
                 tooltip: {
                     followPointer: false,
