@@ -169,20 +169,61 @@
 
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
+        <!-- Include JavaScript to enable highcharts plots -->
+        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script>
+            var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
+            var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
+
+            var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+        </script>
+        <!-- End of include JavaScript for the plots -->
+
+        <!-- JavaScript to enable bootstrap tooltips -->
+        <script>
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+        <!-- End of JavaScript to enable bootstrap tooltips -->
+
+        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
+        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
+
+        <!-- JavaScript chart AJAX code. -->
+        <script src="{{ STATIC_URL }}js/dxChartAjax.js"></script>
+        <!-- End of JavaScript chart AJAX code. -->
+
+        <script>var plotDXAcquisitionMeanDAPOverTimePeriod = '{{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}';</script>
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
+        {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeankVpOverTime or request.user.userprofile.plotDXAcquisitionMeanmAsOverTime or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime%}
+            <script>
+                var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+            </script>
+        {% endif %}
+
         {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
             <!-- HTML to include div container for acquisition plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('container');
-                });
-            </script>
-
             <div class="panel-group" id="accordion1">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion1" href="#collapseOne" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion1" href="#collapseOne" onclick="setTimeout(function() {fitChartToDiv('container');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DAP for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -225,22 +266,49 @@
                 </div>
             </div>
             <!-- End of HTML to include div for acquisition plot -->
+
+            <script>
+                var plotDXAcquisitionMeanDAP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('container');
+                });
+                var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.acq-hist-norm-btn';
+                instr_class = '.acq-instructions';
+                render_div = 'container';
+                val_label = 'DAP';
+                val_units = 'cGy.cm<sup>2</sup>';
+                cat_label = 'Acquisition protocol';
+                cat_counter = 'exposures';
+                field_name_min = 'acquisition_dap_min';
+                field_name_max = 'acquisition_dap_max';
+                field_multiplier = 0.000001;
+                field_cat_name = 'acquisition_protocol';
+                tooltip_filters = tooltipFilters;
+                href_start = '/openrem/dx/?acquisitionhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionFreq %}
             <!-- HTML to include div container for acquisition pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartProtocolDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion2">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseProtocolPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartProtocolDIV');}, 0);">
                                 Pie chart showing a breakdown of acquisition protocol frequency.
                             </a>
                         </h4>
@@ -254,22 +322,23 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for acquisition pie chart -->
+
+            <script>
+                var plotDXAcquisitionFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartProtocolDIV');
+                });
+                result = chartFrequency('piechartProtocolDIV', 'Acquisition protocol frequency');
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXRequestMeanDAP %}
             <!-- HTML to include div container for requested procedure plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('plotDXRequestMeanDAPContainer');
-                });
-            </script>
-
             <div class="panel-group" id="plotDXRequestMeanDAPAccordion">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#plotDXRequestMeanDAPAccordion" href="#collapsePlotDXRequestMeanDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#plotDXRequestMeanDAPAccordion" href="#collapsePlotDXRequestMeanDAPAccordion" onclick="setTimeout(function() {fitChartToDiv('plotDXRequestMeanDAPContainer');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DAP for each requested procedure name.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -312,22 +381,49 @@
                 </div>
             </div>
             <!-- End of HTML to include div for requested procedure name plot -->
+
+            <script>
+                var plotDXRequestMeanDAP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('plotDXRequestMeanDAPContainer');
+                });
+                var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.req-hist-norm-btn';
+                instr_class = '.req-instructions';
+                render_div = 'plotDXRequestMeanDAPContainer';
+                val_label = 'DAP';
+                val_units = 'cGy.cm<sup>2</sup>';
+                cat_label = 'Requested procedure';
+                cat_counter = 'requests';
+                field_name_min = 'study_dap_min';
+                field_name_max = 'study_dap_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'requested_procedure';
+                tooltip_filters = tooltipFiltersRequest;
+                href_start = '/openrem/dx/?acquisitionhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXRequestFreq %}
             <!-- HTML to include div container for requested procedure name pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartRequestDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordionPiechartRequest">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordionPiechartRequest" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordionPiechartRequest" href="#collapseRequestPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartRequestDIV');}, 0);">
                                 Pie chart showing a breakdown of requested procedure name frequency.
                             </a>
                         </h4>
@@ -341,22 +437,24 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for requested procedure name pie chart -->
+
+            <script>
+                var plotDXRequestFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartRequestDIV');
+                });
+                var urlStartReq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
+                result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXStudyMeanDAP %}
             <!-- HTML to include div container for study plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('plotDXStudyMeanDAPContainer');
-                });
-            </script>
-
             <div class="panel-group" id="plotDXStudyMeanDAPAccordion">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#plotDXStudyMeanDAPAccordion" href="#collapsePlotDXStudyMeanDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#plotDXStudyMeanDAPAccordion" href="#collapsePlotDXStudyMeanDAPAccordion" onclick="setTimeout(function() {fitChartToDiv('plotDXStudyMeanDAPContainer');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DAP for each study description.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -399,22 +497,49 @@
                 </div>
             </div>
             <!-- End of HTML to include div for study name plot -->
+
+            <script>
+                var plotDXStudyMeanDAP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('plotDXStudyMeanDAPContainer');
+                });
+                var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.stu-hist-norm-btn';
+                instr_class = '.stu-instructions';
+                render_div = 'plotDXStudyMeanDAPContainer';
+                val_label = 'DAP';
+                val_units = 'cGy.cm<sup>2</sup>';
+                cat_label = 'Study description';
+                cat_counter = 'studies';
+                field_name_min = 'study_dap_min';
+                field_name_max = 'study_dap_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'study_description';
+                tooltip_filters = tooltipFiltersStudy;
+                href_start = '/openrem/dx/?acquisitionhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXStudyFreq %}
             <!-- HTML to include div container for study name pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartStudyDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordionPiechartStudy">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyDIV');}, 0);">
                                 Pie chart showing a breakdown of study name frequency.
                             </a>
                         </h4>
@@ -428,22 +553,24 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for study name pie chart -->
+
+            <script>
+                var plotDXStudyFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyDIV');
+                });
+                var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                result = chartFrequency('piechartStudyDIV', 'Study description frequency');
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
             <!-- HTML to include div container for mean kVp per acquisition chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('chartAcquisitionMeankVp');
-                });
-            </script>
-
             <div class="panel-group" id="accordion3">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseAcquisitionMeankVpChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseAcquisitionMeankVpChart" onclick="setTimeout(function() {fitChartToDiv('chartAcquisitionMeankVp');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean kVp for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -483,22 +610,49 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for mean kVp per acquisition chart -->
+
+            <script>
+                var plotDXAcquisitionMeankVp = true;
+                $(window).resize(function() {
+                    chartSetExportSize('chartAcquisitionMeankVp');
+                });
+                var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.kvp-hist-norm-btn';
+                instr_class = '.kvp-instructions';
+                render_div = 'chartAcquisitionMeankVp';
+                val_label = 'kVp';
+                val_units = 'kVp';
+                cat_label = 'Acquisition protocol';
+                cat_counter = 'exposures';
+                field_name_min = 'acquisition_kvp_min';
+                field_name_max = 'acquisition_kvp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'acquisition_protocol';
+                tooltip_filters = tooltipFilterskVp;
+                href_start = '/openrem/dx/?acquisitionhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
             <!-- HTML to include div container for mean mAs per acquisition chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('chartAcquisitionMeanmAs');
-                });
-            </script>
-
             <div class="panel-group" id="accordion4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseAcquisitionMeanmAsChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseAcquisitionMeanmAsChart" onclick="setTimeout(function() {fitChartToDiv('chartAcquisitionMeanmAs');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean mAs for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -538,22 +692,49 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for mean mAs per acquisition chart -->
+
+            <script>
+                var plotDXAcquisitionMeanmAs = true;
+                $(window).resize(function() {
+                    chartSetExportSize('chartAcquisitionMeanmAs');
+                });
+                var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.mas-hist-norm-btn';
+                instr_class = '.mas-instructions';
+                render_div = 'chartAcquisitionMeanmAs';
+                val_label = 'mAs';
+                val_units = 'mAs';
+                cat_label = 'Acquisition protocol';
+                cat_counter = 'exposures';
+                field_name_min = 'acquisition_mas_min';
+                field_name_max = 'acquisition_mas_max';
+                field_multiplier = 1000;
+                field_cat_name = 'acquisition_protocol';
+                tooltip_filters = tooltipFiltersmAs;
+                href_start = '/openrem/dx/?acquisitionhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
             <!-- HTML to include div container for mean acquisition protocol DAP per week -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartStudyWorkloadDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion5">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyWorkloadDIV');}, 0);">
                                 Pie chart showing a breakdown of number of studies per weekday.
                             </a>
                         </h4>
@@ -568,22 +749,23 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for studies per week day pie chart -->
+
+            <script>
+                var plotDXStudyPerDayAndHour = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
             <!-- HTML to include div container for mean acquisition protocol kVp over time -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseAcquisitionMeankVpOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseAcquisitionMeankVpOverTime" onclick="setTimeout(function() {fitChartToDiv('AcquisitionMeankVpOverTimeDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Line plot showing mean kVp of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
                                 {% else %}
@@ -602,22 +784,27 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for mean acquisition protocol kVp over time -->
+
+            <script>
+                var plotDXAcquisitionMeankVpOverTime = true;
+                $(window).resize(function() {
+                    chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
+                });
+            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Mean');
+            {% else %}
+                result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Median');
+            {% endif %}
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
             <!-- HTML to include div container for mean acquisition protocol mAs over time -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion7">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseAcquisitionMeanmAsOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseAcquisitionMeanmAsOverTime" onclick="setTimeout(function() {fitChartToDiv('AcquisitionMeanmAsOverTimeDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Line plot showing mean mAs of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
                                 {% else %}
@@ -636,22 +823,27 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for mean acquisition protocol mAs over time -->
+
+            <script>
+                var plotDXAcquisitionMeanmAsOverTime = true;
+                $(window).resize(function() {
+                    chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
+                });
+            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Mean');
+            {% else %}
+                result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Median');
+            {% endif %}
+            </script>
         {% endif %}
 
         {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
             <!-- HTML to include div container for mean acquisition protocol DAP per week -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion8">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseAcquisitionMeanDAPOverTime" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseAcquisitionMeanDAPOverTime" onclick="setTimeout(function() {fitChartToDiv('AcquisitionMeanDAPOverTimeDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Line plot showing mean DAP of each acquisition protocol over time ({{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}).
                                 {% else %}
@@ -670,368 +862,20 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for mean acquisition protocol DAP per week -->
-        {% endif %}
-
-        <!-- Include JavaScript to enable highcharts plots -->
-        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
-        <script src="{{ STATIC_URL }}js/boost.js"></script>
-        <script src="{{ STATIC_URL }}js/exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
-        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
-        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
-        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
-        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
-        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
-        <script>
-            var chartSorting = '{{ request.user.userprofile.plotDXInitialSortingChoice }}';
-            var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
-
-            var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
-        </script>
-        <!-- End of include JavaScript for the plots -->
-
-        <!-- JavaScript to enable bootstrap tooltips -->
-        <script>
-            $(document).ready(function(){
-                $('[data-toggle="tooltip"]').tooltip();
-            });
-        </script>
-        <!-- End of JavaScript to enable bootstrap tooltips -->
-
-        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
-        <script src="{{ STATIC_URL }}js/sorting.js"></script>
-        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
-
-        <!-- JavaScript chart AJAX code. -->
-        <script src="{{ STATIC_URL }}js/dxChartAjax.js"></script>
-        <!-- End of JavaScript chart AJAX code. -->
-
-        <!-- Flags to determine if charts should be plotted -->
-        {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
-            <script>var plotDXAcquisitionMeanDAP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionFreq %}
-            <script>var plotDXAcquisitionFreq = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXRequestMeanDAP %}
-            <script>var plotDXRequestMeanDAP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXRequestFreq %}
-            <script>var plotDXRequestFreq = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXStudyMeanDAP %}
-            <script>var plotDXStudyMeanDAP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXStudyFreq %}
-            <script>var plotDXStudyFreq = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
-            <script>var plotDXAcquisitionMeanDAPOverTime = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
-            <script>var plotDXAcquisitionMeankVpOverTime = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
-            <script>var plotDXAcquisitionMeanmAsOverTime = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
-            <script>var plotDXAcquisitionMeankVp = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
-            <script>var plotDXAcquisitionMeanmAs = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
-            <script>var plotDXStudyPerDayAndHour = true;</script>
-        {% endif %}
-
-        <script>var plotDXAcquisitionMeanDAPOverTimePeriod = '{{ request.user.userprofile.plotDXAcquisitionMeanDAPOverTimePeriod }}';</script>
-
-        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanDAP %}
-            <!-- JavaScript for acquisition DAP plot -->
-            <script>
-                var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.acq-hist-norm-btn';
-                instr_class = '.acq-instructions';
-                render_div = 'container';
-                val_label = 'DAP';
-                val_units = 'cGy.cm<sup>2</sup>';
-                cat_label = 'Acquisition protocol';
-                cat_counter = 'exposures';
-                field_name_min = 'acquisition_dap_min';
-                field_name_max = 'acquisition_dap_max';
-                field_multiplier = 0.000001;
-                field_cat_name = 'acquisition_protocol';
-                tooltip_filters = tooltipFilters;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
 
             <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for acquisition plot -->
-        {% endif %}
+                var plotDXAcquisitionMeanDAPOverTime = true;
+                $(window).resize(function() {
+                    chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');
+                });
 
-        {% if request.user.userprofile.plotDXAcquisitionFreq or request.user.userprofile.plotDXAcquisitionMeankVpOverTime or request.user.userprofile.plotDXAcquisitionMeanmAsOverTime or request.user.userprofile.plotDXAcquisitionMeanDAPOverTime%}
-            <!-- JavaScript for acquisition pie chart. protocolColours also needed by plot of DAP over time -->
-            <script>
-                var urlStartAcq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
-            </script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXAcquisitionFreq %}
-            <script>result = chartFrequency('piechartProtocolDIV', 'Acquisition protocol frequency');</script>
-            <!-- End of JavaScript for acquisition pie chart -->
-        {% endif %}
-
-        {% if request.user.userprofile.plotDXRequestMeanDAP %}
-            <!-- JavaScript for requested procedure DAP plot -->
-            <script>
-                var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.req-hist-norm-btn';
-                instr_class = '.req-instructions';
-                render_div = 'plotDXRequestMeanDAPContainer';
-                val_label = 'DAP';
-                val_units = 'cGy.cm<sup>2</sup>';
-                cat_label = 'Requested procedure';
-                cat_counter = 'requests';
-                field_name_min = 'study_dap_min';
-                field_name_max = 'study_dap_max';
-                field_multiplier = 1.0;
-                field_cat_name = 'requested_procedure';
-                tooltip_filters = tooltipFiltersRequest;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
-
-            <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for requested procedure DAP plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXRequestFreq %}
-            <!-- JavaScript for requested procedure name pie chart. -->
-            <script>
-                var urlStartReq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
-            </script>
-
-            <script>result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');</script>
-            <!-- End of JavaScript for requested procedure name pie chart -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXStudyMeanDAP %}
-            <!-- JavaScript for study description plot -->
-            <script>
-                var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.stu-hist-norm-btn';
-                instr_class = '.stu-instructions';
-                render_div = 'plotDXStudyMeanDAPContainer';
-                val_label = 'DAP';
-                val_units = 'cGy.cm<sup>2</sup>';
-                cat_label = 'Study description';
-                cat_counter = 'studies';
-                field_name_min = 'study_dap_min';
-                field_name_max = 'study_dap_max';
-                field_multiplier = 1.0;
-                field_cat_name = 'study_description';
-                tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
-
-            <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for study description plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXStudyFreq %}
-            <!-- JavaScript for study description pie chart. -->
-            <script>
-                var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-            </script>
-
-            <script>result = chartFrequency('piechartStudyDIV', 'Study description frequency');</script>
-            <!-- End of JavaScript for study description pie chart -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXAcquisitionMeankVp %}
-            <!-- JavaScript for acquisition kVp plot -->
-            <script>
-                var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.kvp-hist-norm-btn';
-                instr_class = '.kvp-instructions';
-                render_div = 'chartAcquisitionMeankVp';
-                val_label = 'kVp';
-                val_units = 'kVp';
-                cat_label = 'Acquisition protocol';
-                cat_counter = 'exposures';
-                field_name_min = 'acquisition_kvp_min';
-                field_name_max = 'acquisition_kvp_max';
-                field_multiplier = 1.0;
-                field_cat_name = 'acquisition_protocol';
-                tooltip_filters = tooltipFilterskVp;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
-
-            <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for acquisition kVp plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanmAs %}
-            <!-- JavaScript for acquisition mean plot -->
-            <script>
-                var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.mas-hist-norm-btn';
-                instr_class = '.mas-instructions';
-                render_div = 'chartAcquisitionMeanmAs';
-                val_label = 'mAs';
-                val_units = 'mAs';
-                cat_label = 'Acquisition protocol';
-                cat_counter = 'exposures';
-                field_name_min = 'acquisition_mas_min';
-                field_name_max = 'acquisition_mas_max';
-                field_multiplier = 1000;
-                field_cat_name = 'acquisition_protocol';
-                tooltip_filters = tooltipFiltersmAs;
-                href_start = '/openrem/dx/?acquisitionhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
-
-            <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for acquisition mAs plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXStudyPerDayAndHour %}
-            <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-            <script>result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');</script>
-            <!-- End of JavaScript for studies per week day pie chart -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXAcquisitionMeankVpOverTime %}
-            <!-- JavaScript for mean kvp per acquisition protocol per time period -->
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>
-                    result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Mean');
-                </script>
-            {% else %}
-                <script>
-                    result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Median');
-                </script>
-            {% endif %}
-            <!-- End of JavaScript for mean kVp per acquisition protocol per time period -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanmAsOverTime %}
-            <!-- JavaScript for mean mAs per acquisition protocol per time period -->
-            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>
-                    result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Mean');
-                </script>
-            {% else %}
-                <script>
-                    result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Median');
-                </script>
-            {% endif %}
-            <!-- End of JavaScript for mean mAs per acquisition protocol per time period -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotDXAcquisitionMeanDAPOverTime %}
-            <!-- JavaScript for mean DAP per acquisition protocol per time period -->
-            {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>
                     result = chartAverageOverTime('AcquisitionMeanDAPOverTimeDIV', 'DAP', 'cGy.cm<sup>2</sup>', 'Mean');
-                </script>
             {% else %}
-                <script>
                     result = chartAverageOverTime('AcquisitionMeanDAPOverTimeDIV', 'DAP', 'cGy.cm<sup>2</sup>', 'Median');
-                </script>
             {% endif %}
-            <!-- End of JavaScript for mean DAP per acquisition protocol per time period -->
+            </script>
         {% endif %}
-
 
     {% endif %}
 {% endblock %}

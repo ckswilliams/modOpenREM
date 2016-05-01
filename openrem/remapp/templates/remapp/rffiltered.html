@@ -196,20 +196,53 @@ $('.datepicker').datepicker({
 
         <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
 
+        <!-- Include JavaScript to enable highcharts plots -->
+        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script>
+            var chartSorting = '{{ request.user.userprofile.plotRFInitialSortingChoice }}';
+            var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
+
+            var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+        </script>
+        <!-- End of include JavaScript to enable highcharts plots -->
+
+        <!-- JavaScript to enable bootstrap tooltips -->
+        <script>
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+        <!-- End of JavaScript to enable bootstrap tooltips -->
+
+        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
+        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
+
+        <!-- JavaScript chart AJAX code. -->
+        <script src="{{ STATIC_URL }}js/rfChartAjax.js"></script>
+        <!-- End of JavaScript chart AJAX code. -->
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
         {% if request.user.userprofile.plotRFStudyDAP %}
             <!-- HTML to include div container for study plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('plotRFStudyDAPContainer');
-                });
-            </script>
-
             <div class="panel-group" id="plotRFStudyDAPAccordion">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#plotRFStudyDAPAccordion" href="#collapsePlotRFStudyDAPAccordion" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#plotRFStudyDAPAccordion" href="#collapsePlotRFStudyDAPAccordion" onclick="setTimeout(function() {fitChartToDiv('plotRFStudyDAPContainer');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DAP for each study description.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -252,125 +285,12 @@ $('.datepicker').datepicker({
                 </div>
             </div>
             <!-- End of HTML to include div for study name plot -->
-        {% endif %}
 
-        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
-            <!-- HTML to include div container for study workload -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartStudyWorkloadDIV');
-                });
-            </script>
-
-            <div class="panel-group" id="accordion5">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                                Pie chart showing a breakdown of number of studies per weekday.
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
-                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
-                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- End of HTML to include div container for studies per week day pie chart -->
-        {% endif %}
-
-        {% if request.user.userprofile.plotRFStudyFreq %}
-            <!-- HTML to include div container for study name pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartStudyDIV');
-                });
-            </script>
-
-            <div class="panel-group" id="accordionPiechartStudy">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                                Pie chart showing a breakdown of study name frequency.
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseStudyPieChart" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
-                            <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- End of HTML to include div container for study name pie chart -->
-        {% endif %}
-
-        <!-- Include JavaScript to enable highcharts plots -->
-        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
-        <script src="{{ STATIC_URL }}js/boost.js"></script>
-        <script src="{{ STATIC_URL }}js/exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
-        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
-        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
-        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
-        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
-        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
-        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
-        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
-        <script>
-            var chartSorting = '{{ request.user.userprofile.plotRFInitialSortingChoice }}';
-            var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
-
-            var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
-        </script>
-        <!-- End of include JavaScript to enable highcharts plots -->
-
-        <!-- JavaScript to enable bootstrap tooltips -->
-        <script>
-            $(document).ready(function(){
-                $('[data-toggle="tooltip"]').tooltip();
-            });
-        </script>
-        <!-- End of JavaScript to enable bootstrap tooltips -->
-
-        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
-        <script src="{{ STATIC_URL }}js/sorting.js"></script>
-        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
-
-        <!-- JavaScript chart AJAX code. -->
-        <script src="{{ STATIC_URL }}js/rfChartAjax.js"></script>
-        <!-- End of JavaScript chart AJAX code. -->
-
-        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
-
-        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
-            <script>
-                var plotRFStudyPerDayAndHour = true;
-                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
-            </script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotRFStudyFreq %}
-            <script>
-                var plotRFStudyFreq = true;
-                var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-                result = chartFrequency('piechartStudyDIV', 'Study description frequency');
-            </script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotRFStudyDAP %}
             <script>
                 var plotRFStudyDAP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('plotRFStudyDAPContainer');
+                });
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.stu-hist-norm-btn';
                 instr_class = '.stu-instructions';
@@ -401,6 +321,67 @@ $('.datepicker').datepicker({
             </script>
         {% endif %}
 
-    {% endif %}
+        {% if request.user.userprofile.plotRFStudyPerDayAndHour %}
+            <!-- HTML to include div container for study workload -->
+            <div class="panel-group" id="accordion5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyWorkloadDIV');}, 0);">
+                                Pie chart showing a breakdown of number of studies per weekday.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for studies per week day pie chart -->
 
+            <script>
+                var plotRFStudyPerDayAndHour = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotRFStudyFreq %}
+            <!-- HTML to include div container for study name pie chart -->
+            <div class="panel-group" id="accordionPiechartStudy">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionPiechartStudy" href="#collapseStudyPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyDIV');}, 0);">
+                                Pie chart showing a breakdown of study name frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for study name pie chart -->
+
+            <script>
+                var plotRFStudyFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyDIV');
+                });
+                var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+                result = chartFrequency('piechartStudyDIV', 'Study description frequency');
+            </script>
+        {% endif %}
+
+    {% endif %}
 {% endblock %}
