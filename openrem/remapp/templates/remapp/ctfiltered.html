@@ -268,7 +268,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {fitChartToDiv('histogramAcquisitionPlotDLPdiv');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DLP for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -328,7 +328,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {fitChartToDiv('histogramAcquisitionPlotCTDIdiv');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean CTDI<sub>vol</sub> for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -387,7 +387,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartAcquisitionDIV');}, 0);">
                                 Pie chart showing a breakdown of acquisition protocol frequency.
                             </a>
                         </h4>
@@ -506,7 +506,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {fitChartToDiv('histogramStudyPlotDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DLP for each study description.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -565,7 +565,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyDIV');}, 0);">
                                 Pie chart showing a breakdown of study frequency.
                             </a>
                         </h4>
@@ -595,7 +595,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {fitChartToDiv('histogramRequestPlotDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DLP for each requested procedure type.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -654,7 +654,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartRequestDIV');}, 0);">
                                 Pie chart showing a breakdown of requested procedure type frequency.
                             </a>
                         </h4>
@@ -684,7 +684,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyWorkloadDIV');}, 0);">
                                 Pie chart showing a breakdown of number of studies per weekday.
                             </a>
                         </h4>
@@ -715,7 +715,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {fitChartToDiv('studyMeanDLPOverTimeDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
                                 {% else %}
