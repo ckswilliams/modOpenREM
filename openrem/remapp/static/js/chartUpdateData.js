@@ -80,7 +80,7 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
             date_before = formatDate(new Date((new Date((temp_date).setMonth((temp_date).getMonth() + 1))).setDate((new Date((temp_date).setMonth((temp_date).getMonth() + 1))).getDate() - 1)));
 
             current_value = parseFloat(over_time_data[i][j][1]);
-            if (current_value == 0) current_value = null;
+            if (current_value == 0 || isNaN(current_value)) current_value = null;
 
             temp.push({
                 y: current_value,

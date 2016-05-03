@@ -125,7 +125,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
     return return_structure
 
 
-def average_chart_over_time_data(f, database_events, db_series_names, db_value_name, db_date_field, db_date_time_field,
+def average_chart_over_time_data(database_events, db_series_names, db_value_name, db_date_field, db_date_time_field,
                                  median_available, plot_average_choice, value_multiplier, time_period):
     import datetime
     import qsstats
@@ -137,7 +137,7 @@ def average_chart_over_time_data(f, database_events, db_series_names, db_value_n
     return_structure['series_names'] = list(database_events.values_list(
         db_series_names, flat=True).distinct().order_by(db_series_names))
 
-    start_date = f.qs.aggregate(Min(db_date_field)).get(db_date_field+'__min')
+    start_date = database_events.aggregate(Min(db_date_field)).get(db_date_field+'__min')
     today = datetime.date.today()
 
     if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
