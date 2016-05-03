@@ -8,6 +8,10 @@ To query retrieve dose related objects from a remote server, you need to review 
 **************************************
 Query-retrieve using the web interface
 **************************************
+.. image:: img/QRmenu.png
+    :align: right
+    :alt: Import QR menu
+
 
 * On the Imports menu, select ``Query remote server``. If the menu isn't there, you need to check your user permissions
   - see :ref:`user-settings` for details.
