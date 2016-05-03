@@ -14,7 +14,7 @@ Query-retrieve using the web interface
 * Each configured query-retrieve node and each local store node is automatically tested to make sure they respond to a
   DICOM echo - the results are presented at the top of the page.
 
-.. image:: img/QRstatuses
+.. image:: img/QRstatuses.png
     :align: center
     :alt: local and remote QR statuses
 
