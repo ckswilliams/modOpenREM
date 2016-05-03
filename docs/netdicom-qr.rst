@@ -13,6 +13,11 @@ Query-retrieve using the web interface
   - see :ref:`user-settings` for details.
 * Each configured query-retrieve node and each local store node is automatically tested to make sure they respond to a
   DICOM echo - the results are presented at the top of the page.
+
+.. image:: img/QRstatuses
+    :align: center
+    :alt: local and remote QR statuses
+
 * Select the desired **remote host**, ie the PACS or modality you wish to query.
 * Select the local **store node** you want to retrieve to.
 * Select **which modalities** you want to query for - at least one must be ticked.
