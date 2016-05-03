@@ -67,3 +67,30 @@ Query-retrieve using the command line interface
 ***********************************************
 
 In a command window/shell you can use the ``-h``
+
+.. sourcecode:: console
+
+    usage: qrscu.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd] [-t yyyy-mm-dd] [-e string] [-i string] [-sr] [-dup] qrid storeid
+
+    Query remote server and retrieve to OpenREM
+
+    positional arguments:
+      qrid                  Database ID of the remote QR node
+      storeid               Database ID of the local store node
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -ct                   Query for CT studies
+      -mg                   Query for mammography studies
+      -fl                   Query for fluoroscopy studies
+      -dx                   Query for planar X-ray studies
+      -f yyyy-mm-dd, --dfrom yyyy-mm-dd
+                            Date from, format yyyy-mm-dd
+      -t yyyy-mm-dd, --duntil yyyy-mm-dd
+                            Date until, format yyyy-mm-dd
+      -e string, --desc_exclude string
+                            Terms to exclude in study description, comma separated, quote whole string
+      -i string, --desc_include string
+                            Terms that must be included in study description, comma separated, quote whole string
+      -sr                   Advanced: Query for structured report only studies
+      -dup                  Advanced: Retrieve studies that are already in database
