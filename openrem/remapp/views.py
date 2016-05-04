@@ -224,7 +224,6 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         ).filter(
             study_instance_uid__in=exp_include
         )
-        study_events = f.qs
 
     if plot_request_mean_dap or plot_request_freq:
         request_events = GeneralStudyModuleAttr.objects.exclude(
@@ -730,7 +729,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_acquisition_mean_dlp, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  True)
+                                                  exclude_constant_angle=True)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']

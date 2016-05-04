@@ -183,7 +183,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     y: summary_data[i][j].mean,
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
-                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
+                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + current_num + ')',
                     drilldown: system_list[i]+name_list[j],
                     total_counts: total_counts_per_name[j],
                     avg_value: average_value_per_name[j]
