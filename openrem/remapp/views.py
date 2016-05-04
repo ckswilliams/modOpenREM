@@ -224,6 +224,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
         ).filter(
             study_instance_uid__in=exp_include
         )
+        study_events = f.qs
 
     if plot_request_mean_dap or plot_request_freq:
         request_events = GeneralStudyModuleAttr.objects.exclude(
@@ -723,12 +724,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(f.qs,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
-                                                  'ctradiationdose__ctirradiationeventdata__acquisition_protocol', #'acquisition_protocol',
+                                                  'ctradiationdose__ctirradiationeventdata__acquisition_protocol',
                                                   'ctradiationdose__ctirradiationeventdata__dlp',
                                                   1,
                                                   plot_acquisition_mean_dlp, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  True)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']

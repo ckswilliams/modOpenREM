@@ -370,6 +370,7 @@ class DXFilterPlusPid(DXSummaryListFilter):
         self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
         self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
 
+
 def dx_acq_filter(filters, pid=False):
     from decimal import Decimal, InvalidOperation
     from django.db.models import Q

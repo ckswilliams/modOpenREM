@@ -176,12 +176,14 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
         var mean_data = []; while(mean_data.push([]) < system_list.length);
         for (i = 0; i < system_list.length; i++) {
             for (j = 0; j < name_list.length; j++) {
+                var current_mean = summary_data[i][j].mean != null ? summary_data[i][j].mean : 0;
+                var current_num = summary_data[i][j].num != null ? summary_data[i][j].num : 0;
                 (mean_data[i]).push({
                     name: name_list[j],
                     y: summary_data[i][j].mean,
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
-                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + summary_data[i][j].mean.toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
+                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
                     drilldown: system_list[i]+name_list[j],
                     total_counts: total_counts_per_name[j],
                     avg_value: average_value_per_name[j]
