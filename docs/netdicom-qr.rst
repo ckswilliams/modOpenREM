@@ -66,11 +66,12 @@ The progress of the retrieve is displayed in the same place until the retrieve i
 Query-retrieve using the command line interface
 ***********************************************
 
-In a command window/shell you can use the ``-h``
+In a command window/shell, ``qrscu.py -h`` should present you with the following output:
 
 .. sourcecode:: console
 
-    usage: qrscu.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd] [-t yyyy-mm-dd] [-e string] [-i string] [-sr] [-dup] qrid storeid
+    usage: qrscu.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd] [-t yyyy-mm-dd]
+                    [-e string] [-i string] [-sr] [-dup] qrid storeid
 
     Query remote server and retrieve to OpenREM
 
@@ -89,8 +90,39 @@ In a command window/shell you can use the ``-h``
       -t yyyy-mm-dd, --duntil yyyy-mm-dd
                             Date until, format yyyy-mm-dd
       -e string, --desc_exclude string
-                            Terms to exclude in study description, comma separated, quote whole string
+                            Terms to exclude in study description, comma separated, quote whole
+                            string
       -i string, --desc_include string
-                            Terms that must be included in study description, comma separated, quote whole string
+                            Terms that must be included in study description, comma separated,
+                            quote whole string
       -sr                   Advanced: Query for structured report only studies
       -dup                  Advanced: Retrieve studies that are already in database
+
+As an example, if you wanted to query the PACS for DX images on the 5th April 2010 with any study descriptions including
+``imported`` excluded, first you need to know the database IDs of the remote node and the local node you want the images
+sent to. To find these, go to the :doc:`netdicom-nodes` page where the database ID is listed among the other details for
+each node.
+
+Assuming the PACS database ID is 2, and the store node ID is 1, the command would look something like:
+
+..sourcecode:: console
+
+    qrscu.py 2 1 -dx -f 2010-04-05 -t 2010-04-05 -e "imported"
+
+If you want to do this regularly to catch new studies, you might like to use a script something like this on linux:
+
+.. sourcecode:: bash
+
+    #!/bin/bash
+
+    . /var/openrem/bin/activate  # activate virtualenv if you are using one, modify or delete this line
+
+    ONEHOURAGO=$(date -d "1 hour ago" "+%Y-%m-%d")
+
+    openrem_qr.py 2 1 -dx -f $ONEHOURAGO -t $ONEHOURAGO  -e "Imported"
+
+
+This script could be run once an hour using a cron job. By asking for the date an hour ago, you shouldn't miss exams
+taking place in the last hour of the day.
+
+A similar script could be created as a batch file on Windows and run using the scheduler.
