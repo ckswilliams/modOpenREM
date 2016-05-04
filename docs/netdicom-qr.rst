@@ -105,7 +105,7 @@ each node.
 
 Assuming the PACS database ID is 2, and the store node ID is 1, the command would look something like:
 
-..sourcecode:: console
+.. sourcecode:: console
 
     qrscu.py 2 1 -dx -f 2010-04-05 -t 2010-04-05 -e "imported"
 
