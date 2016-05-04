@@ -126,3 +126,83 @@ This script could be run once an hour using a cron job. By asking for the date a
 taking place in the last hour of the day.
 
 A similar script could be created as a batch file on Windows and run using the scheduler.
+
+***************
+Troubleshooting
+***************
+
+If the default logging settings haven't been changed then there will be two log files to refer to. The default
+location is within your ``MEDIAROOT`` folder:
+
+openrem_qr.log
+==============
+
+This file contains information about the query, the status of the remote node, the C-Find response, the
+analysis of the response, and the individual C-Move requests.
+
+The following is an example of the start of the log for the following query which is run once an hour:
+
+.. sourcecode:: console
+
+    qrscu.py 2 1 -dx -f 2016-05-04 -t 2016-05-04 -e "imported"
+
+.. sourcecode:: console
+
+    [04/May/2016 11:30:02] INFO [remapp.netdicom.qrscu:580] qrscu script called
+    [04/May/2016 11:30:02] INFO [remapp.netdicom.qrscu:595] Modalities are ['DX']
+    [04/May/2016 11:30:02] INFO [remapp.netdicom.qrscu:601] Date from: 2016-05-04
+    [04/May/2016 11:30:02] INFO [remapp.netdicom.qrscu:604] Date until: 2016-05-04
+    [04/May/2016 11:30:02] INFO [remapp.netdicom.qrscu:610] Study description exclude terms are ['imported']
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:267] Request association with Hospital PACS PACSAET01 (PACSEAT01 104 DICOM_QR_SCP)
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:277] assoc is ... <Association(Thread-7208, started daemon 140538998306560)>
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:280] DICOM Echo ...
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:282] done with status Success
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:284] DICOM FindSCU ...
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:311] Currently querying for DX studies...
+    [04/May/2016 11:30:03] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:04] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:04] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:04] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:05] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:05] INFO [remapp.netdicom.qrscu:311] Currently querying for CR studies...
+    [04/May/2016 11:30:05] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:05] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:06] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:06] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:06] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:07] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:10] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:10] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:11] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:11] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:12] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:12] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:12] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:12] INFO [remapp.netdicom.qrscu:339] Checking to see if any of the 16 studies are already in the OpenREM database
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:343] Now have 11 studies
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:349] Deleting studies we didn't ask for
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is DX, mod_set is ["CR"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is CR, mod_set is ["CR"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is DX, mod_set is ["PR", "DX"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is CR, mod_set is ["PR", "DX"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is DX, mod_set is ["DX"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is CR, mod_set is ["DX"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is DX, mod_set is ["PR", "CR"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:358] mod is CR, mod_set is ["PR", "CR"]
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:367] Now have 11 studies
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:372] Deleting series we can't use
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:408] Now have 11 studies
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:413] Deleting any studies that match the exclude criteria
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:422] Now have 6 studies after deleting any containing any of [u'imported']
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:438] Release association
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:499] Preparing to start move request
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:504] Requesting move of 6 studies
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:509] Mv: study_no 1
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:515] Mv: study no 1 series no 1
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:528] Requesting move: modality DX, study 1 (of 6) series 1 (of 1). Series contains 1 objects
+    ...etc
+
+openrem_store.log
+=================
+
