@@ -5,8 +5,7 @@ Troubleshooting
 Server 500 errors
 =================
 
-Turn on debug mode
-------------------
+**Turn on debug mode**
 
 Locate and edit your local_settings file
 
