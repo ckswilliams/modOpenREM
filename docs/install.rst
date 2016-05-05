@@ -86,6 +86,8 @@ If you are using PostgreSQL:
     'USER': 'openremuser',
     'PASSWORD': 'openrem_pw',
 
+.. _mediarootsettings:
+
 Location for imports and exports
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

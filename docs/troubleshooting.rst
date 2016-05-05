@@ -36,3 +36,14 @@ Query-retrieve issues
 Refer to the query-retrieve service :ref:`qrtroubleshooting` documentation
 
 
+Log files
+=========
+
+Log file location, naming and verbosity were configured in the ``local_settings.py`` configuration - see the
+:ref:`local_settings_logfile` configuration docs for details.
+
+If the defaults have not been modified, then there will be three log files in your ``MEDIAROOT`` folder which you
+configured at installation. See the install config section on :ref:`mediarootsettings` for details.
+
+The ``openrem.log`` has general logging information, the other two are specific to the DICOM store and DICOM
+query-retrieve functions if you are making use of them.
