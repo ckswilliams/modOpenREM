@@ -140,7 +140,8 @@ openrem_qr.log
 This file contains information about the query, the status of the remote node, the C-Find response, the
 analysis of the response, and the individual C-Move requests.
 
-The following is an example of the start of the log for the following query which is run once an hour:
+The following is an example of the start of the log for the following query which is run once an hour (ie some
+responses will already have been imported):
 
 .. sourcecode:: console
 
