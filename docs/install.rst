@@ -16,6 +16,8 @@ Install OpenREM 0.7 beta version
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
+.. _localsettingsconfig:
+
 Configuration
 =============
 
