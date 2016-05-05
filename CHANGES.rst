@@ -91,6 +91,7 @@ OpenREM version history
 * `#270`_  Django 1.8 Admin site has a 'view site' link. Pointed it back to OpenREM
 * `#268`_  Improved population of procedure_code_meaning for DX imports
 * `#266`_  DICOM C-Store script added back in - largely redundant with web interface
+* `#265`_  DICOM Store and Query Retrieve services documented
 * `#263`_  Settings for keeping or deleting files once processed moved to database and web interface
 * `#262`_  Dealt with issue where two exposures from the same study would race on import
 * `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
