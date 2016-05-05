@@ -127,6 +127,8 @@ taking place in the last hour of the day.
 
 A similar script could be created as a batch file on Windows and run using the scheduler.
 
+.. _qrtroubleshooting:
+
 ***************
 Troubleshooting
 ***************
@@ -206,4 +208,5 @@ responses will already have been imported):
 
 openrem_store.log
 =================
+
 

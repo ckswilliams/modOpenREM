@@ -28,3 +28,11 @@ This will render a debug report in the browser - usually revealing the problem.
 
 Once the problem is fixed, change ``DEBUG`` to ``False``, or comment it again using a ``#``. If you leave debug mode
 in place, the system is likely to run out of memory.
+
+
+Query-retrieve issues
+=====================
+
+Refer to the query-retrieve service :ref:`qrtroubleshooting` documentation
+
+
