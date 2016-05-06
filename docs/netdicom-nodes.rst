@@ -98,7 +98,7 @@ Association fail - server not running?'
 Controlling native Store SCP nodes
 ==================================
 
-If a native Store SCP node is not running, then a ``Start server`` button will be presented at teh bottom right. If it
+If a native Store SCP node is not running, then a ``Start server`` button will be presented at the bottom right. If it
 is running, this buttin will change to ``Stop server``, and the ``Delete``button will become inactive.
 
 If the node is configured to be auto-started, and if :ref:`celery-beat` is running, then each minute if the server is
@@ -127,6 +127,54 @@ To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM 
   you know it will be resolved.
 
 Now go to the :doc:`netdicom-qr` documentation to learn how to use it.
+
+
+.. _storetroubleshooting:
+
+**********************************
+Troubleshooting: openrem_store.log
+**********************************
+
+If the default logging settings haven't been changed then there will be a log files to refer to. The default
+location is within your ``MEDIAROOT`` folder:
+
+This file contains information about each echo and association that is made against the store node, and any objects that
+are sent to it.
+
+The following is an example of the log for a Philips *dose info* image being received:
+
+
+.. sourcecode:: console
+
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:310] Starting AE... AET:RPYC_DOSE01, port:8104
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:314] Started AE... AET:RPYC_DOSE01, port:8104
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:44] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:46] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:46] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:49] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:49] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:50] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:50] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:51] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:51] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:78] Received C-Store. Stn name NM-54316, Modality CT,
+    SOPClassUID Secondary Capture Image Storage, Study UID 1.2.840.113564.9.1.2843759204.47.2.5000947881 and Instance
+    UID 1.2.840.113704.7.1.1.4188.1453134540.349
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:232] File
+    /var/conquest/openrem/media/dicom_in/1.2.840.113704.7.1.1.4188.1453134540.349.dcm written
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:263] Processing as Philips Dose Info series
+    ...etc
+
+
+
+
+
+
+
+
+
 
 
 .. _`Issue #337`: https://bitbucket.org/openrem/openrem/issues/337/storescp-is-killed-if-daemonized-when
