@@ -146,8 +146,8 @@ The following is an example of the log for a Philips *dose info* image being rec
 
 .. sourcecode:: console
 
-    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:310] Starting AE... AET:RPYC_DOSE01, port:8104
-    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:314] Started AE... AET:RPYC_DOSE01, port:8104
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:310] Starting AE... AET:MYSTOREAE01, port:8104
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:314] Started AE... AET:MYSTOREAE01, port:8104
     [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
     [21/Feb/2016 21:13:44] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
     [21/Feb/2016 21:13:46] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
@@ -160,10 +160,10 @@ The following is an example of the log for a Philips *dose info* image being rec
     [21/Feb/2016 21:13:51] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
     [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
     [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:78] Received C-Store. Stn name NM-54316, Modality CT,
-    SOPClassUID Secondary Capture Image Storage, Study UID 1.2.840.113564.9.1.2843759204.47.2.5000947881 and Instance
-    UID 1.2.840.113704.7.1.1.4188.1453134540.349
+    SOPClassUID Secondary Capture Image Storage, Study UID 1.2.840.113564.9.1.2843752344.47.2.5000947881 and Instance
+    UID 1.2.840.113704.7.1.1.4188.1234134540.349
     [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:232] File
-    /var/conquest/openrem/media/dicom_in/1.2.840.113704.7.1.1.4188.1453134540.349.dcm written
+    /var/openrem/media/dicom_in/1.2.840.113704.7.1.1.4188.1453134540.349.dcm written
     [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:263] Processing as Philips Dose Info series
     ...etc
 
