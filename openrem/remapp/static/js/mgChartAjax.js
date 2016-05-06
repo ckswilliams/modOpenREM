@@ -47,23 +47,6 @@ $(document).ready(function() {
 
             // AGD vs compressed thickness scatter plot
             if(typeof plotMGAGDvsThickness !== 'undefined') {
-                /*
-                // Prepare some dummy data
-                var data = [],
-                    n = 1000000,
-                    i;
-                for (i = 0; i < n; i += 1) {
-                    data.push([
-                        Math.pow(Math.random(), 2) * 100,
-                        Math.pow(Math.random(), 2) * 100
-                    ]);
-                }
-                max_values = [100,100];
-                system_list = ['Dummy data'];
-
-                updateScatterChart([data], max_values, 'scatterDIV', system_list, colour_scale);
-                */
-
                 updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV', json.AGDvsThicknessSystems, colour_scale);
             }
 
