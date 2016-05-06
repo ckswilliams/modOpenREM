@@ -81,7 +81,10 @@ See :doc:`conquestUbuntu` and :doc:`conquestAsWindowsService` for more informati
 Status of DICOM Store SCP nodes
 *******************************
 
-.. image:: img/netdicomstorealive.png
+.. image:: img/storenodealive.png
+    :align: right
+    :alt: DICOM Store SCP status "Alive"
+.. image:: img/storenodefail.png
     :align: right
     :alt: DICOM Store SCP status "Alive"
 
