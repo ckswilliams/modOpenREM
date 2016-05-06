@@ -177,9 +177,11 @@
 
         <!-- Include JavaScript to enable highcharts plots -->
         <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/boost.js"></script>
         <script src="{{ STATIC_URL }}js/exporting.js"></script>
         <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
         <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
         <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
         <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
         <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
@@ -212,62 +214,28 @@
         <script src="{{ STATIC_URL }}js/ctChartAjax.js"></script>
         <!-- End of JavaScript chart AJAX code. -->
 
-        <!-- Flags to determine if charts should be plotted -->
-        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
-            <script>var plotCTAcquisitionMeanDLP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-            <script>var plotCTAcquisitionMeanCTDI = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTAcquisitionFreq %}
-            <script>var plotCTAcquisitionFreq = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTStudyMeanDLP %}
-            <script>var plotCTStudyMeanDLP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTStudyFreq %}
-            <script>var plotCTStudyFreq = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
-            <script>var plotCTStudyPerDayAndHour = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-            <script>var plotCTStudyMeanDLPOverTime = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTRequestMeanDLP %}
-            <script>var plotCTRequestMeanDLP = true;</script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTRequestFreq %}
-            <script>var plotCTRequestFreq = true;</script>
-        {% endif %}
-
-        <script>var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';</script>
-
         <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
         <!-- End of flags to determine if charts should be plotted -->
 
+        {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
+            <script>
+                var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotCTRequestMeanDLP or request.user.userprofile.plotCTRequestFreq %}
+            <script>
+                var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+            </script>
+        {% endif %}
+
         {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
             <!-- HTML to include div container for acquisition plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('histogramAcquisitionPlotDLPdiv');
-                });
-            </script>
-
             <div class="panel-group" id="accordion2">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" onclick="setTimeout(function() {fitChartToDiv('histogramAcquisitionPlotDLPdiv');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DLP for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -311,23 +279,50 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for acquisition plot -->
-        {% endif %}
 
+            <script>
+                var plotCTAcquisitionMeanDLP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('histogramAcquisitionPlotDLPdiv');
+                });
+
+                var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.acq-hist-norm-btn';
+                instr_class = '.acq-instructions';
+                render_div = 'histogramAcquisitionPlotDLPdiv';
+                val_label = 'DLP';
+                val_units = 'mGy.cm';
+                cat_label = 'Acquisition protocol';
+                cat_counter = 'exposures';
+                field_name_min = 'acquisition_dlp_min';
+                field_name_max = 'acquisition_dlp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'acquisition_protocol';
+                tooltip_filters = tooltipFiltersAcq;
+                href_start = '/openrem/ct/?acquisitionhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+        {% endif %}
 
         {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
             <!-- HTML to include div container for acquisition CTDI plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('histogramAcquisitionPlotCTDIdiv');
-                });
-            </script>
-
             <div class="panel-group" id="accordion3">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion3" href="#collapseCTDI" onclick="setTimeout(function() {fitChartToDiv('histogramAcquisitionPlotCTDIdiv');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean CTDI<sub>vol</sub> for each acquisition protocol.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -370,83 +365,13 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for acquisition CTDI plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotCTAcquisitionFreq %}
-            <!-- HTML to include div container for acquisition pie chart -->
 
             <script>
+                var plotCTAcquisitionMeanCTDI = true;
                 $(window).resize(function() {
-                    chartSetExportSize('piechartAcquisitionDIV');
+                    chartSetExportSize('histogramAcquisitionPlotCTDIdiv');
                 });
-            </script>
 
-            <div class="panel-group" id="accordion4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
-                                Pie chart showing a breakdown of acquisition protocol frequency.
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <div id="piechartAcquisitionDIV" style="height: auto; margin: 0 0"></div>
-                            <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartAcquisitionDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- HTML to include div container for acquisition pie chart -->
-        {% endif %}
-
-        <!-- Include JavaScript to enable highcharts drilldown plots -->
-        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
-        <!-- End of include JavaScript to enable highcharts drilldown plots -->
-
-
-        {% if request.user.userprofile.plotCTAcquisitionMeanDLP %}
-            <!-- JavaScript for acquisition mean DLP plot -->
-            <script>
-                var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.acq-hist-norm-btn';
-                instr_class = '.acq-instructions';
-                render_div = 'histogramAcquisitionPlotDLPdiv';
-                val_label = 'DLP';
-                val_units = 'mGy.cm';
-                cat_label = 'Acquisition protocol';
-                cat_counter = 'exposures';
-                field_name_min = 'acquisition_dlp_min';
-                field_name_max = 'acquisition_dlp_max';
-                field_multiplier = 1.0;
-                field_cat_name = 'acquisition_protocol';
-                tooltip_filters = tooltipFiltersAcq;
-                href_start = '/openrem/ct/?acquisitionhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
-
-            <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for acquisition plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotCTAcquisitionMeanCTDI %}
-            <!-- JavaScript for acquisition mean CTDI plot -->
-            <script>
                 var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.acqctdi-hist-norm-btn';
                 instr_class = '.acq-ctdi-instructions';
@@ -461,51 +386,61 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersAcqCTDI;
                 href_start = '/openrem/ct/?acquisitionhist=1&';
-            </script>
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
+                avg_label = 'Mean and median';
             {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
+                avg_label = 'Mean';
             {% else %}
-                <script>avg_label = 'Median';</script>
+                avg_label = 'Median';
             {% endif %}
 
-            <script>
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
                         field_cat_name, tooltip_filters, href_start);
             </script>
-            <!-- End of JavaScript for acquisition CTDI plot -->
         {% endif %}
-
 
         {% if request.user.userprofile.plotCTAcquisitionFreq %}
-            <!-- JavaScript for acquisition pie chart -->
+            <!-- HTML to include div container for acquisition pie chart -->
+            <div class="panel-group" id="accordion4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion4" href="#collapseProtocolPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartAcquisitionDIV');}, 0);">
+                                Pie chart showing a breakdown of acquisition protocol frequency.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseProtocolPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartAcquisitionDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartAcquisitionDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- HTML to include div container for acquisition pie chart -->
+
             <script>
+                var plotCTAcquisitionFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartAcquisitionDIV');
+                });
+
                 var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
+                result = chartFrequency('piechartAcquisitionDIV', 'Acquisition protocol frequency');
             </script>
-
-            <script>result = chartFrequency('piechartAcquisitionDIV', 'Acquisition protocol frequency');</script>
-            <!-- End of JavaScript for acquisition pie chart -->
         {% endif %}
-
 
         {% if request.user.userprofile.plotCTStudyMeanDLP %}
             <!-- HTML to include div container for study plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('histogramStudyPlotDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion5">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseThree" onclick="setTimeout(function() {fitChartToDiv('histogramStudyPlotDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DLP for each study description.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -548,23 +483,50 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for study plot -->
-        {% endif %}
 
+            <script>
+                var plotCTStudyMeanDLP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('histogramStudyPlotDIV');
+                });
+
+                var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.stu-hist-norm-btn';
+                instr_class = '.stu-instructions';
+                render_div = 'histogramStudyPlotDIV';
+                val_label = 'DLP';
+                val_units = 'mGy.cm';
+                cat_label = 'Study description';
+                cat_counter = 'studies';
+                field_name_min = 'study_dlp_min';
+                field_name_max = 'study_dlp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'study_description';
+                tooltip_filters = tooltipFiltersStudy;
+                href_start = '/openrem/ct/?studyhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+        {% endif %}
 
         {% if request.user.userprofile.plotCTStudyFreq %}
             <!-- HTML to include div container for study pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartStudyDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion6" href="#collapseStudyPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyDIV');}, 0);">
                                 Pie chart showing a breakdown of study frequency.
                             </a>
                         </h4>
@@ -578,23 +540,23 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for study pie chart -->
-        {% endif %}
 
+            <script>
+                var plotCTStudyFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyDIV');
+                });
+                result = chartFrequency('piechartStudyDIV', 'Study description frequency');
+            </script>
+        {% endif %}
 
         {% if request.user.userprofile.plotCTRequestMeanDLP %}
             <!-- HTML to include div container for request plot -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('histogramRequestPlotDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion7">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion7" href="#collapseRequestMeanDLP" onclick="setTimeout(function() {fitChartToDiv('histogramRequestPlotDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Plot of mean DLP for each requested procedure type.
                                 {% elif request.user.userprofile.plotAverageChoice == 'median' %}
@@ -637,23 +599,49 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for request plot -->
-        {% endif %}
 
+            <script>
+                var plotCTRequestMeanDLP = true;
+                $(window).resize(function() {
+                    chartSetExportSize('histogramRequestPlotDIV');
+                });
+
+                norm_btn_class = '.req-hist-norm-btn';
+                instr_class = '.req-instructions';
+                render_div = 'histogramRequestPlotDIV';
+                val_label = 'DLP';
+                val_units = 'mGy.cm';
+                cat_label = 'Requested procedure';
+                cat_counter = 'studies';
+                field_name_min = 'study_dlp_min';
+                field_name_max = 'study_dlp_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'requested_procedure';
+                tooltip_filters = tooltipFiltersRequest;
+                href_start = '/openrem/ct/?requesthist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+        {% endif %}
 
         {% if request.user.userprofile.plotCTRequestFreq %}
             <!-- HTML to include div container for request pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartRequestDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion8">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion8" href="#collapseRequestPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartRequestDIV');}, 0);">
                                 Pie chart showing a breakdown of requested procedure type frequency.
                             </a>
                         </h4>
@@ -667,23 +655,24 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for request pie chart -->
-        {% endif %}
 
+            <script>
+                var plotCTRequestFreq = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartRequestDIV');
+                });
+                var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
+                result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
+            </script>
+        {% endif %}
 
         {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
             <!-- HTML to include div container for pie chart of studies per week day pie chart -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('piechartStudyWorkloadDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion9">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion9" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyWorkloadDIV');}, 0);">
                                 Pie chart showing a breakdown of number of studies per weekday.
                             </a>
                         </h4>
@@ -698,23 +687,23 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for studies per week day pie chart -->
-        {% endif %}
 
+            <script>
+                var plotCTStudyPerDayAndHour = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
 
         {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
             <!-- HTML to include div container for mean study DLP per week -->
-
-            <script>
-                $(window).resize(function() {
-                    chartSetExportSize('studyMeanDLPOverTimeDIV');
-                });
-            </script>
-
             <div class="panel-group" id="accordion10">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {$(document).resize();}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordion10" href="#collapseWeeklyStudyMeanChart" onclick="setTimeout(function() {fitChartToDiv('studyMeanDLPOverTimeDIV');}, 0);">
                                 {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                                     Line plot showing mean DLP of each study type over time ({{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}).
                                 {% else %}
@@ -733,141 +722,23 @@
                 </div>
             </div>
             <!-- End of HTML to include div container for mean study DLP per week -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotCTStudyMeanDLP %}
-            <!-- JavaScript for study DLP plot -->
-            <script>
-                var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-                norm_btn_class = '.stu-hist-norm-btn';
-                instr_class = '.stu-instructions';
-                render_div = 'histogramStudyPlotDIV';
-                val_label = 'DLP';
-                val_units = 'mGy.cm';
-                cat_label = 'Study description';
-                cat_counter = 'studies';
-                field_name_min = 'study_dlp_min';
-                field_name_max = 'study_dlp_max';
-                field_multiplier = 1.0;
-                field_cat_name = 'study_description';
-                tooltip_filters = tooltipFiltersStudy;
-                href_start = '/openrem/ct/?studyhist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
 
             <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for study plot -->
-        {% endif %}
+                var plotCTStudyMeanDLPOverTime = true;
+                var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';
+                $(window).resize(function() {
+                    chartSetExportSize('studyMeanDLPOverTimeDIV');
+                });
 
-
-        {% if request.user.userprofile.plotCTStudyFreq or request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-            <!-- JavaScript for study pie chart. studyColours also needed by DLP over time plot -->
-            <script>
-                var urlStartStudy = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-            </script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTStudyFreq %}
-            <script>result = chartFrequency('piechartStudyDIV', 'Study description frequency');</script>
-            <!-- End of JavaScript for study pie chart -->
-        {% endif %}
-
-
-
-
-        {% if request.user.userprofile.plotCTRequestMeanDLP or request.user.userprofile.plotCTRequestFreq %}
-            <!-- JavaScript for request mean DLP and request frequency plot. -->
-            <script>
-                var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'requested_procedure' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
-            </script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTRequestMeanDLP %}
-            <script>
-                norm_btn_class = '.req-hist-norm-btn';
-                instr_class = '.req-instructions';
-                render_div = 'histogramRequestPlotDIV';
-                val_label = 'DLP';
-                val_units = 'mGy.cm';
-                cat_label = 'Requested procedure';
-                cat_counter = 'studies';
-                field_name_min = 'study_dlp_min';
-                field_name_max = 'study_dlp_max';
-                field_multiplier = 1.0;
-                field_cat_name = 'requested_procedure';
-                tooltip_filters = tooltipFiltersRequest;
-                href_start = '/openrem/ct/?requesthist=1&';
-            </script>
-
-            {% if request.user.userprofile.plotAverageChoice == 'both' %}
-                <script>avg_label = 'Mean and median';</script>
-            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>avg_label = 'Mean';</script>
-            {% else %}
-                <script>avg_label = 'Median';</script>
-            {% endif %}
-
-            <script>
-                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
-                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
-                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
-            </script>
-            <!-- End of JavaScript for request plot -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotCTRequestFreq %}
-            <!-- JavaScript for request pie chart. -->
-            <script>
-                var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
-            </script>
-        {% endif %}
-
-        {% if request.user.userprofile.plotCTRequestFreq %}
-            <script>result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');</script>
-            <!-- End of JavaScript for request pie chart -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotCTStudyPerDayAndHour %}
-            <!-- JavaScript for studies per weekday pie chart with drilldown to hourly breakdown -->
-            <script>result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');</script>
-            <!-- End of JavaScript for studies per week day pie chart -->
-        {% endif %}
-
-
-        {% if request.user.userprofile.plotCTStudyMeanDLPOverTime %}
-            <!-- JavaScript for mean DLP per study description -->
-            <script>
                 var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
-            </script>
 
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
-                <script>
-                    result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Mean');
-                </script>
+                result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Mean');
             {% else %}
-                <script>
-                    result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Median');
-                </script>
+                result = chartAverageOverTime('studyMeanDLPOverTimeDIV', 'DLP', 'mGy.cm', 'Median');
             {% endif %}
-            <!-- End of JavaScript for mean DLP per study description -->
+            </script>
         {% endif %}
-
 
     {% endif %}
 {% endblock %}

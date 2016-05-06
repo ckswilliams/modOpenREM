@@ -80,7 +80,7 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
             date_before = formatDate(new Date((new Date((temp_date).setMonth((temp_date).getMonth() + 1))).setDate((new Date((temp_date).setMonth((temp_date).getMonth() + 1))).getDate() - 1)));
 
             current_value = parseFloat(over_time_data[i][j][1]);
-            if (current_value == 0) current_value = null;
+            if (current_value == 0 || isNaN(current_value)) current_value = null;
 
             temp.push({
                 y: current_value,
@@ -117,6 +117,10 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
 function updateFrequencyChart(name_list, system_list, summary_data, url_start, chart_div, colour_scale) {
     var piechart_data = new Array(name_list.length);
     var data_counts = 0;
+
+    var index = name_list.indexOf(null);
+    if (index !== -1) name_list[index] = "Blank";
+
     for (i = 0; i < name_list.length; i++) {
         data_counts = 0;
         for (j = 0; j < system_list.length; j++) {
@@ -154,6 +158,10 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var current_counts;
     var average_value_per_name = [];
     var current_value;
+
+    var index = name_list.indexOf(null);
+    if (index !== -1) name_list[index] = "Blank";
+
     for (j = 0; j < name_list.length; j++) {
         current_counts = 0;
         current_value = 0;
@@ -176,12 +184,14 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
         var mean_data = []; while(mean_data.push([]) < system_list.length);
         for (i = 0; i < system_list.length; i++) {
             for (j = 0; j < name_list.length; j++) {
+                var current_mean = summary_data[i][j].mean != null ? summary_data[i][j].mean : 0;
+                var current_num = summary_data[i][j].num != null ? summary_data[i][j].num : 0;
                 (mean_data[i]).push({
                     name: name_list[j],
                     y: summary_data[i][j].mean,
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
-                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + summary_data[i][j].mean.toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
+                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + current_num + ')',
                     drilldown: system_list[i]+name_list[j],
                     total_counts: total_counts_per_name[j],
                     avg_value: average_value_per_name[j]
@@ -300,5 +310,68 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
             current_series++;
         }
     }
+    chart.redraw({duration: 1000});
+}
+
+
+function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
+    var chart = $('#'+chart_div).highcharts();
+    var colour_max = system_list.length;
+
+    /*
+    // Prepare some dummy data
+    var data = [],
+        n = 100000,
+        i;
+    for (i = 0; i < n; i += 1) {
+        data.push([
+            Math.pow(Math.random(), 2) * 100,
+            Math.pow(Math.random(), 2) * 100
+        ]);
+    }
+    max_values = [100,100];
+    system_list = ['Dummy data'];
+    */
+
+    for (i = 0; i < system_list.length; i++) {
+        if (chart.series.length > i) {
+            chart.series[i].update({
+                type: 'scatter',
+                name: system_list[i],
+                data: scatter_data[i],
+                color: colour_scale(i/colour_max).alpha(0.5).css(),
+                marker: {
+                    radius: 2
+                },
+                tooltip: {
+                    followPointer: false,
+                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                }
+            });
+        }
+        else {
+            chart.addSeries({
+                type: 'scatter',
+                name: system_list[i],
+                data: scatter_data[i],
+                color: colour_scale(i/colour_max).alpha(0.5).css(),
+                marker: {
+                    radius: 2
+                },
+                tooltip: {
+                    followPointer: false,
+                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                }
+            });
+        }
+
+    }
+
+    chart.xAxis[0].update({
+        max: max_values[0]
+    });
+    chart.yAxis[0].update({
+        max: max_values[1]
+    });
     chart.redraw({duration: 1000});
 }

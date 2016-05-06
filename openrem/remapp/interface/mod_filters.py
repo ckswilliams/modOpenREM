@@ -133,6 +133,8 @@ class RFSummaryListFilter(django_filters.FilterSet):
     performing_physician_name = django_filters.CharFilter(lookup_type='icontains', label='Physician')
     accession_number = django_filters.MethodFilter(action=custom_acc_filter, label='Accession number')
     display_name = django_filters.CharFilter(lookup_type='icontains', label='Display name', name='generalequipmentmoduleattr__unique_equipment_name__display_name')
+    study_dap_min = django_filters.MethodFilter(action=dap_min_filter, label=mark_safe('Min study DAP (cGy.cm<sup>2</sup>)'))
+    study_dap_max = django_filters.MethodFilter(action=dap_max_filter, label=mark_safe('Max study DAP (cGy.cm<sup>2</sup>)'))
     test_data = django_filters.ChoiceFilter(lookup_type='isnull', label="Include possible test data", name='patientmoduleattr__not_patient_indicator', choices=TEST_CHOICES, widget=forms.Select)
 
     class Meta:
@@ -369,6 +371,7 @@ class DXFilterPlusPid(DXSummaryListFilter):
         super(DXFilterPlusPid, self).__init__(*args, **kwargs)
         self.filters['patient_name'] = django_filters.MethodFilter(action=custom_name_filter, label='Patient name')
         self.filters['patient_id'] = django_filters.MethodFilter(action=custom_id_filter, label='Patient ID')
+
 
 def dx_acq_filter(filters, pid=False):
     from decimal import Decimal, InvalidOperation
