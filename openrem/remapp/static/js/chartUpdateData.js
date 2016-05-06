@@ -127,7 +127,7 @@ function updateFrequencyChart(name_list, system_list, summary_data, url_start, c
             data_counts += parseInt(summary_data[j][i].num)
         }
         piechart_data[i] = {
-            name: name_list[i] == null ? "Blank" : name_list[i],
+            name: name_list[i],
             y: data_counts,
             url: url_start + name_list[i]
         };

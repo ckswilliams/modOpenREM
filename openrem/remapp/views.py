@@ -508,12 +508,9 @@ def rf_plot_calculations(f, request_results, median_available, plot_average_choi
     if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
         exp_include = [o.study_instance_uid for o in f]
 
-        # study_events = GeneralStudyModuleAttr.objects.exclude(
-        #     study_description__isnull=True
-        # ).filter(
-        #     study_instance_uid__in=exp_include
-        # )
-        study_events = GeneralStudyModuleAttr.objects.filter(
+        study_events = GeneralStudyModuleAttr.objects.exclude(
+            study_description__isnull=True
+        ).filter(
             study_instance_uid__in=exp_include
         )
 
@@ -746,7 +743,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   1,
                                                   plot_acquisition_mean_ctdi, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  exclude_constant_angle=True)
 
         return_structure['acquisitionSystemListCTDI'] = result['system_list']
         return_structure['acquisitionNameListCTDI'] = result['series_names']
