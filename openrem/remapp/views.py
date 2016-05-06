@@ -219,8 +219,6 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
         study_events = GeneralStudyModuleAttr.objects.exclude(
             projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-        ).exclude(
-            study_description__isnull=True
         ).filter(
             study_instance_uid__in=exp_include
         )
@@ -228,8 +226,6 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
     if plot_request_mean_dap or plot_request_freq:
         request_events = GeneralStudyModuleAttr.objects.exclude(
             projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-        ).exclude(
-            requested_procedure_code_meaning__isnull=True
         ).filter(
             study_instance_uid__in=exp_include
         )
@@ -513,9 +509,7 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
     if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
         exp_include = [o.study_instance_uid for o in f]
 
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            study_description__isnull=True
-        ).filter(
+        study_events = GeneralStudyModuleAttr.objects.filter(
             study_instance_uid__in=exp_include
         )
 
@@ -709,8 +703,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
     if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         study_events = GeneralStudyModuleAttr.objects.exclude(
             ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-        ).exclude(
-            study_description__isnull=True
         ).filter(
             study_instance_uid__in=exp_include
         )
@@ -718,8 +710,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
     if plot_request_mean_dlp or plot_request_freq:
         request_events = GeneralStudyModuleAttr.objects.exclude(
             ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-        ).exclude(
-            requested_procedure_code_meaning__isnull=True
         ).filter(
             study_instance_uid__in=exp_include
         )
@@ -958,9 +948,7 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
     if plot_study_per_day_and_hour:
         exp_include = [o.study_instance_uid for o in f]
 
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            study_description__isnull=True
-        ).filter(
+        study_events = GeneralStudyModuleAttr.objects.filter(
             study_instance_uid__in=exp_include
         )
 
