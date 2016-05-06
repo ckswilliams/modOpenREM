@@ -23,4 +23,4 @@ The following instructions might also be useful with a Conquest setup, but they 
 
     conquestAsWindowsService
     conquestImportConfig
-    conquestAddRDSR
+
