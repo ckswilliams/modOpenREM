@@ -550,7 +550,16 @@ def rf_detail_view(request, pk=None):
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
 
-    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+    from remapp.models import SkinDoseMapCalcSettings
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        SkinDoseMapCalcSettings.objects.get()
+    except ObjectDoesNotExist:
+        SkinDoseMapCalcSettings.objects.create()
+
+    admin = {'openremversion': remapp.__version__,
+             'docsversion': remapp.__docs_version__,
+             'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
 
     for group in request.user.groups.all():
         admin[group.name] = True
@@ -560,6 +569,51 @@ def rf_detail_view(request, pk=None):
         {'generalstudymoduleattr': study, 'admin': admin},
         context_instance=RequestContext(request)
     )
+
+
+@login_required
+def rf_detail_view_skin_map(request, pk=None):
+    """View to calculate a skin dose map. Currently just a copy of rf_detail_view
+    """
+    from django.contrib import messages
+    from remapp.models import GeneralStudyModuleAttr
+    from django.http import JsonResponse
+    from openremproject.settings import MEDIA_ROOT
+    import os
+    import cPickle as pickle
+
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        GeneralStudyModuleAttr.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        messages.error(request, 'That study was not found')
+        return redirect('/openrem/rf/')
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    # Check to see if there is already a skin map pickle with the same study ID.
+    skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
+
+    from remapp.version import __skin_map_version__
+    loaded_existing_data = False
+    if os.path.exists(skin_map_path):
+        existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+        try:
+            if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
+                return_structure = existing_skin_map_data
+                loaded_existing_data = True
+        except KeyError:
+            pass
+
+    if not loaded_existing_data:
+        from remapp.tools.make_skin_map import make_skin_map
+        make_skin_map(pk)
+        return_structure = pickle.load(open(skin_map_path, 'rb'))
+
+    return JsonResponse(return_structure, safe=False)
 
 
 @login_required
@@ -1801,6 +1855,28 @@ class DicomDeleteSettingsUpdate(UpdateView):
 
     model = DicomDeleteSettings
     form_class = DicomDeleteSettingsForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class SkinDoseMapCalcSettingsUpdate(UpdateView):
+    from remapp.models import SkinDoseMapCalcSettings
+    from remapp.forms import SkinDoseMapCalcSettingsForm
+    from django.core.exceptions import ObjectDoesNotExist
+
+    try:
+        SkinDoseMapCalcSettings.objects.get()
+    except ObjectDoesNotExist:
+        SkinDoseMapCalcSettings.objects.create()
+
+    model = SkinDoseMapCalcSettings
+    form_class = SkinDoseMapCalcSettingsForm
 
     def get_context_data(self, **context):
         context[self.context_object_name] = self.object

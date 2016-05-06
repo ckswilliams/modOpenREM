@@ -28,6 +28,11 @@ a.sorting-option {
     cursor: hand;
 }
 
+a.no-decoration {
+    text-decoration: none;
+    color: black;
+}
+
 div.ajax-progress {
   position: fixed;
   display: none;
@@ -114,4 +119,201 @@ div.fullscreen{
   opacity: 1;
   padding: 2px;
   z-index: 9999 !important;
+}
+
+div.skinDoseMapGroup {
+  position: relative;
+  height:420px;
+  width: 620px;
+}
+
+div.skinDoseMap {
+  position: absolute;
+  padding: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
+div.skinDoseMap3d {
+  position: absolute;
+  padding: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 10;
+}
+
+div.skinMapSaveBtn {
+  position: absolute;
+  padding: 0px;
+  bottom: 5px;
+  right: 78px;
+  z-index: 15;
+}
+
+div.skinDoseMapOverlayShow {
+  position: absolute;
+  padding: 0px;
+  bottom: 5px;
+  left: 0px;
+  z-index: 5;
+}
+
+div.skinDoseMapOverlayHide {
+  position: absolute;
+  padding: 0px;
+  bottom: 5px;
+  left: 0px;
+  z-index: 5;
+}
+
+div.skinDoseMapFullscreenBtn {
+  position: absolute;
+  padding: 0px;
+  top: -7px;
+  right: 78px;
+  z-index: 15;
+}
+
+div.ajax-progress-skin-dose {
+  position: absolute;
+  display: none;
+  width: 50px;
+  height: 50px;
+  top: 100%;
+  left: 50%;
+  border: none;
+}
+
+div.skinDoseMapInformation {
+  position: absolute;
+  padding: 0px;
+  top: -5px;
+  left: 5px;
+  z-index: 15;
+  font-size: x-small;
+}
+
+.whiteText {
+  color: white;
+}
+
+a.whiteText {
+  color: white;
+}
+
+div.colourScale {
+  position: absolute;
+  padding: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 15;
+}
+
+div.colour_scale_selection {
+  position:absolute;
+  padding: 5px;
+  top: -6px;
+  right: -1px;
+  background-color: white;
+  z-index: 20 !important;
+}
+
+div.openskin_info {
+  font-size: x-small;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+input.skinMapControls {
+  border: none;
+  text-align: right;
+}
+
+input.skinMapControlSlider {
+}
+
+td.rangeCell {
+  width: 150px;
+}
+
+th.centred  {
+  text-align: center;
+  vertical-align: middle;
+}
+
+td.centred {
+  text-align: center;
+  vertical-align: middle;
+}
+
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #7092be;
+  border-radius: 1px;
+  border: 1px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  border: 1px solid #000000;
+  height: 24px;
+  width: 12px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -10px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #7092be;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #7092be;
+  border-radius: 1px;
+  border: 1px solid #010101;
+}
+input[type=range]::-moz-range-thumb {
+  border: 1px solid #000000;
+  height: 24px;
+  width: 12px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 8px 0;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #7092be;
+  border: 1px solid #010101;
+  border-radius: 3px;
+}
+input[type=range]::-ms-fill-upper {
+  background: #7092be;
+  border: 1px solid #010101;
+  border-radius: 3px;
+}
+input[type=range]::-ms-thumb {
+  border: 1px solid #000000;
+  height: 22px;
+  width: 12px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: 0px;
 }

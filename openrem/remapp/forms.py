@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
 from openremproject import settings
-from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP
+from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -398,3 +398,26 @@ class DicomStoreForm(forms.ModelForm):
             'controlled': "Advanced use only: tick this box to control the server using OpenREM",
             'keep_alive': "Advanced use only: tick this box to auto-start this server using celery beat"
         }
+
+
+class SkinDoseMapCalcSettingsForm(forms.ModelForm):
+    """Form for configuring whether skin dose maps are shown / calculated
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(SkinDoseMapCalcSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Div(
+                'enable_skin_dose_maps',
+                'calc_on_import'
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            )
+        )
+
+    class Meta:
+        model = SkinDoseMapCalcSettings
+        fields = ['enable_skin_dose_maps', 'calc_on_import']

@@ -1,4 +1,4 @@
-{% extends "remapp/base.html" %}
+{% extends "remapp/rfdetailbase.html" %}
 
 {% block navrf %}<li class="active">{% endblock %}
 
@@ -32,13 +32,13 @@
                 <li>
                     {% for record in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.all %}
                         Total dose at RP, {{ record.acquisition_plane }}:
-                        {{ record.accumintegratedprojradiogdose_set.get.dose_rp_total|floatformat:6 }} Gy
+                        <script>document.write({{ record.accumintegratedprojradiogdose_set.get.dose_rp_total }}.toPrecision(3));</script> Gy
                         <br>
                     {% endfor %}
                 </li>
                 <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
                 <li>
-                    Scanner:
+                    Equipment:
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
@@ -47,29 +47,266 @@
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
             </ul>
         </div>
+
+        {% if admin.enable_skin_dose_maps %}
+        <div class="col-md-7" id="skinDoseMapContainer">
+            <div class="ajax-progress-skin-dose"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
+            <h2>Radiation exposure incidence map</h2>
+
+            <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
+
+            <div class="skinDoseMapGroup" id="skinDoseMapGroup">
+
+                <div class="skinDoseMap">
+                    <canvas id="skinDoseMap" width="540" height="420" class="table-bordered" data-tooltip="skin_dose_map"></canvas>
+                </div>
+
+                <div class="skinDoseMap3d">
+                    <canvas id="skinDoseMap3d" width="540" height="420" class="table-bordered"></canvas>
+                </div>
+
+                <div class="skinDoseMapOverlayShow">
+                    <a class="btn btn-default btn-sm" role="button" id="skinDoseMapOverlayShow">Show overlay</a>
+                </div>
+
+                <div class="skinDoseMapOverlayHide">
+                    <a class="btn btn-default btn-sm" role="button" id="skinDoseMapOverlayHide">Hide overlay</a>
+                </div>
+
+                <div class="skinMapSaveBtn">
+                    <a class="btn btn-default btn-sm" role="button" id="save2dSkinMap">Save 2D map</a>
+                    <a class="btn btn-default btn-sm" role="button" id="save3dSkinMap">Save 3D map</a>
+                </div>
+
+                <div class="skinDoseMapFullscreenBtn">
+                    <a class="btn btn-default btn-sm" role="button" id="skinDoseMapFullscreenBtn">Toggle fullscreen</a>
+                </div>
+
+                <div class="skinDoseMapInformation" id="skinDoseMapInformation">
+                    <table>
+                        <tr>
+                            <td>Calculated peak skin dose:</td>
+                            <td style="font-weight: bold;"><a id="maxDose" class="no-decoration">0.000</a> Gy</td>
+                        </tr>
+                        <tr>
+                            <td>Phantom dimensions:</td>
+                            <td><a id="phantomDimensions" class="no-decoration"></a> cm (HxWxD)</td>
+                        </tr>
+                        <tr>
+                            <td>Assumed patient height: </td>
+                            <td><a id="patientHeight" class="no-decoration"></a> m</td>
+                        </tr>
+                        <tr>
+                            <td>Assumed patient mass: </td>
+                            <td><a id="patientMass" class="no-decoration"></a> kg</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="colourScale">
+                    <canvas id="colourScale" width="70" height="420"></canvas>
+                </div>
+
+                <div class="colour_scale_selection table-bordered" id="colour_scale_selection">
+                    <form id="colour_scale_form" onsubmit="useNewColourScale(this); return false;">
+                        <table>
+                            <tr>
+                                <td colspan="2" class="centred">Colour scale choice</td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="OrRd"></td>
+                                <td><canvas id="OrRd"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="PuBu"></td>
+                                <td><canvas id="PuBu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="BuPu"></td>
+                                <td><canvas id="BuPu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="Oranges"></td>
+                                <td><canvas id="Oranges"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="BuGn"></td>
+                                <td><canvas id="BuGn"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="YlOrBr"></td>
+                                <td><canvas id="YlOrBr"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="YlGn"></td>
+                                <td><canvas id="YlGn"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="Reds"></td>
+                                <td><canvas id="Reds"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="RdPu"></td>
+                                <td><canvas id="RdPu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="Greens"></td>
+                                <td><canvas id="Greens"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="YlGnBu"></td>
+                                <td><canvas id="YlGnBu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="Purples"></td>
+                                <td><canvas id="Purples"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="GnBu"></td>
+                                <td><canvas id="GnBu"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="Greys" checked></td>
+                                <td><canvas id="Greys"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="YlOrRd"></td>
+                                <td><canvas id="YlOrRd"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="PuRd"></td>
+                                <td><canvas id="PuRd"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="Blues"></td>
+                                <td><canvas id="Blues"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><input type="radio" title="colour_choice" name="colour_choice" value="PuBuGn"></td>
+                                <td><canvas id="PuBuGn"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="centred"><a onclick="$('.colour_scale_selection').hide();" class="btn btn-default btn-sm" role="button">Hide colour scales</a></td>
+                            </tr>
+                        </table>
+                    </form>
+                    <script>
+                        $('#colour_scale_form input[type=radio]').change(function() {
+                            useNewColourScale(this.value);
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div id="skin_map_wwwl_controls">
+                <table>
+                    <tr>
+                        <td><input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm btn-block" role="button" /></td>
+                        <td style="padding-right: 20px"><a onclick="$('#skin_map_maxmin_controls').show();$('#skin_map_wwwl_controls').hide();" class="btn btn-default btn-sm btn-block" role="button">Use max/min</a></td>
+                        <td class="rangeCell"><input type="range" title="windowLevelSlider" name="windowLevelSlider" id="windowLevelSlider" min="0" max="2" value="0.1" step="0.001" oninput="updateWindowLevel(this.value)" /></td>
+                        <td><input type="text" title="currentWindowLevel" name="currentWindowLevel" id="currentWindowLevel" size="5" onchange="updateWindowLevel(this.value)" class="skinMapControls" /> Gy window level</td>
+                    </tr>
+                    <tr>
+                        <td><a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm btn-block" role="button">Colour scales</a></td>
+                        <td style="padding-right: 20px"><a onclick="switch2d3dSkinDoseMap();" class="btn btn-default btn-sm btn-block" role="button" id="swap3dButton1">Toggle 2D/3D view</a></td>
+                        <td class="rangeCell"><input type="range" title="windowWidthSlider" name="windowWidthSlider" id="windowWidthSlider" min="0" max="4" value="0.2" step="0.001" oninput="updateWindowWidth(this.value)" /></td>
+                        <td><input type="text" title="currentWindowWidth" name="currentWindowWidth" id="currentWindowWidth" size="5" onchange="updateWindowWidth(this.value)" class="skinMapControls" /> Gy window width</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="skin_map_maxmin_controls">
+                <table>
+                    <tr>
+                        <td><input type="button" onclick="reset()" value="Reset controls" class="btn btn-default btn-sm btn-block" role="button" /></td>
+                        <td style="padding-right: 20px"><a onclick="$('#skin_map_maxmin_controls').hide();$('#skin_map_wwwl_controls').show();" class="btn btn-default btn-sm btn-block" role="button">Use WW/WL</a></td>
+                        <td class="rangeCell"><input type="range" title="minDoseSlider" name="minDoseSlider" id="minDoseSlider" min="0" max="2" value="0.1" step="0.001" oninput="updateMinDisplayedDose(this.value)" /></td>
+                        <td><input type="text" title="currentMinDisplayedDose" name="currentMinDisplayedDose" id="currentMinDisplayedDose" size="5" onchange="updateMinDisplayedDoseManual(this.value)" class="skinMapControls" /> Gy min. displayed dose</td>
+                    </tr>
+                    <tr>
+                        <td><a onclick="$('.colour_scale_selection').toggle();" class="btn btn-default btn-sm btn-block" role="button">Colour scales</a></td>
+                        <td style="padding-right: 20px"><a onclick="switch2d3dSkinDoseMap();" class="btn btn-default btn-sm btn-block" role="button" id="swap3dButton2">Toggle 2D/3D view</a></td>
+                        <td class="rangeCell"><input type="range" title="maxDoseSlider" name="maxDoseSlider" id="maxDoseSlider" min="0" max="4" value="0.2" step="0.001" oninput="updateMaxDisplayedDose(this.value)" /></td>
+                        <td><input type="text" title="currentMaxDisplayedDose" name="currentMaxDisplayedDose" id="currentMaxDisplayedDose" size="5" onchange="updateMaxDisplayedDoseManual(this.value)" class="skinMapControls" /> Gy max. displayed dose</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="openskin_info" id="openskin_info">Skin dose maps are calculated using openSkin, and are for indication only: openSkin calculations have not
+            been validated. Contributions are welcome, see <a href="http://bitbucket.org/openskin/openskin">openSkin website</a> for details.</div>
+
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapColourScaleObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMap3dObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMap3dPersonObject.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapping.js"></script>
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMapping3d.js"></script>
+
+            <script>
+                if (isCanvasSupported()) {
+                    var skinDoseMapObj = new skinDoseMapObject('skinDoseMap', 'Greys');
+                    var skinDoseMapColourScaleObj = new skinDoseMapColourScaleObject('colourScale', 'Greys');
+                    if (show3dSkinDoseMap) {
+                        var skinDoseMap3dObj = new skinDoseMap3dObject('skinDoseMap3d', 'Greys');
+                        var skinDoseMap3dPersonObj = new skinDoseMap3dPersonObject();
+                    }
+                    else {
+                        $('#swap3dButton1').hide();
+                        $('#swap3dButton2').hide();
+                    }
+                } else {
+                    $('#skinDoseMapContainer').html('<h2>OpenSkin radiation exposure incidence map</h2>' +
+                            '<p>The skin dose map cannot be shown: your browser does not support the HTML &lt;canvas&gt; element.</p>');
+                }
+            </script>
+
+            <script>
+                $('#skin_map_maxmin_controls').show();
+                $('#skin_map_wwwl_controls').hide();
+                $('#colour_scale_selection').hide();
+                $('#skinDoseMapOverlayHide').hide();
+                $('#skinDoseMap3d').hide();
+                $('#save3dSkinMap').hide();
+
+                // Hide the group, controls and info until the skin dose map has been calculated or loaded in.
+                $('#skinDoseMapGroup').hide();
+                $('#skin_map_maxmin_controls').hide();
+                $('#openskin_info').hide();
+            </script>
+
+            <script src="{{ STATIC_URL }}js/rfSkinDoseMappingAjax.js"></script>
+        </div>
+        {% else %}
         <div class="col-md-7">
-            <h2>OpenSkin radiation exposure incidence map</h2>
+            <h2>openSkin radiation exposure incidence map</h2>
             <p>
-                You can export this study to a csv file in the format required by Jonathan
-                Cole's OpenSkin software. The OpenSkin software can be downloaded from the
-                <a href="https://bitbucket.org/openskin/openskin/downloads">OpenSkin BitBucket project</a> and there is
+                You can export this study to a csv file in the format required by Jonathan Cole's openSkin software. The
+                openSkin software can be downloaded from the
+                <a href="https://bitbucket.org/openskin/openskin/downloads">openSkin BitBucket project</a> and there is
                 more information available in the
-                <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>. Future releases of
-                OpenREM will display the exposure incidence map and peak skin dose values integrated into this page.
+                <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>.
+            </p>
+            {% url 'skin_dose_map_settings_update' 1 as the_url %}
+            <p>
+                This version of OpenREM has openSkin built-in, and is able to calculate and display skin dose maps for
+                some x-ray systems. However, this option is switched off for your installation at the moment. It can be
+                enabled by an administrator by changing the <a href="{{ the_url }}">Skin dose map settings</a>.
             </p>
             <p>
                 <strong>Warning:</strong> Only copper filters are considered in this export - aluminium or other filters
-                are not considered. This is related to the way OpenSkin works.
+                are not considered. This is related to the way openSkin works.
             </p>
             <h4>
                 Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">OpenSkin export</a>. <small>(Not
                 available if you don't have export permissions.)</small>
             </h4>
         </div>
-  </div>
+        {% endif %}
+
+    </div>
 
 <table class="table table-striped table-bordered">
-    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Angle (&deg;)</th><th>Detector size (mm)</th>
+    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
@@ -92,6 +329,7 @@
         </td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
+        <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
     </tr>
     {% endfor %}
 </table>

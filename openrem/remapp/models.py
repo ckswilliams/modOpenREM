@@ -36,6 +36,15 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+
+class SkinDoseMapCalcSettings(SingletonModel):
+    enable_skin_dose_maps = models.BooleanField(default=False, verbose_name="Enable skin dose maps?")
+    calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
+
+    def get_absolute_url(self):
+        return '/admin/skindosemapsettings/1/'
+
+
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")

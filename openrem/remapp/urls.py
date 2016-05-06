@@ -35,7 +35,7 @@ from django.views.generic import ListView, DetailView
 from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
-from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate
+from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
 
 
 urlpatterns = patterns('remapp.views',
@@ -48,6 +48,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^rf/chart/$',
         'rf_summary_chart_data', name='rf_summary_chart_data'),
     url(r'^rf/(?P<pk>\d+)/$', 'rf_detail_view', name='rf_detail_view'),
+    url(r'^rf/(?P<pk>\d+)/skin_map/$', 'rf_detail_view_skin_map', name='rf_detail_view_skin_map'),
 
     url(r'^ct/$',
         'ct_summary_list_filter'),
@@ -88,6 +89,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/dicomqr/(?P<pk>\d+)/delete/$', DicomQRDelete.as_view(), name='dicomqr_delete'),
     url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
     url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomDeleteSettingsUpdate.as_view(), name='dicom_delete_settings_update'),
+    url(r'^admin/skindosemapsettings/(?P<pk>\d+)/$', SkinDoseMapCalcSettingsUpdate.as_view(), name='skin_dose_map_settings_update'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

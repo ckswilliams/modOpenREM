@@ -43,6 +43,9 @@ django.setup()
 
 from celery import shared_task
 
+logger = logging.getLogger('remapp.extractors.rdsr')  # Explicitly named so that it is still handled when using __main__
+
+
 def _observercontext(dataset,obs): # TID 1002
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     for cont in dataset.ContentSequence:
@@ -833,6 +836,19 @@ def _rsdr2db(dataset):
     _patientstudymoduleattributes(dataset,g)
     _patientmoduleattributes(dataset,g)
 
+    from remapp.models import SkinDoseMapCalcSettings
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        SkinDoseMapCalcSettings.objects.get()
+    except ObjectDoesNotExist:
+        SkinDoseMapCalcSettings.objects.create()
+
+    enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
+    calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
+    if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:
+        from remapp.tools.make_skin_map import make_skin_map
+        make_skin_map.delay(g.pk)
+
 
 @shared_task
 def rdsr(rdsr_file):
@@ -879,3 +895,5 @@ if __name__ == "__main__":
         sys.exit('Error: Supply exactly one argument - the DICOM RDSR file')
 
     sys.exit(rdsr(sys.argv[1]))
+
+
