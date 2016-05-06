@@ -285,16 +285,13 @@ has instructions and links to get you set up with Apache.
 An advanced guide using Apache, including auto-restarting the server when the code changes, has been contributed
 here: :doc:`apache_on_windows`
 
-Conquest related guides
------------------------
 
-Previous releases of OpenREM have not had a DICOM Store SCP, and we have recommended using Conquest for this job.
-OpenREM now has this functionality built-in, so hopefully the guides below will not be needed!
+DICOM Store and query-retrieve
+------------------------------
 
-..  toctree::
-    :maxdepth: 1
+The best (and only practical way in a production environment) to get DICOM data into OpenREM is to have a DICOM store
+node (Store Service Class Provider/SCP) and possibly a query-retrieve service class user too.
 
-    conquestAsWindowsService
-    conquestImportConfig
-    conquestAddRDSR
+To find out more about this, refer to the :doc:`netdicom` docs.
+
 

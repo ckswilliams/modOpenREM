@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b14 (2016-04-07)
 ---------------------
 
+* `#390`_  Basic troubleshooting is now documented
 * `#387`_  Added laterality to mammography exports
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now

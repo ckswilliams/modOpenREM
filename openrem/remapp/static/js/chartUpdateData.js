@@ -158,26 +158,29 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var current_counts;
     var average_value_per_name = [];
     var current_value;
+    var calc_histograms = typeof histogram_data !== 'undefined' ? true : false;
 
     var index = name_list.indexOf(null);
     if (index !== -1) name_list[index] = "Blank";
 
-    for (j = 0; j < name_list.length; j++) {
-        current_counts = 0;
-        current_value = 0;
-        for (i = 0; i < system_list.length; i++) {
-            (data_counts[i]).push(histogram_data[i][j][0]);
-            (data_bins[i]).push(histogram_data[i][j][1]);
-            current_counts += parseFloat(summary_data[i][j].num);
-            if (average_choice == "mean" || average_choice == "both") {
-                current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
+    if(calc_histograms) {
+        for (j = 0; j < name_list.length; j++) {
+            current_counts = 0;
+            current_value = 0;
+            for (i = 0; i < system_list.length; i++) {
+                (data_counts[i]).push(histogram_data[i][j][0]);
+                (data_bins[i]).push(histogram_data[i][j][1]);
+                current_counts += parseFloat(summary_data[i][j].num);
+                if (average_choice == "mean" || average_choice == "both") {
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
+                }
+                else {
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
+                }
             }
-            else {
-                current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
-            }
+            total_counts_per_name.push(current_counts);
+            average_value_per_name.push(current_value / current_counts);
         }
-        total_counts_per_name.push(current_counts);
-        average_value_per_name.push(current_value / current_counts);
     }
 
     if (average_choice == "mean" || average_choice == "both") {
@@ -192,9 +195,9 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + current_num + ')',
-                    drilldown: system_list[i]+name_list[j],
-                    total_counts: total_counts_per_name[j],
-                    avg_value: average_value_per_name[j]
+                    drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
+                    total_counts: summary_data[i][j].num,
+                    avg_value: summary_data[i][j].mean
                 });
             }
         }
@@ -210,34 +213,36 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + parseFloat(summary_data[i][j].median).toFixed(1) + ' median<br>(n=' + summary_data[i][j].num + ')',
-                    drilldown: system_list[i]+name_list[j],
-                    total_counts: total_counts_per_name[j],
-                    avg_value: average_value_per_name[j]
+                    drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
+                    total_counts: summary_data[i][j].num,
+                    avg_value: summary_data[i][j].mean
                 });
             }
         }
     }
 
-    var temp;
-    var drilldown_series = [];
-    for (i = 0; i < system_list.length; i++) {
-        for (j = 0; j < name_list.length; j++) {
-            temp = [];
-            for (k = 0; k < data_counts[i][0].length; k++) {
-                temp.push([data_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + data_bins[i][j][k + 1].toFixed(1).toString(), data_counts[i][j][k]]);
+    if (calc_histograms) {
+        var temp;
+        var drilldown_series = [];
+        for (i = 0; i < system_list.length; i++) {
+            for (j = 0; j < name_list.length; j++) {
+                temp = [];
+                for (k = 0; k < data_counts[i][0].length; k++) {
+                    temp.push([data_bins[i][j][k].toFixed(1).toString() + ' \u2264 x < ' + data_bins[i][j][k + 1].toFixed(1).toString(), data_counts[i][j][k]]);
+                }
+                drilldown_series.push({
+                    id: system_list[i] + name_list[j],
+                    name: system_list[i],
+                    useHTML: true,
+                    data: temp
+                });
             }
-            drilldown_series.push({
-                id: system_list[i]+name_list[j],
-                name: system_list[i],
-                useHTML: true,
-                data: temp
-            });
         }
     }
 
     var chart = $('#'+chart_div).highcharts();
     chart.xAxis[0].setCategories(name_list);
-    chart.options.drilldown.series = drilldown_series;
+    if (calc_histograms) chart.options.drilldown.series = drilldown_series;
     chart.options.exporting.sourceWidth = $(window).width();
     chart.options.exporting.sourceHeight = $(window).height();
 

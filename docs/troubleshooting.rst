@@ -32,8 +32,12 @@ in place, the system is likely to run out of memory.
 Query-retrieve issues
 =====================
 
-Refer to the query-retrieve service :ref:`qrtroubleshooting` documentation
+Refer to the :ref:`qrtroubleshooting` documentation
 
+OpenREM DICOM storage nodes
+===========================
+
+Refer to the :ref:`storetroubleshooting` documentation
 
 Log files
 =========

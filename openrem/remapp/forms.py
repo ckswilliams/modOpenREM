@@ -191,7 +191,7 @@ class GeneralChartOptionsDisplayForm(forms.Form):
                                                     required=False)
     plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
-
+    plotHistograms = forms.BooleanField(label='Calculate histogram data', required=False)
 
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()

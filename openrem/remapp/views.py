@@ -163,9 +163,7 @@ def dx_summary_chart_data(request):
     from openremproject import settings
     from django.http import JsonResponse
 
-    request_results = request.GET
-
-    f = DXSummaryListFilter(request_results, queryset=GeneralStudyModuleAttr.objects.filter(
+    f = DXSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
         Q(modality_type__exact='DX') | Q(modality_type__exact='CR')
     ).order_by().distinct())
 
@@ -197,7 +195,7 @@ def dx_summary_chart_data(request):
                              user_profile.plotDXAcquisitionMeankVp, user_profile.plotDXAcquisitionMeanmAs,
                              user_profile.plotDXStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
-                             user_profile.plotHistogramBins)
+                             user_profile.plotHistogramBins, user_profile.plotHistograms)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -209,7 +207,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          plot_acquisition_mean_dap_over_time, plot_acquisition_mean_dap_over_time_period,
                          plot_acquisition_mean_kvp, plot_acquisition_mean_mas,
                          plot_study_per_day_and_hour,
-                         median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins):
+                         median_available, plot_average_choice, plot_series_per_systems,
+                         plot_histogram_bins, plot_histograms):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
     return_structure = {}
@@ -243,12 +242,13 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   1000000,
                                                   plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisition_names'] = result['series_names']
         return_structure['acquisitionSummary'] = result['summary']
-        if plot_acquisition_mean_dap:
+        if plot_acquisition_mean_dap and plot_histograms:
             return_structure['acquisitionHistogramData'] = result['histogram_data']
 
     if plot_request_mean_dap or plot_request_freq:
@@ -259,12 +259,13 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   1000000,
                                                   plot_request_mean_dap, plot_request_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['request_names'] = result['series_names']
         return_structure['requestSummary'] = result['summary']
-        if plot_request_mean_dap:
+        if plot_request_mean_dap and plot_histograms:
             return_structure['requestHistogramData'] = result['histogram_data']
 
     if plot_study_mean_dap or plot_study_freq:
@@ -275,12 +276,13 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   1000000,
                                                   plot_study_mean_dap, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['study_names'] = result['series_names']
         return_structure['studySummary'] = result['summary']
-        if plot_study_mean_dap:
+        if plot_study_mean_dap and plot_histograms:
             return_structure['studyHistogramData'] = result['histogram_data']
 
     if plot_acquisition_mean_kvp:
@@ -291,12 +293,14 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   1,
                                                   plot_acquisition_mean_kvp, 0,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['acquisitionkVpSystemList'] = result['system_list']
         return_structure['acquisition_kvp_names'] = result['series_names']
         return_structure['acquisitionkVpSummary'] = result['summary']
-        return_structure['acquisitionHistogramkVpData'] = result['histogram_data']
+        if plot_histograms:
+            return_structure['acquisitionHistogramkVpData'] = result['histogram_data']
 
     if plot_acquisition_mean_mas:
         result = average_chart_inc_histogram_data(f.qs,
@@ -306,12 +310,14 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   0.001,
                                                   plot_acquisition_mean_mas, 0,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['acquisitionmAsSystemList'] = result['system_list']
         return_structure['acquisition_mas_names'] = result['series_names']
         return_structure['acquisitionmAsSummary'] = result['summary']
-        return_structure['acquisitionHistogrammAsData'] = result['histogram_data']
+        if plot_histograms:
+            return_structure['acquisitionHistogrammAsData'] = result['histogram_data']
 
     if plot_acquisition_mean_dap_over_time:
         result = average_chart_over_time_data(f.qs,
@@ -461,8 +467,6 @@ def rf_summary_chart_data(request):
     from openremproject import settings
     from django.http import JsonResponse
 
-    request_results = request.GET
-
     if request.user.groups.filter(name='pidgroup'):
         f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             modality_type__exact='RF').order_by().distinct())
@@ -490,16 +494,17 @@ def rf_summary_chart_data(request):
         median_available = False
 
     return_structure =\
-        rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
+        rf_plot_calculations(f, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
                              user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq,
-                             user_profile.plotRFStudyDAP)
+                             user_profile.plotRFStudyDAP, user_profile.plotHistograms)
 
     return JsonResponse(return_structure, safe=False)
 
 
-def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap):
+def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
+                         plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap,
+                         plot_histograms):
     from remapp.models import IrradEventXRayData, Median
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
@@ -526,12 +531,13 @@ def rf_plot_calculations(f, request_results, median_available, plot_average_choi
                                                   1000000,
                                                   plot_study_dap, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
         return_structure['studySummary'] = result['summary']
-        if plot_study_dap:
+        if plot_study_dap and plot_histograms:
             return_structure['studyHistogramData'] = result['histogram_data']
 
     return return_structure
@@ -706,8 +712,6 @@ def ct_summary_chart_data(request):
     from openremproject import settings
     from django.http import JsonResponse
 
-    request_results = request.GET
-
     if request.user.groups.filter(name='pidgroup'):
         f = CTFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
             modality_type__exact='CT').order_by().distinct())
@@ -738,7 +742,8 @@ def ct_summary_chart_data(request):
         ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
                              user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
-                             median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
+                             median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
+                             user_profile.plotHistogramBins, user_profile.plotHistograms)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -746,7 +751,8 @@ def ct_summary_chart_data(request):
 def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
                          plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
-                         median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins):
+                         median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
+                         plot_histograms):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
     return_structure = {}
@@ -781,12 +787,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_acquisition_mean_dlp, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  exclude_constant_angle=True)
+                                                  exclude_constant_angle=True,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']
         return_structure['acquisitionSummary'] = result['summary']
-        if plot_acquisition_mean_dlp:
+        if plot_acquisition_mean_dlp and plot_histograms:
             return_structure['acquisitionHistogramData'] = result['histogram_data']
 
     if plot_acquisition_mean_ctdi:
@@ -798,12 +805,14 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_acquisition_mean_ctdi, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  exclude_constant_angle=True)
+                                                  exclude_constant_angle=True,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['acquisitionSystemListCTDI'] = result['system_list']
         return_structure['acquisitionNameListCTDI'] = result['series_names']
         return_structure['acquisitionSummaryCTDI'] = result['summary']
-        return_structure['acquisitionHistogramDataCTDI'] = result['histogram_data']
+        if plot_histograms:
+            return_structure['acquisitionHistogramDataCTDI'] = result['histogram_data']
 
     if plot_study_mean_dlp or plot_study_freq:
         result = average_chart_inc_histogram_data(study_events,
@@ -813,12 +822,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   1,
                                                   plot_study_mean_dlp, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
         return_structure['studySummary'] = result['summary']
-        if plot_study_mean_dlp:
+        if plot_study_mean_dlp and plot_histograms:
             return_structure['studyHistogramData'] = result['histogram_data']
 
     if plot_request_mean_dlp or plot_request_freq:
@@ -829,12 +839,13 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   1,
                                                   plot_request_mean_dlp, plot_request_freq,
                                                   plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['requestNameList'] = result['series_names']
         return_structure['requestSummary'] = result['summary']
-        if plot_request_mean_dlp:
+        if plot_request_mean_dlp and plot_histograms:
             return_structure['requestHistogramData'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
@@ -957,8 +968,6 @@ def mg_summary_chart_data(request):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from openremproject import settings
     from django.http import JsonResponse
-
-    request_results = request.GET
 
     if request.user.groups.filter(name='pidgroup'):
         f = MGFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
@@ -1608,6 +1617,7 @@ def chart_options_view(request):
                 user_profile.plotAverageChoice = general_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.plotSeriesPerSystem = general_form.cleaned_data['plotSeriesPerSystem']
             user_profile.plotHistogramBins = general_form.cleaned_data['plotHistogramBins']
+            user_profile.plotHistograms = general_form.cleaned_data['plotHistograms']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1659,7 +1669,8 @@ def chart_options_view(request):
                          'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
                          'plotInitialSortingDirection': user_profile.plotInitialSortingDirection,
                          'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
-                         'plotHistogramBins': user_profile.plotHistogramBins}
+                         'plotHistogramBins': user_profile.plotHistogramBins,
+                         'plotHistograms': user_profile.plotHistograms}
 
     ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
                     'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
