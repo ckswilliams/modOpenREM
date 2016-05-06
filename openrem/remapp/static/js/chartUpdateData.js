@@ -117,13 +117,17 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
 function updateFrequencyChart(name_list, system_list, summary_data, url_start, chart_div, colour_scale) {
     var piechart_data = new Array(name_list.length);
     var data_counts = 0;
+
+    var index = name_list.indexOf(null);
+    if (index !== -1) name_list[index] = "Blank";
+
     for (i = 0; i < name_list.length; i++) {
         data_counts = 0;
         for (j = 0; j < system_list.length; j++) {
             data_counts += parseInt(summary_data[j][i].num)
         }
         piechart_data[i] = {
-            name: name_list[i],
+            name: name_list[i] == null ? "Blank" : name_list[i],
             y: data_counts,
             url: url_start + name_list[i]
         };
@@ -154,6 +158,10 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var current_counts;
     var average_value_per_name = [];
     var current_value;
+
+    var index = name_list.indexOf(null);
+    if (index !== -1) name_list[index] = "Blank";
+
     for (j = 0; j < name_list.length; j++) {
         current_counts = 0;
         current_value = 0;

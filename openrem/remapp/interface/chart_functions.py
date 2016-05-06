@@ -6,17 +6,15 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
     from remapp.models import Median
     import numpy as np
 
-    # The line below will be useful when calculating things for studies. Will need to use a field that is unique to each
-    # study, such as uid. It is from http://stackoverflow.com/questions/13145254/django-annotate-count-with-a-distinct-field
-    # Project.objects.all().annotate(Count('informationunit__username', distinct=True))
-
     return_structure = {}
 
     if plot_average or plot_freq:
+        # Obtain a list of series names
         return_structure['series_names'] = list(database_events.values_list(db_series_names, flat=True).distinct()
                                                 .order_by(db_series_names))
 
         if plot_series_per_system and plot_average:
+            # Obtain a list of x-ray systems
             return_structure['system_list'] = list(database_events.values_list(db_display_name_relationship, flat=True)
                                                    .distinct().order_by(db_display_name_relationship))
         else:
@@ -25,9 +23,13 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
         return_structure['summary'] = []
 
         if median_available and plot_average_choice == 'both':
+
             if plot_series_per_system and plot_average:
+                # Calculate the mean, median and frequency for each x-ray system
+
                 for system in return_structure['system_list']:
                     if exclude_constant_angle:
+                        # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
                             **{db_display_name_relationship: system}).values(db_series_names).annotate(
                             mean=Avg(
@@ -50,6 +52,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             )
                         ).order_by(db_series_names))
                     else:
+                        # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
                             **{db_display_name_relationship: system}).values(db_series_names).annotate(
                             mean=Avg(db_value_name) * value_multiplier,
@@ -57,7 +60,10 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             num=Count(db_value_name)).order_by(db_series_names))
 
             elif plot_average:
+                # Calculate the mean, median and frequency for all data combined
+
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         mean=Avg(
                             Case(
@@ -79,13 +85,16 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         )
                     ).order_by(db_series_names))
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         mean=Avg(db_value_name) * value_multiplier,
                         median=Median(db_value_name) * value_multiplier,
                         num=Count(db_value_name)).order_by(db_series_names))
 
             else:
+                # Just calculate frequency of each series
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         num=Sum(
                             Case(
@@ -95,13 +104,18 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         )
                     ).order_by(db_series_names))
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         num=Count(db_value_name)).order_by(db_series_names))
 
         elif median_available and plot_average_choice == 'median':
+
             if plot_series_per_system and plot_average:
+                # Calculate the median and frequency for each x-ray system
+
                 for system in return_structure['system_list']:
                     if exclude_constant_angle:
+                        # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
                             **{db_display_name_relationship: system}).values(db_series_names).annotate(
                             median=Median(
@@ -118,13 +132,17 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             )
                         ).order_by(db_series_names))
                     else:
+                        # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
                             **{db_display_name_relationship: system}).values(db_series_names).annotate(
                             median=Median(db_value_name) * value_multiplier,
                             num=Count(db_value_name)).order_by(db_series_names))
 
             elif plot_average:
+                # Calculate the median and frequency for all data combined
+
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         median=Median(
                             Case(
@@ -140,12 +158,15 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         )
                     ).order_by(db_series_names))
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         median=Median(db_value_name) * value_multiplier,
                         num=Count(db_value_name)).order_by(db_series_names))
 
             else:
+                # Just calculate frequency of each series
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         num=Sum(
                             Case(
@@ -155,13 +176,18 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         )
                     ).order_by(db_series_names))
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         num=Count(db_value_name)).order_by(db_series_names))
 
         else:
+
             if plot_series_per_system and plot_average:
+                # Calculate the mean and frequency for each x-ray system
+
                 for system in return_structure['system_list']:
                     if exclude_constant_angle:
+                        # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
                             **{db_display_name_relationship: system}).values(db_series_names).annotate(
                             mean=Avg(
@@ -178,13 +204,17 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                             )
                         ).order_by(db_series_names))
                     else:
+                        # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
                             **{db_display_name_relationship: system}).values(db_series_names).annotate(
                             mean=Avg(db_value_name) * value_multiplier,
                             num=Count(db_value_name)).order_by(db_series_names))
 
             elif plot_average:
+                # Calculate the mean and frequency for all data combined
+
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         mean=Avg(
                             Case(
@@ -200,12 +230,15 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         )
                     ).order_by(db_series_names))
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         mean=Avg(db_value_name) * value_multiplier,
                         num=Count(db_value_name)).order_by(db_series_names))
 
             else:
+                # Just calculate frequency of each series
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         num=Sum(
                             Case(
@@ -215,9 +248,11 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         )
                     ).order_by(db_series_names))
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     return_structure['summary'].append(database_events.values(db_series_names).annotate(
                         num=Count(db_value_name)).order_by(db_series_names))
 
+        # Force each item in return_structure['summary'] to be a list
         for index in range(len(return_structure['summary'])):
             return_structure['summary'][index] = list(return_structure['summary'][index])
 
@@ -245,11 +280,13 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                 return_structure['summary'][index] = summary_temp
 
     if plot_average:
+        # Calculate histogram data for each series from each system
         return_structure['histogram_data'] =\
             [[[None for k in xrange(2)] for j in xrange(len(return_structure['series_names']))]
              for i in xrange(len(return_structure['system_list']))]
 
         if exclude_constant_angle:
+            # Exclude "Constant Angle Acquisitions" from the calculations
             value_ranges = database_events.values(db_series_names).annotate(
                 min_value=Min(
                     Case(
@@ -265,6 +302,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                 )
             ).order_by(db_series_names)
         else:
+            # Don't exclude "Constant Angle Acquisitions" from the calculations
             value_ranges = database_events.values(db_series_names).annotate(
                     min_value=Min(db_value_name, output_field=FloatField()),
                     max_value=Max(db_value_name, output_field=FloatField())).order_by(db_series_names)
@@ -279,6 +317,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                     subqs = database_events.filter(**{db_series_names: series_name})
 
                 if exclude_constant_angle:
+                    # Exclude "Constant Angle Acquisitions" from the calculations
                     data_values = subqs.annotate(
                         values=Case(
                             When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -286,6 +325,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         ),
                     ).values_list('values', flat=True)
                 else:
+                    # Don't exclude "Constant Angle Acquisitions" from the calculations
                     data_values = subqs.values_list(db_value_name, flat=True)
 
                 if None in value_ranges.values_list('min_value', 'max_value')[series_i]:

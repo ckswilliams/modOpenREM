@@ -214,7 +214,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
 
     return_structure = {}
 
-    exp_include = [o.study_instance_uid for o in f]
+    if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour or plot_request_mean_dap or plot_request_freq:
+        exp_include = [o.study_instance_uid for o in f]
 
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
         study_events = GeneralStudyModuleAttr.objects.exclude(
@@ -504,12 +505,15 @@ def rf_plot_calculations(f, request_results, median_available, plot_average_choi
 
     return_structure = {}
 
-    exp_include = [o.study_instance_uid for o in f]
-
     if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            study_description__isnull=True
-        ).filter(
+        exp_include = [o.study_instance_uid for o in f]
+
+        # study_events = GeneralStudyModuleAttr.objects.exclude(
+        #     study_description__isnull=True
+        # ).filter(
+        #     study_instance_uid__in=exp_include
+        # )
+        study_events = GeneralStudyModuleAttr.objects.filter(
             study_instance_uid__in=exp_include
         )
 
@@ -696,11 +700,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     return_structure = {}
 
-    # Need to exclude all Constant Angle Acquisitions when calculating data for acquisition plots, as Philips
-    # Ingenuity uses same name for scan projection radiographs as the corresponding CT acquisition. Also exclude any
-    # with null DLP values. These unwanted exposures are included at the moment.
-
-    exp_include = [o.study_instance_uid for o in f]
+    if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
+        exp_include = [o.study_instance_uid for o in f]
 
     if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         study_events = GeneralStudyModuleAttr.objects.exclude(
@@ -947,16 +948,15 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
 
     return_structure = {}
 
-    exp_include = [o.study_instance_uid for o in f]
-
     if plot_study_per_day_and_hour:
+        exp_include = [o.study_instance_uid for o in f]
+
         study_events = GeneralStudyModuleAttr.objects.exclude(
             study_description__isnull=True
         ).filter(
             study_instance_uid__in=exp_include
         )
 
-    if plot_study_per_day_and_hour:
         result = workload_chart_data(study_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
 
@@ -969,11 +969,6 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         return_structure['AGDvsThickness'] = result['scatterData']
         return_structure['maxThicknessAndAGD'] = result['maxXandY']
         return_structure['AGDvsThicknessSystems'] = result['system_list']
-
-        # import numpy as np
-        # return_structure['AGDvsThickness'] = [np.random.rand(1000000,2).tolist()]
-        # return_structure['maxThicknessAndAGD'] = [1.0, 1.0]
-        # return_structure['AGDvsThicknessSystems'] = ['Dummy data']
 
     return return_structure
 
