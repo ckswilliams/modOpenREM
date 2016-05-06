@@ -276,6 +276,8 @@ class UserProfile(models.Model):
 
     plotHistogramBins = models.PositiveSmallIntegerField(default=20)
 
+    plotHistograms = models.BooleanField(default=False)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

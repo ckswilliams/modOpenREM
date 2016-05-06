@@ -1,7 +1,8 @@
 def average_chart_inc_histogram_data(database_events, db_display_name_relationship, db_series_names, db_value_name,
                                      value_multiplier, plot_average, plot_freq, plot_series_per_system,
                                      plot_average_choice, median_available, num_hist_bins,
-                                     exclude_constant_angle=False):
+                                     exclude_constant_angle=False,
+                                     calculate_histograms=False):
     from django.db.models import Avg, Count, Min, Max, FloatField, When, Case, Sum, IntegerField
     from remapp.models import Median
     import numpy as np
@@ -279,7 +280,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                                return_structure['summary'][index])[0])
                 return_structure['summary'][index] = summary_temp
 
-    if plot_average:
+    if plot_average and calculate_histograms:
         # Calculate histogram data for each series from each system
         return_structure['histogram_data'] =\
             [[[None for k in xrange(2)] for j in xrange(len(return_structure['series_names']))]
