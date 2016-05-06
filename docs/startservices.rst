@@ -124,6 +124,8 @@ As with starting the Celery workers, the folder that the pid, log and for beat, 
 
 To stop Celery beat, just press ``Ctrl+c``
 
+.. _user-settings:
+
 Configure the settings
 ======================
 
