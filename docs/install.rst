@@ -16,6 +16,8 @@ Install OpenREM 0.7 beta version
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
+.. _localsettingsconfig:
+
 Configuration
 =============
 
@@ -83,6 +85,8 @@ If you are using PostgreSQL:
     'NAME': 'openremdb',
     'USER': 'openremuser',
     'PASSWORD': 'openrem_pw',
+
+.. _mediarootsettings:
 
 Location for imports and exports
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
