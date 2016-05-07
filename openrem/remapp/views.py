@@ -210,32 +210,45 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_histograms):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+    from django.utils.datastructures import MultiValueDictKeyError
 
     return_structure = {}
 
-    if (plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour or plot_request_mean_dap or plot_request_freq) and f.form.cleaned_data['acquisition_protocol']:
-        exp_include = [o.study_instance_uid for o in f]
+    if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour or plot_request_mean_dap or plot_request_freq:
+        try:
+            if f.form.data['acquisition_protocol']:
+                exp_include = [o.study_instance_uid for o in f]
+        except MultiValueDictKeyError:
+            pass
 
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
-        if f.form.cleaned_data['acquisition_protocol']:
-            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
-            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
-            study_events = GeneralStudyModuleAttr.objects.exclude(
-                projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-            ).filter(study_instance_uid__in=exp_include)
-        else:
-            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+        try:
+            if f.form.data['acquisition_protocol']:
+                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+                # study.
+                study_events = GeneralStudyModuleAttr.objects.exclude(
+                    projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include)
+            else:
+                # The user hasn't filtered on acquisition, so we can use the faster database querying.
+                study_events = f.qs
+        except MultiValueDictKeyError:
             study_events = f.qs
 
     if plot_request_mean_dap or plot_request_freq:
-        if f.form.cleaned_data['acquisition_protocol']:
-            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
-            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
-            request_events = GeneralStudyModuleAttr.objects.exclude(
-                projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-            ).filter(study_instance_uid__in=exp_include)
-        else:
-            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+        try:
+            if f.form.data['acquisition_protocol']:
+                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+                # study.
+                request_events = GeneralStudyModuleAttr.objects.exclude(
+                    projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include)
+            else:
+                # The user hasn't filtered on acquisition, so we can use the faster database querying.
+                request_events = f.qs
+        except MultiValueDictKeyError:
             request_events = f.qs
 
     if plot_acquisition_mean_dap or plot_acquisition_freq:
@@ -755,32 +768,45 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+    from django.utils.datastructures import MultiValueDictKeyError
 
     return_structure = {}
 
     if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
-        exp_include = [o.study_instance_uid for o in f]
+        try:
+            if f.form.data['acquisition_protocol']:
+                exp_include = [o.study_instance_uid for o in f]
+        except MultiValueDictKeyError:
+            pass
 
     if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
-        if f.form.cleaned_data['acquisition_protocol']:
-            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
-            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
-            study_events = GeneralStudyModuleAttr.objects.exclude(
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-            ).filter(study_instance_uid__in=exp_include)
-        else:
-            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+        try:
+            if f.form.data['acquisition_protocol']:
+                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+                # study.
+                study_events = GeneralStudyModuleAttr.objects.exclude(
+                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include)
+            else:
+                # The user hasn't filtered on acquisition, so we can use the faster database querying.
+                study_events = f.qs
+        except MultiValueDictKeyError:
             study_events = f.qs
 
     if plot_request_mean_dlp or plot_request_freq:
-        if f.form.cleaned_data['acquisition_protocol']:
-            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
-            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
-            request_events = GeneralStudyModuleAttr.objects.exclude(
-                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-            ).filter(study_instance_uid__in=exp_include)
-        else:
-            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+        try:
+            if f.form.data['acquisition_protocol']:
+                # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
+                # to avoid studies being duplicated when there is more than one of a particular acquisition type in a
+                # study.
+                request_events = GeneralStudyModuleAttr.objects.exclude(
+                    ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+                ).filter(study_instance_uid__in=exp_include)
+            else:
+                # The user hasn't filtered on acquisition, so we can use the faster database querying.
+                request_events = f.qs
+        except MultiValueDictKeyError:
             request_events = f.qs
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
