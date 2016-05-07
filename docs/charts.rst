@@ -340,7 +340,14 @@ Bar charts
 ==========
 
 Switching off histogram calculation in `Chart options` will speed up bar chart
-data calculation significantly.
+data calculation.
 
 Switching off `Plot a series per system` in the `Chart options` will speed up
-data calculation significantly.
+data calculation.
+
+=============
+Scatter plots
+=============
+
+Switching off `Plot a series per system` in the `Chart options` will speed up
+data calculation.
