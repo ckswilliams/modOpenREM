@@ -47,6 +47,7 @@ OpenREM version history
 * `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
 * `#329`_  All existing logging is now done via the same log files
 * `#328`_  Store SCP no longer uses Celery tasks
+* `#327`_  Celery workers now only take one task at a time
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
