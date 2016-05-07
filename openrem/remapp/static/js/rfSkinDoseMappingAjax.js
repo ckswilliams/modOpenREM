@@ -106,8 +106,19 @@ $(document).ready(function() {
 
                 else {
                     $(".ajax-progress-skin-dose").hide();
-                    $('#skinDoseMapContainer').html('<h2>OpenSkin radiation exposure incidence map</h2>' +
-                        '<p>Sorry: the skin dose map could not be calculated for this study.</p>');
+
+                    var errorMessage = '<h2>OpenSkin radiation exposure incidence map</h2>' +
+                        '<p>Sorry, the skin dose map could not be calculated for this study. Possible reasons for this are shown below:</p>' +
+                        '<ul>';
+
+                    if (skinDoseMapObj.maxDose == 0) errorMessage += '<li>The maximum calculated dose was zero: it may be that every exposure has missed the phantom. This may be due to the way in which this x-ray system has defined the table and x-ray beam geometry.</li>';
+                    if (!isFinite(skinDoseMapObj.maxDose)) errorMessage +=  '<li>There is no data in skin dose map: the x-ray source to isocentre distance or dose at reference point are not present.</li>';
+
+                    errorMessage += '</ul>' +
+                        '<p>Please consider feeding this back to the <a href="http://bitbucket.org/openskin/openskin/">openSkin BitBucket project</a> ' +
+                        'or <a href="http://groups.google.com/forum/#!forum/openrem">OpenREM discussion group</a> so that the issue can be addressed.</p>'
+
+                    $('#skinDoseMapContainer').html(errorMessage);
                 }
             }
 
