@@ -140,8 +140,8 @@ class MGChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
-    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+    # if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+    #     plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
 
 class MGChartOptionsDisplayForm(forms.Form):
@@ -190,8 +190,8 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION,
                                                     required=False)
     plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
-    plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
     plotHistograms = forms.BooleanField(label='Calculate histogram data', required=False)
+    plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
 
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()

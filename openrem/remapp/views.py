@@ -213,22 +213,30 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
 
     return_structure = {}
 
-    if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour or plot_request_mean_dap or plot_request_freq:
+    if (plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour or plot_request_mean_dap or plot_request_freq) and f.form.cleaned_data['acquisition_protocol']:
         exp_include = [o.study_instance_uid for o in f]
 
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-        ).filter(
-            study_instance_uid__in=exp_include
-        )
+        if f.form.cleaned_data['acquisition_protocol']:
+            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
+            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
+            study_events = GeneralStudyModuleAttr.objects.exclude(
+                projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+            ).filter(study_instance_uid__in=exp_include)
+        else:
+            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+            study_events = f.qs
 
     if plot_request_mean_dap or plot_request_freq:
-        request_events = GeneralStudyModuleAttr.objects.exclude(
-            projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
-        ).filter(
-            study_instance_uid__in=exp_include
-        )
+        if f.form.cleaned_data['acquisition_protocol']:
+            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
+            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
+            request_events = GeneralStudyModuleAttr.objects.exclude(
+                projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total__isnull=True
+            ).filter(study_instance_uid__in=exp_include)
+        else:
+            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+            request_events = f.qs
 
     if plot_acquisition_mean_dap or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(f.qs,
@@ -507,11 +515,10 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
     return_structure = {}
 
     if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
-        exp_include = [o.study_instance_uid for o in f]
-
-        study_events = GeneralStudyModuleAttr.objects.filter(
-            study_instance_uid__in=exp_include
-        )
+        # No acquisition-level filters, so can use f.qs for all charts at the moment.
+        # exp_include = [o.study_instance_uid for o in f]
+        # study_events = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=exp_include)
+        study_events = f.qs
 
     if plot_study_per_day_and_hour:
         result = workload_chart_data(study_events)
@@ -755,18 +762,26 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         exp_include = [o.study_instance_uid for o in f]
 
     if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-        ).filter(
-            study_instance_uid__in=exp_include
-        )
+        if f.form.cleaned_data['acquisition_protocol']:
+            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
+            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
+            study_events = GeneralStudyModuleAttr.objects.exclude(
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+            ).filter(study_instance_uid__in=exp_include)
+        else:
+            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+            study_events = f.qs
 
     if plot_request_mean_dlp or plot_request_freq:
-        request_events = GeneralStudyModuleAttr.objects.exclude(
-            ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
-        ).filter(
-            study_instance_uid__in=exp_include
-        )
+        if f.form.cleaned_data['acquisition_protocol']:
+            # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database to
+            # avoid studies being duplicated when there is more than one of a particular acquisition type in a study.
+            request_events = GeneralStudyModuleAttr.objects.exclude(
+                ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total__isnull=True
+            ).filter(study_instance_uid__in=exp_include)
+        else:
+            # The user hasn't filtered on acquisition, so we can use the faster database querying.
+            request_events = f.qs
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
         result = average_chart_inc_histogram_data(f.qs,
@@ -1000,11 +1015,10 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
     return_structure = {}
 
     if plot_study_per_day_and_hour:
-        exp_include = [o.study_instance_uid for o in f]
-
-        study_events = GeneralStudyModuleAttr.objects.filter(
-            study_instance_uid__in=exp_include
-        )
+        # No acquisition-level filters, so can use f.qs for all charts at the moment.
+        # exp_include = [o.study_instance_uid for o in f]
+        # study_events = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=exp_include)
+        study_events = f.qs
 
         result = workload_chart_data(study_events)
         return_structure['studiesPerHourInWeekdays'] = result['workload']
