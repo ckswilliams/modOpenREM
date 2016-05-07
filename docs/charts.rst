@@ -45,7 +45,7 @@ histogram of the data for that point so that you can see the shape of the
 value's distribution (figure 3).
 
 Bar charts can be plotted with a series per x-ray system (figure 4). This can
-be done by activating `Plot a series per system` in the `Chart options`.
+be toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
 .. figure:: img/ChartCTMeanDLPperSystem.png
    :figwidth: 50%
@@ -148,6 +148,16 @@ have taken place on that day (figure 9). Clicking on one of the segments will
 take you to a pie chart that shows the number of events per on that day (figure
 10).
 
+=============================================
+5. Scatter plot showing one value vs. another
+=============================================
+
+These can be plotted with a series per x-ray system. This can be toggled using
+the `Plot a series per system` checkbox in the `Chart options`.
+
+Clicking on a system's legend entry toggles the display of the corresponding
+series on the chart.
+
 ********************
 Exporting chart data
 ********************
@@ -160,6 +170,10 @@ chart: the data can be downloaded in either csv or xls format.
 New in 0.7.0
 ************
 
+* Charts for fluoroscopy and mammography.
+
+* New scatter plot chart type.
+
 * Chart plotting options can be configured by choosing ``Chart options`` from
   the ``User options`` menu at the top of the OpenREM homepage.
 
@@ -169,8 +183,11 @@ New in 0.7.0
 * Bar charts can be plotted with a series per x-ray system. This option can be
   switched on or off via the ``Chart options``.
 
-* The the number of histogram data bins can be set to a value between 2 and 40
+* The number of histogram data bins can be set to a value between 2 and 40
   in ``Chart options``. The default value is 20.
+
+* Histogram calculation can be switched on or off in ``Chart options``. The
+  default is off. Performance is significantly better when set to off.
 
 * Histogram plots can toggle between absolute or normalised values via the
   ``Toggle Normalised histograms`` button that is visible when viewing a
@@ -286,3 +303,44 @@ Chart types - radiography
 * Line chart of average mAs of each acquisition protocol over time
 
 * Line chart of average kVp of each acquisition protocol over time
+
+*************************
+Chart types - fluoroscopy
+*************************
+
+* Bar chart of average DAP for each study description
+
+* Pie chart of the frequency of each study description
+
+* Pie chart showing the number of studies carried out per weekday
+
+*************************
+Chart types - mammography
+*************************
+
+* Scatter plot of average glandular dose vs. compressed thickness for each
+  acquisition
+
+* Pie chart showing the number of studies carried out per weekday
+
+*****************
+Performance notes
+*****************
+
+===============
+All chart types
+===============
+
+Filtering using `Acquisition protocol` forces OpenREM to use a much slower
+method of querying the database for chart data. Where possible avoid filtering
+using this field, especially when viewing a large amount of data.
+
+==========
+Bar charts
+==========
+
+Switching off histogram calculation in `Chart options` will speed up bar chart
+data calculation significantly.
+
+Switching off `Plot a series per system` in the `Chart options` will speed up
+data calculation significantly.
