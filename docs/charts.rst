@@ -176,8 +176,7 @@ take you to a pie chart that shows the number of events per on that day (figure
    :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
    :target: _images/ChartMGScatterPerSystem.png
 
-   Figure 12: Scatter plot of average glandular dose vs. compressed thickness;
-              one series per system
+   Figure 12: Scatter plot of average glandular dose vs. compressed thickness; one series per system
 
 This plot type shows a data point per event (figure 11). The series name and
 data values are shown when the mouse cursor is positioned over a data point.
