@@ -241,7 +241,7 @@ Chart options
 *************
 
 .. figure:: img/ChartOptions.png
-   :figwidth: 50 %
+   :figwidth: 25 %
    :align: right
    :alt: OpenREM chart options
    :target: _images/ChartOptions.png

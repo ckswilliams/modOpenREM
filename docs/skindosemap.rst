@@ -44,7 +44,7 @@ the following features:
 * The current view can be saved as a png file
 
 .. figure:: img/skinDoseMap2D.png
-   :figwidth: 100%
+   :figwidth: 50%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map data
    :target: _images/skinDoseMap2D.png
@@ -52,7 +52,7 @@ the following features:
    Figure 1: 2D visualisation of the 3D data
 
 .. figure:: img/skinDoseMap2DincOverlay.png
-   :figwidth: 100%
+   :figwidth: 50%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
    :target: _images/skinDoseMap2DincOverlay.png
@@ -76,7 +76,7 @@ following features:
 * The current view can be saved as a png file
 
 .. figure:: img/skinDoseMap3D.png
-   :figwidth: 100%
+   :figwidth: 50%
    :align: right
    :alt: 3D visualisation of the skin dose map data
    :target: _images/skinDoseMap3D.png
@@ -145,7 +145,7 @@ incidence map for and go to the detail view. Then click on the link to create
 the OpenSkin export:
 
 .. figure:: img/OpenSkinExport.png
-   :figwidth: 100%
+   :figwidth: 50%
    :align: right
    :alt: Export from OpenREM to openSkin
    :target: _images/OpenSkinExport.png
