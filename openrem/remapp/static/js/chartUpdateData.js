@@ -64,6 +64,9 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
     var over_time_series, date_axis, current_value, temp_date, date_after, date_before;
     var chart = $('#'+chart_div).highcharts();
 
+    var index = name_list.indexOf(null);
+    if (index !== -1) name_list[index] = "Blank";
+
     date_axis = [];
     for (i = 0; i < over_time_data[0].length; i++) {
         temp_date = new Date(Date.parse(over_time_data[0][i][0]));
@@ -322,21 +325,6 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
 function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
     var chart = $('#'+chart_div).highcharts();
     var colour_max = system_list.length;
-
-    /*
-    // Prepare some dummy data
-    var data = [],
-        n = 100000,
-        i;
-    for (i = 0; i < n; i += 1) {
-        data.push([
-            Math.pow(Math.random(), 2) * 100,
-            Math.pow(Math.random(), 2) * 100
-        ]);
-    }
-    max_values = [100,100];
-    system_list = ['Dummy data'];
-    */
 
     for (i = 0; i < system_list.length; i++) {
         if (chart.series.length > i) {

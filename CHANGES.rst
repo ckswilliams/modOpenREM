@@ -5,7 +5,9 @@ OpenREM version history
 0.7.0b14 (2016-04-07)
 ---------------------
 
-* `#390`_  Basic troubleshooting is now documented
+* `#391`_  Basic troubleshooting is now documented
+* `#390`_  Charts: mammography and fluoroscopy charts added
+* `#389`_  Charts: series without a name are now plotted under the name of `Blank` rather than not being plotted at all
 * `#387`_  Added laterality to mammography exports
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now
@@ -123,6 +125,7 @@ OpenREM version history
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 * `#229`_  Charts: Added chart of DLP per requested procedure
 * `#223`_  Charts: speed improvement for weekday charts
+* `#217`_  Charts: Further code optimisation to speed up calculation time
 * `#207`_  DICOM QR SCU now available from web interface
 * `#206`_  DICOM Store SCP configuration now available from web interface
 * `#183`_  Added options to store patient name and ID, and options to hash name, ID and accession number

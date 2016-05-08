@@ -529,8 +529,8 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
 
     if plot_study_per_day_and_hour or plot_study_freq or plot_study_dap:
         # No acquisition-level filters, so can use f.qs for all charts at the moment.
-        # exp_include = [o.study_instance_uid for o in f]
-        # study_events = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=exp_include)
+        #exp_include = [o.study_instance_uid for o in f]
+        #study_events = GeneralStudyModuleAttr.objects.filter(study_instance_uid__in=exp_include)
         study_events = f.qs
 
     if plot_study_per_day_and_hour:
