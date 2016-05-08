@@ -17,10 +17,10 @@ Query-retrieve using the web interface
 
    Figure 1: Import Query-Retrieve menu
 
-* On the Imports menu, select ``Query remote server``. If the menu isn't there, you need to check your user permissions
+* On the Imports menu, select ``Query remote server`` - see figure 1. If the menu isn't there, you need to check your user permissions
   - see :ref:`user-settings` for details.
 * Each configured query-retrieve node and each local store node is automatically tested to make sure they respond to a
-  DICOM echo - the results are presented at the top of the page.
+  DICOM echo - the results are presented at the top of the page. See fingure 2 for an example.
 
 .. figure:: img/QRstatuses.png
    :figwidth: 50%
