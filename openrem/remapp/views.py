@@ -969,15 +969,12 @@ def mg_summary_list_filter(request):
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
             user_profile.plotMGStudyPerDayAndHour = chart_options_form.cleaned_data['plotMGStudyPerDayAndHour']
             user_profile.plotMGAGDvsThickness = chart_options_form.cleaned_data['plotMGAGDvsThickness']
-            if median_available:
-                user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
             user_profile.save()
 
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
                          'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
-                         'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness,
-                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+                         'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness}
             chart_options_form = MGChartOptionsForm(form_data)
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
