@@ -162,15 +162,17 @@ take you to a pie chart that shows the number of events per on that day (figure
 .. figure:: img/ChartMGScatterPerSystem.png
    :figwidth: 50%
    :align: right
-   :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+   :alt: Scatter plot of average glandular dose vs. compressed thickness; one
+         series per system
 
-   Figure 12: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+   Figure 12: Scatter plot of average glandular dose vs. compressed thickness;
+              one series per system
 
-The series name and data values are shown when the mouse cursor is positioned
-over a data point.
+This plot type shows a data point per event (figure 11). The series name and
+data values are shown when the mouse cursor is positioned over a data point.
 
-These can be plotted with a series per x-ray system. This can be toggled using
-the `Plot a series per system` checkbox in the `Chart options`.
+These can be plotted with a series per x-ray system (figure 12). This can be
+toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
 Clicking on a system's legend entry toggles the display of the corresponding
 series on the chart.
