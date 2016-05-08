@@ -84,7 +84,7 @@ following features:
    Figure 3: 3D visualisation of the data
 
 .. figure:: img/skinDoseMapColourScales.png
-   :figwidth: 20%
+   :figwidth: 30%
    :align: right
    :alt: Colour scale choices
    :target: _images/skinDoseMapColourScales.png
@@ -142,7 +142,7 @@ If skin dose maps are disabled the user you are presented with the option of exp
 the study data as a csv file for use with a stand-alone installation of
 openSkin. Select the fluoroscopy study you wish to create the exposure
 incidence map for and go to the detail view. Then click on the link to create
-the OpenSkin export:
+the OpenSkin export (figure 5).
 
 .. figure:: img/OpenSkinExport.png
    :figwidth: 50%
@@ -156,10 +156,9 @@ the OpenSkin export:
 Instructions for openSkin
 *************************
 
-Download the latest version as a zip file from
-http://bitbucket.org/openskin/openskin/downloads. At the time of release for
-OpenREM 0.7.0 the current openSkin beta was dated 14th September 2016. The
-application referred to here will only work on Windows.
+Download the latest version as a zip file from `openSkin downloads`_. At the
+time of release for OpenREM 0.7.0 the current openSkin beta was dated 14th
+September 2016. The application referred to here will only work on Windows.
 
 * Extract the contents of the zip file into a folder on your computer and run
   the openSkin.exe executable
@@ -244,3 +243,4 @@ want to do, please do go ahead and feed back your findings to Jonathan Cole at
 .. _`OpenREM Google Group`: http://groups.google.com/forum/#!forum/openrem
 .. _`GIMP`: http://www.gimp.org/
 .. _ImageJ: http://imagej.nih.gov/ij/download.html
+.. _`openSkin downloads`: http://bitbucket.org/openskin/openskin/downloads
