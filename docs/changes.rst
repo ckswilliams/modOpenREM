@@ -132,6 +132,7 @@ OpenREM version history
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
 * `#70`_   User is returned to the filtered view after deleting a study
+* `#61`_   Skin dose maps for fluoroscopy systems can now be calculated and displayed
 
 0.6.1 (2015-10-30)
 ------------------
