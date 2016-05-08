@@ -8,19 +8,27 @@ To query retrieve dose related objects from a remote server, you need to review 
 **************************************
 Query-retrieve using the web interface
 **************************************
-.. image:: img/QRmenu.png
-    :align: right
-    :alt: Import QR menu
 
+.. figure:: img/QRmenu.png
+   :figwidth: 50%
+   :align: right
+   :alt: Import Query-Retrieve menu
+   :target: _images/QRmenu.png
+
+   Figure 1: Import Query-Retrieve menu
 
 * On the Imports menu, select ``Query remote server``. If the menu isn't there, you need to check your user permissions
   - see :ref:`user-settings` for details.
 * Each configured query-retrieve node and each local store node is automatically tested to make sure they respond to a
   DICOM echo - the results are presented at the top of the page.
 
-.. image:: img/QRstatuses.png
-    :align: center
-    :alt: local and remote QR statuses
+.. figure:: img/QRstatuses.png
+   :figwidth: 50%
+   :align: right
+   :alt: local and remote QR statuses
+   :target: _images/QRstatuses.png
+
+   Figure 2: Local and remote QR statuses
 
 * Select the desired **remote host**, ie the PACS or modality you wish to query.
 * Select the local **store node** you want to retrieve to.
