@@ -47,13 +47,15 @@ the following features:
    :figwidth: 100%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map data
-
+   :target: _images/skinDoseMap2D.png
+   
    Figure 1: 2D visualisation of the 3D data
 
 .. figure:: img/skinDoseMap2DincOverlay.png
    :figwidth: 100%
    :align: right
    :alt: 2D visualisation of the 3D skin dose map including phantom region overlay
+   :target: _images/skinDoseMap2DincOverlay.png
 
    Figure 2: Phantom region overlay
 
@@ -77,6 +79,7 @@ following features:
    :figwidth: 100%
    :align: right
    :alt: 3D visualisation of the skin dose map data
+   :target: _images/skinDoseMap3D.png
 
    Figure 3: 3D visualisation of the data
 
@@ -84,6 +87,7 @@ following features:
    :figwidth: 20%
    :align: right
    :alt: Colour scale choices
+   :target: _images/skinDoseMapColourScales.png
 
    Figure 4: Colour scale choices
 
@@ -144,6 +148,7 @@ the OpenSkin export:
    :figwidth: 100%
    :align: right
    :alt: Export from OpenREM to openSkin
+   :target: _images/OpenSkinExport.png
 
    Figure 5: Export from OpenREM to openSkin
 
@@ -208,11 +213,13 @@ A native and 'colour equalised' version of the same export are shown below:
     :width: 210px
     :align: left
     :alt: OpenSkin incidence map, unscaled
+    :target: _images/skin_dose_map.png
 
 .. image:: img/skin_dose_map_scaled.png
     :width: 210px
     :align: right
     :alt: OpenSkin incidence map, scaled
+    :target: _images/skin_dose_map_scaled.png
 
 .. raw:: html
 
