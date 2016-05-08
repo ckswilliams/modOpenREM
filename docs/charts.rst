@@ -14,6 +14,7 @@ Chart types
    :figwidth: 50%
    :align: right
    :alt: Bar chart of mean DLP per acquisition
+   :target: img/ChartCTMeanDLP.png
 
    Figure 1: Bar chart of mean DLP per acquisition
 
