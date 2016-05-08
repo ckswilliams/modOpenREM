@@ -152,6 +152,23 @@ take you to a pie chart that shows the number of events per on that day (figure
 5. Scatter plot showing one value vs. another
 =============================================
 
+.. figure:: img/ChartMGScatter.png
+   :figwidth: 50%
+   :align: right
+   :alt: Scatter plot of average glandular dose vs. compressed thickness
+
+   Figure 11: Scatter plot of average glandular dose vs. compressed thickness
+
+.. figure:: img/ChartMGScatterPerSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+
+   Figure 12: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+
+The series name and data values are shown when the mouse cursor is positioned
+over a data point.
+
 These can be plotted with a series per x-ray system. This can be toggled using
 the `Plot a series per system` checkbox in the `Chart options`.
 
