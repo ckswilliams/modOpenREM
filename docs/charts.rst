@@ -173,8 +173,7 @@ take you to a pie chart that shows the number of events per on that day (figure
 .. figure:: img/ChartMGScatterPerSystem.png
    :figwidth: 50%
    :align: right
-   :alt: Scatter plot of average glandular dose vs. compressed thickness; one
-         series per system
+   :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
    :target: _images/ChartMGScatterPerSystem.png
 
    Figure 12: Scatter plot of average glandular dose vs. compressed thickness;
