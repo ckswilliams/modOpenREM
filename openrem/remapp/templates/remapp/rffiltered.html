@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block col2 %}
-  <div class="panel panel-info">
+  <div class="panel panel-info small">
   <div class="panel-heading">
       <h3 class="panel-title">Data export</h3>
   </div>
@@ -57,7 +57,7 @@
     {{ studyfilter }}
 
     <form action="" method="get" class="form-horizontal" role="form">
-         <div class="panel panel-info">
+         <div class="panel panel-info small">
             <div class="panel-heading">
               <h3 class="panel-title">Exam filter</h3>
             </div>
@@ -105,9 +105,27 @@ $('.datepicker').datepicker({
     {% autopaginate filter.qs 20 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered table-hover row-clickable">
+    <table class="table table-bordered table-hover row-clickable small">
         <tr>
-            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Physician</th>
+            <th>Institution</th>
+            <th>
+                <table>
+                    <tr><td>Make</td></tr>
+                    <tr><td>Model</td></tr>
+                    <tr><td class="nowrap">Display name</td></tr>
+                </table>
+            </th>
+            <th>Date</th>
+            <th>
+                <table>
+                    <tr><td class="nowrap">Study description</td></tr>
+                    <tr><td class="nowrap">Accession number</td></tr>
+                </table>
+            </th>
+            <th>Number of events</th>
+            <th>Total DAP (cGy.cm<sup>2</sup>)</th>
+            <th>Total dose at RP (Gy)</th>
+            <th>Physician</th>
             {% if admin.admingroup %}
             <th>Delete?</th>
             {% endif %}
@@ -121,9 +139,11 @@ $('.datepicker').datepicker({
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                    {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+                    <table>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                    </table>
                 </a>
             </td>
             <td>
@@ -133,10 +153,12 @@ $('.datepicker').datepicker({
             </td>
             <td>
                 <a href="/openrem/rf/{{ exam.id }}/">
-                    {{ exam.study_description }} |
+                    <table>
+                        <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                   {% if not exam.accession_hashed %}
-                    {{ exam.accession_number }}
+                        <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                   {% endif %}
+                    </table>
                 </a>
             </td>
             <td>
