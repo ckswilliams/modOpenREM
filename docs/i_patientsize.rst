@@ -99,3 +99,45 @@ The completed import tasks table also has a delete check box against each
 record and a delete button at the bottom. The csv file originally imported
 has already been deleted - this delete function is to remove the record
 of the import and the log file associated with it from the database/disk.
+
+Importing patient height and weight information from csv files using the command line
+=====================================================================================
+
+Usage:
+
+.. sourcecode:: console
+
+    openrem_ptsizecsv.py [-h] [-u] [-v] csvfile id height weight
+
+``-h, --help``
+  Print the help text.
+
+``-u, --si-uid``
+  Use Study Instance UID instead of Accession Number.
+
+``-v, --verbose``
+  *New in 0.3.7* Print to the standard output the success or otherwise of inserting each value.
+
+``csvfile``
+  csv file containing the height and/or weight information and study identifier.
+  Other columns will be ignored. Use quotes if the filepath has spaces.
+
+``id``
+  Column title for the accession number or study instance UID. Use quotes
+  if the title has spaces.
+
+``height``
+  Column title for the patient height (DICOM size) - if this information
+  is missing simply add a blank column with a suitable title. Use quotes
+  if the title has spaces.
+
+``weight``
+  Column title for the patient weight - if this information is missing
+  simply add a blank column with a suitable title. Use quotes if the title
+  has spaces.
+
+..  versionchanged:: 0.3.7
+    Verbosity flag added to supress printing to the standard output
+    unless requested.
+
+
