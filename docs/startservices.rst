@@ -88,6 +88,8 @@ For Windows, just press ``Ctrl+c``
 You will need to do this twice if there are running tasks you wish to kill.
 
 
+.. _celery-beat:
+
 Celery periodic tasks: beat
 ===========================
 
@@ -121,6 +123,8 @@ As with starting the Celery workers, the folder that the pid, log and for beat, 
 **must already exist** and the user starting Celery beat must be able write to that folder.
 
 To stop Celery beat, just press ``Ctrl+c``
+
+.. _user-settings:
 
 Configure the settings
 ======================

@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
 from openremproject import settings
-from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP
+from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -119,6 +119,36 @@ class CTChartOptionsForm(forms.Form):
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
 
+class RFChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class RFChartOptionsDisplayForm(forms.Form):
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
+    plotRFInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX,
+                                               required=False)
+
+
+class MGChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
+    # if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+    #     plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class MGChartOptionsDisplayForm(forms.Form):
+    plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
+
+
 class DXChartOptionsDisplayForm(forms.Form):
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
@@ -160,11 +190,11 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION,
                                                     required=False)
     plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
+    plotHistograms = forms.BooleanField(label='Calculate histogram data', required=False)
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
 
-
-class UpdateDisplayNameForm(forms.Form):
-    display_name = forms.CharField()
+class UpdateDisplayNamesForm(forms.Form):
+    display_names = forms.CharField()
 
 
 class DicomQueryForm(forms.Form):
@@ -368,3 +398,26 @@ class DicomStoreForm(forms.ModelForm):
             'controlled': "Advanced use only: tick this box to control the server using OpenREM",
             'keep_alive': "Advanced use only: tick this box to auto-start this server using celery beat"
         }
+
+
+class SkinDoseMapCalcSettingsForm(forms.ModelForm):
+    """Form for configuring whether skin dose maps are shown / calculated
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(SkinDoseMapCalcSettingsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.layout = Layout(
+            Div(
+                'enable_skin_dose_maps',
+                'calc_on_import'
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            )
+        )
+
+    class Meta:
+        model = SkinDoseMapCalcSettings
+        fields = ['enable_skin_dose_maps', 'calc_on_import']

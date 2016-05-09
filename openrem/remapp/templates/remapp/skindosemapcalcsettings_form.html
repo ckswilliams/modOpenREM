@@ -1,0 +1,31 @@
+{% extends "remapp/base.html" %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block navhelp %}
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/skindosemap.html" target="_blank" data-toggle="tooltip" title="Skin dose map documentation - opens in a new tab">
+                Skin dose maps
+            </a>
+        </li>
+{% endblock %}
+
+{% block mainblock %}
+
+      <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+          <h3>Modify skin dose map settings</h3>
+        {% if admin.admingroup %}
+            {% load crispy_forms_tags %}
+            {% crispy form %}
+        {% else %}
+            <p>Only users in the Admin group can modify these settings.</p>
+        {% endif %}
+
+
+
+
+      </div>
+    </div>
+
+{% endblock %}	

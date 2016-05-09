@@ -28,12 +28,15 @@
 
 """
 
+import logging
 import csv
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from remapp.tools.get_values import return_for_export
+
+logger = logging.getLogger(__name__)
 
 
 def _create_sheets(book, protocolslist, protocolheaders):
@@ -700,7 +703,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.progress = 'XLSX book written.'
     tsk.save()
 
-    xlsxfilename = "dxexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfilename = "rfexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
@@ -1063,17 +1066,17 @@ def rfopenskin(studyid):
             column_angulation = event.irradeventxraymechanicaldata_set.get().column_angulation
 
         try:
-            event.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+            for filter in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                if "Copper" in filter.xray_filter_material.code_meaning:
+                    xray_filter_type = filter.xray_filter_type
+                    xray_filter_material = filter.xray_filter_material
+                    xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
+                    xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
         except ObjectDoesNotExist:
             xray_filter_type = ''
             xray_filter_material = ''
             xray_filter_thickness_minimum = ''
             xray_filter_thickness_maximum = ''
-        else:
-            xray_filter_type = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_type
-            xray_filter_material = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material
-            xray_filter_thickness_minimum = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum
-            xray_filter_thickness_maximum = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum
 
         try:
             event.irradeventxraysourcedata_set.get().kvp_set.get()

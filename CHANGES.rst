@@ -2,12 +2,21 @@
 OpenREM version history
 =======================
 
-0.7.0b14 (2016-04-07)
+0.7.0b15 (2016-05-09)
 ---------------------
 
+* `#391`_  Basic troubleshooting is now documented
+* `#390`_  Charts: mammography and fluoroscopy charts added
+* `#389`_  Charts: series without a name are now plotted under the name of `Blank` rather than not being plotted at all
+* `#387`_  Added laterality to mammography exports
+* `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
+* `#384`_  Fluoro exports for OpenSkin only consider copper filters now
+* `#383`_  Refreshed settings.py to django 1.8 including updating template settings and TEMPLATE_CONTEXT_PROCESSORS
 * `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
+* `#378`_  The display name of multiple systems can now be updated together using a single new name
 * `#376`_  Corrected an ill-advised model change
 * `#374`_  CTDIw phantom size now displayed in CT detail view
+* `#373`_  Charts in some releases used GT rather than greater than or equal to for start date, now fixed
 * `#372`_  Mammography studies now record an accumulated AGD per breast. Existing joint accumulated AGD values won't be
   changed. Ordering by Accumulated AGD now creates an entry per accumulated AGD, one per breast
 * `#371`_  Mammo RDSR generates average mA where not recorded, mammo image populates mA
@@ -40,6 +49,7 @@ OpenREM version history
 * `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
 * `#329`_  All existing logging is now done via the same log files
 * `#328`_  Store SCP no longer uses Celery tasks
+* `#327`_  Celery workers now only take one task at a time
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
@@ -85,6 +95,7 @@ OpenREM version history
 * `#270`_  Django 1.8 Admin site has a 'view site' link. Pointed it back to OpenREM
 * `#268`_  Improved population of procedure_code_meaning for DX imports
 * `#266`_  DICOM C-Store script added back in - largely redundant with web interface
+* `#265`_  DICOM Store and Query Retrieve services documented
 * `#263`_  Settings for keeping or deleting files once processed moved to database and web interface
 * `#262`_  Dealt with issue where two exposures from the same study would race on import
 * `#260`_  Fixed issue where import and export jobs would get stuck behind StoreSCP task in queue
@@ -114,14 +125,17 @@ OpenREM version history
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 * `#229`_  Charts: Added chart of DLP per requested procedure
 * `#223`_  Charts: speed improvement for weekday charts
+* `#217`_  Charts: Further code optimisation to speed up calculation time
 * `#207`_  DICOM QR SCU now available from web interface
 * `#206`_  DICOM Store SCP configuration now available from web interface
 * `#183`_  Added options to store patient name and ID, and options to hash name, ID and accession number
 * `#171`_  Root URL now resolves so ``/openrem`` is not necessary
 * `#151`_  Suspected non-patient studies can now be filtered out
+* `#135`_  GE Senographe DS now correctly records compression force in Newtons for new imports
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
 * `#70`_   User is returned to the filtered view after deleting a study
+* `#61`_   Skin dose maps for fluoroscopy systems can now be calculated and displayed
 
 0.6.1 (2015-10-30)
 ------------------

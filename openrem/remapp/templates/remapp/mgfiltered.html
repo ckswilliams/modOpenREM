@@ -12,7 +12,7 @@
 
 
 {% block col2 %}
-  <div class="panel panel-info">
+  <div class="panel panel-info small">
   <div class="panel-heading">
       <h3 class="panel-title">Data export</h3>
   </div>
@@ -49,13 +49,13 @@
 
     {{ studyfilter }}
 
-          <div class="panel panel-info">
+    <form action="" method="get" class="form-horizontal" role="form">
+          <div class="panel panel-info small">
             <div class="panel-heading">
               <h3 class="panel-title">Exam filter</h3>
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal" role="form">
                         {% for field in filter.form %}
                             <div class="form-group">
                                 <div class="col-xs-4">
@@ -68,12 +68,21 @@
                             </div>
                         {% endfor %}
                     Caution: Ordering by AGD will duplicate bilateral studies in filtered list<br>
-                    </table>
                     <input class="btn btn-default" type="submit" />
-                </form> 
+            </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Chart options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {% csrf_token %}
+                    {{ chartOptionsForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
             </div>
           </div>
-    
+    </form>
+
 <script>
 $('.datepicker').datepicker({
     format: "yyyy-mm-dd",
@@ -89,9 +98,25 @@ $('.datepicker').datepicker({
     {% autopaginate filter.qs 50 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered table-hover row-clickable">
+    <table class="table table-bordered table-hover row-clickable small">
         <tr>
-            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Protocol | Accession number</th><th>Number of events</th><th>Accumulated AGD</th>
+            <th>Institution</th>
+            <th>
+                <table>
+                    <tr><td>Make</td></tr>
+                    <tr><td>Model</td></tr>
+                    <tr><td class="nowrap">Display name</td></tr>
+                </table>
+            </th>
+            <th>Date</th>
+            <th>
+                <table>
+                    <tr><td class="nowrap">Acquisition protocol</td></tr>
+                    <tr><td class="nowrap">Accession number</td></tr>
+                </table>
+            </th>
+            <th>Number of events</th>
+            <th>Accumulated AGD (mGy)</th>
             {% if admin.admingroup %}
             <th>Delete?</th>
             {% endif %}
@@ -105,9 +130,11 @@ $('.datepicker').datepicker({
             </td>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
-                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                    {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                    {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+                    <table>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                    </table>
                 </a>
             </td>
             <td>
@@ -117,10 +144,12 @@ $('.datepicker').datepicker({
             </td>
             <td>
                 <a href="/openrem/mg/{{ exam.id }}/">
-                    {{ exam.procedure_code_meaning }} |
+                    <table>
+                        <tr><td class="nowrap">{{ exam.procedure_code_meaning }}</td></tr>
                   {% if not exam.accession_hashed %}
-                    {{ exam.accession_number }}
+                        <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                   {% endif %}
+                    </table>
                 </a>
             </td>
             <td>
@@ -129,15 +158,17 @@ $('.datepicker').datepicker({
                 </a>
             </td>
             <td>
+                <a href="/openrem/mg/{{ exam.id }}/">
                 {% for breast in exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all %}
                     {% if breast.laterality.code_meaning == "Left breast" %}
-                        Left:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}&nbsp;mGy<br>
+                        Left:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}<br>
                     {% elif breast.laterality.code_meaning == "Right breast" %}
-                        Right:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}&nbsp;mGy<br>
+                        Right:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}<br>
                     {% elif breast.laterality.code_meaning == "Both breasts" %}
-                        Both:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}&nbsp;mGy<br>
+                        Both:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }}<br>
                     {% endif %}
                 {% endfor %}
+                </a>
             </td>
             {% if admin.admingroup %}
             <td>
@@ -151,4 +182,112 @@ $('.datepicker').datepicker({
     {% paginate %}
 
  
+{% endblock %}
+
+{% block plotdata %}
+
+    {% if request.user.userprofile.plotCharts %}
+
+        <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
+        <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
+        <script src="{{ STATIC_URL }}js/chartUpdateData.js"></script>
+
+        <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
+        <!-- Include JavaScript to enable highcharts plots -->
+        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script src="{{ STATIC_URL }}js/chartScatter.js"></script>
+        <!-- End of include JavaScript to enable highcharts plots -->
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
+        <!-- JavaScript to enable bootstrap tooltips -->
+        <script>
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+        <!-- End of JavaScript to enable bootstrap tooltips -->
+
+        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
+        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
+
+        <!-- JavaScript chart AJAX code. -->
+        <script src="{{ STATIC_URL }}js/mgChartAjax.js"></script>
+        <!-- End of JavaScript chart AJAX code. -->
+
+        {% if request.user.userprofile.plotMGAGDvsThickness %}
+            <!-- HTML to include div container for scatter plot -->
+            <div class="panel-group" id="accordionScatter">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionScatter" href="#collapseScatter" onclick="setTimeout(function() {fitChartToDiv('scatterDIV');}, 0);">
+                                Scatter plot chart showing AGD vs. compressed breast thickness.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseScatter" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="scatterDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseScatter', 'scatterDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for scatter plot -->
+
+            <script>
+                var plotMGAGDvsThickness = true;
+                $(window).resize(function() {
+                    chartSetExportSize('scatterDIV');
+                });
+                result = chartScatter('Average glandular dose vs. compressed thickness', 'scatterDIV', 'Compressed thickness (mm)', 'Average glandular dose (mGy)');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotMGStudyPerDayAndHour %}
+            <!-- HTML to include div container for study workload -->
+            <div class="panel-group" id="accordion5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyWorkloadDIV');}, 0);">
+                                Pie chart showing a breakdown of number of studies per weekday.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for studies per week day pie chart -->
+            <script>
+                var plotMGStudyPerDayAndHour = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
+
+    {% endif %}
 {% endblock %}

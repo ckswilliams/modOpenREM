@@ -36,6 +36,15 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
+
+class SkinDoseMapCalcSettings(SingletonModel):
+    enable_skin_dose_maps = models.BooleanField(default=False, verbose_name="Enable skin dose maps?")
+    calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
+
+    def get_absolute_url(self):
+        return '/admin/skindosemapsettings/1/'
+
+
 class DicomDeleteSettings(SingletonModel):
     del_no_match = models.BooleanField(default=False,
                     verbose_name="delete objects that don't match any import functions?")
@@ -257,6 +266,16 @@ class UserProfile(models.Model):
                                                   choices=SORTING_CHOICES_CT,
                                                   default=FREQ)
 
+    plotRFStudyPerDayAndHour = models.BooleanField(default=False)
+    plotRFStudyFreq = models.BooleanField(default=False)
+    plotRFStudyDAP = models.BooleanField(default=True)
+    plotRFInitialSortingChoice = models.CharField(max_length=4,
+                                                  choices=SORTING_CHOICES_DX,
+                                                  default=FREQ)
+
+    plotMGStudyPerDayAndHour = models.BooleanField(default=False)
+    plotMGAGDvsThickness = models.BooleanField(default=False)
+
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)
     displayMG = models.BooleanField(default=True)
@@ -265,6 +284,8 @@ class UserProfile(models.Model):
     plotSeriesPerSystem = models.BooleanField(default=False)
 
     plotHistogramBins = models.PositiveSmallIntegerField(default=20)
+
+    plotHistograms = models.BooleanField(default=False)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
