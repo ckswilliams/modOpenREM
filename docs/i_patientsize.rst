@@ -1,6 +1,5 @@
 Adding patient size information from csv using the web interface
 ****************************************************************
-*New in 0.4.3*
 
 .. contents::
 
@@ -100,8 +99,9 @@ record and a delete button at the bottom. The csv file originally imported
 has already been deleted - this delete function is to remove the record
 of the import and the log file associated with it from the database/disk.
 
-Importing patient height and weight information from csv files using the command line
-=====================================================================================
+
+Adding patient size information from csv using the command line
+***************************************************************
 
 Usage:
 
@@ -135,9 +135,5 @@ Usage:
   Column title for the patient weight - if this information is missing
   simply add a blank column with a suitable title. Use quotes if the title
   has spaces.
-
-..  versionchanged:: 0.3.7
-    Verbosity flag added to supress printing to the standard output
-    unless requested.
 
 
