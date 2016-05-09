@@ -166,6 +166,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var index = name_list.indexOf(null);
     if (index !== -1) name_list[index] = "Blank";
 
+    // Calculate counts per name and average value per name. These are used to sort the chart series by.
     if(calc_histograms) {
         for (j = 0; j < name_list.length; j++) {
             current_counts = 0;
@@ -173,6 +174,23 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
             for (i = 0; i < system_list.length; i++) {
                 (data_counts[i]).push(histogram_data[i][j][0]);
                 (data_bins[i]).push(histogram_data[i][j][1]);
+                current_counts += parseFloat(summary_data[i][j].num);
+                if (average_choice == "mean" || average_choice == "both") {
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
+                }
+                else {
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
+                }
+            }
+            total_counts_per_name.push(current_counts);
+            average_value_per_name.push(current_value / current_counts);
+        }
+    }
+    else {
+        for (j = 0; j < name_list.length; j++) {
+            current_counts = 0;
+            current_value = 0;
+            for (i = 0; i < system_list.length; i++) {
                 current_counts += parseFloat(summary_data[i][j].num);
                 if (average_choice == "mean" || average_choice == "both") {
                     current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
@@ -199,8 +217,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + current_num + ')',
                     drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
-                    total_counts: summary_data[i][j].num,
-                    avg_value: summary_data[i][j].mean
+                    total_counts: total_counts_per_name[j],
+                    avg_value: average_value_per_name[j]
                 });
             }
         }
@@ -217,8 +235,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + parseFloat(summary_data[i][j].median).toFixed(1) + ' median<br>(n=' + summary_data[i][j].num + ')',
                     drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
-                    total_counts: summary_data[i][j].num,
-                    avg_value: summary_data[i][j].mean
+                    total_counts: total_counts_per_name[j],
+                    avg_value: average_value_per_name[j]
                 });
             }
         }
