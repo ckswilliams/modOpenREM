@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b15 (2016-05-09)
 ---------------------
 
+* `#392`_  Charts: normalised histogram tooltip now correctly reports frequency
 * `#391`_  Basic troubleshooting is now documented
 * `#390`_  Charts: mammography and fluoroscopy charts added
 * `#389`_  Charts: series without a name are now plotted under the name of `Blank` rather than not being plotted at all
