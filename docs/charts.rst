@@ -14,6 +14,7 @@ Chart types
    :figwidth: 50%
    :align: right
    :alt: Bar chart of mean DLP per acquisition
+   :target: _images/ChartCTMeanDLP.png
 
    Figure 1: Bar chart of mean DLP per acquisition
 
@@ -23,6 +24,7 @@ An example of mean DAP per acquisition type is shown in figure 1.
    :figwidth: 50%
    :align: right
    :alt: Bar chart sorting options
+   :target: _images/ChartCTSortingOptions.png
 
    Figure 2: Bar chart sorting options
 
@@ -37,6 +39,7 @@ corresponding series on the chart.
    :figwidth: 50%
    :align: right
    :alt: Histogram of acquisition DLP
+   :target: _images/ChartCTMeanDLPhistogram.png
 
    Figure 3: Histogram of abdomen DLP values
 
@@ -45,12 +48,13 @@ histogram of the data for that point so that you can see the shape of the
 value's distribution (figure 3).
 
 Bar charts can be plotted with a series per x-ray system (figure 4). This can
-be done by activating `Plot a series per system` in the `Chart options`.
+be toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
 .. figure:: img/ChartCTMeanDLPperSystem.png
    :figwidth: 50%
    :align: right
    :alt: Bar chart of mean DLP (one system per series)
+   :target: _images/ChartCTMeanDLPperSystem.png
 
    Figure 4: Bar chart of mean DLP (one system per series)
 
@@ -62,6 +66,7 @@ multiple histograms: one for each series (figure 5).
    :figwidth: 50%
    :align: right
    :alt: Histogram of abdomen DLP (one series per system)
+   :target: _images/ChartCTMeanDLPhistogramPerSystem.png
 
    Figure 5: Histogram of abdomen DLP values, one series per system
 
@@ -75,6 +80,7 @@ much less data than others.
    :figwidth: 50%
    :align: right
    :alt: Normalised histogram of abdomen DLP (one series per system)
+   :target: _images/ChartCTMeanDLPhistogramPerSystemNorm.png
 
    Figure 6: Normalised histogram of abdomen DLP, one series per system
 
@@ -92,6 +98,7 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
    :figwidth: 50%
    :align: right
    :alt: Pie chart of acquisition frequency
+   :target: _images/ChartCTacquisitionFreq.png
 
    Figure 7: Pie chart of acquisition frequency
 
@@ -111,6 +118,7 @@ isn't exact.
    :figwidth: 50%
    :align: right
    :alt: Line chart of mean DLP per study type over time
+   :target: _images/ChartCTMeanDLPoverTime.png
 
    Figure 8: Line chart of mean DLP per study type over time
 
@@ -133,6 +141,7 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
    :figwidth: 50%
    :align: right
    :alt: Pie chart of study workload per day of the week
+   :target: _images/ChartCTworkload.png
 
    Figure 9: Pie chart of study workload per day of the week
 
@@ -140,6 +149,7 @@ Clicking on a legend entry toggles the visibility of the corresponding series.
    :figwidth: 50%
    :align: right
    :alt: Pie chart of study workload per hour in a day
+   :target: _images/ChartCTworkload24hours.png
 
    Figure 10: Pie chart of study workload per hour in a day
    
@@ -147,6 +157,35 @@ Each segment represents a day of the week, and shows the number of events that
 have taken place on that day (figure 9). Clicking on one of the segments will
 take you to a pie chart that shows the number of events per on that day (figure
 10).
+
+=============================================
+5. Scatter plot showing one value vs. another
+=============================================
+
+.. figure:: img/ChartMGScatter.png
+   :figwidth: 50%
+   :align: right
+   :alt: Scatter plot of average glandular dose vs. compressed thickness
+   :target: _images/ChartMGScatter.png
+
+   Figure 11: Scatter plot of average glandular dose vs. compressed thickness
+
+.. figure:: img/ChartMGScatterPerSystem.png
+   :figwidth: 50%
+   :align: right
+   :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+   :target: _images/ChartMGScatterPerSystem.png
+
+   Figure 12: Scatter plot of average glandular dose vs. compressed thickness; one series per system
+
+This plot type shows a data point per event (figure 11). The series name and
+data values are shown when the mouse cursor is positioned over a data point.
+
+These can be plotted with a series per x-ray system (figure 12). This can be
+toggled using the `Plot a series per system` checkbox in the `Chart options`.
+
+Clicking on a system's legend entry toggles the display of the corresponding
+series on the chart.
 
 ********************
 Exporting chart data
@@ -160,6 +199,10 @@ chart: the data can be downloaded in either csv or xls format.
 New in 0.7.0
 ************
 
+* Charts for fluoroscopy and mammography.
+
+* New scatter plot chart type.
+
 * Chart plotting options can be configured by choosing ``Chart options`` from
   the ``User options`` menu at the top of the OpenREM homepage.
 
@@ -169,8 +212,11 @@ New in 0.7.0
 * Bar charts can be plotted with a series per x-ray system. This option can be
   switched on or off via the ``Chart options``.
 
-* The the number of histogram data bins can be set to a value between 2 and 40
+* The number of histogram data bins can be set to a value between 2 and 40
   in ``Chart options``. The default value is 20.
+
+* Histogram calculation can be switched on or off in ``Chart options``. The
+  default is off. Performance is significantly better when set to off.
 
 * Histogram plots can toggle between absolute or normalised values via the
   ``Toggle Normalised histograms`` button that is visible when viewing a
@@ -193,14 +239,15 @@ Chart options
 *************
 
 .. figure:: img/ChartOptions.png
-   :figwidth: 50 %
+   :figwidth: 25 %
    :align: right
    :alt: OpenREM chart options
+   :target: _images/ChartOptions.png
 
-   Figure 11: OpenREM chart options
+   Figure 13: OpenREM chart options
 
 Chart options can be configured by choosing the ``Chart options`` item from the
-``User options`` menu on the OpenREM homepage (figure 11).
+``User options`` menu on the OpenREM homepage (figure 13).
 
 CT and radiographic plot options can also be set from their respective
 summary pages.
@@ -216,12 +263,13 @@ users may prefer to leave ``Plot charts?`` off for performance reasons.
    :figwidth: 25 %
    :align: right
    :alt: Switching charts off
+   :target: _images/UserOptionsMenu.png
 
-   Figure 12: Switching charts off
+   Figure 14: Switching charts off
 
 The user can also switch off chart plotting by clicking on the
 ``Switch charts off`` link in the ``User options`` menu in the navigation bar
-at the top of any OpenREM page, as shown in figure 12.
+at the top of any OpenREM page, as shown in figure 14.
 
 The user can choose whether the data displayed on the charts is the mean, 
 median or both by using the drop-down ``Average to use`` selection. Only the
@@ -286,3 +334,51 @@ Chart types - radiography
 * Line chart of average mAs of each acquisition protocol over time
 
 * Line chart of average kVp of each acquisition protocol over time
+
+*************************
+Chart types - fluoroscopy
+*************************
+
+* Bar chart of average DAP for each study description
+
+* Pie chart of the frequency of each study description
+
+* Pie chart showing the number of studies carried out per weekday
+
+*************************
+Chart types - mammography
+*************************
+
+* Scatter plot of average glandular dose vs. compressed thickness for each
+  acquisition
+
+* Pie chart showing the number of studies carried out per weekday
+
+*****************
+Performance notes
+*****************
+
+===============
+All chart types
+===============
+
+Filtering using `Acquisition protocol` forces OpenREM to use a much slower
+method of querying the database for chart data. Where possible avoid filtering
+using this field, especially when viewing a large amount of data.
+
+==========
+Bar charts
+==========
+
+Switching off histogram calculation in `Chart options` will speed up bar chart
+data calculation.
+
+Switching off `Plot a series per system` in the `Chart options` will speed up
+data calculation.
+
+=============
+Scatter plots
+=============
+
+Switching off `Plot a series per system` in the `Chart options` will speed up
+data calculation.

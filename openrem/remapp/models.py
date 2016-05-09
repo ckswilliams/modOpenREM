@@ -266,6 +266,16 @@ class UserProfile(models.Model):
                                                   choices=SORTING_CHOICES_CT,
                                                   default=FREQ)
 
+    plotRFStudyPerDayAndHour = models.BooleanField(default=False)
+    plotRFStudyFreq = models.BooleanField(default=False)
+    plotRFStudyDAP = models.BooleanField(default=True)
+    plotRFInitialSortingChoice = models.CharField(max_length=4,
+                                                  choices=SORTING_CHOICES_DX,
+                                                  default=FREQ)
+
+    plotMGStudyPerDayAndHour = models.BooleanField(default=False)
+    plotMGAGDvsThickness = models.BooleanField(default=False)
+
     displayCT = models.BooleanField(default=True)
     displayRF = models.BooleanField(default=True)
     displayMG = models.BooleanField(default=True)
@@ -274,6 +284,8 @@ class UserProfile(models.Model):
     plotSeriesPerSystem = models.BooleanField(default=False)
 
     plotHistogramBins = models.PositiveSmallIntegerField(default=20)
+
+    plotHistograms = models.BooleanField(default=False)
 
 
 def create_user_profile(sender, instance, created, **kwargs):

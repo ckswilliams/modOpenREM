@@ -5,6 +5,9 @@ OpenREM version history
 0.7.0b14 (2016-04-07)
 ---------------------
 
+* `#391`_  Basic troubleshooting is now documented
+* `#390`_  Charts: mammography and fluoroscopy charts added
+* `#389`_  Charts: series without a name are now plotted under the name of `Blank` rather than not being plotted at all
 * `#387`_  Added laterality to mammography exports
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now
@@ -46,6 +49,7 @@ OpenREM version history
 * `#331`_  Keep_alive tasks are now discarded if not executed, so don't pile up
 * `#329`_  All existing logging is now done via the same log files
 * `#328`_  Store SCP no longer uses Celery tasks
+* `#327`_  Celery workers now only take one task at a time
 * `#325`_  Charts: switching charts off now leaves the user on the same page, rather than going to the home page
 * `#324`_  Charts: forced chart tooltip background to be opaque to make reading the text easier
 * `#320`_  The week now begins on Monday rather than Sunday on date form fields
@@ -121,6 +125,7 @@ OpenREM version history
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 * `#229`_  Charts: Added chart of DLP per requested procedure
 * `#223`_  Charts: speed improvement for weekday charts
+* `#217`_  Charts: Further code optimisation to speed up calculation time
 * `#207`_  DICOM QR SCU now available from web interface
 * `#206`_  DICOM Store SCP configuration now available from web interface
 * `#183`_  Added options to store patient name and ID, and options to hash name, ID and accession number
@@ -130,6 +135,7 @@ OpenREM version history
 * `#120`_  Improved testing of data existing for exports
 * `#118`_  Upgraded to Django 1.8
 * `#70`_   User is returned to the filtered view after deleting a study
+* `#61`_   Skin dose maps for fluoroscopy systems can now be calculated and displayed
 
 0.6.1 (2015-10-30)
 ------------------

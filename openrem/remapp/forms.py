@@ -119,6 +119,36 @@ class CTChartOptionsForm(forms.Form):
         plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
 
+class RFChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+        plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class RFChartOptionsDisplayForm(forms.Form):
+    plotRFStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotRFStudyFreq = forms.BooleanField(label='Study frequency', required=False)
+    plotRFStudyDAP = forms.BooleanField(label='DAP per study', required=False)
+    plotRFInitialSortingChoice = forms.ChoiceField(label='Default chart sorting', choices=SORTING_CHOICES_DX,
+                                               required=False)
+
+
+class MGChartOptionsForm(forms.Form):
+    plotCharts = forms.BooleanField(label='Plot charts?', required=False)
+    plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
+    # if 'postgresql' in settings.DATABASES['default']['ENGINE']:
+    #     plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
+
+
+class MGChartOptionsDisplayForm(forms.Form):
+    plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
+    plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
+
+
 class DXChartOptionsDisplayForm(forms.Form):
     plotDXAcquisitionMeanDAP = forms.BooleanField(label='DAP per acquisition', required=False)
     plotDXAcquisitionFreq = forms.BooleanField(label='Acquisition frequency', required=False)
@@ -160,8 +190,8 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotInitialSortingDirection = forms.ChoiceField(label='Default sorting direction', choices=SORTING_DIRECTION,
                                                     required=False)
     plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
+    plotHistograms = forms.BooleanField(label='Calculate histogram data', required=False)
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
-
 
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()

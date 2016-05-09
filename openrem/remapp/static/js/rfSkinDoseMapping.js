@@ -268,7 +268,7 @@ $("#skinDoseMap")
         var y = e.pageY - pos.y;
         var p = skinDoseMapObj.skinDoseMapContext.getImageData(x, y, 1, 1).data;
         var mag = skinDoseMapObj.mag;
-        var current_dose = skinDoseMapObj.skinDoseMap[Math.floor(y/mag) * Math.floor(this.width/mag) + Math.floor(x/mag)].toFixed(skinDoseMapColourScaleObj.decimalPlaces) + " Gy";
+        var current_dose = skinDoseMapObj.skinDoseMap[(Math.floor(this.height/mag)-1 - Math.floor(y/mag)) * Math.floor(this.width/mag) + Math.floor(x/mag)].toPrecision(2) + " Gy";
         $('[data-tooltip="skin_dose_map"]').qtip('option', 'content.text', current_dose);
 
         var deltaMove = {

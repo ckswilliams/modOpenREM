@@ -49,13 +49,13 @@
 
     {{ studyfilter }}
 
+    <form action="" method="get" class="form-horizontal" role="form">
           <div class="panel panel-info small">
             <div class="panel-heading">
               <h3 class="panel-title">Exam filter</h3>
             </div>
             <div class="panel-body">
                 <i>Date format yyyy-mm-dd</i>
-                <form action="" method="get" class="form-horizontal" role="form">
                         {% for field in filter.form %}
                             <div class="form-group">
                                 <div class="col-xs-4">
@@ -68,12 +68,21 @@
                             </div>
                         {% endfor %}
                     Caution: Ordering by AGD will duplicate bilateral studies in filtered list<br>
-                    </table>
                     <input class="btn btn-default" type="submit" />
-                </form> 
+            </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Chart options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {% csrf_token %}
+                    {{ chartOptionsForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
             </div>
           </div>
-    
+    </form>
+
 <script>
 $('.datepicker').datepicker({
     format: "yyyy-mm-dd",
@@ -173,4 +182,112 @@ $('.datepicker').datepicker({
     {% paginate %}
 
  
+{% endblock %}
+
+{% block plotdata %}
+
+    {% if request.user.userprofile.plotCharts %}
+
+        <script src="{{ STATIC_URL }}js/chartFullScreen.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSetExportSize.js"></script>
+        <script src="{{ STATIC_URL }}js/chroma.min.js"></script>
+        <script src="{{ STATIC_URL }}js/chartUpdateData.js"></script>
+
+        <div class="ajax-progress"><img src="{{ STATIC_URL }}img/ajax-loader.gif"></div>
+
+        <!-- Include JavaScript to enable highcharts plots -->
+        <script src="{{ STATIC_URL }}js/highcharts.js"></script>
+        <script src="{{ STATIC_URL }}js/boost.js"></script>
+        <script src="{{ STATIC_URL }}js/exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/offline-exporting.js"></script>
+        <script src="{{ STATIC_URL }}js/export-csv.js"></script>
+        <script src="{{ STATIC_URL }}js/drilldown.js"></script>
+        <script src="{{ STATIC_URL }}js/chartSortingRoutines.js"></script>
+        <script src="{{ STATIC_URL }}js/chartHistogramNormalise.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageAndHistogram.js"></script>
+        <script src="{{ STATIC_URL }}js/chartAverageOverTime.js"></script>
+        <script src="{{ STATIC_URL }}js/chartFrequency.js"></script>
+        <script src="{{ STATIC_URL }}js/chartWorkload.js"></script>
+        <script src="{{ STATIC_URL }}js/chartScatter.js"></script>
+        <!-- End of include JavaScript to enable highcharts plots -->
+
+        <script>var plotAverageChoice = '{{ request.user.userprofile.plotAverageChoice }}';</script>
+
+        <!-- JavaScript to enable bootstrap tooltips -->
+        <script>
+            $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
+        <!-- End of JavaScript to enable bootstrap tooltips -->
+
+        <!-- JavaScript function to sort a list of objects by the 'y' or 'name' object. -->
+        <script src="{{ STATIC_URL }}js/sorting.js"></script>
+        <!-- End of JavaScript function to sort a list of objects by the 'y' or 'name' object -->
+
+        <!-- JavaScript chart AJAX code. -->
+        <script src="{{ STATIC_URL }}js/mgChartAjax.js"></script>
+        <!-- End of JavaScript chart AJAX code. -->
+
+        {% if request.user.userprofile.plotMGAGDvsThickness %}
+            <!-- HTML to include div container for scatter plot -->
+            <div class="panel-group" id="accordionScatter">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionScatter" href="#collapseScatter" onclick="setTimeout(function() {fitChartToDiv('scatterDIV');}, 0);">
+                                Scatter plot chart showing AGD vs. compressed breast thickness.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseScatter" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="scatterDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="enterFullScreen('collapseScatter', 'scatterDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for scatter plot -->
+
+            <script>
+                var plotMGAGDvsThickness = true;
+                $(window).resize(function() {
+                    chartSetExportSize('scatterDIV');
+                });
+                result = chartScatter('Average glandular dose vs. compressed thickness', 'scatterDIV', 'Compressed thickness (mm)', 'Average glandular dose (mGy)');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotMGStudyPerDayAndHour %}
+            <!-- HTML to include div container for study workload -->
+            <div class="panel-group" id="accordion5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion5" href="#collapseStudyWorkloadPieChart" onclick="setTimeout(function() {fitChartToDiv('piechartStudyWorkloadDIV');}, 0);">
+                                Pie chart showing a breakdown of number of studies per weekday.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyWorkloadPieChart" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
+                            <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
+                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for studies per week day pie chart -->
+            <script>
+                var plotMGStudyPerDayAndHour = true;
+                $(window).resize(function() {
+                    chartSetExportSize('piechartStudyWorkloadDIV');
+                });
+                result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
+            </script>
+        {% endif %}
+
+    {% endif %}
 {% endblock %}

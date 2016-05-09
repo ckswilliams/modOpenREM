@@ -14,11 +14,15 @@ the following:
   party one, such as Conquest
 
 To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
-``Add new Store`` and fill in the details:
+``Add new Store`` and fill in the details (see figure 1):
 
-.. image:: img/netdicomstorescp.png
-    :align: center
-    :alt: DICOM Store SCP configuration
+.. figure:: img/netdicomstorescp.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP configuration
+   :target: _images/netdicomstorescp.png
+
+   Figure 1: DICOM Store SCP configuration
 
 * Name of local store node: This is the *friendly name*, such as ``OpenREM store``
 * Application Entity Title of the node: This is the DICOM name for the store, and must be letters or numbers only, no
@@ -56,11 +60,15 @@ The object is then left in the ``dicom_in`` folder in the ``media`` folder, or i
 set in :doc:`i_deletesettings`.
 
 
-For native DICOM store nodes, you need to open the ``Advanced - test/development use only`` section:
+For native DICOM store nodes, you need to open the ``Advanced - test/development use only`` section (see figure 2):
 
-.. image:: img/netdicomstorescpadvanced.png
-    :align: center
-    :alt: DICOM Store SCP advanced configuration
+.. figure:: img/netdicomstorescpadvanced.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP advanced configuration
+   :target: _images/netdicomstorescpadvanced.png
+
+   Figure 2: DICOM Store SCP advanced configuration
 
 * Control the server using OpenREM: this checkbox will enable OpenREM to create and control the node
 * Auto-start the server using celery beat: if checked, and if :ref:`celery-beat` is running, then OpenREM will attempt
@@ -81,24 +89,31 @@ See :doc:`conquestUbuntu` and :doc:`conquestAsWindowsService` for more informati
 Status of DICOM Store SCP nodes
 *******************************
 
-.. image:: img/storenodealive.png
-    :align: right
-    :alt: DICOM Store SCP status "Alive"
-.. image:: img/storenodefail.png
-    :align: right
-    :alt: DICOM Store SCP status "Alive"
+DICOM Store SCP advanced configuration
+
+.. figure:: img/storenodealive.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP status "Alive"
+
+.. figure:: img/storenodefail.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP status "Association fail"
+
+   Figure 3: DICOM Store SCP status - Alive and Association failed
 
 DICOM Store SCP nodes that have been configured are listed in the left column of the DICOM network configuration page.
 For each server, the basic details are displayed, including the Database ID which is required for command line/scripted
 use of the query-retrieve function.
 
 In the title row of the Store SCP config panel, the status will be reported either as 'Server is alive' or 'Error:
-Association fail - server not running?'
+Association fail - server not running?' - see figure 3
 
 Controlling native Store SCP nodes
 ==================================
 
-If a native Store SCP node is not running, then a ``Start server`` button will be presented at teh bottom right. If it
+If a native Store SCP node is not running, then a ``Start server`` button will be presented at the bottom right. If it
 is running, this buttin will change to ``Stop server``, and the ``Delete``button will become inactive.
 
 If the node is configured to be auto-started, and if :ref:`celery-beat` is running, then each minute if the server is
@@ -127,6 +142,54 @@ To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM 
   you know it will be resolved.
 
 Now go to the :doc:`netdicom-qr` documentation to learn how to use it.
+
+
+.. _storetroubleshooting:
+
+**********************************
+Troubleshooting: openrem_store.log
+**********************************
+
+If the default logging settings haven't been changed then there will be a log files to refer to. The default
+location is within your ``MEDIAROOT`` folder:
+
+This file contains information about each echo and association that is made against the store node, and any objects that
+are sent to it.
+
+The following is an example of the log for a Philips *dose info* image being received:
+
+
+.. sourcecode:: console
+
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:310] Starting AE... AET:MYSTOREAE01, port:8104
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:314] Started AE... AET:MYSTOREAE01, port:8104
+    [21/Feb/2016 21:13:43] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:44] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:46] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:46] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:49] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:49] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:50] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:50] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:13:51] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:13:51] INFO [remapp.netdicom.storescp:54] Store SCP: Echo received
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:46] Store SCP: association requested
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:78] Received C-Store. Stn name NM-54316, Modality CT,
+    SOPClassUID Secondary Capture Image Storage, Study UID 1.2.840.113564.9.1.2843752344.47.2.5000947881 and Instance
+    UID 1.2.840.113704.7.1.1.4188.1234134540.349
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:232] File
+    /var/openrem/media/dicom_in/1.2.840.113704.7.1.1.4188.1453134540.349.dcm written
+    [21/Feb/2016 21:14:39] INFO [remapp.netdicom.storescp:263] Processing as Philips Dose Info series
+    ...etc
+
+
+
+
+
+
+
+
+
 
 
 .. _`Issue #337`: https://bitbucket.org/openrem/openrem/issues/337/storescp-is-killed-if-daemonized-when

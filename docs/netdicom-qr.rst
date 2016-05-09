@@ -8,19 +8,27 @@ To query retrieve dose related objects from a remote server, you need to review 
 **************************************
 Query-retrieve using the web interface
 **************************************
-.. image:: img/QRmenu.png
-    :align: right
-    :alt: Import QR menu
 
+.. figure:: img/QRmenu.png
+   :figwidth: 50%
+   :align: right
+   :alt: Import Query-Retrieve menu
+   :target: _images/QRmenu.png
 
-* On the Imports menu, select ``Query remote server``. If the menu isn't there, you need to check your user permissions
+   Figure 1: Import Query-Retrieve menu
+
+* On the Imports menu, select ``Query remote server`` - see figure 1. If the menu isn't there, you need to check your user permissions
   - see :ref:`user-settings` for details.
 * Each configured query-retrieve node and each local store node is automatically tested to make sure they respond to a
-  DICOM echo - the results are presented at the top of the page.
+  DICOM echo - the results are presented at the top of the page. See fingure 2 for an example.
 
-.. image:: img/QRstatuses.png
-    :align: center
-    :alt: local and remote QR statuses
+.. figure:: img/QRstatuses.png
+   :figwidth: 50%
+   :align: right
+   :alt: local and remote QR statuses
+   :target: _images/QRstatuses.png
+
+   Figure 2: Local and remote QR statuses
 
 * Select the desired **remote host**, ie the PACS or modality you wish to query.
 * Select the local **store node** you want to retrieve to.
@@ -129,15 +137,12 @@ A similar script could be created as a batch file on Windows and run using the s
 
 .. _qrtroubleshooting:
 
-***************
-Troubleshooting
-***************
+*******************************
+Troubleshooting: openrem_qr.log
+*******************************
 
-If the default logging settings haven't been changed then there will be two log files to refer to. The default
+If the default logging settings haven't been changed then there will be a log files to refer to. The default
 location is within your ``MEDIAROOT`` folder:
-
-openrem_qr.log
-==============
 
 This file contains information about the query, the status of the remote node, the C-Find response, the
 analysis of the response, and the individual C-Move requests.
@@ -204,9 +209,18 @@ responses will already have been imported):
     [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:509] Mv: study_no 1
     [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:515] Mv: study no 1 series no 1
     [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:528] Requesting move: modality DX, study 1 (of 6) series 1 (of 1). Series contains 1 objects
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:13] INFO [remapp.netdicom.qrscu:44] Move association requested
+    [04/May/2016 11:30:18] INFO [remapp.netdicom.qrscu:53] Move association released
+    [04/May/2016 11:30:18] INFO [remapp.netdicom.qrscu:532] _move_req launched
+    [04/May/2016 11:30:18] INFO [remapp.netdicom.qrscu:509] Mv: study_no 2
+    [04/May/2016 11:30:18] INFO [remapp.netdicom.qrscu:515] Mv: study no 2 series no 1
+    [04/May/2016 11:30:18] INFO [remapp.netdicom.qrscu:528] Requesting move: modality DX, study 2 (of 6) series 1 (of 1). Series contains 2 objects
+    [04/May/2016 11:30:18] INFO [remapp.netdicom.qrscu:33] Association response received
+    [04/May/2016 11:30:19] INFO [remapp.netdicom.qrscu:44] Move association requested
+    [04/May/2016 11:30:29] INFO [remapp.netdicom.qrscu:48] gg is Pending
+    [04/May/2016 11:30:30] INFO [remapp.netdicom.qrscu:53] Move association released
     ...etc
 
-openrem_store.log
-=================
-
+If you are using an OpenREM native storage node, then you might also like to review :ref:`storetroubleshooting`
 

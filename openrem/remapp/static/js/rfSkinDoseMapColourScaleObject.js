@@ -42,22 +42,25 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
             }
         }
 
-        i = 0;
-        for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
+        for (i = 0; i < 11; i++) {
+            y = scaleHeight - Math.floor(i * scaleHeight / 10);
             for (x = 15; x < 20; x++) {
                 this.setPixel(imageData, x, y, 0, 0, 0, 255);
             }
         }
+        y = scaleHeight - 1;
         for (x = 15; x < 20; x++) {
-            this.setPixel(imageData, x, scaleHeight - 1, 0, 0, 0, 255);
+            this.setPixel(imageData, x, y, 0, 0, 0, 255);
         }
         this.colourScaleContext.putImageData(imageData, 0, heightOffset / 2);
 
-        i = this.minDose;
+        this.colourScaleContext.textBaseline = 'middle';
+        var dose = this.minDose;
         increment = (this.maxDose - this.minDose) / 10;
-        for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
-            this.colourScaleContext.fillText(i.toFixed(this.decimalPlaces), 23, this.colourScaleCanvas.height - y - 7);
-            i += increment;
+        for (i = 0; i < 11; i ++) {
+            y = scaleHeight - Math.floor(i * scaleHeight / 10);
+            this.colourScaleContext.fillText(dose.toFixed(this.decimalPlaces), 23, y+(heightOffset / 2));
+            dose += increment;
         }
     }
 
@@ -73,11 +76,12 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
         var imageData = this.colourScaleContext.getImageData(0, heightOffset / 2, this.colourScaleCanvas.width, scaleHeight);
 
-        i = this.minDose;
+        var dose = this.minDose;
         increment = (this.maxDose - this.minDose) / 10;
-        for (y = 0; y < this.colourScaleCanvas.height; y += Math.floor(scaleHeight / 10)) {
-            this.colourScaleContext.fillText(i.toFixed(this.decimalPlaces), 23, this.colourScaleCanvas.height - y - 7);
-            i += increment;
+        for (i = 0; i < 11; i ++) {
+            y = scaleHeight - Math.floor(i * scaleHeight / 10);
+            this.colourScaleContext.fillText(dose.toFixed(this.decimalPlaces), 23, y+(heightOffset / 2));
+            dose += increment;
         }
     }
 
