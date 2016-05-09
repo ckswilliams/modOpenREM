@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0b14 (2016-04-07)
+0.7.0b15 (2016-05-09)
 ---------------------
 
 * `#391`_  Basic troubleshooting is now documented

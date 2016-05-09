@@ -137,6 +137,7 @@ Updates since beta 14
 * Mammo laterality has been added to mammo exports
 * Fixed in one of the beta versions was charts using greater than rather than greater than or equal to
 * Fluoroscopy skin dose maps
+* Display tables made neater
 
 ****************************
 Upgrading from version 0.6.0
@@ -153,7 +154,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b14
+    pip install openrem==0.7.0b15
 
 In a shell/command window, move into the openrem folder:
 
@@ -208,7 +209,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b14
+    pip install openrem==0.7.0b15
 
 From the openrem folder (see above):
 
