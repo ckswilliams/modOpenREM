@@ -139,6 +139,10 @@ Updates since beta 14
 * Fluoroscopy skin dose maps
 * Display tables made neater
 
+Updates since beta 15
+=====================
+* Normalised histogram tooltip now correctly reports frequency
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
