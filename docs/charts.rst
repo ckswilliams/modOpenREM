@@ -184,6 +184,9 @@ data values are shown when the mouse cursor is positioned over a data point.
 These can be plotted with a series per x-ray system (figure 12). This can be
 toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
+Clicking the left-hand mouse button on the chart and dragging a rectangular
+region will zoom in on that selection of the chart.
+
 Clicking on a system's legend entry toggles the display of the corresponding
 series on the chart.
 
@@ -362,9 +365,10 @@ Performance notes
 All chart types
 ===============
 
-Filtering using `Acquisition protocol` forces OpenREM to use a much slower
-method of querying the database for chart data. Where possible avoid filtering
-using this field, especially when viewing a large amount of data.
+For any study- or request-based charts, filtering using `Acquisition protocol`
+forces OpenREM to use a much slower method of querying the database for chart
+data. Where possible avoid filtering using this field, especially when viewing
+a large amount of data.
 
 ==========
 Bar charts
