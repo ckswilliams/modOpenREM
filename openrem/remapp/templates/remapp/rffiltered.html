@@ -312,6 +312,7 @@ $('.datepicker').datepicker({
                 var plotRFStudyDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotRFStudyDAPContainer');
+                    fitChartToDiv('plotRFStudyDAPContainer');
                 });
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.stu-hist-norm-btn';
@@ -369,6 +370,7 @@ $('.datepicker').datepicker({
                 var plotRFStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>
@@ -399,6 +401,7 @@ $('.datepicker').datepicker({
                 var plotRFStudyFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
                 var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');

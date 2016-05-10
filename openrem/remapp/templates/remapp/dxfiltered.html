@@ -292,6 +292,7 @@
                 var plotDXAcquisitionMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('container');
+                    fitChartToDiv('container');
                 });
                 var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.acq-hist-norm-btn';
@@ -348,6 +349,7 @@
                 var plotDXAcquisitionFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartProtocolDIV');
+                    fitChartToDiv('piechartProtocolDIV');
                 });
                 result = chartFrequency('piechartProtocolDIV', 'Acquisition protocol frequency');
             </script>
@@ -407,6 +409,7 @@
                 var plotDXRequestMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXRequestMeanDAPContainer');
+                    fitChartToDiv('plotDXRequestMeanDAPContainer');
                 });
                 var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.req-hist-norm-btn';
@@ -463,6 +466,7 @@
                 var plotDXRequestFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartRequestDIV');
+                    fitChartToDiv('piechartRequestDIV');
                 });
                 var urlStartReq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
                 result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
@@ -523,6 +527,7 @@
                 var plotDXStudyMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXStudyMeanDAPContainer');
+                    fitChartToDiv('plotDXStudyMeanDAPContainer');
                 });
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.stu-hist-norm-btn';
@@ -579,6 +584,7 @@
                 var plotDXStudyFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
                 var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
@@ -636,6 +642,7 @@
                 var plotDXAcquisitionMeankVp = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeankVp');
+                    fitChartToDiv('chartAcquisitionMeankVp');
                 });
                 var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.kvp-hist-norm-btn';
@@ -718,6 +725,7 @@
                 var plotDXAcquisitionMeanmAs = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeanmAs');
+                    fitChartToDiv('chartAcquisitionMeanmAs');
                 });
                 var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.mas-hist-norm-btn';
@@ -775,6 +783,7 @@
                 var plotDXStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>
@@ -810,6 +819,7 @@
                 var plotDXAcquisitionMeankVpOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
+                    fitChartToDiv('AcquisitionMeankVpOverTimeDIV');
                 });
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Mean');
@@ -849,6 +859,7 @@
                 var plotDXAcquisitionMeanmAsOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
+                    fitChartToDiv('AcquisitionMeanmAsOverTimeDIV');
                 });
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Mean');
@@ -888,6 +899,7 @@
                 var plotDXAcquisitionMeanDAPOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');
+                    fitChartToDiv('AcquisitionMeanDAPOverTimeDIV');
                 });
 
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}

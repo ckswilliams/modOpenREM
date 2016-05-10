@@ -304,6 +304,7 @@
                 var plotCTAcquisitionMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramAcquisitionPlotDLPdiv');
+                    fitChartToDiv('histogramAcquisitionPlotDLPdiv');
                 });
 
                 var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -390,6 +391,7 @@
                 var plotCTAcquisitionMeanCTDI = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramAcquisitionPlotCTDIdiv');
+                    fitChartToDiv('histogramAcquisitionPlotCTDIdiv');
                 });
 
                 var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -447,6 +449,7 @@
                 var plotCTAcquisitionFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartAcquisitionDIV');
+                    fitChartToDiv('piechartAcquisitionDIV');
                 });
 
                 var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
@@ -508,6 +511,7 @@
                 var plotCTStudyMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramStudyPlotDIV');
+                    fitChartToDiv('histogramStudyPlotDIV');
                 });
 
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -565,6 +569,7 @@
                 var plotCTStudyFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
@@ -624,6 +629,7 @@
                 var plotCTRequestMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramRequestPlotDIV');
+                    fitChartToDiv('histogramRequestPlotDIV');
                 });
 
                 norm_btn_class = '.req-hist-norm-btn';
@@ -680,6 +686,7 @@
                 var plotCTRequestFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartRequestDIV');
+                    fitChartToDiv('piechartRequestDIV');
                 });
                 var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
                 result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
@@ -712,6 +719,7 @@
                 var plotCTStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>
@@ -748,6 +756,7 @@
                 var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';
                 $(window).resize(function() {
                     chartSetExportSize('studyMeanDLPOverTimeDIV');
+                    fitChartToDiv('studyMeanDLPOverTimeDIV');
                 });
 
                 var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
