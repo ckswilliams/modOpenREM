@@ -81,6 +81,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                     $(norm_btn_class).css('display','none');
                     $(instr_class).css('display','block');
 
+                    this.zoomOut();
 
                     this.setTitle({
                         text: default_title
