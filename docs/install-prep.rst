@@ -83,27 +83,21 @@ For linux::
     # If using a virtualenv, you might need to also do:
     pip install numpy
 
-For Windows, there are various options:
+For Windows:
 
-1. Download executable install file from SourceForge:
+Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
 
-    * Download a pre-compiled Win32 .exe NumPy file from http://sourceforge.net/projects/numpy/files/NumPy/. You need to
-      download the file that matches the Python version, which should be 2.7. At the time of writing the latest version was
-      1.10.1, and the filename to download was ``numpy-1.10.1-win32-superpack-python2.7.exe``. The filename is truncated on
-      SourceForge, so you may need to click on the *i* icon to see which is which. It's usually the first *superpack*.
-    * Run the downloaded binary file to install NumPy.
+* Find the right version - look for **numpy-x.xx.x+mkl-cp27-cp27m-win32.whl** for 32-bit Windows or
+* **numpy-x.xx.x+mkl-cp27-cp27m-win_amd64.whl** for 64-bit Windows.
+* At the time of writing, ``x.xx.x`` was ``1.11.0`` - choose the latest version
+* Install using pip:
 
-2. Or download a ``pip`` installable wheel file:
+.. sourcecode:: console
 
-    * Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy - ``numpy‑1.9.3+mkl‑cp27‑none‑win32.whl`` is
-      likely to be the right version, unless you have 64bit Python installed, in which case use the
-      ``numpy‑1.9.3+mkl‑cp27‑none‑win_amd64.whl`` version instead. If a later version has been released (the 1.9.3 bit),
-      use that instead. Make sure to choose the cp27 one.
-    * Install using pip::
-
-        pip install numpy‑1.9.3+mkl‑cp27‑none‑win32.whl
-        # or
-        pip install numpy‑1.9.3+mkl‑cp27‑none‑win_amd64.whl
+    pip install numpy‑1.11.0+mkl‑cp27-cp27m‑win32.whl
+    # or
+    pip install numpy‑1.11.0+mkl‑cp27‑cp27m‑win_amd64.whl
+    # changing the filename appropriately
 
 Install pynetdicom (edited version)
 ===================================
