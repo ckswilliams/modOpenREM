@@ -17,9 +17,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             zoomType: 'x',
             resetZoomButton: {
                 position: {
-                    // align: 'right', // by default
-                    // verticalAlign: 'top', // by default
-                    x: -10,
+                    x: -50,
                     y: 10
                 },
                 relativeTo: 'chart'
