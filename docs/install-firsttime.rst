@@ -14,5 +14,6 @@ this isn't possible, so we've added instructions for an offline installation too
 (for the server - the computer connected to the internet can be running any operating system).
 
 .. toctree::
+   :maxdepth: 2
 
     install-offline

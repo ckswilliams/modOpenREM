@@ -72,8 +72,8 @@ Installation of binaries
 Install the binaries in the following order:
 
 1. Python
-1. Erlang
-1. RabbitMQ
+2. Erlang
+3. RabbitMQ
 
 Installation of the python packages
 -----------------------------------
