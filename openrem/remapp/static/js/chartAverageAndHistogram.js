@@ -14,12 +14,23 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
         },
         chart: {
             type: 'column',
+            zoomType: 'x',
+            resetZoomButton: {
+                position: {
+                    // align: 'right', // by default
+                    // verticalAlign: 'top', // by default
+                    x: -10,
+                    y: 10
+                },
+                relativeTo: 'chart'
+            },
             renderTo: render_div,
             events: {
                 drilldown: function (e) {
                     $(norm_btn_class).css('display','inline-block');
                     $(instr_class).css('display','none');
 
+                    this.zoomOut();
 
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
@@ -115,6 +126,11 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             labels: {
                 useHTML: true,
                 rotation: 90
+            },
+            events: {
+                afterSetExtremes: function(event){
+                    fitChartToDiv(this.chart.renderTo.id);
+                }
             }
         },
         yAxis: {

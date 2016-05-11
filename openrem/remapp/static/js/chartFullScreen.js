@@ -22,6 +22,8 @@ function enterFullScreen(div_id, chart_div) {
 
 
 function fitChartToDiv(chart_div) {
-    var chart = $('#'+chart_div).highcharts();
-    chart.setSize($('#'+chart_div).width(), $('#'+chart_div).height());
+    if ($('#' + chart_div).width() && $('#' + chart_div).height()) {
+        var chart = $('#' + chart_div).highcharts();
+        chart.setSize($('#' + chart_div).width(), $('#' + chart_div).height());
+    }
 }
