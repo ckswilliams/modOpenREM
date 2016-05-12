@@ -3,9 +3,12 @@ Offline Installation on Windows
 *******************************
 
 In order to carry out an offline installation you will need to download the OpenREM package and dependencies.
-Most of the python libraries will be in tar.gz or whl formats. Ensure you have the version that matches your version of python and is 64 bit or 32 bit as appropriate. They can be installed with `pip install` filename.
+The instructions below should work for downloading on any operating system, as long as you have Python 2.7 and a
+reasonably up to date version of pip installed.
 
-We will need to update pip for compatibility even though it is included in the main python package you download.
+If you have trouble when installing the Python packages due to incorrect architecture, you may need to either download
+on a Windows system similar to the server (matching 32-bit/64-bit), or to download the files from
+http://www.lfd.uci.edu/~gohlke/pythonlibs/ instead.
 
 On a computer with internet access
 ==================================
@@ -29,11 +32,24 @@ RabbitMQ from http://www.rabbitmq.com/install-windows.html
 
 * Download **rabbitmq-server-x.x.x.exe** from either option
 
+PostgreSQL from http://www.enterprisedb.com/products-services-training/pgdownload#windows
+
+*Note: Other databases such as MySQL are also suitable, though the median function for charts will not be available. For
+testing purposes only, you could skip this step and use SQLite3 which comes with OpenREM*
+
+* Download by clicking on the icon for **Win x86-32** or **Win x86-64**
+
+PostgreSQL Python connector from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psycopg
+
+* Find the right version - look for **psycopg2-x.x.x-cp27-cp27m-win32.whl** for 32-bit Windows or
+* **psycopg2-x.x.x-cp27-cp27m-win_amd64.whl** for 64-it Windows.
+* At the time of writing, ``x.x.x`` was ``2.6.1`` - choose the latest ``cp27`` version
+
 Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
 
 * Find the right version - look for **numpy-x.xx.x+mkl-cp27-cp27m-win32.whl** for 32-bit Windows or
 * **numpy-x.xx.x+mkl-cp27-cp27m-win_amd64.whl** for 64-bit Windows.
-* At the time of writing, ``x.xx.x`` was ``1.11.0`` - choose the latest version
+* At the time of writing, ``x.xx.x`` was ``1.11.0`` - choose the latest ``cp27`` version
 
 Download pynetdicom from https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
@@ -42,7 +58,6 @@ Download pynetdicom from https://bitbucket.org/edmcdonagh/pynetdicom/get/default
 To add
 ^^^^^^
 
-* Database
 * Web server
 
 Download python packages from PyPI
@@ -59,7 +74,8 @@ download them all:
 Copy everything to the Windows machine
 --------------------------------------
 
-* Add the ``pynetdicom`` file and the ``numpy`` file to the directory with the other python packages
+* Add the ``pynetdicom`` file, the ``psycopg2`` file and the ``numpy`` file to the directory with the other python
+  packages
 * Copy this directory plus all the binaries to the Windows server that you are using
 
 
@@ -91,10 +107,14 @@ In a console, navigate to the directory that your ``openremfiles`` directory is 
 
     pip install openremfiles\edmcdonagh-pynetdicom-2da8a57b53b3.tar.gz
 
+Install PostgreSQL
+------------------
+
+See the instructions to :ref:`windowspsqlinstall` on Windows.
+
 To add
 ^^^^^^
 
-* Database
 * Web server
 
 Configure OpenREM ready for use
