@@ -50,6 +50,15 @@ value's distribution (figure 3).
 Bar charts can be plotted with a series per x-ray system (figure 4). This can
 be toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
+Clicking the left-hand mouse button on the chart background and dragging left
+or right selects part of the series. Releasing the mouse button zooms in on
+this selection. A ``Reset zoom`` button appears when zoomed in: clicking this
+resets the chart so that the full series can be seen again. The zoom feature
+works on both the main series and the histograms. The zooming can be useful
+when there is a category on the chart that has a very low value compared to
+others. Zooming in on this category will enable the low values to be seen, as
+the chart rescales the y-axis after the zoom.
+
 .. figure:: img/ChartCTMeanDLPperSystem.png
    :figwidth: 50%
    :align: right
@@ -185,7 +194,9 @@ These can be plotted with a series per x-ray system (figure 12). This can be
 toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
 Clicking the left-hand mouse button on the chart and dragging a rectangular
-region will zoom in on that selection of the chart.
+region will zoom in on that selection of the chart. A ``Reset zoom`` button
+appears when zoomed in: clicking this resets the chart so that the full series
+can be seen again.
 
 Clicking on a system's legend entry toggles the display of the corresponding
 series on the chart.
