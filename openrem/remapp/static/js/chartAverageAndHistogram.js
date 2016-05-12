@@ -28,8 +28,6 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                     $(norm_btn_class).css('display','inline-block');
                     $(instr_class).css('display','none');
 
-                    this.zoomOut();
-
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
 
@@ -42,7 +40,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
 
                     this.setTitle({
                         text: drilldownTitle
-                    });
+                    }, false);
                     this.yAxis[0].update({
                         title: {
                             text: (this.options.drilldown.normalise ? 'Normalised' : 'Number')
@@ -63,7 +61,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
 
                         if (e.chart.options.drilldown.normalise) {
-                            for (var i=0; i<e.chart.options.drilldown.series.length-1; i++) {
+                            for (var i=0; i<e.chart.options.drilldown.series.length; i++) {
                                 if (e.chart.options.drilldown.series[i].id == this.series.name + name) {
                                     var max_value = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
                                 }
@@ -73,17 +71,15 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                             var value_to_write = this.y;
                         }
                         return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + href_start + linkText + tooltip_filters + '">Click to view</a></td></tr></table>';
-                    }
+                    };
                 },
                 drillup: function (e) {
                     $(norm_btn_class).css('display','none');
                     $(instr_class).css('display','block');
 
-                    this.zoomOut();
-
                     this.setTitle({
                         text: default_title
-                    });
+                    }, false);
                     this.yAxis[0].update({
                         title: {
                             text: avg_label + ' ' + value_label + ' (' + value_units + ')'
@@ -102,10 +98,10 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                                 return this.point.category;
                             }
                         }
-                    });
+                    }, false);
                     this.tooltip.options.formatter = function () {
                         return this.point.tooltip;
-                    }
+                    };
                 }
             }
         },
@@ -125,11 +121,6 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             labels: {
                 useHTML: true,
                 rotation: 90
-            },
-            events: {
-                afterSetExtremes: function(event){
-                    fitChartToDiv(this.chart.renderTo.id);
-                }
             }
         },
         yAxis: {
