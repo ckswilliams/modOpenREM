@@ -143,6 +143,14 @@ Updates since beta 15
 =====================
 * Normalised histogram tooltip now correctly reports frequency
 
+***************************************************
+Upgrading an OpenREM server with no internet access
+***************************************************
+
+See the :doc:`upgrade-offline` docs.
+
+..  _upgradefrom060:
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
@@ -202,6 +210,8 @@ and then run
 
 * Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
   :ref:`local_settings_logfile` settings in the install docs.
+
+..  _upgradefrom070b:
 
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
