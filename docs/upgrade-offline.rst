@@ -18,12 +18,12 @@ download them all:
     mkdir openremfiles
     pip install -d openremfiles openrem==0.7.0b15
 
-Copy everything to the Windows machine
---------------------------------------
+Copy everything to the OpenREM server
+-------------------------------------
 
 * Copy the directory to the OpenREM server
 
-On the Windows server without internet access
+On the OpenREM server without internet access
 =============================================
 
 * Back up your database
@@ -38,5 +38,5 @@ On the Windows server without internet access
 
     pip install --no-index --find-links=openremfiles openrem==0.7.0b15
 
-Now continue with :ref:`upgradefrom 060` or :ref:`upgradefrom070b` as appropriate, starting just after the ``pip
+Now continue with :ref:`upgradefrom060` or :ref:`upgradefrom070b` as appropriate, starting just after the ``pip
 install`` line.
