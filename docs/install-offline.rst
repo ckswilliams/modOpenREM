@@ -16,49 +16,48 @@ On a computer with internet access
 Download independent binaries
 -----------------------------
 
-Python from https://www.python.org/downloads/windows/
+**Python** from https://www.python.org/downloads/windows/
 
 * Follow the link to the 'Latest Python 2 release'
 * Download either the ``Windows x86 MSI installer`` for 32-bit Windows or
 * Download ``Windows x86-64 MSI installer`` for 64-bit Windows
 
-Erlang from https://www.erlang.org/downloads
+**Erlang** from https://www.erlang.org/downloads
 
 * Download the latest version of Erlang/OTP. Again, choose between
 * ``Windows 32-bit Binary File`` or
 * ``Windows 64-bit Binary File``
 
-RabbitMQ from http://www.rabbitmq.com/install-windows.html
+**RabbitMQ** from http://www.rabbitmq.com/install-windows.html
 
 * Download ``rabbitmq-server-x.x.x.exe`` from either option
 
-PostgreSQL from http://www.enterprisedb.com/products-services-training/pgdownload#windows
+**PostgreSQL** from http://www.enterprisedb.com/products-services-training/pgdownload#windows
 
 *Note: Other databases such as MySQL are also suitable, though the median function for charts will not be available. For
 testing purposes only, you could skip this step and use SQLite3 which comes with OpenREM*
 
 * Download by clicking on the icon for ``Win x86-32`` or ``Win x86-64``
 
-PostgreSQL Python connector from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psycopg
+**PostgreSQL** Python connector from http://www.lfd.uci.edu/~gohlke/pythonlibs/#psycopg
 
 * Find the right version - look for ``psycopg2-x.x.x-cp27-cp27m-win32.whl`` for 32-bit Windows or
 * ``psycopg2-x.x.x-cp27-cp27m-win_amd64.whl`` for 64-it Windows.
 * At the time of writing, ``x.x.x`` was ``2.6.1`` - choose the latest ``cp27`` version
 
-Download NumPy from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
+**NumPy** from http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy
 
 * Find the right version - look for ``numpy-x.xx.x+mkl-cp27-cp27m-win32.whl`` for 32-bit Windows or
 * ``numpy-x.xx.x+mkl-cp27-cp27m-win_amd64.whl`` for 64-bit Windows.
 * At the time of writing, ``x.xx.x`` was ``1.11.0`` - choose the latest ``cp27`` version
 
-Download pynetdicom from https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
+**Pynetdicom** from https://bitbucket.org/edmcdonagh/pynetdicom/get/default.tar.gz#egg=pynetdicom-0.8.2b2
 
 * The downloaded file will be named something like ``edmcdonagh-pynetdicom-2da8a57b53b3.tar.gz``
+* Note: this version is modified in comparison to the version in PyPI
 
-To add
-^^^^^^
-
-* Web server
+**A webserver** such as Apache, although this can be left till later - you can get started with the built-in web
+server
 
 Download python packages from PyPI
 ----------------------------------
@@ -112,10 +111,10 @@ Install PostgreSQL
 
 See the instructions to :ref:`windowspsqlinstall` on Windows.
 
-To add
-^^^^^^
+Install webserver
+-----------------
 
-* Web server
+If you are doing so at this stage.
 
 Configure OpenREM ready for use
 ===============================
