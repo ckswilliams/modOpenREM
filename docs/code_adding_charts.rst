@@ -185,7 +185,7 @@ Before:
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-							 user_profile.plotHistograms)
+                             user_profile.plotHistograms)
 
 After:
 
@@ -195,7 +195,7 @@ After:
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
                              user_profile.plotRFStudyPerDayAndHour,  user_profile.plotRFStudyFreq,
-							 user_profile.plotHistograms)
+                             user_profile.plotHistograms)
 
 ----------------------------------
 ``xx_plot_calculations`` additions
@@ -244,10 +244,10 @@ uses one of the methods in the ``chart_functions.py`` file, located in the
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
                                                   1000000,
-												  plot_study_dap, plot_study_freq,
-												  plot_series_per_systems, plot_average_choice,
+                                                  plot_study_dap, plot_study_freq,
+                                                  plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-												  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
