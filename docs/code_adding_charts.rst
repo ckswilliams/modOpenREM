@@ -184,7 +184,8 @@ Before:
 
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
-                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
+                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
+							 user_profile.plotHistograms)
 
 After:
 
@@ -193,7 +194,8 @@ After:
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour,  user_profile.plotRFStudyFreq)
+                             user_profile.plotRFStudyPerDayAndHour,  user_profile.plotRFStudyFreq,
+							 user_profile.plotHistograms)
 
 ----------------------------------
 ``xx_plot_calculations`` additions
@@ -206,14 +208,14 @@ Before:
 .. sourcecode:: python
 
     def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                             plot_histogram_bins):
+                             plot_histogram_bins, plot_histograms):
 
 After:
 
 .. sourcecode:: python
 
     def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                             plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq):
+                             plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_histograms):
 
 Our new charts makes use of ``study_events`` (rather than ``acquisition_events``
 or ``request_events``). We therefore need to ensure that ``study_events`` are
@@ -224,11 +226,7 @@ After additions:
 .. sourcecode:: python
 
     if plot_study_per_day_and_hour:
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            study_description__isnull=True
-        ).filter(
-            study_instance_uid__in=exp_include
-        )
+        study_events = f.qs
 
 We now need to add code that will calculate the data for the new charts. This
 uses one of the methods in the ``chart_functions.py`` file, located in the
@@ -245,8 +243,11 @@ uses one of the methods in the ``chart_functions.py`` file, located in the
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
-                                                  1, 0, plot_study_freq, plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  1000000,
+												  plot_study_dap, plot_study_freq,
+												  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+												  calculate_histograms=plot_histograms)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
