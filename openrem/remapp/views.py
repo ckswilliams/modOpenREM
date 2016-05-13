@@ -1922,3 +1922,10 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
             admin[group.name] = True
         context['admin'] = admin
         return context
+
+    def form_valid(self, form):
+        if form.has_changed():
+            messages.success(self.request, "Skin dose map settings have been updated")
+        else:
+            messages.info(self.request, "No changes made")
+        return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
