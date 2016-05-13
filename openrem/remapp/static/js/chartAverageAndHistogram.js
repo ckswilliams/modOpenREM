@@ -16,11 +16,14 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             type: 'column',
             zoomType: 'x',
             resetZoomButton: {
-                position: {
-                    x: -50,
-                    y: 10
-                },
-                relativeTo: 'chart'
+                theme: {
+                    display: 'none'
+                }
+                //position: {
+                //    x: -50,
+                //    y: 10
+                //},
+                //relativeTo: 'chart'
             },
             renderTo: render_div,
             events: {

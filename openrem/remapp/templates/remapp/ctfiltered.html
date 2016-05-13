@@ -274,10 +274,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
 
                                     <tr>
@@ -363,10 +367,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
@@ -484,10 +492,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that study.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that study.<br>
                                             Click on a histogram bin tooltip to see the studies in the bin. Note that this will
                                             include studies at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
@@ -603,10 +615,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that requested exam type.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that requested exam type.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'avg_value', 1, 0, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
