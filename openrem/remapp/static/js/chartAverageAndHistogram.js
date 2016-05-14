@@ -124,7 +124,8 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             labels: {
                 useHTML: true,
                 rotation: 90
-            }
+            },
+            minRange: 1
         },
         yAxis: {
             min: 0,
