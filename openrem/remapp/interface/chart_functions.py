@@ -3,6 +3,29 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                      plot_average_choice, median_available, num_hist_bins,
                                      exclude_constant_angle=False,
                                      calculate_histograms=False):
+    """ This function calculates the data for an OpenREM Highcharts plot of average value vs. a category, as well as a
+    histogram of values for each category. It is also used for OpenREM Highcharts frequency plots.
+
+    Args:
+        database_events: database events to use for the plot
+        db_display_name_relationship: database table and field of x-ray system display name, relative to database_events
+        db_series_names: database field to use as categories
+        db_value_name: database field to use as values
+        value_multiplier: float value used to multiply all db_value_name values by
+        plot_average: boolean to set whether average data is calculated
+        plot_freq: boolean to set whether frequency data should be calculated
+        plot_series_per_system: boolean to set whether to calculate a series for each value found in db_display_name_relationship
+        plot_average_choice: string set to either mean, median or both
+        median_available: boolean to set whether the database can calculate median values
+        num_hist_bins: integer value to set how many histogram bins to calculate
+
+    Params:
+        exclude_constant_angle: boolean, default=False; set to true to exclude Constant Angle Acquisition data
+        calculate_histograms: boolean, default=False; set to true to calculate histogram data
+
+    Returns:
+        A structure containing the required average, histogram and frequency data.
+    """
     from django.db.models import Avg, Count, Min, Max, FloatField, When, Case, Sum, IntegerField
     from remapp.models import Median
     import numpy as np
@@ -348,6 +371,23 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
 
 def average_chart_over_time_data(database_events, db_series_names, db_value_name, db_date_field, db_date_time_field,
                                  median_available, plot_average_choice, value_multiplier, time_period):
+    """ This function calculates the data for an OpenREM Highcharts plot of average value per category over time.
+
+    Args:
+        database_events: database events to use for the plot
+        db_display_name_relationship: database table and field of x-ray system display name, relative to database_events
+        db_series_names: database field to use as categories
+        db_value_name: database field to use as values
+        db_date_field: database field containing the event date
+        db_date_time_field: database field containing the event datatime
+        median_available: boolean to set whether the database can calculate median values
+        plot_average_choice: string set to either mean, median or both
+        value_multiplier: float value used to multiply all db_value_name values by
+        time_period: string containing either days, weeks, months or years
+
+    Returns:
+        A structure containing the required average data over time.
+    """
     import datetime
     import qsstats
     from django.db.models import Min, Avg
@@ -380,6 +420,15 @@ def average_chart_over_time_data(database_events, db_series_names, db_value_name
 
 
 def workload_chart_data(database_events):
+    """ This function calculates the data for an OpenREM Highcharts plot of events per day of the week and also
+    per 24 hours in each day of the week.
+
+    Args:
+        database_events: database events to use for the plot
+
+    Returns:
+        A structure containing the required breakdown of events per day of the week and per 24 hours in each day.
+    """
     import datetime
     import qsstats
 
@@ -401,6 +450,19 @@ def workload_chart_data(database_events):
 
 
 def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system, db_display_name_relationship):
+    """ This function calculates the data for an OpenREM Highcharts plot of average value vs. a category, as well as a
+    histogram of values for each category. It is also used for OpenREM Highcharts frequency plots.
+
+    Args:
+        database_events: database events to use for the plot
+        x_field: database field containing data for the x-axis
+        y_field: database field containing data for the y-axis
+        plot_series_per_system: boolean to set whether to calculate a series for each value found in db_display_name_relationship
+        db_display_name_relationship: database table and field of x-ray system display name, relative to database_events
+
+    Returns:
+        A structure containing the x-y data.
+    """
     return_structure = dict()
 
     if plot_series_per_system:
