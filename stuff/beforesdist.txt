@@ -1,6 +1,10 @@
 Change the version number in 
 	openrem/remapp/version.py
 	install instructions in the release notes where applicable
+	    install.rst
+	    release-0.7.0.rst (twice)
+	    install-offline.rst (twice)
+	    upgrade-offline.rst (twice)
 	date and other details in changes and CHANGES
     Edit README.rst
 
