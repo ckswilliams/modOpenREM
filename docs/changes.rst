@@ -62,6 +62,7 @@ OpenREM version history
 * `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
 * `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
+* `#310`_  Series level QR feedback now presented. Any further would require improvements in pynetdicom
 * `#309`_  StoreSCP now deals safely with incoming files with additional transfer syntax tag
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
