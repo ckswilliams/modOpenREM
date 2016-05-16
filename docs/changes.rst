@@ -6,6 +6,7 @@ OpenREM version history
 ---------------------
 
 * `#396`_  Charts: zooming on bar charts of average value vs. category now works
+* `#395`_  Docs: offline Windows install instructions created, plus offline upgrade instructions
 * `#394`_  Charts: made charts resize to fit containing div when browser is resized
 * `#392`_  Charts: normalised histogram tooltip now correctly reports frequency
 * `#391`_  Basic troubleshooting is now documented
