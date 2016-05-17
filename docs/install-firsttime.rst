@@ -17,3 +17,14 @@ this isn't possible, so we've added instructions for an offline installation too
     :maxdepth: 2
 
     install-offline
+
+We strongly recommend using PostgreSQL as the database for OpenREM, though there are other options. This is covered in
+the installation prep documents at :ref:`installpreppostgres` instructions.
+
+If you do use PostgreSQL, the following docs will be useful - there are also linked to from the installaton prep docs:
+
+..  toctree::
+    :maxdepth: 2
+
+    postgresql
+    postgresql_windows
