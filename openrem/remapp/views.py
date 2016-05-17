@@ -615,7 +615,14 @@ def rf_detail_view_skin_map(request, pk=None):
         admin[group.name] = True
 
     # Check to see if there is already a skin map pickle with the same study ID.
-    skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
+    try:
+        study_date = GeneralStudyModuleAttr.objects.get(pk=pk).study_date
+        if study_date:
+            skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', "{0:0>4}".format(study_date.year), "{0:0>2}".format(study_date.month), "{0:0>2}".format(study_date.day), 'skin_map_'+str(pk)+'.p')
+        else:
+            skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_' + str(pk) + '.p')
+    except:
+        skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
 
     from remapp.version import __skin_map_version__
     loaded_existing_data = False

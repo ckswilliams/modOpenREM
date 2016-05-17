@@ -79,10 +79,9 @@ def make_skin_map(study_pk=None):
             pat_height = 178.6
 
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D',
-                                                   pat_mass=pat_mass, pat_height=pat_height,
-                                                   table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
-                                                   matt_thick=4.0, matt_trans=0.75)
-
+                                             pat_mass=pat_mass, pat_height=pat_height,
+                                             table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
+                                             matt_thick=4.0, matt_trans=0.75)
 
         for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position:
@@ -179,7 +178,15 @@ def make_skin_map(study_pk=None):
         }
 
         # Save the return_structure as a pickle in a skin_maps sub-folder of the MEDIA_ROOT folder
-        skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps')
+        try:
+            study_date = study.study_date
+            if study_date:
+                skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', "{0:0>4}".format(study_date.year), "{0:0>2}".format(study_date.month), "{0:0>2}".format(study_date.day))
+            else:
+                skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps')
+        except:
+            skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps')
+
         if not os.path.exists(skin_map_path):
             os.makedirs(skin_map_path)
 
