@@ -256,19 +256,6 @@ You are now ready to start the services to allow you to use OpenREM - go to :doc
 Further instructions
 ====================
 
-Database guides
----------------
-
-Here are instructions for installing PostgreSQL on linux and on Windows, and guides to backup up PostgreSQL and MySQL:
-
-..  toctree::
-    :maxdepth: 1
-    
-    postgresql
-    postgresql_windows
-    backupMySQLWindows
-
-
 Production webservers
 ---------------------
 
