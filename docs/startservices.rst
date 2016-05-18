@@ -13,17 +13,52 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
-Run the built in web server::
+Web access on OpenREM server only
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Run the built in web server:
+
+.. sourcecode:: console
 
     python manage.py runserver --insecure
 
-Open the web addesss given, optionally appending ``/openrem`` (http://localhost:8000/openrem)
+In a web browser on the same computer, go to http://localhost:8000/ - you should now see the message about creating
+users. For full functionality start the `Celery task queue`_ before moving on to `Configure the settings`_.
 
-If you are using a headless server and need to be able to see the web interface from another machine, use
-``python manage.py runserver x.x.x.x:8000 --insecure`` replacing the ``x`` with the IP address of the server
-and ``8000`` with the port you wish to use. Then on your client computer, go to ``http://x.x.x.x:8000/openrem``, again
-replacing the ``x`` with the IP address of the server, and ammending the ``8000`` as appropriate.
+Web access on other computers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+The built-in webserver only provides a service on the computer OpenREM is installed on (it's only there really for
+testing). To view the OpenREM interface on another computer, you need to modify the ``runserver`` command:
+
+.. sourcecode:: console
+
+    python manage.py runserver --insecure 192.168.1.10:8000
+
+Make sure you **change the IP address** to the address of the server! On Windows you can find the IP address information
+by typing
+
+.. sourcecode:: console
+
+    ipconfig
+
+You are looking for a line that has ``IPv4 Address`` followed by four numbers with dots between, similar to the
+numbers before the colon in the command above.
+
+With a linux server, type
+
+.. sourcecode:: console
+
+    ip add
+
+Again you are looking for the same dotted number, this time it will be after ``inet``. In both examples, you might
+have several to choose from depending on how many network cards (real or virtual) your computer has. Determining
+which one is which is probably beyond the scope of these instructions! If you get the IP address completely wrong,
+the command will fail with the error: ``Error: That IP address can't be assigned-to.``
+
+In a web browser on a different computer on the same network, go to http://192.168.110:8000/ (changing the IP address
+to the one you are running the server on) and you should see the OpenREM interface and the message about creating users.
+For full functionality start the `Celery task queue`_ before moving on to `Configure the settings`_.
 
 ..  Note::
 
