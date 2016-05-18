@@ -466,6 +466,39 @@ def rf_summary_list_filter(request):
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
+    # # Calculate skin dose map for all objects in the database
+    # import cPickle as pickle
+    # num_studies = f.count()
+    # current_study = 0
+    # for study in f:
+    #     current_study += 1
+    #     print "working on " + str(study.pk) + " (" + str(current_study) + " of " + str(num_studies) + ")"
+    #     # Check to see if there is already a skin map pickle with the same study ID.
+    #     try:
+    #         study_date = study.study_date
+    #         if study_date:
+    #             skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', "{0:0>4}".format(study_date.year), "{0:0>2}".format(study_date.month), "{0:0>2}".format(study_date.day), 'skin_map_'+str(study.pk)+'.p')
+    #         else:
+    #             skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_' + str(study.pk) + '.p')
+    #     except:
+    #         skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(study.pk)+'.p')
+    #
+    #     from remapp.version import __skin_map_version__
+    #     loaded_existing_data = False
+    #     if os.path.exists(skin_map_path):
+    #         existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+    #         try:
+    #             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
+    #                 loaded_existing_data = True
+    #                 print str(study.pk) + " already calculated"
+    #         except KeyError:
+    #             pass
+    #
+    #     if not loaded_existing_data:
+    #         from remapp.tools.make_skin_map import make_skin_map
+    #         make_skin_map(study.pk)
+    #         print str(study.pk) + " done"
+
     for group in request.user.groups.all():
         admin[group.name] = True
 
