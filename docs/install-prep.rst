@@ -118,7 +118,7 @@ use any of the databases listed on the `Django website <https://docs.djangoproje
 as MySQL, Oracle or MS SQL Server, with the limitations listed there. There is one additional limitation - the
 calculation of median values for charts in OpenREM is dependent on using PostgreSQL.
 
-If this is your first time installing OpenREM and you just want to test it out, **you can skip this step** and make use
+If this is your first time installing OpenREM and you just want to test it out, you *can* skip this step and make use
 of the in-built SQLite database. However, you should expect to start again when you move to a production grade database.
 
 * :doc:`postgresql`

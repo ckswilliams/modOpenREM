@@ -1,6 +1,6 @@
-##################################################
-Instructions for the PostgreSQL database (Windows)
-##################################################
+#############################
+PostgreSQL database (Windows)
+#############################
 
 ..  Note:: Original author JA Cole
 
