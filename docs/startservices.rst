@@ -28,8 +28,8 @@ users. For full functionality start the `Celery task queue`_ before moving on to
 Web access on other computers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The built-in webserver only provides a service on the computer OpenREM is installed on (it's only there really for
-testing). To view the OpenREM interface on another computer, you need to modify the ``runserver`` command:
+The built-in webserver only provides a service on the computer OpenREM is installed on by default (it's only there
+really for testing). To view the OpenREM interface on another computer, you need to modify the ``runserver`` command:
 
 .. sourcecode:: console
 
