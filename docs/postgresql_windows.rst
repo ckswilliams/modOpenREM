@@ -1,6 +1,6 @@
-##################################################
-Instructions for the PostgreSQL database (Windows)
-##################################################
+#############################
+PostgreSQL database (Windows)
+#############################
 
 ..  Note:: Original author JA Cole
 
@@ -9,6 +9,8 @@ Get PostgreSQL and the python connector
     
 + Download the installer from http://www.enterprisedb.com/products-services-training/pgdownload#windows
 + Download psycopg2 from http://www.lfd.uci.edu/~gohlke/pythonlibs/. Make sure it matches your python and Windows version.
+
+.. _windowspsqlinstall:
 
 Install PostgreSQL
 ==================
@@ -34,7 +36,13 @@ Open pgAdmin III
 
 Install psycopg2
 ================
-Run the installer you downloaded for psycopg2 earlier.
+
+.. sourcecode:: console
+
+    pip install psycopg2-2.6.1-cp27-cp27m-win32.whl
+    # or if you have the 64-bit version
+    pip install psycopg2-2.6.1-cp27-cp27m-win_amd64.whl
+    # adjusting the version number appropriately
 
 **If this is your initial install**, you are now ready to install OpenREM, so go to the :doc:`install` docs.
 

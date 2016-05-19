@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block col2 %}
-    <div class="panel panel-info">
+    <div class="panel panel-info small">
         <div class="panel-heading">
             <h3 class="panel-title">Data export</h3>
         </div>
@@ -58,7 +58,7 @@
     {{ studyfilter }}
 
     <form action="" method="get" class="form-horizontal" role="form">
-        <div class="panel panel-info">
+        <div class="panel panel-info small">
             <div class="panel-heading">
                 <h3 class="panel-title">Exam filter</h3>
             </div>
@@ -100,13 +100,29 @@
 
 {% block col1 %}
 
-
     {% autopaginate filter.qs 25 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered table-hover row-clickable">
+    <table class="table table-bordered table-hover row-clickable small">
         <tr>
-            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study description | Request | Accession number</th><th>Number of events</th><th>Total DLP (mGy.cm)</th>
+            <th>Institution</th>
+            <th>
+                <table>
+                    <tr><td>Make</td></tr>
+                    <tr><td>Model</td></tr>
+                    <tr><td class="nowrap">Display name</td></tr>
+                </table>
+            </th>
+            <th>Date</th>
+            <th>
+                <table>
+                    <tr><td class="nowrap">Study description</td></tr>
+                    <tr><td class="nowrap">Requested procedure</td></tr>
+                    <tr><td class="nowrap">Accession number</td></tr>
+                </table>
+            </th>
+            <th>Number of events</th>
+            <th>Total DLP (mGy.cm)</th>
             {% if admin.admingroup %}
                 <th>Delete?</th>
             {% endif %}
@@ -120,9 +136,11 @@
                 </td>
                 <td>
                     <a href="/openrem/ct/{{ exam.id }}/">
-                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                        {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+                        <table>
+                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
+                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
+                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                        </table>
                     </a>
                 </td>
                 <td>
@@ -131,11 +149,13 @@
                 </a>
                 <td>
                     <a href="/openrem/ct/{{ exam.id }}/">
-                        {{ exam.study_description }}</a> |
-                    {{ exam.requested_procedure_code_meaning }} |
+                    <table>
+                        <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
+                        <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
                     {% if not exam.accession_hashed %}
-                        {{ exam.accession_number }}
+                        <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                     {% endif %}
+                    </table>
                     </a>
                 </td>
                 <td>
@@ -254,10 +274,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
 
                                     <tr>
@@ -273,6 +297,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseTwo', 'histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -284,6 +309,7 @@
                 var plotCTAcquisitionMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramAcquisitionPlotDLPdiv');
+                    fitChartToDiv('histogramAcquisitionPlotDLPdiv');
                 });
 
                 var tooltipFiltersAcq = '{% for field in filter.form %}{% if field.name != 'acquisition_dlp_min' and field.name != 'acquisition_dlp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -341,10 +367,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramAcquisitionPlotCTDIdiv', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
@@ -359,6 +389,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseCTDI', 'histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="acqctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -370,6 +401,7 @@
                 var plotCTAcquisitionMeanCTDI = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramAcquisitionPlotCTDIdiv');
+                    fitChartToDiv('histogramAcquisitionPlotCTDIdiv');
                 });
 
                 var tooltipFiltersAcqCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -427,6 +459,7 @@
                 var plotCTAcquisitionFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartAcquisitionDIV');
+                    fitChartToDiv('piechartAcquisitionDIV');
                 });
 
                 var urlStartAcq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&acquisition_protocol=';
@@ -459,10 +492,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that study.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that study.<br>
                                             Click on a histogram bin tooltip to see the studies in the bin. Note that this will
                                             include studies at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotDIV', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
@@ -477,6 +514,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseThree', 'histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#histogramStudyPlotDIV').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -488,6 +526,7 @@
                 var plotCTStudyMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramStudyPlotDIV');
+                    fitChartToDiv('histogramStudyPlotDIV');
                 });
 
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_dlp_min' and field.name != 'study_dlp_max' and field.name != 'study_description' and field.name != 's' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
@@ -545,6 +584,7 @@
                 var plotCTStudyFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
             </script>
@@ -575,10 +615,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px">Click on an individual column to show a histogram of data for that requested exam type.<br>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that requested exam type.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramRequestPlotDIV', 'avg_value', 1, 0, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DLP</a></td>
@@ -593,6 +637,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#histogramRequestPlotDIV').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -604,6 +649,7 @@
                 var plotCTRequestMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramRequestPlotDIV');
+                    fitChartToDiv('histogramRequestPlotDIV');
                 });
 
                 norm_btn_class = '.req-hist-norm-btn';
@@ -660,6 +706,7 @@
                 var plotCTRequestFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartRequestDIV');
+                    fitChartToDiv('piechartRequestDIV');
                 });
                 var urlStartReq = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'requested_procedure' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure=';
                 result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
@@ -692,6 +739,7 @@
                 var plotCTStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>
@@ -728,6 +776,7 @@
                 var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';
                 $(window).resize(function() {
                     chartSetExportSize('studyMeanDLPOverTimeDIV');
+                    fitChartToDiv('studyMeanDLPOverTimeDIV');
                 });
 
                 var urlStartStudyOverTime = '/openrem/ct/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'date_before' and field.name != 'date_after' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';

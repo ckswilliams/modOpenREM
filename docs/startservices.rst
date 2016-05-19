@@ -9,21 +9,56 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\`` (remember to activate the virtualenv)
 
-Run the built in web server::
+Web access on OpenREM server only
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Run the built in web server:
+
+.. sourcecode:: console
 
     python manage.py runserver --insecure
 
-Open the web addesss given, optionally appending ``/openrem`` (http://localhost:8000/openrem)
+In a web browser on the same computer, go to http://localhost:8000/ - you should now see the message about creating
+users. For full functionality start the `Celery task queue`_ before moving on to `Configure the settings`_.
 
-If you are using a headless server and need to be able to see the web interface from another machine, use
-``python manage.py runserver x.x.x.x:8000 --insecure`` replacing the ``x`` with the IP address of the server
-and ``8000`` with the port you wish to use. Then on your client computer, go to ``http://x.x.x.x:8000/openrem``, again
-replacing the ``x`` with the IP address of the server, and ammending the ``8000`` as appropriate.
+Web access on other computers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+The built-in webserver only provides a service on the computer OpenREM is installed on by default (it's only there
+really for testing). To view the OpenREM interface on another computer, you need to modify the ``runserver`` command:
+
+.. sourcecode:: console
+
+    python manage.py runserver --insecure 192.168.1.10:8000
+
+Make sure you **change the IP address** to the address of the server! On Windows you can find the IP address information
+by typing
+
+.. sourcecode:: console
+
+    ipconfig
+
+You are looking for a line that has ``IPv4 Address`` followed by four numbers with dots between, similar to the
+numbers before the colon in the command above.
+
+With a linux server, type
+
+.. sourcecode:: console
+
+    ip add
+
+Again you are looking for the same dotted number, this time it will be after ``inet``. In both examples, you might
+have several to choose from depending on how many network cards (real or virtual) your computer has. Determining
+which one is which is probably beyond the scope of these instructions! If you get the IP address completely wrong,
+the command will fail with the error: ``Error: That IP address can't be assigned-to.``
+
+In a web browser on a different computer on the same network, go to http://192.168.1.10:8000/ (**changing the IP address**
+to the one you are running the server on) and you should see the OpenREM interface and the message about creating users.
+For full functionality start the `Celery task queue`_ before moving on to `Configure the settings`_.
 
 ..  Note::
 
@@ -40,22 +75,34 @@ RabbitMQ allows for asynchronous task processing for imports, exports and DICOM 
 
 ..  Note::
 
-    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure the
-    folder permissions allow this for the user that starts Celery. In the examples below, the logs and pid files are
-    written to the ``MEDIA_ROOT`` location, where Celery and the webserver also needs to be able to write exported
-    files. For a Debian/Ubuntu server, the webserver user is usually ``www-data``, so you might like to start Celery
-    with the ``www-data`` user too.
+    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure:
 
-    You might instead wish to write the logs to a folder in ``/var/log/`` on linux systems - wherever you define,
-    **the folder should already exist**.
+    * the folder exists (the suggestion below is to create a folder in the ``MEDIA_ROOT`` location)
+    * the user that starts Celery can write to that folder
 
-In a new shell/command window, move into the openrem folder:
+You can put the folder wherever you like, for example you might like to create a ``/var/log/openrem/`` folder on a linux
+system.
+
+If you are using the built-in `Test web server`_ then Celery and the webserver will be running as your user. If you are
+running a production webserver, such as Apache or nginx on linux, then the user that runs those daemons will need to
+be able to write to the ``MEDIA_ROOT`` and the Celery log files folder. In this case, you need to change the ownership
+of the folders and change to the right user before running Celery. On Ubuntu:
+
+.. sourcecode:: console
+
+    mkdir /path/to/media/celery  # change as appropriate
+    sudo chown www-data /path/to/media  # change as appropriate
+    sudo su -p www-data
+
+Now start celery...
+
+Move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\`` (remember to activate the virtualenv)
 
 Linux - ``\`` is the line continuation character:
 
@@ -93,6 +140,12 @@ You will need to do this twice if there are running tasks you wish to kill.
 Celery periodic tasks: beat
 ===========================
 
+.. note::
+
+    Celery beat is only required if you are using the :ref:`nativestore`. Please read the warnings there before deciding
+    if you need to run Celery beat. At the current time, using a third party DICOM store service is recommended for
+    most users. See the :doc:`netdicom` documentation for more details
+
 Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
 Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
 If this is not successful, then the Store SCP is started.
@@ -101,9 +154,9 @@ To run celery beat, open a new shell and move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\`` (remember to activate the virtualenv)
 
 Linux::
 
@@ -188,9 +241,8 @@ Add some data!
 Further instructions
 ====================
 
-
 Daemonising Celery
-------------------
+^^^^^^^^^^^^^^^^^^
 
 In a production environment, Celery will need to start automatically and
 not depend on a particular user being logged in. Therefore, much like

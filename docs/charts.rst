@@ -50,6 +50,15 @@ value's distribution (figure 3).
 Bar charts can be plotted with a series per x-ray system (figure 4). This can
 be toggled using the `Plot a series per system` checkbox in the `Chart options`.
 
+Clicking the left-hand mouse button on the chart background and dragging left
+or right selects part of the series. Releasing the mouse button zooms in on
+this selection. A ``Reset zoom`` button appears when zoomed in: clicking this
+resets the chart so that the full series can be seen again. The zoom feature
+works on both the main series and the histograms. The zooming can be useful
+when there is a category on the chart that has a very low value compared to
+others. Zooming in on this category will enable the low values to be seen, as
+the chart rescales the y-axis after the zoom.
+
 .. figure:: img/ChartCTMeanDLPperSystem.png
    :figwidth: 50%
    :align: right
@@ -173,18 +182,21 @@ take you to a pie chart that shows the number of events per on that day (figure
 .. figure:: img/ChartMGScatterPerSystem.png
    :figwidth: 50%
    :align: right
-   :alt: Scatter plot of average glandular dose vs. compressed thickness; one
-         series per system
+   :alt: Scatter plot of average glandular dose vs. compressed thickness; one series per system
    :target: _images/ChartMGScatterPerSystem.png
 
-   Figure 12: Scatter plot of average glandular dose vs. compressed thickness;
-              one series per system
+   Figure 12: Scatter plot of average glandular dose vs. compressed thickness; one series per system
 
 This plot type shows a data point per event (figure 11). The series name and
 data values are shown when the mouse cursor is positioned over a data point.
 
 These can be plotted with a series per x-ray system (figure 12). This can be
 toggled using the `Plot a series per system` checkbox in the `Chart options`.
+
+Clicking the left-hand mouse button on the chart and dragging a rectangular
+region will zoom in on that selection of the chart. A ``Reset zoom`` button
+appears when zoomed in: clicking this resets the chart so that the full series
+can be seen again.
 
 Clicking on a system's legend entry toggles the display of the corresponding
 series on the chart.
@@ -364,9 +376,10 @@ Performance notes
 All chart types
 ===============
 
-Filtering using `Acquisition protocol` forces OpenREM to use a much slower
-method of querying the database for chart data. Where possible avoid filtering
-using this field, especially when viewing a large amount of data.
+For any study- or request-based charts, filtering using `Acquisition protocol`
+forces OpenREM to use a much slower method of querying the database for chart
+data. Where possible avoid filtering using this field, especially when viewing
+a large amount of data.
 
 ==========
 Bar charts

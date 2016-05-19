@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block col2 %}
-    <div class="panel panel-info">
+    <div class="panel panel-info small">
         <div class="panel-heading">
             <h3 class="panel-title">Data export</h3>
         </div>
@@ -56,7 +56,7 @@
     {{ studyfilter }}
 
     <form action="{% url "dx_summary" %}" method="get" class="form-horizontal" role="form" id="examFilterForm">
-        <div class="panel panel-info">
+        <div class="panel panel-info small">
             <div class="panel-heading">
                 <h3 class="panel-title">Exam filter</h3>
             </div>
@@ -102,9 +102,26 @@
     {% autopaginate filter.qs 50 as filter_list %}
     {% paginate %}
 
-    <table class="table table-bordered table-hover row-clickable">
+    <table class="table table-bordered table-hover row-clickable small">
         <row>
-            <th>Institution</th><th>Make | Model | Display name</th><th>Date</th><th>Study | Request | Accession number</th><th>Number of events</th><th>Total DAP (cGy.cm<sup>2</sup>)</th>
+            <th>Institution</th>
+            <th>
+                <table>
+                    <tr><td>Make</td></tr>
+                    <tr><td>Model</td></tr>
+                    <tr><td class="nowrap">Display name</td></tr>
+                </table>
+            </th>
+            <th>Date</th>
+            <th>
+                <table>
+                    <tr><td class="nowrap">Study description</td></tr>
+                    <tr><td class="nowrap">Requested procedure</td></tr>
+                    <tr><td class="nowrap">Accession number</td></tr>
+                </table>
+            </th>
+            <th>Number of events</th>
+            <th>Total DAP (cGy.cm<sup>2</sup>)</th>
             {% if admin.admingroup %}
                 <th>Delete?</th>
             {% endif %}
@@ -118,9 +135,11 @@
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer }} |
-                        {{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
-                        {{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}
+                        <table>
+                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
+                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
+                            <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
+                        </table>
                     </a>
                 </td>
                 <td>
@@ -130,11 +149,13 @@
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                        {{ exam.study_description }} |
-                        {{ exam.requested_procedure_code_meaning }} |
+                        <table>
+                            <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
+                            <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
                         {% if not exam.accession_hashed %}
-                            {{ exam.accession_number }}
+                            <tr><td class="nowrap">{{ exam.accession_number }}</td></tr>
                         {% endif %}
+                        </table>
                     </a>
                 </td>
                 <td>
@@ -242,10 +263,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.<br>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the acquisitions in the bin. Note that
                                             this will include acquisitions at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#container', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DAP">&uarr;DAP</a></td>
@@ -260,6 +285,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseOne','container')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#container').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -271,6 +297,7 @@
                 var plotDXAcquisitionMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('container');
+                    fitChartToDiv('container');
                 });
                 var tooltipFilters = '{% for field in filter.form %}{% if field.name != 'acquisition_dap_min' and field.name != 'acquisition_dap_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.acq-hist-norm-btn';
@@ -327,6 +354,7 @@
                 var plotDXAcquisitionFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartProtocolDIV');
+                    fitChartToDiv('piechartProtocolDIV');
                 });
                 result = chartFrequency('piechartProtocolDIV', 'Acquisition protocol frequency');
             </script>
@@ -357,10 +385,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that requested procedure name.<br>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that requested procedure name.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the requested procedure names in the bin. Note that
                                             this will include requested procedures at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXRequestMeanDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
@@ -375,6 +407,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -386,6 +419,7 @@
                 var plotDXRequestMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXRequestMeanDAPContainer');
+                    fitChartToDiv('plotDXRequestMeanDAPContainer');
                 });
                 var tooltipFiltersRequest = '{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.req-hist-norm-btn';
@@ -442,6 +476,7 @@
                 var plotDXRequestFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartRequestDIV');
+                    fitChartToDiv('piechartRequestDIV');
                 });
                 var urlStartReq = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'requested_procedure_code_meaning' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&requested_procedure_code_meaning=';
                 result = chartFrequency('piechartRequestDIV', 'Requested procedure frequency');
@@ -473,10 +508,14 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that study description.<br>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that study description.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the study names in the bin. Note that
                                             this will include studies at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotDXStudyMeanDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
@@ -491,6 +530,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -502,6 +542,7 @@
                 var plotDXStudyMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXStudyMeanDAPContainer');
+                    fitChartToDiv('plotDXStudyMeanDAPContainer');
                 });
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.stu-hist-norm-btn';
@@ -558,6 +599,7 @@
                 var plotDXStudyFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
                 var urlStartStudy = '/openrem/dx/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');
@@ -589,7 +631,11 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeankVp', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending kVp">&uarr;kVp</a></td>
@@ -604,6 +650,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseAcquisitionMeankVpChart', 'chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#chartAcquisitionMeankVp').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -615,6 +662,7 @@
                 var plotDXAcquisitionMeankVp = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeankVp');
+                    fitChartToDiv('chartAcquisitionMeankVp');
                 });
                 var tooltipFilterskVp = '{% for field in filter.form %}{% if field.name != 'acquisition_kvp_min' and field.name != 'acquisition_kvp_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.kvp-hist-norm-btn';
@@ -671,7 +719,11 @@
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="2" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that acquisition protocol.</td>
+                                        <td rowspan="2" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that acquisition protocol.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#chartAcquisitionMeanmAs', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending mAs">&uarr;mAs</a></td>
@@ -686,6 +738,7 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseAcquisitionMeanmAsChart', 'chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#chartAcquisitionMeanmAs').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -697,6 +750,7 @@
                 var plotDXAcquisitionMeanmAs = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeanmAs');
+                    fitChartToDiv('chartAcquisitionMeanmAs');
                 });
                 var tooltipFiltersmAs = '{% for field in filter.form %}{% if field.name != 'acquisition_mas_min' and field.name != 'acquisition_mas_max' and field.name != 'acquisition_protocol' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.mas-hist-norm-btn';
@@ -754,6 +808,7 @@
                 var plotDXStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>
@@ -789,6 +844,7 @@
                 var plotDXAcquisitionMeankVpOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
+                    fitChartToDiv('AcquisitionMeankVpOverTimeDIV');
                 });
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 result = chartAverageOverTime('AcquisitionMeankVpOverTimeDIV', 'kVp', '', 'Mean');
@@ -828,6 +884,7 @@
                 var plotDXAcquisitionMeanmAsOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
+                    fitChartToDiv('AcquisitionMeanmAsOverTimeDIV');
                 });
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}
                 result = chartAverageOverTime('AcquisitionMeanmAsOverTimeDIV', 'mAs', '', 'Mean');
@@ -867,6 +924,7 @@
                 var plotDXAcquisitionMeanDAPOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');
+                    fitChartToDiv('AcquisitionMeanDAPOverTimeDIV');
                 });
 
             {% if request.user.userprofile.plotAverageChoice == 'mean' %}

@@ -2,10 +2,16 @@
 OpenREM version history
 =======================
 
-0.7.0b14 (2016-04-07)
+0.7.0b15 (2016-05-09)
 ---------------------
 
-* `#390`_  Basic troubleshooting is now documented
+* `#396`_  Charts: zooming on bar charts of average value vs. category now works
+* `#395`_  Docs: offline Windows install instructions created, plus offline upgrade instructions
+* `#394`_  Charts: made charts resize to fit containing div when browser is resized
+* `#392`_  Charts: normalised histogram tooltip now correctly reports frequency
+* `#391`_  Basic troubleshooting is now documented
+* `#390`_  Charts: mammography and fluoroscopy charts added
+* `#389`_  Charts: series without a name are now plotted under the name of `Blank` rather than not being plotted at all
 * `#387`_  Added laterality to mammography exports
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now
@@ -32,6 +38,7 @@ OpenREM version history
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
 * `#352`_  Fixed CT xlsx exports that had complete study data in each series protocol sheet (from earlier beta)
 * `#351`_  Charts: simplified chart JavaScript and Python code
+* `#350`_  DICOM networking documented for use with 3rd party store and advanced use with native
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
 * `#345`_  CSV size imports in cm are now stored as m in the database. Interface display of size corrected.
@@ -57,6 +64,7 @@ OpenREM version history
 * `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
 * `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
+* `#310`_  Series level QR feedback now presented. Any further would require improvements in pynetdicom
 * `#309`_  StoreSCP now deals safely with incoming files with additional transfer syntax tag
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
@@ -123,6 +131,7 @@ OpenREM version history
 * `#230`_  Fixed error in OperatorsName field in DICOM extraction
 * `#229`_  Charts: Added chart of DLP per requested procedure
 * `#223`_  Charts: speed improvement for weekday charts
+* `#217`_  Charts: Further code optimisation to speed up calculation time
 * `#207`_  DICOM QR SCU now available from web interface
 * `#206`_  DICOM Store SCP configuration now available from web interface
 * `#183`_  Added options to store patient name and ID, and options to hash name, ID and accession number

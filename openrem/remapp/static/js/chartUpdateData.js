@@ -64,6 +64,9 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
     var over_time_series, date_axis, current_value, temp_date, date_after, date_before;
     var chart = $('#'+chart_div).highcharts();
 
+    var index = name_list.indexOf(null);
+    if (index !== -1) name_list[index] = "Blank";
+
     date_axis = [];
     for (i = 0; i < over_time_data[0].length; i++) {
         temp_date = new Date(Date.parse(over_time_data[0][i][0]));
@@ -163,6 +166,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var index = name_list.indexOf(null);
     if (index !== -1) name_list[index] = "Blank";
 
+    // Calculate counts per name and average value per name. These are used to sort the chart series by.
     if(calc_histograms) {
         for (j = 0; j < name_list.length; j++) {
             current_counts = 0;
@@ -170,6 +174,23 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
             for (i = 0; i < system_list.length; i++) {
                 (data_counts[i]).push(histogram_data[i][j][0]);
                 (data_bins[i]).push(histogram_data[i][j][1]);
+                current_counts += parseFloat(summary_data[i][j].num);
+                if (average_choice == "mean" || average_choice == "both") {
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
+                }
+                else {
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
+                }
+            }
+            total_counts_per_name.push(current_counts);
+            average_value_per_name.push(current_value / current_counts);
+        }
+    }
+    else {
+        for (j = 0; j < name_list.length; j++) {
+            current_counts = 0;
+            current_value = 0;
+            for (i = 0; i < system_list.length; i++) {
                 current_counts += parseFloat(summary_data[i][j].num);
                 if (average_choice == "mean" || average_choice == "both") {
                     current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
@@ -196,8 +217,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + current_num + ')',
                     drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
-                    total_counts: summary_data[i][j].num,
-                    avg_value: summary_data[i][j].mean
+                    total_counts: total_counts_per_name[j],
+                    avg_value: average_value_per_name[j]
                 });
             }
         }
@@ -214,8 +235,8 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
                     bins: data_bins[i][j],
                     tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + parseFloat(summary_data[i][j].median).toFixed(1) + ' median<br>(n=' + summary_data[i][j].num + ')',
                     drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
-                    total_counts: summary_data[i][j].num,
-                    avg_value: summary_data[i][j].mean
+                    total_counts: total_counts_per_name[j],
+                    avg_value: average_value_per_name[j]
                 });
             }
         }
@@ -322,21 +343,6 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
 function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
     var chart = $('#'+chart_div).highcharts();
     var colour_max = system_list.length;
-
-    /*
-    // Prepare some dummy data
-    var data = [],
-        n = 100000,
-        i;
-    for (i = 0; i < n; i += 1) {
-        data.push([
-            Math.pow(Math.random(), 2) * 100,
-            Math.pow(Math.random(), 2) * 100
-        ]);
-    }
-    max_values = [100,100];
-    system_list = ['Dummy data'];
-    */
 
     for (i = 0; i < system_list.length; i++) {
         if (chart.series.length > i) {

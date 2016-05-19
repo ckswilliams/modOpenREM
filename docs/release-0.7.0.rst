@@ -137,6 +137,19 @@ Updates since beta 14
 * Mammo laterality has been added to mammo exports
 * Fixed in one of the beta versions was charts using greater than rather than greater than or equal to
 * Fluoroscopy skin dose maps
+* Display tables made neater
+
+Updates since beta 15
+=====================
+* Normalised histogram tooltip now correctly reports frequency
+
+***************************************************
+Upgrading an OpenREM server with no internet access
+***************************************************
+
+See the :doc:`upgrade-offline` docs.
+
+..  _upgradefrom060:
 
 ****************************
 Upgrading from version 0.6.0
@@ -153,7 +166,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b14
+    pip install openrem==0.7.0b15
 
 In a shell/command window, move into the openrem folder:
 
@@ -198,6 +211,8 @@ and then run
 * Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
   :ref:`local_settings_logfile` settings in the install docs.
 
+..  _upgradefrom070b:
+
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
@@ -208,7 +223,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b14
+    pip install openrem==0.7.0b15
 
 From the openrem folder (see above):
 

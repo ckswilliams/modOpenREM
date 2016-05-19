@@ -12,7 +12,7 @@ Install OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b14
+    pip install openrem==0.7.0b15
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -255,19 +255,6 @@ You are now ready to start the services to allow you to use OpenREM - go to :doc
 
 Further instructions
 ====================
-
-Database guides
----------------
-
-Here are instructions for installing PostgreSQL on linux and on Windows, and guides to backup up PostgreSQL and MySQL:
-
-..  toctree::
-    :maxdepth: 1
-    
-    postgresql
-    postgresql_windows
-    backupMySQLWindows
-
 
 Production webservers
 ---------------------

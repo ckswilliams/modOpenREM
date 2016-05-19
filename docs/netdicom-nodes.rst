@@ -14,11 +14,15 @@ the following:
   party one, such as Conquest
 
 To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
-``Add new Store`` and fill in the details:
+``Add new Store`` and fill in the details (see figure 1):
 
-.. image:: img/netdicomstorescp.png
-    :align: center
-    :alt: DICOM Store SCP configuration
+.. figure:: img/netdicomstorescp.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP configuration
+   :target: _images/netdicomstorescp.png
+
+   Figure 1: DICOM Store SCP configuration
 
 * Name of local store node: This is the *friendly name*, such as ``OpenREM store``
 * Application Entity Title of the node: This is the DICOM name for the store, and must be letters or numbers only, no
@@ -28,6 +32,7 @@ To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network co
   between the remote nodes (modalities, PACS) and the OpenREM server, then you need to make sure that the firewall is
   configured to allow the port you choose here
 
+.. _nativestore:
 
 ******************************************
 Native DICOM store node with direct import
@@ -56,11 +61,15 @@ The object is then left in the ``dicom_in`` folder in the ``media`` folder, or i
 set in :doc:`i_deletesettings`.
 
 
-For native DICOM store nodes, you need to open the ``Advanced - test/development use only`` section:
+For native DICOM store nodes, you need to open the ``Advanced - test/development use only`` section (see figure 2):
 
-.. image:: img/netdicomstorescpadvanced.png
-    :align: center
-    :alt: DICOM Store SCP advanced configuration
+.. figure:: img/netdicomstorescpadvanced.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP advanced configuration
+   :target: _images/netdicomstorescpadvanced.png
+
+   Figure 2: DICOM Store SCP advanced configuration
 
 * Control the server using OpenREM: this checkbox will enable OpenREM to create and control the node
 * Auto-start the server using celery beat: if checked, and if :ref:`celery-beat` is running, then OpenREM will attempt
@@ -81,19 +90,26 @@ See :doc:`conquestUbuntu` and :doc:`conquestAsWindowsService` for more informati
 Status of DICOM Store SCP nodes
 *******************************
 
-.. image:: img/storenodealive.png
-    :align: right
-    :alt: DICOM Store SCP status "Alive"
-.. image:: img/storenodefail.png
-    :align: right
-    :alt: DICOM Store SCP status "Alive"
+DICOM Store SCP advanced configuration
+
+.. figure:: img/storenodealive.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP status "Alive"
+
+.. figure:: img/storenodefail.png
+   :figwidth: 50%
+   :align: right
+   :alt: DICOM Store SCP status "Association fail"
+
+   Figure 3: DICOM Store SCP status - Alive and Association failed
 
 DICOM Store SCP nodes that have been configured are listed in the left column of the DICOM network configuration page.
 For each server, the basic details are displayed, including the Database ID which is required for command line/scripted
 use of the query-retrieve function.
 
 In the title row of the Store SCP config panel, the status will be reported either as 'Server is alive' or 'Error:
-Association fail - server not running?'
+Association fail - server not running?' - see figure 3
 
 Controlling native Store SCP nodes
 ==================================
