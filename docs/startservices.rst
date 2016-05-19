@@ -131,7 +131,7 @@ Celery periodic tasks: beat
 .. note::
 
     Celery beat is only required if you are using the :ref:`nativestore`. Please read the warnings there before deciding
-    if you need to run Celery beat. At thie current time, using a third party DICOM store service is recommended for
+    if you need to run Celery beat. At the current time, using a third party DICOM store service is recommended for
     most users. See the :doc:`netdicom` documentation for more details
 
 Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
@@ -229,9 +229,8 @@ Add some data!
 Further instructions
 ====================
 
-
 Daemonising Celery
-------------------
+^^^^^^^^^^^^^^^^^^
 
 In a production environment, Celery will need to start automatically and
 not depend on a particular user being logged in. Therefore, much like
