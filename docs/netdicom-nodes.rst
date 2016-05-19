@@ -32,6 +32,7 @@ To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network co
   between the remote nodes (modalities, PACS) and the OpenREM server, then you need to make sure that the firewall is
   configured to allow the port you choose here
 
+.. _nativestore:
 
 ******************************************
 Native DICOM store node with direct import

@@ -56,7 +56,7 @@ have several to choose from depending on how many network cards (real or virtual
 which one is which is probably beyond the scope of these instructions! If you get the IP address completely wrong,
 the command will fail with the error: ``Error: That IP address can't be assigned-to.``
 
-In a web browser on a different computer on the same network, go to http://192.168.110:8000/ (changing the IP address
+In a web browser on a different computer on the same network, go to http://192.168.1.10:8000/ (**changing the IP address**
 to the one you are running the server on) and you should see the OpenREM interface and the message about creating users.
 For full functionality start the `Celery task queue`_ before moving on to `Configure the settings`_.
 
@@ -127,6 +127,12 @@ You will need to do this twice if there are running tasks you wish to kill.
 
 Celery periodic tasks: beat
 ===========================
+
+.. note::
+
+    Celery beat is only required if you are using the :ref:`nativestore`. Please read the warnings there before deciding
+    if you need to run Celery beat. At thie current time, using a third party DICOM store service is recommended for
+    most users. See the :doc:`netdicom` documentation for more details
 
 Celery beat is a scheduler. If it is running, then every 60 seconds a task is run to check if any of the DICOM
 Store SCP nodes are set to ``keep_alive``, and if they are, it tries to verify they are running with a DICOM echo.
