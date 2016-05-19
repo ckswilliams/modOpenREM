@@ -75,7 +75,7 @@ RabbitMQ allows for asynchronous task processing for imports, exports and DICOM 
 
 ..  Note::
 
-    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure
+    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure:
 
     * the folder exists (the suggestion below is to create a folder in the ``MEDIA_ROOT`` location)
     * the user that starts Celery can write to that folder

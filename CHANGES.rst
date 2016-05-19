@@ -38,6 +38,7 @@ OpenREM version history
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
 * `#352`_  Fixed CT xlsx exports that had complete study data in each series protocol sheet (from earlier beta)
 * `#351`_  Charts: simplified chart JavaScript and Python code
+* `#350`_  DICOM networking documented for use with 3rd party store and advanced use with native
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
 * `#345`_  CSV size imports in cm are now stored as m in the database. Interface display of size corrected.
