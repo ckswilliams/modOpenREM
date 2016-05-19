@@ -512,7 +512,7 @@ def _ctxraysourceparameters(dataset,event):
             param.maximum_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray tube current':
             param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceotNameCodeSequence[0].CodeValue == '113734':  # Additional check as code meaning is wrong for Siemens Intevo see https://bitbucket.org/openrem/openrem/issues/380/siemens-intevo-rdsr-have-wrong-code
+        elif cont.ConceptNameCodeSequence[0].CodeValue == '113734':  # Additional check as code meaning is wrong for Siemens Intevo see https://bitbucket.org/openrem/openrem/issues/380/siemens-intevo-rdsr-have-wrong-code
             param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time per Rotation':
             param.exposure_time_per_rotation = cont.MeasuredValueSequence[0].NumericValue
