@@ -9,9 +9,9 @@ In a shell/command window, move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\`` (remember to activate the virtualenv)
 
 Web access on OpenREM server only
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -75,22 +75,34 @@ RabbitMQ allows for asynchronous task processing for imports, exports and DICOM 
 
 ..  Note::
 
-    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure the
-    folder permissions allow this for the user that starts Celery. In the examples below, the logs and pid files are
-    written to the ``MEDIA_ROOT`` location, where Celery and the webserver also needs to be able to write exported
-    files. For a Debian/Ubuntu server, the webserver user is usually ``www-data``, so you might like to start Celery
-    with the ``www-data`` user too.
+    Celery needs to be able to write to the place where the Celery logs and pid file are to be stored, so make sure
 
-    You might instead wish to write the logs to a folder in ``/var/log/`` on linux systems - wherever you define,
-    **the folder should already exist**.
+    * the folder exists (the suggestion below is to create a folder in the ``MEDIA_ROOT`` location)
+    * the user that starts Celery can write to that folder
 
-In a new shell/command window, move into the openrem folder:
+You can put the folder wherever you like, for example you might like to create a ``/var/log/openrem/`` folder on a linux
+system.
+
+If you are using the built-in `Test web server`_ then Celery and the webserver will be running as your user. If you are
+running a production webserver, such as Apache or nginx on linux, then the user that runs those daemons will need to
+be able to write to the ``MEDIA_ROOT`` and the Celery log files folder. In this case, you need to change the ownership
+of the folders and change to the right user before running Celery. On Ubuntu:
+
+.. sourcecode:: console
+
+    mkdir /path/to/media/celery  # change as appropriate
+    sudo chown www-data /path/to/media  # change as appropriate
+    sudo su -p www-data
+
+Now start celery...
+
+Move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\`` (remember to activate the virtualenv)
 
 Linux - ``\`` is the line continuation character:
 
@@ -142,9 +154,9 @@ To run celery beat, open a new shell and move into the openrem folder:
 
 * Ubuntu linux: ``/usr/local/lib/python2.7/dist-packages/openrem/``
 * Other linux: ``/usr/lib/python2.7/site-packages/openrem/``
-* Linux virtualenv: ``lib/python2.7/site-packages/openrem/``
+* Linux virtualenv: ``lib/python2.7/site-packages/openrem/`` (remember to activate the virtualenv)
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
-* Windows virtualenv: ``Lib\site-packages\openrem\``
+* Windows virtualenv: ``Lib\site-packages\openrem\`` (remember to activate the virtualenv)
 
 Linux::
 
