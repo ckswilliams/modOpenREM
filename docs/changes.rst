@@ -16,6 +16,7 @@ OpenREM version history
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now
 * `#383`_  Refreshed settings.py to django 1.8 including updating template settings and TEMPLATE_CONTEXT_PROCESSORS
+* `#380`_  Tube current now extracted from Siemens Intevo RDSR despite non-conformance
 * `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
 * `#378`_  The display name of multiple systems can now be updated together using a single new name
 * `#376`_  Corrected an ill-advised model change
