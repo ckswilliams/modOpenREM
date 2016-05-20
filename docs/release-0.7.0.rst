@@ -58,6 +58,7 @@ Headline changes
       into database without change. Existing height data will remain as cm value for csv imports, and m value for RDSR
       imports
     * Better handling of non-ASCII characters
+    * Tube current is now extracted from Siemens Intevo RDSRs
 
 * Exports
 
@@ -109,8 +110,6 @@ Updates since beta 11
 
 Updates since beta 12
 =====================
-**Requires database migration**
-
 * Mammography RDSRs now import correctly
 * Added study description to mammography exports
 * Philips Allura fluoro RDSRs import fixed
@@ -118,8 +117,6 @@ Updates since beta 12
 
 Updates since beta 13
 =====================
-**Requires database migration**
-
 * Mammography RDSRs and images now record an Accumulated AGD per breast
 * Mammography RDSRs and images now record mA in the same way as each other
 * CTDIw phantom size now displayed in the detail view
@@ -142,6 +139,7 @@ Updates since beta 14
 Updates since beta 15
 =====================
 * Normalised histogram tooltip now correctly reports frequency
+* Tube current is now extracted from Siemens Intevo RDSRs
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
