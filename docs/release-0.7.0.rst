@@ -174,9 +174,9 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
-Delete all numbered migration files in openrem's ``migrations`` folder, **leaving the 0002 files ending in .inactive**
+Delete all numbered migration files in openrem's ``remapp/migrations`` folder, **leaving the 0002 files ending in .inactive**
 
-If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it.
+If there is no file named ``__init__.py`` in the ``remapp/migrations`` folder, please create it.
 
 .. sourcecode:: bash
 
@@ -231,7 +231,7 @@ From the openrem folder (see above):
     python manage.py migrate remapp
 
 * Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
-:ref:`local_settings_logfile` settings in the install docs.
+  :ref:`local_settings_logfile` settings in the install docs.
 
 
 Restart all the services!
