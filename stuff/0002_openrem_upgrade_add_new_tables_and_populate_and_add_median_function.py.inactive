@@ -222,6 +222,26 @@ class Migration(migrations.Migration):
                 ('hash_generated', models.BooleanField(default=False)),
             ],
         ),
+        migrations.CreateModel(
+            name='SkinDoseMapCalcSettings',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('enable_skin_dose_maps', models.BooleanField(default=False, verbose_name=b'Enable skin dose maps?')),
+                ('calc_on_import', models.BooleanField(default=True, verbose_name=b'Calculate skin dose map on import?')),
+            ],
+            options={
+                'abstract': False,
+            },
+        ),
+        migrations.RemoveField(
+            model_name='projectionxrayradiationdose',
+            name='acquisition_device_type',
+        ),
+        migrations.AddField(
+            model_name='irradeventxraydata',
+            name='reference_point_definition_text',
+            field=models.TextField(null=True, blank=True),
+        ),
         migrations.AddField(
             model_name='exports',
             name='export_user',
@@ -236,6 +256,11 @@ class Migration(migrations.Migration):
             model_name='generalstudymoduleattr',
             name='accession_hashed',
             field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='projectionxrayradiationdose',
+            name='acquisition_device_type_cid',
+            field=models.ForeignKey(related_name='tid10001_type', blank=True, to='remapp.ContextID', null=True),
         ),
         migrations.AddField(
             model_name='generalstudymoduleattr',
@@ -301,22 +326,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='plotDXStudyMeanDAP',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='plotDXStudyFreq',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='plotDXRequestMeanDAP',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='plotDXRequestFreq',
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='userprofile',
@@ -326,7 +351,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='plotHistogramBins',
-            field=models.IntegerField(default=20),
+            field=models.PositiveSmallIntegerField(default=20),
         ),
         migrations.AlterField(
             model_name='generalstudymoduleattr',
@@ -366,6 +391,41 @@ class Migration(migrations.Migration):
             model_name='generalequipmentmoduleattr',
             name='unique_equipment_name',
             field=models.ForeignKey(to='remapp.UniqueEquipmentNames', null=True),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotHistograms',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotMGAGDvsThickness',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotMGStudyPerDayAndHour',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotRFInitialSortingChoice',
+            field=models.CharField(default=b'freq', max_length=4, choices=[(b'dap', b'DAP'), (b'freq', b'Frequency'), (b'name', b'Name')]),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotRFStudyDAP',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotRFStudyFreq',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='plotRFStudyPerDayAndHour',
+            field=models.BooleanField(default=False),
         ),
         migrations.RunPython(populate_unique_equipment_names),
     ]
