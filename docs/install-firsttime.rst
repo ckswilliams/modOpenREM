@@ -20,6 +20,9 @@ this isn't possible, so we've added instructions for an offline installation too
 
 .. _databaselinks:
 
+Databases
+=========
+
 During the installation process, you will need to install a database. For testing only, you can use the built in
 SQLite3 database, but for production use you will need a production grade database. This is covered in the
 :doc:`install-prep` documentation, but as you will probably want to find the database instructions again, the links
