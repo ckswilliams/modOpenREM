@@ -188,13 +188,13 @@ Now rename the file
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
+    remapp/migrations/0002_upgrade_0_7_from_0_6.py.inactive
 
 to:
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
+    remapp/migrations/0002_upgrade_0_7_from_0_6.py
 
 and then run
 

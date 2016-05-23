@@ -227,13 +227,13 @@ Rename the file
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_fresh_openrem_install_add_median_function.py.inactive
+    remapp/migrations/0002_0_7_fresh_install_add_median.py.inactive
 
 to
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_fresh_openrem_install_add_median_function.py
+    remapp/migrations/0002_0_7_fresh_install_add_median.py
 
 and then run
 
@@ -244,8 +244,7 @@ and then run
 
 The first command will create a skeleton ``0001_initial.py`` migration file. The
 second command runs the migration files, and will display the text
-``Applying remapp.0002_fresh__openrem_install_add_median_function... OK``, indicating
-that the median function has been added.
+``Applying remapp.0002_0_7_fresh_install_add_median... OK``, indicating that the median function has been added.
 
 Start all the services!
 =======================
