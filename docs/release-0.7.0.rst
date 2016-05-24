@@ -146,7 +146,7 @@ Upgrading an OpenREM server with no internet access
 ***************************************************
 
 ..  toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     upgrade-offline
 
