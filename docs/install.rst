@@ -65,7 +65,7 @@ Database
     displayed in OpenREM charts.** Alternatively, other databases such as MySQL/MariaDB, Oracle, and
     some others with lower levels of support can be used.
 
-    There are some further guides to setting up PostgreSQL – see :ref:`_databaselinks` below
+    There are some further guides to setting up PostgreSQL – see :ref:`databaselinks` below
 
 If you are using SQLite:
 
