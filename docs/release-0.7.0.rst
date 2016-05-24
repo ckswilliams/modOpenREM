@@ -145,7 +145,10 @@ Updates since beta 15
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
-See the :doc:`upgrade-offline` docs.
+..  toctree::
+    :maxdepth: 2
+
+    upgrade-offline
 
 ..  _upgradefrom060:
 
