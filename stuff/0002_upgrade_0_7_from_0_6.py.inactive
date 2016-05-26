@@ -233,10 +233,6 @@ class Migration(migrations.Migration):
                 'abstract': False,
             },
         ),
-        migrations.RemoveField(
-            model_name='projectionxrayradiationdose',
-            name='acquisition_device_type',
-        ),
         migrations.AddField(
             model_name='irradeventxraydata',
             name='reference_point_definition_text',
