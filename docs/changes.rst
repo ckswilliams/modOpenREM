@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b15 (2016-05-09)
 ---------------------
 
+* `#398`_  Skin exposure maps are now stored in folders (feature postponed for future release)
 * `#396`_  Charts: zooming on bar charts of average value vs. category now works
 * `#395`_  Docs: offline Windows install instructions created, plus offline upgrade instructions
 * `#394`_  Charts: made charts resize to fit containing div when browser is resized
