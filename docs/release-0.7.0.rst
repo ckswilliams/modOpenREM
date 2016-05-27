@@ -143,6 +143,7 @@ Updates since beta 15
 * Tube current is now extracted from Siemens Intevo RDSRs
 * Non-ASCII characters are better handled in stored patient names
 * Fluoroscopy skin dose maps removed again until orientation errors are corrected
+* Upgrades from 0.6 have been fixed
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
