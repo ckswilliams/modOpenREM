@@ -8,6 +8,7 @@ OpenREM version history
 * `#400`_  Strings are encoded as UTF-8 before being hashed to prevent errors with non-ASCII characters
 * `#399`_  Migration file brought up to date for 0.6 to 0.7 upgrades
 * `#398`_  Skin exposure maps are now stored in folders (feature postponed for future release)
+* `#397`_  Skin exposure maps no longer available until orientation errors are fixed
 * `#396`_  Charts: zooming on bar charts of average value vs. category now works
 * `#395`_  Docs: offline Windows install instructions created, plus offline upgrade instructions
 * `#394`_  Charts: made charts resize to fit containing div when browser is resized
