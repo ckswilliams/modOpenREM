@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0b15 (2016-05-09)
+0.7.0b16 (2016-05-28)
 ---------------------
 
 * `#400`_  Strings are encoded as UTF-8 before being hashed to prevent errors with non-ASCII characters
