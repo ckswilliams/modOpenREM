@@ -171,7 +171,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b15
+    pip install openrem==0.7.0b16
 
 In a shell/command window, move into the openrem folder:
 
@@ -228,7 +228,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b15
+    pip install openrem==0.7.0b16
 
 From the openrem folder (see above):
 
