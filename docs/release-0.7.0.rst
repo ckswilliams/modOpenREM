@@ -140,6 +140,7 @@ Updates since beta 15
 =====================
 * Normalised histogram tooltip now correctly reports frequency
 * Tube current is now extracted from Siemens Intevo RDSRs
+*
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
