@@ -40,6 +40,7 @@ Headline changes
     * Fluoroscopy chart of average DAP for each study description
     * Fluoroscopy chart of the frequency of each study description
     * Fluoroscopy chart showing the number of studies carried out per weekday
+    * Context specific documentation has been added to the Docs menu
 
 * DICOM Networking
 

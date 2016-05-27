@@ -1,5 +1,13 @@
 {% extends "remapp/base.html" %}
 
+{% block navhelp %}
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/charts.html#chart-options" target="_blank" data-toggle="tooltip" title="Chart options documentation - opens in a new tab">
+                Chart options documentation
+            </a>
+        </li>
+{% endblock %}
+
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
 {% block toprow %}

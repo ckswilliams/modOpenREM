@@ -73,6 +73,7 @@ OpenREM version history
 * `#309`_  StoreSCP now deals safely with incoming files with additional transfer syntax tag
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
+* `#305`_  Added links to documentation throughout the web interface
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
 * `#303`_  Fixed a typo in 0.6.0 documents relating to the storescp command
 * `#302`_  Improved handling of Philips Dose Info objects when series information sequence has UN value representation
