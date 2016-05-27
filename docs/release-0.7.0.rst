@@ -70,13 +70,8 @@ Headline changes
 
 * Skin dose maps
 
-    * Fluoroscopy skin dose map data calculated to the surface of a simple geometric phantom
-      using the in-built openSkin routines (3D phantom)
-    * Phantom dimensions calculated from the height and mass of the patient
-    * Data can be calculated on import to OpenREM, or on demand when a study is viewed
-    * 3D skin dose map data shown graphically as a 2D image and a 3D model
-    * If skin dose map display is disabled then fluoroscopy study data can be
-      exported in a format suitable for the stand-alone openSkin routines
+    * Skin dose maps have been withdrawn from OpenREM version 0.7.0 due to incorrect orientation calculations that need
+      to be fixed before openSkin can be reimplemented into OpenREM
 
 Updates since beta 7
 ====================
