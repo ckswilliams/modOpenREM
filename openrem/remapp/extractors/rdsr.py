@@ -512,6 +512,8 @@ def _ctxraysourceparameters(dataset,event):
             param.maximum_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray tube current':
             param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+        elif cont.ConceptNameCodeSequence[0].CodeValue == '113734':  # Additional check as code meaning is wrong for Siemens Intevo see https://bitbucket.org/openrem/openrem/issues/380/siemens-intevo-rdsr-have-wrong-code
+            param.xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time per Rotation':
             param.exposure_time_per_rotation = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray filter aluminum equivalent':
@@ -843,8 +845,9 @@ def _rsdr2db(dataset):
     except ObjectDoesNotExist:
         SkinDoseMapCalcSettings.objects.create()
 
-    enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
-    calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
+    # Commented out until openSkin confirmed as working OK
+    enable_skin_dose_maps = False #SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
+    calc_on_import = False #SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
     if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:
         from remapp.tools.make_skin_map import make_skin_map
         make_skin_map.delay(g.pk)

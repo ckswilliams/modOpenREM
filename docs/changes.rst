@@ -2,9 +2,17 @@
 OpenREM version history
 =======================
 
-0.7.0b15 (2016-05-09)
+0.7.0b16 (2016-05-28)
 ---------------------
 
+* `#400`_  Strings are encoded as UTF-8 before being hashed to prevent errors with non-ASCII characters
+* `#399`_  Migration file brought up to date for 0.6 to 0.7 upgrades
+* `#398`_  Skin exposure maps are now stored in folders (feature postponed for future release)
+* `#397`_  Skin exposure maps no longer available until orientation errors are fixed
+* `#396`_  Charts: zooming on bar charts of average value vs. category now works
+* `#395`_  Docs: offline Windows install instructions created, plus offline upgrade instructions
+* `#394`_  Charts: made charts resize to fit containing div when browser is resized
+* `#392`_  Charts: normalised histogram tooltip now correctly reports frequency
 * `#391`_  Basic troubleshooting is now documented
 * `#390`_  Charts: mammography and fluoroscopy charts added
 * `#389`_  Charts: series without a name are now plotted under the name of `Blank` rather than not being plotted at all
@@ -12,6 +20,7 @@ OpenREM version history
 * `#385`_  Fixed issue with non-ASCII letters in RDSR sequence TextValue fields
 * `#384`_  Fluoro exports for OpenSkin only consider copper filters now
 * `#383`_  Refreshed settings.py to django 1.8 including updating template settings and TEMPLATE_CONTEXT_PROCESSORS
+* `#380`_  Tube current now extracted from Siemens Intevo RDSR despite non-conformance
 * `#379`_  Exposure time now populated for fluoro if not supplied by RDSR
 * `#378`_  The display name of multiple systems can now be updated together using a single new name
 * `#376`_  Corrected an ill-advised model change
@@ -34,6 +43,7 @@ OpenREM version history
 * `#355`_  Charts: sorting now works as expected for plots with a series per system
 * `#352`_  Fixed CT xlsx exports that had complete study data in each series protocol sheet (from earlier beta)
 * `#351`_  Charts: simplified chart JavaScript and Python code
+* `#350`_  DICOM networking documented for use with 3rd party store and advanced use with native
 * `#348`_  Study delete confirmation page now displays total DAP for DX or CR radiographic studies
 * `#346`_  Charts: exporting a chart as an image no longer requires an internet connection
 * `#345`_  CSV size imports in cm are now stored as m in the database. Interface display of size corrected.
@@ -59,9 +69,11 @@ OpenREM version history
 * `#313`_  Replaced non-working function with code to extract SeriesDescription etc in query response message
 * `#312`_  Display names are now grouped by modality
 * `#311`_  Queries are deleted from database after a successful C-Move
+* `#310`_  Series level QR feedback now presented. Any further would require improvements in pynetdicom
 * `#309`_  StoreSCP now deals safely with incoming files with additional transfer syntax tag
 * `#308`_  Secondary capture images that don't have the manufacturer field no longer crash the StoreSCP function
 * `#306`_  Charts: added a button to each chart to toggle full-screen display
+* `#305`_  Added links to documentation throughout the web interface
 * `#304`_  Date of birth is now included in all exports that have either patient name or ID included
 * `#303`_  Fixed a typo in 0.6.0 documents relating to the storescp command
 * `#302`_  Improved handling of Philips Dose Info objects when series information sequence has UN value representation
@@ -421,6 +433,106 @@ Reopened issue
 
 *       Initial version uploaded to bitbucket.org
 
+..  _`#500`: https://bitbucket.org/openrem/openrem/issue/500/
+..  _`#499`: https://bitbucket.org/openrem/openrem/issue/499/
+..  _`#498`: https://bitbucket.org/openrem/openrem/issue/498/
+..  _`#497`: https://bitbucket.org/openrem/openrem/issue/497/
+..  _`#496`: https://bitbucket.org/openrem/openrem/issue/496/
+..  _`#495`: https://bitbucket.org/openrem/openrem/issue/495/
+..  _`#494`: https://bitbucket.org/openrem/openrem/issue/494/
+..  _`#493`: https://bitbucket.org/openrem/openrem/issue/493/
+..  _`#492`: https://bitbucket.org/openrem/openrem/issue/492/
+..  _`#491`: https://bitbucket.org/openrem/openrem/issue/491/
+..  _`#490`: https://bitbucket.org/openrem/openrem/issue/490/
+..  _`#489`: https://bitbucket.org/openrem/openrem/issue/489/
+..  _`#488`: https://bitbucket.org/openrem/openrem/issue/488/
+..  _`#487`: https://bitbucket.org/openrem/openrem/issue/487/
+..  _`#486`: https://bitbucket.org/openrem/openrem/issue/486/
+..  _`#485`: https://bitbucket.org/openrem/openrem/issue/485/
+..  _`#484`: https://bitbucket.org/openrem/openrem/issue/484/
+..  _`#483`: https://bitbucket.org/openrem/openrem/issue/483/
+..  _`#482`: https://bitbucket.org/openrem/openrem/issue/482/
+..  _`#481`: https://bitbucket.org/openrem/openrem/issue/481/
+..  _`#480`: https://bitbucket.org/openrem/openrem/issue/480/
+..  _`#479`: https://bitbucket.org/openrem/openrem/issue/479/
+..  _`#478`: https://bitbucket.org/openrem/openrem/issue/478/
+..  _`#477`: https://bitbucket.org/openrem/openrem/issue/477/
+..  _`#476`: https://bitbucket.org/openrem/openrem/issue/476/
+..  _`#475`: https://bitbucket.org/openrem/openrem/issue/475/
+..  _`#474`: https://bitbucket.org/openrem/openrem/issue/474/
+..  _`#473`: https://bitbucket.org/openrem/openrem/issue/473/
+..  _`#472`: https://bitbucket.org/openrem/openrem/issue/472/
+..  _`#471`: https://bitbucket.org/openrem/openrem/issue/471/
+..  _`#470`: https://bitbucket.org/openrem/openrem/issue/470/
+..  _`#469`: https://bitbucket.org/openrem/openrem/issue/469/
+..  _`#468`: https://bitbucket.org/openrem/openrem/issue/468/
+..  _`#467`: https://bitbucket.org/openrem/openrem/issue/467/
+..  _`#466`: https://bitbucket.org/openrem/openrem/issue/466/
+..  _`#465`: https://bitbucket.org/openrem/openrem/issue/465/
+..  _`#464`: https://bitbucket.org/openrem/openrem/issue/464/
+..  _`#463`: https://bitbucket.org/openrem/openrem/issue/463/
+..  _`#462`: https://bitbucket.org/openrem/openrem/issue/462/
+..  _`#461`: https://bitbucket.org/openrem/openrem/issue/461/
+..  _`#460`: https://bitbucket.org/openrem/openrem/issue/460/
+..  _`#459`: https://bitbucket.org/openrem/openrem/issue/459/
+..  _`#458`: https://bitbucket.org/openrem/openrem/issue/458/
+..  _`#457`: https://bitbucket.org/openrem/openrem/issue/457/
+..  _`#456`: https://bitbucket.org/openrem/openrem/issue/456/
+..  _`#455`: https://bitbucket.org/openrem/openrem/issue/455/
+..  _`#454`: https://bitbucket.org/openrem/openrem/issue/454/
+..  _`#453`: https://bitbucket.org/openrem/openrem/issue/453/
+..  _`#452`: https://bitbucket.org/openrem/openrem/issue/452/
+..  _`#451`: https://bitbucket.org/openrem/openrem/issue/451/
+..  _`#450`: https://bitbucket.org/openrem/openrem/issue/450/
+..  _`#449`: https://bitbucket.org/openrem/openrem/issue/449/
+..  _`#448`: https://bitbucket.org/openrem/openrem/issue/448/
+..  _`#447`: https://bitbucket.org/openrem/openrem/issue/447/
+..  _`#446`: https://bitbucket.org/openrem/openrem/issue/446/
+..  _`#445`: https://bitbucket.org/openrem/openrem/issue/445/
+..  _`#444`: https://bitbucket.org/openrem/openrem/issue/444/
+..  _`#443`: https://bitbucket.org/openrem/openrem/issue/443/
+..  _`#442`: https://bitbucket.org/openrem/openrem/issue/442/
+..  _`#441`: https://bitbucket.org/openrem/openrem/issue/441/
+..  _`#440`: https://bitbucket.org/openrem/openrem/issue/440/
+..  _`#439`: https://bitbucket.org/openrem/openrem/issue/439/
+..  _`#438`: https://bitbucket.org/openrem/openrem/issue/438/
+..  _`#437`: https://bitbucket.org/openrem/openrem/issue/437/
+..  _`#436`: https://bitbucket.org/openrem/openrem/issue/436/
+..  _`#435`: https://bitbucket.org/openrem/openrem/issue/435/
+..  _`#434`: https://bitbucket.org/openrem/openrem/issue/434/
+..  _`#433`: https://bitbucket.org/openrem/openrem/issue/433/
+..  _`#432`: https://bitbucket.org/openrem/openrem/issue/432/
+..  _`#431`: https://bitbucket.org/openrem/openrem/issue/431/
+..  _`#430`: https://bitbucket.org/openrem/openrem/issue/430/
+..  _`#429`: https://bitbucket.org/openrem/openrem/issue/429/
+..  _`#428`: https://bitbucket.org/openrem/openrem/issue/428/
+..  _`#427`: https://bitbucket.org/openrem/openrem/issue/427/
+..  _`#426`: https://bitbucket.org/openrem/openrem/issue/426/
+..  _`#425`: https://bitbucket.org/openrem/openrem/issue/425/
+..  _`#424`: https://bitbucket.org/openrem/openrem/issue/424/
+..  _`#423`: https://bitbucket.org/openrem/openrem/issue/423/
+..  _`#422`: https://bitbucket.org/openrem/openrem/issue/422/
+..  _`#421`: https://bitbucket.org/openrem/openrem/issue/421/
+..  _`#420`: https://bitbucket.org/openrem/openrem/issue/420/
+..  _`#419`: https://bitbucket.org/openrem/openrem/issue/419/
+..  _`#418`: https://bitbucket.org/openrem/openrem/issue/418/
+..  _`#417`: https://bitbucket.org/openrem/openrem/issue/417/
+..  _`#416`: https://bitbucket.org/openrem/openrem/issue/416/
+..  _`#415`: https://bitbucket.org/openrem/openrem/issue/415/
+..  _`#414`: https://bitbucket.org/openrem/openrem/issue/414/
+..  _`#413`: https://bitbucket.org/openrem/openrem/issue/413/
+..  _`#412`: https://bitbucket.org/openrem/openrem/issue/412/
+..  _`#411`: https://bitbucket.org/openrem/openrem/issue/411/
+..  _`#410`: https://bitbucket.org/openrem/openrem/issue/410/
+..  _`#409`: https://bitbucket.org/openrem/openrem/issue/409/
+..  _`#408`: https://bitbucket.org/openrem/openrem/issue/408/
+..  _`#407`: https://bitbucket.org/openrem/openrem/issue/407/
+..  _`#406`: https://bitbucket.org/openrem/openrem/issue/406/
+..  _`#405`: https://bitbucket.org/openrem/openrem/issue/405/
+..  _`#404`: https://bitbucket.org/openrem/openrem/issue/404/
+..  _`#403`: https://bitbucket.org/openrem/openrem/issue/403/
+..  _`#402`: https://bitbucket.org/openrem/openrem/issue/402/
+..  _`#401`: https://bitbucket.org/openrem/openrem/issue/401/
 ..  _`#400`: https://bitbucket.org/openrem/openrem/issue/400/
 ..  _`#399`: https://bitbucket.org/openrem/openrem/issue/399/
 ..  _`#398`: https://bitbucket.org/openrem/openrem/issue/398/

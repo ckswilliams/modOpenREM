@@ -283,10 +283,14 @@ $('.datepicker').datepicker({
                                 <table style="border:none">
                                     <tr>
                                         <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
-                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">Click on an individual column to show a histogram of data for that study description.<br>
+                                        <td rowspan="3" style="padding-left: 20px; vertical-align: top">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that study description.<br>
                                             Click on a histogram bin tooltip to see the studies that contain the study names in the bin. Note that
                                             this will include studies at the upper bin boundary, so in some cases may display more data than
-                                            shown in the histogram bin.</td>
+                                            shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#plotRFStudyDAPContainer', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending DLP">&uarr;DAP</a></td>
@@ -301,6 +305,7 @@ $('.datepicker').datepicker({
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapsePlotRFStudyDAPAccordion','plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotRFStudyDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -312,6 +317,7 @@ $('.datepicker').datepicker({
                 var plotRFStudyDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotRFStudyDAPContainer');
+                    fitChartToDiv('plotRFStudyDAPContainer');
                 });
                 var tooltipFiltersStudy = '{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
                 norm_btn_class = '.stu-hist-norm-btn';
@@ -369,6 +375,7 @@ $('.datepicker').datepicker({
                 var plotRFStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>
@@ -399,6 +406,7 @@ $('.datepicker').datepicker({
                 var plotRFStudyFreq = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
                 var urlStartStudy = '/openrem/rf/?{% for field in filter.form %}{% if field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}&study_description=';
                 result = chartFrequency('piechartStudyDIV', 'Study description frequency');

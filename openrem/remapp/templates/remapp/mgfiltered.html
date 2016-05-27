@@ -254,6 +254,7 @@ $('.datepicker').datepicker({
                 var plotMGAGDvsThickness = true;
                 $(window).resize(function() {
                     chartSetExportSize('scatterDIV');
+                    fitChartToDiv('scatterDIV');
                 });
                 result = chartScatter('Average glandular dose vs. compressed thickness', 'scatterDIV', 'Compressed thickness (mm)', 'Average glandular dose (mGy)');
             </script>
@@ -284,6 +285,7 @@ $('.datepicker').datepicker({
                 var plotMGStudyPerDayAndHour = true;
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
                 result = chartWorkload('piechartStudyWorkloadDIV', 'Studies');
             </script>

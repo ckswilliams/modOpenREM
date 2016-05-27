@@ -40,6 +40,7 @@ Headline changes
     * Fluoroscopy chart of average DAP for each study description
     * Fluoroscopy chart of the frequency of each study description
     * Fluoroscopy chart showing the number of studies carried out per weekday
+    * Context specific documentation has been added to the Docs menu
 
 * DICOM Networking
 
@@ -58,6 +59,7 @@ Headline changes
       into database without change. Existing height data will remain as cm value for csv imports, and m value for RDSR
       imports
     * Better handling of non-ASCII characters
+    * Tube current is now extracted from Siemens Intevo RDSRs
 
 * Exports
 
@@ -109,8 +111,6 @@ Updates since beta 11
 
 Updates since beta 12
 =====================
-**Requires database migration**
-
 * Mammography RDSRs now import correctly
 * Added study description to mammography exports
 * Philips Allura fluoro RDSRs import fixed
@@ -118,8 +118,6 @@ Updates since beta 12
 
 Updates since beta 13
 =====================
-**Requires database migration**
-
 * Mammography RDSRs and images now record an Accumulated AGD per breast
 * Mammography RDSRs and images now record mA in the same way as each other
 * CTDIw phantom size now displayed in the detail view
@@ -139,6 +137,25 @@ Updates since beta 14
 * Fluoroscopy skin dose maps
 * Display tables made neater
 
+Updates since beta 15
+=====================
+* Normalised histogram tooltip now correctly reports frequency
+* Tube current is now extracted from Siemens Intevo RDSRs
+* Non-ASCII characters are better handled in stored patient names
+* Fluoroscopy skin dose maps removed again until orientation errors are corrected
+* Upgrades from 0.6 have been fixed
+
+***************************************************
+Upgrading an OpenREM server with no internet access
+***************************************************
+
+..  toctree::
+    :maxdepth: 1
+
+    upgrade-offline
+
+..  _upgradefrom060:
+
 ****************************
 Upgrading from version 0.6.0
 ****************************
@@ -154,7 +171,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b15
+    pip install openrem==0.7.0b16
 
 In a shell/command window, move into the openrem folder:
 
@@ -164,9 +181,9 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
-Delete all numbered migration files in openrem's ``migrations`` folder, **leaving the 0002 files ending in .inactive**
+Delete all numbered migration files in openrem's ``remapp/migrations`` folder, **leaving the 0002 files ending in .inactive**
 
-If there is no file named ``__init__.py`` in the ``migrations`` folder, please create it.
+If there is no file named ``__init__.py`` in the ``remapp/migrations`` folder, please create it.
 
 .. sourcecode:: bash
 
@@ -178,13 +195,13 @@ Now rename the file
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py.inactive
+    remapp/migrations/0002_upgrade_0_7_from_0_6.py.inactive
 
 to:
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function.py
+    remapp/migrations/0002_upgrade_0_7_from_0_6.py
 
 and then run
 
@@ -199,6 +216,8 @@ and then run
 * Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
   :ref:`local_settings_logfile` settings in the install docs.
 
+..  _upgradefrom070b:
+
 ********************************************
 Upgrading from version 0.7.0 beta 7 or later
 ********************************************
@@ -209,7 +228,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b15
+    pip install openrem==0.7.0b16
 
 From the openrem folder (see above):
 
@@ -219,7 +238,7 @@ From the openrem folder (see above):
     python manage.py migrate remapp
 
 * Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
-:ref:`local_settings_logfile` settings in the install docs.
+  :ref:`local_settings_logfile` settings in the install docs.
 
 
 Restart all the services!

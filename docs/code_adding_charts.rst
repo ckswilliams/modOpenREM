@@ -13,7 +13,15 @@ To add a new chart several files need to be updated:
 
 Where xx is one of ``ct``, ``dx``, ``mg`` or ``rf``
 
-The process is probably best illustrated via an example. What follows is a
+The additions to the files add:
+
+* database fields in the user profile to control whether the new charts are plotted (``models.py``)
+* new options on the chart plotting forms (``forms.py``, ``displaychartoptions.html``)
+* extra code to calculate the data for the new charts if they are switched on (``views.py``)
+* a section of html and JavaScript to contain the charts (``xxfiltered.html``)
+* a section of JavaScript to pass the data calculated by ``views.py`` to ``xxfiltered.html``
+
+The process is probably best illustrated with an example. What follows is a
 description of how to add a new chart that displays study workload for
 fluoroscopy, and a pie chart of study description frequency.
 
@@ -176,7 +184,8 @@ Before:
 
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
-                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins)
+                             user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
+                             user_profile.plotHistograms)
 
 After:
 
@@ -185,7 +194,8 @@ After:
     return_structure =\
         rf_plot_calculations(f, request_results, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotRFStudyPerDayAndHour,  user_profile.plotRFStudyFreq)
+                             user_profile.plotRFStudyPerDayAndHour,  user_profile.plotRFStudyFreq,
+                             user_profile.plotHistograms)
 
 ----------------------------------
 ``xx_plot_calculations`` additions
@@ -198,14 +208,14 @@ Before:
 .. sourcecode:: python
 
     def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                             plot_histogram_bins):
+                             plot_histogram_bins, plot_histograms):
 
 After:
 
 .. sourcecode:: python
 
     def rf_plot_calculations(f, request_results, median_available, plot_average_choice, plot_series_per_systems,
-                             plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq):
+                             plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_histograms):
 
 Our new charts makes use of ``study_events`` (rather than ``acquisition_events``
 or ``request_events``). We therefore need to ensure that ``study_events`` are
@@ -216,11 +226,7 @@ After additions:
 .. sourcecode:: python
 
     if plot_study_per_day_and_hour:
-        study_events = GeneralStudyModuleAttr.objects.exclude(
-            study_description__isnull=True
-        ).filter(
-            study_instance_uid__in=exp_include
-        )
+        study_events = f.qs
 
 We now need to add code that will calculate the data for the new charts. This
 uses one of the methods in the ``chart_functions.py`` file, located in the
@@ -237,8 +243,11 @@ uses one of the methods in the ``chart_functions.py`` file, located in the
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
                                                   'study_description',
                                                   'projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__dose_area_product_total',
-                                                  1, 0, plot_study_freq, plot_series_per_systems, plot_average_choice,
-                                                  median_available, plot_histogram_bins)
+                                                  1000000,
+                                                  plot_study_dap, plot_study_freq,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  calculate_histograms=plot_histograms)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
@@ -465,6 +474,7 @@ DIV for the new charts:
             <script>
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyWorkloadDIV');
+                    fitChartToDiv('piechartStudyWorkloadDIV');
                 });
             </script>
 
@@ -495,6 +505,7 @@ DIV for the new charts:
             <script>
                 $(window).resize(function() {
                     chartSetExportSize('piechartStudyDIV');
+                    fitChartToDiv('piechartStudyDIV');
                 });
             </script>
 

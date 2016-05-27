@@ -32,6 +32,7 @@ To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network co
   between the remote nodes (modalities, PACS) and the OpenREM server, then you need to make sure that the firewall is
   configured to allow the port you choose here
 
+.. _nativestore:
 
 ******************************************
 Native DICOM store node with direct import
@@ -114,7 +115,7 @@ Controlling native Store SCP nodes
 ==================================
 
 If a native Store SCP node is not running, then a ``Start server`` button will be presented at the bottom right. If it
-is running, this buttin will change to ``Stop server``, and the ``Delete``button will become inactive.
+is running, this buttin will change to ``Stop server``, and the ``Delete`` button will become inactive.
 
 If the node is configured to be auto-started, and if :ref:`celery-beat` is running, then each minute if the server is
 not started Celery will try to start the node. If you intend to stop the node for some reason, modify the configuration

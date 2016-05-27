@@ -2,6 +2,19 @@
 
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
+{% block navhelp %}
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/netdicom-nodes.html#query-retrieve-of-third-party-system-such-as-a-pacs-or-modality" target="_blank" data-toggle="tooltip" title="DICOM QR configuration documentation - opens in a new tab">
+                DICOM query retrieve node configuration documentation
+            </a>
+        </li>
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/netdicom.html" target="_blank" data-toggle="tooltip" title="DICOM Store and QR documentation - opens in a new tab">
+                DICOM store and query-retrieve documentation
+            </a>
+        </li>
+{% endblock %}
+
 {% block mainblock %}		
 
       <div class="row col-md-offset-2">

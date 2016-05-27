@@ -1,6 +1,6 @@
-########################################
+#########################################
 Calculation and display of skin dose maps
-########################################
+#########################################
 
 ***********************
 Functionality available
@@ -27,7 +27,6 @@ The phantom consists of a cuboid with one semi-cylinder on each side (see
 default height of 1.786 m and mass of 73.2 kg are used if patient-specific data
 are unavailable.
 
-===============================
 2D visualisation of the 3D data
 ===============================
 
@@ -59,7 +58,6 @@ the following features:
 
    Figure 2: Phantom region overlay
 
-================
 3D visualisation
 ================
 

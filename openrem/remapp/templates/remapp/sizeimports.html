@@ -1,5 +1,13 @@
 {% extends "remapp/base.html" %}
 
+{% block navhelp %}
+        <li>
+            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_patientsize.html" target="_blank" data-toggle="tooltip" title="Patient size upload documentation - opens in a new tab">
+                Patient size upload documentation
+            </a>
+        </li>
+{% endblock %}
+
 
 {% block headextras %}
 {% if current %}

@@ -31,7 +31,7 @@
 
 
 def _patientstudymoduleattributes(exam, height, weight, verbose, csvrecord, *args, **kwargs): # C.7.2.2
-    from decimal import *
+    from decimal import Decimal
 
     imp_log = None
     if 'imp_log' in kwargs:

@@ -42,4 +42,4 @@ def hash_id(id, *args, **kwargs):
     if id:
         if isinstance(id, dicom.multival.MultiValue):
             id = ''.join(id)
-        return hashlib.sha256(id).hexdigest()
+        return hashlib.sha256(id.encode('utf-8')).hexdigest()

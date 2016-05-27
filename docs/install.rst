@@ -12,7 +12,7 @@ Install OpenREM 0.7 beta version
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b15
+    pip install openrem==0.7.0b16
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
@@ -65,7 +65,7 @@ Database
     displayed in OpenREM charts.** Alternatively, other databases such as MySQL/MariaDB, Oracle, and
     some others with lower levels of support can be used.
 
-    There are some further guides to setting up PostgreSQL – see `Database guides`_ below
+    There are some further guides to setting up PostgreSQL – see :ref:`databaselinks`
 
 If you are using SQLite:
 
@@ -227,13 +227,13 @@ Rename the file
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_fresh_openrem_install_add_median_function.py.inactive
+    remapp/migrations/0002_0_7_fresh_install_add_median.py.inactive
 
 to
 
 .. sourcecode:: console
 
-    remapp/migrations/0002_fresh_openrem_install_add_median_function.py
+    remapp/migrations/0002_0_7_fresh_install_add_median.py
 
 and then run
 
@@ -244,8 +244,7 @@ and then run
 
 The first command will create a skeleton ``0001_initial.py`` migration file. The
 second command runs the migration files, and will display the text
-``Applying remapp.0002_fresh__openrem_install_add_median_function... OK``, indicating
-that the median function has been added.
+``Applying remapp.0002_0_7_fresh_install_add_median... OK``, indicating that the median function has been added.
 
 Start all the services!
 =======================
@@ -255,19 +254,6 @@ You are now ready to start the services to allow you to use OpenREM - go to :doc
 
 Further instructions
 ====================
-
-Database guides
----------------
-
-Here are instructions for installing PostgreSQL on linux and on Windows, and guides to backup up PostgreSQL and MySQL:
-
-..  toctree::
-    :maxdepth: 1
-    
-    postgresql
-    postgresql_windows
-    backupMySQLWindows
-
 
 Production webservers
 ---------------------
