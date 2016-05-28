@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b16 (2016-05-28)
 ---------------------
 
+* `#401`_  Updated skin dose map documentation to say it won't be in this release
 * `#400`_  Strings are encoded as UTF-8 before being hashed to prevent errors with non-ASCII characters
 * `#399`_  Migration file brought up to date for 0.6 to 0.7 upgrades
 * `#398`_  Skin exposure maps are now stored in folders (feature postponed for future release)
