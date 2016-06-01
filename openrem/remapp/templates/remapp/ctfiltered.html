@@ -559,6 +559,98 @@
             </script>
         {% endif %}
 
+        {% if request.user.userprofile.plotCTStudyMeanCTDI %}
+            <!-- HTML to include div container for study CTDI plot -->
+            <div class="panel-group" id="accordionStudyCTDI">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionStudyCTDI" href="#collapseStudyCTDI" onclick="setTimeout(function() {fitChartToDiv('histogramStudyPlotCTDIdiv');}, 0);">
+                                {% if request.user.userprofile.plotAverageChoice == 'mean' %}
+                                    Plot of mean CTDI<sub>vol</sub> for each study description (may include multiple acquisition protocols per study).
+                                {% elif request.user.userprofile.plotAverageChoice == 'median' %}
+                                    Plot of median CTDI<sub>vol</sub> for each study description (may include multiple acquisition protocols per study).
+                                {% else %}
+                                    Plot of mean and median CTDI<sub>vol</sub> for each study description (may include multiple acquisition protocols per study).
+                                {% endif %}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseStudyCTDI" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="histogramStudyPlotCTDIdiv" style="height: auto; margin: 0 0"></div>
+
+                            <div class="stu-ctdi-instructions">
+                                <table style="border:none">
+                                    <tr>
+                                        <th colspan="3" style="padding: 0px; padding-right: 10px; vertical-align: top">Sorting options</th>
+                                        <td rowspan="3" style="padding-left: 20px">
+                                            {% if request.user.userprofile.plotHistograms %}
+                                            Click on an individual column to show a histogram of data for that study description.<br>
+                                            Click on a histogram bin tooltip to see the studies contained in the bin. Note that this
+                                            will include studies at the upper bin boundary, so in some cases may display more data
+                                            than shown in the histogram bin.
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotCTDIdiv', 'avg_value', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending CTDI">&uarr;CTDI</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotCTDIdiv', 'total_counts', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by ascending frequency">&uarr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotCTDIdiv', 'name', 1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort alphabetically">A&nbsp;to&nbsp;Z</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotCTDIdiv', 'avg_value', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending CTDI">&darr;CTDI</a></td>
+                                        <td style="padding: 0px; padding-right: 10px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotCTDIdiv', 'total_counts', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort by descending frequency">&darr;frequency</a></td>
+                                        <td style="padding: 0px; vertical-align: top"><a onclick="anySeriesSort('#histogramStudyPlotCTDIdiv', 'name', -1, 0)" class="sorting-option" data-toggle="tooltip" title="Sort reverse alphabetically">Z&nbsp;to&nbsp;A</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <a onclick="enterFullScreen('collapseStudyCTDI', 'histogramStudyPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <div class="stu-ctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotCTDIdiv')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for study CTDI plot -->
+
+            <script>
+                var plotCTStudyMeanCTDI = true;
+                $(window).resize(function() {
+                    chartSetExportSize('histogramStudyPlotCTDIdiv');
+                    fitChartToDiv('histogramStudyPlotCTDIdiv');
+                });
+
+                var tooltipFiltersStudyCTDI = '{% for field in filter.form %}{% if field.name != 'acquisition_ctdi_min' and field.name != 'acquisition_ctdi_max' and field.name != 'study_description' and field.name != 'o' and field.value %}&{{ field.name }}={{ field.value }}{% endif %}{% endfor %}';
+                norm_btn_class = '.stu-ctdi-hist-norm-btn';
+                instr_class = '.stu-ctdi-instructions';
+                render_div = 'histogramStudyPlotCTDIdiv';
+                val_label = 'CTDI<sub>vol</sub>';
+                val_units = 'mGy';
+                cat_label = 'Study description';
+                cat_counter = 'studies';
+                field_name_min = 'acquisition_ctdi_min';
+                field_name_max = 'acquisition_ctdi_max';
+                field_multiplier = 1.0;
+                field_cat_name = 'study_description';
+                tooltip_filters = tooltipFiltersStudyCTDI;
+                href_start = '/openrem/ct/?studyhist=1&';
+
+            {% if request.user.userprofile.plotAverageChoice == 'both' %}
+                avg_label = 'Mean and median';
+            {% elif request.user.userprofile.plotAverageChoice == 'mean' %}
+                avg_label = 'Mean';
+            {% else %}
+                avg_label = 'Median';
+            {% endif %}
+
+                def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
+                result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
+                        val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
+                        field_cat_name, tooltip_filters, href_start);
+            </script>
+        {% endif %}
+
         {% if request.user.userprofile.plotCTStudyFreq %}
             <!-- HTML to include div container for study pie chart -->
             <div class="panel-group" id="accordion6">

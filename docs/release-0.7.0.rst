@@ -26,7 +26,9 @@ Headline changes
 * Charts and interface
 
     * Bar chart data points sorted by frequency, value or name in ascending or descending order
-    * New chart of DLP per requested procedure type and requested procedure frequency
+    * CT chart of DLP per requested procedure type
+    * CT chart of requested procedure frequency
+    * CT chart of CTDIvol per study description
     * Chart data returned using AJAX to make pages more responsive
     * Chart plotting options available via Config menu
     * Charts can now be made full-screen

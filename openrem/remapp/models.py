@@ -254,6 +254,7 @@ class UserProfile(models.Model):
     plotCTAcquisitionMeanCTDI = models.BooleanField(default=True)
     plotCTAcquisitionFreq = models.BooleanField(default=False)
     plotCTStudyMeanDLP = models.BooleanField(default=True)
+    plotCTStudyMeanCTDI = models.BooleanField(default=True)
     plotCTStudyFreq = models.BooleanField(default=False)
     plotCTRequestMeanDLP = models.BooleanField(default=False)
     plotCTRequestFreq = models.BooleanField(default=False)

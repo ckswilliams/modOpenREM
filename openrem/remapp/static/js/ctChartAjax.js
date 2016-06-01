@@ -57,6 +57,12 @@ $(document).ready(function() {
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramStudyPlotDIV');
             }
 
+            // CTDI per study chart data
+            if(typeof plotCTStudyMeanCTDI !== 'undefined') {
+                updateAverageChart(json.studyNameListCTDI, json.studySystemListCTDI, json.studySummaryCTDI, json.studyHistogramDataCTDI, plotAverageChoice, 'histogramStudyPlotCTDIdiv', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramStudyPlotCTDIdiv');
+            }
+
             // DLP per request chart data start
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
                 updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, 'histogramRequestPlotDIV', colour_scale);
