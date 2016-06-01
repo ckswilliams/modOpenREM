@@ -224,7 +224,10 @@ def ct_acq_filter(filters, pid=False):
                     'acquisition_ctdi_min' in filters or 'acquisition_ctdi_max' in filters or
                         'acquisition_dlp_min' in filters or 'acquisition_dlp_max' in filters
     ):
-        events = CtIrradiationEventData.objects.filter(acquisition_protocol__exact = filters['acquisition_protocol'])
+        if ('studyhist' in filters) and ('study_description' in filters):
+            events = CtIrradiationEventData.objects.select_related().filter(ct_radiation_dose_id__general_study_module_attributes__study_description=filters['study_description'])
+        else:
+            events = CtIrradiationEventData.objects.filter(acquisition_protocol__exact = filters['acquisition_protocol'])
         if 'acquisition_ctdi_min' in filters:
             try:
                 Decimal(filters['acquisition_ctdi_min'])
