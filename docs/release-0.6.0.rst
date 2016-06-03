@@ -13,6 +13,16 @@ Headline changes
 * Mammography import compression force behaviour changed
 * Import of Toshiba planar RDSRs fixed
 
+Changes for 0.6.2
+=================
+
+Minor update due prevent new installs from installing a non-compatible version of ``django-filter``.
+The link to `OpenSkin`_ has also been updated in the fluoroscopy detail page.
+
+**There is no advantage to updating to this version over 0.6.0**
+
+Release 0.6.1 was just a documentation only change to update the link to `OpenSkin`_.
+
 
 *************************
 Preparing for the upgrade
@@ -136,7 +146,7 @@ Exports for OpenSkin
 
 Fluoroscopy studies can now be exported in a format suitable for importing into Jonathan Cole's OpenSkin software. The
 export link is on the fluoroscopy study detail page. The software for creating the exposure incidence map can be
-downloaded from https://bitbucket.org/jacole/openskin/downloads (choose the zip file), and information about the project
+downloaded from https://bitbucket.org/openskin/openskin/downloads (choose the zip file), and information about the project
 can be found on the `OpenSkin wiki`_. The software allows the user to choose between a 2D phantom that would represent
 the dose to a film laying on the couch surface, or a simple 3D phantom made up of a cuboid and two semi-cylinders
 (these can be seen on the `Phantom design`_ section of the wiki). For both options the output is an image of the dose
@@ -174,9 +184,9 @@ Toshiba include Patient Orientation and Patient Orientation Modifier information
 code was deficient for this as the RDSRs previously used didn't have this information. This has now been fixed. There
 might however be an issue with Station Name not being provided - it is not yet clear if this is a configuration issue.
 
-.. _`OpenSkin`: https://bitbucket.org/jacole/openskin
-.. _`OpenSkin wiki`: https://bitbucket.org/jacole/openskin/wiki/Home
-.. _`Phantom design`: https://bitbucket.org/jacole/openskin/wiki/Phantom%20design
+.. _`OpenSkin`: https://bitbucket.org/openskin/openskin
+.. _`OpenSkin wiki`: https://bitbucket.org/openskin/openskin/wiki/Home
+.. _`Phantom design`: https://bitbucket.org/openskin/openskin/wiki/Phantom%20design
 ..  _`#41`: https://bitbucket.org/openrem/openrem/issue/41/
 ..  _`#133`: https://bitbucket.org/openrem/openrem/issue/133/
 ..  _`#135`: https://bitbucket.org/openrem/openrem/issue/135/
