@@ -27,6 +27,7 @@
 ..  moduleauthor:: Ed McDonagh
 
 """
+from dicom.valuerep import PersonName
 import logging
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ def get_value_kw(tag,dataset):
     if (tag in dataset):
         val = getattr(dataset,tag)
         if val != '':
-            if type(val) is str:
+            if type(val) is str or type(val) is PersonName:
                 val = val.decode('latin-1', 'replace')
             return val
 
@@ -62,7 +63,7 @@ def get_value_num(tag,dataset):
     if (tag in dataset):
         val = dataset[tag].value
         if val != '':
-            if type(val) is str:
+            if type(val) is str or type(val) is PersonName:
                 val = val.decode('latin-1', 'replace')
             return val
 
@@ -95,7 +96,7 @@ def get_seq_code_meaning(sequence,dataset):
         if seq and hasattr(seq[0],'CodeMeaning'):
             meaning = seq[0].CodeMeaning
             if meaning != '':
-                if type(meaning) is str:
+                if type(meaning) is str or type(meaning) is PersonName:
                     meaning = meaning.decode('latin-1', 'replace')
             return meaning
 
