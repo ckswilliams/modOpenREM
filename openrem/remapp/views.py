@@ -468,6 +468,7 @@ def rf_summary_list_filter(request):
 
     # # Calculate skin dose map for all objects in the database
     # import cPickle as pickle
+    # import gzip
     # num_studies = f.count()
     # current_study = 0
     # for study in f:
@@ -486,7 +487,8 @@ def rf_summary_list_filter(request):
     #     from remapp.version import __skin_map_version__
     #     loaded_existing_data = False
     #     if os.path.exists(skin_map_path):
-    #         existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+    #         with gzip.open(skin_map_path, 'rb') as f:
+    #             existing_skin_map_data = pickle.load(f)
     #         try:
     #             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
     #                 loaded_existing_data = True
@@ -635,6 +637,7 @@ def rf_detail_view_skin_map(request, pk=None):
     from openremproject.settings import MEDIA_ROOT
     import os
     import cPickle as pickle
+    import gzip
 
     from django.core.exceptions import ObjectDoesNotExist
     try:
@@ -661,7 +664,8 @@ def rf_detail_view_skin_map(request, pk=None):
     from remapp.version import __skin_map_version__
     loaded_existing_data = False
     if os.path.exists(skin_map_path):
-        existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+        with gzip.open(skin_map_path, 'rb') as f:
+            existing_skin_map_data = pickle.load(f)
         try:
             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
                 return_structure = existing_skin_map_data
@@ -672,7 +676,8 @@ def rf_detail_view_skin_map(request, pk=None):
     if not loaded_existing_data:
         from remapp.tools.make_skin_map import make_skin_map
         make_skin_map(pk)
-        return_structure = pickle.load(open(skin_map_path, 'rb'))
+        with gzip.open(skin_map_path, 'rb') as f:
+            return_structure = pickle.load(f)
 
     return JsonResponse(return_structure, safe=False)
 

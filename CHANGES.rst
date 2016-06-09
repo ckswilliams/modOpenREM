@@ -5,6 +5,7 @@ OpenREM version history
 0.7.0b16 (2016-05-28)
 ---------------------
 
+* `#402`_  Skin dose map data pickle files saved using gzip compression to save space
 * `#401`_  Updated skin dose map documentation to say it won't be in this release
 * `#400`_  Strings are encoded as UTF-8 before being hashed to prevent errors with non-ASCII characters
 * `#399`_  Migration file brought up to date for 0.6 to 0.7 upgrades

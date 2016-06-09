@@ -54,6 +54,7 @@ def make_skin_map(study_pk=None):
     from openremproject.settings import MEDIA_ROOT
     import os
     import cPickle as pickle
+    import gzip
     from remapp.version import __skin_map_version__
 
     if study_pk:
@@ -190,4 +191,5 @@ def make_skin_map(study_pk=None):
         if not os.path.exists(skin_map_path):
             os.makedirs(skin_map_path)
 
-        pickle.dump(return_structure, open(os.path.join(skin_map_path, 'skin_map_' + str(study_pk) + '.p'), 'wb'))
+        with gzip.open(os.path.join(skin_map_path, 'skin_map_' + str(study_pk) + '.p'), 'wb') as f:
+            pickle.dump(return_structure, f)
