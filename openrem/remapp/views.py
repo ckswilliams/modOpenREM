@@ -487,8 +487,8 @@ def rf_summary_list_filter(request):
     #     from remapp.version import __skin_map_version__
     #     loaded_existing_data = False
     #     if os.path.exists(skin_map_path):
-    #         with gzip.open(skin_map_path, 'rb') as f:
-    #             existing_skin_map_data = pickle.load(f)
+    #         with gzip.open(skin_map_path, 'rb') as pickle_file:
+    #             existing_skin_map_data = pickle.load(pickle_file)
     #         try:
     #             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
     #                 loaded_existing_data = True
