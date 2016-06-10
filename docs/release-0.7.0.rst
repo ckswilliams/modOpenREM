@@ -1,11 +1,6 @@
-#############################
-Upgrade to OpenREM 0.7.0 beta
-#############################
-
-.. Warning::
-
-    This is a beta version for developer testing. It is not suitable for general use, and the instructions below are
-    likely to be incorrect.
+########################
+Upgrade to OpenREM 0.7.0
+########################
 
 ****************
 Headline changes
@@ -75,73 +70,6 @@ Headline changes
     * Skin dose maps have been withdrawn from OpenREM version 0.7.0 due to incorrect orientation calculations that need
       to be fixed before openSkin can be reimplemented into OpenREM
 
-Updates since beta 7
-====================
-* Full screen charts
-* Test implementation of QR SCU from the command line
-* Equipment display names are now grouped by modality
-* New docs and bug fixes
-
-Updates since beta 9
-====================
-* QR SCU has been much improved
-* Docs, charts and fixes: see git commits
-
-Updates since beta 10
-=====================
-* QR SCU further improved with more testing
-* QR SCU can now filter by include and exclude terms in study description
-* QR SCU now safe with non-ASCII characters in series names etc
-* Version number now only declared once in the project
-* Monday is now the first day of the week in the pop-up date-pickers
-* Improvements to chart tool-tip visibility
-* 'Turn off charts' no longer changes the page
-* Improvements (hopefully) to Store SCP - no longer a Celery task
-* Improvements (hopefully) to task performance as long-running QR and export operations shouldn't queue tasks when there
-  are unused workers
-* Improvements (hopefully) to the keep-alive periodic task preventing requests stacking up when something goes wrong
-* Improvements to docs, beginnings of DICOM networking docs
-
-Updates since beta 11
-=====================
-* Fixed errors with DICOM store, keep_alive and echo functions
-
-Updates since beta 12
-=====================
-* Mammography RDSRs now import correctly
-* Added study description to mammography exports
-* Philips Allura fluoro RDSRs import fixed
-* Bi-plane fluoro exports fixed
-
-Updates since beta 13
-=====================
-* Mammography RDSRs and images now record an Accumulated AGD per breast
-* Mammography RDSRs and images now record mA in the same way as each other
-* CTDIw phantom size now displayed in the detail view
-* Patient size imports from CSV are now assumed to be cm and converted to m to store. Interface now assumes m
-* Exposure time is now populated when not supplied for fluoro RDSRs
-* DICOM Store and QR documentation updated, but not complete. Forms and text changed to demote OpenREM native DICOM
-  Store and QR functionality
-
-Updates since beta 14
-=====================
-* Senographe DS compression force now stored correctly in Newtons for new imports
-* The display name of multiple systems can now be updated together using a single new name
-* Non-ASCII characters can now be imported from TextValue fields in RDSR sequences
-* Settings file has been updated
-* Mammo laterality has been added to mammo exports
-* Fixed in one of the beta versions was charts using greater than rather than greater than or equal to
-* Fluoroscopy skin dose maps
-* Display tables made neater
-
-Updates since beta 15
-=====================
-* Normalised histogram tooltip now correctly reports frequency
-* Tube current is now extracted from Siemens Intevo RDSRs
-* Non-ASCII characters are better handled in stored patient names
-* Fluoroscopy skin dose maps removed again until orientation errors are corrected
-* Upgrades from 0.6 have been fixed
-
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
@@ -168,7 +96,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b16
+    pip install openrem==0.7.0
 
 In a shell/command window, move into the openrem folder:
 
@@ -180,7 +108,9 @@ In a shell/command window, move into the openrem folder:
 
 Delete all numbered migration files in openrem's ``remapp/migrations`` folder, **leaving the 0002 files ending in .inactive**
 
-If there is no file named ``__init__.py`` in the ``remapp/migrations`` folder, please create it.
+* If there is no file named ``__init__.py`` in the ``remapp/migrations`` folder, please create it.
+* If you have accidentally deleted the 0002 files ending in ``.inactive``, you can get a new copy from
+  `the bitbucket repository <https://bitbucket.org/openrem/openrem/src/008ec3c2e7ffee89355c10fda39a6293b79fa89f/stuff/0002_upgrade_0_7_from_0_6.py.inactive?at=develop>`_.
 
 .. sourcecode:: bash
 
@@ -210,8 +140,18 @@ and then run
 
     With a large database, this may take some time!
 
-* Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
+* Review the new ``openremproject/local_settings.py.example`` file and copy accross the logging section. Then see
   :ref:`local_settings_logfile` settings in the install docs.
+
+  If you are using PuTTY on Windows to interact with a linux server, you can select the logging configuration section
+  of the example file with your mouse, and it will be automatically copied to the clipboard. Then open the existing
+  ``local_settings.py`` file with nano, move the curser down to the bottom and click the right mouse button to paste.
+
+Restart all the services!
+=========================
+
+Some of the commands and services have changed - follow the guide at :doc:`startservices`.
+
 
 ..  _upgradefrom070b:
 
@@ -225,7 +165,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0b16
+    pip install openrem==0.7.0
 
 From the openrem folder (see above):
 

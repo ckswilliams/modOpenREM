@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.7.0b16 (2016-05-28)
----------------------
+0.7.0 (2016-06-10)
+------------------
 
 * `#403`_  Now deals with PersonName fields with latin-1 extended characters correctly
 * `#402`_  Skin dose map data pickle files saved using gzip compression to save space
