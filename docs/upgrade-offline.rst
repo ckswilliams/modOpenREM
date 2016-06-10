@@ -16,7 +16,7 @@ download them all:
 .. sourcecode:: console
 
     mkdir openremfiles
-    pip install -d openremfiles openrem==0.7.0b16
+    pip install -d openremfiles openrem==0.7.0
 
 Copy everything to the OpenREM server
 -------------------------------------
@@ -36,7 +36,7 @@ On the OpenREM server without internet access
 
 .. sourcecode:: console
 
-    pip install --no-index --find-links=openremfiles openrem==0.7.0b16
+    pip install --no-index --find-links=openremfiles openrem==0.7.0
 
 Now continue with :ref:`upgradefrom060` or :ref:`upgradefrom070b` as appropriate, starting just after the ``pip
 install`` line.
