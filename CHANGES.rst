@@ -2,9 +2,12 @@
 OpenREM version history
 =======================
 
-0.7.0b16 (2016-05-28)
----------------------
+0.7.0 (2016-06-10)
+------------------
 
+* `#403`_  Now deals with PersonName fields with latin-1 extended characters correctly
+* `#402`_  Skin dose map data pickle files saved using gzip compression to save space
+* `#401`_  Updated skin dose map documentation to say it won't be in this release
 * `#400`_  Strings are encoded as UTF-8 before being hashed to prevent errors with non-ASCII characters
 * `#399`_  Migration file brought up to date for 0.6 to 0.7 upgrades
 * `#398`_  Skin exposure maps are now stored in folders (feature postponed for future release)
@@ -148,6 +151,11 @@ OpenREM version history
 * `#118`_  Upgraded to Django 1.8
 * `#70`_   User is returned to the filtered view after deleting a study
 * `#61`_   Skin dose maps for fluoroscopy systems can now be calculated and displayed
+
+0.6.2 (2016-01-27)
+------------------
+* `#347`_  Django-filter v0.12 has minimum Django version of 1.8, fixed OpenREM 0.6.2 to max django-filter 0.11
+* `#341`_  Changed references to the OpenSkin repository for 0.6 series.
 
 0.6.1 (2015-10-30)
 ------------------

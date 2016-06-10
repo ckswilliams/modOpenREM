@@ -59,6 +59,10 @@ div.acqctdi-hist-norm-btn {
   display: none;
 }
 
+div.stu-ctdi-hist-norm-btn {
+  display: none;
+}
+
 div.kvp-hist-norm-btn {
   display: none;
 }
@@ -72,6 +76,10 @@ div.acq-instructions {
 }
 
 div.acq-ctdi-instructions {
+  display: block;
+}
+
+div.stu-ctdi-instructions {
   display: block;
 }
 

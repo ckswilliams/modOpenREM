@@ -468,6 +468,7 @@ def rf_summary_list_filter(request):
 
     # # Calculate skin dose map for all objects in the database
     # import cPickle as pickle
+    # import gzip
     # num_studies = f.count()
     # current_study = 0
     # for study in f:
@@ -486,7 +487,8 @@ def rf_summary_list_filter(request):
     #     from remapp.version import __skin_map_version__
     #     loaded_existing_data = False
     #     if os.path.exists(skin_map_path):
-    #         existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+    #         with gzip.open(skin_map_path, 'rb') as pickle_file:
+    #             existing_skin_map_data = pickle.load(pickle_file)
     #         try:
     #             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
     #                 loaded_existing_data = True
@@ -635,6 +637,7 @@ def rf_detail_view_skin_map(request, pk=None):
     from openremproject.settings import MEDIA_ROOT
     import os
     import cPickle as pickle
+    import gzip
 
     from django.core.exceptions import ObjectDoesNotExist
     try:
@@ -661,7 +664,8 @@ def rf_detail_view_skin_map(request, pk=None):
     from remapp.version import __skin_map_version__
     loaded_existing_data = False
     if os.path.exists(skin_map_path):
-        existing_skin_map_data = pickle.load(open(skin_map_path, 'rb'))
+        with gzip.open(skin_map_path, 'rb') as f:
+            existing_skin_map_data = pickle.load(f)
         try:
             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
                 return_structure = existing_skin_map_data
@@ -672,7 +676,8 @@ def rf_detail_view_skin_map(request, pk=None):
     if not loaded_existing_data:
         from remapp.tools.make_skin_map import make_skin_map
         make_skin_map(pk)
-        return_structure = pickle.load(open(skin_map_path, 'rb'))
+        with gzip.open(skin_map_path, 'rb') as f:
+            return_structure = pickle.load(f)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -721,6 +726,7 @@ def ct_summary_list_filter(request):
             user_profile.plotCTAcquisitionMeanCTDI = chart_options_form.cleaned_data['plotCTAcquisitionMeanCTDI']
             user_profile.plotCTAcquisitionFreq = chart_options_form.cleaned_data['plotCTAcquisitionFreq']
             user_profile.plotCTStudyMeanDLP = chart_options_form.cleaned_data['plotCTStudyMeanDLP']
+            user_profile.plotCTStudyMeanCTDI = chart_options_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = chart_options_form.cleaned_data['plotCTStudyFreq']
             user_profile.plotCTRequestMeanDLP = chart_options_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = chart_options_form.cleaned_data['plotCTRequestFreq']
@@ -738,6 +744,7 @@ def ct_summary_list_filter(request):
                         'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
                         'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
                         'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
+                        'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                         'plotCTStudyFreq': user_profile.plotCTStudyFreq,
                         'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                         'plotCTRequestFreq': user_profile.plotCTRequestFreq,
@@ -763,16 +770,22 @@ def ct_summary_list_filter(request):
 
 @login_required
 def ct_summary_chart_data(request):
-    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid
+    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid, ct_acq_filter
     from openremproject import settings
     from django.http import JsonResponse
 
+    # if request.user.groups.filter(name='pidgroup'):
+    #     f = CTFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+    #         modality_type__exact='CT').order_by().distinct())
+    # else:
+    #     f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
+    #         modality_type__exact='CT').order_by().distinct())
+
     if request.user.groups.filter(name='pidgroup'):
-        f = CTFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact='CT').order_by().distinct())
+        pid = True
     else:
-        f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-            modality_type__exact='CT').order_by().distinct())
+        pid = False
+    f = ct_acq_filter(request.GET, pid=pid)
 
     try:
         # See if the user has plot settings in userprofile
@@ -796,6 +809,7 @@ def ct_summary_chart_data(request):
     return_structure =\
         ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
                              user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
+                             user_profile.plotCTStudyMeanCTDI,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
                              user_profile.plotHistogramBins, user_profile.plotHistograms)
@@ -805,6 +819,7 @@ def ct_summary_chart_data(request):
 
 def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
                          plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
+                         plot_study_mean_ctdi,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms):
@@ -813,14 +828,14 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     return_structure = {}
 
-    if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
         try:
             if f.form.data['acquisition_protocol']:
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
 
-    if plot_study_mean_dlp or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -902,6 +917,24 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         return_structure['studySummary'] = result['summary']
         if plot_study_mean_dlp and plot_histograms:
             return_structure['studyHistogramData'] = result['histogram_data']
+
+    if plot_study_mean_ctdi:
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'ctradiationdose__ctirradiationeventdata__mean_ctdivol',
+                                                  1,
+                                                  plot_study_mean_ctdi, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  exclude_constant_angle=True,
+                                                  calculate_histograms=plot_histograms)
+
+        return_structure['studySystemListCTDI'] = result['system_list']
+        return_structure['studyNameListCTDI'] = result['series_names']
+        return_structure['studySummaryCTDI'] = result['summary']
+        if plot_histograms:
+            return_structure['studyHistogramDataCTDI'] = result['histogram_data']
 
     if plot_request_mean_dlp or plot_request_freq:
         result = average_chart_inc_histogram_data(request_events,
@@ -1689,6 +1722,7 @@ def chart_options_view(request):
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
             user_profile.plotCTAcquisitionFreq = ct_form.cleaned_data['plotCTAcquisitionFreq']
             user_profile.plotCTStudyMeanDLP = ct_form.cleaned_data['plotCTStudyMeanDLP']
+            user_profile.plotCTStudyMeanCTDI = ct_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = ct_form.cleaned_data['plotCTStudyFreq']
             user_profile.plotCTRequestMeanDLP = ct_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = ct_form.cleaned_data['plotCTRequestFreq']
@@ -1744,6 +1778,7 @@ def chart_options_view(request):
                     'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                     'plotCTStudyFreq': user_profile.plotCTStudyFreq,
                     'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
+                    'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                     'plotCTRequestFreq': user_profile.plotCTRequestFreq,
                     'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                     'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
