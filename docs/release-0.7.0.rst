@@ -1,5 +1,5 @@
 ########################
-Upgrade to OpenREM 0.7.0
+Upgrade to OpenREM 0.7.1
 ########################
 
 ****************
@@ -70,6 +70,11 @@ Headline changes
     * Skin dose maps have been withdrawn from OpenREM version 0.7.0 due to incorrect orientation calculations that need
       to be fixed before openSkin can be reimplemented into OpenREM
 
+Changes since 0.7.0
+===================
+
+Extremely minor change to the documenation links
+
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
@@ -96,7 +101,7 @@ Upgrading from version 0.6.0
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0
+    pip install openrem==0.7.1
 
 In a shell/command window, move into the openrem folder:
 
@@ -165,7 +170,7 @@ Upgrading from version 0.7.0 beta 7 or later
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0
+    pip install openrem==0.7.1
 
 From the openrem folder (see above):
 
