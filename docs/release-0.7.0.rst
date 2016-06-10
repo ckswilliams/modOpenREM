@@ -108,7 +108,9 @@ In a shell/command window, move into the openrem folder:
 
 Delete all numbered migration files in openrem's ``remapp/migrations`` folder, **leaving the 0002 files ending in .inactive**
 
-If there is no file named ``__init__.py`` in the ``remapp/migrations`` folder, please create it.
+* If there is no file named ``__init__.py`` in the ``remapp/migrations`` folder, please create it.
+* If you have accidentally deleted the 0002 files ending in ``.inactive``, you can get a new copy from
+  `the bitbucket repository <https://bitbucket.org/openrem/openrem/src/008ec3c2e7ffee89355c10fda39a6293b79fa89f/stuff/0002_upgrade_0_7_from_0_6.py.inactive?at=develop>`_.
 
 .. sourcecode:: bash
 
@@ -138,8 +140,18 @@ and then run
 
     With a large database, this may take some time!
 
-* Review the new ``local_settings.py.example`` file and copy accross the logging section. Then see
+* Review the new ``openremproject/local_settings.py.example`` file and copy accross the logging section. Then see
   :ref:`local_settings_logfile` settings in the install docs.
+
+  If you are using PuTTY on Windows to interact with a linux server, you can select the logging configuration section
+  of the example file with your mouse, and it will be automatically copied to the clipboard. Then open the existing
+  ``local_settings.py`` file with nano, move the curser down to the bottom and click the right mouse button to paste.
+
+Restart all the services!
+=========================
+
+Some of the commands and services have changed - follow the guide at :doc:`startservices`.
+
 
 ..  _upgradefrom070b:
 
