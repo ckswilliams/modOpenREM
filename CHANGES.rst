@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.0 (2016-06-10)
+0.7.1 (2016-06-10)
 ------------------
 
 * `#403`_  Now deals with PersonName fields with latin-1 extended characters correctly
