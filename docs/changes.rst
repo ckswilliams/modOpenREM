@@ -2,6 +2,11 @@
 OpenREM version history
 =======================
 
+0.7.2
+-----
+
+* `#406`_  Replaced Math.log10 JavaScript function with alternative function to fix IE11 skin dose map error
+
 0.7.0 (2016-06-10)
 ------------------
 
