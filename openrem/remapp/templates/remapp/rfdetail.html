@@ -287,7 +287,6 @@
                 <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>.
             </p>
             {% url 'skin_dose_map_settings_update' 1 as the_url %}
-            <!-- Commented out until openSkin confirmed as working OK
             <p>
                 This version of OpenREM has openSkin built-in, and is able to calculate and display skin dose maps for
                 some x-ray systems. However, this option is switched off for your installation at the moment. It can be
@@ -297,7 +296,6 @@
                 <strong>Warning:</strong> Only copper filters are considered in this export - aluminium or other filters
                 are not considered. This is related to the way openSkin works.
             </p>
-            -->
             <h4>
                 Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">openSkin export</a>. <small>(Not
                 available if you don't have export permissions.)</small>
