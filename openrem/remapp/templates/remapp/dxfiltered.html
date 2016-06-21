@@ -135,7 +135,7 @@
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                        <table>
+                        <table onclick="window.location='/openrem/dx/{{ exam.id }}/';">
                             <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer }}</td></tr>
                             <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.manufacturer_model_name }}</td></tr>
                             <tr><td class="nowrap">{{ exam.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</td></tr>
@@ -149,7 +149,7 @@
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
-                        <table>
+                        <table onclick="window.location='/openrem/dx/{{ exam.id }}/';">
                             <tr><td class="nowrap">{{ exam.study_description }}</td></tr>
                             <tr><td class="nowrap">{{ exam.requested_procedure_code_meaning }}</td></tr>
                         {% if not exam.accession_hashed %}
