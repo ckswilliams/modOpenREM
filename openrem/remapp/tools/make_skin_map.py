@@ -47,7 +47,7 @@ from celery import shared_task
 logger = logging.getLogger('remapp.tools.make_skin_map')  # Explicitly named so that it is still handled when using __main__
 
 
-@shared_task(name='remapp.tools.make_skin_map')
+@shared_task(name='remapp.tools.make_skin_map', ignore_result=True)
 def make_skin_map(study_pk=None):
     import remapp.tools.openskin.calc_exp_map as calc_exp_map
     from remapp.models import GeneralStudyModuleAttr
