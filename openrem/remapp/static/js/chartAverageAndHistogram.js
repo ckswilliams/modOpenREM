@@ -144,7 +144,8 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
             column: {
                 pointPadding: 0,
                 borderWidth: 1,
-                borderColor: '#999999'
+                borderColor: '#999999',
+                turboThreshold: 5000 // Greater than the 1000 default to enable large data series to be plotted
             }
         },
         series: [],

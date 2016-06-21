@@ -7,6 +7,11 @@ function chartAverageOverTime(render_div, value_label, value_units, avg_label) {
             renderTo: render_div,
             zoomType: 'x'
         },
+        plotOptions: {
+            line: {
+                turboThreshold: 5000 // Greater than the 1000 default to enable large data series to be plotted
+            }
+        },
         title: {
             text: ''
         },
