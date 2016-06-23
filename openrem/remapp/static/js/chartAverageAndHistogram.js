@@ -19,11 +19,6 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                 theme: {
                     display: 'none'
                 }
-                //position: {
-                //    x: -50,
-                //    y: 10
-                //},
-                //relativeTo: 'chart'
             },
             renderTo: render_div,
             events: {
@@ -57,21 +52,23 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                         title: {
                             text: value_label + ' range (' + value_units + ')'
                         },
-                        categories: []
+                        categories: [],
+                        max: e.seriesOptions.data.length - 1
                     }, false);
                     this.tooltip.options.formatter = function (e) {
                         var linkText = fld_min + '=' + (bins[this.x])*fld_multiplier + '&' + fld_max + '=' + (bins[this.x + 1])*fld_multiplier + '&' + fld_cat_name + '=' + name;
                         if (this.series.name != 'All systems') linkText += '&display_name=' + this.series.name;
 
+                        var value_to_write;
                         if (e.chart.options.drilldown.normalise) {
                             for (var i=0; i<e.chart.options.drilldown.series.length; i++) {
                                 if (e.chart.options.drilldown.series[i].id == this.series.name + name) {
                                     var max_value = Math.max.apply(Math, e.chart.options.drilldown.series[i].original_data.map(function(v) {return v;}));
                                 }
                             }
-                            var value_to_write = max_value * this.y;
+                            value_to_write = max_value * this.y;
                         } else {
-                            var value_to_write = this.y;
+                            value_to_write = this.y;
                         }
                         return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + href_start + linkText + tooltip_filters + '">Click to view</a></td></tr></table>';
                     };
@@ -100,7 +97,8 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                             formatter: function (args) {
                                 return this.point.category;
                             }
-                        }
+                        },
+                        max: e.seriesOptions.data.length - 1
                     }, false);
                     this.tooltip.options.formatter = function () {
                         return this.point.tooltip;
@@ -125,7 +123,8 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                 useHTML: true,
                 rotation: 90
             },
-            minRange: 1
+            minRange: 1,
+            min: 0
         },
         yAxis: {
             min: 0,

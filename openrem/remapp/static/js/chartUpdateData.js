@@ -260,7 +260,11 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     }
 
     var chart = $('#'+chart_div).highcharts();
-    chart.xAxis[0].setCategories(name_list);
+    chart.xAxis[0].update({
+        categories: name_list,
+        min: 0,
+        max: name_list.length - 1
+    }, false);
     if (calc_histograms) chart.options.drilldown.series = drilldown_series;
     chart.options.exporting.sourceWidth = $(window).width();
     chart.options.exporting.sourceHeight = $(window).height();
