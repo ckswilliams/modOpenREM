@@ -53,7 +53,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                             text: value_label + ' range (' + value_units + ')'
                         },
                         categories: [],
-                        max: e.seriesOptions.data.length - 1
+                        max: (typeof(e.seriesOptions) !== 'undefined') ? e.seriesOptions.data.length - 1 : this.xAxis[0].max
                     }, false);
                     this.tooltip.options.formatter = function (e) {
                         var linkText = fld_min + '=' + (bins[this.x])*fld_multiplier + '&' + fld_max + '=' + (bins[this.x + 1])*fld_multiplier + '&' + fld_cat_name + '=' + name;
