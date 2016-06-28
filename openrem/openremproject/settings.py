@@ -8,11 +8,12 @@ from __future__ import absolute_import
 
 # Debug is now set to false - you can turn it back on in local_settings if you need to
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 # Celery settings
 
 BROKER_URL = 'amqp://guest:guest@localhost//'
+BROKER_TRANSPORT_OPTIONS = {'confirm_publish': True}
 CELERY_RESULT_BACKEND = 'amqp'
 
 
