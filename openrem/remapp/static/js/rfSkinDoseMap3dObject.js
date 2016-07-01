@@ -179,8 +179,8 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         _this.camera.lookAt(_this.scene.position );
         _this.scene.add(_this.camera);
 
-        var geometry, material;
-        _this.meshes = [], geometry, material;
+        var geometry;
+        _this.meshes = [];
 
         THREE.ImageUtils.crossOrigin = 'anonymous';
 
