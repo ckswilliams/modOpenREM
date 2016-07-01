@@ -1,3 +1,9 @@
+/**
+ * Function to convert a url to an array of key pairs
+ * @param url
+ * @returns {{}}
+ * @constructor
+ */
 function URLToArray(url) {
     var request = {};
     var pairs = url.substring(url.indexOf('?') + 1).split('&');
@@ -11,6 +17,12 @@ function URLToArray(url) {
 }
 
 
+/**
+ * Function to convert an array of key pairs to a url
+ * @param array
+ * @returns {string}
+ * @constructor
+ */
 function ArrayToURL(array) {
     var pairs = [];
     for (var key in array)

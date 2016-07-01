@@ -1,12 +1,31 @@
+/**
+ * Function to create a 2D skin dose map object
+ * @param skinDoseMapCanvasName
+ * @param colourScaleName
+ */
 function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
     this.useNewColourScale = useNewColourScale;
+    /**
+     * Internal function to create a new colour scale
+     * @param new_scale
+     */
     function useNewColourScale(new_scale) {
         this.colourScale = chroma.scale(new_scale);
     }
 
 
     this.setPixel = setPixel;
+    /**
+     * Internal function to set the rgba value of a pixel
+     * @param imageData
+     * @param x
+     * @param y
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
     function setPixel(imageData, x, y, r, g, b, a) {
         var index = (x + y * imageData.width) * 4;
         imageData.data[index + 0] = r;
@@ -17,6 +36,9 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.draw = draw;
+    /**
+     * Internal function to draw the skin dose map
+     */
     function draw() {
         var x, y, dose, scaledDose;
         for (x = 0; x < this.skinDoseMapWidth; x++) {
@@ -33,6 +55,9 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.drawOverlay = drawOverlay;
+    /**
+     * Internal function to draw the overlay on the skin dose map
+     */
     function drawOverlay() {
         this.skinDoseMapContext.textAlign = 'center';
         this.skinDoseMapContext.font = '12pt arial';
@@ -74,6 +99,9 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.resizeSkinDoseMap = resizeSkinDoseMap;
+    /**
+     * Internal function to resize the skin dose map
+     */
     function resizeSkinDoseMap() {
         this.skinDoseMapCanvas.width = this.skinDoseMapWidth * this.mag;
         this.skinDoseMapCanvas.height = this.skinDoseMapHeight * this.mag;
@@ -81,6 +109,9 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.reset = reset;
+    /**
+     * Internal function to reset the skin dose map
+     */
     function reset() {
         this.updateWindowWidth(this.maxDose - this.minDose);
         this.updateWindowLevel(this.minDose + (this.windowWidth / 2.0));
@@ -88,6 +119,9 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.toggleOverlay = toggleOverlay;
+    /**
+     * Internal function to toggle the display of the overlay
+     */
     function toggleOverlay() {
         this.showOverlay = this.showOverlay ? this.showOverlay = false : this.showOverlay = true;
 
@@ -100,6 +134,10 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateWindowLevel = updateWindowLevel;
+    /**
+     * Internal function to update the window level
+     * @param newWindowLevel
+     */
     function updateWindowLevel(newWindowLevel) {
         if (newWindowLevel < 0) newWindowLevel = 0;
         this.windowLevel = parseFloat(newWindowLevel);
@@ -110,6 +148,10 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateWindowWidth = updateWindowWidth;
+    /**
+     * Internal function to update the window width
+     * @param newWindowWidth
+     */
     function updateWindowWidth(newWindowWidth) {
         this.windowWidth = newWindowWidth;
 
@@ -119,6 +161,10 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateMinDisplayedDose = updateMinDisplayedDose;
+    /**
+     * Internal function to update the minimum displayed dose
+     * @param minDisplayedDose
+     */
     function updateMinDisplayedDose(minDisplayedDose) {
         minDisplayedDose = parseFloat(minDisplayedDose);
         
@@ -142,6 +188,10 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateMaxDisplayedDose = updateMaxDisplayedDose;
+    /**
+     * Internal function to update the maximum displayed dose
+     * @param maxDisplayedDose
+     */
     function updateMaxDisplayedDose(maxDisplayedDose) {
         maxDisplayedDose = parseFloat(maxDisplayedDose);
 
@@ -165,6 +215,10 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateMinDisplayedDoseManual = updateMinDisplayedDose;
+    /**
+     * Internal function to update the minimum displayed dose
+     * @param minDisplayedDose
+     */
     function updateMinDisplayedDose(minDisplayedDose) {
         minDisplayedDose = parseFloat(minDisplayedDose);
 
@@ -181,6 +235,10 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateMaxDisplayedDoseManual = updateMaxDisplayedDose;
+    /**
+     * Internal function to update the maximum displayed dose
+     * @param maxDisplayedDose
+     */
     function updateMaxDisplayedDose(maxDisplayedDose) {
         maxDisplayedDose = parseFloat(maxDisplayedDose);
 
@@ -197,6 +255,14 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.initialise = initialise;
+    /**
+     * Internal function to initialise the skin dose map
+     * @param skinMapData
+     * @param skinMapWidth
+     * @param skinMapHeight
+     * @param phantomFlatWidth
+     * @param phantomCurvedEdgeWidth
+     */
     function initialise(skinMapData, skinMapWidth, skinMapHeight, phantomFlatWidth, phantomCurvedEdgeWidth) {
         this.skinDoseMap = skinMapData;
         this.skinDoseMapWidth = skinMapWidth;
@@ -217,6 +283,9 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.updateBoundaries = updateBoundaries;
+    /**
+     * Internal function to update the boundaries of the phantom sections
+     */
     function updateBoundaries () {
         this.frontLeftBoundary = this.phantomFlatWidth * this.mag;
         this.leftBackBoundary = this.frontLeftBoundary + (this.phantomCurvedEdgeWidth * this.mag);
