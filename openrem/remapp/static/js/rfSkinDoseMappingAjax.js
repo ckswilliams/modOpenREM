@@ -44,26 +44,31 @@ $(document).ready(function() {
         data: request_data,
         dataType: "json",
         success: function( json ) {
+            var skin_dose_map_container = $('#skinDoseMapContainer');
+
             if (isCanvasSupported()) {
 
                 skinDoseMapObj.initialise(json.skin_map, json.width, json.height, json.phantom_flat_dist, json.phantom_curved_dist);
 
                 if (skinDoseMapObj.maxDose != 0 && isFinite(skinDoseMapObj.maxDose)) {
 
+                    var skin_dose_map_group = $('#skinDoseMapGroup');
+                    var openskin_info = $('#openskin_info');
+
                     //var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 2;
                     var decimalPlaces = Math.abs(Math.ceil(getBaseLog(10, skinDoseMapObj.maxDose))) + 2;
                     if (!isFinite(decimalPlaces)) decimalPlaces = 0;
 
-                    $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
-                    $('#openskin_info').width($('#skinDoseMapGroup').width());
+                    skin_dose_map_group.width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
+                    openskin_info.width(skin_dose_map_group.width());
 
                     skinDoseMapObj.draw();
 
                     skinDoseMapColourScaleObj.initialise(skinDoseMapObj.minDose, skinDoseMapObj.maxDose, 70, skinDoseMapObj.skinDoseMapCanvas.height, decimalPlaces);
                     skinDoseMapColourScaleObj.draw();
 
-                    skinDoseMapGroupOrigWidth = $('#skinDoseMapGroup').width();
-                    skinDoseMapGroupOrigHeight = $('#skinDoseMapGroup').height();
+                    skinDoseMapGroupOrigWidth = skin_dose_map_group.width();
+                    skinDoseMapGroupOrigHeight = skin_dose_map_group.height();
 
                     $('#maxDose').html(skinDoseMapObj.maxDose.toFixed(decimalPlaces));
                     $('#phantomDimensions').html(json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth);
@@ -112,9 +117,9 @@ $(document).ready(function() {
                     }
                     $(".ajax-progress-skin-dose").hide();
 
-                    $('#skinDoseMapGroup').show();
+                    skin_dose_map_group.show();
                     $('#skin_map_maxmin_controls').show();
-                    $('#openskin_info').show();
+                    openskin_info.show();
                 }
 
                 else {
@@ -129,15 +134,15 @@ $(document).ready(function() {
 
                     errorMessage += '</ul>' +
                         '<p>Please consider feeding this back to the <a href="http://bitbucket.org/openskin/openskin/">openSkin BitBucket project</a> ' +
-                        'or <a href="http://groups.google.com/forum/#!forum/openrem">OpenREM discussion group</a> so that the issue can be addressed.</p>'
+                        'or <a href="http://groups.google.com/forum/#!forum/openrem">OpenREM discussion group</a> so that the issue can be addressed.</p>';
 
-                    $('#skinDoseMapContainer').html(errorMessage);
+                    skin_dose_map_container.html(errorMessage);
                 }
             }
 
             else {
                 $(".ajax-progress-skin-dose").hide();
-                $('#skinDoseMapContainer').html('<h2>OpenSkin radiation exposure incidence map</h2>' +
+                skin_dose_map_container.html('<h2>OpenSkin radiation exposure incidence map</h2>' +
                     '<p>The skin dose map cannot be shown: your browser does not support the HTML &lt;canvas&gt; element.</p>');
             }
         },

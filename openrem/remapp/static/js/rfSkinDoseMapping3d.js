@@ -6,7 +6,7 @@ var previousMousePosition3d = {
 
 
 $("#skinDoseMap3d")
-    .on('mousedown', function(e) {
+    .on('mousedown', function() {
         isDragging3d = true;
     })
     .on('mousemove', function(e) {
@@ -67,7 +67,7 @@ $("#skinDoseMap3d")
     });
 
 
-$(document).on('mouseup', function(e) {
+$(document).on('mouseup', function() {
     isDragging3d = false;
 });
 
