@@ -1,3 +1,8 @@
+/**
+ * Function to create a 3d skin dose map object
+ * @param skinDoseMap3dCanvasName
+ * @param colourScaleName
+ */
 function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
     this.useNewColourScale = useNewColourScale;
@@ -7,6 +12,9 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.draw = draw;
+    /**
+     * Internal function to draw the 3d skin dose map
+     */
     function draw() {
         var currentDose, scaledDose, newColour, i, j, k;
         k = 0;
@@ -82,6 +90,11 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.mergeMeshes = mergeMeshes;
+    /**
+     * Internal function to merge three.js meshes
+     * @param meshes
+     * @returns {THREE.Geometry}
+     */
     function mergeMeshes (meshes) {
         var combined = new THREE.Geometry();
 
@@ -101,6 +114,14 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.initialise = initialise;
+    /**
+     * Internal function to initialse the 3d skin dose map
+     * @param skinDoseMap
+     * @param phantomFlatWidth
+     * @param phantomCurvedEdgeWidth
+     * @param phantomHeight
+     * @param phantomCurvedRadius
+     */
     function initialise(skinDoseMap, phantomFlatWidth, phantomCurvedEdgeWidth, phantomHeight, phantomCurvedRadius) {
 
         this.skinDoseMap = new Array(skinDoseMap.length);
@@ -240,6 +261,9 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.reset = reset;
+    /**
+     * Internal function to reset the 3d skin dose map
+     */
     function reset() {
         this.mesh.position.set( 0, 0, 0 );
         this.mesh.rotation.set( 0, 0, 0 );
@@ -254,6 +278,9 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.animate = animate;
+    /**
+     * Internal function to animate the 3d skin dose map
+     */
     function animate() {
         requestAnimationFrame(animate);
         render();

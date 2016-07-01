@@ -1,3 +1,7 @@
+/**
+ * Function to draw the available colour scales
+ * @param div
+ */
 function colourScaleSelection(div) {
     var colour_scales = ['OrRd','PuBu','BuPu','Oranges','BuGn','YlOrBr',
         'YlGn','Reds','RdPu','Greens','YlGnBu','Purples','GnBu','Greys',
@@ -22,6 +26,10 @@ function colourScaleSelection(div) {
 }
 
 
+/**
+ * Function to set a new colour scale
+ * @param new_scale
+ */
 function useNewColourScale(new_scale) {
     skinDoseMapObj.useNewColourScale(new_scale);
     skinDoseMapObj.draw();
@@ -37,6 +45,11 @@ function useNewColourScale(new_scale) {
 }
 
 
+/**
+ * Function to return the position of the cursor
+ * @param obj
+ * @returns {*}
+ */
 function findPos(obj) {
     var curleft = 0, curtop = 0;
     if (obj.offsetParent) {
@@ -50,11 +63,24 @@ function findPos(obj) {
 }
 
 
+/**
+ * Function to decode an rgb value to a dose in Gy
+ * @param r
+ * @param g
+ * @param b
+ * @param doseUpperLimit
+ * @returns {number}
+ */
 function rgbToDoseInGy(r, g, b, doseUpperLimit) {
     return doseUpperLimit * ((r * b) + g) / 65535.0;
 }
 
 
+/**
+ * Function to convert a dose in Gy to an rgb value
+ * @param dose
+ * @returns {string}
+ */
 function doseInGyToRGB(dose) {
     var r, g, b;
     dose = dose / 10. * 65535;
@@ -65,6 +91,9 @@ function doseInGyToRGB(dose) {
 }
 
 
+/**
+ * Function to reset the skin dose maps to their default settings
+ */
 function reset() {
     skinDoseMapObj.updateWindowWidth(skinDoseMapObj.maxDose - skinDoseMapObj.minDose);
     skinDoseMapObj.updateWindowLevel(skinDoseMapObj.minDose + (skinDoseMapObj.windowWidth/2.0));
@@ -98,6 +127,10 @@ function reset() {
 }
 
 
+/**
+ * Function to update the skin dose map when the window level has been changed
+ * @param newWindowLevel
+ */
 function updateWindowLevel(newWindowLevel) {
     newWindowLevel = parseFloat(newWindowLevel);
     if (newWindowLevel < 0) newWindowLevel = 0;
@@ -127,6 +160,10 @@ function updateWindowLevel(newWindowLevel) {
 }
 
 
+/**
+ * Function to update the skin dose map when the window width has been changed
+ * @param newWindowWidth
+ */
 function updateWindowWidth(newWindowWidth) {
     newWindowWidth = parseFloat(newWindowWidth);
     $('input[name=currentWindowWidth]').val(newWindowWidth.toFixed(skinDoseMapColourScaleObj.decimalPlaces));
@@ -154,6 +191,10 @@ function updateWindowWidth(newWindowWidth) {
 }
 
 
+/**
+ * Function to update the skin dose map when the minimum displayed dose has been changed
+ * @param minDisplayedDose
+ */
 function updateMinDisplayedDose(minDisplayedDose) {
     minDisplayedDose = parseFloat(minDisplayedDose);
 
@@ -194,6 +235,10 @@ function updateMaxDisplayedDose(maxDisplayedDose) {
 }
 
 
+/**
+ * Function to change the skin dose map when the minimum displayed dose has been changed
+ * @param minDisplayedDose
+ */
 function updateMinDisplayedDoseManual(minDisplayedDose) {
     minDisplayedDose = parseFloat(minDisplayedDose);
 
@@ -214,6 +259,10 @@ function updateMinDisplayedDoseManual(minDisplayedDose) {
 }
 
 
+/**
+ * Function to update the skin dose map when the maximum displayed dose has been changed
+ * @param maxDisplayedDose
+ */
 function updateMaxDisplayedDoseManual(maxDisplayedDose) {
     maxDisplayedDose = parseFloat(maxDisplayedDose);
 
@@ -234,6 +283,9 @@ function updateMaxDisplayedDoseManual(maxDisplayedDose) {
 }
 
 
+/**
+ * Function to update the HTML sliders and their displayed values
+ */
 function updateSlidersAndValues() {
     $('input[name=minDoseSlider]').prop({'value': skinDoseMapObj.minDisplayedDose});
     $('input[name=maxDoseSlider]').prop({'value': skinDoseMapObj.maxDisplayedDose});
@@ -336,6 +388,12 @@ $('[data-tooltip="skin_dose_map"]').qtip({
 });
 
 
+/**
+ * Function to enable the user to save the contents of the HTML canvas as a png file
+ * @param link
+ * @param canvasId
+ * @param filename
+ */
 function downloadCanvas(link, canvasId, filename) {
     var canvas = document.getElementById(canvasId);
 
@@ -348,6 +406,12 @@ function downloadCanvas(link, canvasId, filename) {
     }
 }
 
+
+/**
+ * Function to enable the user to save the contents of the three.js display as a png file
+ * @param link
+ * @param filename
+ */
 function download3dCanvas(link, filename) {
     if (renderer.domElement.msToBlob) { //for IE
         var blob = renderer.domElement.msToBlob();
@@ -430,12 +494,19 @@ document.getElementById('skinDoseMapFullscreenBtn').addEventListener('click', fu
 }, false);
 
 
+/**
+ * Function to check that the HTML5 canvas is supported by the user's browser
+ * @returns {boolean}
+ */
 function isCanvasSupported(){
     var elem = document.createElement('canvas');
     return !!(elem.getContext && elem.getContext('2d'));
 }
 
 
+/**
+ * Function to toggle between 2D and 3D skin dose map display
+ */
 function switch2d3dSkinDoseMap() {
     $('#save2dSkinMap').toggle();
     $('#save3dSkinMap').toggle();

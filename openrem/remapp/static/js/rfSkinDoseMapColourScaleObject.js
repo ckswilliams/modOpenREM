@@ -1,12 +1,31 @@
+/**
+ * Function to create a skin dose map colour scale object
+ * @param colourScaleCanvasName
+ * @param colourScaleName
+ */
 function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
     this.useNewColourScale = useNewColourScale;
+    /**
+     * Internal function to use a new colour scale
+     * @param new_scale
+     */
     function useNewColourScale(new_scale) {
         this.colourScale = chroma.scale(new_scale);
     }
 
 
     this.setPixel = setPixel;
+    /**
+     * Internal function to update an rgba pixel value
+     * @param imageData
+     * @param x
+     * @param y
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
     function setPixel(imageData, x, y, r, g, b, a) {
         var index = (x + y * imageData.width) * 4;
         imageData.data[index + 0] = r;
@@ -17,6 +36,11 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
 
     this.resizeColourScale = resizeColourScale;
+    /**
+     * Internal function to resize the colour scale
+     * @param newWidth
+     * @param newHeight
+     */
     function resizeColourScale(newWidth, newHeight) {
         this.colourScaleCanvas.width = newWidth;
         this.colourScaleCanvas.height = newHeight;
@@ -24,6 +48,9 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
 
     this.draw = draw;
+    /**
+     * Internal function to draw the colour scale
+     */
     function draw() {
         var x, y, i, increment, fraction, heightOffset, scaleHeight, colour;
 
@@ -66,6 +93,9 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
 
     this.redrawValues = redrawValues;
+    /**
+     * Internal function to redraw the values on the colour scale
+     */
     function redrawValues() {
         var y, i, increment, heightOffset, scaleHeight;
 
@@ -87,6 +117,14 @@ function skinDoseMapColourScaleObject(colourScaleCanvasName, colourScaleName) {
 
 
     this.initialise = initialise;
+    /**
+     * Internal function to initialise the colour scale
+     * @param minDose
+     * @param maxDose
+     * @param width
+     * @param height
+     * @param decimalPlaces
+     */
     function initialise(minDose, maxDose, width, height, decimalPlaces) {
         this.decimalPlaces = decimalPlaces;
         this.resizeColourScale(width, height);

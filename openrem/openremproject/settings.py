@@ -11,10 +11,9 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 
 # Celery settings
-
 BROKER_URL = 'amqp://guest:guest@localhost//'
 BROKER_TRANSPORT_OPTIONS = {'confirm_publish': True}
-CELERY_RESULT_BACKEND = 'amqp'
+#CELERY_RESULT_BACKEND = 'amqp'
 
 
 #: Only add pickle to this list if your broker is secured

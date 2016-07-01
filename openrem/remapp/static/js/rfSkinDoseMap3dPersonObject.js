@@ -1,6 +1,14 @@
+/**
+ * Function to create a 3d person object to orientate the 3d skin dose map
+ */
 function skinDoseMap3dPersonObject() {
 
     this.mergeMeshes = mergeMeshes;
+    /**
+     * Internal function to merge three.js meshes together
+     * @param meshes
+     * @returns {THREE.Geometry}
+     */
     function mergeMeshes (meshes) {
         var combined = new THREE.Geometry();
 
@@ -20,6 +28,10 @@ function skinDoseMap3dPersonObject() {
 
 
     this.initialise = initialise;
+    /**
+     * Internal function to initialise the 3d person
+     * @param phantomHeight
+     */
     function initialise(phantomHeight) {
 
         this.phantomHeight = phantomHeight;
@@ -125,6 +137,9 @@ function skinDoseMap3dPersonObject() {
 
 
     this.reset = reset;
+    /**
+     * Internal function to reset the 3d person
+     */
     function reset() {
         this.mesh.position.set( 0, 0, 0 );
         this.mesh.rotation.set( 0, 0, 0 );
