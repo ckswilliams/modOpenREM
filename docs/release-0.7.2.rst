@@ -113,4 +113,4 @@ This relates to `issue #415 <https://bitbucket.org/openrem/openrem/issue/415/>`_
 Upgrading from 0.6 series
 *************************
 
-Follow the instructions to :ref:`release-0.7.0` first, then return to these instructions to upgrade to 0.7.2.
+Follow the instructions to :doc:`release-0.7.0` first, then return to these instructions to upgrade to 0.7.2.
