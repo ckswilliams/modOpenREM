@@ -107,3 +107,10 @@ Import all the failed studies since 0.6 series upgrade
 ======================================================
 
 Re-import any fluoroscopy, radiography or mammography data that has not imported since the upgrade from the 0.6 series.
+This relates to `issue #415 <https://bitbucket.org/openrem/openrem/issue/415/>`_ on the Bitbucket issue tracker.
+
+*************************
+Upgrading from 0.6 series
+*************************
+
+Follow the instructions to :ref:`release-0.7.0` first, then return to these instructions to upgrade to 0.7.2.
