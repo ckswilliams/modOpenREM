@@ -39,7 +39,8 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
-Check the current status of your migrations:
+Check the current status of your migrations
+===========================================
 
 .. sourcecode:: bash
 
@@ -52,15 +53,15 @@ like this::
      [X] 0001_initial
      [X] 0002_upgrade_0_7_from_0_6
 
-Alternatively, if you are using the PostgreSQL database and installed 0.7.1 without any migration, the ``remapp``
+Alternatively, if you are using the PostgreSQL database and installed 0.7.1 as a fresh install, the ``remapp``
 section should look like this::
 
     remapp
      [X] 0001_initial
      [X] 0002_0_7_fresh_install_add_median
 
-Finally, if you are using a different database, including the built-in test database SQLite3, the ``remapp`` section
-should look like this::
+Finally, if you are using a different database – including the built-in test database SQLite3 – with a fresh install the
+``remapp`` section should look like this::
 
     remapp
      [X] 0001_initial
@@ -70,4 +71,39 @@ check box and you don't know why, please ask a question on the
 `Google group <https://groups.google.com/d/forum/openrem>`_ before continuing. Don't forget to tell us what is in the
 ``remapp`` section of your ``showmigrations`` listing and what upgrades you have done so far.
 
+Apply the new migration
+=======================
 
+Rename the file
+
+.. sourcecode:: console
+
+    remapp/migrations/000x_delete_060_acq_field.py.inactive
+
+to:
+
+.. sourcecode:: console
+
+    remapp/migrations/000x_delete_060_acq_field.py
+
+.. Note:: You can optionally change the ``000x`` to ``0003`` or similar, but it is not important. The important thing is
+          that the end of the filename is ``.py`` and not ``.inactive``
+
+and then run
+
+.. sourcecode:: console
+
+    python manage.py migrate remapp
+
+This migration will make changes that are only applicable to upgrades from 0.6 series databases, but they do no harm to
+0.7.1 fresh installs, so should be run anyway.
+
+Restart all the services
+========================
+
+Follow the guide at :doc:`startservices`.
+
+Import all the failed studies since 0.6 series upgrade
+======================================================
+
+Re-import any fluoroscopy, radiography or mammography data that has not imported since the upgrade from the 0.6 series.
