@@ -354,13 +354,15 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 type: 'scatter',
                 name: system_list[i],
                 data: scatter_data[i],
-                color: colour_scale(i/colour_max).alpha(0.5).css(),
+                //color: colour_scale(i/colour_max).alpha(0.5).css(),
+                color: colour_scale(i/colour_max).alpha(1.0).css(),
                 marker: {
                     radius: 2
                 },
                 tooltip: {
                     followPointer: false,
-                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                    //pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                    pointFormat: '{point.x:.0f}<br>{point.y:.2f}'
                 }
             });
         }
@@ -369,13 +371,15 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 type: 'scatter',
                 name: system_list[i],
                 data: scatter_data[i],
-                color: colour_scale(i/colour_max).alpha(0.5).css(),
+                //color: colour_scale(i/colour_max).alpha(0.5).css(),
+                color: colour_scale(i/colour_max).alpha(1.0).css(),
                 marker: {
                     radius: 2
                 },
                 tooltip: {
                     followPointer: false,
-                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                    //pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                    pointFormat: '{point.x:.0f}<br>{point.y:.2f}'
                 }
             });
         }
