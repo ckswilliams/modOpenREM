@@ -50,5 +50,24 @@ like this::
 
     remapp
      [X] 0001_initial
-     [X] 0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function
+     [X] 0002_upgrade_0_7_from_0_6
+
+Alternatively, if you are using the PostgreSQL database and installed 0.7.1 without any migration, the ``remapp``
+section should look like this::
+
+    remapp
+     [X] 0001_initial
+     [X] 0002_0_7_fresh_install_add_median
+
+Finally, if you are using a different database, including the built-in test database SQLite3, the ``remapp`` section
+should look like this::
+
+    remapp
+     [X] 0001_initial
+
+If your migrations list is different from this, particularly if there are any migrations listed with an empty ``[ ]``
+check box and you don't know why, please ask a question on the
+`Google group <https://groups.google.com/d/forum/openrem>`_ before continuing. Don't forget to tell us what is in the
+``remapp`` section of your ``showmigrations`` listing and what upgrades you have done so far.
+
 
