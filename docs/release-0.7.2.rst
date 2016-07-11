@@ -39,3 +39,16 @@ In a shell/command window, move into the openrem folder:
 * Windows: ``C:\Python27\Lib\site-packages\openrem\``
 * Windows virtualenv: ``Lib\site-packages\openrem\``
 
+Check the current status of your migrations:
+
+.. sourcecode:: bash
+
+    python manage.py showmigrations
+
+If you have an installation that has been upgraded from the 0.6 series, it should have a ``remapp`` section that looks
+like this::
+
+    remapp
+     [X] 0001_initial
+     [X] 0002_openrem_upgrade_add_new_tables_and_populate_and_add_median_function
+
