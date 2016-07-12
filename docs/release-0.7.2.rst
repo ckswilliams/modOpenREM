@@ -92,7 +92,7 @@ to:
     remapp/migrations/000x_delete_060_acq_field.py
 
 .. Note:: You can optionally change the ``000x`` to ``0003`` or similar, but it is not important. The important thing is
-          that the end of the filename is ``.py`` and not ``.inactive``. You can che3ck that the renaming has been
+          that the end of the filename is ``.py`` and not ``.inactive``. You can check that the renaming has been
           been successful by running the ``showmigrations`` command again - it should now be listed with an empty pair of
           square brackets.
 
