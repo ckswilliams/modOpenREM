@@ -42,7 +42,7 @@ function anySeriesSort(chartContainer, p, d, s) {
 function rebuildAnySeries(chartContainer, chartData, s) {
     var chart = $(chartContainer).highcharts();
     var newCategories = [];
-    var i = 0;
+    var i, j, k;
 
     for (i = 0; i < chartData[0].length; i++) {
         newCategories.push(chartData[0][i].name);
@@ -66,7 +66,7 @@ function rebuildAnySeries(chartContainer, chartData, s) {
         for (k = 0; k < chartData.length; k++) {
             if (k != s) {
                 var found = false;
-                var j = 0;
+                j = 0;
                 while (found == false) {
                     if (chartData[k][i].name == chartData[0][j].name) {
                         chart.series[k].data[j].update({
@@ -97,13 +97,13 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 // a is an array of objects; p is the property to sort on; d is the direction of sort: 1 for ascending, anything else
 // for descending.
 function bubbleSort(a, p, d) {
-    var swapped;
+    var swapped, temp;
     do {
         swapped = false;
         for (var i=0; i < a.length-1; i++) {
             if (d == 1) {
                 if (a[i][p] > a[i + 1][p]) {
-                    var temp = a[i];
+                    temp = a[i];
                     a[i] = a[i + 1];
                     a[i + 1] = temp;
                     swapped = true;
@@ -111,7 +111,7 @@ function bubbleSort(a, p, d) {
             }
             else {
                 if (a[i][p] < a[i + 1][p]) {
-                    var temp = a[i];
+                    temp = a[i];
                     a[i] = a[i + 1];
                     a[i + 1] = temp;
                     swapped = true;

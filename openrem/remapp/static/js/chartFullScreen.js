@@ -16,14 +16,16 @@ function enterFullScreen(div_id, chart_div) {
 
     $('#'+div_id).toggleClass('fullscreen');
 
-    var chart = $('#'+chart_div).highcharts();
-    chart.setSize($('#'+chart_div).width(), $('#'+chart_div).height());
+    var chart_div_element = $('#'+chart_div);
+    var chart = chart_div_element.highcharts();
+    chart.setSize(chart_div_element.width(), chart_div_element.height());
 }
 
 
 function fitChartToDiv(chart_div) {
-    if ($('#' + chart_div).width() && $('#' + chart_div).height()) {
-        var chart = $('#' + chart_div).highcharts();
-        chart.setSize($('#' + chart_div).width(), $('#' + chart_div).height());
+    var chart_div_element = $('#'+chart_div);
+    if (chart_div_element.width() && chart_div_element.height()) {
+        var chart = chart_div_element.highcharts();
+        chart.setSize(chart_div_element.width(), chart_div_element.height());
     }
 }
