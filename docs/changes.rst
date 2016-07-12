@@ -2,6 +2,15 @@
 OpenREM version history
 =======================
 
+0.7.2b1 (2016-07-11)
+--------------------
+
+* `#410`_  Charts: fixed display of bar charts containing only one data point
+* `#408`_  Charts: Increased number of items that can be shown on some Highcharts plots
+* `#407`_  Fixed issue where skin dose map data was not being calculated on import
+* `#406`_  Replaced Math.log10 JavaScript function with alternative function to fix IE11 skin dose map error
+* `#405`_  Altered multi-line cell links in filtered pages so they work with IE8
+
 0.7.1 (2016-06-10)
 ------------------
 

@@ -13,7 +13,7 @@ TEMPLATE_DEBUG = DEBUG
 # Celery settings
 
 BROKER_URL = 'amqp://guest:guest@localhost//'
-CELERY_RESULT_BACKEND = 'amqp'
+#CELERY_RESULT_BACKEND = 'amqp'
 
 
 #: Only add pickle to this list if your broker is secured

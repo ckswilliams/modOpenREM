@@ -26,7 +26,7 @@ function updateWorkloadChart(workload_data, chart_div, colour_scale) {
     var day_total = 0;
     var workload_series_data = [];
     var drilldown_series_data = [];
-    var temp_time;
+    var temp_time, i, j, temp;
     for (i = 0; i < 7; i++) {
         day_total = 0;
         temp = [];
@@ -61,7 +61,7 @@ function updateWorkloadChart(workload_data, chart_div, colour_scale) {
 
 
 function updateOverTimeChart(name_list, over_time_data, series_colours, url_start, chart_div) {
-    var over_time_series, date_axis, current_value, temp_date, date_after, date_before;
+    var date_axis, current_value, temp_date, date_after, date_before, temp, i, j;
     var chart = $('#'+chart_div).highcharts();
 
     var index = name_list.indexOf(null);
@@ -73,8 +73,8 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
         temp_date = formatDate(temp_date);
         date_axis.push(temp_date);
     }
+    chart.xAxis[0].setCategories(date_axis);
 
-    over_time_series = [];
     for (i = 0; i < over_time_data.length; i++) {
         temp = [];
         for (j = 0; j < over_time_data[0].length; j++) {
@@ -90,7 +90,8 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
                 url: url_start + name_list[i] + '&date_after=' + date_after + '&date_before=' + date_before
             });
         }
-        over_time_series.push({
+
+        chart.addSeries({
             name: name_list[i],
             color: series_colours[i],
             marker: {enabled: true},
@@ -102,13 +103,8 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
                     }
                 }
             },
-            data: temp,
+            data: temp
         });
-    }
-
-    chart.xAxis[0].setCategories(date_axis);
-    for (i = 0; i < over_time_series.length; i++) {
-        chart.addSeries(over_time_series[i]);
     }
 
     chart.options.exporting.sourceWidth = $(window).width();
@@ -120,6 +116,7 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
 function updateFrequencyChart(name_list, system_list, summary_data, url_start, chart_div, colour_scale) {
     var piechart_data = new Array(name_list.length);
     var data_counts = 0;
+    var i, j;
 
     var index = name_list.indexOf(null);
     if (index !== -1) name_list[index] = "Blank";
@@ -162,6 +159,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var average_value_per_name = [];
     var current_value;
     var calc_histograms = typeof histogram_data !== 'undefined' ? true : false;
+    var i, j, k;
 
     var index = name_list.indexOf(null);
     if (index !== -1) name_list[index] = "Blank";
@@ -262,13 +260,18 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     }
 
     var chart = $('#'+chart_div).highcharts();
-    chart.xAxis[0].setCategories(name_list);
+    chart.xAxis[0].update({
+        categories: name_list,
+        min: 0,
+        max: name_list.length - 1
+    }, false);
     if (calc_histograms) chart.options.drilldown.series = drilldown_series;
     chart.options.exporting.sourceWidth = $(window).width();
     chart.options.exporting.sourceHeight = $(window).height();
 
+    var colour_max;
     if (average_choice == "mean") {
-        var colour_max = system_list.length == 1 ? system_list.length : system_list.length - 1;
+        colour_max = system_list.length == 1 ? system_list.length : system_list.length - 1;
         for (i = 0; i < system_list.length; i++) {
             if (chart.series.length > i) {
                 chart.series[i].update({
@@ -287,7 +290,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
         }
     }
     else if (average_choice == "median") {
-        var colour_max = system_list.length == 1 ? system_list.length : system_list.length - 1;
+        colour_max = system_list.length == 1 ? system_list.length : system_list.length - 1;
         for (i = 0; i < system_list.length; i++) {
             if (chart.series.length > i) {
                 chart.series[i].update({
@@ -306,7 +309,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
         }
     }
     else {
-        var colour_max = system_list.length;
+        colour_max = system_list.length;
         var current_series = 0;
         for (i = 0; i < (system_list.length)*2; i+=2) {
             if (chart.series.length > i+1) {
@@ -343,6 +346,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
 function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
     var chart = $('#'+chart_div).highcharts();
     var colour_max = system_list.length;
+    var i;
 
     for (i = 0; i < system_list.length; i++) {
         if (chart.series.length > i) {

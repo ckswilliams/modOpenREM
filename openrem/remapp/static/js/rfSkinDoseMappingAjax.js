@@ -38,7 +38,8 @@ $(document).ready(function() {
 
                 if (skinDoseMapObj.maxDose != 0 && isFinite(skinDoseMapObj.maxDose)) {
 
-                    var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 2;
+                    //var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 2;
+                    var decimalPlaces = Math.abs(Math.ceil(getBaseLog(10, skinDoseMapObj.maxDose))) + 2;
                     if (!isFinite(decimalPlaces)) decimalPlaces = 0;
 
                     $('#skinDoseMapGroup').width(skinDoseMapObj.skinDoseMapCanvas.width + 80).height(skinDoseMapObj.skinDoseMapCanvas.height);
@@ -138,3 +139,8 @@ $(document).ready(function() {
     });
     return false;
 });
+
+//The following function returns the logarithm of y with base x (ie. logxy):
+function getBaseLog(x, y) {
+    return Math.log(y) / Math.log(x);
+}

@@ -25,7 +25,8 @@ function chartFrequency(render_div, series_name) {
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
-                }
+                },
+                turboThreshold: 5000 // Greater than the 1000 default to enable large data series to be plotted
             }
         },
         series: [{
