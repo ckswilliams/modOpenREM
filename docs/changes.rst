@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.7.2
------
+0.7.2b1 (2016-07-11)
+--------------------
 
 * `#410`_  Charts: fixed display of bar charts containing only one data point
 * `#408`_  Charts: Increased number of items that can be shown on some Highcharts plots
