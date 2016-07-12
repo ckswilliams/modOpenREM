@@ -28,6 +28,10 @@ Upgrading from version 0.7.1
 
 * Stop any Celery workers
 
+* If you are using a virtualenv, activate it
+
+* Install the new version of OpenREM:
+
 .. sourcecode:: bash
 
     pip install openrem==0.7.2b1
@@ -88,7 +92,9 @@ to:
     remapp/migrations/000x_delete_060_acq_field.py
 
 .. Note:: You can optionally change the ``000x`` to ``0003`` or similar, but it is not important. The important thing is
-          that the end of the filename is ``.py`` and not ``.inactive``
+          that the end of the filename is ``.py`` and not ``.inactive``. You can check that the renaming has been
+          been successful by running the ``showmigrations`` command again - it should now be listed with an empty pair of
+          square brackets.
 
 and then run
 
@@ -97,7 +103,8 @@ and then run
     python manage.py migrate remapp
 
 This migration will make changes that are only applicable to upgrades from 0.6 series databases, but they do no harm to
-0.7.1 fresh installs, so should be run anyway.
+0.7.1 fresh installs, so should be run anyway. You might like to run the ``showmigrations`` command to confirm it has
+been applied.
 
 Restart all the services
 ========================
@@ -109,6 +116,14 @@ Import all the failed studies since 0.6 series upgrade
 
 Re-import any fluoroscopy, radiography or mammography data that has not imported since the upgrade from the 0.6 series.
 This relates to `issue #415 <https://bitbucket.org/openrem/openrem/issue/415/>`_ on the Bitbucket issue tracker.
+
+If you have any studies complaining ::
+
+    remapp.models.DoesNotExist: ProjectionXRayRadiationDose matching query does not exist.
+
+You should check to see if the study you are importing has been partially imported before the database was fixed. If it
+has, you might need to delete it using the delete function in the web interface. You will only see the delete function
+if you have admin privileges - see :ref:`user-settings` for details.
 
 *************************
 Upgrading from 0.6 series

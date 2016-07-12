@@ -23,7 +23,7 @@ function ArrayToURL(array) {
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
-    var i, j, temp;
+    var i;
 
     $(".ajax-progress").show();
 
@@ -33,9 +33,6 @@ $(document).ready(function() {
         data: request_data,
         dataType: "json",
         success: function( json ) {
-            // this.url contains info about which charts need to be plotted
-            var plotting_info = URLToArray(this.url);
-
             // Initialise some colours to use for plotting
             var colour_scale = chroma.scale('RdYlBu');
 
@@ -92,10 +89,11 @@ $(document).ready(function() {
                 var study_line_colours = new Array(json.studyNameList.length);
                 if (typeof plotCTStudyFreq !== 'undefined') {
                     study_line_colours = [];
-                    for (i = 0; i < $('#piechartStudyDIV').highcharts().series[0].data.length; i++) {
-                        study_line_colours.push($('#piechartStudyDIV').highcharts().series[0].data.sort(sort_by_name)[i].color);
+                    var piechart_study_div = $('#piechartStudyDIV');
+                    for (i = 0; i < piechart_study_div.highcharts().series[0].data.length; i++) {
+                        study_line_colours.push(piechart_study_div.highcharts().series[0].data.sort(sort_by_name)[i].color);
                     }
-                    $('#piechartStudyDIV').highcharts().series[0].data.sort(sort_by_y);
+                    piechart_study_div.highcharts().series[0].data.sort(sort_by_y);
                 }
                 else study_line_colours = colour_scale.colors(json.studyNameList.length);
 

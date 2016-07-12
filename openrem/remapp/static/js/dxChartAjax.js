@@ -22,7 +22,7 @@ function ArrayToURL(array) {
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
-    var i, j, temp;
+    var i;
 
     $(".ajax-progress").show();
 
@@ -32,9 +32,6 @@ $(document).ready(function() {
         data: request_data,
         dataType: "json",
         success: function( json ) {
-            // this.url contains info about which charts need to be plotted
-            var plotting_info = URLToArray(this.url);
-
             // Initialise some colours to use for plotting
             var colour_scale = chroma.scale('RdYlBu');
 
@@ -83,15 +80,18 @@ $(document).ready(function() {
                 updateFrequencyChart(json.study_names, json.studySystemList, json.studySummary, urlStartStudy, 'piechartStudyDIV', colour_scale);
             }
 
+            var piechart_protocol_div;
+
             // DAP over time chart data
             if(typeof plotDXAcquisitionMeanDAPOverTime !== 'undefined') {
                 var acquisition_line_colours;
                 if (typeof plotDXAcquisitionFreq !== 'undefined') {
                     acquisition_line_colours = [];
-                    for (i = 0; i < $('#piechartProtocolDIV').highcharts().series[0].data.length; i++) {
-                        acquisition_line_colours.push($('#piechartProtocolDIV').highcharts().series[0].data.sort(sort_by_name)[i].color);
+                    piechart_protocol_div = $('#piechartProtocolDIV');
+                    for (i = 0; i < piechart_protocol_div.highcharts().series[0].data.length; i++) {
+                        acquisition_line_colours.push(piechart_protocol_div.highcharts().series[0].data.sort(sort_by_name)[i].color);
                     }
-                    $('#piechartProtocolDIV').highcharts().series[0].data.sort(sort_by_y);
+                    piechart_protocol_div.highcharts().series[0].data.sort(sort_by_y);
                 }
                 else acquisition_line_colours = colour_scale.colors(json.acquisition_names.length);
 
@@ -104,10 +104,11 @@ $(document).ready(function() {
                 var protocol_kvp_line_colours;
                 if (typeof plotDXAcquisitionFreq !== 'undefined') {
                     protocol_kvp_line_colours = [];
-                    for (i = 0; i < $('#piechartProtocolDIV').highcharts().series[0].data.length; i++) {
-                        protocol_kvp_line_colours.push($('#piechartProtocolDIV').highcharts().series[0].data.sort(sort_by_name)[i].color);
+                    piechart_protocol_div = $('#piechartProtocolDIV');
+                    for (i = 0; i < piechart_protocol_div.highcharts().series[0].data.length; i++) {
+                        protocol_kvp_line_colours.push(piechart_protocol_div.highcharts().series[0].data.sort(sort_by_name)[i].color);
                     }
-                    $('#piechartProtocolDIV').highcharts().series[0].data.sort(sort_by_y);
+                    piechart_protocol_div.highcharts().series[0].data.sort(sort_by_y);
                 }
                 else protocol_kvp_line_colours = colour_scale.colors(json.acquisition_kvp_names.length);
 
@@ -120,10 +121,11 @@ $(document).ready(function() {
                 var protocol_mas_line_colours;
                 if (typeof plotDXAcquisitionFreq !== 'undefined') {
                     protocol_mas_line_colours = [];
-                    for (i = 0; i < $('#piechartProtocolDIV').highcharts().series[0].data.length; i++) {
-                        protocol_mas_line_colours.push($('#piechartProtocolDIV').highcharts().series[0].data.sort(sort_by_name)[i].color);
+                    piechart_protocol_div = $('#piechartProtocolDIV');
+                    for (i = 0; i < piechart_protocol_div.highcharts().series[0].data.length; i++) {
+                        protocol_mas_line_colours.push(piechart_protocol_div.highcharts().series[0].data.sort(sort_by_name)[i].color);
                     }
-                    $('#piechartProtocolDIV').highcharts().series[0].data.sort(sort_by_y);
+                    piechart_protocol_div.highcharts().series[0].data.sort(sort_by_y);
                 }
                 else protocol_mas_line_colours = colour_scale.colors(json.acquisition_mas_names.length);
 
