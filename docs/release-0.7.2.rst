@@ -51,6 +51,21 @@ Check the current status of your migrations
 
     python manage.py showmigrations
 
+If you are using the PostgreSQL database and installed 0.7.1 as a fresh install, the ``remapp``
+section should look like this::
+
+    remapp
+     [X] 0001_initial
+     [X] 0002_0_7_fresh_install_add_median
+
+If you installed 0.7.1 as a fresh install and are using a different database – such as MySQL or the built-in test
+database SQLite3 – the ``remapp`` section should look like this::
+
+    remapp
+     [X] 0001_initial
+
+**For both of these scenarios your upgrade is complete** and you can :doc:`startservices`.
+
 If you have an installation that has been upgraded from the 0.6 series, it should have a ``remapp`` section that looks
 like this::
 
@@ -58,23 +73,13 @@ like this::
      [X] 0001_initial
      [X] 0002_upgrade_0_7_from_0_6
 
-Alternatively, if you are using the PostgreSQL database and installed 0.7.1 as a fresh install, the ``remapp``
-section should look like this::
+For this scenario, please continue and apply the new migration using the instructions below.
 
-    remapp
-     [X] 0001_initial
-     [X] 0002_0_7_fresh_install_add_median
-
-Finally, if you are using a different database – including the built-in test database SQLite3 – with a fresh install the
-``remapp`` section should look like this::
-
-    remapp
-     [X] 0001_initial
-
-If your migrations list is different from this, particularly if there are any migrations listed with an empty ``[ ]``
+If your migrations list is different from these, particularly if there are any migrations listed with an empty ``[ ]``
 check box and you don't know why, please ask a question on the
 `Google group <https://groups.google.com/d/forum/openrem>`_ before continuing. Don't forget to tell us what is in the
 ``remapp`` section of your ``showmigrations`` listing and what upgrades you have done so far.
+
 
 Apply the new migration
 =======================
@@ -91,20 +96,57 @@ to:
 
     remapp/migrations/000x_delete_060_acq_field.py
 
-.. Note:: You can optionally change the ``000x`` to ``0003`` or similar, but it is not important. The important thing is
-          that the end of the filename is ``.py`` and not ``.inactive``. You can check that the renaming has been
-          been successful by running the ``showmigrations`` command again - it should now be listed with an empty pair of
-          square brackets.
+Check that the rename was successful by running ``python manage.py showmigrations`` again. The new migration should
+be listed with an empty pair of square brackets.
 
-and then run
+Now run
 
 .. sourcecode:: console
 
     python manage.py migrate remapp
 
-This migration will make changes that are only applicable to upgrades from 0.6 series databases, but they do no harm to
-0.7.1 fresh installs, so should be run anyway. You might like to run the ``showmigrations`` command to confirm it has
-been applied.
+This should result in the following error:
+
+.. sourcecode:: console
+
+    CommandError: Conflicting migrations detected (0002_upgrade_0_7_from_0_6, 000x_delete_060_acq_field in remapp).
+    To fix them run 'python manage.py makemigrations --merge'
+
+Now run
+
+.. sourcecode:: console
+
+    python manage.py makemigrations --merge
+
+This will then list the merge actions, finishing with the following text:
+
+.. sourcecode:: console
+
+    Merging will only work if the operations printed above do not conflict
+    with each other (working on different fields or models)
+    Do you want to merge these migration branches? [y/N]
+
+Respond with a ``y``, then run ``python manage.py showmigrations`` again. This should result in the following listing::
+
+    remapp
+     [X] 0001_initial
+     [ ] 000x_delete_060_acq_field
+     [X] 0002_upgrade_0_7_from_0_6
+     [ ] 0003_merge
+
+Now run the migration:
+
+.. sourcecode:: console
+
+    python manage.py migrate remapp
+
+A final ``python manage.py showmigrations`` should show::
+
+    remapp
+     [X] 0001_initial
+     [X] 000x_delete_060_acq_field
+     [X] 0002_upgrade_0_7_from_0_6
+     [X] 0003_merge
 
 Restart all the services
 ========================
