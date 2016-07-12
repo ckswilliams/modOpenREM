@@ -105,7 +105,7 @@ Now run
 
     python manage.py migrate remapp
 
-This should result in the following error:
+This should result in an error similar to this:
 
 .. sourcecode:: console
 
