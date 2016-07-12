@@ -1,5 +1,5 @@
 ########################
-Upgrade to OpenREM 0.7.2
+Upgrade to OpenREM 0.7.3
 ########################
 
 ****************
@@ -15,7 +15,7 @@ Upgrading an OpenREM server with no internet access
 ***************************************************
 
 Install using the instructions found at :doc:`upgrade-offline`, but change the pip commands from ``openrem==0.7.1`` to
-``openrem==0.7.2b1``. If you are still on a 0.6 series install, upgrade to 0.7.1 first.
+``openrem==0.7.3b1``. If you are still on a 0.6 series install, upgrade to 0.7.1 first.
 
 ****************************
 Upgrading from version 0.7.1
@@ -34,7 +34,7 @@ Upgrading from version 0.7.1
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.2b1
+    pip install openrem==0.7.3b1
 
 In a shell/command window, move into the openrem folder:
 
@@ -171,4 +171,4 @@ if you have admin privileges - see :ref:`user-settings` for details.
 Upgrading from 0.6 series
 *************************
 
-Follow the instructions to :doc:`release-0.7.0` first, then return to these instructions to upgrade to 0.7.2.
+Follow the instructions to :doc:`release-0.7.0` first, then return to these instructions to upgrade to 0.7.3.
