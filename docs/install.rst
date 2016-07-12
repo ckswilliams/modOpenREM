@@ -7,7 +7,7 @@ Install OpenREM 0.7
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.0
+    pip install openrem==0.7.2b1
 
 *Will need ``sudo`` or equivalent if installing on linux without using a virtualenv*
 
