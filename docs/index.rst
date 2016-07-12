@@ -24,7 +24,7 @@ Contents:
 
     install-firsttime
     release-0.7.0
-    release-0.7.2
+    release-0.7.3
     startservices
     configuration
     import

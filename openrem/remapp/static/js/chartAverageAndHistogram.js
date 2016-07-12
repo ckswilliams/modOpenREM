@@ -94,7 +94,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                             text: cat_label
                         },
                         categories: {
-                            formatter: function (args) {
+                            formatter: function () {
                                 return this.point.category;
                             }
                         },
