@@ -1130,6 +1130,7 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         result = scatter_plot_data(f.qs,
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraymechanicaldata__compression_thickness',
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__average_glandular_dose',
+                                   1,
                                    plot_series_per_systems,
                                    'generalequipmentmoduleattr__unique_equipment_name_id__display_name')
         return_structure['AGDvsThickness'] = result['scatterData']
@@ -1140,6 +1141,7 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         result = scatter_plot_data(f.qs,
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraymechanicaldata__compression_thickness',
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp',
+                                   1,
                                    plot_series_per_systems,
                                    'generalequipmentmoduleattr__unique_equipment_name_id__display_name')
         return_structure['kVpvsThickness'] = result['scatterData']
@@ -1150,6 +1152,7 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         result = scatter_plot_data(f.qs,
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraymechanicaldata__compression_thickness',
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure',
+                                   0.001,
                                    plot_series_per_systems,
                                    'generalequipmentmoduleattr__unique_equipment_name_id__display_name')
         return_structure['mAsvsThickness'] = result['scatterData']

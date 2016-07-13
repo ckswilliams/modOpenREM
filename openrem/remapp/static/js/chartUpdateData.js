@@ -343,7 +343,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
 }
 
 
-function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
+function updateScatterChart(scatter_data, max_values, chart_div, system_list, x_axis_unit, y_axis_unit, colour_scale) {
     var chart = $('#'+chart_div).highcharts();
     var colour_max = system_list.length;
     var i;
@@ -354,15 +354,13 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 type: 'scatter',
                 name: system_list[i],
                 data: scatter_data[i],
-                //color: colour_scale(i/colour_max).alpha(0.5).css(),
-                color: colour_scale(i/colour_max).alpha(1.0).css(),
+                color: colour_scale(i/colour_max).alpha(0.5).css(),
                 marker: {
                     radius: 2
                 },
                 tooltip: {
                     followPointer: false,
-                    //pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
-                    pointFormat: '{point.x:.0f}<br>{point.y:.2f}'
+                    pointFormat: `{point.x:.0f} ${x_axis_unit}<br>{point.y:.2f} ${y_axis_unit}`
                 }
             });
         }
@@ -371,15 +369,13 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 type: 'scatter',
                 name: system_list[i],
                 data: scatter_data[i],
-                //color: colour_scale(i/colour_max).alpha(0.5).css(),
-                color: colour_scale(i/colour_max).alpha(1.0).css(),
+                color: colour_scale(i/colour_max).alpha(0.5).css(),
                 marker: {
                     radius: 2
                 },
                 tooltip: {
                     followPointer: false,
-                    //pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
-                    pointFormat: '{point.x:.0f}<br>{point.y:.2f}'
+                    pointFormat: `{point.x:.0f} ${x_axis_unit}<br>{point.y:.2f} ${y_axis_unit}`
                 }
             });
         }
