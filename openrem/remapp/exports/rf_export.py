@@ -1067,11 +1067,17 @@ def rfopenskin(studyid):
 
         try:
             for filter in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                if "Copper" in filter.xray_filter_material.code_meaning:
-                    xray_filter_type = filter.xray_filter_type
-                    xray_filter_material = filter.xray_filter_material
-                    xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
-                    xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
+                try:
+                    if "Copper" in filter.xray_filter_material.code_meaning:
+                        xray_filter_type = filter.xray_filter_type
+                        xray_filter_material = filter.xray_filter_material
+                        xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
+                        xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
+                except AttributeError:
+                        xray_filter_type = ''
+                        xray_filter_material = ''
+                        xray_filter_thickness_minimum = ''
+                        xray_filter_thickness_maximum = ''
         except ObjectDoesNotExist:
             xray_filter_type = ''
             xray_filter_material = ''
