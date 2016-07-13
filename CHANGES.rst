@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.2b1 (2016-07-11)
+0.7.3b1 (2016-07-12)
 --------------------
 
 * `#410`_  Charts: fixed display of bar charts containing only one data point
