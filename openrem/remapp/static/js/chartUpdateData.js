@@ -158,7 +158,7 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
     var current_counts;
     var average_value_per_name = [];
     var current_value;
-    var calc_histograms = typeof histogram_data !== 'undefined' ? true : false;
+    var calc_histograms = typeof histogram_data !== 'undefined';
     var i, j, k;
 
     var index = name_list.indexOf(null);

@@ -6,7 +6,7 @@ function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
         chart: {
             zoomType: 'xy',
             type: 'column',
-            renderTo: render_div,
+            renderTo: render_div
         },
         title: {
             useHTML: true,
