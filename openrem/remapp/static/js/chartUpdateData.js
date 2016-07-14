@@ -360,7 +360,7 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, x_
                 },
                 tooltip: {
                     followPointer: false,
-                    pointFormat: `{point.x:.0f} ${x_axis_unit}<br>{point.y:.2f} ${y_axis_unit}`
+                    pointFormat: '{point.x:.0f} ' + x_axis_unit + '<br>{point.y:.2f} ' + y_axis_unit
                 }
             });
         }
@@ -375,7 +375,7 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, x_
                 },
                 tooltip: {
                     followPointer: false,
-                    pointFormat: `{point.x:.0f} ${x_axis_unit}<br>{point.y:.2f} ${y_axis_unit}`
+                    pointFormat: '{point.x:.0f} ' + x_axis_unit + '<br>{point.y:.2f} ' + y_axis_unit
                 }
             });
         }
