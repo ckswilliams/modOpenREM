@@ -5,6 +5,7 @@ OpenREM version history
 0.7.3b1 (2016-07-12)
 --------------------
 
+* `#419`_  Interface: fixed error where "Cancel" was ignored when deleting study in Firefox browser
 * `#418`_  Exports: fixed error when exporting fluoroscopy study with missing xray_filter_material
 * `#410`_  Charts: fixed display of bar charts containing only one data point
 * `#408`_  Charts: Increased number of items that can be shown on some Highcharts plots
