@@ -1043,12 +1043,16 @@ def mg_summary_list_filter(request):
             user_profile.plotCharts = chart_options_form.cleaned_data['plotCharts']
             user_profile.plotMGStudyPerDayAndHour = chart_options_form.cleaned_data['plotMGStudyPerDayAndHour']
             user_profile.plotMGAGDvsThickness = chart_options_form.cleaned_data['plotMGAGDvsThickness']
+            user_profile.plotMGkVpvsThickness = chart_options_form.cleaned_data['plotMGkVpvsThickness']
+            user_profile.plotMGmAsvsThickness = chart_options_form.cleaned_data['plotMGmAsvsThickness']
             user_profile.save()
 
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
                          'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
-                         'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness}
+                         'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness,
+                         'plotMGkVpvsThickness': user_profile.plotMGkVpvsThickness,
+                         'plotMGmAsvsThickness': user_profile.plotMGmAsvsThickness}
             chart_options_form = MGChartOptionsForm(form_data)
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
@@ -1100,13 +1104,15 @@ def mg_summary_chart_data(request):
     return_structure =\
         mg_plot_calculations(f, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
-                             user_profile.plotMGStudyPerDayAndHour, user_profile.plotMGAGDvsThickness)
+                             user_profile.plotMGStudyPerDayAndHour, user_profile.plotMGAGDvsThickness,
+                             user_profile.plotMGkVpvsThickness, user_profile.plotMGmAsvsThickness)
 
     return JsonResponse(return_structure, safe=False)
 
 
 def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_study_per_day_and_hour, plot_agd_vs_thickness):
+                         plot_histogram_bins, plot_study_per_day_and_hour, plot_agd_vs_thickness,
+                         plot_kvp_vs_thickness, plot_mas_vs_thickness):
     from interface.chart_functions import workload_chart_data, scatter_plot_data
 
     return_structure = {}
@@ -1124,11 +1130,34 @@ def mg_plot_calculations(f, median_available, plot_average_choice, plot_series_p
         result = scatter_plot_data(f.qs,
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraymechanicaldata__compression_thickness',
                                    'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__average_glandular_dose',
+                                   1,
                                    plot_series_per_systems,
                                    'generalequipmentmoduleattr__unique_equipment_name_id__display_name')
         return_structure['AGDvsThickness'] = result['scatterData']
         return_structure['maxThicknessAndAGD'] = result['maxXandY']
         return_structure['AGDvsThicknessSystems'] = result['system_list']
+
+    if plot_kvp_vs_thickness:
+        result = scatter_plot_data(f.qs,
+                                   'projectionxrayradiationdose__irradeventxraydata__irradeventxraymechanicaldata__compression_thickness',
+                                   'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__kvp__kvp',
+                                   1,
+                                   plot_series_per_systems,
+                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name')
+        return_structure['kVpvsThickness'] = result['scatterData']
+        return_structure['maxThicknessAndkVp'] = result['maxXandY']
+        return_structure['kVpvsThicknessSystems'] = result['system_list']
+
+    if plot_mas_vs_thickness:
+        result = scatter_plot_data(f.qs,
+                                   'projectionxrayradiationdose__irradeventxraydata__irradeventxraymechanicaldata__compression_thickness',
+                                   'projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure__exposure',
+                                   0.001,
+                                   plot_series_per_systems,
+                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name')
+        return_structure['mAsvsThickness'] = result['scatterData']
+        return_structure['maxThicknessAndmAs'] = result['maxXandY']
+        return_structure['mAsvsThicknessSystems'] = result['system_list']
 
     return return_structure
 
@@ -1747,6 +1776,8 @@ def chart_options_view(request):
 
             user_profile.plotMGStudyPerDayAndHour = mg_form.cleaned_data['plotMGStudyPerDayAndHour']
             user_profile.plotMGAGDvsThickness = mg_form.cleaned_data['plotMGAGDvsThickness']
+            user_profile.plotMGkVpvsThickness = mg_form.cleaned_data['plotMGkVpvsThickness']
+            user_profile.plotMGmAsvsThickness = mg_form.cleaned_data['plotMGmAsvsThickness']
 
             user_profile.save()
 
@@ -1800,7 +1831,9 @@ def chart_options_view(request):
                     'plotRFInitialSortingChoice': user_profile.plotRFInitialSortingChoice}
 
     mg_form_data = {'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
-                    'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness}
+                    'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness,
+                    'plotMGkVpvsThickness': user_profile.plotMGkVpvsThickness,
+                    'plotMGmAsvsThickness': user_profile.plotMGmAsvsThickness}
 
     general_chart_options_form = GeneralChartOptionsDisplayForm(general_form_data)
     ct_chart_options_form = CTChartOptionsDisplayForm(ct_form_data)
