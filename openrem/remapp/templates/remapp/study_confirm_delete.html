@@ -97,12 +97,14 @@
     Are you sure you want to delete the above study with UID {{ exam }}?
     <input type="hidden" name="return_url" value="{{ return_url }}" />
     <input type="submit" value="Delete" class="btn btn-primary" />
-    <button onclick="goBack()" class="btn btn-default">Cancel</button>
+    <button id="backButton" class="btn btn-default">Cancel</button>
 
     <script>
-    function goBack() {
-        window.history.back();
-    }
+        $("#backButton").click(function(e) {
+            e = e || window.event; // support  for IE8 and lower
+            e.preventDefault(); // stop browser from doing native logic
+            window.history.back();
+        });
     </script>
 </form>
 
