@@ -43,17 +43,17 @@ $(document).ready(function() {
 
             // AGD vs compressed thickness scatter plot
             if(typeof plotMGAGDvsThickness !== 'undefined') {
-                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV1', json.AGDvsThicknessSystems, 'mm', 'mGy', colour_scale);
+                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV1', json.AGDvsThicknessSystems, 'mm', 'mGy', [0,2], colour_scale);
             }
 
             // kVp vs compressed thickness scatter plot
             if(typeof plotMGkVpvsThickness !== 'undefined') {
-                updateScatterChart(json.kVpvsThickness, json.maxThicknessAndkVp, 'scatterDIV2', json.kVpvsThicknessSystems, 'mm', 'kV', colour_scale);
+                updateScatterChart(json.kVpvsThickness, json.maxThicknessAndkVp, 'scatterDIV2', json.kVpvsThicknessSystems, 'mm', 'kV', [0,0], colour_scale);
             }
 
             // mAs vs compressed thickness scatter plot
             if(typeof plotMGmAsvsThickness !== 'undefined') {
-                updateScatterChart(json.mAsvsThickness, json.maxThicknessAndmAs, 'scatterDIV3', json.mAsvsThicknessSystems, 'mm', 'mAs', colour_scale);
+                updateScatterChart(json.mAsvsThickness, json.maxThicknessAndmAs, 'scatterDIV3', json.mAsvsThicknessSystems, 'mm', 'mAs', [0,1], colour_scale);
             }
 
             $(".ajax-progress").hide();
