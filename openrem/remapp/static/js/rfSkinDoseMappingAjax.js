@@ -55,7 +55,6 @@ $(document).ready(function() {
                     var skin_dose_map_group = $('#skinDoseMapGroup');
                     var openskin_info = $('#openskin_info');
 
-                    //var decimalPlaces = Math.abs(Math.ceil(Math.log10(skinDoseMapObj.maxDose))) + 2;
                     var decimalPlaces = Math.abs(Math.ceil(getBaseLog(10, skinDoseMapObj.maxDose))) + 2;
                     if (!isFinite(decimalPlaces)) decimalPlaces = 0;
 
@@ -157,7 +156,14 @@ $(document).ready(function() {
     return false;
 });
 
-//The following function returns the logarithm of y with base x (ie. logxy):
+
+/**
+ * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not
+ * supported in Internet Explorer
+ * @param x - the base to use
+ * @param y - the number for which the logarithm is required
+ * @returns {number} - the base x logarithm of y
+ */
 function getBaseLog(x, y) {
     return Math.log(y) / Math.log(x);
 }

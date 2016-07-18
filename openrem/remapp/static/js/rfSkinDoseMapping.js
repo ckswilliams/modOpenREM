@@ -12,7 +12,7 @@ function colourScaleSelection() {
     var num_shades = 11;
 
     for (i=0; i<colour_scales.length; i++) {
-        canvas = document.getElementById(colour_scales[i]);
+        canvas = $('#' + colour_scales[i])[0];
         context = canvas.getContext('2d');
         canvas.height = side_length;
         canvas.width = side_length * num_shades;
@@ -345,6 +345,7 @@ var previousMousePosition = {
 };
 
 
+// jQuery mouse event handlers for the DIV that contains the 2D skin dose map
 $("#skinDoseMap")
     .on('mouseup', function () {
         isDragging = false;
@@ -369,14 +370,14 @@ $("#skinDoseMap")
         };
 
         if (isDragging) {
-            var maxWL = parseFloat(document.getElementById("windowLevelSlider").max);
+            var maxWL = parseFloat($('#windowLevelSlider')[0].max);
             var newWL = skinDoseMapObj.windowLevel * (100-deltaMove.y)/100;
             if (newWL == 0) newWL += 0.01;
             if (newWL < 0) newWL = 0;
             if (newWL > maxWL) newWL = maxWL;
             skinDoseMapObj.updateWindowLevel(newWL);
 
-            var maxWW = parseFloat(document.getElementById("windowWidthSlider").max);
+            var maxWW = parseFloat($('#windowWidthSlider')[0].max);
             var newWW = skinDoseMapObj.windowWidth + skinDoseMapObj.windowWidth * deltaMove.x/100;
             if (newWW == 0) newWW += 0.01;
             if (newWW < 0) newWW = 0;
@@ -433,7 +434,7 @@ $('[data-tooltip="skin_dose_map"]').qtip({
  * @param filename
  */
 function downloadCanvas(link, canvasId, filename) {
-    var canvas = document.getElementById(canvasId);
+    var canvas = $('#'+canvasId)[0];
 
     if (canvas.msToBlob) { //for IE
         var blob = canvas.msToBlob();
@@ -460,33 +461,33 @@ function download3dCanvas(link, filename) {
     }
 }
 
-document.getElementById('save2dSkinMap').addEventListener('click', function() {
+$('#save2dSkinMap').click(function() {
     downloadCanvas(this, 'skinDoseMap', '2dSkinMap.png');
-}, false);
+});
 
-document.getElementById('save3dSkinMap').addEventListener('click', function() {
+$('#save3dSkinMap').click(function() {
     download3dCanvas(this, '3dSkinMap.png');
-}, false);
+});
 
-document.getElementById('skinDoseMapOverlayShow').addEventListener('click', function() {
+$('#skinDoseMapOverlayShow').click(function() {
     $('#skinDoseMapOverlayHide').toggle();
     $('#skinDoseMapOverlayShow').toggle();
     skinDoseMapObj.toggleOverlay();
-}, false);
+});
 
-document.getElementById('skinDoseMapOverlayHide').addEventListener('click', function() {
+$('#skinDoseMapOverlayHide').click(function() {
     $('#skinDoseMapOverlayHide').toggle();
     $('#skinDoseMapOverlayShow').toggle();
     skinDoseMapObj.toggleOverlay();
-}, false);
+});
 
 
 var skinMapFullScreen = false;
 var skinDoseMapGroupOrigWidth, skinDoseMapGroupOrigHeight;
-document.getElementById('skinDoseMapFullscreenBtn').addEventListener('click', function() {
+$('#skinDoseMapFullscreenBtn').click(function() {
     skinMapFullScreen = !skinMapFullScreen;
 
-    skin_dose_map_container = $('#skinDoseMapContainer');
+    var skin_dose_map_container = $('#skinDoseMapContainer');
 
     var otherHeight = skin_dose_map_container.height() - $('#skinDoseMap').height();
 
@@ -533,7 +534,7 @@ document.getElementById('skinDoseMapFullscreenBtn').addEventListener('click', fu
             skinDoseMap3dObj.draw();
         }
     }
-}, false);
+});
 
 
 /**

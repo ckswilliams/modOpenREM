@@ -5,6 +5,7 @@ var previousMousePosition3d = {
 };
 
 
+// jQuery mouse event handlers for the DIV that contains the 3D skin dose map
 $("#skinDoseMap3d")
     .on('mousedown', function() {
         isDragging3d = true;
@@ -83,16 +84,29 @@ window.requestAnimFrame = (function(){
 })();
 
 
+/**
+ * Function to convert an angle in degrees into radians
+ * @param angle
+ * @returns {number}
+ */
 function toRadians(angle) {
     return angle * (Math.PI / 180);
 }
 
 
+/**
+ * Function to convert an angle in radians to degrees
+ * @param angle
+ * @returns {number}
+ */
 function toDegrees(angle) {
     return angle * (180 / Math.PI);
 }
 
 
+/**
+ * Function to render the 3D scene
+ */
 function render() {
     renderer.clear();
     renderer.setViewport(0, 0, skinDoseMap3dObj.canvas.width, skinDoseMap3dObj.canvas.height);
@@ -105,6 +119,10 @@ function render() {
 }
 
 
+/**
+ * Function to check whether the browser can support WebGL
+ * @returns {boolean}
+ */
 function webglAvailable() {
     try {
         var canvas = document.createElement('canvas');
@@ -118,9 +136,10 @@ function webglAvailable() {
 }
 
 
-skinDoseMap3dCanvas = document.getElementById('skinDoseMap3d');
+skinDoseMap3dCanvas = $('#skinDoseMap3d')[0]; // The first element is the HTML DOM Object
 renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
 renderer.autoClear = false;
 renderer.setClearColor( 0x000000, 0 );
 
-var show3dSkinDoseMap = webglAvailable() ? true : false;
+// http://stackoverflow.com/questions/29312123/how-does-the-double-exclamation-work-in-javascript
+var show3dSkinDoseMap = !!webglAvailable();
