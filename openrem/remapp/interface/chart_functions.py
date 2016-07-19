@@ -42,7 +42,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
         return_structure['series_names'] = list(database_events.values_list(db_series_names, flat=True).distinct()
                                                 .order_by(db_series_names))
 
-        if plot_series_per_system and plot_average:
+        if plot_series_per_system:
             # Obtain a list of x-ray systems
             return_structure['system_list'] = list(database_events.values_list(db_display_name_relationship, flat=True)
                                                    .distinct().order_by(db_display_name_relationship))
@@ -192,6 +192,25 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         median=Median(db_value_name) * value_multiplier,
                         num=Count(db_value_name)).order_by(db_series_names))
 
+            elif plot_series_per_system and plot_freq:
+                # Just calculate frequency of each series
+                for system in return_structure['system_list']:
+                    if exclude_constant_angle:
+                        # Exclude "Constant Angle Acquisitions" from the calculations
+                        return_structure['summary'].append(database_events.filter(
+                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            num=Sum(
+                                Case(
+                                    When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=0),
+                                    default=1, output_field=IntegerField()
+                                )
+                            )
+                        ).order_by(db_series_names))
+                    else:
+                        # Don't exclude "Constant Angle Acquisitions" from the calculations
+                        return_structure['summary'].append(database_events.filter(
+                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            num=Count(db_value_name)).order_by(db_series_names))
             else:
                 # Just calculate frequency of each series
                 if exclude_constant_angle:
@@ -286,21 +305,26 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
             return_structure['summary'][index] = list(return_structure['summary'][index])
 
         # Fill in default values where data for a series name is missing for any of the systems
-        if plot_series_per_system and plot_average:
+        if plot_series_per_system:
             for index in range(len(return_structure['system_list'])):
                 missing_names =\
                     list(set(return_structure['series_names']) -
                          set([d[db_series_names] for d in return_structure['summary'][index]]))
                 for missing_name in missing_names:
-                    if median_available and plot_average_choice == 'both':
+                    if plot_average:
+                        if median_available and plot_average_choice == 'both':
+                            (return_structure['summary'][index]).append(
+                                {'median': 0, 'mean': 0, db_series_names: missing_name, 'num': 0})
+                        elif median_available and plot_average_choice == 'median':
+                            (return_structure['summary'][index]).append(
+                                {'median': 0, db_series_names: missing_name, 'num': 0})
+                        else:
+                            (return_structure['summary'][index]).append(
+                                {'mean': 0, db_series_names: missing_name, 'num': 0})
+                    elif plot_freq:
                         (return_structure['summary'][index]).append(
-                            {'median': 0, 'mean': 0, db_series_names: missing_name, 'num': 0})
-                    elif median_available and plot_average_choice == 'median':
-                        (return_structure['summary'][index]).append(
-                            {'median': 0, db_series_names: missing_name, 'num': 0})
-                    else:
-                        (return_structure['summary'][index]).append(
-                            {'mean': 0, db_series_names: missing_name, 'num': 0})
+                            {db_series_names: missing_name, 'num': 0})
+
                 # Rearrange the list into the same order as series_names
                 summary_temp = []
                 for series_name in return_structure['series_names']:

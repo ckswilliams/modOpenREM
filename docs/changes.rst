@@ -5,6 +5,7 @@ OpenREM version history
 0.7.3b1 (2016-07-12)
 --------------------
 
+* `#420`_  Charts: fixed error where frequency pie charts were only showing data from the first system
 * `#419`_  Interface: fixed error where "Cancel" was ignored when deleting study in Firefox browser
 * `#418`_  Exports: fixed error when exporting fluoroscopy study with missing xray_filter_material
 * `#410`_  Charts: fixed display of bar charts containing only one data point
