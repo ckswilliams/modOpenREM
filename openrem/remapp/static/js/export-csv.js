@@ -25,7 +25,7 @@
         lang: {
             downloadCSV: 'Download CSV',
             downloadXLS: 'Download XLS',
-            viewData: 'View data table'
+            viewData: 'Toggle data table'
         }
     });
 
@@ -54,11 +54,11 @@
         i = 0;
         each(this.series, function (series) {
             var keys = series.options.keys,
-                pointArrayMap = keys || series.pointArrayMap || ['y'],
+                pointArrayMap = keys || series.pointArrayMap || ['y', 'freq'],
                 valueCount = pointArrayMap.length,
                 requireSorting = series.requireSorting,
                 categoryMap = {},
-                j;
+                j, k;
 
             // Map the categories for value axes
             each(pointArrayMap, function (prop) {
@@ -68,7 +68,9 @@
             if (series.options.includeInCSVExport !== false && series.visible !== false) { // #55
                 j = 0;
                 while (j < valueCount) {
-                    names.push(columnHeaderFormatter(series, pointArrayMap[j], pointArrayMap.length));
+                    if (series.points[0].hasOwnProperty(pointArrayMap[j])) {
+                        names.push(columnHeaderFormatter(series, pointArrayMap[j], pointArrayMap.length));
+                    }
                     j = j + 1;
                 }
 
@@ -78,6 +80,7 @@
                         val;
 
                     j = 0;
+                    k = 0;
 
                     if (!rows[key]) {
                         rows[key] = [];
@@ -92,12 +95,15 @@
                     while (j < valueCount) {
                         prop = pointArrayMap[j]; // y, z etc
                         val = point[prop];
-                        rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                        if (point.hasOwnProperty(prop)) {
+                            rows[key][i + k] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                            k = k + 1;
+                        }
                         j = j + 1;
                     }
 
                 });
-                i = i + j;
+                i = i + k;
             }
         });
 
@@ -310,6 +316,10 @@
             this.renderTo.parentNode.insertBefore(div, this.renderTo.nextSibling);
             div.innerHTML = this.getTable();
             this.insertedTable = true;
+            div.id = this.container.id + '-data-table';
+        }
+        else {
+            $('#' + this.container.id + '-data-table').toggle();
         }
     };
 
