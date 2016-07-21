@@ -244,6 +244,7 @@ $('.datepicker').datepicker({
                         <div class="panel-body">
                             <div id="scatterDIV" style="height: auto; margin: 0 0"></div>
                             <a onclick="enterFullScreen('collapseScatter', 'scatterDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#scatterDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -276,6 +277,7 @@ $('.datepicker').datepicker({
                             <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
                             <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyWorkloadDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>

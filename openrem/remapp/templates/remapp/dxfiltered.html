@@ -285,8 +285,9 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseOne','container')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#container').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                             <a onclick="$('#container').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
-                            <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                            <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container'); $('#container').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
                 </div>
@@ -344,6 +345,7 @@
                         <div class="panel-body">
                             <div id="piechartProtocolDIV" style="height: auto; margin: 0 0"></div>
                             <a onclick="enterFullScreen('collapseProtocolPieChart', 'piechartProtocolDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartProtocolDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -407,8 +409,9 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
-                            <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                            <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer'); $('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
                 </div>
@@ -466,6 +469,7 @@
                         <div class="panel-body">
                             <div id="piechartRequestDIV" style="height: auto; margin: 0 0"></div>
                             <a onclick="enterFullScreen('collapseRequestPieChart', 'piechartRequestDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartRequestDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -530,8 +534,9 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
-                            <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                            <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer'); $('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
                 </div>
@@ -589,6 +594,7 @@
                         <div class="panel-body">
                             <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
                             <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -650,8 +656,9 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseAcquisitionMeankVpChart', 'chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
-                            <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                            <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp'); $('#chartAcquisitionMeankVp').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
                 </div>
@@ -738,8 +745,9 @@
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapseAcquisitionMeanmAsChart', 'chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
-                            <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                            <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs'); $('#chartAcquisitionMeanmAs').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
                 </div>
@@ -798,6 +806,7 @@
                             <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
                             <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyWorkloadDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -834,6 +843,7 @@
                             <div id="AcquisitionMeankVpOverTimeDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="enterFullScreen('collapseAcquisitionMeankVpOverTime', 'AcquisitionMeankVpOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -874,6 +884,7 @@
                             <div id="AcquisitionMeanmAsOverTimeDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="enterFullScreen('collapseAcquisitionMeanmAsOverTime', 'AcquisitionMeanmAsOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -914,6 +925,7 @@
                             <div id="AcquisitionMeanDAPOverTimeDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="enterFullScreen('collapseAcquisitionMeanDAPOverTime', 'AcquisitionMeanDAPOverTimeDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>

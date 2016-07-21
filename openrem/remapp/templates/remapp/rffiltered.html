@@ -305,8 +305,9 @@ $('.datepicker').datepicker({
                                 </table>
                             </div>
                             <a onclick="enterFullScreen('collapsePlotRFStudyDAPAccordion','plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#plotRFStudyDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
-                            <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
+                            <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFStudyDAPContainer'); $('#plotRFStudyDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
                 </div>
@@ -365,6 +366,7 @@ $('.datepicker').datepicker({
                             <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
                             <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyWorkloadDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -396,6 +398,7 @@ $('.datepicker').datepicker({
                         <div class="panel-body">
                             <div id="piechartStudyDIV" style="height: auto; margin: 0 0"></div>
                             <a onclick="enterFullScreen('collapseStudyPieChart', 'piechartStudyDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button">Toggle data table</a>
                         </div>
                     </div>
                 </div>

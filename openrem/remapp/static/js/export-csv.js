@@ -308,7 +308,10 @@
     /**
      * View the data in a table below the chart
      */
-    Highcharts.Chart.prototype.viewData = function () {
+    Highcharts.Chart.prototype.viewData = function (toggleDisplay, updateTableData, hide) {
+        if (toggleDisplay && this.insertedTable) {
+            $('#' + this.insertedTableID).toggle();
+        }
         if (!this.insertedTable) {
             var div = document.createElement('div');
             div.className = 'highcharts-data-table';
@@ -321,8 +324,11 @@
             this.insertedTableID = 'div_' + date_str + rand_str
             div.id = this.insertedTableID;
         }
-        else {
-            $('#' + this.insertedTableID).toggle();
+        if (updateTableData) {
+            $('#' + this.insertedTableID).html(this.getTable());
+        }
+        if (hide) {
+            $('#' + this.insertedTableID).hide();
         }
     };
 
@@ -339,7 +345,7 @@
             onclick: function () { this.downloadXLS(); }
         }, {
             textKey: 'viewData',
-            onclick: function () { this.viewData(); }
+            onclick: function () { this.viewData(true); }
         });
     }
 
