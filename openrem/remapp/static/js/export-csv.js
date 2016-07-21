@@ -191,7 +191,7 @@
      * Build a HTML table with the data
      */
     Highcharts.Chart.prototype.getTable = function (useLocalDecimalPoint) {
-        var html = '<table>',
+        var html = '<table class="table table-bordered table-hover small">',
             rows = this.getDataRows();
 
         // Transform the rows to HTML
@@ -316,10 +316,13 @@
             this.renderTo.parentNode.insertBefore(div, this.renderTo.nextSibling);
             div.innerHTML = this.getTable();
             this.insertedTable = true;
-            div.id = this.container.id + '-data-table';
+            var date_str = new Date().getTime().toString();
+            var rand_str = Math.floor(Math.random() * (1000000)).toString();
+            this.insertedTableID = 'div_' + date_str + rand_str
+            div.id = this.insertedTableID;
         }
         else {
-            $('#' + this.container.id + '-data-table').toggle();
+            $('#' + this.insertedTableID).toggle();
         }
     };
 
