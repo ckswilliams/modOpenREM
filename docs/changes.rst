@@ -5,6 +5,7 @@ OpenREM version history
 0.7.3b1 (2016-07-12)
 --------------------
 
+* `#423`_  Charts: fixed error where some chart plotting options were not updated after being changed by the user
 * `#421`_  Charts: fixed error where only some scatter plot data was being exported to csv or xls files
 * `#420`_  Charts: fixed error where frequency pie charts were only showing data from the first system
 * `#419`_  Interface: fixed error where "Cancel" was ignored when deleting study in Firefox browser
