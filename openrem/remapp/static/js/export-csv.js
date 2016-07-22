@@ -193,6 +193,7 @@
     Highcharts.Chart.prototype.getTable = function (useLocalDecimalPoint) {
         var html = '<table class="table table-bordered table-hover small">',
             rows = this.getDataRows();
+        var dp;
 
         // Transform the rows to HTML
         each(rows, function (row, i) {
@@ -206,7 +207,8 @@
                 val = row[j];
                 // Add the cell
                 if (typeof val === 'number') {
-                    val = val.toString();
+                    dp = rows[0][j].indexOf('freq') != -1 ? 0 : 2;
+                    val = val.toFixed(dp).toString();
                     if (n === ',') {
                         val = val.replace('.', n);
                     }
