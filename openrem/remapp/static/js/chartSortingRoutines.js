@@ -31,6 +31,7 @@ function anySeriesSort(chartContainer, p, d, s) {
             for (i = 1; i < chart.series.length; i++) {
                 bubbleSort(chartDataNew[i], 'x', 1);
             }
+            chart.xAxis[0].isDirty = true;
             chart.yAxis[0].isDirty = true;
             chart.redraw({duration: 1000});
         }
@@ -60,6 +61,10 @@ function rebuildAnySeries(chartContainer, chartData, s) {
         }, false);
     }
     chart.xAxis[0].categories = newCategories;
+    chart.xAxis[0].options.categories = newCategories;
+    chart.xAxis[0].userOptions.categories = newCategories;
+    chart.options.xAxis[0].categories = newCategories;
+    chart.userOptions.xAxis.categories = newCategories;
 
 
     for (i = 0; i < chartData[0].length; i++) {
