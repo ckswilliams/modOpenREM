@@ -43,6 +43,13 @@ def _replace_comma(comma_string):
     return comma_string
 
 
+def _export_safe(ascii_string):
+    if ascii_string:
+        utf8_string = ascii_string.encode("utf-8")
+        safe_string = _replace_comma(utf8_string)
+        return safe_string
+
+
 @shared_task
 def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered CT database data to a single-sheet CSV file.
@@ -236,8 +243,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             manufacturer_model_name,
             station_name,
             display_name,
-            exams.accession_number,
-            exams.operator_name,
+            _export_safe(exams.accession_number),
+            _export_safe(exams.operator_name),
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -250,8 +257,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_size,
             patient_weight,
             not_patient,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
+            _export_safe(exams.study_description),
+            _export_safe(exams.requested_procedure_code_meaning),
             total_number_of_irradiation_events,
             ct_dose_length_product_total,
             ]
@@ -266,7 +273,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 scanning_length = s.scanninglength_set.get().scanning_length
 
             examdata += [
-                s.acquisition_protocol,
+                _export_safe(s.acquisition_protocol),
                 s.ct_acquisition_type,
                 s.exposure_time,
                 scanning_length,
