@@ -741,7 +741,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, export_safe
     from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
@@ -849,23 +849,23 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
-                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                    patient_name = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
                 if patid:
-                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
+                    patient_id = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
 
         try:
             exams.generalequipmentmoduleattr_set.get()
         except ObjectDoesNotExist:
             manufacturer = None
         else:
-            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            manufacturer = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
 
         try:
             exams.projectionxrayradiationdose_set.get().observercontext_set.get()
         except ObjectDoesNotExist:
             device_observer_name = None
         else:
-            device_observer_name = return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name')
+            device_observer_name = export_safe(return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name'))
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -873,8 +873,8 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             institution_name = None
             display_name = None
         else:
-            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
+            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
 
         try:
             exams.patientmoduleattr_set.get()
@@ -913,7 +913,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             device_observer_name,
             institution_name,
             display_name,
-            exams.accession_number,
+            export_safe(exams.accession_number),
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -925,10 +925,10 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
-            not_patient,
-            exams.study_description,
-            exams.performing_physician_name,
-            exams.operator_name,
+            export_safe(not_patient),
+            export_safe(exams.study_description),
+            export_safe(exams.performing_physician_name),
+            export_safe(exams.operator_name),
             count,
         ]
 
