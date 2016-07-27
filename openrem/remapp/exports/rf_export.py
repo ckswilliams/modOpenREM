@@ -991,6 +991,7 @@ def rfopenskin(studyid):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
+    from remapp.tools.get_values import export_safe
 
     tsk = Exports.objects.create()
 
@@ -1132,8 +1133,7 @@ def rfopenskin(studyid):
             table_height_position = event.irradeventxraymechanicaldata_set.get(
             ).doserelateddistancemeasurements_set.get().table_height_position
 
-        acquisition_protocol = return_for_export(event, 'acquisition_protocol')
-        # sent to return_for_export to ensure a unicode return - probably unnecessary
+        acquisition_protocol = export_safe(return_for_export(event, 'acquisition_protocol'))
 
         data = [
             'Anon',
@@ -1174,7 +1174,7 @@ def rfopenskin(studyid):
             table_lateral_position,
             table_height_position,
             event.target_region,
-            event.comment,
+            export_safe(event.comment),
         ]
         writer.writerow(data)
         tsk.progress = "{0} of {1}".format(i, numevents)
