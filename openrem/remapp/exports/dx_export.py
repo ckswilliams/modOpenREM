@@ -320,7 +320,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
             examdata += [
                 export_safe(s.acquisition_protocol),
-                export_safe(s.image_view),
+                s.image_view,
                 export_safe(exposure_control_mode),
                 kvp,
                 mas,

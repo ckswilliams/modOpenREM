@@ -580,7 +580,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
                 export_safe(exp.projection_xray_radiation_dose.general_study_module_attributes.study_description),
-                export_safe(exp.image_view),
+                exp.image_view,
                 exp.laterality,
                 export_safe(exp.acquisition_protocol),
                 compression_thickness,
