@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.3b1 (2016-07-12)
+0.7.3b1 (2016-07-29)
 --------------------
 
 * `#424`_  Charts: fixed error where png or svg export of chart would show incorrect x-axis labels
