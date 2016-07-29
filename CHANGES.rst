@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.3b1 (2016-07-12)
+0.7.3b1 (2016-07-29)
 --------------------
 
 * `#425`_  Exports: fixed error with non-ASCII characters being exported to csv
