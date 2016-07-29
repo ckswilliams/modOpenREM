@@ -741,7 +741,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, export_safe
     from django.core.exceptions import ObjectDoesNotExist
 
     tsk = Exports.objects.create()
@@ -849,23 +849,23 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
-                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                    patient_name = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
                 if patid:
-                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
+                    patient_id = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
 
         try:
             exams.generalequipmentmoduleattr_set.get()
         except ObjectDoesNotExist:
             manufacturer = None
         else:
-            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
+            manufacturer = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
 
         try:
             exams.projectionxrayradiationdose_set.get().observercontext_set.get()
         except ObjectDoesNotExist:
             device_observer_name = None
         else:
-            device_observer_name = return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name')
+            device_observer_name = export_safe(return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name'))
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -873,8 +873,8 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             institution_name = None
             display_name = None
         else:
-            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
+            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
 
         try:
             exams.patientmoduleattr_set.get()
@@ -913,7 +913,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             device_observer_name,
             institution_name,
             display_name,
-            exams.accession_number,
+            export_safe(exams.accession_number),
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -925,10 +925,10 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
-            not_patient,
-            exams.study_description,
-            exams.performing_physician_name,
-            exams.operator_name,
+            export_safe(not_patient),
+            export_safe(exams.study_description),
+            export_safe(exams.performing_physician_name),
+            export_safe(exams.operator_name),
             count,
         ]
 
@@ -991,6 +991,7 @@ def rfopenskin(studyid):
     from django.shortcuts import redirect
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
+    from remapp.tools.get_values import export_safe
 
     tsk = Exports.objects.create()
 
@@ -1067,11 +1068,17 @@ def rfopenskin(studyid):
 
         try:
             for filter in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                if "Copper" in filter.xray_filter_material.code_meaning:
-                    xray_filter_type = filter.xray_filter_type
-                    xray_filter_material = filter.xray_filter_material
-                    xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
-                    xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
+                try:
+                    if "Copper" in filter.xray_filter_material.code_meaning:
+                        xray_filter_type = filter.xray_filter_type
+                        xray_filter_material = filter.xray_filter_material
+                        xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
+                        xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
+                except AttributeError:
+                        xray_filter_type = ''
+                        xray_filter_material = ''
+                        xray_filter_thickness_minimum = ''
+                        xray_filter_thickness_maximum = ''
         except ObjectDoesNotExist:
             xray_filter_type = ''
             xray_filter_material = ''
@@ -1126,8 +1133,7 @@ def rfopenskin(studyid):
             table_height_position = event.irradeventxraymechanicaldata_set.get(
             ).doserelateddistancemeasurements_set.get().table_height_position
 
-        acquisition_protocol = return_for_export(event, 'acquisition_protocol')
-        # sent to return_for_export to ensure a unicode return - probably unnecessary
+        acquisition_protocol = export_safe(return_for_export(event, 'acquisition_protocol'))
 
         data = [
             'Anon',
@@ -1168,7 +1174,7 @@ def rfopenskin(studyid):
             table_lateral_position,
             table_height_position,
             event.target_region,
-            event.comment,
+            export_safe(event.comment),
         ]
         writer.writerow(data)
         tsk.progress = "{0} of {1}".format(i, numevents)

@@ -2,9 +2,15 @@
 OpenREM version history
 =======================
 
-0.7.3b1 (2016-07-12)
+0.7.3b1 (2016-07-29)
 --------------------
 
+* `#424`_  Charts: fixed error where png or svg export of chart would show incorrect x-axis labels
+* `#423`_  Charts: fixed error where some chart plotting options were not updated after being changed by the user
+* `#421`_  Charts: fixed error where only some scatter plot data was being exported to csv or xls files
+* `#420`_  Charts: fixed error where frequency pie charts were only showing data from the first system
+* `#419`_  Interface: fixed error where "Cancel" was ignored when deleting study in Firefox browser
+* `#418`_  Exports: fixed error when exporting fluoroscopy study with missing xray_filter_material
 * `#410`_  Charts: fixed display of bar charts containing only one data point
 * `#408`_  Charts: Increased number of items that can be shown on some Highcharts plots
 * `#407`_  Fixed issue where skin dose map data was not being calculated on import

@@ -3,15 +3,31 @@
  *
  * Author:   Torstein Honsi
  * Licence:  MIT
- * Version:  1.3.1
+ * Version:  1.4.2
  */
 /*global Highcharts, window, document, Blob */
-(function (Highcharts) {
+(function (factory) {
+    if (typeof module === 'object' && module.exports) {
+        module.exports = factory;
+    } else {
+        factory(Highcharts);
+    }
+})(function (Highcharts) {
 
     'use strict';
 
     var each = Highcharts.each,
+        pick = Highcharts.pick,
+        seriesTypes = Highcharts.seriesTypes,
         downloadAttrSupported = document.createElement('a').download !== undefined;
+
+    Highcharts.setOptions({
+        lang: {
+            downloadCSV: 'Download CSV',
+            downloadXLS: 'Download XLS',
+            viewData: 'Toggle data table'
+        }
+    });
 
 
     /**
@@ -26,36 +42,68 @@
             names = [],
             i,
             x,
+            xTitle = xAxis.options.title && xAxis.options.title.text,
 
             // Options
-            dateFormat = options.dateFormat || '%Y-%m-%d %H:%M:%S';
+            dateFormat = options.dateFormat || '%Y-%m-%d %H:%M:%S',
+            columnHeaderFormatter = options.columnHeaderFormatter || function (series, key, keyLength) {
+                return series.name + (keyLength > 1 ? ' ('+ key + ')' : '');
+            };
 
         // Loop the series and index values
         i = 0;
         each(this.series, function (series) {
-            if (series.options.includeInCSVExport !== false) {
-                names.push(series.name);
-                if (series.points[0].hasOwnProperty('freq')) {
-                    names.push('Frequency');
+            var keys = series.options.keys,
+                pointArrayMap = keys || series.pointArrayMap || ['y', 'freq'],
+                valueCount = pointArrayMap.length,
+                requireSorting = series.requireSorting,
+                categoryMap = {},
+                j, k;
+
+            // Map the categories for value axes
+            each(pointArrayMap, function (prop) {
+                categoryMap[prop] = (series[prop + 'Axis'] && series[prop + 'Axis'].categories) || [];
+            });
+
+            if (series.options.includeInCSVExport !== false && series.visible !== false) { // #55
+                j = 0;
+                while (j < valueCount) {
+                    if (series.points[0].hasOwnProperty(pointArrayMap[j])) {
+                        names.push(columnHeaderFormatter(series, pointArrayMap[j], pointArrayMap.length));
+                    }
+                    j = j + 1;
                 }
-                each(series.points, function (point) {
-                    if (!rows[point.x]) {
-                        rows[point.x] = [];
-                    }
-                    rows[point.x].x = point.x;
 
-                    if (!series.xAxis || point.name) {
-                        rows[point.x].name = point.name;
+                each(series.points, function (point, pIdx) {
+                    var key = requireSorting ? point.x : pIdx,
+                        prop,
+                        val;
+
+                    j = 0;
+                    k = 0;
+
+                    if (!rows[key]) {
+                        rows[key] = [];
+                    }
+                    rows[key].x = point.x;
+
+                    // Pies, funnels, geo maps etc. use point name in X row
+                    if (!series.xAxis || series.exportKey === 'name') {
+                        rows[key].name = point.name;
                     }
 
-                    rows[point.x][i] = [];
-                    rows[point.x][i][0] = point.y;
-
-                    if (point.hasOwnProperty('freq')) {
-                        rows[point.x][i][1] = point.freq;
+                    while (j < valueCount) {
+                        prop = pointArrayMap[j]; // y, z etc
+                        val = point[prop];
+                        if (point.hasOwnProperty(prop)) {
+                            rows[key][i + k] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                            k = k + 1;
+                        }
+                        j = j + 1;
                     }
+
                 });
-                i += 1;
+                i = i + k;
             }
         });
 
@@ -71,13 +119,30 @@
         });
 
         // Add header row
-        dataRows = [[xAxis.isDatetimeAxis ? 'DateTime' : 'Category'].concat(names)];
+        if (!xTitle) {
+            xTitle = xAxis.isDatetimeAxis ? 'DateTime' : 'Category';
+        }
+        dataRows = [[xTitle].concat(names)];
 
-        // Transform the rows to CSV
+        // Add the category column
         each(rowArr, function (row) {
 
+            var category = row.name;
+            if (!category) {
+                if (xAxis.isDatetimeAxis) {
+                    if (row.x instanceof Date) {
+                        row.x = row.x.getTime();
+                    }
+                    category = Highcharts.dateFormat(dateFormat, row.x);
+                } else if (xAxis.categories) {
+                    category = pick(xAxis.names[row.x], xAxis.categories[row.x], row.x)
+                } else {
+                    category = row.x;
+                }
+            }
+
             // Add the X/date/category
-            row.unshift(row.name || (xAxis.isDatetimeAxis ? Highcharts.dateFormat(dateFormat, row.x) : xAxis.categories ? Highcharts.pick(xAxis.categories[row.x], row.x) : row.x));
+            row.unshift(category);
             dataRows.push(row);
         });
 
@@ -126,7 +191,7 @@
      * Build a HTML table with the data
      */
     Highcharts.Chart.prototype.getTable = function (useLocalDecimalPoint) {
-        var html = '<table>',
+        var html = '<table class="table table-bordered table-hover small">',
             rows = this.getDataRows();
 
         // Transform the rows to HTML
@@ -134,34 +199,21 @@
             var tag = i ? 'td' : 'th',
                 val,
                 j,
-                arr_i,
                 n = useLocalDecimalPoint ? (1.1).toLocaleString()[1] : '.';
 
             html += '<tr>';
-            for (j = 0; j < row.length; j++) {
+            for (j = 0; j < row.length; j = j + 1) {
                 val = row[j];
                 // Add the cell
-                if (typeof val === 'object') {
-                    for (arr_i = 0; arr_i < val.length; arr_i++) {
-                        if (typeof val[arr_i] === 'number') {
-                            if (n === ',') {
-                                html += '<' + tag + (typeof val[arr_i] === 'number' ? ' class="number"' : '') + '>' + val[arr_i].toString().replace(".", ",") + '</' + tag + '>';
-                            } else {
-                                html += '<' + tag + (typeof val[arr_i] === 'number' ? ' class="number"' : '') + '>' + val[arr_i].toString() + '</' + tag + '>';
-                            }
-                        } else {
-                            html += '<' + tag + '>' + val[arr_i] + '</' + tag + '>';
-                        }
-                    }
-                }
-                else if (typeof val === 'number') {
+                if (typeof val === 'number') {
+                    val = val.toString();
                     if (n === ',') {
-                        html += '<' + tag + (typeof val === 'number' ? ' class="number"' : '') + '>' + val.toString().replace(".", ",") + '</' + tag + '>';
-                    } else {
-                        html += '<' + tag + (typeof val === 'number' ? ' class="number"' : '') + '>' + val.toString() + '</' + tag + '>';
+                        val = val.replace('.', n);
                     }
+                    html += '<' + tag + ' class="number">' + val + '</' + tag + '>';
+
                 } else {
-                    html += '<' + tag + '>' + val + '</' + tag + '>';
+                    html += '<' + tag + '>' + (val === undefined ? '' : val) + '</' + tag + '>';
                 }
             }
 
@@ -171,77 +223,132 @@
         return html;
     };
 
-    function getContent(chart, href, extention, content, MIME) {
+    function getContent(chart, href, extension, content, MIME) {
         var a,
             blobObject,
-            name = (chart.title ? chart.title.textStr.replace(/ /g, '-').toLowerCase() : 'chart'),
+            name,
             options = (chart.options.exporting || {}).csv || {},
             url = options.url || 'http://www.highcharts.com/studies/csv-export/download.php';
 
+        if (chart.options.exporting.filename) {
+            name = chart.options.exporting.filename;
+        } else if (chart.title) {
+            name = chart.title.textStr.replace(/ /g, '-').toLowerCase();
+        } else {
+            name = 'chart';
+        }
+
+        // MS specific. Check this first because of bug with Edge (#76)
+        if (window.Blob && window.navigator.msSaveOrOpenBlob) {
+            // Falls to msSaveOrOpenBlob if download attribute is not supported
+            blobObject = new Blob([content]);
+            window.navigator.msSaveOrOpenBlob(blobObject, name + '.' + extension);
+
         // Download attribute supported
-        if (downloadAttrSupported) {
+        } else if (downloadAttrSupported) {
             a = document.createElement('a');
             a.href = href;
-            a.target      = '_blank';
-            a.download    = name + '.' + extention;
+            a.target = '_blank';
+            a.download = name + '.' + extension;
             document.body.appendChild(a);
             a.click();
             a.remove();
-
-        } else if (window.Blob && window.navigator.msSaveOrOpenBlob) {
-            // Falls to msSaveOrOpenBlob if download attribute is not supported
-            blobObject = new Blob([content]);
-            window.navigator.msSaveOrOpenBlob(blobObject, name + '.' + extention);
 
         } else {
             // Fall back to server side handling
             Highcharts.post(url, {
                 data: content,
                 type: MIME,
-                extension: extention
+                extension: extension
             });
         }
     }
+
+    /**
+     * Call this on click of 'Download CSV' button
+     */
+    Highcharts.Chart.prototype.downloadCSV = function () {
+        var csv = this.getCSV(true);
+        getContent(
+            this,
+            'data:text/csv,\uFEFF' + csv.replace(/\n/g, '%0A'),
+            'csv',
+            csv,
+            'text/csv'
+        );
+    };
+
+    /**
+     * Call this on click of 'Download XLS' button
+     */
+    Highcharts.Chart.prototype.downloadXLS = function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
+                '<x:Name>Ark1</x:Name>' +
+                '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+                '<style>td{border:none;font-family: Calibri, sans-serif;} .number{mso-number-format:"0.00";}</style>' +
+                '<meta name=ProgId content=Excel.Sheet>' +
+                '<meta charset=UTF-8>' +
+                '</head><body>' +
+                this.getTable(true) +
+                '</body></html>',
+            base64 = function (s) { 
+                return window.btoa(unescape(encodeURIComponent(s))); // #50
+            };
+        getContent(
+            this,
+            uri + base64(template),
+            'xls',
+            template,
+            'application/vnd.ms-excel'
+        );
+    };
+
+    /**
+     * View the data in a table below the chart
+     */
+    Highcharts.Chart.prototype.viewData = function () {
+        if (!this.insertedTable) {
+            var div = document.createElement('div');
+            div.className = 'highcharts-data-table';
+            // Insert after the chart container
+            this.renderTo.parentNode.insertBefore(div, this.renderTo.nextSibling);
+            div.innerHTML = this.getTable();
+            this.insertedTable = true;
+            var date_str = new Date().getTime().toString();
+            var rand_str = Math.floor(Math.random() * (1000000)).toString();
+            this.insertedTableID = 'div_' + date_str + rand_str
+            div.id = this.insertedTableID;
+        }
+        else {
+            $('#' + this.insertedTableID).toggle();
+        }
+    };
+
 
     // Add "Download CSV" to the exporting menu. Use download attribute if supported, else
     // run a simple PHP script that returns a file. The source code for the PHP script can be viewed at
     // https://raw.github.com/highslide-software/highcharts.com/master/studies/csv-export/csv.php
     if (Highcharts.getOptions().exporting) {
         Highcharts.getOptions().exporting.buttons.contextButton.menuItems.push({
-            text: Highcharts.getOptions().lang.downloadCSV || 'Download CSV',
-            onclick: function () {
-                var csv = this.getCSV(true);
-                getContent(
-                    this,
-                    'data:text/csv;charset=utf-8,%EF%BB%BF' + csv.replace(/\n/g, '%0A'),
-                    'csv',
-                    csv,
-                    'text/csv'
-                );
-            }
-
+            textKey: 'downloadCSV',
+            onclick: function () { this.downloadCSV(); }
         }, {
-            text: Highcharts.getOptions().lang.downloadXLS || 'Download XLS',
-            onclick: function () {
-                var uri = 'data:application/vnd.ms-excel;base64,',
-                    template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">' +
-                        '<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
-                        '<x:Name>Ark1</x:Name>' +
-                        '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
-                        '<style>td{border:none;font-family: Calibri, sans-serif;} .number{mso-number-format:"0.00";}</style>' +
-                        '<meta name=ProgId content=Excel.Sheet>' +
-                        '</head><body>' +
-                        this.getTable(true) +
-                        '</body></html>',
-                    base64 = function (s) { return window.btoa(decodeURIComponent(unescape(encodeURIComponent(s)))); };
-                getContent(
-                    this,
-                    uri + base64(template),
-                    'xls',
-                    template,
-                    'application/vnd.ms-excel'
-                );
-            }
+            textKey: 'downloadXLS',
+            onclick: function () { this.downloadXLS(); }
+        }, {
+            textKey: 'viewData',
+            onclick: function () { this.viewData(); }
         });
     }
-}(Highcharts));
+
+    // Series specific
+    if (seriesTypes.map) {
+        seriesTypes.map.prototype.exportKey = 'name';
+    }
+    if (seriesTypes.mapbubble) {
+        seriesTypes.mapbubble.prototype.exportKey = 'name';
+    }
+
+});

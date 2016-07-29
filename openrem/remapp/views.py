@@ -1733,9 +1733,15 @@ def chart_options_view(request):
 
             user_profile.plotDXAcquisitionMeanDAP = dx_form.cleaned_data['plotDXAcquisitionMeanDAP']
             user_profile.plotDXAcquisitionFreq = dx_form.cleaned_data['plotDXAcquisitionFreq']
+            user_profile.plotDXStudyMeanDAP = dx_form.cleaned_data['plotDXStudyMeanDAP']
+            user_profile.plotDXStudyFreq = dx_form.cleaned_data['plotDXStudyFreq']
+            user_profile.plotDXRequestMeanDAP = dx_form.cleaned_data['plotDXRequestMeanDAP']
+            user_profile.plotDXRequestFreq = dx_form.cleaned_data['plotDXRequestFreq']
             user_profile.plotDXAcquisitionMeankVp = dx_form.cleaned_data['plotDXAcquisitionMeankVp']
             user_profile.plotDXAcquisitionMeanmAs = dx_form.cleaned_data['plotDXAcquisitionMeanmAs']
             user_profile.plotDXStudyPerDayAndHour = dx_form.cleaned_data['plotDXStudyPerDayAndHour']
+            user_profile.plotDXAcquisitionMeankVpOverTime = dx_form.cleaned_data['plotDXAcquisitionMeankVpOverTime']
+            user_profile.plotDXAcquisitionMeanmAsOverTime = dx_form.cleaned_data['plotDXAcquisitionMeanmAsOverTime']
             user_profile.plotDXAcquisitionMeanDAPOverTime = dx_form.cleaned_data['plotDXAcquisitionMeanDAPOverTime']
             user_profile.plotDXAcquisitionMeanDAPOverTimePeriod = dx_form.cleaned_data[
                 'plotDXAcquisitionMeanDAPOverTimePeriod']
@@ -1743,6 +1749,7 @@ def chart_options_view(request):
 
             user_profile.plotRFStudyPerDayAndHour = rf_form.cleaned_data['plotRFStudyPerDayAndHour']
             user_profile.plotRFStudyFreq = rf_form.cleaned_data['plotRFStudyFreq']
+            user_profile.plotRFStudyDAP = rf_form.cleaned_data['plotRFStudyDAP']
             user_profile.plotRFInitialSortingChoice = rf_form.cleaned_data['plotRFInitialSortingChoice']
 
             user_profile.plotMGStudyPerDayAndHour = mg_form.cleaned_data['plotMGStudyPerDayAndHour']
@@ -1776,9 +1783,9 @@ def chart_options_view(request):
                     'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
                     'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
                     'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
+                    'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                     'plotCTStudyFreq': user_profile.plotCTStudyFreq,
                     'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
-                    'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                     'plotCTRequestFreq': user_profile.plotCTRequestFreq,
                     'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                     'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
@@ -1787,9 +1794,15 @@ def chart_options_view(request):
 
     dx_form_data = {'plotDXAcquisitionMeanDAP': user_profile.plotDXAcquisitionMeanDAP,
                     'plotDXAcquisitionFreq': user_profile.plotDXAcquisitionFreq,
+                    'plotDXStudyMeanDAP': user_profile.plotDXStudyMeanDAP,
+                    'plotDXStudyFreq': user_profile.plotDXStudyFreq,
+                    'plotDXRequestMeanDAP': user_profile.plotDXRequestMeanDAP,
+                    'plotDXRequestFreq': user_profile.plotDXRequestFreq,
                     'plotDXAcquisitionMeankVp': user_profile.plotDXAcquisitionMeankVp,
                     'plotDXAcquisitionMeanmAs': user_profile.plotDXAcquisitionMeanmAs,
                     'plotDXStudyPerDayAndHour': user_profile.plotDXStudyPerDayAndHour,
+                    'plotDXAcquisitionMeankVpOverTime': user_profile.plotDXAcquisitionMeankVpOverTime,
+                    'plotDXAcquisitionMeanmAsOverTime': user_profile.plotDXAcquisitionMeanmAsOverTime,
                     'plotDXAcquisitionMeanDAPOverTime': user_profile.plotDXAcquisitionMeanDAPOverTime,
                     'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
                     'plotDXInitialSortingChoice': user_profile.plotDXInitialSortingChoice}
