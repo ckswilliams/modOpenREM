@@ -50,7 +50,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, export_safe
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -162,9 +162,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
-                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
+                    patient_name = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
                 if patid:
-                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
+                    patient_id = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
         try:
             exams.generalequipmentmoduleattr_set.get()
         except ObjectDoesNotExist:
@@ -174,11 +174,11 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             station_name = None
             display_name = None
         else:
-            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
-            manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
-            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
+            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
+            manufacturer = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
+            manufacturer_model_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name'))
+            station_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
+            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
         try:
             exams.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
@@ -222,8 +222,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             manufacturer_model_name,
             station_name,
             display_name,
-            exams.accession_number,
-            exams.operator_name,
+            export_safe(exams.accession_number),
+            export_safe(exams.operator_name),
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -235,8 +235,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
-            exams.study_description,
-            exams.requested_procedure_code_meaning,
+            export_safe(exams.study_description),
+            export_safe(exams.requested_procedure_code_meaning),
             total_number_of_radiographic_frames,
             cgycm2,
         ]
@@ -319,9 +319,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             cgycm2 = s.convert_gym2_to_cgycm2()
 
             examdata += [
-                s.acquisition_protocol,
+                export_safe(s.acquisition_protocol),
                 s.image_view,
-                exposure_control_mode,
+                export_safe(exposure_control_mode),
                 kvp,
                 mas,
                 average_xray_tube_current,
