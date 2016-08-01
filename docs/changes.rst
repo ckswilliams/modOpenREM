@@ -2,9 +2,10 @@
 OpenREM version history
 =======================
 
-0.7.3b1 (2016-07-12)
+0.7.3b1 (2016-07-29)
 --------------------
 
+* `#425`_  Exports: fixed error with non-ASCII characters being exported to csv
 * `#424`_  Charts: fixed error where png or svg export of chart would show incorrect x-axis labels
 * `#423`_  Charts: fixed error where some chart plotting options were not updated after being changed by the user
 * `#421`_  Charts: fixed error where only some scatter plot data was being exported to csv or xls files

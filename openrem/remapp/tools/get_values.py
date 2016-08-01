@@ -148,3 +148,17 @@ def safe_strings(str):
         return str.decode('latin-1', 'replace')
     except AttributeError:
         return None
+
+
+def replace_comma(comma_string):
+    if comma_string:
+        no_comma_string = comma_string.replace(","," ").replace(";"," ")
+        return no_comma_string
+    return comma_string
+
+
+def export_safe(ascii_string):
+    if ascii_string:
+        utf8_string = ascii_string.encode("utf-8")
+        safe_string = replace_comma(utf8_string)
+        return safe_string
