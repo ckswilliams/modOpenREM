@@ -5,6 +5,7 @@ OpenREM version history
 0.7.3b1 (2016-07-29)
 --------------------
 
+* `#426`_  Charts: added css so that wide chart data tables are displayed above the filter form div
 * `#425`_  Exports: fixed error with non-ASCII characters being exported to csv
 * `#424`_  Charts: fixed error where png or svg export of chart would show incorrect x-axis labels
 * `#423`_  Charts: fixed error where some chart plotting options were not updated after being changed by the user
