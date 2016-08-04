@@ -5,9 +5,11 @@ OpenREM version history
 0.7.3b1 (2016-07-29)
 --------------------
 
+* `#426`_  Charts: added css so that wide chart data tables are displayed above the filter form div
 * `#425`_  Exports: fixed error with non-ASCII characters being exported to csv
 * `#424`_  Charts: fixed error where png or svg export of chart would show incorrect x-axis labels
 * `#423`_  Charts: fixed error where some chart plotting options were not updated after being changed by the user
+* `#422`_  Charts: added a button below each chart to toggle the display of the data table
 * `#421`_  Charts: fixed error where only some scatter plot data was being exported to csv or xls files
 * `#420`_  Charts: fixed error where frequency pie charts were only showing data from the first system
 * `#419`_  Interface: fixed error where "Cancel" was ignored when deleting study in Firefox browser

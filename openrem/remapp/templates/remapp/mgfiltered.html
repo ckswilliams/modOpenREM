@@ -242,8 +242,9 @@ $('.datepicker').datepicker({
                     </div>
                     <div id="collapseScatter1" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <div id="scatterDIV1" style="height: auto; margin: 0 0"></div>
-                            <a onclick="enterFullScreen('collapseScatter1', 'scatterDIV1')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <div id="scatterDIV" style="height: auto; margin: 0 0"></div>
+                            <a onclick="$('#scatterDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter1', 'scatterDIV'); $('#toggle_scatteragd_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#scatterDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scatteragd_data_btn">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -337,7 +338,8 @@ $('.datepicker').datepicker({
                         <div class="panel-body">
                             <div id="piechartStudyWorkloadDIV" style="height: auto; margin: 0 0"></div>
                             <p>Click on a segment to be taken to a pie chart showing the breakdown per hour for that weekday.</p>
-                            <a onclick="enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV')" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyWorkloadDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseStudyWorkloadPieChart', 'piechartStudyWorkloadDIV'); $('#toggle_studywl_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#piechartStudyWorkloadDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_studywl_data_btn">Toggle data table</a>
                         </div>
                     </div>
                 </div>
