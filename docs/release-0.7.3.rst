@@ -7,8 +7,11 @@ Headline changes
 ****************
 
 * New migration file for upgrades from 0.6 series databases
-* Fixed multi-line cells in tables so that the links work in IE8
 * Charts: Increased number of points that can be plotted and fixed display of bar charts with just one data point
+* Charts: Added button to display table of data represented in the chart
+* Fixed multi-line cells in tables so that the links work in IE8
+* Fixed delete cancel button in firefox
+* Fixed export of non-ASCII characters to csv file
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
