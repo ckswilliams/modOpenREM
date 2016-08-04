@@ -329,3 +329,12 @@ input[type=range]::-ms-thumb {
 td.nowrap {
   white-space: nowrap;
 }
+
+.highcharts-data-table {
+  position: relative;
+  z-index: 99999;
+}
+
+.highcharts-data-table-contents {
+  background: rgba(255,255,255,1.0);
+}
