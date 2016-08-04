@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.3b1 (2016-07-29)
+0.7.3b3 (2016-08-04)
 --------------------
 
 * `#426`_  Charts: added css so that wide chart data tables are displayed above the filter form div
