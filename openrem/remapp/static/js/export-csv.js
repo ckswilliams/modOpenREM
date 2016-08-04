@@ -191,8 +191,9 @@
      * Build a HTML table with the data
      */
     Highcharts.Chart.prototype.getTable = function (useLocalDecimalPoint) {
-        var html = '<table class="table table-bordered table-hover small">',
+        var html = '<table class="table table-bordered table-hover small highcharts-data-table-contents">',
             rows = this.getDataRows();
+        var dp;
 
         // Transform the rows to HTML
         each(rows, function (row, i) {
@@ -206,7 +207,8 @@
                 val = row[j];
                 // Add the cell
                 if (typeof val === 'number') {
-                    val = val.toString();
+                    dp = rows[0][j].indexOf('freq') != -1 ? 0 : 2;
+                    val = val.toFixed(dp).toString();
                     if (n === ',') {
                         val = val.replace('.', n);
                     }
@@ -308,7 +310,10 @@
     /**
      * View the data in a table below the chart
      */
-    Highcharts.Chart.prototype.viewData = function () {
+    Highcharts.Chart.prototype.viewData = function (toggleDisplay, updateTableData, hide) {
+        if (toggleDisplay && this.insertedTable) {
+            $('#' + this.insertedTableID).toggle();
+        }
         if (!this.insertedTable) {
             var div = document.createElement('div');
             div.className = 'highcharts-data-table';
@@ -321,8 +326,11 @@
             this.insertedTableID = 'div_' + date_str + rand_str
             div.id = this.insertedTableID;
         }
-        else {
-            $('#' + this.insertedTableID).toggle();
+        if (updateTableData) {
+            $('#' + this.insertedTableID).html(this.getTable());
+        }
+        if (hide) {
+            $('#' + this.insertedTableID).hide();
         }
     };
 
@@ -339,7 +347,7 @@
             onclick: function () { this.downloadXLS(); }
         }, {
             textKey: 'viewData',
-            onclick: function () { this.viewData(); }
+            onclick: function () { this.viewData(true); }
         });
     }
 

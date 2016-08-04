@@ -25,6 +25,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                 drilldown: function (e) {
                     $(norm_btn_class).css('display','inline-block');
                     $(instr_class).css('display','none');
+                    this.viewData(false, false, true);
 
                     bins = e.point.bins;
                     name = (e.point.name).replace('&amp;', '%26');
@@ -76,6 +77,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                 drillup: function (e) {
                     $(norm_btn_class).css('display','none');
                     $(instr_class).css('display','block');
+                    this.viewData(false, false, true);
 
                     this.setTitle({
                         text: default_title

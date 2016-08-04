@@ -9,9 +9,11 @@ function chartWorkload(render_div, category_type) {
             plotShadow: false,
             events: {
                 drilldown: function(e) {
+                    this.viewData(false, false, true);
                     this.setTitle({ text: category_type + ' per hour,<br>'+e.point.name, align:'left', verticalAlign:'top', y:50, x:50 });
                 },
                 drillup: function() {
+                    this.viewData(false, false, true);
                     this.setTitle({ text: category_type + ' per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
                 }
             }
