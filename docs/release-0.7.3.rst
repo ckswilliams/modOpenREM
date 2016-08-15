@@ -7,15 +7,18 @@ Headline changes
 ****************
 
 * New migration file for upgrades from 0.6 series databases
-* Fixed multi-line cells in tables so that the links work in IE8
 * Charts: Increased number of points that can be plotted and fixed display of bar charts with just one data point
+* Charts: Added button to display table of data represented in the chart
+* Fixed multi-line cells in tables so that the links work in IE8
+* Fixed delete cancel button in firefox
+* Fixed export of non-ASCII characters to csv file
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
 Upgrade using the instructions found at :doc:`upgrade-offline`, but change the pip commands from ``openrem==0.7.1`` to
-``openrem==0.7.3b2``. If you are still on a 0.6 series install, upgrade to 0.7.1 first.
+``openrem==0.7.3b3``. If you are still on a 0.6 series install, upgrade to 0.7.1 first.
 
 ****************************
 Upgrading from version 0.7.1
@@ -34,7 +37,7 @@ Upgrading from version 0.7.1
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.3b2
+    pip install openrem==0.7.3b3
 
 In a shell/command window, move into the openrem folder:
 
