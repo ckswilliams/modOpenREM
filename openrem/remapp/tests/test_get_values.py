@@ -54,26 +54,3 @@ class GetCodeMeaningTests(TestCase):
         self.assertEqual(val, None)
 
 
-from remapp.extractors import rdsr
-from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
-
-
-
-class ImportCTRDSR(TestCase):
-    def test_import_ct_rdsr_siemens(self):
-        """
-        attempt to test importing RDSR files
-        :return:
-        """
-        PatientIDSettings.objects.create()
-
-        import os
-        dicom_file = "test_files/CT-RDSR-Siemens_Flash-TAP-SS.dcm"
-        root_tests = os.path.dirname(os.path.abspath(__file__))
-        dicom_path = os.path.join(root_tests, dicom_file)
-
-        rdsr(dicom_path)
-        a = GeneralStudyModuleAttr.objects.all()
-        b = a[0]
-
-        self.assertEqual(b.accession_number,'ACC12345601')
