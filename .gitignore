@@ -5,3 +5,8 @@ openrem/remapp/migrations/0*
 .idea
 openrem/openremproject/local_settings.py
 openrem/openremproject/wsgi.py
+
+#  Testing related bits
+.tox
+OpenREM.egg-info/
+.coverage
