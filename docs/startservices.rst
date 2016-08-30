@@ -128,7 +128,7 @@ To stop the celery queues in Linux:
 
 .. sourcecode:: console
 
-    celery multi stop stores default --pidfile=/path/to/media/celery/%N.pid
+    celery multi stop default --pidfile=/path/to/media/celery/%N.pid
 
 For Windows, just press ``Ctrl+c``
 

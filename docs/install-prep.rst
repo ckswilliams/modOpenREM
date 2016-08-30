@@ -153,6 +153,6 @@ script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
 system wide Python will be used instead. This doesn't apply to Linux, where
 once activated, the scripts can be called without a `python` prefix from anywhere.
 
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+.. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
 .. _consider virtualenv: `Virtualenv and virtualenvwrapper`_

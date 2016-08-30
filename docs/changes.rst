@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.7.3b3 (2016-08-04)
---------------------
+0.7.3 (2016-08-30)
+------------------
 
 * `#426`_  Charts: added css so that wide chart data tables are displayed above the filter form div
 * `#425`_  Exports: fixed error with non-ASCII characters being exported to csv
@@ -14,6 +14,9 @@ OpenREM version history
 * `#420`_  Charts: fixed error where frequency pie charts were only showing data from the first system
 * `#419`_  Interface: fixed error where "Cancel" was ignored when deleting study in Firefox browser
 * `#418`_  Exports: fixed error when exporting fluoroscopy study with missing xray_filter_material
+* `#416`_  Charts: improved efficiency of JavaScript
+* `#415`_  Database: migration for 0.6 upgraded installs to fix acquisition_device_type failures
+* `#413`_  Documentation: removed erroneous reference to store queue in stop celery command
 * `#410`_  Charts: fixed display of bar charts containing only one data point
 * `#408`_  Charts: Increased number of items that can be shown on some Highcharts plots
 * `#407`_  Fixed issue where skin dose map data was not being calculated on import
