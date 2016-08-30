@@ -1,13 +1,9 @@
 # test_get_values.py
 
+import os
 from django.test import TestCase
-from dicom.sequence import Sequence
-from dicom.dataset import Dataset
-from remapp.tools.get_values import get_seq_code_value, get_seq_code_meaning
-
-
 from remapp.extractors import rdsr
-from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
+from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
 
 
@@ -19,14 +15,17 @@ class ImportCTRDSR(TestCase):
         """
         PatientIDSettings.objects.create()
 
-        import os
         dicom_file = "test_files/CT-RDSR-Siemens_Flash-TAP-SS.dcm"
         root_tests = os.path.dirname(os.path.abspath(__file__))
         dicom_path = os.path.join(root_tests, dicom_file)
 
         rdsr(dicom_path)
-        a = GeneralStudyModuleAttr.objects.all()
-        b = a[0]
+        study = GeneralStudyModuleAttr.objects.all()[0]
 
-        self.assertEqual(b.accession_number, 'ACC12345601')
+        # Test that patient identifiable data is not stored
+        self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
+
+        # Test that study level data is recorded correctly
+        self.assertEqual(study.accession_number, 'ACC12345601')
+
 
