@@ -6,12 +6,11 @@ Upgrade to OpenREM 0.7.3
 Headline changes
 ****************
 
-* New migration file for upgrades from 0.6 series databases
-* Charts: Increased number of points that can be plotted and fixed display of bar charts with just one data point
-* Charts: Added button to display table of data represented in the chart
-* Fixed multi-line cells in tables so that the links work in IE8
-* Fixed delete cancel button in firefox
-* Fixed export of non-ASCII characters to csv file
+* Database: New migration file for upgrades from 0.6 series databases
+* Charts: Fixed display and export errors, improved layout and increased the number of data points that can be plotted
+* Interface: Fixed multi-line cells in tables so that the links work in IE8
+* Interface: Fixed delete cancel button in firefox
+* Exports: Fixed export of non-ASCII characters to csv file
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
