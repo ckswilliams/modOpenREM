@@ -7,4 +7,4 @@ pipelines:
           - mv openrem/openremproject/local_settings.py{.example,}
           - mv openrem/openremproject/wsgi.py{.example,}
           - pip install -U tox
-          - tox
+          - tox -e ci
