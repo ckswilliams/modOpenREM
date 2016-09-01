@@ -2,6 +2,11 @@
 OpenREM version history
 =======================
 
+0.8.0 (?)
+---------
+
+* `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
+
 0.7.3 (2016-08-30)
 ------------------
 
@@ -965,3 +970,4 @@ Reopened issue
 
 
 ..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
+..  _@rijkhorst: https://bitbucket.org/rijkhorst/
