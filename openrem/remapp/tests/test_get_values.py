@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 from django.test import TestCase
-from dicom.dataelem import DataElement
 from dicom.sequence import Sequence
 from dicom.dataset import Dataset
 from remapp.tools.get_values import get_seq_code_value, get_seq_code_meaning, get_value_kw
