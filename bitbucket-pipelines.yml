@@ -1,0 +1,10 @@
+image: python:2.7
+
+pipelines:
+  default:
+    - step:
+        script: # Modify the commands below to build your repository.
+          - mv openrem/openremproject/local_settings.py{.example,}
+          - mv openrem/openremproject/wsgi.py{.example,}
+          - pip install -U tox
+          - tox -e ci

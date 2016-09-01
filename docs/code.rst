@@ -17,6 +17,7 @@ Contents:
     code_forms
     code_netdicom
     code_adding_charts
+    code_running_tests
 
 
 
