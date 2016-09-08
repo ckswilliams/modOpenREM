@@ -231,20 +231,20 @@ $('.datepicker').datepicker({
 
         {% if request.user.userprofile.plotMGAGDvsThickness %}
             <!-- HTML to include div container for scatter plot -->
-            <div class="panel-group" id="accordionScatter">
+            <div class="panel-group" id="accordionScatter1">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordionScatter" href="#collapseScatter" onclick="setTimeout(function() {fitChartToDiv('scatterDIV');}, 0);">
+                            <a data-toggle="collapse" data-parent="#accordionScatter1" href="#collapseScatter1" onclick="setTimeout(function() {fitChartToDiv('scatterDIV1');}, 0);">
                                 Scatter plot chart showing AGD vs. compressed breast thickness.
                             </a>
                         </h4>
                     </div>
-                    <div id="collapseScatter" class="panel-collapse collapse">
+                    <div id="collapseScatter1" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <div id="scatterDIV" style="height: auto; margin: 0 0"></div>
-                            <a onclick="$('#scatterDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter', 'scatterDIV'); $('#toggle_scatteragd_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
-                            <a onclick="$('#scatterDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scatteragd_data_btn">Toggle data table</a>
+                            <div id="scatterDIV1" style="height: auto; margin: 0 0"></div>
+                            <a onclick="$('#scatterDIV1').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter1', 'scatterDIV1'); $('#toggle_scatteragd_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#scatterDIV1').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scatteragd_data_btn">Toggle data table</a>
                         </div>
                     </div>
                 </div>
@@ -254,10 +254,74 @@ $('.datepicker').datepicker({
             <script>
                 var plotMGAGDvsThickness = true;
                 $(window).resize(function() {
-                    chartSetExportSize('scatterDIV');
-                    fitChartToDiv('scatterDIV');
+                    chartSetExportSize('scatterDIV1');
+                    fitChartToDiv('scatterDIV1');
                 });
-                result = chartScatter('Average glandular dose vs. compressed thickness', 'scatterDIV', 'Compressed thickness (mm)', 'Average glandular dose (mGy)');
+                result = chartScatter('Average glandular dose vs. compressed thickness', 'scatterDIV1', 'Compressed thickness (mm)', 'Average glandular dose (mGy)');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotMGkVpvsThickness %}
+            <!-- HTML to include div container for scatter plot -->
+            <div class="panel-group" id="accordionScatter2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionScatter2" href="#collapseScatter2" onclick="setTimeout(function() {fitChartToDiv('scatterDIV2');}, 0);">
+                                Scatter plot chart showing kVp vs. compressed breast thickness.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseScatter2" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="scatterDIV2" style="height: auto; margin: 0 0"></div>
+                            <a onclick="$('#scatterDIV2').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter2', 'scatterDIV2'); $('#toggle_scatterkvp_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#scatterDIV2').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scatterkvp_data_btn">Toggle data table</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for scatter plot -->
+
+            <script>
+                var plotMGkVpvsThickness = true;
+                $(window).resize(function() {
+                    chartSetExportSize('scatterDIV2');
+                    fitChartToDiv('scatterDIV2');
+                });
+                result = chartScatter('kVp vs. compressed thickness', 'scatterDIV2', 'Compressed thickness (mm)', 'kVp (kV)');
+            </script>
+        {% endif %}
+
+        {% if request.user.userprofile.plotMGmAsvsThickness %}
+            <!-- HTML to include div container for scatter plot -->
+            <div class="panel-group" id="accordionScatter3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordionScatter3" href="#collapseScatter3" onclick="setTimeout(function() {fitChartToDiv('scatterDIV3');}, 0);">
+                                Scatter plot chart showing exposure vs. compressed breast thickness.
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseScatter3" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div id="scatterDIV3" style="height: auto; margin: 0 0"></div>
+                            <a onclick="$('#scatterDIV3').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter3', 'scatterDIV3'); $('#toggle_scattermas_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
+                            <a onclick="$('#scatterDIV3').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scattermas_data_btn">Toggle data table</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of HTML to include div container for scatter plot -->
+
+            <script>
+                var plotMGmAsvsThickness = true;
+                $(window).resize(function() {
+                    chartSetExportSize('scatterDIV3');
+                    fitChartToDiv('scatterDIV3');
+                });
+                result = chartScatter('Exposure vs. compressed thickness', 'scatterDIV3', 'Compressed thickness (mm)', 'Exposure (mAs)');
             </script>
         {% endif %}
 
