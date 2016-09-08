@@ -99,6 +99,21 @@ def _xrayfiltersnone(source):
     filters.xray_filter_type = get_or_create_cid('111609', "No filter")
     filters.save()
 
+
+def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source):
+    for i, material in enumerate(xray_filter_material.split(',')):
+        try:
+            thickmax = None
+            thickmin = None
+            if isinstance(xray_filter_thickness_maximum, list):
+                thickmax = xray_filter_thickness_maximum[i]
+            if isinstance(xray_filter_thickness_minimum, list):
+                thickmin = xray_filter_thickness_minimum[i]
+            _xrayfilters('FLAT', material, thickmax, thickmin, source)
+        except IndexError:
+            pass
+
+
 def _kvp(dataset,source):
     from remapp.models import Kvp
     from remapp.tools.get_values import get_value_kw
@@ -233,17 +248,8 @@ def _irradiationeventxraysourcedata(dataset,event):
         if xray_filter_type == 'NONE':
             _xrayfiltersnone(source)
         elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
-            for i, material in enumerate(xray_filter_material.split(',')):
-                try:
-                    thickmax = None
-                    thickmin = None
-                    if isinstance(xray_filter_thickness_maximum, list):
-                        thickmax = xray_filter_thickness_maximum[i]
-                    if isinstance(xray_filter_thickness_minimum, list):
-                        thickmin = xray_filter_thickness_minimum[i]
-                    _xrayfilters('FLAT', material, thickmax, thickmin, source)
-                except IndexError:
-                    pass
+            _xray_filters_multiple(
+                xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
         else:
             siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
             if xray_filter_type in siemens_filters:
