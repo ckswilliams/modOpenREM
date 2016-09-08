@@ -1,6 +1,7 @@
 # test_get_values.py
 
 import os
+from decimal import Decimal
 from django.test import TestCase
 from remapp.extractors import rdsr
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
@@ -27,5 +28,17 @@ class ImportCTRDSR(TestCase):
 
         # Test that study level data is recorded correctly
         self.assertEqual(study.accession_number, 'ACC12345601')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, 'Hospital Number One Trust')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'SIEMENS')
+
+        # Test that patient study level data is recorded correctly
+        self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '067Y')
+        self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(67.6))
+
+        # Test that exposure data is recorded correctly
+        self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+                         total_number_of_irradiation_events, 4)
+        self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+                         ct_dose_length_product_total, Decimal(724.52))
 
 
