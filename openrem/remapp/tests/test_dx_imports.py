@@ -42,7 +42,7 @@ class DXImportTests(TestCase):
         Test the material extraction process when the materials are in a MultiValue format
         """
         ds = Dataset()
-        FilterMaterial = "aluminum\\copper"
+        ds.FilterMaterial = "aluminum\\copper"
         ds.FilterThicknessMinimum = "1.0\\0.1"
         ds.FilterThicknessMaximum = "1.0\\0.1"
 
@@ -55,9 +55,9 @@ class DXImportTests(TestCase):
         source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
         source.save()
 
-        _xray_filters_multiple(FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
+        _xray_filters_multiple(ds.FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
 
-        self.assertEqual(source.xrayfilters_set.all().count(), 2)
+        self.assertEqual(source.xrayfilters_set.all().count(), 2, 'Wrong number of filters recorded')
         self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
                          "Aluminum or Aluminum compound")
         self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,
