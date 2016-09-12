@@ -14,7 +14,7 @@ class DXImportTests(TestCase):
         """
         """
         ds = Dataset()
-        FilterMaterial = "aluminium,copper"
+        FilterMaterial = "aluminum,copper"
         ds.FilterThicknessMinimum = "1.0\\0.1"
         ds.FilterThicknessMaximum = "1.0\\0.1"
 
@@ -30,3 +30,7 @@ class DXImportTests(TestCase):
         _xray_filters_multiple(FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
 
         self.assertEqual(source.xrayfilters_set.all().count(), 2)
+        self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
+                         "Aluminum or Aluminum compound")
+        self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,
+                         "Copper or Copper compound")
