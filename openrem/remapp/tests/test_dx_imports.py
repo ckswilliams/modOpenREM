@@ -12,9 +12,37 @@ from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, I
 class DXImportTests(TestCase):
     def test_multiple_filter_kodak_dr7500(self):
         """
+        Test the material extraction process when the materials are comma separated
         """
         ds = Dataset()
-        FilterMaterial = "aluminum,copper"
+        FilterMaterial = "niobium,europium"
+        ds.FilterThicknessMinimum = "1.0\\0.1"
+        ds.FilterThicknessMaximum = "1.0\\0.1"
+
+        g = GeneralStudyModuleAttr.objects.create()
+        g.save()
+        proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
+        proj.save()
+        event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
+        event.save()
+        source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
+        source.save()
+
+        _xray_filters_multiple(FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
+
+        self.assertEqual(source.xrayfilters_set.all().count(), 2)
+        self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
+                         "Niobium or Niobium compound")
+        self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,
+                         "Europium or Europium compound")
+
+
+    def test_multiple_filter_kodak_drxevolution(self):
+        """
+        Test the material extraction process when the materials are in a MultiValue format
+        """
+        ds = Dataset()
+        FilterMaterial = "aluminum\\copper"
         ds.FilterThicknessMinimum = "1.0\\0.1"
         ds.FilterThicknessMaximum = "1.0\\0.1"
 
@@ -34,3 +62,28 @@ class DXImportTests(TestCase):
                          "Aluminum or Aluminum compound")
         self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,
                          "Copper or Copper compound")
+
+
+    def test_single_filter(self):
+        """
+        Test the material extraction process when there is just one filter
+        """
+        ds = Dataset()
+        FilterMaterial = "lead"
+        ds.FilterThicknessMinimum = "1.0"
+        ds.FilterThicknessMaximum = "1.0"
+
+        g = GeneralStudyModuleAttr.objects.create()
+        g.save()
+        proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
+        proj.save()
+        event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
+        event.save()
+        source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
+        source.save()
+
+        _xray_filters_multiple(FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
+
+        self.assertEqual(source.xrayfilters_set.all().count(), 1)
+        self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
+                         "Lead or Lead compound")

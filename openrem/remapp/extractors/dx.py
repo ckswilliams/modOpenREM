@@ -69,23 +69,23 @@ def _xrayfilters(filttype, material, thickmax, thickmin, source):
             )
     if material:
         if material.strip().lower() == 'molybdenum':
-            filters.xray_filter_material = get_or_create_cid('C-150F9','Molybdenum or Molybdenum compound')
+            filters.xray_filter_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
         if material.strip().lower() == 'rhodium':
-            filters.xray_filter_material = get_or_create_cid('C-167F9','Rhodium or Rhodium compound')
+            filters.xray_filter_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
         if material.strip().lower() == 'silver':
-            filters.xray_filter_material = get_or_create_cid('C-137F9','Silver or Silver compound')
+            filters.xray_filter_material = get_or_create_cid('C-137F9', 'Silver or Silver compound')
         if material.strip().lower() == 'aluminum':
-            filters.xray_filter_material = get_or_create_cid('C-120F9','Aluminum or Aluminum compound')
+            filters.xray_filter_material = get_or_create_cid('C-120F9', 'Aluminum or Aluminum compound')
         if material.strip().lower() == 'copper':
-            filters.xray_filter_material = get_or_create_cid('C-127F9','Copper or Copper compound')
+            filters.xray_filter_material = get_or_create_cid('C-127F9', 'Copper or Copper compound')
         if material.strip().lower() == 'niobium':
-            filters.xray_filter_material = get_or_create_cid('C-1190E','Niobium or Niobium compound')
+            filters.xray_filter_material = get_or_create_cid('C-1190E', 'Niobium or Niobium compound')
         if material.strip().lower() == 'europium':
-            filters.xray_filter_material = get_or_create_cid('C-1190F','Europium or Europium compound')
+            filters.xray_filter_material = get_or_create_cid('C-1190F', 'Europium or Europium compound')
         if material.strip().lower() == 'lead':
-            filters.xray_filter_material = get_or_create_cid('C-132F9','Lead or Lead compound')
+            filters.xray_filter_material = get_or_create_cid('C-132F9', 'Lead or Lead compound')
         if material.strip().lower() == 'tantalum':
-            filters.xray_filter_material = get_or_create_cid('C-156F9','Tantalum or Tantalum compound')
+            filters.xray_filter_material = get_or_create_cid('C-156F9', 'Tantalum or Tantalum compound')
     if thickmax:
         filters.xray_filter_thickness_maximum = thickmax
     if thickmin:
