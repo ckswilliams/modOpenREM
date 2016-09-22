@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
 if projectpath not in sys.path:
-    sys.path.insert(1,projectpath)
+    sys.path.insert(1, projectpath)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
@@ -62,9 +62,9 @@ def _xrayfilters(dataset, source):
             filters.xray_filter_material = get_or_create_cid('C-120F9', 'Aluminum or Aluminum compound')
 
         filters.save()
-    
 
-def _kvp(dataset,source):
+
+def _kvp(dataset, source):
     from remapp.models import Kvp
     from remapp.tools.get_values import get_value_kw
     kv = Kvp.objects.create(irradiation_event_xray_source_data=source)
@@ -76,7 +76,7 @@ def _exposure(dataset, source):
     from remapp.models import Exposure
     exp = Exposure.objects.create(irradiation_event_xray_source_data=source)
     from remapp.tools.get_values import get_value_kw
-    exp.exposure = get_value_kw('ExposureInuAs', dataset) # uAs
+    exp.exposure = get_value_kw('ExposureInuAs', dataset)  # uAs
     exp.save()
 
 
@@ -106,9 +106,9 @@ def _irradiationeventxraysourcedata(dataset, event):
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     # AGD/MGD is dGy in Mammo headers, and was dGy in Radiation Dose SR - CP1194 changes this to mGy!
-    agd_dgy = get_value_kw('OrganDose',dataset) #AGD in dGy 
+    agd_dgy = get_value_kw('OrganDose', dataset)  # AGD in dGy
     if agd_dgy:
-        source.average_glandular_dose = float(agd_dgy) * 100.0  #AGD in mGy
+        source.average_glandular_dose = float(agd_dgy) * 100.0  # AGD in mGy
     source.average_xray_tube_current = get_value_kw('XRayTubeCurrent', dataset)
     _xraytubecurrent(source.average_xray_tube_current, source)
     source.exposure_time = get_value_kw('ExposureTime', dataset)
@@ -125,26 +125,26 @@ def _irradiationeventxraysourcedata(dataset, event):
         source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
     source.exposure_control_mode = get_value_kw('ExposureControlMode', dataset)
     source.save()
-    _xrayfilters(dataset,source)
-    _kvp(dataset,source)
-    _exposure(dataset,source)
-    xray_grid = get_value_kw('Grid',dataset)
+    _xrayfilters(dataset, source)
+    _kvp(dataset, source)
+    _exposure(dataset, source)
+    xray_grid = get_value_kw('Grid', dataset)
     if xray_grid:
         if xray_grid == 'NONE':
-            _xraygrid('111646',source)
+            _xraygrid('111646', source)
         elif xray_grid == ['RECIPROCATING', 'FOCUSED']:
-            _xraygrid('111642',source)
-            _xraygrid('111643',source)
+            _xraygrid('111642', source)
+            _xraygrid('111643', source)
 
 
-def _doserelateddistancemeasurements(dataset,mech):
+def _doserelateddistancemeasurements(dataset, mech):
     from remapp.models import DoseRelatedDistanceMeasurements
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector', dataset)
     dist.distance_source_to_entrance_surface = get_value_kw('DistanceSourceToEntrance', dataset)
     dist.radiological_thickness = get_value_num(0x00451049, dataset)
-    dist.save()        
+    dist.save()
 
 
 def _irradiationeventxraymechanicaldata(dataset, event):
@@ -159,7 +159,7 @@ def _irradiationeventxraymechanicaldata(dataset, event):
     _doserelateddistancemeasurements(dataset, mech)
 
 
-def _accumulatedmammo_update(dataset, event): # TID 10005
+def _accumulatedmammo_update(dataset, event):  # TID 10005
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
     accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
@@ -189,7 +189,7 @@ def _accumulatedmammo_update(dataset, event): # TID 10005
     accummam.save()
 
 
-def _irradiationeventxraydata(dataset, proj, ch): # TID 10003
+def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
@@ -224,18 +224,18 @@ def _irradiationeventxraydata(dataset, proj, ch): # TID 10003
     event.comment = get_value_kw('ExposureControlModeDescription', dataset, ch)
     event.save()
 
-#    irradiationeventxraydetectordata(dataset,event)
-    _irradiationeventxraysourcedata(dataset,event)
-    _irradiationeventxraymechanicaldata(dataset,event)
+    #    irradiationeventxraydetectordata(dataset,event)
+    _irradiationeventxraysourcedata(dataset, event)
+    _irradiationeventxraymechanicaldata(dataset, event)
     if event.laterality and event.irradeventxraysourcedata_set.get().average_glandular_dose:
-        _accumulatedmammo_update(dataset,event)
+        _accumulatedmammo_update(dataset, event)
 
 
-def _accumulatedxraydose(dataset,proj):
+def _accumulatedxraydose(dataset, proj):
     from remapp.models import AccumXRayDose, AccumMammographyXRayDose
     from remapp.tools.get_values import get_value_kw, get_or_create_cid
     accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
-    accum.acquisition_plane = get_or_create_cid('113622','Single Plane')
+    accum.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
     accum.save()
     accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
     accummam.accumulated_average_glandular_dose = 0.0
@@ -246,13 +246,13 @@ def _projectionxrayradiationdose(dataset, g, ch):
     from remapp.models import ProjectionXRayRadiationDose
     from remapp.tools.get_values import get_or_create_cid
     proj = ProjectionXRayRadiationDose.objects.create(general_study_module_attributes=g)
-    proj.procedure_reported = get_or_create_cid('P5-40010','Mammography')
-    proj.has_intent = get_or_create_cid('R-408C3','Diagnostic Intent')
-    proj.scope_of_accumulation = get_or_create_cid('113014','Study')
-    proj.source_of_dose_information = get_or_create_cid('113866','Copied From Image Attributes')
-    proj.xray_detector_data_available = get_or_create_cid('R-00339','No')
-    proj.xray_source_data_available = get_or_create_cid('R-0038D','Yes')
-    proj.xray_mechanical_data_available = get_or_create_cid('R-0038D','Yes')
+    proj.procedure_reported = get_or_create_cid('P5-40010', 'Mammography')
+    proj.has_intent = get_or_create_cid('R-408C3', 'Diagnostic Intent')
+    proj.scope_of_accumulation = get_or_create_cid('113014', 'Study')
+    proj.source_of_dose_information = get_or_create_cid('113866', 'Copied From Image Attributes')
+    proj.xray_detector_data_available = get_or_create_cid('R-00339', 'No')
+    proj.xray_source_data_available = get_or_create_cid('R-0038D', 'Yes')
+    proj.xray_mechanical_data_available = get_or_create_cid('R-0038D', 'Yes')
     proj.save()
     _accumulatedxraydose(dataset, proj)
     _irradiationeventxraydata(dataset, proj, ch)
@@ -278,19 +278,26 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
 
     equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
-                                                                             manufacturer_hash=hash_id(equip.manufacturer),
+                                                                             manufacturer_hash=hash_id(
+                                                                                 equip.manufacturer),
                                                                              institution_name=equip.institution_name,
-                                                                             institution_name_hash = hash_id(equip.institution_name),
+                                                                             institution_name_hash=hash_id(
+                                                                                 equip.institution_name),
                                                                              station_name=equip.station_name,
-                                                                             station_name_hash=hash_id(equip.station_name),
+                                                                             station_name_hash=hash_id(
+                                                                                 equip.station_name),
                                                                              institutional_department_name=equip.institutional_department_name,
-                                                                             institutional_department_name_hash=hash_id(equip.institutional_department_name),
+                                                                             institutional_department_name_hash=hash_id(
+                                                                                 equip.institutional_department_name),
                                                                              manufacturer_model_name=equip.manufacturer_model_name,
-                                                                             manufacturer_model_name_hash=hash_id(equip.manufacturer_model_name),
+                                                                             manufacturer_model_name_hash=hash_id(
+                                                                                 equip.manufacturer_model_name),
                                                                              device_serial_number=equip.device_serial_number,
-                                                                             device_serial_number_hash=hash_id(equip.device_serial_number),
+                                                                             device_serial_number_hash=hash_id(
+                                                                                 equip.device_serial_number),
                                                                              software_versions=equip.software_versions,
-                                                                             software_versions_hash=hash_id(equip.software_versions),
+                                                                             software_versions_hash=hash_id(
+                                                                                 equip.software_versions),
                                                                              gantry_id=equip.gantry_id,
                                                                              gantry_id_hash=hash_id(equip.gantry_id),
                                                                              hash_generated=True
@@ -311,15 +318,15 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.save()
 
 
-def _patientstudymoduleattributes(dataset, g): # C.7.2.2
+def _patientstudymoduleattributes(dataset, g):  # C.7.2.2
     from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
-    patientatt.patient_age = get_value_kw('PatientAge',dataset)
+    patientatt.patient_age = get_value_kw('PatientAge', dataset)
     patientatt.save()
 
 
-def _patientmoduleattributes(dataset, g, ch): # C.7.1.1
+def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     from decimal import Decimal
     import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
@@ -334,14 +341,14 @@ def _patientmoduleattributes(dataset, g, ch): # C.7.1.1
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal(
-            (g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
+            (g.study_date.date() - patient_birth_date.date()).days) / Decimal('365.25')
     elif patientatt.patient_age:
         if patientatt.patient_age[-1:] == 'Y':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
         elif patientatt.patient_age[-1:] == 'M':
-            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('12')
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1]) / Decimal('12')
         elif patientatt.patient_age[-1:] == 'D':
-            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('365.25') 
+            patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1]) / Decimal('365.25')
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
     patientatt.save()
@@ -376,7 +383,7 @@ def _generalstudymoduleattributes(dataset, g):
     logger.debug("Populating mammo study %s", g.study_instance_uid)
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
-    g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), datetime.time(g.study_time))
+    g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
     g.referring_physician_name = get_value_kw('ReferringPhysicianName', dataset, char_set=ch)
     g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification', dataset, char_set=ch)
     g.study_id = get_value_kw('StudyID', dataset, char_set=ch)
@@ -392,9 +399,10 @@ def _generalstudymoduleattributes(dataset, g):
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset, char_set=ch)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
     g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
-    g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch) # Being used to summarise protocol for study
-    g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
-    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
+    g.procedure_code_meaning = get_value_kw('ProtocolName', dataset,
+                                            char_set=ch)  # Being used to summarise protocol for study
+    g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
+    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
     g.save()
 
     _generalequipmentmoduleattributes(dataset, g, ch)
@@ -411,6 +419,7 @@ def _test_if_mammo(dataset):
         return 1
     return 0
 
+
 def _create_event(dataset):
     """
     If study exists, create new event
@@ -422,14 +431,14 @@ def _create_event(dataset):
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.dcmdatetime import make_date_time
 
-    study_uid = get_value_kw('StudyInstanceUID',dataset)
-    event_uid = get_value_kw('SOPInstanceUID',dataset)
+    study_uid = get_value_kw('StudyInstanceUID', dataset)
+    event_uid = get_value_kw('SOPInstanceUID', dataset)
     logger.debug("In _create_event. Study %s, event %s", study_uid, event_uid)
-    inst_in_db = check_uid.check_uid(event_uid,'Event')
+    inst_in_db = check_uid.check_uid(event_uid, 'Event')
     if inst_in_db:
         logger.debug("Instance %s already in db", event_uid)
         return 0
-    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact = study_uid)
+    same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
     if same_study_uid.count() != 1:
         print "Duplicate study UIDs in database! Could be a problem."
         for dup in same_study_uid:
@@ -440,18 +449,18 @@ def _create_event(dataset):
         # further check required to ensure 'for processing' and 'for presentation'
         # versions of the same irradiation event don't get imported twice
         # check first to make sure this isn't a Hologic SC tomo file
-        event_time = get_value_kw('AcquisitionTime',dataset)
-        event_date = get_value_kw('AcquisitionDate',dataset)
-        event_date_time = make_date_time('{0}{1}'.format(event_date,event_time))
+        event_time = get_value_kw('AcquisitionTime', dataset)
+        event_date = get_value_kw('AcquisitionDate', dataset)
+        event_date_time = make_date_time('{0}{1}'.format(event_date, event_time))
         try:
             for events in same_study_uid.get().projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
                 if event_date_time == events.date_time_started:
                     return 0
         except Exception as e:
             logger.warning("MG study UID %s, event UID %s failed at check for identical event. Error %s",
-                         study_uid, event_uid, e)
+                           study_uid, event_uid, e)
     # study exists, but event doesn't
-    _irradiationeventxraydata(dataset,same_study_uid.get().projectionxrayradiationdose_set.get())
+    _irradiationeventxraydata(dataset, same_study_uid.get().projectionxrayradiationdose_set.get())
     # update the accumulated tables
     return 0
 
@@ -470,9 +479,9 @@ def _mammo2db(dataset):
     from remapp.tools import check_uid
     from remapp.tools.get_values import get_value_kw
 
-    study_uid = get_value_kw('StudyInstanceUID',dataset)
+    study_uid = get_value_kw('StudyInstanceUID', dataset)
     if not study_uid:
-        sys.exit('No UID returned')  
+        sys.exit('No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
     logger.info("In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
 
@@ -483,14 +492,14 @@ def _mammo2db(dataset):
     if not study_in_db:
         # study doesn't exist, start from scratch
         g = GeneralStudyModuleAttr.objects.create()
-        g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+        g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
-        event_uid = get_value_kw('SOPInstanceUID',dataset)
+        event_uid = get_value_kw('SOPInstanceUID', dataset)
         logger.debug("Created new mammo study %s, event %s", study_uid, event_uid)
         # check again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
-            _generalstudymoduleattributes(dataset,g)
+            _generalstudymoduleattributes(dataset, g)
         elif not study_in_db:
             sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
@@ -498,7 +507,7 @@ def _mammo2db(dataset):
             # Check if other instance(s) has deleted the study yet
             study_in_db = check_uid.check_uid(study_uid)
             if study_in_db == 1:
-                _generalstudymoduleattributes(dataset,g)
+                _generalstudymoduleattributes(dataset, g)
             elif study_in_db > 1:
                 g.delete()
                 study_in_db = check_uid.check_uid(study_uid)
@@ -512,12 +521,12 @@ def _mammo2db(dataset):
                         _create_event(dataset)
                     while not study_in_db:
                         g = GeneralStudyModuleAttr.objects.create()
-                        g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+                        g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
                         g.save()
                         # check again
                         study_in_db = check_uid.check_uid(study_uid)
                         if study_in_db == 1:
-                            _generalstudymoduleattributes(dataset,g)
+                            _generalstudymoduleattributes(dataset, g)
                         elif study_in_db > 1:
                             g.delete()
                             sleep(random())
@@ -528,8 +537,6 @@ def _mammo2db(dataset):
                 elif study_in_db == 1:
                     sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
                     _create_event(dataset)
-
-
 
 
 @shared_task
@@ -557,7 +564,6 @@ def mam(mg_file):
     except ObjectDoesNotExist:
         del_mg_im = False
 
-
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
@@ -576,10 +582,11 @@ def mam(mg_file):
 
     return 0
 
+
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) != 2:
         sys.exit('Error: Supply exactly one argument - the DICOM mammography image file')
 
     sys.exit(mam(sys.argv[1]))
-
