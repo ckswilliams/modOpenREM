@@ -255,24 +255,24 @@ def _projectionxrayradiationdose(dataset,g):
     _irradiationeventxraydata(dataset,proj)
 
 
-def _generalequipmentmoduleattributes(dataset,study):
+def _generalequipmentmoduleattributes(dataset, study, ch):
     from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.hash_id import hash_id
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
-    equip.manufacturer = get_value_kw("Manufacturer",dataset)
-    equip.institution_name = get_value_kw("InstitutionName",dataset)
-    equip.institution_address = get_value_kw("InstitutionAddress",dataset)
-    equip.station_name = get_value_kw("StationName",dataset)
-    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName",dataset)
-    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName",dataset)
-    equip.device_serial_number = get_value_kw("DeviceSerialNumber",dataset)
-    equip.software_versions = get_value_kw("SoftwareVersions",dataset)
-    equip.gantry_id = get_value_kw("GantryID",dataset)
-    equip.spatial_resolution = get_value_kw("SpatialResolution",dataset)
-    equip.date_of_last_calibration = get_date("DateOfLastCalibration",dataset)
-    equip.time_of_last_calibration = get_time("TimeOfLastCalibration",dataset)
+    equip.manufacturer = get_value_kw("Manufacturer", dataset, char_set=ch)
+    equip.institution_name = get_value_kw("InstitutionName", dataset, char_set=ch)
+    equip.institution_address = get_value_kw("InstitutionAddress", dataset, char_set=ch)
+    equip.station_name = get_value_kw("StationName", dataset, char_set=ch)
+    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset, char_set=ch)
+    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset, char_set=ch)
+    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset, char_set=ch)
+    equip.software_versions = get_value_kw("SoftwareVersions", dataset, char_set=ch)
+    equip.gantry_id = get_value_kw("GantryID", dataset, char_set=ch)
+    equip.spatial_resolution = get_value_kw("SpatialResolution", dataset)
+    equip.date_of_last_calibration = get_date("DateOfLastCalibration", dataset)
+    equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
 
     equip_display_name, created = UniqueEquipmentNames.objects.get_or_create(manufacturer=equip.manufacturer,
                                                                              manufacturer_hash=hash_id(equip.manufacturer),
@@ -308,7 +308,7 @@ def _generalequipmentmoduleattributes(dataset,study):
     equip.save()
 
 
-def _patientstudymoduleattributes(dataset,g): # C.7.2.2
+def _patientstudymoduleattributes(dataset, g): # C.7.2.2
     from remapp.models import PatientStudyModuleAttr
     from remapp.tools.get_values import get_value_kw
     patientatt = PatientStudyModuleAttr.objects.create(general_study_module_attributes=g)
@@ -316,7 +316,7 @@ def _patientstudymoduleattributes(dataset,g): # C.7.2.2
     patientatt.save()
 
 
-def _patientmoduleattributes(dataset,g): # C.7.1.1
+def _patientmoduleattributes(dataset, g, ch): # C.7.1.1
     from decimal import Decimal
     import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
@@ -327,18 +327,18 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
     from datetime import timedelta
     from decimal import Decimal
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
-    pat.patient_sex = get_value_kw('PatientSex',dataset)
-    patient_birth_date = get_date('PatientBirthDate',dataset)
+    pat.patient_sex = get_value_kw('PatientSex', dataset)
+    patient_birth_date = get_date('PatientBirthDate', dataset)
     pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days)/Decimal('365.25')
     elif patientatt.patient_age:
-        if patientatt.patient_age[-1:]=='Y':
+        if patientatt.patient_age[-1:] == 'Y':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])
-        elif patientatt.patient_age[-1:]=='M':
+        elif patientatt.patient_age[-1:] == 'M':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('12')
-        elif patientatt.patient_age[-1:]=='D':
+        elif patientatt.patient_age[-1:] == 'D':
             patientatt.patient_age_decimal = Decimal(patientatt.patient_age[:-1])/Decimal('365.25') 
     if patientatt.patient_age_decimal:
         patientatt.patient_age_decimal = patientatt.patient_age_decimal.quantize(Decimal('.1'))
@@ -346,13 +346,13 @@ def _patientmoduleattributes(dataset,g): # C.7.1.1
 
     patient_id_settings = PatientIDSettings.objects.get()
     if patient_id_settings.name_stored:
-        name = get_value_kw("PatientName", dataset)
+        name = get_value_kw("PatientName", dataset, ch)
         if name and patient_id_settings.name_hashed:
             name = hashlib.sha256(name).hexdigest()
             pat.name_hashed = True
         pat.patient_name = name
     if patient_id_settings.id_stored:
-        patid = get_value_kw("PatientID", dataset)
+        patid = get_value_kw("PatientID", dataset, ch)
         if patid and patient_id_settings.id_hashed:
             patid = hashlib.sha256(patid).hexdigest()
             pat.id_hashed = True
@@ -369,35 +369,36 @@ def _generalstudymoduleattributes(dataset, g):
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
-    g.study_instance_uid = get_value_kw('StudyInstanceUID',dataset)
+    ch = get_value_kw('SpecificCharacterSet', dataset)
+    g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
     logger.debug("Populating mammo study %s", g.study_instance_uid)
-    g.study_date = get_date('StudyDate',dataset)
-    g.study_time = get_time('StudyTime',dataset)
+    g.study_date = get_date('StudyDate', dataset)
+    g.study_time = get_time('StudyTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900,1,1)), datetime.time(g.study_time))
-    g.referring_physician_name = get_value_kw('ReferringPhysicianName',dataset)
-    g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification',dataset)
-    g.study_id = get_value_kw('StudyID',dataset)
-    accession_number = get_value_kw('AccessionNumber',dataset)
+    g.referring_physician_name = get_value_kw('ReferringPhysicianName', dataset, char_set=ch)
+    g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification', dataset, char_set=ch)
+    g.study_id = get_value_kw('StudyID', dataset, char_set=ch)
+    accession_number = get_value_kw('AccessionNumber', dataset, char_set=ch)
     patient_id_settings = PatientIDSettings.objects.get()
     if accession_number and patient_id_settings.accession_hashed:
         accession_number = hash_id(accession_number)
         g.accession_hashed = True
     g.accession_number = accession_number
-    g.study_description = get_value_kw('StudyDescription',dataset)
-    g.modality_type = get_value_kw('Modality',dataset)
-    g.physician_of_record = get_value_kw('PhysicianOfRecord',dataset)
-    g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy',dataset)
-    g.performing_physician_name = get_value_kw('PerformingPhysicianName',dataset)
-    g.operator_name = get_value_kw('OperatorsName',dataset)
-    g.procedure_code_meaning = get_value_kw('ProtocolName',dataset) # Being used to summarise protocol for study
+    g.study_description = get_value_kw('StudyDescription', dataset, char_set=ch)
+    g.modality_type = get_value_kw('Modality', dataset)
+    g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset, char_set=ch)
+    g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset, char_set=ch)
+    g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
+    g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
+    g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch) # Being used to summarise protocol for study
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence',dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence',dataset)
     g.save()
 
-    _generalequipmentmoduleattributes(dataset,g)
-    _projectionxrayradiationdose(dataset,g)
-    _patientstudymoduleattributes(dataset,g)
-    _patientmoduleattributes(dataset,g)
+    _generalequipmentmoduleattributes(dataset, g, ch)
+    _projectionxrayradiationdose(dataset, g)
+    _patientstudymoduleattributes(dataset, g)
+    _patientmoduleattributes(dataset, g, ch)
 
 
 def _test_if_mammo(dataset):
