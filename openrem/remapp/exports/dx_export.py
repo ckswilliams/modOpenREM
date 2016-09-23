@@ -924,7 +924,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = None
 
                 try:
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.get()
+                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
                 except ObjectDoesNotExist:
                     filters = None
                     filter_thicknesses = None
