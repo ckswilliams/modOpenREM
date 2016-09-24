@@ -117,8 +117,8 @@ def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, 
             except IndexError:
                 pass
     elif xray_filter_material:
-        thickmax = xray_filter_thickness_maximum[0]
-        thickmin = xray_filter_thickness_minimum[0]
+        thickmax = xray_filter_thickness_maximum
+        thickmin = xray_filter_thickness_minimum
         _xrayfilters('FLAT', xray_filter_material, thickmax, thickmin, source)
 
 
