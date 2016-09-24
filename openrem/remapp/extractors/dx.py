@@ -104,22 +104,17 @@ def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, 
     from dicom.valuerep import MultiValue
     if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
         xray_filter_material = xray_filter_material.split(',')
-    if isinstance(xray_filter_material, list) or isinstance(xray_filter_material, MultiValue):
-        for i, material in enumerate(xray_filter_material):
-            try:
-                thickmax = None
-                thickmin = None
-                if isinstance(xray_filter_thickness_maximum, list):
-                    thickmax = xray_filter_thickness_maximum[i]
-                if isinstance(xray_filter_thickness_minimum, list):
-                    thickmin = xray_filter_thickness_minimum[i]
-                _xrayfilters('FLAT', material, thickmax, thickmin, source)
-            except IndexError:
-                pass
-    elif xray_filter_material:
-        thickmax = xray_filter_thickness_maximum
-        thickmin = xray_filter_thickness_minimum
-        _xrayfilters('FLAT', xray_filter_material, thickmax, thickmin, source)
+    for i, material in enumerate(xray_filter_material):
+        try:
+            thickmax = None
+            thickmin = None
+            if isinstance(xray_filter_thickness_maximum, list):
+                thickmax = xray_filter_thickness_maximum[i]
+            if isinstance(xray_filter_thickness_minimum, list):
+                thickmin = xray_filter_thickness_minimum[i]
+            _xrayfilters('FLAT', material, thickmax, thickmin, source)
+        except IndexError:
+            pass
 
 
 def _kvp(dataset,source):
