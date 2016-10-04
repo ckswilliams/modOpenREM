@@ -147,16 +147,21 @@ def make_skin_map(study_pk=None):
                 end_angle = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle)
             else:
                 end_angle = None
-
+            if irrad.patient_table_relationship_cid:
+                patPos = str(irrad.patient_table_relationship_cid)[0] + "f" + str(irrad.patient_orientation_modifier_cid)[0]				
+            else:
+                patPos = None
             if ref_ak and d_ref:
                 my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
                                     angle_x=angle_x, angle_y=angle_y,
                                     d_ref=d_ref, dap=dap, ref_ak=ref_ak,
                                     kvp=kvp, filter_cu=filter_cu,
-                                    run_type=run_type, frames=frames, end_angle=end_angle)
+                                    run_type=run_type, frames=frames, end_angle=end_angle, patPos=patPos)
 
         import numpy as np
 
+        # Flip the skin dose map left-right so the view is from the front
+        my_exp_map.my_dose.fliplr()
         my_exp_map.my_dose.totalDose = np.roll(my_exp_map.my_dose.totalDose, int(my_exp_map.phantom.phantom_flat_dist / 2),
                                                axis=0)
         try:
