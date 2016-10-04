@@ -5,3 +5,5 @@ openrem/remapp/migrations/0*
 .idea
 openrem/openremproject/local_settings.py
 openrem/openremproject/wsgi.py
+.tox
+.coverage

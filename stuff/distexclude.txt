@@ -1,5 +1,8 @@
 .git/
 .gitignore
+.tox/
+.coverage/
+.idea/
 docs/
 stuff/
 openrem/remapp/migrations/0*
