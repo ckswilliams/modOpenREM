@@ -44,8 +44,23 @@ class CalcExpMap(object):
                  angle_x=None, angle_y=None,
                  d_ref=None, dap=None, ref_ak=None,
                  kvp=None, filter_cu=None,
-                 run_type=None, frames=None, end_angle=None):
-
+                 run_type=None, frames=None, end_angle=None, patPos=None):
+        
+        if patPos == "FFS" or patPos == "ffs":
+            delta_x = -delta_x
+            delta_y = - delta_y
+        elif patPos == "HFP" or patPos == "hfp":
+            delta_z = -delta_z
+            delta_x = -delta_x 
+        elif patPos == "FFP" or patPos == "ffp":
+            delta_y = -delta_y
+            delta_z = -delta_z
+        elif patPos == "HFS" or patPos == "hfs":
+            pass
+        else:
+            print("No orientation known. Quitting skin dose calculator")
+            return
+        	
         self.my_dose.addView(str(self.num_views))
         self.num_views += 1
 
