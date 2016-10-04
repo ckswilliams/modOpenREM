@@ -2,7 +2,7 @@
 OpenREM version history
 =======================
 
-0.7.4b1 (2016-10-03)
+0.7.4b1 (2016-10-04)
 --------------------
 
 * `#436`_  Install: temporary fix blocking django-filter latest version that breaks OpenREM
