@@ -742,13 +742,13 @@ def _dx2db(dataset):
 @shared_task
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
-    
+
     :param filename: relative or absolute path to DICOM DX radiographic image file.
     :type filename: str.
 
     Tested with:
         Nothing yet
-    
+
     """
 
     import dicom
