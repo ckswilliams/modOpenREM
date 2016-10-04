@@ -183,7 +183,7 @@ def _irradiationeventxraydetectordata(dataset, event):
     elif 'philips' in manufacturer:
         detector.relative_exposure_unit = 'EI ()'
     elif 'siemens' in manufacturer:
-        detector.relative_exposure_unit = u'EXI (Î¼Gy)'
+        detector.relative_exposure_unit = u'EXI (μGy)'
     detector.sensitivity = get_value_kw('Sensitivity', dataset)
     detector.target_exposure_index = get_value_kw('TargetExposureIndex', dataset)
     detector.deviation_index = get_value_kw('DeviationIndex', dataset)
