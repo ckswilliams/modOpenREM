@@ -283,11 +283,12 @@ def _imageviewmodifier(dataset,event):
     modifier.save()
 
 
-def _irradiationeventxraydata(dataset,proj):  # TID 10003
+def _irradiationeventxraydata(dataset,proj,fulldataset):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
+    from xml.etree import ElementTree as ET
     event = IrradEventXRayData.objects.create(projection_xray_radiation_dose=proj)
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Plane':
@@ -345,7 +346,34 @@ def _irradiationeventxraydata(dataset,proj):  # TID 10003
                         event.percent_fibroglandular_tissue = cont2.NumericValue 
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
             event.comment = safe_strings(cont.TextValue)
-    
+    for cont3 in fulldataset.ContentSequence:
+        if cont3.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
+            try:
+                
+                orientation = ET.fromstring(cont3.TextValue).find('PatientPosition').find('Position').get('SRData')
+                if orientation.strip().lower() == 'hfs':
+                    event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
+                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'supine')					
+                elif orientation.strip().lower() == 'hfp':
+                    event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
+                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')					
+                elif orientation.strip().lower() == 'ffs':
+                    event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
+                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'supine')				
+                elif orientation.strip().lower() == 'ffp':
+                    event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
+                    event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'prone')									
+                else:
+                    event.patient_table_relationship_cid = None
+                    event.patient_orientation_cid = None
+                    event.patient_orientation_modifier_cid = None		
+            except:
+                pass
+            event.save()
     # needs include for optional multiple person participant
     _irradiationeventxraydetectordata(dataset,event)
     _irradiationeventxraysourcedata(dataset,event)
@@ -657,7 +685,7 @@ def _projectionxrayradiationdose(dataset,g,reporttype):
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated X-Ray Dose Data':
                 _accumulatedxraydose(cont,proj)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event X-Ray Data':
-                _irradiationeventxraydata(cont,proj)
+                _irradiationeventxraydata(cont,proj,dataset)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
                 proj.general_study_module_attributes.modality_type = 'CT'
                 _ctaccumulateddosedata(cont,proj)
@@ -846,8 +874,8 @@ def _rsdr2db(dataset):
         SkinDoseMapCalcSettings.objects.create()
 
     # Commented out until openSkin confirmed as working OK
-    enable_skin_dose_maps = False #SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
-    calc_on_import = False #SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
+    enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
+    calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
     if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:
         from remapp.tools.make_skin_map import make_skin_map
         make_skin_map.delay(g.pk)
