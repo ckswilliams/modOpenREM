@@ -287,7 +287,7 @@
                 <a href="http://docs.openrem.org/en/latest/openskin.html">OpenREM documentation</a>.
             </p>
             {% url 'skin_dose_map_settings_update' 1 as the_url %}
-            <!-- Commented out until openSkin confirmed as working OK
+
             <p>
                 This version of OpenREM has openSkin built-in, and is able to calculate and display skin dose maps for
                 some x-ray systems. However, this option is switched off for your installation at the moment. It can be
@@ -297,7 +297,7 @@
                 <strong>Warning:</strong> Only copper filters are considered in this export - aluminium or other filters
                 are not considered. This is related to the way openSkin works.
             </p>
-            -->
+
             <h4>
                 Create <a href="/openrem/exportrfopenskin/{{ generalstudymoduleattr.id }}">openSkin export</a>. <small>(Not
                 available if you don't have export permissions.)</small>
@@ -308,7 +308,7 @@
     </div>
 
 <table class="table table-striped table-bordered small">
-    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th>
+    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th><th>Orientation</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
@@ -332,6 +332,7 @@
         <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
+		<td>{{ event.patient_table_relationship_cid|title }}, {{ event.patient_orientation_cid|title }}, {{ event.patient_orientation_modifier_cid|title }}
     </tr>
     {% endfor %}
 </table>
