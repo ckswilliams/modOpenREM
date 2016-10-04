@@ -141,6 +141,8 @@ class MGChartOptionsForm(forms.Form):
     plotCharts = forms.BooleanField(label='Plot charts?', required=False)
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
+    plotMGkVpvsThickness = forms.BooleanField(label='kVp vs. compressed thickness', required=False)
+    plotMGmAsvsThickness = forms.BooleanField(label='mAs vs. compressed thickness', required=False)
     # if 'postgresql' in settings.DATABASES['default']['ENGINE']:
     #     plotMeanMedianOrBoth = forms.ChoiceField(label='Average to use', choices=AVERAGES, required=False)
 
@@ -148,6 +150,8 @@ class MGChartOptionsForm(forms.Form):
 class MGChartOptionsDisplayForm(forms.Form):
     plotMGStudyPerDayAndHour = forms.BooleanField(label='Study workload', required=False)
     plotMGAGDvsThickness = forms.BooleanField(label='AGD vs. compressed thickness', required=False)
+    plotMGkVpvsThickness = forms.BooleanField(label='kVp vs. compressed thickness', required=False)
+    plotMGmAsvsThickness = forms.BooleanField(label='mAs vs. compressed thickness', required=False)
 
 
 class DXChartOptionsDisplayForm(forms.Form):
