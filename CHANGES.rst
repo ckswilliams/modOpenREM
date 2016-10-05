@@ -7,6 +7,14 @@ OpenREM version history
 
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 
+0.7.4b1 (2016-10-04)
+--------------------
+
+* `#436`_  Install: temporary fix blocking django-filter latest version that breaks OpenREM
+* `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al)
+* `#430`_  Exports: fixed DX exports with multiple filters (Cu + Al)
+
+
 0.7.3 (2016-08-30)
 ------------------
 
