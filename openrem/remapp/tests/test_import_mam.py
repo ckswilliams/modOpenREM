@@ -34,7 +34,7 @@ class ImportMGImg(TestCase):
 
         # Test that patient study level data is recorded correctly
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '001D')
-        self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(67.6))
+        self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(0.00))
 
         # Test that exposure data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
