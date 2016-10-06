@@ -25,6 +25,7 @@ Contents:
     install-firsttime
     release-0.7.0
     release-0.7.3
+    release-0.7.4
     release-0.8.0
     startservices
     configuration
