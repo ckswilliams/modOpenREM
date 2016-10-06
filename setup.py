@@ -10,7 +10,7 @@ exec(open('openrem/remapp/version.py').read())
 
 requires = [
     'django>=1.8,<1.9',
-    'django-filter >= 0.10',
+    'django-filter >= 0.10,<0.15',
     'pytz >= 0a',
     'humanize',
     'pydicom >= 0.9.9',
