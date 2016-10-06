@@ -28,25 +28,34 @@
 
 """
 from dicom.valuerep import PersonName
+from dicom import charset
+from django.utils.encoding import smart_text
 import logging
 logger = logging.getLogger(__name__)
 
 
-def get_value_kw(tag,dataset):
+def get_value_kw(tag, dataset, char_set=charset.default_encoding):
     """Get DICOM value by keyword reference.
 
-    :param keyword:     DICOM keyword, no spaces or plural as per dictionary.
-    :type keyword:      str.
+    :param tag:         DICOM keyword, no spaces or plural as per dictionary.
+    :type tag:          str.
     :param dataset:     The DICOM dataset containing the tag.
     :type dataset:      dataset
+    :param char_set:    The SpecificCharacterSet value from the DICOM object, if present
+    :type char_set:     str
     :returns:           str. -- value
     """
-    if (tag in dataset):
-        val = getattr(dataset,tag)
+    if tag in dataset:
+        val = getattr(dataset, tag)
         if val != '':
             if type(val) is str or type(val) is PersonName:
-                val = val.decode('latin-1', 'replace')
+                try:
+                    python_char_set = charset.python_encoding[char_set]
+                except KeyError:
+                    python_char_set = charset.default_encoding
+                val = smart_text(val, encoding=python_char_set)
             return val
+
 
 def get_value_num(tag,dataset):
     """Get DICOM value by tag group and element number.
