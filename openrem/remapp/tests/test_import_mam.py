@@ -37,9 +37,9 @@ class ImportMGImg(TestCase):
         self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(0.00))
 
         # Test that exposure data is recorded correctly
-        self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
-                         total_number_of_irradiation_events, 4)
-        self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
-                         ct_dose_length_product_total, Decimal(724.52))
+        # self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+        #                  total_number_of_irradiation_events, 4)
+        # self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+        #                  ct_dose_length_product_total, Decimal(724.52))
 
 
