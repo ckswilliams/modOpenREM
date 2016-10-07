@@ -240,7 +240,7 @@ def _patientstudymoduleattributes(dataset, g):  # C.7.2.2
     patientatt.save()
 
 
-def _patientmoduleattributes(dataset, g):  # C.7.1.1
+def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     from decimal import Decimal
     import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
@@ -252,7 +252,7 @@ def _patientmoduleattributes(dataset, g):  # C.7.1.1
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     patient_birth_date = get_date("PatientBirthDate", dataset)
     pat.patient_sex = get_value_kw("PatientSex", dataset)
-    pat.not_patient_indicator = get_not_pt(dataset)
+    pat.not_patient_indicator = get_not_pt(dataset, char_set=ch)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal((g.study_date.date() - patient_birth_date.date()).days) / Decimal(
@@ -286,7 +286,7 @@ def _patientmoduleattributes(dataset, g):  # C.7.1.1
     pat.save()
 
 
-def _generalstudymoduleattributes(dataset, g):
+def _generalstudymoduleattributes(dataset, g, ch):
     from datetime import datetime
     from remapp.models import PatientIDSettings
     from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
@@ -297,23 +297,23 @@ def _generalstudymoduleattributes(dataset, g):
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
-    g.referring_physician_name = get_value_kw('RequestingPhysician', dataset)
-    g.study_id = get_value_kw('StudyID', dataset)
-    accession_number = get_value_kw('AccessionNumber', dataset)
+    g.referring_physician_name = get_value_kw('RequestingPhysician', dataset, char_set=ch)
+    g.study_id = get_value_kw('StudyID', dataset, char_set=ch)
+    accession_number = get_value_kw('AccessionNumber', dataset, char_set=ch)
     patient_id_settings = PatientIDSettings.objects.get()
     if accession_number and patient_id_settings.accession_hashed:
         accession_number = hash_id(accession_number)
         g.accession_hashed = True
     g.accession_number = accession_number
     g.modality_type = 'CT'
-    g.study_description = get_value_kw('ProtocolName', dataset)
-    g.operator_name = get_value_kw('OperatorsName', dataset)
+    g.study_description = get_value_kw('ProtocolName', dataset, char_set=ch)
+    g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
     if 'RequestAttributesSequence' in dataset:
         g.procedure_code_value = get_seq_code_value('ScheduledProtocolCodeSequence',
                                                     dataset.RequestAttributesSequence[0])
         g.procedure_code_meaning = get_seq_code_meaning('ScheduledProtocolCodeSequence',
-                                                        dataset.RequestAttributesSequence[0])
-    g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset)
+                                                        dataset.RequestAttributesSequence[0], char_set=ch)
+    g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset, char_set=ch)
     g.save()
     _ctradiationdose(dataset, g)
 
@@ -327,6 +327,7 @@ def _philips_ct2db(dataset):
 
     openrem_settings.add_project_to_path()
     from remapp.models import GeneralStudyModuleAttr
+    from remapp.tools.get_values import get_value_kw
 
     if 'StudyInstanceUID' in dataset:
         uid = dataset.StudyInstanceUID
@@ -335,10 +336,11 @@ def _philips_ct2db(dataset):
             return
 
     g = GeneralStudyModuleAttr.objects.create()
-    _generalstudymoduleattributes(dataset, g)
-    _generalequipmentmoduleattributes(dataset, g)
+    ch = get_value_kw('SpecificCharacterSet', dataset)
+    _generalstudymoduleattributes(dataset, g, ch)
+    _generalequipmentmoduleattributes(dataset, g, ch)
     _patientstudymoduleattributes(dataset, g)
-    _patientmoduleattributes(dataset, g)
+    _patientmoduleattributes(dataset, g, ch)
 
 
 @shared_task

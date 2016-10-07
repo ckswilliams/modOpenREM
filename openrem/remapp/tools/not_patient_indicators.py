@@ -28,8 +28,10 @@
 
 """
 
+from dicom import charset
 
-def get_not_pt(dataset):
+
+def get_not_pt(dataset, char_set=charset.default_encoding):
     """Looks for indications that a study might be a test or QA study.
     
     Some values that might indicate a study was for QA or similar purposes
@@ -41,10 +43,9 @@ def get_not_pt(dataset):
     :type dataset:      dataset
     :returns:           str. -- xml style string if any trigger values are found.
     """
-    from remapp.models import PatientModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patient_id = get_value_kw('PatientID', dataset)
-    patient_name = get_value_kw('PatientName', dataset)
+    patient_id = get_value_kw('PatientID', dataset, char_set=char_set)
+    patient_name = get_value_kw('PatientName', dataset, char_set=char_set)
     id_indicators = ['phy', 'test', 'qa']
     name_indicators = ['phys', 'test', 'qa']
     id_contains = []
