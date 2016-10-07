@@ -724,7 +724,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                 proj.general_study_module_attributes.modality_type = 'CT'
                 _ctaccumulateddosedata(cont, proj, ch)
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
-                _ctirradiationeventdata(cont, proj)
+                _ctirradiationeventdata(cont, proj, ch)
 
 
 def _generalequipmentmoduleattributes(dataset, study, ch):
