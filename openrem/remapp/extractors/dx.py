@@ -164,8 +164,8 @@ def _irradiationeventxraydetectordata(dataset, event):
     detector.exposure_index = get_value_kw('ExposureIndex', dataset)
     detector.relative_xray_exposure = get_value_kw('RelativeXRayExposure', dataset)
     manufacturer = \
-    detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[
-        0].manufacturer.lower()
+        detector.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[
+            0].manufacturer.lower()
     if 'fuji' in manufacturer:
         detector.relative_exposure_unit = 'S ()'
     elif 'carestream' in manufacturer:
@@ -293,11 +293,11 @@ def _doserelateddistancemeasurements(dataset, mech):
     from remapp.tools.get_values import get_value_kw, get_value_num
     dist = DoseRelatedDistanceMeasurements.objects.create(irradiation_event_xray_mechanical_data=mech)
     manufacturer = \
-    dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[
-        0].manufacturer
+        dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[
+            0].manufacturer
     model_name = \
-    dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[
-        0].manufacturer_model_name
+        dist.irradiation_event_xray_mechanical_data.irradiation_event_xray_data.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.all()[
+            0].manufacturer_model_name
     dist.distance_source_to_detector = get_value_kw('DistanceSourceToDetector', dataset)
     if dist.distance_source_to_detector and manufacturer and model_name and "kodak" in manufacturer.lower() and "dr 7500" in model_name.lower():
         dist.distance_source_to_detector = dist.distance_source_to_detector * 100  # convert dm to mm
@@ -376,9 +376,9 @@ def _irradiationeventxraydata(dataset, proj):  # TID 10003
             event.image_view = get_or_create_cid('R-10236', 'left lateral')
         elif projection == 'RL':
             event.image_view = get_or_create_cid('R-10232', 'right lateral')
-        # http://dicomlookup.com/lookup.asp?sw=Tnumber&q=(0018,5101) lists four other views: RLD (Right Lateral Decubitus),
-        # LLD (Left Lateral Decubitus), RLO (Right Lateral Oblique) and LLO (Left Lateral Oblique). There isn't an exact
-        # match for these views in the CID 4010 DX View (http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4010.html)
+            # http://dicomlookup.com/lookup.asp?sw=Tnumber&q=(0018,5101) lists four other views: RLD (Right Lateral Decubitus),
+            # LLD (Left Lateral Decubitus), RLO (Right Lateral Oblique) and LLO (Left Lateral Oblique). There isn't an exact
+            # match for these views in the CID 4010 DX View (http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4010.html)
 
     # image view modifier?
     if event.anatomical_structure:
