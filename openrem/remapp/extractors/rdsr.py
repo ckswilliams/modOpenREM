@@ -46,7 +46,7 @@ from celery import shared_task
 logger = logging.getLogger('remapp.extractors.rdsr')  # Explicitly named so that it is still handled when using __main__
 
 
-def _observercontext(dataset, obs):  # TID 1002
+def _observercontext(dataset, obs, ch):  # TID 1002
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
@@ -55,15 +55,15 @@ def _observercontext(dataset, obs):  # TID 1002
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer UID':
             obs.device_observer_uid = cont.UID
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Name':
-            obs.device_observer_name = safe_strings(cont.TextValue)
+            obs.device_observer_name = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Manufacturer':
-            obs.device_observer_manufacturer = safe_strings(cont.TextValue)
+            obs.device_observer_manufacturer = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Model Name':
-            obs.device_observer_model_name = safe_strings(cont.TextValue)
+            obs.device_observer_model_name = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Serial Number':
-            obs.device_observer_serial_number = cont.TextValue
+            obs.device_observer_serial_number = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Observer Physical Location during observation':
-            obs.device_observer_physical_location_during_observation = safe_strings(cont.TextValue)
+            obs.device_observer_physical_location_during_observation = safe_strings(cont.TextValue, ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Device Role in Procedure':
             obs.device_role_in_procedure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                              cont.ConceptCodeSequence[0].CodeMeaning)
@@ -713,7 +713,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                 obs = ObserverContext.objects.create(projection_xray_radiation_dose=proj)
             elif reporttype == 'ct':
                 obs = ObserverContext.objects.create(ct_radiation_dose=proj)
-            _observercontext(dataset, obs)
+            _observercontext(dataset, obs, ch)
 
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Accumulated X-Ray Dose Data':
