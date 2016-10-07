@@ -156,18 +156,22 @@ class Phantom_3:
         radius = refRadius / math.sqrt(height / refHeight) * math.sqrt(mass / refMass)
         
         if patPos == "HFS":
+            prone = False
             patPosZ = 1.
             patPosY = 1.
             origin[1] = origin[1] - 24 * height/refHeight
         elif patPos == "FFS":
+            prone = False
             patPosZ = 1.
             patPosY = -1.
             origin[1] = origin[1] - 174 * height/refHeight
         elif patPos == "HFP":
+            prone = True		
             patPosZ = -1.
             patPosY = 1.
             origin[1] = origin[1] - 24 * height/refHeight
         elif patPos == "FFP":
+            prone = True
             patPosZ = -1.
             patPosY = -1.
             origin[1] = origin[1] - 174 * height/refHeight
@@ -241,9 +245,17 @@ class Phantom_3:
             self.phantomMap[it.multi_index[0], it.multi_index[1]] = np.array([myX, myY, myZ])
             self.normalMap[it.multi_index[0], it.multi_index[1]] = normal
             it.iternext()
-        # Flip to correct left and right so it becomes a view of the back.
-        self.phantomMap = np.flipud(self.phantomMap)
-        self.normalMap = np.flipud(self.normalMap)
+        #Flip to correct left and right so it becomes a view of the back.
+        #self.phantomMap = np.flipud(self.phantomMap)
+        #self.normalMap = np.flipud(self.normalMap)
+        self.phantomMap = np.fliplr(self.phantomMap)
+        self.normalMap = np.fliplr(self.normalMap)
+        if prone:
+            self.normalMap = np.roll(self.normalMap, int(self.phantom_flat_dist + self.phantom_curved_dist),axis=0)
+            self.phantomMap = np.roll(self.phantomMap, int(self.phantom_flat_dist + self.phantom_curved_dist),axis=0)
+            self.phantomMap = np.flipud(self.phantomMap)
+            self.normalMap = np.flipud(self.normalMap)
+           
 
 
 class SkinDose:
@@ -280,9 +292,4 @@ class SkinDose:
             self.totalDose = skinMap
         else:
             self.doseArray = np.dstack((self.doseArray, skinMap))
-            self.totalDose = self.totalDose + skinMap
-
-    def fliplr(self):
-        self.totalDose = np.flipud(self.totalDose)
-        for i in xrange(0,len(self.doseArray)-1):
-            self.doseArray[i] = np.flipud(self.doseArray[i])			
+            self.totalDose = self.totalDose + skinMap		
