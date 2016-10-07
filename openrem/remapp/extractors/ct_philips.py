@@ -112,17 +112,17 @@ def _ctirradiationeventdata(dataset, ct):  # TID 10013
     event.save()
 
 
-def _ctaccumulateddosedata(dataset, ct):  # TID 10012
+def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
     from remapp.models import CtAccumulatedDoseData, ContextID
     from remapp.tools.get_values import get_value_kw, get_value_num
     ctacc = CtAccumulatedDoseData.objects.create(ct_radiation_dose=ct)
     ctacc.total_number_of_irradiation_events = get_value_kw('TotalNumberOfExposures', dataset)
     ctacc.ct_dose_length_product_total = get_value_num(0x00e11021, dataset)  # Philips private tag
-    ctacc.comment = get_value_kw('CommentsOnRadiationDose', dataset)
+    ctacc.comment = get_value_kw('CommentsOnRadiationDose', dataset, char_set=ch)
     ctacc.save()
 
 
-def _ctradiationdose(dataset, g):
+def _ctradiationdose(dataset, g, ch):
     from remapp.models import CtRadiationDose, ObserverContext
     from remapp.tools.get_values import get_value_kw, get_value_num, get_or_create_cid
     from datetime import timedelta
@@ -131,9 +131,9 @@ def _ctradiationdose(dataset, g):
     proj.procedure_reported = get_or_create_cid('P5-08000', 'Computed Tomography X-Ray')
     proj.has_intent = get_or_create_cid('R-408C3', 'Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014', 'Study')
-    commentdose = get_value_kw('CommentsOnRadiationDose', dataset)
-    commentprotocolfile = get_value_num(0x00e11061, dataset)
-    commentstudydescription = get_value_kw('StudyDescription', dataset)
+    commentdose = get_value_kw('CommentsOnRadiationDose', dataset, char_set=ch)
+    commentprotocolfile = get_value_num(0x00e11061, dataset, char_set=ch)
+    commentstudydescription = get_value_kw('StudyDescription', dataset, char_set=ch)
     if not commentdose:
         commentdose = ''
     if not commentprotocolfile:
@@ -144,15 +144,15 @@ def _ctradiationdose(dataset, g):
         commentdose, commentprotocolfile, commentstudydescription)
     proj.source_of_dose_information = get_or_create_cid('113866', 'Copied From Image Attributes')
     proj.save()
-    _ctaccumulateddosedata(dataset, proj)
+    _ctaccumulateddosedata(dataset, proj, ch)
     for series in dataset.ExposureDoseSequence:
         if 'AcquisitionType' in series:
             _ctirradiationeventdata(series, proj)
     events = proj.ctirradiationeventdata_set.all()
     if not events:
-        station_name = get_value_kw("StationName", dataset)
-        manufacturer = get_value_kw("Manufacturer", dataset)
-        manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset)
+        station_name = get_value_kw("StationName", dataset, char_set=ch)
+        manufacturer = get_value_kw("Manufacturer", dataset, char_set=ch)
+        manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset, char_set=ch)
         study_date = g.study_date.date()
         study_time = g.study_time.time()
         accession_number = g.accession_number
@@ -170,21 +170,21 @@ def _ctradiationdose(dataset, g):
         proj.save()
 
 
-def _generalequipmentmoduleattributes(dataset, study):
+def _generalequipmentmoduleattributes(dataset, study, ch):
     from remapp.models import GeneralEquipmentModuleAttr, UniqueEquipmentNames
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.hash_id import hash_id
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
-    equip.manufacturer = get_value_kw("Manufacturer", dataset)
-    equip.institution_name = get_value_kw("InstitutionName", dataset)
-    equip.institution_address = get_value_kw("InstitutionAddress", dataset)
-    equip.station_name = get_value_kw("StationName", dataset)
-    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset)
-    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset)
-    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset)
-    equip.software_versions = get_value_kw("SoftwareVersions", dataset)
-    equip.gantry_id = get_value_kw("GantryID", dataset)
+    equip.manufacturer = get_value_kw("Manufacturer", dataset, char_set=ch)
+    equip.institution_name = get_value_kw("InstitutionName", dataset, char_set=ch)
+    equip.institution_address = get_value_kw("InstitutionAddress", dataset, char_set=ch)
+    equip.station_name = get_value_kw("StationName", dataset, char_set=ch)
+    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset, char_set=ch)
+    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset, char_set=ch)
+    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset, char_set=ch)
+    equip.software_versions = get_value_kw("SoftwareVersions", dataset, char_set=ch)
+    equip.gantry_id = get_value_kw("GantryID", dataset, char_set=ch)
     equip.spatial_resolution = get_value_kw("SpatialResolution",
                                             dataset)  # might fall over if field present but blank - check!
     equip.date_of_last_calibration = get_date("DateOfLastCalibration", dataset)
@@ -270,13 +270,13 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
 
     patient_id_settings = PatientIDSettings.objects.get()
     if patient_id_settings.name_stored:
-        name = get_value_kw("PatientName", dataset)
+        name = get_value_kw("PatientName", dataset, ch)
         if name and patient_id_settings.name_hashed:
             name = hashlib.sha256(name).hexdigest()
             pat.name_hashed = True
         pat.patient_name = name
     if patient_id_settings.id_stored:
-        patid = get_value_kw("PatientID", dataset)
+        patid = get_value_kw("PatientID", dataset, ch)
         if patid and patient_id_settings.id_hashed:
             patid = hashlib.sha256(patid).hexdigest()
             pat.id_hashed = True
@@ -315,7 +315,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
                                                         dataset.RequestAttributesSequence[0], char_set=ch)
     g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset, char_set=ch)
     g.save()
-    _ctradiationdose(dataset, g)
+    _ctradiationdose(dataset, g, ch)
 
 
 def _philips_ct2db(dataset):
