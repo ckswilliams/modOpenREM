@@ -415,7 +415,8 @@ def _test_if_mammo(dataset):
     """ Test if dicom object passed is a mammo file by looking at SOP Class UID"""
     if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2.1' or dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.1.2':
         return 1
-    elif dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7' and dataset.Modality == 'MG' and 'ORIGINAL' in dataset.ImageType:
+    elif dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7' and dataset.Modality == 'MG' and \
+            'ORIGINAL' in dataset.ImageType:
         return 1
     return 0
 
