@@ -78,11 +78,16 @@ def make_skin_map(study_pk=None):
 
         if pat_height == 0.0:
             pat_height = 178.6
-
-        my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D',
+        if study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid:
+            patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid)[0] + "f" + str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]				
+            patPos = patPos.upper()				
+        else:
+            patPos = None
+			
+        my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D', patPos=patPos,
                                              pat_mass=pat_mass, pat_height=pat_height,
-                                             table_thick=0.5, table_trans=0.8, table_width=40.0, table_length=150.0,
-                                             matt_thick=4.0, matt_trans=0.75)
+                                             table_thick=0.5, table_width=40.0, table_length=150.0,
+                                             matt_thick=4.0)
 
         for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
             if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position:
@@ -147,10 +152,6 @@ def make_skin_map(study_pk=None):
                 end_angle = float(irrad.irradeventxraymechanicaldata_set.get().positioner_primary_end_angle)
             else:
                 end_angle = None
-            if irrad.patient_table_relationship_cid:
-                patPos = str(irrad.patient_table_relationship_cid)[0] + "f" + str(irrad.patient_orientation_modifier_cid)[0]				
-            else:
-                patPos = None
             if ref_ak and d_ref:
                 my_exp_map.add_view(delta_x=delta_x, delta_y=delta_y, delta_z=delta_z,
                                     angle_x=angle_x, angle_y=angle_y,
@@ -161,7 +162,7 @@ def make_skin_map(study_pk=None):
         import numpy as np
 
         # Flip the skin dose map left-right so the view is from the front
-        my_exp_map.my_dose.fliplr()
+       # my_exp_map.my_dose.fliplr()
         my_exp_map.my_dose.totalDose = np.roll(my_exp_map.my_dose.totalDose, int(my_exp_map.phantom.phantom_flat_dist / 2),
                                                axis=0)
         try:

@@ -358,15 +358,15 @@ def _irradiationeventxraydata(dataset,proj,fulldataset):  # TID 10003
                 elif orientation.strip().lower() == 'hfp':
                     event.patient_table_relationship_cid = get_or_create_cid('F-10470', 'headfirst')
                     event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')					
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')
                 elif orientation.strip().lower() == 'ffs':
                     event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
                     event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'supine')				
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'supine')				
                 elif orientation.strip().lower() == 'ffp':
                     event.patient_table_relationship_cid = get_or_create_cid('F-10480', 'feet-first')
                     event.patient_orientation_cid = get_or_create_cid('F-10450', 'recumbent')
-                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10340', 'prone')									
+                    event.patient_orientation_modifier_cid = get_or_create_cid('F-10310', 'prone')									
                 else:
                     event.patient_table_relationship_cid = None
                     event.patient_orientation_cid = None
