@@ -53,6 +53,7 @@ class ImportMGImg(TestCase):
         pid.id_stored = True
         pid.id_hashed = False
         pid.dob_stored = True
+        pid.save()
 
         dicom_file = "test_files/MG-Im-GE-SenDS-scaled.dcm"
         root_tests = os.path.dirname(os.path.abspath(__file__))
@@ -62,5 +63,5 @@ class ImportMGImg(TestCase):
         study = GeneralStudyModuleAttr.objects.all()[0]
 
         # Test that patient identifiable data is stored in plain text
-        self.assertEqual(study.patientmoduleattr_set.get().patient_name, 'Mamografía^Bịnhnhân')
-        self.assertEqual(study.patientmoduleattr_set.get().patient_id, 'ABCD1234')
+        self.assertEqual(study.patientmoduleattr_set.get().patient_name, u'Mamografía^Bịnhnhân')
+        self.assertEqual(study.patientmoduleattr_set.get().patient_id, u'ABCD1234')
