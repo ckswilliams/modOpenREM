@@ -37,9 +37,10 @@ def hash_id(id, *args, **kwargs):
     :returns:          str
     """
     import dicom
+    from django.utils.encoding import smart_bytes
     import hashlib
 
     if id:
         if isinstance(id, dicom.multival.MultiValue):
             id = ''.join(id)
-        return hashlib.sha256(id.encode('utf-8')).hexdigest()
+        return hashlib.sha256(smart_bytes(id, encoding='utf-8')).hexdigest()
