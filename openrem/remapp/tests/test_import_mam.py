@@ -80,6 +80,7 @@ class ImportMGImg(TestCase):
         pid.name_hashed = True
         pid.id_stored = True
         pid.id_hashed = True
+        pid.accession_hashed = True
         pid.save()
 
         dicom_file = "test_files/MG-Im-GE-SenDS-scaled.dcm"
@@ -94,3 +95,4 @@ class ImportMGImg(TestCase):
                          'fe66aceb4eb0ccbd76306a485e162cc3cad8c9312b25b002ad784f72575ae500')
         self.assertEqual(study.patientmoduleattr_set.get().patient_id,
                          '1635c8525afbae58c37bede3c9440844e9143727cc7c160bed665ec378d8a262')
+        self.assertEqual(study.accession_number, '8f541d3a1bdab5e197e3acb3b51419b162809c926ee7f45044aca9aef9d6e22d')
