@@ -42,4 +42,25 @@ class ImportMGImg(TestCase):
         # self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
         #                  ct_dose_length_product_total, Decimal(724.52))
 
+    def test_import_mg_img_ge_pid(self):
+        """
+        Imports a known mammography image file derived from a GE Senographe DS image, and tests the values
+        imported against those expected.
+        """
+        pid = PatientIDSettings.objects.create()
+        pid.name_stored = True
+        pid.name_hashed = False
+        pid.id_stored = True
+        pid.id_hashed = False
+        pid.dob_stored = True
 
+        dicom_file = "test_files/MG-Im-GE-SenDS-scaled.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        mam(dicom_path)
+        study = GeneralStudyModuleAttr.objects.all()[0]
+
+        # Test that patient identifiable data is stored in plain text
+        self.assertEqual(study.patientmoduleattr_set.get().patient_name, 'Mamografía^Bịnhnhân')
+        self.assertEqual(study.patientmoduleattr_set.get().patient_id, 'ABCD1234')
