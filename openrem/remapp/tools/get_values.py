@@ -28,27 +28,36 @@
 
 """
 from dicom.valuerep import PersonName
+from dicom import charset
+from django.utils.encoding import smart_text
 import logging
 logger = logging.getLogger(__name__)
 
 
-def get_value_kw(tag,dataset):
+def get_value_kw(tag, dataset, char_set=charset.default_encoding):
     """Get DICOM value by keyword reference.
 
-    :param keyword:     DICOM keyword, no spaces or plural as per dictionary.
-    :type keyword:      str.
+    :param tag:         DICOM keyword, no spaces or plural as per dictionary.
+    :type tag:          str.
     :param dataset:     The DICOM dataset containing the tag.
     :type dataset:      dataset
+    :param char_set:    The SpecificCharacterSet value from the DICOM object, if present
+    :type char_set:     str
     :returns:           str. -- value
     """
-    if (tag in dataset):
-        val = getattr(dataset,tag)
+    if tag in dataset:
+        val = getattr(dataset, tag)
         if val != '':
             if type(val) is str or type(val) is PersonName:
-                val = val.decode('latin-1', 'replace')
+                try:
+                    python_char_set = charset.python_encoding[char_set]
+                except KeyError:
+                    python_char_set = charset.default_encoding
+                val = smart_text(val, encoding=python_char_set)
             return val
 
-def get_value_num(tag,dataset):
+
+def get_value_num(tag, dataset, char_set=charset.default_encoding):
     """Get DICOM value by tag group and element number.
     
     Always use get_value_kw by preference for readability. This module can
@@ -58,16 +67,23 @@ def get_value_num(tag,dataset):
     :type tag:          hex
     :param dataset:     The DICOM dataset containing the tag.
     :type dataset:      dataset
+    :param char_set:    The SpecificCharacterSet value from the DICOM object, if present
+    :type char_set:     str
     :returns:           str. -- value
     """
-    if (tag in dataset):
+    if tag in dataset:
         val = dataset[tag].value
         if val != '':
             if type(val) is str or type(val) is PersonName:
-                val = val.decode('latin-1', 'replace')
+                try:
+                    python_char_set = charset.python_encoding[char_set]
+                except KeyError:
+                    python_char_set = charset.default_encoding
+                val = smart_text(val, encoding=python_char_set)
             return val
 
-def get_seq_code_value(sequence,dataset):
+
+def get_seq_code_value(sequence, dataset):
     """From a DICOM sequence, get the code value.
 
     :param sequence:    DICOM sequence name.
@@ -76,19 +92,21 @@ def get_seq_code_value(sequence,dataset):
     :type dataset:      DICOM dataset
     :returns:           int. -- code value
     """
-    if (sequence in dataset):
-        seq = getattr(dataset,sequence)
-        if seq and hasattr(seq[0],'CodeValue'):
+    if sequence in dataset:
+        seq = getattr(dataset, sequence)
+        if seq and hasattr(seq[0], 'CodeValue'):
             return seq[0].CodeValue
 
 
-def get_seq_code_meaning(sequence,dataset):
+def get_seq_code_meaning(sequence, dataset, char_set=charset.default_encoding):
     """From a DICOM sequence, get the code meaning.
 
     :param sequence:    DICOM sequence name.
     :type sequence:     DICOM keyword, no spaces or plural as per dictionary.
     :param dataset:     The DICOM dataset containing the sequence.
     :type dataset:      DICOM dataset
+    :param char_set:    The SpecificCharacterSet value from the DICOM object, if present
+    :type char_set:     str
     :returns:           str. -- code meaning
     """
     if (sequence in dataset):
@@ -96,8 +114,12 @@ def get_seq_code_meaning(sequence,dataset):
         if seq and hasattr(seq[0],'CodeMeaning'):
             meaning = seq[0].CodeMeaning
             if meaning != '':
-                if type(meaning) is str or type(meaning) is PersonName:
-                    meaning = meaning.decode('latin-1', 'replace')
+                if type(meaning) is str:
+                    try:
+                        python_char_set = charset.python_encoding[char_set]
+                    except KeyError:
+                        python_char_set = charset.default_encoding
+                    meaning = smart_text(meaning, encoding=python_char_set)
             return meaning
 
 def get_or_create_cid(codevalue, codemeaning):
@@ -143,11 +165,12 @@ def return_for_export(model, field):
         return None
 
 
-def safe_strings(str):
+def safe_strings(string, char_set=charset.default_encoding):
     try:
-        return str.decode('latin-1', 'replace')
-    except AttributeError:
-        return None
+        python_char_set = charset.python_encoding[char_set]
+    except KeyError:
+        python_char_set = charset.default_encoding
+    return smart_text(string, encoding=python_char_set)
 
 
 def replace_comma(comma_string):
@@ -159,6 +182,8 @@ def replace_comma(comma_string):
 
 def export_safe(ascii_string):
     if ascii_string:
+        # I'm not convinced the next line is a good idea, particularly when we are confident (day forward) values are
+        # stored as UTF-8. Will need to be tested.
         utf8_string = ascii_string.encode("utf-8")
         safe_string = replace_comma(utf8_string)
         return safe_string

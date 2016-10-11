@@ -28,7 +28,10 @@
 
 """
 
-def get_not_pt(dataset):
+from dicom import charset
+
+
+def get_not_pt(dataset, char_set=charset.default_encoding):
     """Looks for indications that a study might be a test or QA study.
     
     Some values that might indicate a study was for QA or similar purposes
@@ -40,19 +43,19 @@ def get_not_pt(dataset):
     :type dataset:      dataset
     :returns:           str. -- xml style string if any trigger values are found.
     """
-    from remapp.models import PatientModuleAttr
     from remapp.tools.get_values import get_value_kw
-    patient_id = get_value_kw('PatientID',dataset)
-    patient_name = get_value_kw('PatientName',dataset)
-    id_indicators = ['phy','test','qa']
-    name_indicators = ['phys','test','qa']
+    patient_id = get_value_kw('PatientID', dataset, char_set=char_set)
+    patient_name = get_value_kw('PatientName', dataset, char_set=char_set)
+    id_indicators = ['phy', 'test', 'qa']
+    name_indicators = ['phys', 'test', 'qa']
     id_contains = []
     name_contains = []
     if patient_id:
-        id_contains = [indicator 
-                        for indicator in id_indicators if indicator in patient_id.lower()]
+        id_contains = [indicator
+                       for indicator in id_indicators if indicator in patient_id.lower()]
     if patient_name:
-        name_contains = [indicator 
-                        for indicator in name_indicators if indicator in patient_name.lower()]
+        name_contains = [indicator
+                         for indicator in name_indicators if indicator in patient_name.lower()]
     if id_contains or name_contains:
-        return '<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],str(name_contains)[1:-1])
+        return '<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
+                                                                              str(name_contains)[1:-1])

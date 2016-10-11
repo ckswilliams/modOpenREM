@@ -1,8 +1,12 @@
 .git/
 .gitignore
+.tox/
+.coverage/
+.idea/
 docs/
 stuff/
 openrem/remapp/migrations/0*
 openrem/openremproject/local_settings.py
 openrem/openremproject/wsgi.py
 *.pyc
+OpenREM.egg-info/

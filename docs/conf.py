@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OpenREM'
-copyright = u'2013-2015, The Royal Marsden NHS Foundation Trust'
+copyright = u'2013-2016, The Royal Marsden NHS Foundation Trust'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
