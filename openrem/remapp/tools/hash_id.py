@@ -29,17 +29,18 @@
 """
 
 
-def hash_id(id, *args, **kwargs):
+def hash_id(id_string, *args, **kwargs):
     """Return a one-way hash of the provided ID value
 
-    :param id:         ID to create hash from
-    :type id:          str
+    :param id_string:         ID to create hash from
+    :type id_string:          str
     :returns:          str
     """
     import dicom
+    from django.utils.encoding import smart_bytes
     import hashlib
 
-    if id:
-        if isinstance(id, dicom.multival.MultiValue):
-            id = ''.join(id)
-        return hashlib.sha256(id.encode('utf-8')).hexdigest()
+    if id_string:
+        if isinstance(id_string, dicom.multival.MultiValue):
+            id_string = ''.join(id_string)
+        return hashlib.sha256(smart_bytes(id_string, encoding='utf-8')).hexdigest()
