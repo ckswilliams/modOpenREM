@@ -242,6 +242,7 @@ def _patientstudymoduleattributes(dataset, g):  # C.7.2.2
 
 def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     from decimal import Decimal
+    from django.utils.encoding import smart_bytes
     import hashlib
     from remapp.models import PatientModuleAttr, PatientStudyModuleAttr
     from remapp.models import PatientIDSettings
@@ -272,13 +273,13 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     if patient_id_settings.name_stored:
         name = get_value_kw("PatientName", dataset, ch)
         if name and patient_id_settings.name_hashed:
-            name = hashlib.sha256(name).hexdigest()
+            name = hashlib.sha256(smart_bytes(name, encoding='utf-8')).hexdigest()
             pat.name_hashed = True
         pat.patient_name = name
     if patient_id_settings.id_stored:
         patid = get_value_kw("PatientID", dataset, ch)
         if patid and patient_id_settings.id_hashed:
-            patid = hashlib.sha256(patid).hexdigest()
+            patid = hashlib.sha256(smart_bytes(patid, encoding='utf-8')).hexdigest()
             pat.id_hashed = True
         pat.patient_id = patid
     if patient_id_settings.dob_stored and patient_birth_date:
