@@ -274,7 +274,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             pass
 
 
-def _irradiationeventxraydetectordata(dataset, event):  # TID 10003a
+def _irradiationeventxraydetectordata(dataset, event, ch):  # TID 10003a
     from remapp.models import IrradEventXRayDetectorData
     detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
