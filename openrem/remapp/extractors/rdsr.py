@@ -274,7 +274,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             pass
 
 
-def _irradiationeventxraydetectordata(dataset, event, ch):  # TID 10003a
+def _irradiationeventxraydetectordata(dataset, event):  # TID 10003a
     from remapp.models import IrradEventXRayDetectorData
     detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
@@ -951,7 +951,6 @@ def _rsdr2db(dataset):
     except ObjectDoesNotExist:
         SkinDoseMapCalcSettings.objects.create()
 
-    # Commented out until openSkin confirmed as working OK
     enable_skin_dose_maps = SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]
     calc_on_import = SkinDoseMapCalcSettings.objects.values_list('calc_on_import', flat=True)[0]
     if g.modality_type == "RF" and enable_skin_dose_maps and calc_on_import:

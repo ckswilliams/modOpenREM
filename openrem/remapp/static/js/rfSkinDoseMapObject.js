@@ -1,15 +1,35 @@
+/**
+ * Function to create a 2D skin dose map object
+ * @param skinDoseMapCanvasName
+ * @param colourScaleName
+ */
 function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
     this.useNewColourScale = useNewColourScale;
+    /**
+     * Internal function to create a new colour scale
+     * @param new_scale
+     */
     function useNewColourScale(new_scale) {
-        this.colourScale = chroma.scale(new_scale);
+        var _this = this;
+        _this.colourScale = chroma.scale(new_scale);
     }
 
 
     this.setPixel = setPixel;
+    /**
+     * Internal function to set the rgba value of a pixel
+     * @param imageData
+     * @param x
+     * @param y
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
     function setPixel(imageData, x, y, r, g, b, a) {
         var index = (x + y * imageData.width) * 4;
-        imageData.data[index + 0] = r;
+        imageData.data[index    ] = r;
         imageData.data[index + 1] = g;
         imageData.data[index + 2] = b;
         imageData.data[index + 3] = a;
@@ -17,211 +37,274 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
 
 
     this.draw = draw;
+    /**
+     * Internal function to draw the skin dose map
+     */
     function draw() {
+        var _this = this;
         var x, y, dose, scaledDose;
-        for (x = 0; x < this.skinDoseMapWidth; x++) {
-            for (y = 0; y < this.skinDoseMapHeight; y++) {
-                dose = this.skinDoseMap[(y) * this.skinDoseMapWidth + x];
-                scaledDose = dose - (this.windowLevel - (this.windowWidth / 2.0));
+        for (x = 0; x < _this.skinDoseMapWidth; x++) {
+            for (y = 0; y < _this.skinDoseMapHeight; y++) {
+                dose = _this.skinDoseMap[(_this.skinDoseMapHeight-1 - y) * _this.skinDoseMapWidth + x];
+                scaledDose = dose - (_this.windowLevel - (_this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
-                this.skinDoseMapContext.fillStyle = this.colourScale(scaledDose / this.windowWidth).hex();
-                this.skinDoseMapContext.fillRect(x*this.mag, y*this.mag, this.mag, this.mag);
+                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                _this.skinDoseMapContext.fillStyle = _this.colourScale(scaledDose / _this.windowWidth).hex();
+                _this.skinDoseMapContext.fillRect(x*_this.mag, y*_this.mag, _this.mag, _this.mag);
             }
         }
     }
 
 
     this.drawOverlay = drawOverlay;
+    /**
+     * Internal function to draw the overlay on the skin dose map
+     */
     function drawOverlay() {
-        this.skinDoseMapContext.textAlign = 'center';
-        this.skinDoseMapContext.font = '12pt arial';
+        var _this = this;
+        _this.skinDoseMapContext.textAlign = 'center';
+        _this.skinDoseMapContext.font = '12pt arial';
 
-        this.skinDoseMapContext.fillStyle = 'rgba(0, 80, 0, 0.85)';
-        this.skinDoseMapContext.fillText('Superior', this.skinDoseMapCanvas.width/2, 15);
-        this.skinDoseMapContext.fillText('Inferior', this.skinDoseMapCanvas.width/2, this.skinDoseMapCanvas.height-10);
+        _this.skinDoseMapContext.fillStyle = 'rgba(0, 80, 0, 0.85)';
+        _this.skinDoseMapContext.fillText('Superior', _this.skinDoseMapCanvas.width/2, 15);
+        _this.skinDoseMapContext.fillText('Inferior', _this.skinDoseMapCanvas.width/2, _this.skinDoseMapCanvas.height-10);
 
-        this.skinDoseMapContext.save();
+        _this.skinDoseMapContext.save();
 
-        this.skinDoseMapContext.rotate(0.5*Math.PI);
-        this.skinDoseMapContext.fillStyle = 'rgba(255, 0, 0, 0.85)';
-        this.skinDoseMapContext.fillText('Anterior', this.skinDoseMapCanvas.height/2, -this.frontLeftBoundary/2);
-        this.skinDoseMapContext.fillText('Posterior', this.skinDoseMapCanvas.height/2, -this.leftBackBoundary - (this.backRightBoundary-this.leftBackBoundary)/2);
-        this.skinDoseMapContext.fillText('Left', this.skinDoseMapCanvas.height/2, -this.frontLeftBoundary - (this.leftBackBoundary-this.frontLeftBoundary)/2);
-        this.skinDoseMapContext.fillText('Right', this.skinDoseMapCanvas.height/2, -this.rightFrontBoundary + (this.rightFrontBoundary-this.backRightBoundary)/2);
+        _this.skinDoseMapContext.rotate(0.5*Math.PI);
+        _this.skinDoseMapContext.fillStyle = 'rgba(255, 0, 0, 0.85)';
+        _this.skinDoseMapContext.fillText('Anterior', _this.skinDoseMapCanvas.height/2, -_this.frontLeftBoundary/2);
+        _this.skinDoseMapContext.fillText('Posterior', _this.skinDoseMapCanvas.height/2, -_this.leftBackBoundary - (_this.backRightBoundary-_this.leftBackBoundary)/2);
+        _this.skinDoseMapContext.fillText('Left', _this.skinDoseMapCanvas.height/2, -_this.frontLeftBoundary - (_this.leftBackBoundary-_this.frontLeftBoundary)/2);
+        _this.skinDoseMapContext.fillText('Right', _this.skinDoseMapCanvas.height/2, -_this.rightFrontBoundary + (_this.rightFrontBoundary-_this.backRightBoundary)/2);
 
-        this.skinDoseMapContext.restore();
+        _this.skinDoseMapContext.restore();
 
-        this.skinDoseMapContext.lineWidth = 1;
-        this.skinDoseMapContext.setLineDash([5, 15]);
-        this.skinDoseMapContext.strokeStyle = 'rgba(255, 0, 0, 0.25)';
+        _this.skinDoseMapContext.lineWidth = 1;
+        _this.skinDoseMapContext.setLineDash([5, 15]);
+        _this.skinDoseMapContext.strokeStyle = 'rgba(255, 0, 0, 0.25)';
 
-        this.skinDoseMapContext.beginPath();
-        this.skinDoseMapContext.moveTo(this.frontLeftBoundary, 0);
-        this.skinDoseMapContext.lineTo(this.frontLeftBoundary, this.skinDoseMapCanvas.height-1);
-        this.skinDoseMapContext.stroke();
+        _this.skinDoseMapContext.beginPath();
+        _this.skinDoseMapContext.moveTo(_this.frontLeftBoundary, 0);
+        _this.skinDoseMapContext.lineTo(_this.frontLeftBoundary, _this.skinDoseMapCanvas.height-1);
+        _this.skinDoseMapContext.stroke();
 
-        this.skinDoseMapContext.beginPath();
-        this.skinDoseMapContext.moveTo(this.leftBackBoundary, 0);
-        this.skinDoseMapContext.lineTo(this.leftBackBoundary, this.skinDoseMapCanvas.height-1);
-        this.skinDoseMapContext.stroke();
+        _this.skinDoseMapContext.beginPath();
+        _this.skinDoseMapContext.moveTo(_this.leftBackBoundary, 0);
+        _this.skinDoseMapContext.lineTo(_this.leftBackBoundary, _this.skinDoseMapCanvas.height-1);
+        _this.skinDoseMapContext.stroke();
 
-        this.skinDoseMapContext.beginPath();
-        this.skinDoseMapContext.moveTo(this.backRightBoundary, 0);
-        this.skinDoseMapContext.lineTo(this.backRightBoundary, this.skinDoseMapCanvas.height-1);
-        this.skinDoseMapContext.stroke();
+        _this.skinDoseMapContext.beginPath();
+        _this.skinDoseMapContext.moveTo(_this.backRightBoundary, 0);
+        _this.skinDoseMapContext.lineTo(_this.backRightBoundary, _this.skinDoseMapCanvas.height-1);
+        _this.skinDoseMapContext.stroke();
     }
 
 
     this.resizeSkinDoseMap = resizeSkinDoseMap;
+    /**
+     * Internal function to resize the skin dose map
+     */
     function resizeSkinDoseMap() {
-        this.skinDoseMapCanvas.width = this.skinDoseMapWidth * this.mag;
-        this.skinDoseMapCanvas.height = this.skinDoseMapHeight * this.mag;
+        var _this = this;
+        _this.skinDoseMapCanvas.width = _this.skinDoseMapWidth * _this.mag;
+        _this.skinDoseMapCanvas.height = _this.skinDoseMapHeight * _this.mag;
     }
 
 
     this.reset = reset;
+    /**
+     * Internal function to reset the skin dose map
+     */
     function reset() {
-        this.updateWindowWidth(this.maxDose - this.minDose);
-        this.updateWindowLevel(this.minDose + (this.windowWidth / 2.0));
+        var _this = this;
+        _this.updateWindowWidth(_this.maxDose - _this.minDose);
+        _this.updateWindowLevel(_this.minDose + (_this.windowWidth / 2.0));
     }
 
 
     this.toggleOverlay = toggleOverlay;
+    /**
+     * Internal function to toggle the display of the overlay
+     */
     function toggleOverlay() {
-        this.showOverlay = this.showOverlay ? this.showOverlay = false : this.showOverlay = true;
+        var _this = this;
+        _this.showOverlay = _this.showOverlay ? _this.showOverlay = false : _this.showOverlay = true;
 
-        if (this.showOverlay) {
-            this.drawOverlay();
+        if (_this.showOverlay) {
+            _this.drawOverlay();
         } else {
-            this.draw();
+            _this.draw();
         }
     }
 
 
     this.updateWindowLevel = updateWindowLevel;
+    /**
+     * Internal function to update the window level
+     * @param newWindowLevel
+     */
     function updateWindowLevel(newWindowLevel) {
+        var _this = this;
         if (newWindowLevel < 0) newWindowLevel = 0;
-        this.windowLevel = parseFloat(newWindowLevel);
+        _this.windowLevel = parseFloat(newWindowLevel);
 
-        this.minDisplayedDose = this.windowLevel - (this.windowWidth / 2.0);
-        this.maxDisplayedDose = this.windowLevel + (this.windowWidth / 2.0);
+        _this.minDisplayedDose = _this.windowLevel - (_this.windowWidth / 2.0);
+        _this.maxDisplayedDose = _this.windowLevel + (_this.windowWidth / 2.0);
     }
 
 
     this.updateWindowWidth = updateWindowWidth;
+    /**
+     * Internal function to update the window width
+     * @param newWindowWidth
+     */
     function updateWindowWidth(newWindowWidth) {
-        this.windowWidth = newWindowWidth;
+        var _this = this;
+        _this.windowWidth = newWindowWidth;
 
-        this.minDisplayedDose = this.windowLevel - (this.windowWidth / 2.0);
-        this.maxDisplayedDose = this.windowLevel + (this.windowWidth / 2.0);
+        _this.minDisplayedDose = _this.windowLevel - (_this.windowWidth / 2.0);
+        _this.maxDisplayedDose = _this.windowLevel + (_this.windowWidth / 2.0);
     }
 
 
     this.updateMinDisplayedDose = updateMinDisplayedDose;
+    /**
+     * Internal function to update the minimum displayed dose
+     * @param minDisplayedDose
+     */
     function updateMinDisplayedDose(minDisplayedDose) {
+        var _this = this;
         minDisplayedDose = parseFloat(minDisplayedDose);
         
-        if (minDisplayedDose <= this.minDose) {
-            minDisplayedDose = this.minDose;
+        if (minDisplayedDose <= _this.minDose) {
+            minDisplayedDose = _this.minDose;
         }
-        else if (minDisplayedDose >= this.maxDose) {
-            minDisplayedDose = this.maxDose;
+        else if (minDisplayedDose >= _this.maxDose) {
+            minDisplayedDose = _this.maxDose;
         }
 
-        this.minDisplayedDose = minDisplayedDose;
+        _this.minDisplayedDose = minDisplayedDose;
 
         // Prevent the minDisplatedDose exceeding the maxDisplayedDose
-        if (minDisplayedDose >= this.maxDisplayedDose) {
-            this.maxDisplayedDose = minDisplayedDose;
+        if (minDisplayedDose >= _this.maxDisplayedDose) {
+            _this.maxDisplayedDose = minDisplayedDose;
         }
 
-        this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
-        this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
+        _this.windowWidth = _this.maxDisplayedDose - _this.minDisplayedDose;
+        _this.windowLevel = _this.minDisplayedDose + (_this.windowWidth / 2.0);
     }
 
 
     this.updateMaxDisplayedDose = updateMaxDisplayedDose;
+    /**
+     * Internal function to update the maximum displayed dose
+     * @param maxDisplayedDose
+     */
     function updateMaxDisplayedDose(maxDisplayedDose) {
+        var _this = this;
         maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-        if (maxDisplayedDose <= this.minDose) {
-            maxDisplayedDose = this.minDose;
+        if (maxDisplayedDose <= _this.minDose) {
+            maxDisplayedDose = _this.minDose;
         }
-        else if (maxDisplayedDose >= this.maxDose) {
-            maxDisplayedDose = this.maxDose;
+        else if (maxDisplayedDose >= _this.maxDose) {
+            maxDisplayedDose = _this.maxDose;
         }
 
-        this.maxDisplayedDose = maxDisplayedDose;
+        _this.maxDisplayedDose = maxDisplayedDose;
 
         // Prevent the maxDisplatedDose being smaller than the minDisplayedDose
-        if (maxDisplayedDose <= this.minDisplayedDose) {
-            this.minDisplayedDose = maxDisplayedDose;
+        if (maxDisplayedDose <= _this.minDisplayedDose) {
+            _this.minDisplayedDose = maxDisplayedDose;
         }
 
-        this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
-        this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
+        _this.windowWidth = _this.maxDisplayedDose - _this.minDisplayedDose;
+        _this.windowLevel = _this.minDisplayedDose + (_this.windowWidth / 2.0);
     }
 
 
-    this.updateMinDisplayedDoseManual = updateMinDisplayedDose;
-    function updateMinDisplayedDose(minDisplayedDose) {
+    this.updateMinDisplayedDoseManual = updateMinDisplayedDoseManual;
+    /**
+     * Internal function to update the minimum displayed dose
+     * @param minDisplayedDose
+     */
+    function updateMinDisplayedDoseManual(minDisplayedDose) {
+        var _this = this;
         minDisplayedDose = parseFloat(minDisplayedDose);
 
-        this.minDisplayedDose = minDisplayedDose;
+        _this.minDisplayedDose = minDisplayedDose;
 
         // Prevent the minDisplatedDose exceeding the maxDisplayedDose
-        if (minDisplayedDose >= this.maxDisplayedDose) {
-            this.maxDisplayedDose = minDisplayedDose;
+        if (minDisplayedDose >= _this.maxDisplayedDose) {
+            _this.maxDisplayedDose = minDisplayedDose;
         }
 
-        this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
-        this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
+        _this.windowWidth = _this.maxDisplayedDose - _this.minDisplayedDose;
+        _this.windowLevel = _this.minDisplayedDose + (_this.windowWidth / 2.0);
     }
 
 
-    this.updateMaxDisplayedDoseManual = updateMaxDisplayedDose;
-    function updateMaxDisplayedDose(maxDisplayedDose) {
+    this.updateMaxDisplayedDoseManual = updateMaxDisplayedDoseManual;
+    /**
+     * Internal function to update the maximum displayed dose
+     * @param maxDisplayedDose
+     */
+    function updateMaxDisplayedDoseManual(maxDisplayedDose) {
+        var _this = this;
         maxDisplayedDose = parseFloat(maxDisplayedDose);
 
-        this.maxDisplayedDose = maxDisplayedDose;
+        _this.maxDisplayedDose = maxDisplayedDose;
 
         // Prevent the maxDisplatedDose being smaller than the minDisplayedDose
-        if (maxDisplayedDose <= this.minDisplayedDose) {
-            this.minDisplayedDose = maxDisplayedDose;
+        if (maxDisplayedDose <= _this.minDisplayedDose) {
+            _this.minDisplayedDose = maxDisplayedDose;
         }
 
-        this.windowWidth = this.maxDisplayedDose - this.minDisplayedDose;
-        this.windowLevel = this.minDisplayedDose + (this.windowWidth / 2.0);
+        _this.windowWidth = _this.maxDisplayedDose - _this.minDisplayedDose;
+        _this.windowLevel = _this.minDisplayedDose + (_this.windowWidth / 2.0);
     }
 
 
     this.initialise = initialise;
+    /**
+     * Internal function to initialise the skin dose map
+     * @param skinMapData
+     * @param skinMapWidth
+     * @param skinMapHeight
+     * @param phantomFlatWidth
+     * @param phantomCurvedEdgeWidth
+     */
     function initialise(skinMapData, skinMapWidth, skinMapHeight, phantomFlatWidth, phantomCurvedEdgeWidth) {
-        this.skinDoseMap = skinMapData;
-        this.skinDoseMapWidth = skinMapWidth;
-        this.skinDoseMapHeight = skinMapHeight;
-        this.minDose = Math.min.apply(null, this.skinDoseMap);
-        this.maxDose = Math.max.apply(null, this.skinDoseMap);
-        this.windowWidth = this.maxDose - this.minDose;
-        this.windowLevel = this.minDose + (this.windowWidth / 2.0);
-        this.minDisplayedDose = this.minDose;
-        this.maxDisplayedDose = this.maxDose;
+        var _this = this;
+        _this.skinDoseMap = skinMapData;
+        _this.skinDoseMapWidth = skinMapWidth;
+        _this.skinDoseMapHeight = skinMapHeight;
+        _this.minDose = Math.min.apply(null, _this.skinDoseMap);
+        _this.maxDose = Math.max.apply(null, _this.skinDoseMap);
+        _this.windowWidth = _this.maxDose - _this.minDose;
+        _this.windowLevel = _this.minDose + (_this.windowWidth / 2.0);
+        _this.minDisplayedDose = _this.minDose;
+        _this.maxDisplayedDose = _this.maxDose;
 
-        this.phantomFlatWidth = phantomFlatWidth;
-        this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
+        _this.phantomFlatWidth = phantomFlatWidth;
+        _this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
 
-        this.resizeSkinDoseMap();
-        this.updateBoundaries();
+        _this.resizeSkinDoseMap();
+        _this.updateBoundaries();
     }
 
 
     this.updateBoundaries = updateBoundaries;
+    /**
+     * Internal function to update the boundaries of the phantom sections
+     */
     function updateBoundaries () {
-        this.frontLeftBoundary = this.phantomFlatWidth * this.mag;
-        this.leftBackBoundary = this.frontLeftBoundary + (this.phantomCurvedEdgeWidth * this.mag);
-        this.backRightBoundary = this.leftBackBoundary + (this.phantomFlatWidth * this.mag);
-        this.rightFrontBoundary = this.backRightBoundary + (this.phantomCurvedEdgeWidth * this.mag);
+        var _this = this;
+        _this.frontLeftBoundary = _this.phantomFlatWidth * _this.mag;
+        _this.leftBackBoundary = _this.frontLeftBoundary + (_this.phantomCurvedEdgeWidth * _this.mag);
+        _this.backRightBoundary = _this.leftBackBoundary + (_this.phantomFlatWidth * _this.mag);
+        _this.rightFrontBoundary = _this.backRightBoundary + (_this.phantomCurvedEdgeWidth * _this.mag);
     }
 
 

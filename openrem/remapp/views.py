@@ -612,7 +612,6 @@ def rf_detail_view(request, pk=None):
     except ObjectDoesNotExist:
         SkinDoseMapCalcSettings.objects.create()
 
-    # Commented out until openSkin confirmed as working OK
     admin = {'openremversion': remapp.__version__,
              'docsversion': remapp.__docs_version__,
              'enable_skin_dose_maps': SkinDoseMapCalcSettings.objects.values_list('enable_skin_dose_maps', flat=True)[0]}
