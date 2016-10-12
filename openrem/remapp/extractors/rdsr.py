@@ -250,7 +250,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
             _xrayfilters(cont.ContentSequence, source)
-    _deviceparticipant(dataset, 'source', source)
+    _deviceparticipant(dataset, 'source', source, ch)
     try:
         source.ii_field_size = ET.fromstring(source.irradiation_event_xray_data.comment).find('iiDiameter').get(
             'SRData')
@@ -274,7 +274,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             pass
 
 
-def _irradiationeventxraydetectordata(dataset, event):  # TID 10003a
+def _irradiationeventxraydetectordata(dataset, event, ch):  # TID 10003a
     from remapp.models import IrradEventXRayDetectorData
     detector = IrradEventXRayDetectorData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
@@ -284,7 +284,7 @@ def _irradiationeventxraydetectordata(dataset, event):  # TID 10003a
             detector.target_exposure_index = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Deviation Index':
             detector.deviation_index = cont.MeasuredValueSequence[0].NumericValue
-    _deviceparticipant(dataset, 'detector', detector)
+    _deviceparticipant(dataset, 'detector', detector, ch)
     detector.save()
 
 
@@ -398,7 +398,7 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
                 pass
             event.save()
     # needs include for optional multiple person participant
-    _irradiationeventxraydetectordata(dataset, event)
+    _irradiationeventxraydetectordata(dataset, event, ch)
     _irradiationeventxraysourcedata(dataset, event, ch)
     _irradiationeventxraymechanicaldata(dataset, event)
 
