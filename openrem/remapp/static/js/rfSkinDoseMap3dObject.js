@@ -139,7 +139,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         for (x = 0; x < _this.skinDoseMapWidth; x++) {
             for (y = 0; y < _this.skinDoseMapHeight; y++) {
                 offset = _this.skinDoseMapHeight * x + y;
-                _this.skinDoseMap[offset] = skinDoseMap[_this.skinDoseMapWidth * (_this.skinDoseMapHeight - 1 - y) + x];
+                _this.skinDoseMap[offset] = skinDoseMap[_this.skinDoseMapWidth * (y) + x];
             }
         }
 

@@ -45,7 +45,7 @@ function skinDoseMapObject(skinDoseMapCanvasName, colourScaleName) {
         var x, y, dose, scaledDose;
         for (x = 0; x < _this.skinDoseMapWidth; x++) {
             for (y = 0; y < _this.skinDoseMapHeight; y++) {
-                dose = _this.skinDoseMap[(_this.skinDoseMapHeight-1 - y) * _this.skinDoseMapWidth + x];
+                dose = _this.skinDoseMap[(y) * _this.skinDoseMapWidth + x];
                 scaledDose = dose - (_this.windowLevel - (_this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
                 if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
