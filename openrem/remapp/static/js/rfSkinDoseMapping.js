@@ -360,7 +360,8 @@ $("#skinDoseMap")
         //var p = skinDoseMapObj.skinDoseMapContext.getImageData(x, y, 1, 1).data;
         var mag = skinDoseMapObj.mag;
         if (x <= this.width-1 && y <= this.height-1) {
-            var current_dose = skinDoseMapObj.skinDoseMap[(Math.floor(this.height / mag) - 1 - Math.floor(y / mag)) * Math.floor(this.width / mag) + Math.floor(x / mag)].toPrecision(2) + " Gy";
+            // var current_dose = skinDoseMapObj.skinDoseMap[(Math.floor(this.height / mag) - 1 - Math.floor(y / mag)) * Math.floor(this.width / mag) + Math.floor(x / mag)].toPrecision(2) + " Gy";
+            var current_dose = parseFloat(skinDoseMapObj.skinDoseMap[(Math.floor(y/mag)) * Math.floor(this.width/mag) + Math.floor(x/mag)]).toPrecision(2) + " Gy";
             $('[data-tooltip="skin_dose_map"]').qtip('option', 'content.text', current_dose);
         }
 
