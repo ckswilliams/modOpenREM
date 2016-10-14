@@ -38,7 +38,9 @@ class ImportMGImg(TestCase):
 
         # Test that exposure data is recorded correctly
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
-            ).irradeventxraysourcedata_set.get().exposure_time, Decimal(834))
+            ).irradeventxraysourcedata_set.get().exposure_time, Decimal(834)) # in ms
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+        ).irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(61))  # in ms
 
     def test_import_mg_img_ge_pid(self):
         """
