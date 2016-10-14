@@ -18,6 +18,8 @@
 
 from geomfunc import *
 import time
+from decimal import *
+
 
 
 def skinMap(xRay, phantom, area, refAK, kV, filterCu, Dref, tableLength, tableWidth, transmission,
@@ -42,14 +44,14 @@ def skinMap(xRay, phantom, area, refAK, kV, filterCu, Dref, tableLength, tableWi
     """
     refLength_squared = math.pow(Dref, 2)
 
-    skinMap = np.zeros((phantom.width, phantom.height))
+    skinMap = np.zeros((phantom.width, phantom.height), dtype=np.dtype(Decimal))
     focus = xRay.source
     table1 = Triangle_3(np.array([-tableWidth / 2, 0, 0]), np.array([tableWidth / 2, 0, 0]),
                         np.array([-tableWidth / 2, tableLength, 0]))
     table2 = Triangle_3(np.array([-tableWidth / 2, tableLength, 0]), np.array([tableWidth / 2, tableLength, 0]),
                         np.array([tableWidth / 2, 0, 0]))
 
-    it = np.nditer(skinMap, op_flags=['readwrite'], flags=['multi_index'])
+    it = np.nditer(skinMap, op_flags=['readwrite'], flags=['multi_index', 'refs_ok'])
 
     (myTriangle1, myTriangle2) = collimate(xRay, area, Dref)
 
@@ -90,8 +92,8 @@ def skinMap(xRay, phantom, area, refAK, kV, filterCu, Dref, tableLength, tableWi
 
                 # Calculate the dose at the skin point by correcting for distance and BSF
                 mylengthSquared = pow(myRay.length, 2)
-                it[0] = refLength_squared / mylengthSquared * refAKcor * getBSF(kV, filterCu, math.sqrt(
-                    mylengthSquared / refLength_squared))
+                it[0] = Decimal(refLength_squared / mylengthSquared * refAKcor * getBSF(kV, filterCu, math.sqrt(
+                    mylengthSquared / refLength_squared))).quantize(Decimal('0.000000001'),rounding=ROUND_HALF_UP)
 
         it.iternext()
 
@@ -171,8 +173,8 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
 
     elif encode_16_bit_colour:
         # White at 10 Gy
-        threshDose = 10.
-        totalDose = totalDose / threshDose * 65535.
+        threshDose = Decimal(10)
+        totalDose = (totalDose * Decimal(65535)) / threshDose 
 
         r, g = divmod(totalDose, 255)
         # r is the number of times 255 goes into totalDose; g is the remainder
@@ -193,8 +195,8 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
 
     else:
         # White at 10 Gy
-        threshDose = 10.
-        totalDose = totalDose / threshDose * 65535.
+        threshDose = Decimal(10)
+        totalDose = (totalDose * Decimal(65535)) / threshDose 
 
         f = open(filename, 'wb')
 
