@@ -40,7 +40,17 @@ class ImportMGImg(TestCase):
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().exposure_time, Decimal(834)) # in ms
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
-        ).irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(61))  # in ms
+            ).irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(61))  # in mA
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(51800))  # in μAs
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(29))  # in kV
+        self.assertEqual('Reciprocating grid' in set(
+            grid.xray_grid.code_meaning for grid in study.projectionxrayradiationdose_set.get(
+            ).irradeventxraydata_set.get().irradeventxraysourcedata_set.get().xraygrid_set.all()), True)
+        self.assertEqual('Focused grid' in set(
+            grid.xray_grid.code_meaning for grid in study.projectionxrayradiationdose_set.get(
+            ).irradeventxraydata_set.get().irradeventxraysourcedata_set.get().xraygrid_set.all()), True)
 
     def test_import_mg_img_ge_pid(self):
         """
