@@ -51,6 +51,11 @@ class ImportMGImg(TestCase):
         self.assertEqual('Focused grid' in set(
             grid.xray_grid.code_meaning for grid in study.projectionxrayradiationdose_set.get(
             ).irradeventxraydata_set.get().irradeventxraysourcedata_set.get().xraygrid_set.all()), True)
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraysourcedata_set.get().anode_target_material.code_meaning, 'Rhodium or Rhodium compound')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning,
+            'Rhodium or Rhodium compound')
 
     def test_import_mg_img_ge_pid(self):
         """
