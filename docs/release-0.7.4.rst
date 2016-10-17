@@ -1,6 +1,6 @@
-#######################################
-Upgrade to OpenREM 0.7.4 beta release 1
-#######################################
+########################
+Upgrade to OpenREM 0.7.4
+########################
 
 ****************
 Headline changes
@@ -14,16 +14,19 @@ Headline changes
 Upgrading an OpenREM server with no internet access
 ***************************************************
 
-Upgrade using the instructions found at :doc:`upgrade-offline`, but change the pip commands from ``openrem==0.7.1`` to
-``openrem==0.7.4b1``. :doc:`release-0.7.3` first.
+Follow the instructions to :doc:`release-0.7.0` and to :doc:`release-0.7.3` first.
+
+Then use the instructions found at :doc:`upgrade-offline` again, but this time change the pip commands from
+``openrem==0.7.1`` to ``openrem==0.7.4``.
 
 
 *************************
 Upgrading from 0.6 series
 *************************
 
-Follow the instructions to :doc:`release-0.7.0` first, then follow the instructions to :doc:`release-0.7.3`, then
-finally return to these instructions to upgrade to 0.7.4.
+Follow the instructions to :doc:`release-0.7.0` and to :doc:`release-0.7.3` first.
+
+Finally, return to these instructions to upgrade to 0.7.4.
 
 
 ****************************
@@ -50,7 +53,7 @@ Upgrading from version 0.7.3
 
 .. sourcecode:: bash
 
-    pip install openrem==0.7.4b1
+    pip install openrem==0.7.4
 
 In a shell/command window, move into the openrem folder:
 
@@ -67,7 +70,7 @@ Check for any migrations
 
     python manage.py makemigrations remapp
 
-The response should be: ``No changes detected in app 'remapp'``
+The expected response should is: ``No changes detected in app 'remapp'``
 
 Restart all the services
 ========================
