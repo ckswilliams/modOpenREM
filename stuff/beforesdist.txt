@@ -17,5 +17,5 @@ rsync -av --exclude-from='../bbOpenREM/stuff/distexclude.txt' ../bbOpenREM/ .
 cp ../bbOpenREM/stuff/0002_0_7_fresh_install_add_median.py.inactive openrem/remapp/migrations/
 
 Build:
-	python setup.py sdist
+	python setup.py sdist bdist_wheel
 
