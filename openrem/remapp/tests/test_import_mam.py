@@ -56,6 +56,16 @@ class ImportMGImg(TestCase):
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning,
             'Rhodium or Rhodium compound')
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraysourcedata_set.get().focal_spot_size, Decimal(0.30))  # in mm
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraymechanicaldata_set.get().compression_force, Decimal(50))  # not in std, recorded as presented
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraymechanicaldata_set.get().compression_thickness, Decimal(53))  # mm
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).irradeventxraysourcedata_set.get().average_glandular_dose, Decimal(1.373))  # AGD in mGy
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
+            ).entrance_exposure_at_rp, Decimal(5.071))  # in mGy
 
     def test_import_mg_img_ge_pid(self):
         """
