@@ -68,7 +68,7 @@ download them all:
 .. sourcecode:: console
 
     mkdir openremfiles
-    pip install -d openremfiles openrem==0.7.4b1
+    pip install -d openremfiles openrem==0.7.4
 
 Copy everything to the Windows machine
 --------------------------------------
@@ -102,7 +102,7 @@ In a console, navigate to the directory that your ``openremfiles`` directory is 
     pip install openremfiles\numpy‑1.11.0+mkl‑cp27-cp27m‑win_amd64.whl
     # adjusting the version number appropriately
 
-    pip install --no-index --find-links=openremfiles openrem==0.7.4b1
+    pip install --no-index --find-links=openremfiles openrem==0.7.4
 
     pip install openremfiles\edmcdonagh-pynetdicom-2da8a57b53b3.tar.gz
 
