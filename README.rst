@@ -5,12 +5,13 @@ OpenREM
 OpenREM is a Django app to extract, store and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
 
-This is a beta release (0.7.4b1) containing a few essential fixes. Non-expert users should wait for the final release
-of 0.7.4. However, feedback from testers would be very useful.
-Please review the `release notes <http://docs.openrem.org/en/release-0.7.4b1/release-0.7.4.html>`_
-for details.
+This is release 0.7.4 containing a few essential fixes. Please review the
+`release notes <http://docs.openrem.org/en/0.7.4/release-0.7.4.html>`_ for details.
 
-Full documentation can be found on Read the Docs: http://docs.openrem.org/en/release-0.7.4b1
+Full documentation can be found on Read the Docs: http://docs.openrem.org/
+
+For upgrades, please review the `version release notes <http://docs.openrem.org/en/0.7.4/release-0.7.4.html>`_. For
+fresh installs, please review the `install docs <http://docs.openrem.org/en/0.7.4/install.html>`_.
 
 Contribution of code, ideas, bug reports documentation is all welcome.
 Please feel free to fork the repository and send me pull requests. See
@@ -18,3 +19,9 @@ Please feel free to fork the repository and send me pull requests. See
 
 There is a developer demo site, which at times has a working demo of recent code, but might not, and 
 might be broken. It can be found at http://djp-openremdemo.rhcloud.com/openrem/
+
+OpenREM currently ships with charts that use the HighCharts libraries. This is free to use in a non-commercial setting.
+For other environments please contact Highcharts for licencing. For more information, please see
+`their website <http://highcharts.com>`_, or the
+`Non-Commercial FAQ <https://shop.highsoft.com/faq#Non-Commercial-0>`_.
+

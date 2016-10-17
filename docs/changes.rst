@@ -2,8 +2,8 @@
 OpenREM version history
 =======================
 
-0.7.4b1 (2016-10-04)
---------------------
+0.7.4 (2016-10-17)
+------------------
 
 * `#436`_  Install: temporary fix blocking django-filter latest version that breaks OpenREM
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al)
