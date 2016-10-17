@@ -5,7 +5,6 @@ Change the version number in
 	    release-0.x.x.rst - set to version (upgrades always need version specified)
 	    install-offline.rst (twice)
 	    upgrade-offline.rst (twice)
-	    release-n(-1) - set to fixed version
 	date and other details in changes and CHANGES
     Edit README.rst
     Edit description in setup.py between beta and release
