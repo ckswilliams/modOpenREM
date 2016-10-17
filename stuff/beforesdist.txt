@@ -2,7 +2,7 @@ Change the version number in
 	openrem/remapp/version.py
 	install instructions in the release notes where applicable
 	    install.rst - set to version for beta or versionless for release
-	    release-0.x.x.rst - set to version for beta or versionless for release
+	    release-0.x.x.rst - set to version (upgrades always need version specified)
 	    install-offline.rst (twice)
 	    upgrade-offline.rst (twice)
 	    release-n(-1) - set to fixed version
