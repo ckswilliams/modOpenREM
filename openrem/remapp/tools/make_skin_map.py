@@ -82,7 +82,7 @@ def make_skin_map(study_pk=None):
             patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid)[0] + "f" + str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]				
             patPos = patPos.upper()				
         else:
-            patPos = None
+            patPos = "HFS"
 			
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D', patPos=patPos,
                                              pat_mass=pat_mass, pat_height=pat_height,
