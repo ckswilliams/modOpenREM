@@ -70,6 +70,19 @@ For either install, just follow the defaults – no special configurations requi
 
 ..  Note::
 
+    If you encounter problems running RabbitMQ as a service under Windows then try the following::
+
+        Create c:\rabbitmq
+        From an administrator command prompt run Advanced System Properties by typing `sysdm.cpl`
+        Create a new system environment variable called RABBITMQ_BASE and set its value to `c:\rabbitmq`
+        Navigate to the folder containing the RabbitMQ commands in the command prompt and run::
+
+            rabbitmq_service.bat remove
+            rabbitmq_service.bat install
+            rabbitmq_service.bat start
+
+..  Note::
+
     Before continuing, `consider virtualenv`_
 
 Install NumPy
