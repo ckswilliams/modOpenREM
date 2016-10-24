@@ -3,15 +3,19 @@
 
 import os
 from decimal import Decimal
+from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase, RequestFactory
 from remapp.extractors import mam
 from remapp.exports.exportcsv import exportMG2excel
 from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 from remapp.tools.hash_id import hash_id
+from remapp.exports.exportviews import mgcsv1
 
 class ExportMammoCSV(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
+        self.user = User.objects.create_user(
+            username='jacob', email='jacob@…', password='top_secret')
 
     def test_export_no_ascii(self):
         """
@@ -27,5 +31,7 @@ class ExportMammoCSV(TestCase):
         studies = GeneralStudyModuleAttr.objects.all()
 
         request = self.factory.get('/openrem/exportmgcsv1/0/0/?')
-
+        request.user = self.user
+        response = mgcsv1(request)
+        print "Response is {0}".format(response)
 

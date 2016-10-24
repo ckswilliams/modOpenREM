@@ -348,7 +348,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     :type pid: bool
     
     """
-
+    print "In export MG"
     import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
