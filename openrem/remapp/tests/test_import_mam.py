@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-# test_get_values.py
+# test_import_mam.py
 
 import os
 from decimal import Decimal
