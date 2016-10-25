@@ -3,7 +3,7 @@
 
 import os
 from decimal import Decimal
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User, Group
 from django.test import TestCase, RequestFactory
 from remapp.extractors import mam
 from remapp.exports.exportcsv import exportMG2excel
@@ -16,6 +16,9 @@ class ExportMammoCSV(TestCase):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(
             username='jacob', email='jacob@…', password='top_secret')
+        eg = Group(name="exportgroup")
+        eg.save()
+        self.user.groups.add(name="exportgroup")
 
     def test_export_no_ascii(self):
         """
