@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#439`_  Charts: Added controls for plotting a series per system and calculation histogram data to each filtered view
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 
 0.7.4 (2016-10-17)
