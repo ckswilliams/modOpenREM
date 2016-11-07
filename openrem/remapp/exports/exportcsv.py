@@ -348,7 +348,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     :type pid: bool
     
     """
-    print "In export MG"
+
     import os, sys, datetime
     from tempfile import TemporaryFile
     from django.conf import settings
@@ -364,6 +364,9 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = exportMG2excel.request.id
+    # TODO: Do something proper to enable this during testing only
+    if tsk.task_id is None:
+        tsk.task_id = 1
     tsk.modality = "MG"
     tsk.export_type = "CSV export"
     datestamp = datetime.datetime.now()
