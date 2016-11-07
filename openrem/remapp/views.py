@@ -121,6 +121,8 @@ def dx_summary_list_filter(request):
                 'plotDXAcquisitionMeanDAPOverTimePeriod']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.plotSeriesPerSystem = chart_options_form.cleaned_data['plotSeriesPerSystem']
+            user_profile.plotHistograms = chart_options_form.cleaned_data['plotHistograms']
             user_profile.save()
 
         # If submit was not clicked then use the settings already stored in the user's profile
@@ -139,7 +141,9 @@ def dx_summary_list_filter(request):
                          'plotDXAcquisitionMeanmAsOverTime': user_profile.plotDXAcquisitionMeanmAsOverTime,
                          'plotDXAcquisitionMeanDAPOverTime': user_profile.plotDXAcquisitionMeanDAPOverTime,
                          'plotDXAcquisitionMeanDAPOverTimePeriod': user_profile.plotDXAcquisitionMeanDAPOverTimePeriod,
-                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
+                         'plotHistograms': user_profile.plotHistograms}
             chart_options_form = DXChartOptionsForm(form_data)
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
@@ -454,6 +458,8 @@ def rf_summary_list_filter(request):
             user_profile.plotRFStudyDAP = chart_options_form.cleaned_data['plotRFStudyDAP']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.plotSeriesPerSystem = chart_options_form.cleaned_data['plotSeriesPerSystem']
+            user_profile.plotHistograms = chart_options_form.cleaned_data['plotHistograms']
             user_profile.save()
 
         else:
@@ -461,7 +467,9 @@ def rf_summary_list_filter(request):
                          'plotRFStudyPerDayAndHour': user_profile.plotRFStudyPerDayAndHour,
                          'plotRFStudyFreq': user_profile.plotRFStudyFreq,
                          'plotRFStudyDAP': user_profile.plotRFStudyDAP,
-                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
+                         'plotHistograms': user_profile.plotHistograms}
             chart_options_form = RFChartOptionsForm(form_data)
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
@@ -735,22 +743,26 @@ def ct_summary_list_filter(request):
                 'plotCTStudyMeanDLPOverTimePeriod']
             if median_available:
                 user_profile.plotAverageChoice = chart_options_form.cleaned_data['plotMeanMedianOrBoth']
+            user_profile.plotSeriesPerSystem = chart_options_form.cleaned_data['plotSeriesPerSystem']
+            user_profile.plotHistograms = chart_options_form.cleaned_data['plotHistograms']
             user_profile.save()
 
         else:
             form_data = {'plotCharts': user_profile.plotCharts,
-                        'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
-                        'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
-                        'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
-                        'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
-                        'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
-                        'plotCTStudyFreq': user_profile.plotCTStudyFreq,
-                        'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
-                        'plotCTRequestFreq': user_profile.plotCTRequestFreq,
-                        'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
-                        'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
-                        'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
-                        'plotMeanMedianOrBoth': user_profile.plotAverageChoice}
+                         'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
+                         'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,
+                         'plotCTAcquisitionFreq': user_profile.plotCTAcquisitionFreq,
+                         'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
+                         'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
+                         'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                         'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
+                         'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                         'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
+                         'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
+                         'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
+                         'plotMeanMedianOrBoth': user_profile.plotAverageChoice,
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
+                         'plotHistograms': user_profile.plotHistograms}
             chart_options_form = CTChartOptionsForm(form_data)
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
@@ -1044,6 +1056,9 @@ def mg_summary_list_filter(request):
             user_profile.plotMGAGDvsThickness = chart_options_form.cleaned_data['plotMGAGDvsThickness']
             user_profile.plotMGkVpvsThickness = chart_options_form.cleaned_data['plotMGkVpvsThickness']
             user_profile.plotMGmAsvsThickness = chart_options_form.cleaned_data['plotMGmAsvsThickness']
+            user_profile.plotSeriesPerSystem = chart_options_form.cleaned_data['plotSeriesPerSystem']
+            # Uncomment the following line when there's at least one bar chart for mammo
+            #user_profile.plotHistograms = chart_options_form.cleaned_data['plotHistograms']
             user_profile.save()
 
         else:
@@ -1051,7 +1066,10 @@ def mg_summary_list_filter(request):
                          'plotMGStudyPerDayAndHour': user_profile.plotMGStudyPerDayAndHour,
                          'plotMGAGDvsThickness': user_profile.plotMGAGDvsThickness,
                          'plotMGkVpvsThickness': user_profile.plotMGkVpvsThickness,
-                         'plotMGmAsvsThickness': user_profile.plotMGmAsvsThickness}
+                         'plotMGmAsvsThickness': user_profile.plotMGmAsvsThickness,
+                         'plotSeriesPerSystem': user_profile.plotSeriesPerSystem}
+                         # Uncomment the following line when there's at least one bar chart for mammo
+                         #'plotHistograms': user_profile.plotHistograms}
             chart_options_form = MGChartOptionsForm(form_data)
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
