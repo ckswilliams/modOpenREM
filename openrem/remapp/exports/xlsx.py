@@ -33,6 +33,13 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 
+# LO: maybe this function can be moved to tools (as it can be reused in other exports)
+def _to_float(string_number):
+    try:
+        return float(string_number)
+    except: # TypeError
+        return None
+
 def _ct_common_get_data(exams, pid, name, patid):
     from django.core.exceptions import ObjectDoesNotExist
     from remapp.tools.get_values import return_for_export
@@ -84,9 +91,9 @@ def _ct_common_get_data(exams, pid, name, patid):
         patient_size = None
         patient_weight = None
     else:
-        patient_age_decimal = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-        patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-        patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+        patient_age_decimal = _to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal'))
+        patient_size = _to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size'))
+        patient_weight = _to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight'))
 
     try:
         exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
@@ -94,8 +101,8 @@ def _ct_common_get_data(exams, pid, name, patid):
         total_number_of_irradiation_events = None
         ct_dose_length_product_total = None
     else:
-        total_number_of_irradiation_events = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events')
-        ct_dose_length_product_total = return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total')
+        total_number_of_irradiation_events = int(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events'))
+        ct_dose_length_product_total = _to_float(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total'))
 
     examdata = []
     if pid and name:
@@ -134,25 +141,25 @@ def _ct_get_series_data(s):
     from django.core.exceptions import ObjectDoesNotExist
     from remapp.tools.get_values import return_for_export
     seriesdata = [
-        s.acquisition_protocol,
+        str(s.acquisition_protocol),
         str(s.ct_acquisition_type),
-        str(s.exposure_time),
-        str(s.scanninglength_set.get().scanning_length),
-        str(s.nominal_single_collimation_width),
-        str(s.nominal_total_collimation_width),
-        str(s.pitch_factor),
-        str(s.number_of_xray_sources),
-        str(s.mean_ctdivol),
-        str(s.dlp),
+        s.exposure_time,
+        s.scanninglength_set.get().scanning_length,
+        s.nominal_single_collimation_width,
+        s.nominal_total_collimation_width,
+        s.pitch_factor,
+        s.number_of_xray_sources,
+        s.mean_ctdivol,
+        s.dlp,
         ]
     if s.number_of_xray_sources > 1:
         for source in s.ctxraysourceparameters_set.all():
             seriesdata += [
                 str(source.identification_of_the_xray_source),
-                str(source.kvp),
-                str(source.maximum_xray_tube_current),
-                str(source.xray_tube_current),
-                str(source.exposure_time_per_rotation),
+                source.kvp,
+                source.maximum_xray_tube_current,
+                source.xray_tube_current,
+                source.exposure_time_per_rotation,
                 ]
     else:
         try:
@@ -166,10 +173,10 @@ def _ct_get_series_data(s):
                 exposure_time_per_rotation = None
             else:
                 identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(), 'identification_of_the_xray_source')
-                kvp = return_for_export(s.ctxraysourceparameters_set.get(), 'kvp')
-                maximum_xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current')
-                xray_tube_current = return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current')
-                exposure_time_per_rotation = return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation')
+                kvp = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
+                maximum_xray_tube_current = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current'))
+                xray_tube_current = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current'))
+                exposure_time_per_rotation = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation'))
 
             seriesdata += [
                 identification_of_the_xray_source,
@@ -230,7 +237,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         tmpxlsx = TemporaryFile()
         book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
-                                 'strings_to_numbers':  True})
+                                 'strings_to_numbers':  False})
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
@@ -245,6 +252,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     # Add summary sheet and all data sheet
+    # Create format for cells that should be text (independently from the possibility to read it as a number)
+    textformat = book.add_format({'num_format': '@'})
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
     date_column = 7
@@ -254,7 +263,12 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         date_column += 1
     wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
     if pid and (name or patid):
-        wsalldata.set_column(date_column+1, date_column+1, 10) # Date column
+        wsalldata.set_column(date_column+1, date_column+1, 10) # Birth date column
+    if pid and (name and patid):
+        wsalldata.set_column(1, 1, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
+    elif pid and (patid):
+        wsalldata.set_column(0, 0, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
+    wsalldata.set_column(date_column-2, date_column-2, None, textformat) # Take care AccessionNumber is inserted as text (it can look like a number with significant leading zero('s))
 
     # Some prep
     pidheadings = []
@@ -344,7 +358,12 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
             sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
             if pid and (name or patid):
-                sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, 10) # Date column
+                sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, 10) # Birth date column
+            if pid and (name and patid):
+                sheetlist[tabtext]['sheet'].set_column(1, 1, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
+            elif pid and (patid):
+                sheetlist[tabtext]['sheet'].set_column(0, 0, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
+            sheetlist[tabtext]['sheet'].set_column(date_column-2, date_column-2, None, textformat) # Take care AccessionNumber is inserted as text (it can look like a number with significant leading zero('s))
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -383,7 +402,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
+    #LO (commented next line): I think that it was already arranged for on line 264
+    #wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed. 
     numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 8
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
@@ -416,7 +436,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
 
         wsalldata.write_row(row+1,0, allexamdata)
-
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
