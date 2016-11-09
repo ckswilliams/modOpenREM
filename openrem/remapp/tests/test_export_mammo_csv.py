@@ -47,10 +47,3 @@ class ExportMammoCSV(TestCase):
         self.assertTrue(os.path.isfile(task.filename.path))
         self.assertEqual(hashlib.sha256(open(task.filename.path, 'rb').read()).hexdigest(), file_sha256)
 
-        # studies = GeneralStudyModuleAttr.objects.all()
-
-        # request = self.factory.get('/openrem/exportmgcsv1/0/0/?')
-        # request.user = self.user
-        # response = mgcsv1(request)
-        # print "Response is {0}".format(response)
-

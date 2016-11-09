@@ -360,6 +360,14 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from remapp.tools.get_values import return_for_export, export_safe
     from django.core.exceptions import ObjectDoesNotExist
+    from celery import current_task
+
+    if not current_task:
+        print "Not current task"
+    else:
+        print "Current task is {0}".format(current_task)
+        print "Current task request ID is {0}".format(current_task.request.id)
+        print "wxportMG2excel is {0}".format(exportMG2excel)
 
     tsk = Exports.objects.create()
 
