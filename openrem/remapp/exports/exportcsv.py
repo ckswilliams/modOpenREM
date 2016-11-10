@@ -360,21 +360,12 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
     from remapp.tools.get_values import return_for_export, export_safe
     from django.core.exceptions import ObjectDoesNotExist
-    from celery import current_task
-
-    if not current_task:
-        print "Not current task"
-    else:
-        print "Current task is {0}".format(current_task)
-        print "Current task request ID is {0}".format(current_task.request.id)
-        print "wxportMG2excel is {0}".format(exportMG2excel)
+    import uuid
 
     tsk = Exports.objects.create()
-
     tsk.task_id = exportMG2excel.request.id
-    # TODO: Do something proper to enable this during testing only
-    if tsk.task_id is None:
-        tsk.task_id = 1
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = "MG"
     tsk.export_type = "CSV export"
     datestamp = datetime.datetime.now()
