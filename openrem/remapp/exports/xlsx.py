@@ -34,15 +34,10 @@ from celery import shared_task
 from django.conf import settings
 
 # LO: maybe this function can be moved to tools (as it can be reused in other exports)
-def _to_float(string_number):
-    try:
-        return float(string_number)
-    except: # TypeError
-        return None
 
 def _ct_common_get_data(exams, pid, name, patid):
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, string_to_float
 
     if pid and (name or patid):
         try:
@@ -91,9 +86,9 @@ def _ct_common_get_data(exams, pid, name, patid):
         patient_size = None
         patient_weight = None
     else:
-        patient_age_decimal = _to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal'))
-        patient_size = _to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size'))
-        patient_weight = _to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight'))
+        patient_age_decimal = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal'))
+        patient_size = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size'))
+        patient_weight = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight'))
 
     try:
         exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get()
@@ -105,7 +100,7 @@ def _ct_common_get_data(exams, pid, name, patid):
             total_number_of_irradiation_events = int(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events'))
         except TypeError:
             total_number_of_irradiation_events = None  # in case retrun_for_export returns None
-        ct_dose_length_product_total = _to_float(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total'))
+        ct_dose_length_product_total = string_to_float(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total'))
 
     examdata = []
     if pid and name:
@@ -142,7 +137,7 @@ def _ct_common_get_data(exams, pid, name, patid):
 
 def _ct_get_series_data(s):
     from django.core.exceptions import ObjectDoesNotExist
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, string_to_float
     seriesdata = [
         str(s.acquisition_protocol),
         str(s.ct_acquisition_type),
@@ -175,11 +170,15 @@ def _ct_get_series_data(s):
                 xray_tube_current = None
                 exposure_time_per_rotation = None
             else:
-                identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(), 'identification_of_the_xray_source')
-                kvp = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
-                maximum_xray_tube_current = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'maximum_xray_tube_current'))
-                xray_tube_current = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'xray_tube_current'))
-                exposure_time_per_rotation = _to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'exposure_time_per_rotation'))
+                identification_of_the_xray_source = return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                      'identification_of_the_xray_source')
+                kvp = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(), 'kvp'))
+                maximum_xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                        'maximum_xray_tube_current'))
+                xray_tube_current = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                'xray_tube_current'))
+                exposure_time_per_rotation = string_to_float(return_for_export(s.ctxraysourceparameters_set.get(),
+                                                                         'exposure_time_per_rotation'))
 
             seriesdata += [
                 identification_of_the_xray_source,
@@ -254,9 +253,10 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.num_records = e.count()
     tsk.save()
 
-    # Add summary sheet and all data sheet
     # Create format for cells that should be text (independently from the possibility to read it as a number)
     textformat = book.add_format({'num_format': '@'})
+
+    # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
     wsalldata = book.add_worksheet('All data')       
     date_column = 7
@@ -405,8 +405,6 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    #LO (commented next line): I think that it was already arranged for on line 264
-    #wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed. 
     numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 8
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
