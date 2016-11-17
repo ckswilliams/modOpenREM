@@ -101,7 +101,10 @@ def _ct_common_get_data(exams, pid, name, patid):
         total_number_of_irradiation_events = None
         ct_dose_length_product_total = None
     else:
-        total_number_of_irradiation_events = int(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events'))
+        try:
+            total_number_of_irradiation_events = int(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'total_number_of_irradiation_events'))
+        except TypeError:
+            total_number_of_irradiation_events = None  # in case retrun_for_export returns None
         ct_dose_length_product_total = _to_float(return_for_export(exams.ctradiationdose_set.get().ctaccumulateddosedata_set.get(), 'ct_dose_length_product_total'))
 
     examdata = []
