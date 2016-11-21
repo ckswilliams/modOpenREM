@@ -303,12 +303,15 @@ def _get_xray_filterinfo(xrayfilterset):
             elif 'Lead' in str(current_filter.xray_filter_material):
                 filter_material += 'Pb'
             else:
-                filter_material += str(current_filter.xray_filter_material) # LO:str for occasional case it is nonetype 
+                filter_material += str(current_filter.xray_filter_material) # Use str for occasional case it is nonetype 
             filter_material += ' | '
-            if (current_filter.xray_filter_thickness_maximum != None):
+            # return average thickness if minimum and maximum are filled, else return the only value that is filled.
+            if (current_filter.xray_filter_thickness_maximum != None) & (current_filter.xray_filter_thickness_minimum != None):
+                filter_thick += "{:1.1f}".format((float(current_filter.xray_filter_thickness_maximum + current_filter.xray_filter_thickness_minimum)/2)) + ' | ' 
+            elif (current_filter.xray_filter_thickness_maximum != None):
                 filter_thick += str(current_filter.xray_filter_thickness_maximum) + ' | '
             else:
-                filter_thick += str(current_filter.xray_filter_thickness_minimum) + ' | '   #LO: it might be that this one is filled, if maximum isn't (At least with Philips Veradius it is)
+                filter_thick += str(current_filter.xray_filter_thickness_minimum) + ' | '
         filter_material = filter_material[:-3]
         filter_thick = filter_thick[:-3]
     return filter_material, filter_thick
@@ -327,6 +330,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from django.core.files import File
     from django.shortcuts import redirect
     from django.db.models import Max, Min, Avg
+    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
@@ -354,7 +358,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
-        #messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0])) #LO: request is unresolved. Should be fixed
         return redirect('/openrem/export/')
 
     # Get the data
@@ -405,7 +409,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 anglei = None
                 angleii = None
             else:
-                anglei = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_primary_angle") #LO: is it useful to use a nested _get_db_value. We already tested "irradeventxraymechanicaldata_set" exists (if it didn't the set would raise an error)
+                anglei = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_primary_angle")
                 angleii = _get_db_value(_get_db_value(inst[0], "irradeventxraymechanicaldata_set").get(), "positioner_secondary_angle")
 
             try:
@@ -413,11 +417,13 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             except ObjectDoesNotExist:
                 pulse_rate = None
                 fieldsize = None
+                filter_material = None
+                filter_thick = None
             else:
                 pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
                 fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
+                filter_material, filter_thick = _get_xray_filterinfo(inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all())
 
-            filter_material, filter_thick = _get_xray_filterinfo(_get_db_value(_get_db_value(inst[0], 'irradeventxraysourcedata_set').get(), 'xrayfilters_set').all())
             protocol = _get_db_value(inst[0], "acquisition_protocol")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
 
@@ -440,12 +446,12 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             if pulse_rate:
                 similarexposures = similarexposures.filter(
                     irradeventxraysourcedata__pulse_rate__exact = pulse_rate)
-            #if filter_material:            # LO: Seems not to be used.
-            #    similarexposures = similarexposures.filter(
-            #        irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = filter_material)
-            #if filter_thick:
-            #    similarexposures = similarexposures.filter(
-            #        irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = filter_thick)
+            if filter_material:
+                for xray_filter in inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                    similarexposures = similarexposures.filter(
+                        irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = xray_filter.xray_filter_material)
+                    similarexposures = similarexposures.filter(
+                        irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = xray_filter.xray_filter_thickness_maximum)
             if event_type:
                 similarexposures = similarexposures.filter(
                     irradiation_event_type__code_meaning__exact = event_type)
@@ -541,7 +547,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
             'G' + str(h+1) + ' Filter material',
-            'G' + str(h+1) + ' Filter thickness',
+            'G' + str(h+1) + ' Filter thickness (average)',
             'G' + str(h+1) + ' kVp min',
             'G' + str(h+1) + ' kVp max',
             'G' + str(h+1) + ' kVp mean',
@@ -658,11 +664,9 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     except:
                         pos_primary_angle = None
                         pos_secondary_angle = None
-                    try:
-                        filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get().xrayfilters_set.all())
-                    except:
-                        filter_material = None
-                        filter_thick = None
+                        # It seems all() never throws an exception (emperically and search on internet)
+                        # "After calling all() on either object, you'll definitely have a QuerySet to work with." (https://docs.djangoproject.com/en/1.10/ref/models/querysets/#all)
+                    filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get().xrayfilters_set.all()) 
                 except:
                     # if we get here, all parameters under irradeventxraysourcedata are not available
                     pulse_rate = None
@@ -800,6 +804,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from tempfile import TemporaryFile
     from django.core.files import File
     from django.shortcuts import redirect
+    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
@@ -828,7 +833,7 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = 'CSV file created'
         tsk.save()
     except:
-        #messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0])) #LO: request is unresolved. Should be fixed
         return redirect('/openrem/export/')
 
     # Get the data!
