@@ -3,14 +3,11 @@
 
 import hashlib
 import os
-from decimal import Decimal
-from django.contrib.auth.models import AnonymousUser, User, Group
+from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
 from remapp.extractors import mam
 from remapp.exports.exportcsv import exportMG2excel
-from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, Exports
-from remapp.tools.hash_id import hash_id
-from remapp.exports.exportviews import mgcsv1
+from remapp.models import PatientIDSettings, Exports
 
 class ExportMammoCSV(TestCase):
     def setUp(self):
