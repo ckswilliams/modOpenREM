@@ -22,7 +22,8 @@ requires = [
     'python-dateutil',
     'django-solo',
     'django-crispy-forms',
-    'pandas'
+    'pandas',
+    'xlrd',
     ]
 
 setup(
