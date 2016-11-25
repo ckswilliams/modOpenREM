@@ -219,10 +219,13 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import ct_acq_filter
+    import uuid
 
     tsk = Exports.objects.create()
 
     tsk.task_id = ctxlsx.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = "CT"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
