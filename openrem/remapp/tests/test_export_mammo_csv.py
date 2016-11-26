@@ -27,6 +27,11 @@ class ExportMammoCSV(TestCase):
 
         mam(dicom_path)
 
+    def test_export_no_ascii(self):
+        """
+
+        """
+
         filter_set = ""
         pid = False
         name = False
@@ -34,21 +39,26 @@ class ExportMammoCSV(TestCase):
 
         exportMG2excel(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
 
-
-    def test_export_no_ascii(self):
-        """
-
-        """
-
         task = Exports.objects.all()[0]
         file_sha256 = '6a7f762a4cb67068f9150489f76eae89dbc21ca4748e1d9427c5d750df97754a'
 
         self.assertTrue(os.path.isfile(task.filename.path))
         self.assertEqual(hashlib.sha256(open(task.filename.path, 'rb').read()).hexdigest(), file_sha256)
 
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+        task.delete()  # not necessary, by hey, why not?
+
     def test_all_values(self):
         import pandas as pd
-        import numpy as np
+
+        filter_set = ""
+        pid = False
+        name = False
+        patient_id = False
+
+        exportMG2excel(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
         task = Exports.objects.all()[0]
         csvdf = pd.read_csv(task.filename.path)
 
@@ -74,3 +84,7 @@ class ExportMammoCSV(TestCase):
                 self.assertEqual(csvdf[col][0], refdf[col][0])
             else:  # assume all other values are numbers
                 self.assertAlmostEqual(csvdf[col][0], float(refdf[col][0]))
+
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+        task.delete()  # not necessary, by hey, why not?
