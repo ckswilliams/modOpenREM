@@ -65,6 +65,9 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
+# Default date format for exporting to Excel xlsx spreadsheets - use Excel codes, override it in local_settings.py
+XLSX_DATE = 'dd/mm/yyyy'
+
 #
 # MEDIA_ROOT filepath has been moved to local_settings.py
 #
