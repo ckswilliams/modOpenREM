@@ -40,6 +40,7 @@ Contents:
     troubleshooting
     code
     releasenotes
+    testgraphviz
 
 ******************
 Indices and tables
