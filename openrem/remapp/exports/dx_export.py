@@ -378,10 +378,13 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.tools.get_values import return_for_export
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
+    import uuid
 
     tsk = Exports.objects.create()
 
     tsk.task_id = dxxlsx.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = "DX"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()

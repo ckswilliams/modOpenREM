@@ -48,10 +48,9 @@ class ExportDXxlsx(TestCase):
         import pandas as pd
         task = Exports.objects.all()[0]
         all_data_sheet = pd.read_excel(task.filename.path, sheetname='All data')
-        self.assertEqual(all_data_sheet['Patient ID'][1], '00001234')
-        self.assertEqual(all_data_sheet['Accession number'][0], '001234512345678')
-        self.assertEqual(all_data_sheet['Accession number'][1], '0012345.12345678')
+        self.assertEqual(all_data_sheet['Patient ID'][0], '00098765')
+        self.assertEqual(all_data_sheet['Accession number'][0], '00938475')
 
         # cleanup
-        # task.filename.delete()  # delete file so local testing doesn't get too messy!
-        # task.delete()  # not necessary, by hey, why not?
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+        task.delete()  # not necessary, by hey, why not?
