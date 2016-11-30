@@ -19,9 +19,9 @@ Testing GraphViz
       pacs -> conquest;
       conquest -> storage -> conquest_script;
 
-      modality [shape=box, label="X-ray imaging modality"];
+      modality [shape=box, label="X-ray imaging\nmodality"];
       pacs [shape=box, label="PACS via OpenREM\nquery-retrieve"];
-      conquest [label="DICOM StoreSCP (Conquest)"];
+      conquest [label="DICOM StoreSCP\n(Conquest)"];
       storage [shape=box, label="DICOM objects stored\non server temporarily"];
       conquest_script [label="Apply dicom.ini rules\nto the DICOM object"];
       populate_database [label="Extract information from\nthe DICOM object to the\nOpenREM database"];
