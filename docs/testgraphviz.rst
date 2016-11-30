@@ -9,7 +9,10 @@ Testing GraphViz
          style=filled;
          color=lightgrey;
          conquest_script -> populate_database -> delete_object;
-         label = "Apply Conquest rules"
+         label = "Apply Conquest rules";
+         fontsize=10;
+         labelloc=t;
+         labeljust=l;
       }
 
       modality -> conquest;
