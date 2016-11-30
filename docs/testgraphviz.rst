@@ -8,14 +8,13 @@ Testing GraphViz
          node [style=filled,color=white];
          style=filled;
          color=lightgrey;
-         conquest_script -> populate_database -> delete object;
+         conquest_script -> populate_database -> delete_object;
          label = "Apply Conquest rules"
       }
 
       modality -> conquest;
       pacs -> conquest;
-      conquest -> storage;
-      conquest -> conquest_script;
+      conquest -> storage -> conquest_script;
 
       modality [shape=box, label="X-ray imaging modality"];
       pacs [shape=box, label="PACS via OpenREM query-retrieve"];
