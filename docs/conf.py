@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'celery.contrib.sphinx',
     'sphinx.ext.napoleon',
+    'sphinx.ext.graphviz',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
