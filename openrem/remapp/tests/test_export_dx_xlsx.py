@@ -48,6 +48,7 @@ class ExportDXxlsx(TestCase):
         import pandas as pd
         task = Exports.objects.all()[0]
         all_data_sheet = pd.read_excel(task.filename.path, sheetname='All data')
+        self.assertAlmostEqual(all_data_sheet['E1 Exposure index'][0], 51.745061)
         self.assertEqual(all_data_sheet['Patient ID'][0], '00098765')
         self.assertEqual(all_data_sheet['Accession number'][0], '00938475')
 
