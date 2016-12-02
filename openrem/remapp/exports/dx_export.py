@@ -375,7 +375,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, string_to_float
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
     import uuid
@@ -400,8 +400,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
-                                 'strings_to_numbers':  True})
+        book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE, 'strings_to_numbers': True})
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
@@ -564,7 +563,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for row, exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
+        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(
+            row + 1, numrows)
         tsk.save()
 
         if pid and (name or patid):

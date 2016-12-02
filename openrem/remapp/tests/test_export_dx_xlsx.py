@@ -45,12 +45,24 @@ class ExportDXxlsx(TestCase):
 
         dxxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
 
-        import pandas as pd
+        import xlrd
         task = Exports.objects.all()[0]
-        all_data_sheet = pd.read_excel(task.filename.path, sheetname='All data')
-        self.assertAlmostEqual(all_data_sheet['E1 Exposure index'][0], 51.745061)
-        self.assertEqual(all_data_sheet['Patient ID'][0], '00098765')
-        self.assertEqual(all_data_sheet['Accession number'][0], '00938475')
+
+        book = xlrd.open_workbook(task.filename.path)
+        all_data_sheet = book.sheet_by_name('All data')
+        headers = all_data_sheet.row(0)
+
+        patient_id_col = [i for i, x in enumerate(headers) if x.value == 'Patient ID'][0]
+        accession_number_col = [i for i, x in enumerate(headers) if x.value == 'Accession number'][0]
+        exposure_index_col = [i for i, x in enumerate(headers) if x.value == 'E1 Exposure index'][0]
+
+        self.assertEqual(all_data_sheet.cell_type(1,patient_id_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(1, accession_number_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(1, exposure_index_col), xlrd.XL_CELL_NUMBER)
+
+        self.assertEqual(all_data_sheet.cell_value(1,patient_id_col), '00098765')
+        self.assertEqual(all_data_sheet.cell_value(1, accession_number_col), '00938475')
+        self.assertEqual(all_data_sheet.cell_value(1, exposure_index_col), 51.745061)
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
