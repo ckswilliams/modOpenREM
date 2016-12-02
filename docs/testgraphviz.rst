@@ -68,17 +68,17 @@ Diagram showing import of data into OpenREM
 
          conquest_script -> populate_database [label="Yes", fontcolor=darkgreen, fontsize=8, fontname="Courier"];
          populate_database -> delete_object;
-         conquest_script -> delete_object [label="No", fontcolor=red, fontsize=8, fontsize="Courier"];
+         conquest_script -> delete_object [label="No", fontcolor=red, fontsize=8, fontname="Courier"];
 
          {rank=same; populate_database, delete_object};
       }
 
-      modality -> conquest [label="Via modality\nconfiguration", fontsize=8, fontname="Courier"];
-      pacs -> conquest [label="Via OpenREM\nquery-retrieve", fontsize=8, fontname="Courier"];
+      modality -> conquest [label="via modality\lconfiguration\l", fontsize=8, fontname="Courier"];
+      pacs -> conquest [label="via OpenREM\lquery-retrieve\l", fontsize=8, fontname="Courier"];
       conquest -> conquest_script;
 
-      modality [shape=box, label="X-ray imaging\nmodality", fontname="Helvetica", tooltip="Data send from an x-ray imaging modality"];
-      pacs [shape=box, label="PACS", fontname="Helvetica", tooltip="A Picture Archiving and Communication System"];
+      modality [label="X-ray imaging\nmodality", fontname="Helvetica", tooltip="Data send from an x-ray imaging modality"];
+      pacs [label="PACS", fontname="Helvetica", tooltip="A Picture Archiving and Communication System"];
       conquest [label="DICOM StoreSCP\n(Conquest)", fontname="Helvetica", tooltip="Conquest, acting as a DICOM storage SCP"];
       conquest_script [shape=diamond, label="Does the object contain useful data?", fontname="Helvetica", tooltip="Process the rules in dicom.ini"];
       populate_database [label="Extract information from\nthe DICOM object to the\nOpenREM database", fontname="Helvetica", tooltip="Extract data using OpenREM's python scripts"];
