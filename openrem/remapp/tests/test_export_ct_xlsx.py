@@ -45,12 +45,28 @@ class ExportCTxlsx(TestCase):
 
         ctxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
 
-        import pandas as pd
+        import xlrd
         task = Exports.objects.all()[0]
-        all_data_sheet = pd.read_excel(task.filename.path, sheetname='All data')
-        self.assertEqual(all_data_sheet['Patient ID'][1], '00001234')
-        self.assertEqual(all_data_sheet['Accession number'][0], '001234512345678')
-        self.assertEqual(all_data_sheet['Accession number'][1], '0012345.12345678')
+
+        book = xlrd.open_workbook(task.filename.path)
+        all_data_sheet = book.sheet_by_name('All data')
+        headers = all_data_sheet.row(0)
+
+        patient_id_col = [i for i, x in enumerate(headers) if x.value == 'Patient ID'][0]
+        accession_number_col = [i for i, x in enumerate(headers) if x.value == 'Accession number'][0]
+        dlp_total_col = [i for i, x in enumerate(headers) if x.value == 'DLP total (mGy.cm)'][0]
+
+        self.assertEqual(all_data_sheet.cell_type(1, patient_id_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(2, patient_id_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(1, accession_number_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(2, accession_number_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(1, dlp_total_col), xlrd.XL_CELL_NUMBER)
+
+        self.assertEqual(all_data_sheet.cell_value(1, patient_id_col), '008F/g234')
+        self.assertEqual(all_data_sheet.cell_value(2, patient_id_col), '00001234')
+        self.assertEqual(all_data_sheet.cell_value(1, accession_number_col), '001234512345678')
+        self.assertEqual(all_data_sheet.cell_value(2, accession_number_col), '0012345.12345678')
+        self.assertEqual(all_data_sheet.cell_value(1, dlp_total_col), 2002.39)
 
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!

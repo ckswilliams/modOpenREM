@@ -56,11 +56,11 @@ class ExportDXxlsx(TestCase):
         accession_number_col = [i for i, x in enumerate(headers) if x.value == 'Accession number'][0]
         exposure_index_col = [i for i, x in enumerate(headers) if x.value == 'E1 Exposure index'][0]
 
-        self.assertEqual(all_data_sheet.cell_type(1,patient_id_col), xlrd.XL_CELL_TEXT)
+        self.assertEqual(all_data_sheet.cell_type(1, patient_id_col), xlrd.XL_CELL_TEXT)
         self.assertEqual(all_data_sheet.cell_type(1, accession_number_col), xlrd.XL_CELL_TEXT)
         self.assertEqual(all_data_sheet.cell_type(1, exposure_index_col), xlrd.XL_CELL_NUMBER)
 
-        self.assertEqual(all_data_sheet.cell_value(1,patient_id_col), '00098765')
+        self.assertEqual(all_data_sheet.cell_value(1, patient_id_col), '00098765')
         self.assertEqual(all_data_sheet.cell_value(1, accession_number_col), '00938475')
         self.assertEqual(all_data_sheet.cell_value(1, exposure_index_col), 51.745061)
 
