@@ -70,7 +70,7 @@ Diagram showing import of data into OpenREM
          populate_database -> delete_object;
          conquest_script -> delete_object [label="No", fontcolor=red, fontsize=8, fontname="Courier"];
 
-         {rank=same; populate_database, delete_object};
+         {rank=same; populate_database delete_object};
       }
 
       modality -> conquest [label="via modality\lconfiguration\l", fontsize=8, fontname="Courier"];
