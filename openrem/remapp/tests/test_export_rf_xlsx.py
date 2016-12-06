@@ -5,7 +5,7 @@ import hashlib
 import os
 from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
-from remapp.extractors import dx
+from remapp.extractors import rdsr
 from remapp.exports.rf_export import rfxlsx
 from remapp.models import PatientIDSettings, Exports
 
@@ -31,7 +31,7 @@ class ExportDXxlsx(TestCase):
         rf_siemens_zee = os.path.join("test_files", "RF-RDSR-Siemens-Zee.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
-        dx(os.path.join(root_tests, rf_siemens_zee))
+        rdsr(os.path.join(root_tests, rf_siemens_zee))
 
     def test_id_as_text(self):  # See https://bitbucket.org/openrem/openrem/issues/443
         filter_set = ""
@@ -50,15 +50,15 @@ class ExportDXxlsx(TestCase):
 
         patient_id_col = [i for i, x in enumerate(headers) if x.value == 'Patient ID'][0]
         accession_number_col = [i for i, x in enumerate(headers) if x.value == 'Accession number'][0]
-        exposure_index_col = [i for i, x in enumerate(headers) if x.value == 'E1 Exposure index'][0]
+        a_dose_rp_col = [i for i, x in enumerate(headers) if x.value == 'A Dose RP total'][0]
 
         self.assertEqual(all_data_sheet.cell_type(1, patient_id_col), xlrd.XL_CELL_TEXT)
         self.assertEqual(all_data_sheet.cell_type(1, accession_number_col), xlrd.XL_CELL_TEXT)
-        self.assertEqual(all_data_sheet.cell_type(1, exposure_index_col), xlrd.XL_CELL_NUMBER)
+        self.assertEqual(all_data_sheet.cell_type(1, a_dose_rp_col), xlrd.XL_CELL_NUMBER)
 
-        self.assertEqual(all_data_sheet.cell_value(1, patient_id_col), '00098765')
-        self.assertEqual(all_data_sheet.cell_value(1, accession_number_col), '00938475')
-        self.assertEqual(all_data_sheet.cell_value(1, exposure_index_col), 51.745061)
+        self.assertEqual(all_data_sheet.cell_value(1, patient_id_col), '098765')
+        self.assertEqual(all_data_sheet.cell_value(1, accession_number_col), '1234.5678')
+        self.assertEqual(all_data_sheet.cell_value(1, a_dose_rp_col), 0.00252)
 
         # cleanup
         # task.filename.delete()  # delete file so local testing doesn't get too messy!
