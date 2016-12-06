@@ -20,13 +20,13 @@ Diagram showing the OpenREM system components
          node [style=filled color=white];
 
          // Define the nodes
-         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box" style="rounded filled white"];
+         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box" style="rounded filled" color="white"];
          python_django [label="OpenREM\nDjango app" fontname="Helvetica" tooltip="Python web framework" shape="box"];
          database [label="PostgreSQL\ndatabase" fontname="Helvetica" tooltip="Relational database management system" shape="cylinder"];
          rabbitmq [label="RabbitMQ\nmessage broker" fontname="Helvetica" tooltip="Message broker" shape="box"];
          celery [label="Celery\ntask queue" fontname="Helvetica" tooltip="Asynchronous task queue" shape="polygon sides=6"];
-         skin_dose_map_data [label="Skin dose map data\ncalculation, storage, retrieval" fontname="Helvetica" tooltip="Calculate, store and retrieve skin dose map data" shape="parallelogram"];
-         server_media_folder [label="Server file storage\n(Media Home folder)" fontname="Helvetica" tooltip="File storage on the server" shape="folder"];
+         skin_dose_map_data [label="Skin dose map data\ncalculation, storage, retrieval" fontname="Helvetica" tooltip="Calculate, store and retrieve skin dose map data" shape="parallelogram" width="2.5"];
+         server_media_folder [label="Server file storage\n(Media Home folder)" fontname="Helvetica" tooltip="File storage on the server" shape="folder" width="2.5"];
          data_export [label="Data export to\nlocal file system" fontname="Helvetica" tooltip="Files are made available to the user via a web page URL" shape="box"];
 
          // Define the links between the nodes
