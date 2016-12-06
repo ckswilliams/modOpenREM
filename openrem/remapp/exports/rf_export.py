@@ -318,8 +318,8 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
-                                 'strings_to_numbers':  True})
+        book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE,
+                                 'strings_to_numbers':  False})
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
