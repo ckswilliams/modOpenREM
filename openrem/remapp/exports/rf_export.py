@@ -296,10 +296,13 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
+    import uuid
 
     tsk = Exports.objects.create()
 
     tsk.task_id = rfxlsx.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = "RF"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
