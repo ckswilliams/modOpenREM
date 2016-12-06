@@ -7,7 +7,7 @@ Diagram showing the OpenREM system components
 .. graphviz::
 
    digraph {
-      node [fixedsize=true width=0.75];
+      node [fixedsize=true width=1.5];
 
       // Define the things on the server
       subgraph cluster_server {
