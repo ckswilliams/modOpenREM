@@ -47,5 +47,6 @@ Many people have contributed to OpenREM - either with code, documentation, bugs,
 * `Eivind Larsen <https://bitbucket.org/leivind>`_
 * `John Loveland <https://bitbucket.org/JLMPO/>`_
 * `Ed McDonagh <https://bitbucket.org/edmcdonagh>`_
+* `Luuk Oostveen <https://bitbucket.org/LuukO>`_
 * `David Platten <https://bitbucket.org/dplatten>`_
-*  Erik-Jan Rijkhorst
+* `Erik-Jan Rijkhorst <https://bitbucket.org/rijkhorst>`_
