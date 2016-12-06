@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
 * `#440`_  Charts: Fixed a bug in sorting.js so that undefined strings are handled correctly
 * `#439`_  Charts: Added controls for plotting a series per system and calculation histogram data to each filtered view
@@ -982,3 +983,4 @@ Reopened issue
 
 ..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
+..  _@LuukO: https://bitbucket.org/LuukO/
