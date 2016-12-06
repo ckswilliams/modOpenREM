@@ -7,6 +7,7 @@ Diagram showing the OpenREM system components
 .. graphviz::
 
    digraph {
+      node [fixedsize=true width=0.75];
 
       // Define the things on the server
       subgraph cluster_server {
@@ -19,7 +20,7 @@ Diagram showing the OpenREM system components
          node [style=filled color=white];
 
          // Define the nodes
-         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box" style="rounded"];
+         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box" style="rounded filled white"];
          python_django [label="OpenREM\nDjango app" fontname="Helvetica" tooltip="Python web framework" shape="box"];
          database [label="PostgreSQL\ndatabase" fontname="Helvetica" tooltip="Relational database management system" shape="cylinder"];
          rabbitmq [label="RabbitMQ\nmessage broker" fontname="Helvetica" tooltip="Message broker" shape="box"];
@@ -78,7 +79,7 @@ Diagram showing import of data into OpenREM
       conquest -> conquest_script;
 
       modality [label="X-ray imaging\nmodality" fontname="Helvetica" tooltip="Data send from an x-ray imaging modality" shape="box" style="rounded"];
-      pacs [label="PACS" fontname="Helvetica" tooltip="A Picture Archiving and Communication System"];
+      pacs [label="PACS" fontname="Helvetica" tooltip="A Picture Archiving and Communication System" shape="parallelogram"];
       conquest [label="DICOM StoreSCP\n(Conquest)" fontname="Helvetica" tooltip="Conquest, acting as a DICOM storage SCP" shape="box"];
       conquest_script [shape=diamond label="Does the object contain useful data?" fontname="Helvetica" tooltip="Process the rules in dicom.ini"];
       populate_database [label="Extract information from\nthe DICOM object to the\nOpenREM database" fontname="Helvetica", tooltip="Extract data using OpenREM's python scripts" shape="box"];
