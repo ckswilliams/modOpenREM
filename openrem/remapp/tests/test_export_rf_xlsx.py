@@ -61,5 +61,5 @@ class ExportDXxlsx(TestCase):
         self.assertEqual(all_data_sheet.cell_value(1, a_dose_rp_col), 0.00252)
 
         # cleanup
-        # task.filename.delete()  # delete file so local testing doesn't get too messy!
-        # task.delete()  # not necessary, by hey, why not?
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+        task.delete()  # not necessary, by hey, why not?
