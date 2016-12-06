@@ -128,6 +128,15 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
+Customised date format in xlsx exports
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+# TODO: check csv situation
+The default date form at for OpenREM xlsx exports is dd/mm/yyyy. If you wish to customise this, uncomment the
+`XLSX_DATE` line, for example the standard US date format would be::
+
+    XLSX_DATE = 'mm/dd/yyyy'
+
 .. _local_settings_logfile:
 
 Log file

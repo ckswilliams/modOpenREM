@@ -46,6 +46,11 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
+# Date format for exporting data to Excel xlsx files.
+# Default in OpenREM is dd/mm/yyyy. Override it by uncommenting and customising below; a full list of codes is available
+# at https://msdn.microsoft.com/en-us/library/ee634398.aspx.
+# XLSX_DATE = 'mm/dd/yyyy'
+
 # Logging configuration
 # Set the log file location. The example places the log file in the media directory. Change as required - on linux
 # systems you might put these in a subdirectory of /var/log/. If you want all the logs in one file, set the filename

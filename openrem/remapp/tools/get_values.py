@@ -165,6 +165,13 @@ def return_for_export(model, field):
         return None
 
 
+def string_to_float(string_number):
+    try:
+        return float(string_number)
+    except TypeError:
+        return None
+
+
 def safe_strings(string, char_set=charset.default_encoding):
     try:
         python_char_set = charset.python_encoding[char_set]

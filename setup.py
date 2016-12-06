@@ -21,7 +21,9 @@ requires = [
     'django-qsstats-magic',
     'python-dateutil',
     'django-solo',
-    'django-crispy-forms'
+    'django-crispy-forms',
+    'pandas',
+    'xlrd',
     ]
 
 setup(
