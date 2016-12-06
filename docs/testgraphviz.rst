@@ -20,13 +20,13 @@ Diagram showing the OpenREM system components
          node [style=filled color=white];
 
          // Define the nodes
-         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box" style="rounded filled" color=white];
+         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box" style="rounded"];
          python_django [label="OpenREM\nDjango app" fontname="Helvetica" tooltip="Python web framework" shape="box"];
-         database [label="PostgreSQL\ndatabase" fontname="Helvetica" tooltip="Relational database management system" shape="cylinder"];
+         database [label="PostgreSQL\ndatabase" fontname="Helvetica" tooltip="Relational database management system" shape="parallelogram"];
          rabbitmq [label="RabbitMQ\nmessage broker" fontname="Helvetica" tooltip="Message broker" shape="box"];
          celery [label="Celery\ntask queue" fontname="Helvetica" tooltip="Asynchronous task queue" shape="polygon sides=6"];
-         skin_dose_map_data [label="Skin dose map\ndata calculation,\nstorage, retrieval" fontname="Helvetica" tooltip="Calculate, store and retrieve skin dose map data" shape="parallelogram" width="2.5"];
-         server_media_folder [label="Server file storage\n(Media Home folder)" fontname="Helvetica" tooltip="File storage on the server" shape="folder" width="2.5"];
+         skin_dose_map_data [label="Skin dose map\ndata calculation,\nstorage, retrieval" fontname="Helvetica" tooltip="Calculate, store and retrieve skin dose map data" shape="parallelogram" width="2.5" height="1.5"];
+         server_media_folder [label="Server file storage\n(Media Home folder)" fontname="Helvetica" tooltip="File storage on the server" shape="parallelogram" width="2.5"];
          data_export [label="Data export to\nlocal file system" fontname="Helvetica" tooltip="Files are made available to the user via a web page URL" shape="box"];
 
          // Define the links between the nodes
@@ -78,7 +78,7 @@ Diagram showing import of data into OpenREM
       pacs -> conquest [label="via OpenREM\lquery-retrieve\l" fontsize=8 fontname="Courier"];
       conquest -> conquest_script;
 
-      modality [label="X-ray imaging\nmodality" fontname="Helvetica" tooltip="Data send from an x-ray imaging modality" shape="box" style="rounded"];
+      modality [label="X-ray imaging\nmodality" fontname="Helvetica" tooltip="Data send from an x-ray imaging modality" shape="parallelogram"];
       pacs [label="PACS" fontname="Helvetica" tooltip="A Picture Archiving and Communication System" shape="parallelogram"];
       conquest [label="DICOM StoreSCP\n(Conquest)" fontname="Helvetica" tooltip="Conquest, acting as a DICOM storage SCP" shape="box"];
       conquest_script [shape=diamond label="Does the object contain useful data?" fontname="Helvetica" tooltip="Process the rules in dicom.ini"];
