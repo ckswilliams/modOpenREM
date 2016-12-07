@@ -61,7 +61,7 @@ Diagram showing import of data into OpenREM
       node [fixedsize=true width=2.0 height=0.75 fontsize=10 margin="0.0,0.0"];
 
       subgraph cluster_rules {
-         label = "Apply Conquest rules\nto each DICOM object";
+         label = "Server";
          node [style=filled color=white];
          style=filled;
          color=lightgrey;
@@ -73,13 +73,13 @@ Diagram showing import of data into OpenREM
          conquest_script -> populate_database [label="Yes" fontcolor=darkgreen fontsize=8 fontname="Courier"];
          populate_database -> delete_object;
          conquest_script -> delete_object [label="No" fontcolor=red fontsize=8 fontname="Courier"];
+         conquest -> conquest_script;
 
          {rank=same; populate_database delete_object};
       }
 
       modality -> conquest [label="via modality\lconfiguration\l" fontsize=8 fontname="Courier"];
       pacs -> conquest [label="via OpenREM\lquery-retrieve\l" fontsize=8 fontname="Courier"];
-      conquest -> conquest_script;
 
       modality [label="X-ray imaging\nmodality" fontname="Helvetica" tooltip="Data send from an x-ray imaging modality" shape="parallelogram"];
       pacs [label="PACS" fontname="Helvetica" tooltip="A Picture Archiving and Communication System" shape="parallelogram"];
