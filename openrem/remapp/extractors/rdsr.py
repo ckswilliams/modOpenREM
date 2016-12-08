@@ -222,6 +222,10 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
             source.pulse_rate = cont.MeasuredValueSequence[0].NumericValue
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
             source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
+        elif ((cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Frames') and
+              (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER')):
+            # Philips Allura XPer systems: Private coding scheme designator: 99PHI-IXR-XPER; [number of pulses]
+            source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
             # should be a derivation thing in here for when the no. pulses is estimated
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Duration':
             source.irradiation_duration = cont.MeasuredValueSequence[0].NumericValue
