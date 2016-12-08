@@ -54,12 +54,12 @@ Diagram showing the OpenREM system components
          populate_database -> calc_skin_dose_map;
 
          // Define the links between the two groups
-         database -> populate_database [dir=back]
+         python_django -> populate_database [dir=back]
          calc_skin_dose_map -> celery [style=dotted label="Yes" fontcolor=darkgreen fontsize=8 fontname="Courier"]
 
          // Force certain nodes to be on the same level so that the diagram looks good (hopefully)
          {rank=same; webserver conquest};
-         {rank=same; python_django database populate_database delete_object}
+         {rank=same; python_django populate_database delete_object}
       }
 
       // Define the web browser, modality and pacs nodes
