@@ -97,6 +97,6 @@ recommended DICOM Store service to use.
 3: Database
 ^^^^^^^^^^^
 PostgreSQL is the recommended database to use with OpenREM. It is the only database that OpenREM will calculate
-median values for charts with. Other databases can be used with variable capabilities; see the `Django documentation
+median values for charts with. Other databases can be used with varying capabilities; see the `Django documentation
 <https://docs.djangoproject.com/en/1.8/ref/databases/>`_ for more details. For testing only, the built-in SQLite3
 database can be used, but this is not suitable for later migration to a production database.
