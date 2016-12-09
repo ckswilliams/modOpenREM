@@ -45,6 +45,7 @@ Diagram showing the OpenREM system components
          populate_database [label="Extract information from\nthe DICOM object to the\nOpenREM database" fontname="Helvetica", tooltip="Extract data using OpenREM's python scripts" shape="box"];
          delete_object [label="Delete the DICOM object\nfrom the Conquest store" fontname="Helvetica" tooltip="Delete the DICOM object from the local store SCP" shape="box"];
          calc_skin_dose_map [shape=diamond label="Calculate\nskin dose\nmap?" fontname="Helvetica" tooltip="Calculate the skin dose map?"];
+         blank_node_1 [shape=none style=invisible];
 
          // Define the links between the DICOM store, database population and skin dose map calculation
          conquest_script -> populate_database [label="Yes" fontcolor=darkgreen fontsize=8 fontname="Courier"];
@@ -59,21 +60,23 @@ Diagram showing the OpenREM system components
 
          // Force certain nodes to be on the same level so that the diagram looks good (hopefully)
          {rank=same; webserver conquest};
-         {rank=same; python_django populate_database delete_object}
+         {rank=same; celery calc_skin_dose_map };
+         {rank=same; python_django->blank_node_1->delete_object->populate_database [style=invis]; rankdir=LR;}
       }
 
       // Define the web browser, modality and pacs nodes
       web_browser [label="Client\nweb browser" fontname="Helvetica" tooltip="The user's web browser" shape="box" style=rounded];
       modality [label="X-ray imaging\nmodality" fontname="Helvetica" tooltip="Data send from an x-ray imaging modality" shape="parallelogram"];
       pacs [label="PACS" fontname="Helvetica" tooltip="A Picture Archiving and Communication System" shape="parallelogram"];
+      blank_node_2 [label="" shape=none];
 
       // Define the links that the browser, modality and pacs have
       web_browser -> webserver [dir=both label="via user-requests\land Ajax\l" fontsize=8 fontname="Courier" tooltip="Ajax used to retrieve chart data"];
       modality -> conquest [label="via modality\lconfiguration\l" fontsize=8 fontname="Courier"];
       pacs -> conquest [label="via OpenREM\lquery-retrieve\l" fontsize=8 fontname="Courier"];
 
-      // Force the web browser, modality and pacs to be on the same level
-      {rank=same; web_browser modality pacs};
+      // Force the web browser, blank node, modality and pacs to be on the same level in a specific order
+      {rank=same; web_browser->blank_node_2->modality->pacs [style=invis]; rankdir=LR;};
    }
 
 Alternatives
