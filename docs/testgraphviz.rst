@@ -18,9 +18,9 @@ Diagram showing the OpenREM system components
          node [style=filled color=white];
 
          // Define the nodes for the data storage, display and retrieval
-         webserver [label="Apache\nweb server" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box"];
+         webserver [label="Apache\nweb server&sup1;" fontname="Helvetica" tooltip="Serve web pages to the user" shape="box"];
          python_django [label="OpenREM\nDjango app" fontname="Helvetica" tooltip="Python web framework" shape="box"];
-         database [label="PostgreSQL\ndatabase" fontname="Helvetica" tooltip="Relational database management system" shape="parallelogram"];
+         database [label="PostgreSQL\ndatabase&sup3;" fontname="Helvetica" tooltip="Relational database management system" shape="parallelogram"];
          rabbitmq [label="RabbitMQ\nmessage broker" fontname="Helvetica" tooltip="Message broker" shape="box"];
          celery [label="Celery\ntask queue" fontname="Helvetica" tooltip="Asynchronous task queue" shape="hexagon"];
          skin_dose_map_data [label="Skin dose map\ndata calculation,\nstorage, retrieval" fontname="Helvetica" tooltip="Calculate, store and retrieve skin dose map data" shape="parallelogram"];
@@ -40,7 +40,7 @@ Diagram showing the OpenREM system components
          data_export -> python_django [style=dotted dir=both];
 
          // Define the nodes for the DICOM store, database population and skin dose map calculation
-         conquest [label="DICOM StoreSCP\n(Conquest)" fontname="Helvetica" tooltip="Conquest, acting as a DICOM storage SCP" shape="box"];
+         conquest [label="DICOM StoreSCP\n(Conquest&sup2;)" fontname="Helvetica" tooltip="Conquest, acting as a DICOM storage SCP" shape="box"];
          conquest_script [shape=diamond label="Does the\nobject contain\nuseful data?" fontname="Helvetica" tooltip="Process the rules in dicom.ini"];
          populate_database [label="Extract information from\nthe DICOM object to the\nOpenREM database" fontname="Helvetica", tooltip="Extract data using OpenREM's python scripts" shape="box"];
          delete_object [label="Delete the DICOM object\nfrom the Conquest store" fontname="Helvetica" tooltip="Delete the DICOM object from the local store SCP" shape="box"];
@@ -75,3 +75,28 @@ Diagram showing the OpenREM system components
       // Force the web browser, modality and pacs to be on the same level
       {rank=same; web_browser modality pacs};
    }
+
+Alternatives
+------------
+
+1: Webservers
+^^^^^^^^^^^^^
+Apache with mod_wsgi is the recommended method of deploying OpenREM/Django. You can use other web servers, for example
+nginx. You can read more about `Apache and mod_wsgi on the Django website
+<https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/>`_ and also about other methods on the subsequent
+pages on the same site.
+
+Alternatively, a built-in web server is included that will suffice for testing purposes and getting started.
+
+2: DICOM Store node
+^^^^^^^^^^^^^^^^^^^
+Any DICOM Store can be used, as long as it can be used to call the OpenREM import script. A built-in store is
+available, but not recommended for production use. See :doc:`netdicom-nodes` for more details. Conquest is the
+recommended DICOM Store service to use.
+
+3: Database
+^^^^^^^^^^^
+PostgreSQL is the recommended database to use with OpenREM. It is the only database that OpenREM will calculate
+median values for charts with. Other databases can be used with variable capabilities; see the `Django documentation
+<https://docs.djangoproject.com/en/1.8/ref/databases/>`_ for more details. For testing only, the built-in SQLite3
+database can be used, but this is not suitable for later migration to a production database.
