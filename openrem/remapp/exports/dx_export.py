@@ -375,13 +375,16 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import return_for_export
+    from remapp.tools.get_values import return_for_export, string_to_float
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist
+    import uuid
 
     tsk = Exports.objects.create()
 
     tsk.task_id = dxxlsx.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = "DX"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
@@ -397,8 +400,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
-                                 'strings_to_numbers':  True})
+        book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE, 'strings_to_numbers': False})
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
@@ -561,7 +563,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for row, exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
+        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(
+            row + 1, numrows)
         tsk.save()
 
         if pid and (name or patid):
@@ -609,9 +612,11 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             patient_size = None
             patient_weight = None
         else:
-            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+            patient_age = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
+                                                            'patient_age_decimal'))
+            patient_size = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size'))
+            patient_weight = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
+                                                               'patient_weight'))
 
         try:
             exams.patientmoduleattr_set.get()
@@ -626,10 +631,14 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             total_number_of_radiographic_frames = None
             cgycm2 = None
         else:
-            total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
-            dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+            total_number_of_radiographic_frames = int(return_for_export(
+                exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
+                'total_number_of_radiographic_frames'))
+            dap_total = return_for_export(
+                exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
+                'dose_area_product_total')
             if dap_total:
-                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+                cgycm2 = string_to_float(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2())
             else:
                 cgycm2 = None
 
@@ -647,7 +656,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             display_name,
             exams.accession_number,
             exams.operator_name,
-            exams.study_date,  # Is a date - cell needs formatting
+            exams.study_date,
         ]
         if pid and (name or patid):
             examdata += [
@@ -678,14 +687,15 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 filter_thicknesses = None
             else:
                 exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-                average_xray_tube_current = str(s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-                exposure_time = str(s.irradeventxraysourcedata_set.get().exposure_time)
+                average_xray_tube_current = string_to_float(
+                    s.irradeventxraysourcedata_set.get().average_xray_tube_current)
+                exposure_time = string_to_float(s.irradeventxraysourcedata_set.get().exposure_time)
                 try:
                     s.irradeventxraysourcedata_set.get().kvp_set.get()
                 except ObjectDoesNotExist:
                     kvp = None
                 else:
-                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+                    kvp = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp'))
 
                 try:
                     s.irradeventxraysourcedata_set.get().exposure_set.get()
@@ -694,7 +704,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 else:
                     uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
                     if uas:
-                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                        mas = string_to_float(
+                            s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
                     else:
                         mas = None
 
@@ -736,13 +747,14 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 exposure_index = None
                 relative_xray_exposure = None
             else:
-                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
-                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+                exposure_index = string_to_float(
+                    return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index'))
+                relative_xray_exposure = string_to_float(return_for_export(
+                    s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure'))
 
-            cgycm2 = str(s.convert_gym2_to_cgycm2())
+            cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
 
-
-            entrance_exposure_at_rp = return_for_export(s, 'entrance_exposure_at_rp')
+            entrance_exposure_at_rp = string_to_float(return_for_export(s, 'entrance_exposure_at_rp'))
 
             try:
                 s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
@@ -752,10 +764,18 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 distance_source_to_isocenter = None
                 table_height_position = None
             else:
-                distance_source_to_detector = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_detector')
-                distance_source_to_entrance_surface = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_entrance_surface')
-                distance_source_to_isocenter = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_isocenter')
-                table_height_position = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'table_height_position')
+                distance_source_to_detector = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'distance_source_to_detector'))
+                distance_source_to_entrance_surface = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'distance_source_to_entrance_surface'))
+                distance_source_to_isocenter = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'distance_source_to_isocenter'))
+                table_height_position = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'table_height_position'))
 
             examdata += [
                 s.acquisition_protocol,
@@ -788,8 +808,9 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             if not protocol:
                 protocol = u'Unknown'
             tabtext = protocol.lower().replace(" ","_")
-            translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
-            tabtext = tabtext.translate(translation_table) # remove illegal characters
+            translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'),
+                                 ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
+            tabtext = tabtext.translate(translation_table)  # remove illegal characters
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
 
@@ -835,9 +856,12 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 patient_size = None
                 patient_weight = None
             else:
-                patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-                patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-                patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
+                patient_age = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
+                                                                'patient_age_decimal'))
+                patient_size = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
+                                                                 'patient_size'))
+                patient_weight = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
+                                                                   'patient_weight'))
 
             try:
                 exams.patientmoduleattr_set.get()
@@ -852,10 +876,16 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 total_number_of_radiographic_frames = None
                 cgycm2 = None
             else:
-                total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
-                dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
+                total_number_of_radiographic_frames = int(return_for_export(
+                    exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                    ).accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames'))
+                dap_total = return_for_export(
+                    exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                    ).accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
                 if dap_total:
-                    cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+                    cgycm2 = string_to_float(
+                        exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                        ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2())
                 else:
                     cgycm2 = None
 
@@ -903,14 +933,16 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 filter_thicknesses = None
             else:
                 exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-                average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
-                exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
+                average_xray_tube_current = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get(),
+                                                                              'average_xray_tube_current'))
+                exposure_time = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get(),
+                                                                  'exposure_time'))
                 try:
                     s.irradeventxraysourcedata_set.get().kvp_set.get()
                 except ObjectDoesNotExist:
                     kvp = None
                 else:
-                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+                    kvp = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp'))
 
                 try:
                     s.irradeventxraysourcedata_set.get().exposure_set.get()
@@ -919,7 +951,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 else:
                     uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
                     if uas:
-                        mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
+                        mas = string_to_float(
+                            s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
                     else:
                         mas = None
 
@@ -961,12 +994,14 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 exposure_index = None
                 relative_xray_exposure = None
             else:
-                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
-                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
+                exposure_index = string_to_float(return_for_export(s.irradeventxraydetectordata_set.get(),
+                                                                   'exposure_index'))
+                relative_xray_exposure = string_to_float(return_for_export(s.irradeventxraydetectordata_set.get(),
+                                                                           'relative_xray_exposure'))
 
-            cgycm2 = s.convert_gym2_to_cgycm2()
+            cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
 
-            entrance_exposure_at_rp = return_for_export(s, 'entrance_exposure_at_rp')
+            entrance_exposure_at_rp = string_to_float(return_for_export(s, 'entrance_exposure_at_rp'))
 
             try:
                 s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
@@ -976,10 +1011,18 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 distance_source_to_isocenter = None
                 table_height_position = None
             else:
-                distance_source_to_detector = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_detector')
-                distance_source_to_entrance_surface = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_entrance_surface')
-                distance_source_to_isocenter = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'distance_source_to_isocenter')
-                table_height_position = return_for_export(s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(), 'table_height_position')
+                distance_source_to_detector = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'distance_source_to_detector'))
+                distance_source_to_entrance_surface = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'distance_source_to_entrance_surface'))
+                distance_source_to_isocenter = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'distance_source_to_isocenter'))
+                table_height_position = string_to_float(return_for_export(
+                    s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(),
+                    'table_height_position'))
 
             examdata += [
                 s.acquisition_protocol,
@@ -1003,7 +1046,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 s.comment,
             ]
 
-            sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'],0,examdata)
+            sheetlist[tabtext]['sheet'].write_row(sheetlist[tabtext]['count'], 0, examdata)
 
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     

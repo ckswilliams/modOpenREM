@@ -34,7 +34,7 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from remapp.tools.get_values import return_for_export
+from remapp.tools.get_values import return_for_export, string_to_float
 
 logger = logging.getLogger(__name__)
 
@@ -83,22 +83,32 @@ def _get_accumulated_data(accumXrayDose):
     accum = {}
     accum['plane'] = accumXrayDose.acquisition_plane.code_meaning
     try:
-        accum['dose_area_product_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
-        accum['dose_rp_total'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_rp_total')
-        accum['reference_point_definition'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
+        accum['dose_area_product_total'] = string_to_float(return_for_export(
+            accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_area_product_total'))
+        accum['dose_rp_total'] = string_to_float(return_for_export(
+            accumXrayDose.accumintegratedprojradiogdose_set.get(), 'dose_rp_total'))
+        accum['reference_point_definition'] = return_for_export(
+            accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition_code')
         if not accum['reference_point_definition']:
-            accum['reference_point_definition'] = return_for_export(accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition')
+            accum['reference_point_definition'] = return_for_export(
+                accumXrayDose.accumintegratedprojradiogdose_set.get(), 'reference_point_definition')
     except ObjectDoesNotExist:
         accum['dose_area_product_total'] = None
         accum['dose_rp_total'] = None
         accum['reference_point_definition_code'] = None
     try:
-        accum['fluoro_dose_area_product_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_area_product_total')
-        accum['fluoro_dose_rp_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_rp_total')
-        accum['total_fluoro_time'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'total_fluoro_time')
-        accum['acquisition_dose_area_product_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_area_product_total')
-        accum['acquisition_dose_rp_total'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_rp_total')
-        accum['total_acquisition_time'] = return_for_export(accumXrayDose.accumprojxraydose_set.get(), 'total_acquisition_time')
+        accum['fluoro_dose_area_product_total'] = string_to_float(return_for_export(
+            accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_area_product_total'))
+        accum['fluoro_dose_rp_total'] = string_to_float(return_for_export(
+            accumXrayDose.accumprojxraydose_set.get(), 'fluoro_dose_rp_total'))
+        accum['total_fluoro_time'] = string_to_float(return_for_export(
+            accumXrayDose.accumprojxraydose_set.get(), 'total_fluoro_time'))
+        accum['acquisition_dose_area_product_total'] = string_to_float(return_for_export(
+            accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_area_product_total'))
+        accum['acquisition_dose_rp_total'] = string_to_float(return_for_export(
+            accumXrayDose.accumprojxraydose_set.get(), 'acquisition_dose_rp_total'))
+        accum['total_acquisition_time'] = string_to_float(return_for_export(
+            accumXrayDose.accumprojxraydose_set.get(), 'total_acquisition_time'))
     except ObjectDoesNotExist:
         accum['fluoro_dose_area_product_total'] = None
         accum['fluoro_dose_rp_total'] = None
@@ -112,7 +122,8 @@ def _get_accumulated_data(accumXrayDose):
     except ObjectDoesNotExist:
         accum['eventcount'] = None
     else:
-        accum['eventcount'] = str(accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.filter(acquisition_plane__code_meaning__exact = accum['plane']).count())
+        accum['eventcount'] = int(accumXrayDose.projection_xray_radiation_dose.irradeventxraydata_set.filter(
+            acquisition_plane__code_meaning__exact = accum['plane']).count())
 
     return accum
 
@@ -164,16 +175,19 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         patient_size = None
         patient_weight = None
     else:
-        patient_age_decimal = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-        patient_size = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_size')
-        patient_weight = return_for_export(source.patientstudymoduleattr_set.get(), 'patient_weight')
+        patient_age_decimal = string_to_float(return_for_export(
+            source.patientstudymoduleattr_set.get(), 'patient_age_decimal'))
+        patient_size = string_to_float(return_for_export(
+            source.patientstudymoduleattr_set.get(), 'patient_size'))
+        patient_weight = string_to_float(return_for_export(
+            source.patientstudymoduleattr_set.get(), 'patient_weight'))
 
     try:
         source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
     except ObjectDoesNotExist:
         eventcount = None
     else:
-        eventcount = str(source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count())
+        eventcount = int(source.projectionxrayradiationdose_set.get().irradeventxraydata_set.all().count())
 
     examdata = []
     if pid and name:
@@ -190,7 +204,7 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         return_for_export(source, 'accession_number'),
         return_for_export(source, 'operator_name'),
         return_for_export(source, 'performing_physician_name'),
-        source.study_date,  # Is a date - needs to be a datetime object for formatting
+        source.study_date,
     ]
     if pid and (name or patid):
         examdata += [
@@ -296,10 +310,13 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr, IrradEventXRayData
     from remapp.models import Exports
     from remapp.interface.mod_filters import RFSummaryListFilter, RFFilterPlusPid
+    import uuid
 
     tsk = Exports.objects.create()
 
     tsk.task_id = rfxlsx.request.id
+    if tsk.task_id is None:  # Required when testing without celery
+        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
     tsk.modality = "RF"
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
@@ -315,8 +332,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'default_date_format': 'dd/mm/yyyy',
-                                 'strings_to_numbers':  True})
+        book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE, 'strings_to_numbers':  False})
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
@@ -464,36 +480,36 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             examdata += [
                 event_type,
                 protocol,
-                str(similarexposures.count()),
-                str(plane),
-                str(pulse_rate),
-                str(fieldsize),
+                similarexposures.count(),
+                plane,
+                pulse_rate,
+                fieldsize,
                 filter_material,
-                str(filter_thick),
-                str(kvp['irradeventxraysourcedata__kvp__kvp__min']),
-                str(kvp['irradeventxraysourcedata__kvp__kvp__max']),
-                str(kvp['irradeventxraysourcedata__kvp__kvp__avg']),
-                str(tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__min']),
-                str(tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__max']),
-                str(tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__avg']),
-                str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__min']),
-                str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__max']),
-                str(pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__avg']),
-                str(exp_time['irradeventxraysourcedata__exposure_time__min']),
-                str(exp_time['irradeventxraysourcedata__exposure_time__max']),
-                str(exp_time['irradeventxraysourcedata__exposure_time__avg']),
-                str(dap['dose_area_product__min']),
-                str(dap['dose_area_product__max']),
-                str(dap['dose_area_product__avg']),
-                str(dose_rp['irradeventxraysourcedata__dose_rp__min']),
-                str(dose_rp['irradeventxraysourcedata__dose_rp__max']),
-                str(dose_rp['irradeventxraysourcedata__dose_rp__avg']),
-                str(angle1['irradeventxraymechanicaldata__positioner_primary_angle__min']),
-                str(angle1['irradeventxraymechanicaldata__positioner_primary_angle__max']),
-                str(angle1['irradeventxraymechanicaldata__positioner_primary_angle__avg']),
-                str(angle2['irradeventxraymechanicaldata__positioner_secondary_angle__min']),
-                str(angle2['irradeventxraymechanicaldata__positioner_secondary_angle__max']),
-                str(angle2['irradeventxraymechanicaldata__positioner_secondary_angle__avg']),
+                filter_thick,
+                kvp['irradeventxraysourcedata__kvp__kvp__min'],
+                kvp['irradeventxraysourcedata__kvp__kvp__max'],
+                kvp['irradeventxraysourcedata__kvp__kvp__avg'],
+                tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__min'],
+                tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__max'],
+                tube_current['irradeventxraysourcedata__xraytubecurrent__xray_tube_current__avg'],
+                pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__min'],
+                pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__max'],
+                pulse_width['irradeventxraysourcedata__pulsewidth__pulse_width__avg'],
+                exp_time['irradeventxraysourcedata__exposure_time__min'],
+                exp_time['irradeventxraysourcedata__exposure_time__max'],
+                exp_time['irradeventxraysourcedata__exposure_time__avg'],
+                dap['dose_area_product__min'],
+                dap['dose_area_product__max'],
+                dap['dose_area_product__avg'],
+                dose_rp['irradeventxraysourcedata__dose_rp__min'],
+                dose_rp['irradeventxraysourcedata__dose_rp__max'],
+                dose_rp['irradeventxraysourcedata__dose_rp__avg'],
+                angle1['irradeventxraymechanicaldata__positioner_primary_angle__min'],
+                angle1['irradeventxraymechanicaldata__positioner_primary_angle__max'],
+                angle1['irradeventxraymechanicaldata__positioner_primary_angle__avg'],
+                angle2['irradeventxraymechanicaldata__positioner_secondary_angle__min'],
+                angle2['irradeventxraymechanicaldata__positioner_secondary_angle__max'],
+                angle2['irradeventxraymechanicaldata__positioner_secondary_angle__avg'],
             ]
 
         if num_groups_this_exam > num_groups_max:
@@ -616,18 +632,18 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
                     event.acquisition_plane.code_meaning,
-                    str(event.irradeventxraysourcedata_set.get().pulse_rate),
-                    str(event.irradeventxraysourcedata_set.get().ii_field_size),
+                    event.irradeventxraysourcedata_set.get().pulse_rate,
+                    event.irradeventxraysourcedata_set.get().ii_field_size,
                     filter_material,
-                    str(event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum),
-                    str(event.irradeventxraysourcedata_set.get().kvp_set.get().kvp),
-                    str(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current),
-                    str(event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width),
-                    str(event.irradeventxraysourcedata_set.get().exposure_time),
-                    str(event.convert_gym2_to_cgycm2()),
-                    str(event.irradeventxraysourcedata_set.get().dose_rp),
-                    str(event.irradeventxraymechanicaldata_set.get().positioner_primary_angle),
-                    str(event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle),
+                    event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum,
+                    event.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
+                    event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current,
+                    event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width,
+                    event.irradeventxraysourcedata_set.get().exposure_time,
+                    event.convert_gym2_to_cgycm2(),
+                    event.irradeventxraysourcedata_set.get().dose_rp,
+                    event.irradeventxraymechanicaldata_set.get().positioner_primary_angle,
+                    event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle,
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
         tabcolumns = 49
@@ -708,12 +724,14 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(
+            e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(
+            sys.exc_info()[0])
         tsk.status = 'ERROR'
         tsk.save()
         return
