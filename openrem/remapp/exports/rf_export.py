@@ -679,7 +679,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         event.irradeventxraysourcedata_set.get().kvp_set.get()
                     except ObjectDoesNotExist:
                         kVp = None
-                    except:
+                    else:
                         kVp = _get_db_value(event.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
                     try:
                         event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get()
