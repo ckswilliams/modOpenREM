@@ -662,46 +662,47 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 sheetlist[tab]['count'] += 1
                 examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes,
                                                pid, name, patid)
-
                 try:
-                    pulse_rate = _get_db_value(event.irradeventxraysourcedata_set.get(), 'pulse_rate')
-                    ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
-                    exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
-                    dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
-                    try:
-                        kVp = _get_db_value(event.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-                    except:
-                        kVp = None
-                    try:
-                        xray_tube_current = _get_db_value(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get(), 'xray_tube_current')
-                    except:
-                        xray_tube_current = None
-                    try:
-                        pulse_width = _get_db_value(event.irradeventxraysourcedata_set.get().pulsewidth_set.get(), 'pulse_width')
-                    except:
-                        pulse_width = None
-                    try:
-                        pos_primary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_primary_angle')
-                        pos_secondary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_secondary_angle')
-                    except:
-                        pos_primary_angle = None
-                        pos_secondary_angle = None
-                        # It seems all() never throws an exception (emperically and search on internet)
-                        # "After calling all() on either object, you'll definitely have a QuerySet to work with." (https://docs.djangoproject.com/en/1.10/ref/models/querysets/#all)
-                    filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get().xrayfilters_set.all())
-                except:
-                    # if we get here, all parameters under irradeventxraysourcedata are not available
+                    event.irradeventxraysourcedata_set.get()
+                except ObjectDoesNotExist:
                     pulse_rate = None
                     ii_field_size = None
                     exposure_time = None
                     dose_rp = None
-                    kVp = None
-                    xray_tube_current = None
-                    pulse_width = None
+                else:
+                    pulse_rate = _get_db_value(event.irradeventxraysourcedata_set.get(), 'pulse_rate')
+                    ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
+                    exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
+                    dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
+                    filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get().xrayfilters_set.all())
+                    try:
+                        event.irradeventxraysourcedata_set.get().kvp_set.get()
+                    except ObjectDoesNotExist:
+                        kVp = None
+                    except:
+                        kVp = _get_db_value(event.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+                    try:
+                        event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get()
+                    except ObjectDoesNotExist:
+                        xray_tube_current = None
+                    else:
+                        xray_tube_current = _get_db_value(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get(), 'xray_tube_current')
+                    try:
+                        event.irradeventxraysourcedata_set.get().pulsewidth_set.get()
+                    except ObjectDoesNotExist:
+                        pulse_width = None
+                    else:
+                        pulse_width = _get_db_value(event.irradeventxraysourcedata_set.get().pulsewidth_set.get(), 'pulse_width')
+                try:
+                    event.irradeventxraymechanicaldata_set.get()
+                except ObjectDoesNotExist:
                     pos_primary_angle = None
                     pos_secondary_angle = None
-                    filter_material = None
-                    filter_thick = None
+                else:
+                    pos_primary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_primary_angle')
+                    pos_secondary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_secondary_angle')
+                        # It seems all() never throws an exception (emperically and search on internet)
+                        # "After calling all() on either object, you'll definitely have a QuerySet to work with." (https://docs.djangoproject.com/en/1.10/ref/models/querysets/#all)
 
                 examdata += [
                     str(event.date_time_started),
