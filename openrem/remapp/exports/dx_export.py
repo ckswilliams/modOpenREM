@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -50,9 +51,9 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import return_for_export, export_safe
+    from remapp.tools.get_values import replace_comma
     from django.db.models import Q # For the Q "OR" query used for DX and CR
-    from django.core.exceptions import ObjectDoesNotExist
+    from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
     tsk = Exports.objects.create()
 
@@ -152,63 +153,52 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     for i, exams in enumerate(e):
         if pid and (name or patid):
             try:
-                exams.patientmoduleattr_set.get()
+                patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
+                if name:
+                    patient_name = replace_comma(exams.patientmoduleattr_set.get().patient_name)
+                if patid:
+                    patient_id = replace_comma(exams.patientmoduleattr_set.get().patient_id)
             except ObjectDoesNotExist:
                 patient_birth_date = None
-                if name:
-                    patient_name = None
-                if patid:
-                    patient_id = None
-            else:
-                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
-                if name:
-                    patient_name = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
-                if patid:
-                    patient_id = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
+                patient_name = None
+                patient_id = None
         try:
-            exams.generalequipmentmoduleattr_set.get()
+            institution_name = replace_comma(exams.generalequipmentmoduleattr_set.get().institution_name)
+            manufacturer = replace_comma(exams.generalequipmentmoduleattr_set.get().manufacturer)
+            manufacturer_model_name = replace_comma(exams.generalequipmentmoduleattr_set.get().manufacturer_model_name)
+            station_name = replace_comma(exams.generalequipmentmoduleattr_set.get().station_name)
+            display_name = replace_comma(exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name)
         except ObjectDoesNotExist:
             institution_name = None
             manufacturer = None
             manufacturer_model_name = None
             station_name = None
             display_name = None
-        else:
-            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
-            manufacturer = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-            manufacturer_model_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name'))
-            station_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
-            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
         try:
-            exams.patientmoduleattr_set.get()
+            patient_sex = exams.patientmoduleattr_set.get().patient_sex
         except ObjectDoesNotExist:
             patient_sex = None
-        else:
-            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-
         try:
-            exams.patientstudymoduleattr_set.get()
+            patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
+            patient_size = exams.patientstudymoduleattr_set.get().patient_size
+            patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
         except ObjectDoesNotExist:
             patient_age = None
             patient_size = None
             patient_weight = None
-        else:
-            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
-
         try:
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+            total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
+            dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                ).accumintegratedprojradiogdose_set.get().dose_area_product_total
+            if dap_total:
+                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                    ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            else:
+                cgycm2 = None
         except ObjectDoesNotExist:
             total_number_of_radiographic_frames = None
             cgycm2 = None
-        else:
-            total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
-            dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
-            if dap_total:
-                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
-            else:
-                cgycm2 = None
 
         examdata = []
         if pid and name:
@@ -222,8 +212,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             manufacturer_model_name,
             station_name,
             display_name,
-            export_safe(exams.accession_number),
-            export_safe(exams.operator_name),
+            replace_comma(exams.accession_number),
+            replace_comma(exams.operator_name),
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -235,8 +225,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
-            export_safe(exams.study_description),
-            export_safe(exams.requested_procedure_code_meaning),
+            replace_comma(exams.study_description),
+            replace_comma(exams.requested_procedure_code_meaning),
             total_number_of_radiographic_frames,
             cgycm2,
         ]
@@ -244,43 +234,22 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
 
             try:
-                s.irradeventxraysourcedata_set.get()
-            except ObjectDoesNotExist:
-                exposure_control_mode = None
-                kvp = None
-                average_xray_tube_current = None
-                exposure_time = None
-                mas = None
-                filters = None
-                filter_thicknesses = None
-            else:
-                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-                average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
-                exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
+                exposure_control_mode = replace_comma(s.irradeventxraysourcedata_set.get().exposure_control_mode)
+                average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
+                exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
                 try:
-                    s.irradeventxraysourcedata_set.get().kvp_set.get()
+                    kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
                 except ObjectDoesNotExist:
                     kvp = None
-                else:
-                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-
                 try:
-                    s.irradeventxraysourcedata_set.get().exposure_set.get()
-                except ObjectDoesNotExist:
-                    mas = None
-                else:
-                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+                    uas = s.irradeventxraysourcedata_set.get().exposure_set.get().exposure
                     if uas:
                         mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
                     else:
                         mas = None
-
-                try:
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
                 except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
-                else:
+                    mas = None
+                try:
                     filters = ''
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
@@ -306,22 +275,32 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                         filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
+                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
+                except ObjectDoesNotExist:
+                    filters = None
+                    filter_thicknesses = None
+            except ObjectDoesNotExist:
+                exposure_control_mode = None
+                average_xray_tube_current = None
+                exposure_time = None
+                kvp = None
+                mas = None
+                filters = None
+                filter_thicknesses = None
 
             try:
-                s.irradeventxraydetectordata_set.get()
+                exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
+                relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
             except ObjectDoesNotExist:
                 exposure_index = None
                 relative_xray_exposure = None
-            else:
-                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
-                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
 
             cgycm2 = s.convert_gym2_to_cgycm2()
 
             examdata += [
-                export_safe(s.acquisition_protocol),
-                s.image_view,
-                export_safe(exposure_control_mode),
+                replace_comma(s.acquisition_protocol),
+                s.image_view.code_meaning,
+                exposure_control_mode,
                 kvp,
                 mas,
                 average_xray_tube_current,
@@ -342,7 +321,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     csvfilename = "dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
-        tsk.filename.save(csvfilename,File(tmpfile))
+        tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
         tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
