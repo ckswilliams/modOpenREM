@@ -73,7 +73,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile)
+        writer = csv.writer(tmpfile, dialect=csv.excel)
 
         tsk.progress = 'CSV file created'
         tsk.save()
@@ -99,32 +99,32 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     pidheadings = []
     if pid and name:
-        pidheadings += ['Patient name']
+        pidheadings += [u'Patient name']
     if pid and patid:
-        pidheadings += ['Patient ID']
+        pidheadings += [u'Patient ID']
     headers = pidheadings + [
-        'Institution name', 
-        'Manufacturer', 
-        'Model name',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Operator',
-        'Study date',
+        u'Institution name',
+        u'Manufacturer',
+        u'Model name',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Operator',
+        u'Study date',
     ]
     if pid and (name or patid):
         headers += [
-            'Date of birth',
+            u'Date of birth',
         ]
     headers += [
-        'Patient age',
-        'Patient sex',
-        'Patient height', 
-        'Patient mass (kg)', 
-        'Study description',
-        'Requested procedure',
-        'Number of events',
-        'DAP total (cGy.cm^2)',
+        u'Patient age',
+        u'Patient sex',
+        u'Patient height',
+        u'Patient mass (kg)',
+        u'Study description',
+        u'Requested procedure',
+        u'Number of events',
+        u'DAP total (cGy.cm^2)',
     ]
 
     from django.db.models import Max
@@ -132,22 +132,23 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         headers += [
-            'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Image view',
-            'E' + str(h+1) + ' Exposure control mode',
-            'E' + str(h+1) + ' kVp',
-            'E' + str(h+1) + ' mAs',
-            'E' + str(h+1) + ' mA',
-            'E' + str(h+1) + ' Exposure time (ms)',
-            'E' + str(h+1) + ' Filters',
-            'E' + str(h+1) + ' Filter thicknesses (mm)',
-            'E' + str(h+1) + ' Exposure index',
-            'E' + str(h+1) + ' Relative x-ray exposure',
-            'E' + str(h+1) + ' DAP (cGy.cm^2)',
+            'E' + str(h+1) + u' Protocol',
+            'E' + str(h+1) + u' Image view',
+            'E' + str(h+1) + u' Exposure control mode',
+            'E' + str(h+1) + u' kVp',
+            'E' + str(h+1) + u' mAs',
+            'E' + str(h+1) + u' mA',
+            'E' + str(h+1) + u' Exposure time (ms)',
+            'E' + str(h+1) + u' Filters',
+            'E' + str(h+1) + u' Filter thicknesses (mm)',
+            'E' + str(h+1) + u' Exposure index',
+            'E' + str(h+1) + u' Relative x-ray exposure',
+            'E' + str(h+1) + u' DAP (cGy.cm^2)',
             ]
-    writer.writerow(headers)
 
-    tsk.progress = 'CSV header row written.'
+    writer.writerow([unicode(header).encode("utf-8") for header in headers])
+
+    tsk.progress = u'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
@@ -254,25 +255,25 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                     filter_thicknesses = ''
                     for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
                         if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += 'Al'
+                            filters += u'Al'
                         elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += 'Cu'
+                            filters += u'Cu'
                         elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += 'Ta'
+                            filters += u'Ta'
                         elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += 'Mo'
+                            filters += u'Mo'
                         elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += 'Rh'
+                            filters += u'Rh'
                         elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += 'Ag'
+                            filters += u'Ag'
                         elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += 'Nb'
+                            filters += u'Nb'
                         elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += 'Eu'
+                            filters += u'Eu'
                         elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += 'Pb'
-                        filters += ' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
+                            filters += u'Pb'
+                        filters += u' | '
+                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + u' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
                     s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
@@ -299,7 +300,14 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
             examdata += [
                 replace_comma(s.acquisition_protocol),
+                ]
+            try:
+                examdata += [
                 s.image_view.code_meaning,
+                ]
+            except AttributeError:
+                pass
+            examdata += [
                 exposure_control_mode,
                 kvp,
                 mas,
@@ -312,7 +320,10 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 cgycm2,
                 ]
 
-        writer.writerow(examdata)
+        for index, item in enumerate(examdata):
+            if item is None:
+                examdata[index] = ''
+        writer.writerow([unicode(datastring).encode("utf-8") for datastring in examdata])
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
     tsk.progress = 'All study data written.'
@@ -323,12 +334,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
         tsk.status = 'ERROR'
         tsk.save()
         return
