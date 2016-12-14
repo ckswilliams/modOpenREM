@@ -263,7 +263,7 @@ def _irradiationeventxraysourcedata(dataset, event):
     if xray_filter_type:
         if xray_filter_type == 'NONE':
             _xrayfiltersnone(source)
-        elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
+        elif type(xray_filter_material) is list:
             _xray_filters_multiple(
                 xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
         else:
