@@ -51,7 +51,6 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import replace_comma
     from django.db.models import Q # For the Q "OR" query used for DX and CR
     from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
@@ -156,19 +155,19 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             try:
                 patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
                 if name:
-                    patient_name = replace_comma(exams.patientmoduleattr_set.get().patient_name)
+                    patient_name = exams.patientmoduleattr_set.get().patient_name
                 if patid:
-                    patient_id = replace_comma(exams.patientmoduleattr_set.get().patient_id)
+                    patient_id = exams.patientmoduleattr_set.get().patient_id
             except ObjectDoesNotExist:
                 patient_birth_date = None
                 patient_name = None
                 patient_id = None
         try:
-            institution_name = replace_comma(exams.generalequipmentmoduleattr_set.get().institution_name)
-            manufacturer = replace_comma(exams.generalequipmentmoduleattr_set.get().manufacturer)
-            manufacturer_model_name = replace_comma(exams.generalequipmentmoduleattr_set.get().manufacturer_model_name)
-            station_name = replace_comma(exams.generalequipmentmoduleattr_set.get().station_name)
-            display_name = replace_comma(exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name)
+            institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
+            manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
+            manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
+            station_name = exams.generalequipmentmoduleattr_set.get().station_name
+            display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
         except ObjectDoesNotExist:
             institution_name = None
             manufacturer = None
@@ -213,8 +212,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             manufacturer_model_name,
             station_name,
             display_name,
-            replace_comma(exams.accession_number),
-            replace_comma(exams.operator_name),
+            exams.accession_number,
+            exams.operator_name,
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -226,8 +225,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
-            replace_comma(exams.study_description),
-            replace_comma(exams.requested_procedure_code_meaning),
+            exams.study_description,
+            exams.requested_procedure_code_meaning,
             total_number_of_radiographic_frames,
             cgycm2,
         ]
@@ -235,7 +234,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
 
             try:
-                exposure_control_mode = replace_comma(s.irradeventxraysourcedata_set.get().exposure_control_mode)
+                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
                 average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
                 exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
                 try:
@@ -299,7 +298,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             cgycm2 = s.convert_gym2_to_cgycm2()
 
             examdata += [
-                replace_comma(s.acquisition_protocol),
+                s.acquisition_protocol,
                 ]
             try:
                 examdata += [
@@ -323,6 +322,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         for index, item in enumerate(examdata):
             if item is None:
                 examdata[index] = ''
+            if isinstance(item, basestring) and ',' in item:
+                examdata[index] = item.replace(',', ';')
         writer.writerow([unicode(datastring).encode("utf-8") for datastring in examdata])
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
