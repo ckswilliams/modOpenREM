@@ -28,6 +28,7 @@
 ..  moduleauthor:: David Platten and Ed McDonagh
 
 """
+from __future__ import division
 
 import csv
 from xlsxwriter.workbook import Workbook
@@ -139,7 +140,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + u' mA',
             'E' + str(h+1) + u' Exposure time (ms)',
             'E' + str(h+1) + u' Filters',
-            'E' + str(h+1) + u' Filter thicknesses (mm)',
+            'E' + str(h+1) + u' Filter thicknesses average (mm)',
             'E' + str(h+1) + u' Exposure index',
             'E' + str(h+1) + u' Relative x-ray exposure',
             'E' + str(h+1) + u' DAP (cGy.cm^2)',
@@ -272,7 +273,18 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                         elif 'Lead' in str(current_filter.xray_filter_material):
                             filters += u'Pb'
                         filters += u' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + u' | '
+                        thicknesses = [current_filter.xray_filter_thickness_minimum,
+                                       current_filter.xray_filter_thickness_maximum]
+                        if thicknesses[0] is not None and thicknesses[1] is not None:
+                            thick = sum(thicknesses)/len(thicknesses)
+                        elif thicknesses[0] is None and thicknesses[1] is None:
+                            thick = ''
+                        elif thicknesses[0] is not None:
+                            thick = thicknesses[0]
+                        elif thicknesses[1] is not None:
+                            thick = thicknesses[1]
+                        print "Final thickness is {0}".format(thick)
+                        filter_thicknesses += str(thick) + u' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
                     s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
