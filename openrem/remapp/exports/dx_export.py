@@ -283,7 +283,6 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                             thick = thicknesses[0]
                         elif thicknesses[1] is not None:
                             thick = thicknesses[1]
-                        print "Final thickness is {0}".format(thick)
                         filter_thicknesses += str(thick) + u' | '
                     filters = filters[:-3]
                     filter_thicknesses = filter_thicknesses[:-3]
