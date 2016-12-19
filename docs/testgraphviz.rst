@@ -4,7 +4,7 @@ Diagram showing the OpenREM system components
 .. graphviz::
 
    digraph {
-      node [fixedsize=true width=1.6 height=0.75 fontsize=8 margin="0.0,0.0"];
+      node [fixedsize=true width=2.0 height=0.75 fontsize=10 margin="0.0,0.0"];
 
       // Define the things on the server
       subgraph cluster_server {
@@ -12,7 +12,7 @@ Diagram showing the OpenREM system components
          label="OpenREM server";
          tooltip="The server";
          fontname="Helvetica-bold";
-         fontsize=14;
+         fontsize=16;
          style=filled;
          color=lightgrey;
          node [style=filled color=white];
