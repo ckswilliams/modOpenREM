@@ -3,11 +3,10 @@
 
 from __future__ import unicode_literals
 from django.test import TestCase
-from dicom.sequence import Sequence
 from dicom.dataelem import RawDataElement
 from dicom.dataset import Dataset
 from dicom.tag import Tag
-from remapp.extractors.dx import _xray_filters_multiple, _xray_filters_prep
+from remapp.extractors.dx import _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
     IrradEventXRaySourceData
 
