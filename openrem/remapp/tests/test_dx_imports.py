@@ -4,8 +4,10 @@
 from __future__ import unicode_literals
 from django.test import TestCase
 from dicom.sequence import Sequence
+from dicom.dataelem import RawDataElement
 from dicom.dataset import Dataset
-from remapp.extractors.dx import _xray_filters_multiple
+from dicom.tag import Tag
+from remapp.extractors.dx import _xray_filters_multiple, _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
     IrradEventXRaySourceData
 
@@ -14,10 +16,13 @@ class DXImportTests(TestCase):
         """
         Test the material extraction process when the materials are comma separated
         """
-        ds = Dataset()
-        FilterMaterial = "niobium,europium"
-        ds.FilterThicknessMinimum = "1.0\\0.1"
-        ds.FilterThicknessMaximum = "1.0\\0.1"
+
+        rawelemmin = RawDataElement(Tag(0x187052), 'DS', 9, '0.09,1.18', 0, False, True)
+        rawelemmax = RawDataElement(Tag(0x187054), 'DS', 9, '0.11,1.22', 0, False, True)
+        rawdict = {0x187052: rawelemmin, 0x187054: rawelemmax}
+        ds = Dataset(rawdict)
+
+        ds.FilterMaterial = "niobium,europium"
 
         g = GeneralStudyModuleAttr.objects.create()
         g.save()
@@ -28,9 +33,13 @@ class DXImportTests(TestCase):
         source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
         source.save()
 
-        _xray_filters_multiple(FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
+#        _xray_filters_multiple(FilterMaterial, ds.FilterThicknessMaximum, ds.FilterThicknessMinimum, source)
+        _xray_filters_prep(ds, source)
 
-        self.assertEqual(source.xrayfilters_set.all().count(), 2)
+        self.assertEqual(source.xrayfilters_set.all().count(), 2,
+                         "Testing Kodak old style, two filters should have been stored, {0} were".format(
+                             source.xrayfilters_set.all().count()
+                         ))
         self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
                          "Niobium or Niobium compound")
         self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,

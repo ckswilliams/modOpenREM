@@ -102,9 +102,6 @@ def _xrayfiltersnone(source):
 
 
 def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source):
-    from dicom.valuerep import MultiValue
-    if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
-        xray_filter_material = xray_filter_material.split(',')
     for i, material in enumerate(xray_filter_material):
         try:
             thickmax = None
@@ -116,6 +113,74 @@ def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, 
             _xrayfilters('FLAT', material, thickmax, thickmin, source)
         except IndexError:
             pass
+
+def _xray_filters_prep(dataset, source):
+    from dicom.valuerep import MultiValue
+    from remapp.tools.get_values import get_value_kw
+
+    xray_filter_type = get_value_kw('FilterType', dataset)
+    xray_filter_material = get_value_kw('FilterMaterial', dataset)
+
+    # Explicit no filter, register as such
+    if xray_filter_type == 'NONE':
+        _xrayfiltersnone(source)
+        return
+    # Implicit no filter, just ignore
+    if xray_filter_material is None:
+        return
+
+    # Get multiple filters into dicom MultiValue or lists
+    if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
+        xray_filter_material = xray_filter_material.split(',')
+
+    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+        else:
+            xray_filter_thickness_minimum = None
+
+    try:
+        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+        else:
+            xray_filter_thickness_maximum = None
+
+    if type(xray_filter_material) is list:
+        _xray_filters_multiple(
+            xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
+    else:
+        # deal with known Siemens filter records
+        siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
+        if xray_filter_type in siemens_filters:
+            if xray_filter_type == "CU_0.1_MM":
+                thickmax = 0.1
+                thickmin = 0.1
+            elif xray_filter_type == "CU_0.2_MM":
+                thickmax = 0.2
+                thickmin = 0.2
+            elif xray_filter_type == "CU_0.3_MM":
+                thickmax = 0.3
+                thickmin = 0.3
+            _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
+        else:
+            _xrayfilters(
+                xray_filter_type, xray_filter_material, xray_filter_thickness_maximum,
+                xray_filter_thickness_minimum, source
+            )
 
 
 def _kvp(dataset, source):
@@ -231,59 +296,7 @@ def _irradiationeventxraysourcedata(dataset, event):
     source.grid_period = get_value_kw('GridPeriod', dataset)
     source.grid_focal_distance = get_value_kw('GridFocalDistance', dataset)
     source.save()
-    xray_filter_type = get_value_kw('FilterType', dataset)
-    xray_filter_material = get_value_kw('FilterMaterial', dataset)
-
-    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except ValueError:  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187052, thick2)
-            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-        else:
-            xray_filter_thickness_minimum = None
-
-    try:
-        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except ValueError:  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187054, thick2)
-            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-        else:
-            xray_filter_thickness_maximum = None
-
-    if xray_filter_type:
-        if xray_filter_type == 'NONE':
-            _xrayfiltersnone(source)
-        elif type(xray_filter_material) is list:
-            _xray_filters_multiple(
-                xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
-        else:
-            siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
-            if xray_filter_type in siemens_filters:
-                if xray_filter_type == "CU_0.1_MM":
-                    thickmax = 0.1
-                    thickmin = 0.1
-                elif xray_filter_type == "CU_0.2_MM":
-                    thickmax = 0.2
-                    thickmin = 0.2
-                elif xray_filter_type == "CU_0.3_MM":
-                    thickmax = 0.3
-                    thickmin = 0.3
-                _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
-            else:
-                _xrayfilters(
-                    xray_filter_type, xray_filter_material, xray_filter_thickness_maximum,
-                    xray_filter_thickness_minimum, source
-                )
+    _xray_filters_prep(dataset, source)
     _kvp(dataset, source)
     _exposure(dataset, source)
 
