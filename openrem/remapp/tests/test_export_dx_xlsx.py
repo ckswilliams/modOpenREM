@@ -71,3 +71,25 @@ class ExportDXxlsx(TestCase):
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
         task.delete()  # not necessary, by hey, why not?
+
+    def test_filters(self):
+        filter_set = ''
+        # filter_set = "display_name=Carestream+Clinic+KODAK7500&"
+        pid = True
+        name = True
+        patient_id = True
+
+        dxxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
+        import xlrd
+        task = Exports.objects.all()[0]
+
+        book = xlrd.open_workbook(task.filename.path)
+        aec_sheet = book.sheet_by_name('aec')
+        headers = aec_sheet.row(0)
+
+        filter_col = [i for i, x in enumerate(headers) if x.value == 'Filters'][0]
+
+        self.assertEqual(aec_sheet.cell_value(1, filter_col), 'Al')
+        self.assertEqual(aec_sheet.cell_value(2, filter_col), 'Al | Cu')
+
