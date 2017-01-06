@@ -73,6 +73,7 @@ class ExportDXxlsx(TestCase):
         task.delete()  # not necessary, by hey, why not?
 
     def test_filters(self):
+        # Tests that extracts with multiple filters succeed (though previous test would fail too!
         filter_set = ''
         # filter_set = "display_name=Carestream+Clinic+KODAK7500&"
         pid = True
@@ -89,7 +90,8 @@ class ExportDXxlsx(TestCase):
         headers = aec_sheet.row(0)
 
         filter_col = [i for i, x in enumerate(headers) if x.value == 'Filters'][0]
+        filter_thick_col = [i for i, x in enumerate(headers) if x.value == 'Filter thicknesses (mm)'][0]
 
         self.assertEqual(aec_sheet.cell_value(1, filter_col), 'Al')
         self.assertEqual(aec_sheet.cell_value(2, filter_col), 'Al | Cu')
-
+        self.assertEqual(aec_sheet.cell_value(2, filter_thick_col), '0.94000000 | 0.19400000')
