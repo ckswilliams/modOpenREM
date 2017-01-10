@@ -93,5 +93,6 @@ class ExportDXxlsx(TestCase):
         filter_thick_col = [i for i, x in enumerate(headers) if x.value == 'Filter thicknesses (mm)'][0]
 
         self.assertEqual(aec_sheet.cell_value(1, filter_col), 'Al')
+        self.assertEqual(aec_sheet.cell_value(1, filter_thick_col), '1.00000000')
         self.assertEqual(aec_sheet.cell_value(2, filter_col), 'Al | Cu')
-        self.assertEqual(aec_sheet.cell_value(2, filter_thick_col), '0.94000000 | 0.19400000')
+        self.assertEqual(aec_sheet.cell_value(2, filter_thick_col), '1.00000000 | 0.20000000')
