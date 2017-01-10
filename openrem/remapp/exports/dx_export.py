@@ -71,6 +71,8 @@ def get_filters(source):
                 thick = thicknesses[0]
             elif thicknesses[1] is not None:
                 thick = thicknesses[1]
+            if thick:
+                thick = round(thick, 4)
             filter_thicknesses += str(thick) + u' | '
         filters = filters[:-3]
         filter_thicknesses = filter_thicknesses[:-3]
