@@ -35,6 +35,51 @@ from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
 
+
+def get_filters(source):
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        filters = ''
+        filter_thicknesses = ''
+        for current_filter in source.xrayfilters_set.all():
+            if 'Aluminum' in str(current_filter.xray_filter_material):
+                filters += u'Al'
+            elif 'Copper' in str(current_filter.xray_filter_material):
+                filters += u'Cu'
+            elif 'Tantalum' in str(current_filter.xray_filter_material):
+                filters += u'Ta'
+            elif 'Molybdenum' in str(current_filter.xray_filter_material):
+                filters += u'Mo'
+            elif 'Rhodium' in str(current_filter.xray_filter_material):
+                filters += u'Rh'
+            elif 'Silver' in str(current_filter.xray_filter_material):
+                filters += u'Ag'
+            elif 'Niobium' in str(current_filter.xray_filter_material):
+                filters += u'Nb'
+            elif 'Europium' in str(current_filter.xray_filter_material):
+                filters += u'Eu'
+            elif 'Lead' in str(current_filter.xray_filter_material):
+                filters += u'Pb'
+            filters += u' | '
+            thicknesses = [current_filter.xray_filter_thickness_minimum,
+                           current_filter.xray_filter_thickness_maximum]
+            if thicknesses[0] is not None and thicknesses[1] is not None:
+                thick = sum(thicknesses) / len(thicknesses)
+            elif thicknesses[0] is None and thicknesses[1] is None:
+                thick = ''
+            elif thicknesses[0] is not None:
+                thick = thicknesses[0]
+            elif thicknesses[1] is not None:
+                thick = thicknesses[1]
+            filter_thicknesses += str(thick) + u' | '
+        filters = filters[:-3]
+        filter_thicknesses = filter_thicknesses[:-3]
+    except ObjectDoesNotExist:
+        filters = None
+        filter_thicknesses = None
+    return filters, filter_thicknesses
+
+
 @shared_task
 def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered DX database data to a single-sheet CSV file.
@@ -250,46 +295,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = None
                 except ObjectDoesNotExist:
                     mas = None
-                try:
-                    filters = ''
-                    filter_thicknesses = ''
-                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += u'Al'
-                        elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += u'Cu'
-                        elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += u'Ta'
-                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += u'Mo'
-                        elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += u'Rh'
-                        elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += u'Ag'
-                        elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += u'Nb'
-                        elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += u'Eu'
-                        elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += u'Pb'
-                        filters += u' | '
-                        thicknesses = [current_filter.xray_filter_thickness_minimum,
-                                       current_filter.xray_filter_thickness_maximum]
-                        if thicknesses[0] is not None and thicknesses[1] is not None:
-                            thick = sum(thicknesses)/len(thicknesses)
-                        elif thicknesses[0] is None and thicknesses[1] is None:
-                            thick = ''
-                        elif thicknesses[0] is not None:
-                            thick = thicknesses[0]
-                        elif thicknesses[1] is not None:
-                            thick = thicknesses[1]
-                        filter_thicknesses += str(thick) + u' | '
-                    filters = filters[:-3]
-                    filter_thicknesses = filter_thicknesses[:-3]
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
-                except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
+                filters, filter_thicknesses = get_filters(s.irradeventxraysourcedata_set.get())
             except ObjectDoesNotExist:
                 exposure_control_mode = None
                 average_xray_tube_current = None
@@ -677,36 +683,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = None
                 except ObjectDoesNotExist:
                     mas = None
-
-                try:
-                    filters = ''
-                    filter_thicknesses = ''
-                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += 'Al'
-                        elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += 'Cu'
-                        elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += 'Ta'
-                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += 'Mo'
-                        elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += 'Rh'
-                        elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += 'Ag'
-                        elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += 'Nb'
-                        elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += 'Eu'
-                        elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += 'Pb'
-                        filters += ' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
-                    filters = filters[:-3]
-                    filter_thicknesses = filter_thicknesses[:-3]
-                except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
+                filters, filter_thicknesses = get_filters(s.irradeventxraysourcedata_set.get())
             except ObjectDoesNotExist:
                 exposure_control_mode = None
                 kvp = None
@@ -926,39 +903,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                             s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
                     else:
                         mas = None
-
-                try:
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
-                except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
-                else:
-                    filters = ''
-                    filter_thicknesses = ''
-                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += 'Al'
-                        elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += 'Cu'
-                        elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += 'Ta'
-                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += 'Mo'
-                        elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += 'Rh'
-                        elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += 'Ag'
-                        elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += 'Nb'
-                        elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += 'Eu'
-                        elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += 'Pb'
-                        filters += ' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
-                    filters = filters[:-3]
-                    filter_thicknesses = filter_thicknesses[:-3]
-
+                filters, filter_thicknesses = get_filters(s.irradeventxraysourcedata_set.get())
             try:
                 s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:
