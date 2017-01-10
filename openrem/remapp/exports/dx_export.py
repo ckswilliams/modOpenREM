@@ -36,7 +36,7 @@ from celery import shared_task
 from django.conf import settings
 
 
-def get_filters(source):
+def _get_xray_filterinfo(source):
     from django.core.exceptions import ObjectDoesNotExist
     try:
         filters = ''
@@ -297,7 +297,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = None
                 except ObjectDoesNotExist:
                     mas = None
-                filters, filter_thicknesses = get_filters(s.irradeventxraysourcedata_set.get())
+                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
             except ObjectDoesNotExist:
                 exposure_control_mode = None
                 average_xray_tube_current = None
@@ -685,7 +685,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                         mas = None
                 except ObjectDoesNotExist:
                     mas = None
-                filters, filter_thicknesses = get_filters(s.irradeventxraysourcedata_set.get())
+                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
             except ObjectDoesNotExist:
                 exposure_control_mode = None
                 kvp = None
@@ -905,7 +905,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                             s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
                     else:
                         mas = None
-                filters, filter_thicknesses = get_filters(s.irradeventxraysourcedata_set.get())
+                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
             try:
                 s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:
