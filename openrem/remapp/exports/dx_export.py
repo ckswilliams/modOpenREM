@@ -60,6 +60,8 @@ def _get_xray_filterinfo(source):
                 filters += u'Eu'
             elif 'Lead' in str(current_filter.xray_filter_material):
                 filters += u'Pb'
+            else:
+                filters += str(current_filter.xray_filter_material)
             filters += u' | '
             thicknesses = [current_filter.xray_filter_thickness_minimum,
                            current_filter.xray_filter_thickness_maximum]
