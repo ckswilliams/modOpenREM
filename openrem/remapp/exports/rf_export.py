@@ -651,7 +651,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for tab in sheetlist:
         for protocol in sheetlist[tab]['protocolname']:
-            tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
+            tsk.progress = u'Populating the protocol sheet for protocol {0}'.format(protocol)
             tsk.save()
             p_events = IrradEventXRayData.objects.filter(
                 acquisition_protocol__exact = protocol
