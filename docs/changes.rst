@@ -6,6 +6,7 @@ OpenREM version history
 ---------
 
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
+* `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
 * `#440`_  Charts: Fixed a bug in sorting.js so that undefined strings are handled correctly
