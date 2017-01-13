@@ -179,6 +179,8 @@ progressively less logging.
     LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
 
 
+.. _database_creation:
+
 Create the database
 -------------------
 
