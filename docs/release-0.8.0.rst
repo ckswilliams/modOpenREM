@@ -7,6 +7,7 @@ Headline changes
 ****************
 
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
+* Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
