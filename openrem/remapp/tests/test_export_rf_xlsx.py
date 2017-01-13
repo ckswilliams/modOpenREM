@@ -29,9 +29,11 @@ class ExportDXxlsx(TestCase):
         pid.save()
 
         rf_siemens_zee = os.path.join("test_files", "RF-RDSR-Siemens-Zee.dcm")
+        rf_philips_allura = os.path.join("test_files", "RF-RDSR-Philips_Allura.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
         rdsr(os.path.join(root_tests, rf_siemens_zee))
+        rdsr(os.path.join(root_tests, rf_philips_allura))
 
     def test_id_as_text(self):  # See https://bitbucket.org/openrem/openrem/issues/443
         filter_set = ""
@@ -63,3 +65,27 @@ class ExportDXxlsx(TestCase):
         # cleanup
         task.filename.delete()  # delete file so local testing doesn't get too messy!
         task.delete()  # not necessary, by hey, why not?
+
+    def test_filters(self):
+        filter_set = ""
+        pid = True
+        name = False
+        patient_id = True
+
+        rfxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
+
+        import xlrd
+        task = Exports.objects.all()[0]
+
+        book = xlrd.open_workbook(task.filename.path)
+        philips_sheet = book.sheet_by_name('abdomen_2fps_25%')
+        siemens_sheet = book.sheet_by_name(('fl_-_ang'))
+        headers = philips_sheet.row(0)
+
+        filter_material_col = [i for i, x in enumerate(headers) if x.value == 'Filter material'][0]
+        filter_thickness_col = [i for i, x in enumerate(headers) if x.value == 'Filter thickness'][0]
+
+        self.assertEqual(philips_sheet.cell_value(1, filter_material_col), 'Cu | Al')
+        self.assertEqual(philips_sheet.cell_value(1, filter_thickness_col), '0.1 | 1.0')
+        self.assertEqual(siemens_sheet.cell_value(1, filter_material_col), 'Cu')
+        self.assertEqual(siemens_sheet.cell_value(1, filter_thickness_col), '0.6')
