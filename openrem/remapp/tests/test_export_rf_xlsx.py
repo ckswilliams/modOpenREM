@@ -89,3 +89,7 @@ class ExportDXxlsx(TestCase):
         self.assertEqual(philips_sheet.cell_value(1, filter_thickness_col), '0.1 | 1.0')
         self.assertEqual(siemens_sheet.cell_value(1, filter_material_col), 'Cu')
         self.assertEqual(siemens_sheet.cell_value(1, filter_thickness_col), '0.6')
+
+        # cleanup
+        task.filename.delete()  # delete file so local testing doesn't get too messy!
+        task.delete()  # not necessary, by hey, why not?
