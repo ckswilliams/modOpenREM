@@ -290,45 +290,53 @@ def _rf_common_headers(pid=None, name=None, patid=None):
     ]
     return commonheaders
 
-def _get_xray_filterinfo(xrayfilterset):
-    filter_material = ''
-    filter_thick = ''
-    if (xrayfilterset == None):
-        filter_material = None
-        filter_thick = None
-    else:
-        for current_filter in xrayfilterset:
+
+def _get_xray_filterinfo(source):
+    try:
+        filters = ''
+        filter_thicknesses = ''
+        for current_filter in source.xrayfilters_set.all():
             if 'Aluminum' in str(current_filter.xray_filter_material):
-                filter_material += 'Al'
+                filters += u'Al'
             elif 'Copper' in str(current_filter.xray_filter_material):
-                filter_material += 'Cu'
+                filters += u'Cu'
             elif 'Tantalum' in str(current_filter.xray_filter_material):
-                filter_material += 'Ta'
+                filters += u'Ta'
             elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                filter_material += 'Mo'
+                filters += u'Mo'
             elif 'Rhodium' in str(current_filter.xray_filter_material):
-                filter_material += 'Rh'
+                filters += u'Rh'
             elif 'Silver' in str(current_filter.xray_filter_material):
-                filter_material += 'Ag'
+                filters += u'Ag'
             elif 'Niobium' in str(current_filter.xray_filter_material):
-                filter_material += 'Nb'
+                filters += u'Nb'
             elif 'Europium' in str(current_filter.xray_filter_material):
-                filter_material += 'Eu'
+                filters += u'Eu'
             elif 'Lead' in str(current_filter.xray_filter_material):
-                filter_material += 'Pb'
+                filters += u'Pb'
             else:
-                filter_material += str(current_filter.xray_filter_material) # Use str for occasional case it is nonetype
-            filter_material += ' | '
-            # return average thickness if minimum and maximum are filled, else return the only value that is filled.
-            if (current_filter.xray_filter_thickness_maximum != None) & (current_filter.xray_filter_thickness_minimum != None):
-                filter_thick += "{:1.1f}".format((float(current_filter.xray_filter_thickness_maximum + current_filter.xray_filter_thickness_minimum)/2)) + ' | '
-            elif (current_filter.xray_filter_thickness_maximum != None):
-                filter_thick += str(current_filter.xray_filter_thickness_maximum) + ' | '
-            else:
-                filter_thick += str(current_filter.xray_filter_thickness_minimum) + ' | '
-        filter_material = filter_material[:-3]
-        filter_thick = filter_thick[:-3]
-    return filter_material, filter_thick
+                filters += str(current_filter.xray_filter_material)
+            filters += u' | '
+            thicknesses = [current_filter.xray_filter_thickness_minimum,
+                           current_filter.xray_filter_thickness_maximum]
+            if thicknesses[0] is not None and thicknesses[1] is not None:
+                thick = sum(thicknesses) / len(thicknesses)
+            elif thicknesses[0] is None and thicknesses[1] is None:
+                thick = ''
+            elif thicknesses[0] is not None:
+                thick = thicknesses[0]
+            elif thicknesses[1] is not None:
+                thick = thicknesses[1]
+            if thick:
+                thick = round(thick, 4)
+            filter_thicknesses += str(thick) + u' | '
+        filters = filters[:-3]
+        filter_thicknesses = filter_thicknesses[:-3]
+    except ObjectDoesNotExist:
+        filters = None
+        filter_thicknesses = None
+    return filters, filter_thicknesses
+
 
 @shared_task
 def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
@@ -444,7 +452,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     filter_thick = None
                 else:
                     filter_material, filter_thick = _get_xray_filterinfo(
-                        inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all())
+                        inst[0].irradeventxraysourcedata_set.get())
 
             protocol = _get_db_value(inst[0], "acquisition_protocol")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
@@ -674,7 +682,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
                     exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
                     dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
-                    filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get().xrayfilters_set.all())
+                    filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get())
                     try:
                         event.irradeventxraysourcedata_set.get().kvp_set.get()
                     except ObjectDoesNotExist:
