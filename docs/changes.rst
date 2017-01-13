@@ -5,12 +5,16 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
+* `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
+* `#442`_  Exports: Fixed RF exports with multiple filters, added tests. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
 * `#440`_  Charts: Fixed a bug in sorting.js so that undefined strings are handled correctly
 * `#439`_  Charts: Added controls for plotting a series per system and calculation histogram data to each filtered view
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al) again!
+* `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
 
 0.7.4 (2016-10-17)

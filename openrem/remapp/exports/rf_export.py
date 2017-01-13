@@ -291,6 +291,53 @@ def _rf_common_headers(pid=None, name=None, patid=None):
     return commonheaders
 
 
+def _get_xray_filterinfo(source):
+    try:
+        filters = ''
+        filter_thicknesses = ''
+        for current_filter in source.xrayfilters_set.all():
+            if 'Aluminum' in str(current_filter.xray_filter_material):
+                filters += u'Al'
+            elif 'Copper' in str(current_filter.xray_filter_material):
+                filters += u'Cu'
+            elif 'Tantalum' in str(current_filter.xray_filter_material):
+                filters += u'Ta'
+            elif 'Molybdenum' in str(current_filter.xray_filter_material):
+                filters += u'Mo'
+            elif 'Rhodium' in str(current_filter.xray_filter_material):
+                filters += u'Rh'
+            elif 'Silver' in str(current_filter.xray_filter_material):
+                filters += u'Ag'
+            elif 'Niobium' in str(current_filter.xray_filter_material):
+                filters += u'Nb'
+            elif 'Europium' in str(current_filter.xray_filter_material):
+                filters += u'Eu'
+            elif 'Lead' in str(current_filter.xray_filter_material):
+                filters += u'Pb'
+            else:
+                filters += str(current_filter.xray_filter_material)
+            filters += u' | '
+            thicknesses = [current_filter.xray_filter_thickness_minimum,
+                           current_filter.xray_filter_thickness_maximum]
+            if thicknesses[0] is not None and thicknesses[1] is not None:
+                thick = sum(thicknesses) / len(thicknesses)
+            elif thicknesses[0] is None and thicknesses[1] is None:
+                thick = ''
+            elif thicknesses[0] is not None:
+                thick = thicknesses[0]
+            elif thicknesses[1] is not None:
+                thick = thicknesses[1]
+            if thick:
+                thick = round(thick, 4)
+            filter_thicknesses += str(thick) + u' | '
+        filters = filters[:-3]
+        filter_thicknesses = filter_thicknesses[:-3]
+    except ObjectDoesNotExist:
+        filters = None
+        filter_thicknesses = None
+    return filters, filter_thicknesses
+
+
 @shared_task
 def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     """Export filtered RF database data to multi-sheet Microsoft XSLX files.
@@ -398,15 +445,14 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 pulse_rate = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "pulse_rate")
                 fieldsize = _get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "ii_field_size")
-
-            try:
-                inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.get()
-            except ObjectDoesNotExist:
-                filter_material = None
-                filter_thick = None
-            else:
-                filter_material = _get_db_value(_get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_material"), "code_meaning")
-                filter_thick = _get_db_value(_get_db_value(_get_db_value(inst[0], "irradeventxraysourcedata_set").get(), "xrayfilters_set").get(), "xray_filter_thickness_maximum")
+                try:
+                    inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all()
+                except ObjectDoesNotExist:
+                    filter_material = None
+                    filter_thick = None
+                else:
+                    filter_material, filter_thick = _get_xray_filterinfo(
+                        inst[0].irradeventxraysourcedata_set.get())
 
             protocol = _get_db_value(inst[0], "acquisition_protocol")
             event_type = _get_db_value(_get_db_value(inst[0], "irradiation_event_type"), "code_meaning")
@@ -431,11 +477,11 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 similarexposures = similarexposures.filter(
                     irradeventxraysourcedata__pulse_rate__exact = pulse_rate)
             if filter_material:
-                similarexposures = similarexposures.filter(
-                    irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = filter_material)
-            if filter_thick:
-                similarexposures = similarexposures.filter(
-                    irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = filter_thick)
+                for xray_filter in inst[0].irradeventxraysourcedata_set.get().xrayfilters_set.all():
+                    similarexposures = similarexposures.filter(
+                        irradeventxraysourcedata__xrayfilters__xray_filter_material__code_meaning__exact = xray_filter.xray_filter_material)
+                    similarexposures = similarexposures.filter(
+                        irradeventxraysourcedata__xrayfilters__xray_filter_thickness_maximum__exact = xray_filter.xray_filter_thickness_maximum)
             if event_type:
                 similarexposures = similarexposures.filter(
                     irradiation_event_type__code_meaning__exact = event_type)
@@ -531,7 +577,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'G' + str(h+1) + ' Pulse rate',
             'G' + str(h+1) + ' Field size',
             'G' + str(h+1) + ' Filter material',
-            'G' + str(h+1) + ' Filter thickness',
+            'G' + str(h+1) + ' Filter thickness (average)',
             'G' + str(h+1) + ' kVp min',
             'G' + str(h+1) + ' kVp max',
             'G' + str(h+1) + ' kVp mean',
@@ -613,7 +659,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for tab in sheetlist:
         for protocol in sheetlist[tab]['protocolname']:
-            tsk.progress = 'Populating the protocol sheet for protocol {0}'.format(protocol)
+            tsk.progress = u'Populating the protocol sheet for protocol {0}'.format(protocol)
             tsk.save()
             p_events = IrradEventXRayData.objects.filter(
                 acquisition_protocol__exact = protocol
@@ -624,26 +670,65 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 sheetlist[tab]['count'] += 1
                 examdata = _rf_common_get_data(event.projection_xray_radiation_dose.general_study_module_attributes,
                                                pid, name, patid)
-                if event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material:
-                    filter_material = event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
-                else: filter_material = None
+                try:
+                    event.irradeventxraysourcedata_set.get()
+                except ObjectDoesNotExist:
+                    pulse_rate = None
+                    ii_field_size = None
+                    exposure_time = None
+                    dose_rp = None
+                else:
+                    pulse_rate = _get_db_value(event.irradeventxraysourcedata_set.get(), 'pulse_rate')
+                    ii_field_size = _get_db_value(event.irradeventxraysourcedata_set.get(), 'ii_field_size')
+                    exposure_time = _get_db_value(event.irradeventxraysourcedata_set.get(), 'exposure_time')
+                    dose_rp = _get_db_value(event.irradeventxraysourcedata_set.get(), 'dose_rp')
+                    filter_material, filter_thick = _get_xray_filterinfo(event.irradeventxraysourcedata_set.get())
+                    try:
+                        event.irradeventxraysourcedata_set.get().kvp_set.get()
+                    except ObjectDoesNotExist:
+                        kVp = None
+                    else:
+                        kVp = _get_db_value(event.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
+                    try:
+                        event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get()
+                    except ObjectDoesNotExist:
+                        xray_tube_current = None
+                    else:
+                        xray_tube_current = _get_db_value(event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get(), 'xray_tube_current')
+                    try:
+                        event.irradeventxraysourcedata_set.get().pulsewidth_set.get()
+                    except ObjectDoesNotExist:
+                        pulse_width = None
+                    else:
+                        pulse_width = _get_db_value(event.irradeventxraysourcedata_set.get().pulsewidth_set.get(), 'pulse_width')
+                try:
+                    event.irradeventxraymechanicaldata_set.get()
+                except ObjectDoesNotExist:
+                    pos_primary_angle = None
+                    pos_secondary_angle = None
+                else:
+                    pos_primary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_primary_angle')
+                    pos_secondary_angle = _get_db_value(event.irradeventxraymechanicaldata_set.get(), 'positioner_secondary_angle')
+                        # It seems all() never throws an exception (emperically and search on internet)
+                        # "After calling all() on either object, you'll definitely have a QuerySet to work with." (https://docs.djangoproject.com/en/1.10/ref/models/querysets/#all)
+
                 examdata += [
                     str(event.date_time_started),
                     event.irradiation_event_type.code_meaning,
                     event.acquisition_protocol,
                     event.acquisition_plane.code_meaning,
-                    event.irradeventxraysourcedata_set.get().pulse_rate,
-                    event.irradeventxraysourcedata_set.get().ii_field_size,
+                    pulse_rate,
+                    ii_field_size,
                     filter_material,
-                    event.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum,
-                    event.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
-                    event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current,
-                    event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width,
-                    event.irradeventxraysourcedata_set.get().exposure_time,
-                    event.convert_gym2_to_cgycm2(),
-                    event.irradeventxraysourcedata_set.get().dose_rp,
-                    event.irradeventxraymechanicaldata_set.get().positioner_primary_angle,
-                    event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle,
+                    filter_thick,
+                    kVp,
+                    xray_tube_current,
+                    pulse_width,
+                    exposure_time,
+                    str(event.convert_gym2_to_cgycm2()),
+                    dose_rp,
+                    pos_primary_angle,
+                    pos_secondary_angle,
                 ]
                 sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
         tabcolumns = 49
@@ -1218,4 +1303,3 @@ def rfopenskin(studyid):
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-
