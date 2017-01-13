@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
 * `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
