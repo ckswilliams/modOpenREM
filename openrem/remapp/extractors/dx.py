@@ -86,6 +86,11 @@ def _xrayfilters(filttype, material, thickmax, thickmin, source):
             filters.xray_filter_material = get_or_create_cid('C-132F9', 'Lead or Lead compound')
         if material.strip().lower() == 'tantalum':
             filters.xray_filter_material = get_or_create_cid('C-156F9', 'Tantalum or Tantalum compound')
+    if thickmax is not None and thickmin is not None:
+        if thickmax < thickmin:
+            tempmin = thickmax
+            thickmax = thickmin
+            thickmin = tempmin
     if thickmax is not None:
         filters.xray_filter_thickness_maximum = thickmax
     if thickmin is not None:
