@@ -2,6 +2,8 @@
 # test_get_values.py
 
 from __future__ import unicode_literals
+import os
+from django.contrib.auth.models import User, Group
 from django.test import TestCase
 from dicom.dataelem import RawDataElement
 from dicom.dataset import Dataset
@@ -96,5 +98,44 @@ class DXFilterTests(TestCase):
         self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
                          "Lead or Lead compound")
 
+
 class ImportCarestreamDR7500(TestCase):
-    pass
+
+    def setUp(self):
+        from remapp.extractors import dx
+        from remapp.models import PatientIDSettings
+
+        self.user = User.objects.create_user(
+            username='jacob', email='jacob@…', password='top_secret')
+        eg = Group(name="exportgroup")
+        eg.save()
+        eg.user_set.add(self.user)
+        eg.save()
+
+        pid = PatientIDSettings.objects.create()
+        pid.name_stored = True
+        pid.name_hashed = False
+        pid.id_stored = True
+        pid.id_hashed = False
+        pid.dob_stored = True
+        pid.save()
+
+        dx_ge_xr220_1 = os.path.join("test_files", "DX-Im-GE_XR220-1.dcm")
+        dx_ge_xr220_2 = os.path.join("test_files", "DX-Im-GE_XR220-2.dcm")
+        dx_ge_xr220_3 = os.path.join("test_files", "DX-Im-GE_XR220-3.dcm")
+        dx_carestream_dr7500_1 = os.path.join("test_files", "DX-Im-Carestream_DR7500-1.dcm")
+        dx_carestream_dr7500_2 = os.path.join("test_files", "DX-Im-Carestream_DR7500-2.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+
+        dx(os.path.join(root_tests, dx_ge_xr220_1))
+        dx(os.path.join(root_tests, dx_ge_xr220_2))
+        dx(os.path.join(root_tests, dx_ge_xr220_3))
+        dx(os.path.join(root_tests, dx_carestream_dr7500_1))
+        dx(os.path.join(root_tests, dx_carestream_dr7500_2))
+
+    def test_filter_thickness_order(self):
+        from remapp.models import XrayFilters
+
+        all_filters = XrayFilters.objects.all()
+        for exposure in all_filters:
+            self.assertGreaterEqual(exposure.xray_filter_thickness_maximum, exposure.xray_filter_thickness_minimum)
