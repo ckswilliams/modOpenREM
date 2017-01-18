@@ -10,7 +10,7 @@ from remapp.exports.rf_export import rfxlsx
 from remapp.models import PatientIDSettings, Exports
 
 
-class ExportDXxlsx(TestCase):
+class ExportRFxlsx(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create_user(

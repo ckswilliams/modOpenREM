@@ -10,7 +10,8 @@ from remapp.extractors.dx import _xray_filters_prep
 from remapp.models import GeneralStudyModuleAttr, ProjectionXRayRadiationDose, IrradEventXRayData, \
     IrradEventXRaySourceData
 
-class DXImportTests(TestCase):
+
+class DXFilterTests(TestCase):
     def test_multiple_filter_kodak_dr7500(self):
         """
         Test the material extraction process when the materials are comma separated
@@ -94,3 +95,6 @@ class DXImportTests(TestCase):
         self.assertEqual(source.xrayfilters_set.all().count(), 1)
         self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
                          "Lead or Lead compound")
+
+class ImportCarestreamDR7500(TestCase):
+    pass
