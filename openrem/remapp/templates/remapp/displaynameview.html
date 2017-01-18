@@ -1,5 +1,9 @@
 {% extends "remapp/base.html" %}
 
+{% block headextras %}
+    <script src="{{ STATIC_URL }}js/sorttable.js"></script>
+{% endblock %}
+
 {% block confnav %}<li class="dropdown active">{% endblock %}
 
 {% block navhelp %}
@@ -39,13 +43,13 @@
 
 <h3>CT</h3>
   <p>There are {{ ct_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable">
-    <row>
+  <table class="table table-bordered table-hover row-clickable sortable">
+    <tr>
       {% if admin.admingroup %}
-        <th style="text-align: center;">Update?</th>
+        <th>Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </row>
+    </tr>
     {% for eachrow in ct_names %}
       <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
@@ -69,13 +73,13 @@
 
 <h3>Mammography</h3>
   <p>There are {{ mg_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable">
-    <row>
+  <table class="table table-bordered table-hover row-clickable sortable">
+    <tr>
       {% if admin.admingroup %}
-        <th style="text-align: center;">Update?</th>
+        <th>Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </row>
+    </tr>
     {% for eachrow in mg_names %}
       <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
@@ -99,13 +103,13 @@
 
 <h3>DX and CR</h3>
   <p>There are {{ dx_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable">
-    <row>
+  <table class="table table-bordered table-hover row-clickable sortable">
+    <tr>
       {% if admin.admingroup %}
-        <th style="text-align: center;">Update?</th>
+        <th>Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </row>
+    </tr>
     {% for eachrow in dx_names %}
       <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
@@ -129,13 +133,13 @@
 
 <h3>Fluoroscopy</h3>
   <p>There are {{ rf_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable">
-    <row>
+  <table class="table table-bordered table-hover row-clickable sortable">
+    <tr>
       {% if admin.admingroup %}
-        <th style="text-align: center;">Update?</th>
+        <th>Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </row>
+    </tr>
     {% for eachrow in rf_names %}
       <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
@@ -159,13 +163,13 @@
 
 <h3>Other</h3>
   <p>There are {{ ot_names.count }} entries in this table.</p>
-  <table class="table table-bordered table-hover row-clickable">
-    <row>
+  <table class="table table-bordered table-hover row-clickable sortable">
+    <tr>
       {% if admin.admingroup %}
-        <th style="text-align: center;">Update?</th>
+        <th>Update?</th>
       {% endif %}
       <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
-    </row>
+    </tr>
     {% for eachrow in ot_names %}
       <tr class="clickable-row" row_name="{{ eachrow.id }}">
         {% if admin.admingroup %}
