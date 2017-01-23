@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
 * `#454`_  Exports: Mean filter thickness now reported in exports
 * `#453`_  Imports: DX with min filter thickness greater than max have values switched on import
