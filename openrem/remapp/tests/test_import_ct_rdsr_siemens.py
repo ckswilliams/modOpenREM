@@ -41,4 +41,10 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          ct_dose_length_product_total, Decimal(724.52))
 
-
+        # Test that irradiation length data is recorded before changes for ref #447
+        irrad_events = study.ctradiationdose_set.get().ctirradiationeventdata_set.all()
+        self.assertEqual(irrad_events.count(), 4)
+        self.assertAlmostEqual(irrad_events[0].scanninglength_set.get().scanning_length, 821)
+        self.assertAlmostEqual(irrad_events[1].scanninglength_set.get().scanning_length, 10)
+        self.assertAlmostEqual(irrad_events[2].scanninglength_set.get().scanning_length, 10)
+        self.assertAlmostEqual(irrad_events[3].scanninglength_set.get().scanning_length, 737)
