@@ -28,8 +28,8 @@ class ExportCTxlsx(TestCase):
         pid.dob_stored = True
         pid.save()
 
-        ct_ge_ct660 = os.path.join("test_files", "CT-RDSR-GE_Optima.dcm")
-        ct_ge_vct = os.path.join("test_files", "CT-RDSR-GE_VCT.dcm")
+        ct_ge_ct660 = os.path.join("test_files", "CT-ESR-GE_Optima.dcm")
+        ct_ge_vct = os.path.join("test_files", "CT-ESR-GE_VCT.dcm")
         ct_siemens_flash_ss = os.path.join("test_files", "CT-RDSR-Siemens_Flash-TAP-SS.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
