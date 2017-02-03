@@ -1,4 +1,5 @@
-# test_get_values.py
+# This Python file uses the following encoding: utf-8
+# test_import_ct_rdsr_siemens.py
 
 import os
 from decimal import Decimal
