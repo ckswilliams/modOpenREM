@@ -40,21 +40,34 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[0].accession_number, '0012345.12345678')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().institution_name, 'An Optima Hospital')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().manufacturer, 'GE Medical Systems')
+        self.assertEqual(studies[1].accession_number, '001234512345678')
+        self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().institution_name, 'A VCT Hospital')
+        self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().manufacturer, 'GE Medical Systems')
 
         # Test that patient level data is recorded correctly
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_name, 'Patient^Optima')
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_id, '00001234')
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_birth_date, datetime.date(1957, 03, 12))
-#        self.assertEqual(studies[0].patientstudymoduleattr_set.get().patient_age, '067Y')
-#        self.assertAlmostEqual(studies[0].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(67.6))
+        self.assertAlmostEqual(studies[0].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(49.4))
+        self.assertEqual(studies[1].patientmoduleattr_set.get().patient_name, 'Patient^DiscoVCT')
+        self.assertEqual(studies[1].patientmoduleattr_set.get().patient_id, '008F/g234')
+        self.assertEqual(studies[1].patientmoduleattr_set.get().patient_birth_date, datetime.date(1923, 05, 9))
+        self.assertEqual(studies[1].patientstudymoduleattr_set.get().patient_age, '89Y')
+        self.assertAlmostEqual(studies[1].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(89.8))
 
         # Test that exposure summary data is recorded correctly
         self.assertEqual(studies[0].ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          total_number_of_irradiation_events, 6)
         self.assertAlmostEqual(studies[0].ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          ct_dose_length_product_total, Decimal(415.82))
+        self.assertEqual(studies[1].ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+                         total_number_of_irradiation_events, 27)
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+                         ct_dose_length_product_total, Decimal(2002.39))
 
         # Test that event level dat is recorded correctly
         self.assertAlmostEqual(
             studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].mean_ctdivol, Decimal(5.3))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[26].mean_ctdivol, Decimal(32.83))
 
