@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
 * `#454`_  Exports: Mean filter thickness now reported in exports
