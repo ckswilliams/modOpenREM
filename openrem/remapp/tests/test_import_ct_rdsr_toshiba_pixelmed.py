@@ -33,10 +33,11 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '042Y')
         self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(42.9))
 
-        # Test that exposure data is recorded correctly
+        # Test that summary level exposure data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          total_number_of_irradiation_events, 3)
         self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          ct_dose_length_product_total, Decimal(349.7))
 
-
+        # Test that event level exposure data is recorded correctly (note: not much is in the source file)
+        self.assertAlmostEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].mean_ctdivol, Decimal(24.7))
