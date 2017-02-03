@@ -990,7 +990,7 @@ def rdsr(rdsr_file):
         pass
     elif dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.88.67':
         return ('{0}{1}'.format(rdsr_file, " is not a Radiation Dose Structured Report"))
-    elif dataset.ConceptNameCodeSequence[0].CodeValue != '113701':
+    if dataset.ConceptNameCodeSequence[0].CodeValue != '113701':
         return ('{0}{1}'.format(rdsr_file, " doesn't seem to have a report in it :-("))
 
     _rsdr2db(dataset)

@@ -10,7 +10,7 @@ from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
 
 class ImportCTRDSR(TestCase):
-    def test_import_ct_rdsr_siemens(self):
+    def test_import_ct_esr_ge(self):
         """
         Imports known GE Enhanced Structured Reports, and tests all the values
         imported against those expected.
@@ -71,3 +71,22 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(
             studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[26].mean_ctdivol, Decimal(32.83))
 
+
+class ImportNonDoseSR(TestCase):
+    def test_import_esr_non_dose(self):
+        """
+        Imports known GE Enhanced Structured Reports, and tests all the values
+        imported against those expected.
+        """
+
+        PatientIDSettings.objects.create()
+
+        enhanced_sr = "test_files/ESR_non-dose.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        esr_path = os.path.join(root_tests, enhanced_sr)
+
+        rdsr(esr_path)
+        studies = GeneralStudyModuleAttr.objects.all()
+
+        # Test that no studies have been imported
+        self.assertEqual(studies.count(), 0)
