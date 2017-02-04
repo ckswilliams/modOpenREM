@@ -985,15 +985,12 @@ def rdsr(rdsr_file):
 
     dataset = dicom.read_file(rdsr_file)
 
-    if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22':
-        # print '{0}{1}'.format(rdsr_file," is not an RDSR, but it is an enhanced structured report, so we'll attempt to use it")
-        pass
-    elif dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.88.67':
-        return ('{0}{1}'.format(rdsr_file, " is not a Radiation Dose Structured Report"))
-    if dataset.ConceptNameCodeSequence[0].CodeValue != '113701':
-        return ('{0}{1}'.format(rdsr_file, " doesn't seem to have a report in it :-("))
-
-    _rsdr2db(dataset)
+    if dataset.SOPClassUID in ('1.2.840.10008.5.1.4.1.1.88.67', '1.2.840.10008.5.1.4.1.1.88.22') and dataset.ConceptNameCodeSequence[0].CodeValue == '113701':
+        logger.debug('rdsr.py extracting from {0}'.format(rdsr_file))
+        _rsdr2db(dataset)
+    else:
+        logger.warning('rdsr.py not attempting to extract from {0}, not a radiation dose structured report'.format(
+            rdsr_file))
 
     if del_rdsr:
         os.remove(rdsr_file)
