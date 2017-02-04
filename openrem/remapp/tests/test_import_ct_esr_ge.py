@@ -75,8 +75,8 @@ class ImportCTRDSR(TestCase):
 class ImportNonDoseSR(TestCase):
     def test_import_esr_non_dose(self):
         """
-        Imports known GE Enhanced Structured Reports, and tests all the values
-        imported against those expected.
+        Imports Enhanced Structured Reports that isn't a radiadation dose structured report, and tests nothing is
+        imported.
         """
 
         PatientIDSettings.objects.create()
@@ -85,8 +85,16 @@ class ImportNonDoseSR(TestCase):
         root_tests = os.path.dirname(os.path.abspath(__file__))
         esr_path = os.path.join(root_tests, enhanced_sr)
 
-        rdsr(esr_path)
-        studies = GeneralStudyModuleAttr.objects.all()
+        from testfixtures import LogCapture
+        with LogCapture() as l:
+            rdsr(esr_path)
+            studies = GeneralStudyModuleAttr.objects.all()
 
-        # Test that no studies have been imported
-        self.assertEqual(studies.count(), 0)
+            # Test that no studies have been imported
+            self.assertEqual(studies.count(), 0)
+        # Test that log file was written to
+        l.check(
+            ('remapp.extractors.rdsr', 'WARNING',
+             'rdsr.py not attempting to extract from {0}, not a radiation dose structured report'.format(esr_path)))
+
+

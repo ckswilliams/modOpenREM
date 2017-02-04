@@ -24,6 +24,7 @@ requires = [
     'django-crispy-forms',
     'pandas',
     'xlrd',
+    'testfixtures',
     ]
 
 setup(
