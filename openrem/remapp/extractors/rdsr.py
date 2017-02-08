@@ -751,7 +751,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
-        if proj.acquisition_device_type_cid:
+        if reporttype == 'projection' and proj.acquisition_device_type_cid:
             if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF'
             elif 'Integrated' in proj.acquisition_device_type_cid.code_meaning:
