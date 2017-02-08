@@ -279,6 +279,11 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 source.save()
         except ObjectDoesNotExist:
             pass
+    if not source.average_xray_tube_current:
+        if source.xraytubecurrent_set.all().count() > 0:
+            source.average_xray_tube_current = source.xraytubecurrent_set.all().aggregate(
+                Avg('xray_tube_current'))['xray_tube_current__avg']
+            source.save()
 
 
 def _irradiationeventxraydetectordata(dataset, event, ch):  # TID 10003a
