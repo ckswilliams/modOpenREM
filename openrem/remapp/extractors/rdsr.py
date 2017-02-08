@@ -336,14 +336,20 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
             event.anatomical_structure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                            cont.ConceptCodeSequence[0].CodeMeaning)
-            for cont2 in cont.ContentSequence:
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
-                    event.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
-                                                         cont2.ConceptCodeSequence[0].CodeMeaning)
+            try:
+                for cont2 in cont.ContentSequence:
+                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
+                        event.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
+                                                             cont2.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View':
             event.image_view = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                  cont.ConceptCodeSequence[0].CodeMeaning)
-            _imageviewmodifier(cont, event)
+            try:
+                _imageviewmodifier(cont, event)
+            except AttributeError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Table Relationship':
             event.patient_table_relationship_cid = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -446,7 +452,8 @@ def _accumulatedmammoxraydose(dataset, accum):  # TID 10005
             accummammo.save()
 
 
-def _accumulatedprojectionxraydose(dataset, accum):  # TID 10004
+def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
+    # Name in DICOM standard for TID 10004 is Accumulated Fluoroscopy and Acquisition Projection X-Ray Dose
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumProjXRayDose
     accumproj = AccumProjXRayDose.objects.create(accumulated_xray_dose=accum)
@@ -465,7 +472,7 @@ def _accumulatedprojectionxraydose(dataset, accum):  # TID 10004
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
                 accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
             # TODO: Remove the following four items, as they are also imported (correctly) into
-            # _accumulatedintegratedprojectionradiographydose
+            # _accumulatedtotalprojectionradiographydose
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
                 accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
@@ -480,21 +487,9 @@ def _accumulatedprojectionxraydose(dataset, accum):  # TID 10004
                     accumproj.reference_point_definition = cont.TextValue
         except IndexError:
             pass
-
     if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == \
             'RF,DX':
-        try:
-            acquisition_type = accumproj.accumulated_xray_dose.projection_xray_radiation_dose.acquisition_device_type_cid.code_value
-        except AttributeError:
-            acquisition_type = None
-        if acquisition_type:
-            if acquisition_type == '113957':
-                accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
-                    modality_type = 'RF'
-            elif acquisition_type in ('113958', '113959'):
-                accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
-                    modality_type = 'DX'
-        elif (accumproj.fluoro_dose_area_product_total != "" and accumproj.fluoro_dose_area_product_total is not None) \
+        if (accumproj.fluoro_dose_area_product_total != "" and accumproj.fluoro_dose_area_product_total is not None) \
                 or (accumproj.total_fluoro_time != "" and accumproj.total_fluoro_time is not None):
             accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = 'RF'
@@ -517,7 +512,8 @@ def _accumulatedcassettebasedprojectionradiographydose(dataset, accum):  # TID 1
     accumcass.save()
 
 
-def _accumulatedintegratedprojectionradiographydose(dataset, accum):  # TID 10007
+def _accumulatedtotalprojectionradiographydose(dataset, accum):  # TID 10007
+    # Name in DICOM standard for TID 10007 is Accumulated Total Projection Radiography Dose
     from remapp.models import AccumIntegratedProjRadiogDose
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
@@ -551,23 +547,22 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont, accum, ch)
-    if ((proj.acquisition_device_type_cid and (
-                'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
-            (proj.procedure_reported and (
-                        'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
-        ):
-        _accumulatedprojectionxraydose(dataset, accum)
+    if proj.acquisition_device_type_cid:
+        if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+            _accumulatedfluoroxraydose(dataset, accum)
+    elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
+        _accumulatedfluoroxraydose(dataset, accum)
     if proj.procedure_reported and (proj.procedure_reported.code_meaning == 'Mammography'):
         _accumulatedmammoxraydose(dataset, accum)
-    if ((proj.acquisition_device_type_cid and ('Integrated' in proj.acquisition_device_type_cid.code_meaning)) or
-            (proj.acquisition_device_type_cid and (
-                        'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
-            (proj.procedure_reported and (
-                        'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
-        ):
-        _accumulatedintegratedprojectionradiographydose(dataset, accum)
-    if (proj.acquisition_device_type_cid and ('Cassette-based' in proj.acquisition_device_type_cid.code_meaning)):
-        _accumulatedcassettebasedprojectionradiographydose(dataset, accum)
+    if proj.acquisition_device_type_cid:
+        if 'Integrated' in proj.acquisition_device_type_cid.code_meaning or \
+                'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+            _accumulatedtotalprojectionradiographydose(dataset, accum)
+    elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
+        _accumulatedtotalprojectionradiographydose(dataset, accum)
+    if proj.acquisition_device_type_cid:
+       if 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+            _accumulatedcassettebasedprojectionradiographydose(dataset, accum)
     accum.save()
 
 
@@ -756,6 +751,22 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
+        if proj.acquisition_device_type_cid:
+            if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'RF'
+            elif 'Integrated' in proj.acquisition_device_type_cid.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'DX'
+            elif 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'DX'
+            else:
+                logging.error(
+                    "Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, Station name: {1}, Study date, time: {2}, {3} ".format(
+                    proj.general_study_module_attributes.study_instance_uid,
+                    proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
+                    proj.general_study_module_attributes.study_date,
+                    proj.general_study_module_attributes.study_time
+                ))
+
         proj.save()
 
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
