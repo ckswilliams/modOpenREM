@@ -265,13 +265,6 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     except:
         pass
     source.save()
-    if not source.average_xray_tube_current and source.average_glandular_dose:  # AGD to test for mammo
-        try:
-            source.average_xray_tube_current = source.xraytubecurrent_set.all().aggregate(Avg('xray_tube_current'))[
-                'xray_tube_current__avg']
-            source.save()
-        except ObjectDoesNotExist:
-            pass
     if not source.exposure_time and source.number_of_pulses:
         try:
             avg_pulse_width = source.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
