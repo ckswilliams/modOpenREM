@@ -555,24 +555,27 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
 def _scanninglength(dataset, event):  # TID 10014
     from remapp.models import ScanningLength
     scanlen = ScanningLength.objects.create(ct_irradiation_event_data=event)
-    for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'scanning length':
-            scanlen.scanning_length = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'length of reconstructable volume':
-            scanlen.length_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'exposed range':
-            scanlen.exposed_range = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of reconstructable volume':
-            scanlen.top_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of reconstructable volume':
-            scanlen.bottom_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of scanning length':
-            scanlen.top_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of scanning length':
-            scanlen.bottom_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'irradiation event uid':
-            scanlen.irradiation_event_uid = cont.UID
-    scanlen.save()
+    try:
+        for cont in dataset.ContentSequence:
+            if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'scanning length':
+                scanlen.scanning_length = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'length of reconstructable volume':
+                scanlen.length_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'exposed range':
+                scanlen.exposed_range = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of reconstructable volume':
+                scanlen.top_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of reconstructable volume':
+                scanlen.bottom_z_location_of_reconstructable_volume = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'top z location of scanning length':
+                scanlen.top_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'bottom z location of scanning length':
+                scanlen.bottom_z_location_of_scanning_length = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'irradiation event uid':
+                scanlen.irradiation_event_uid = cont.UID
+        scanlen.save()
+    except AttributeError:
+        pass
 
 
 def _ctxraysourceparameters(dataset, event):
@@ -621,20 +624,23 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
                 _scanninglength(cont, event)
-                for cont2 in cont.ContentSequence:
-                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
-                        event.exposure_time = cont2.MeasuredValueSequence[0].NumericValue
-                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Single Collimation Width':
-                        event.nominal_single_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
-                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Total Collimation Width':
-                        event.nominal_total_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
-                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Pitch Factor':
-                        event.pitch_factor = cont2.MeasuredValueSequence[0].NumericValue
-                    elif cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'number of x-ray sources':
-                        event.number_of_xray_sources = cont2.MeasuredValueSequence[0].NumericValue
-                    if cont2.ValueType == 'CONTAINER':
-                        if cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'ct x-ray source parameters':
-                            _ctxraysourceparameters(cont2, event)
+                try:
+                    for cont2 in cont.ContentSequence:
+                        if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
+                            event.exposure_time = cont2.MeasuredValueSequence[0].NumericValue
+                        elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Single Collimation Width':
+                            event.nominal_single_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
+                        elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Nominal Total Collimation Width':
+                            event.nominal_total_collimation_width = cont2.MeasuredValueSequence[0].NumericValue
+                        elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Pitch Factor':
+                            event.pitch_factor = cont2.MeasuredValueSequence[0].NumericValue
+                        elif cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'number of x-ray sources':
+                            event.number_of_xray_sources = cont2.MeasuredValueSequence[0].NumericValue
+                        if cont2.ValueType == 'CONTAINER':
+                            if cont2.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'ct x-ray source parameters':
+                                _ctxraysourceparameters(cont2, event)
+                except AttributeError:
+                    pass
             elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose':
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIvol':

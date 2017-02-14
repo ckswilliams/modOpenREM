@@ -12,6 +12,7 @@ OpenREM version history
 * `#453`_  Imports: DX with min filter thickness greater than max have values switched on import
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
 * `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
+* `#447`_  Imports: Modified rdsr and ctdetail template to import and display data from Pixelmed generated Toshiba RDSR
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
 * `#442`_  Exports: Fixed RF exports with multiple filters, added tests. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
