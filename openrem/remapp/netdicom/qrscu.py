@@ -401,10 +401,16 @@ def qrscu(
             else:
                 series = study.dicomqrrspseries_set.all()
                 series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-                if 'dose info' in series_descriptions:  # i.e. Philips dose info series
+                # if SR not present in study, only keep Philips dose info series
+                # skip this step for PACS systems returning (only) empty seriesdescriptions
+                if (series_descriptions != set([None])):
                     for s in series:
                         if s.series_description != 'dose info':
                             s.delete()
+            nr_series_remaining = study.dicomqrrspseries_set.all().count()
+            if (nr_series_remaining==0):
+                study.delete()
+
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now delete any that don't match the exclude and include criteria
