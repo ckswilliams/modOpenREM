@@ -223,7 +223,7 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
             source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
         elif ((cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Frames') and
-              (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER')):
+                  (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER')):
             # Philips Allura XPer systems: Private coding scheme designator: 99PHI-IXR-XPER; [number of pulses]
             source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
             # should be a derivation thing in here for when the no. pulses is estimated
@@ -480,10 +480,10 @@ def _accumulatedprojectionxraydose(dataset, accum):  # TID 10004
                     accumproj.total_fluoro_time != "" or
                     accumproj.acquisition_dose_area_product_total != "" or
                     accumproj.total_acquisition_time != ""):
-            accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.\
+            accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = 'RF'
         elif accumproj.total_number_of_radiographic_frames != "":
-            accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.\
+            accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = "DX"
     accumproj.save()
 
@@ -533,18 +533,18 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont, accum, ch)
     if ((proj.acquisition_device_type_cid and (
-        'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
+                'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
             (proj.procedure_reported and (
-                'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
+                        'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
         ):
         _accumulatedprojectionxraydose(dataset, accum)
     if proj.procedure_reported and (proj.procedure_reported.code_meaning == 'Mammography'):
         _accumulatedmammoxraydose(dataset, accum)
     if ((proj.acquisition_device_type_cid and ('Integrated' in proj.acquisition_device_type_cid.code_meaning)) or
             (proj.acquisition_device_type_cid and (
-                'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
+                        'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
             (proj.procedure_reported and (
-                'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
+                        'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
         ):
         _accumulatedintegratedprojectionradiographydose(dataset, accum)
     if (proj.acquisition_device_type_cid and ('Cassette-based' in proj.acquisition_device_type_cid.code_meaning)):
@@ -710,7 +710,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
             proj.procedure_reported = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
             if (
-                'ContentSequence' in cont):  # Extra if statement to allow for non-conformant GE RDSR that don't have this mandatory field.
+                        'ContentSequence' in cont):  # Extra if statement to allow for non-conformant GE RDSR that don't have this mandatory field.
                 for cont2 in cont.ContentSequence:
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Has Intent':
                         proj.has_intent = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
@@ -917,7 +917,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.save()
     if not g.requested_procedure_code_meaning:
         if (('RequestAttributesSequence' in dataset) and dataset[
-                0x40, 0x275].VM):  # Ugly hack to prevent issues with zero length LS16 sequence
+            0x40, 0x275].VM):  # Ugly hack to prevent issues with zero length LS16 sequence
             req = dataset.RequestAttributesSequence
             g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', req[0], char_set=ch)
             # Sometimes the above is true, but there is no RequestedProcedureDescription in that sequence, but
@@ -975,9 +975,7 @@ def rdsr(rdsr_file):
     :param filename: relative or absolute path to Radiation Dose Structured Report.
     :type filename: str.
     
-    Tested with:
-        * CT: Siemens, Philips and GE RDSR, GE Enhanced SR.
-        * Fluoro: Siemens Artis Zee RDSR
+
     """
 
     import dicom
@@ -991,15 +989,13 @@ def rdsr(rdsr_file):
 
     dataset = dicom.read_file(rdsr_file)
 
-    if dataset.SOPClassUID == '1.2.840.10008.5.1.4.1.1.88.22':
-        # print '{0}{1}'.format(rdsr_file," is not an RDSR, but it is an enhanced structured report, so we'll attempt to use it")
-        pass
-    elif dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.88.67':
-        return ('{0}{1}'.format(rdsr_file, " is not a Radiation Dose Structured Report"))
-    elif dataset.ConceptNameCodeSequence[0].CodeValue != '113701':
-        return ('{0}{1}'.format(rdsr_file, " doesn't seem to have a report in it :-("))
-
-    _rsdr2db(dataset)
+    if dataset.SOPClassUID in ('1.2.840.10008.5.1.4.1.1.88.67', '1.2.840.10008.5.1.4.1.1.88.22') and \
+            dataset.ConceptNameCodeSequence[0].CodeValue == '113701':
+        logger.debug('rdsr.py extracting from {0}'.format(rdsr_file))
+        _rsdr2db(dataset)
+    else:
+        logger.warning('rdsr.py not attempting to extract from {0}, not a radiation dose structured report'.format(
+            rdsr_file))
 
     if del_rdsr:
         os.remove(rdsr_file)
