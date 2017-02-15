@@ -411,9 +411,9 @@ def qrscu(
                     for s in series:
                         if s.number_of_series_related_instances > 5:
                             s.delete()
-            nr_series_remaining = study.dicomqrrspseries_set.all().count()
-            if (nr_series_remaining==0):
-                study.delete()
+        nr_series_remaining = study.dicomqrrspseries_set.all().count()
+        if (nr_series_remaining==0):
+        study.delete()
 
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
