@@ -66,6 +66,7 @@ class DicomDeleteSettings(SingletonModel):
     def get_absolute_url(self):
         return reverse('dicom_summary')
 
+
 class PatientIDSettings(SingletonModel):
     name_stored = models.BooleanField(default=False)
     name_hashed = models.BooleanField(default=True)
@@ -156,6 +157,7 @@ class DicomQRRspSeries(models.Model):
     series_description = models.TextField(blank=True, null=True)
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
     station_name = models.CharField(max_length=16, blank=True, null=True)
+
 
 class DicomQRRspImage(models.Model):
     dicom_qr_rsp_series = models.ForeignKey(DicomQRRspSeries)
