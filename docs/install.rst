@@ -189,6 +189,16 @@ http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 
     TIME_ZONE = 'Europe/London'
 
+Language
+^^^^^^^^
+
+Configure the local language. Default language is set at us-english. Valid options can be found here: 
+http://www.i18nguy.com/unicode/language-identifiers.html
+
+.. sourcecode:: python
+
+    LANGUAGE_CODE = 'en-us'
+
 .. _database_creation:
 
 Create the database
