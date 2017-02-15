@@ -154,7 +154,7 @@ class DicomQRRspSeries(models.Model):
     modality = models.CharField(max_length=16, blank=True, null=True)
     series_description = models.TextField(blank=True, null=True)
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
-
+    station_name = models.CharField(max_length=16, blank=True, null=True)
 
 class DicomQRRspImage(models.Model):
     dicom_qr_rsp_series = models.ForeignKey(DicomQRRspSeries)

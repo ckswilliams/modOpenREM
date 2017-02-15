@@ -245,6 +245,9 @@ class DicomQueryForm(forms.Form):
     desc_include_field = forms.CharField(required=False,
                                          label="Only keep studies with these terms in the study description:",
                                          help_text="Comma separated list of terms")
+    stationname_exclude_field = forms.CharField(required=False,
+                                         label="Exclude series with these terms in the station name:",
+                                         help_text="Comma separated list of terms")
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
@@ -269,6 +272,7 @@ class DicomQueryForm(forms.Form):
                 ),
                 'desc_exclude_field',
                 'desc_include_field',
+                'stationname_exclude_field',
                 Accordion(
                     AccordionGroup(
                         'Advanced',
