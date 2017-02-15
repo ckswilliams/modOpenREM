@@ -444,19 +444,23 @@ def qrscu(
                                                                                                 study_desc_inc))
 
     if stationname_exc:
-        query.stage = "Deleting any series with station names that match the exclude criteria"
-        logger.info("Deleting any series with station names that match the exclude criteria")
+        query.stage = "Deleting any studies/series with station names that match the exclude criteria"
+        logger.info("Deleting any studies/series with station names that match the exclude criteria")
         for study in study_rsp:
-            series = study.dicomqrrspseries_set.all()
-            for s in series:
-                if any(term in s.station_name.lower() for term in stationname_exc):
-                    s.delete()
-            nr_series_remaining = study.dicomqrrspseries_set.all().count()
-            if (nr_series_remaining==0):
+            # check if station name is blacklisted at study-level first; if not check at series-level
+            if any(term in study.station_name.lower() for term in stationname_exc):
                 study.delete()
+            else:
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    if any(term in s.station_name.lower() for term in stationname_exc):
+                        s.delete()
+                nr_series_remaining = study.dicomqrrspseries_set.all().count()
+                if (nr_series_remaining==0):
+                    study.delete()
         study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info('Now have {0} studies after deleting all series with station name containing: {1}'.format(study_rsp.count(),
-                                                                                                               stationname_exc))
+        logger.info('Now have {0} studies after deleting all studies/series with station name containing: {1}'.format(study_rsp.count(),
+                                                                                                                       stationname_exc))
 
     logger.info("Release association")
     assoc.Release(0)
