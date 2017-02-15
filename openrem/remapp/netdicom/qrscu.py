@@ -148,6 +148,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
+        rsp.station_name = get_value_kw('StationName', ss[1])
 
         # Series level query
         d2 = Dataset()
@@ -297,6 +298,7 @@ def qrscu(
     d.PatientAge = ''
     d.PatientBirthDate = ''
     d.NumberOfStudyRelatedSeries = ''
+    d.StationName = ''
 
     d.StudyDate = make_dcm_date_range(date_from, date_until)
     if not d.StudyDate:
