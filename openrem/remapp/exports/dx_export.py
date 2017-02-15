@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -27,11 +28,61 @@
 ..  moduleauthor:: David Platten and Ed McDonagh
 
 """
+from __future__ import division
 
 import csv
 from xlsxwriter.workbook import Workbook
 from celery import shared_task
 from django.conf import settings
+
+
+def _get_xray_filterinfo(source):
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        filters = ''
+        filter_thicknesses = ''
+        for current_filter in source.xrayfilters_set.all():
+            if 'Aluminum' in str(current_filter.xray_filter_material):
+                filters += u'Al'
+            elif 'Copper' in str(current_filter.xray_filter_material):
+                filters += u'Cu'
+            elif 'Tantalum' in str(current_filter.xray_filter_material):
+                filters += u'Ta'
+            elif 'Molybdenum' in str(current_filter.xray_filter_material):
+                filters += u'Mo'
+            elif 'Rhodium' in str(current_filter.xray_filter_material):
+                filters += u'Rh'
+            elif 'Silver' in str(current_filter.xray_filter_material):
+                filters += u'Ag'
+            elif 'Niobium' in str(current_filter.xray_filter_material):
+                filters += u'Nb'
+            elif 'Europium' in str(current_filter.xray_filter_material):
+                filters += u'Eu'
+            elif 'Lead' in str(current_filter.xray_filter_material):
+                filters += u'Pb'
+            else:
+                filters += str(current_filter.xray_filter_material)
+            filters += u' | '
+            thicknesses = [current_filter.xray_filter_thickness_minimum,
+                           current_filter.xray_filter_thickness_maximum]
+            if thicknesses[0] is not None and thicknesses[1] is not None:
+                thick = sum(thicknesses) / len(thicknesses)
+            elif thicknesses[0] is None and thicknesses[1] is None:
+                thick = ''
+            elif thicknesses[0] is not None:
+                thick = thicknesses[0]
+            elif thicknesses[1] is not None:
+                thick = thicknesses[1]
+            if thick:
+                thick = round(thick, 4)
+            filter_thicknesses += str(thick) + u' | '
+        filters = filters[:-3]
+        filter_thicknesses = filter_thicknesses[:-3]
+    except ObjectDoesNotExist:
+        filters = None
+        filter_thicknesses = None
+    return filters, filter_thicknesses
+
 
 @shared_task
 def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
@@ -50,9 +101,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import dx_acq_filter
-    from remapp.tools.get_values import return_for_export, export_safe
     from django.db.models import Q # For the Q "OR" query used for DX and CR
-    from django.core.exceptions import ObjectDoesNotExist
+    from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
     tsk = Exports.objects.create()
 
@@ -72,7 +122,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpfile = TemporaryFile()
-        writer = csv.writer(tmpfile)
+        writer = csv.writer(tmpfile, dialect=csv.excel)
 
         tsk.progress = 'CSV file created'
         tsk.save()
@@ -98,32 +148,32 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     pidheadings = []
     if pid and name:
-        pidheadings += ['Patient name']
+        pidheadings += [u'Patient name']
     if pid and patid:
-        pidheadings += ['Patient ID']
+        pidheadings += [u'Patient ID']
     headers = pidheadings + [
-        'Institution name', 
-        'Manufacturer', 
-        'Model name',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Operator',
-        'Study date',
+        u'Institution name',
+        u'Manufacturer',
+        u'Model name',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Operator',
+        u'Study date',
     ]
     if pid and (name or patid):
         headers += [
-            'Date of birth',
+            u'Date of birth',
         ]
     headers += [
-        'Patient age',
-        'Patient sex',
-        'Patient height', 
-        'Patient mass (kg)', 
-        'Study description',
-        'Requested procedure',
-        'Number of events',
-        'DAP total (cGy.cm^2)',
+        u'Patient age',
+        u'Patient sex',
+        u'Patient height',
+        u'Patient mass (kg)',
+        u'Study description',
+        u'Requested procedure',
+        u'Number of events',
+        u'DAP total (cGy.cm^2)',
     ]
 
     from django.db.models import Max
@@ -131,84 +181,74 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         headers += [
-            'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Image view',
-            'E' + str(h+1) + ' Exposure control mode',
-            'E' + str(h+1) + ' kVp',
-            'E' + str(h+1) + ' mAs',
-            'E' + str(h+1) + ' mA',
-            'E' + str(h+1) + ' Exposure time (ms)',
-            'E' + str(h+1) + ' Filters',
-            'E' + str(h+1) + ' Filter thicknesses (mm)',
-            'E' + str(h+1) + ' Exposure index',
-            'E' + str(h+1) + ' Relative x-ray exposure',
-            'E' + str(h+1) + ' DAP (cGy.cm^2)',
+            'E' + str(h+1) + u' Protocol',
+            'E' + str(h+1) + u' Image view',
+            'E' + str(h+1) + u' Exposure control mode',
+            'E' + str(h+1) + u' kVp',
+            'E' + str(h+1) + u' mAs',
+            'E' + str(h+1) + u' mA',
+            'E' + str(h+1) + u' Exposure time (ms)',
+            'E' + str(h+1) + u' Filters',
+            'E' + str(h+1) + u' Filter thicknesses average (mm)',
+            'E' + str(h+1) + u' Exposure index',
+            'E' + str(h+1) + u' Relative x-ray exposure',
+            'E' + str(h+1) + u' DAP (cGy.cm^2)',
             ]
-    writer.writerow(headers)
 
-    tsk.progress = 'CSV header row written.'
+    writer.writerow([unicode(header).encode("utf-8") for header in headers])
+
+    tsk.progress = u'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
         if pid and (name or patid):
             try:
-                exams.patientmoduleattr_set.get()
+                patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
+                if name:
+                    patient_name = exams.patientmoduleattr_set.get().patient_name
+                if patid:
+                    patient_id = exams.patientmoduleattr_set.get().patient_id
             except ObjectDoesNotExist:
                 patient_birth_date = None
-                if name:
-                    patient_name = None
-                if patid:
-                    patient_id = None
-            else:
-                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
-                if name:
-                    patient_name = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
-                if patid:
-                    patient_id = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
+                patient_name = None
+                patient_id = None
         try:
-            exams.generalequipmentmoduleattr_set.get()
+            institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
+            manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
+            manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
+            station_name = exams.generalequipmentmoduleattr_set.get().station_name
+            display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
         except ObjectDoesNotExist:
             institution_name = None
             manufacturer = None
             manufacturer_model_name = None
             station_name = None
             display_name = None
-        else:
-            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
-            manufacturer = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-            manufacturer_model_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name'))
-            station_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
-            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
         try:
-            exams.patientmoduleattr_set.get()
+            patient_sex = exams.patientmoduleattr_set.get().patient_sex
         except ObjectDoesNotExist:
             patient_sex = None
-        else:
-            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-
         try:
-            exams.patientstudymoduleattr_set.get()
+            patient_age = exams.patientstudymoduleattr_set.get().patient_age_decimal
+            patient_size = exams.patientstudymoduleattr_set.get().patient_size
+            patient_weight = exams.patientstudymoduleattr_set.get().patient_weight
         except ObjectDoesNotExist:
             patient_age = None
             patient_size = None
             patient_weight = None
-        else:
-            patient_age = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_age_decimal')
-            patient_size = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size')
-            patient_weight = return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_weight')
-
         try:
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+            total_number_of_radiographic_frames = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                ).accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames
+            dap_total = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                ).accumintegratedprojradiogdose_set.get().dose_area_product_total
+            if dap_total:
+                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get(
+                    ).accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
+            else:
+                cgycm2 = None
         except ObjectDoesNotExist:
             total_number_of_radiographic_frames = None
             cgycm2 = None
-        else:
-            total_number_of_radiographic_frames = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'total_number_of_radiographic_frames')
-            dap_total = return_for_export(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(), 'dose_area_product_total')
-            if dap_total:
-                cgycm2 = exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2()
-            else:
-                cgycm2 = None
 
         examdata = []
         if pid and name:
@@ -222,8 +262,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             manufacturer_model_name,
             station_name,
             display_name,
-            export_safe(exams.accession_number),
-            export_safe(exams.operator_name),
+            exams.accession_number,
+            exams.operator_name,
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -235,8 +275,8 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_sex,
             patient_size,
             patient_weight,
-            export_safe(exams.study_description),
-            export_safe(exams.requested_procedure_code_meaning),
+            exams.study_description,
+            exams.requested_procedure_code_meaning,
             total_number_of_radiographic_frames,
             cgycm2,
         ]
@@ -244,84 +284,51 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
 
             try:
-                s.irradeventxraysourcedata_set.get()
-            except ObjectDoesNotExist:
-                exposure_control_mode = None
-                kvp = None
-                average_xray_tube_current = None
-                exposure_time = None
-                mas = None
-                filters = None
-                filter_thicknesses = None
-            else:
-                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-                average_xray_tube_current = return_for_export(s.irradeventxraysourcedata_set.get(), 'average_xray_tube_current')
-                exposure_time = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_time')
+                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
+                average_xray_tube_current = s.irradeventxraysourcedata_set.get().average_xray_tube_current
+                exposure_time = s.irradeventxraysourcedata_set.get().exposure_time
                 try:
-                    s.irradeventxraysourcedata_set.get().kvp_set.get()
+                    kvp = s.irradeventxraysourcedata_set.get().kvp_set.get().kvp
                 except ObjectDoesNotExist:
                     kvp = None
-                else:
-                    kvp = return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp')
-
                 try:
-                    s.irradeventxraysourcedata_set.get().exposure_set.get()
-                except ObjectDoesNotExist:
-                    mas = None
-                else:
-                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
+                    uas = s.irradeventxraysourcedata_set.get().exposure_set.get().exposure
                     if uas:
                         mas = s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs()
                     else:
                         mas = None
-
-                try:
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
                 except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
-                else:
-                    filters = ''
-                    filter_thicknesses = ''
-                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += 'Al'
-                        elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += 'Cu'
-                        elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += 'Ta'
-                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += 'Mo'
-                        elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += 'Rh'
-                        elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += 'Ag'
-                        elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += 'Nb'
-                        elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += 'Eu'
-                        elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += 'Pb'
-                        filters += ' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
-                    filters = filters[:-3]
-                    filter_thicknesses = filter_thicknesses[:-3]
+                    mas = None
+                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
+            except ObjectDoesNotExist:
+                exposure_control_mode = None
+                average_xray_tube_current = None
+                exposure_time = None
+                kvp = None
+                mas = None
+                filters = None
+                filter_thicknesses = None
 
             try:
-                s.irradeventxraydetectordata_set.get()
+                exposure_index = s.irradeventxraydetectordata_set.get().exposure_index
+                relative_xray_exposure = s.irradeventxraydetectordata_set.get().relative_xray_exposure
             except ObjectDoesNotExist:
                 exposure_index = None
                 relative_xray_exposure = None
-            else:
-                exposure_index = return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index')
-                relative_xray_exposure = return_for_export(s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure')
 
             cgycm2 = s.convert_gym2_to_cgycm2()
 
             examdata += [
-                export_safe(s.acquisition_protocol),
-                s.image_view,
-                export_safe(exposure_control_mode),
+                s.acquisition_protocol,
+                ]
+            try:
+                examdata += [
+                s.image_view.code_meaning,
+                ]
+            except AttributeError:
+                pass
+            examdata += [
+                exposure_control_mode,
                 kvp,
                 mas,
                 average_xray_tube_current,
@@ -333,7 +340,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 cgycm2,
                 ]
 
-        writer.writerow(examdata)
+        for index, item in enumerate(examdata):
+            if item is None:
+                examdata[index] = ''
+            if isinstance(item, basestring) and ',' in item:
+                examdata[index] = item.replace(',', ';')
+        writer.writerow([unicode(datastring).encode("utf-8") for datastring in examdata])
         tsk.progress = "{0} of {1}".format(i+1, numresults)
         tsk.save()
     tsk.progress = 'All study data written.'
@@ -342,14 +354,14 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     csvfilename = "dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
-        tsk.filename.save(csvfilename,File(tmpfile))
+        tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
         tsk.status = 'ERROR'
         tsk.save()
         return
@@ -389,7 +401,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.export_type = "XLSX export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
+    tsk.progress = u'Query filters imported, task started'
     tsk.status = 'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
@@ -401,7 +413,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         tmpxlsx = TemporaryFile()
         book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE, 'strings_to_numbers': False})
-        tsk.progress = 'Workbook created'
+        tsk.progress = u'Workbook created'
         tsk.save()
     except:
         # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
@@ -412,7 +424,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
     # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
     tsk.save()
 
@@ -431,58 +443,58 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Some prep
     pidheadings = []
     if pid and name:
-        pidheadings += ['Patient name']
+        pidheadings += [u'Patient name']
     if pid and patid:
-        pidheadings += ['Patient ID']
+        pidheadings += [u'Patient ID']
     commonheaders = pidheadings + [
-        'Institution', 
-        'Manufacturer', 
-        'Model name',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Operator',
-        'Study date',
+        u'Institution',
+        u'Manufacturer',
+        u'Model name',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Operator',
+        u'Study date',
     ]
     if pid and (name or patid):
         commonheaders += [
-            'Date of birth',
+            u'Date of birth',
         ]
     commonheaders += [
-        'Patient age',
-        'Patient sex',
-        'Patient height',
-        'Patient mass (kg)',
-        'Test patient?',
-        'Study description',
-        'Requested procedure',
-        'Number of events',
-        'DAP total (cGy.cm^2)',
+        u'Patient age',
+        u'Patient sex',
+        u'Patient height',
+        u'Patient mass (kg)',
+        u'Test patient?',
+        u'Study description',
+        u'Requested procedure',
+        u'Number of events',
+        u'DAP total (cGy.cm^2)',
         ]
     protocolheaders = commonheaders + [
-        'Protocol',
-        'Anatomy',
-        'Image view',
-        'Exposure control mode',
-        'kVp',
-        'mAs',
-        'mA',
-        'Exposure time (ms)',
-        'Filters',
-        'Filter thicknesses (mm)',
-        'Exposure index',
-        'Relative x-ray exposure',
-        'DAP (cGy.cm^2)',
-        'Entrance exposure at RP',
-        'SDD Detector Dist',
-        'SPD Patient Dist',
-        'SIsoD Isocentre Dist',
-        'Table Height',
-        'Comment'
+        u'Protocol',
+        u'Anatomy',
+        u'Image view',
+        u'Exposure control mode',
+        u'kVp',
+        u'mAs',
+        u'mA',
+        u'Exposure time (ms)',
+        u'Filters',
+        u'Filter thicknesses (mm)',
+        u'Exposure index',
+        u'Relative x-ray exposure',
+        u'DAP (cGy.cm^2)',
+        u'Entrance exposure at RP',
+        u'SDD Detector Dist',
+        u'SPD Patient Dist',
+        u'SIsoD Isocentre Dist',
+        u'Table Height',
+        u'Comment'
         ]
         
     # Generate list of protocols in queryset and create worksheets for each
-    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()
 
     sheetlist = {}
@@ -497,7 +509,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 protocolslist.append(safeprotocol)
     protocolslist.sort()
 
-    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
     for protocol in protocolslist:
@@ -528,30 +540,30 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     alldataheaders = commonheaders
 
-    tsk.progress = 'Generating headers for the all data sheet...'
+    tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
     for h in xrange(max_events['projectionxrayradiationdose__accumxraydose__accumintegratedprojradiogdose__total_number_of_radiographic_frames__max']):
         alldataheaders += [
-            'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Anatomy',
-            'E' + str(h+1) + ' Image view',
-            'E' + str(h+1) + ' Exposure control mode',
-            'E' + str(h+1) + ' kVp',
-            'E' + str(h+1) + ' mAs',
-            'E' + str(h+1) + ' mA',
-            'E' + str(h+1) + ' Exposure time (ms)',
-            'E' + str(h+1) + ' Filters',
-            'E' + str(h+1) + ' Filter thicknesses (mm)',
-            'E' + str(h+1) + ' Exposure index',
-            'E' + str(h+1) + ' Relative x-ray exposure',
-            'E' + str(h+1) + ' DAP (cGy.cm^2)',
-            'E' + str(h+1) + ' Entrance Exposure at RP (mGy)',
-            'E' + str(h+1) + ' SDD Detector Dist',
-            'E' + str(h+1) + ' SPD Patient Dist',
-            'E' + str(h+1) + ' SIsoD Isocentre Dist',
-            'E' + str(h+1) + ' Table Height',
-            'E' + str(h+1) + ' Comment',
+            u'E' + str(h+1) + u' Protocol',
+            u'E' + str(h+1) + u' Anatomy',
+            u'E' + str(h+1) + u' Image view',
+            u'E' + str(h+1) + u' Exposure control mode',
+            u'E' + str(h+1) + u' kVp',
+            u'E' + str(h+1) + u' mAs',
+            u'E' + str(h+1) + u' mA',
+            u'E' + str(h+1) + u' Exposure time (ms)',
+            u'E' + str(h+1) + u' Filters',
+            u'E' + str(h+1) + u' Filter thicknesses (mm)',
+            u'E' + str(h+1) + u' Exposure index',
+            u'E' + str(h+1) + u' Relative x-ray exposure',
+            u'E' + str(h+1) + u' DAP (cGy.cm^2)',
+            u'E' + str(h+1) + u' Entrance Exposure at RP (mGy)',
+            u'E' + str(h+1) + u' SDD Detector Dist',
+            u'E' + str(h+1) + u' SPD Patient Dist',
+            u'E' + str(h+1) + u' SIsoD Isocentre Dist',
+            u'E' + str(h+1) + u' Table Height',
+            u'E' + str(h+1) + u' Comment',
             ]
     wsalldata.write_row('A1', alldataheaders)
     wsalldata.set_column(date_column, date_column, 10) # allow date to be displayed.
@@ -563,84 +575,66 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for row, exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(
+        tsk.progress = u'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(
             row + 1, numrows)
         tsk.save()
 
         if pid and (name or patid):
             try:
-                exams.patientmoduleattr_set.get()
+                patient_birth_date = exams.patientmoduleattr_set.get().patient_birth_date
+                if name:
+                    patient_name = exams.patientmoduleattr_set.get().patient_name
+                if patid:
+                    patient_id = exams.patientmoduleattr_set.get().patient_id
             except ObjectDoesNotExist:
                 patient_birth_date = None
-                if name:
-                    patient_name = None
-                if patid:
-                    patient_id = None
-            else:
-                patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
-                if name:
-                    patient_name = return_for_export(exams.patientmoduleattr_set.get(), 'patient_name')
-                if patid:
-                    patient_id = return_for_export(exams.patientmoduleattr_set.get(), 'patient_id')
+                patient_name = None
+                patient_id = None
 
         try:
-            exams.generalequipmentmoduleattr_set.get()
+            institution_name = exams.generalequipmentmoduleattr_set.get().institution_name
+            manufacturer = exams.generalequipmentmoduleattr_set.get().manufacturer
+            manufacturer_model_name = exams.generalequipmentmoduleattr_set.get().manufacturer_model_name
+            station_name = exams.generalequipmentmoduleattr_set.get().station_name
+            display_name = exams.generalequipmentmoduleattr_set.get().unique_equipment_name.display_name
         except ObjectDoesNotExist:
             institution_name = None
             manufacturer = None
             manufacturer_model_name = None
             station_name = None
             display_name = None
-        else:
-            institution_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name')
-            manufacturer = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer')
-            manufacturer_model_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name')
-            station_name = return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name')
-            display_name = return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name')
 
         try:
-            exams.patientmoduleattr_set.get()
+            patient_sex = exams.patientmoduleattr_set.get().patient_sex
         except ObjectDoesNotExist:
             patient_sex = None
-        else:
-            patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
 
         try:
-            exams.patientstudymoduleattr_set.get()
+            patient_age = string_to_float(exams.patientstudymoduleattr_set.get().patient_age_decimal)
+            patient_size = string_to_float(exams.patientstudymoduleattr_set.get().patient_size)
+            patient_weight = string_to_float(exams.patientstudymoduleattr_set.get().patient_weight)
         except ObjectDoesNotExist:
             patient_age  = None
             patient_size = None
             patient_weight = None
-        else:
-            patient_age = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
-                                                            'patient_age_decimal'))
-            patient_size = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(), 'patient_size'))
-            patient_weight = string_to_float(return_for_export(exams.patientstudymoduleattr_set.get(),
-                                                               'patient_weight'))
 
         try:
-            exams.patientmoduleattr_set.get()
+            not_patient_indicator = exams.patientmoduleattr_set.get().not_patient_indicator
         except ObjectDoesNotExist:
             not_patient_indicator = None
-        else:
-            not_patient_indicator = return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator')
 
         try:
-            exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get()
+            total_number_of_radiographic_frames = int(exams.projectionxrayradiationdose_set.get(
+                ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames)
+            if exams.projectionxrayradiationdose_set.get(
+                ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().dose_area_product_total is not None:
+                cgycm2 = string_to_float(exams.projectionxrayradiationdose_set.get(
+                    ).accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2())
+            else:
+                cgycm2 = None
         except ObjectDoesNotExist:
             total_number_of_radiographic_frames = None
             cgycm2 = None
-        else:
-            total_number_of_radiographic_frames = int(return_for_export(
-                exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
-                'total_number_of_radiographic_frames'))
-            dap_total = return_for_export(
-                exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get(),
-                'dose_area_product_total')
-            if dap_total:
-                cgycm2 = string_to_float(exams.projectionxrayradiationdose_set.get().accumxraydose_set.get().accumintegratedprojradiogdose_set.get().convert_gym2_to_cgycm2())
-            else:
-                cgycm2 = None
 
         examdata = []
         if pid and name:
@@ -676,7 +670,24 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
 
             try:
-                s.irradeventxraysourcedata_set.get()
+                exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
+                average_xray_tube_current = string_to_float(
+                    s.irradeventxraysourcedata_set.get().average_xray_tube_current)
+                exposure_time = string_to_float(s.irradeventxraysourcedata_set.get().exposure_time)
+                try:
+                    kvp = string_to_float(s.irradeventxraysourcedata_set.get().kvp_set.get().kvp)
+                except ObjectDoesNotExist:
+                    kvp = None
+
+                try:
+                    if s.irradeventxraysourcedata_set.get().exposure_set.get().exposure is not None:
+                        mas = string_to_float(
+                            s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
+                    else:
+                        mas = None
+                except ObjectDoesNotExist:
+                    mas = None
+                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
             except ObjectDoesNotExist:
                 exposure_control_mode = None
                 kvp = None
@@ -685,76 +696,17 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 mas = None
                 filters = None
                 filter_thicknesses = None
-            else:
-                exposure_control_mode = return_for_export(s.irradeventxraysourcedata_set.get(), 'exposure_control_mode')
-                average_xray_tube_current = string_to_float(
-                    s.irradeventxraysourcedata_set.get().average_xray_tube_current)
-                exposure_time = string_to_float(s.irradeventxraysourcedata_set.get().exposure_time)
-                try:
-                    s.irradeventxraysourcedata_set.get().kvp_set.get()
-                except ObjectDoesNotExist:
-                    kvp = None
-                else:
-                    kvp = string_to_float(return_for_export(s.irradeventxraysourcedata_set.get().kvp_set.get(), 'kvp'))
-
-                try:
-                    s.irradeventxraysourcedata_set.get().exposure_set.get()
-                except ObjectDoesNotExist:
-                    mas = None
-                else:
-                    uas = return_for_export(s.irradeventxraysourcedata_set.get().exposure_set.get(), 'exposure')
-                    if uas:
-                        mas = string_to_float(
-                            s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
-                    else:
-                        mas = None
-
-                try:
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
-                except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
-                else:
-                    filters = ''
-                    filter_thicknesses = ''
-                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += 'Al'
-                        elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += 'Cu'
-                        elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += 'Ta'
-                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += 'Mo'
-                        elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += 'Rh'
-                        elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += 'Ag'
-                        elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += 'Nb'
-                        elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += 'Eu'
-                        elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += 'Pb'
-                        filters += ' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
-                    filters = filters[:-3]
-                    filter_thicknesses = filter_thicknesses[:-3]
 
             try:
-                s.irradeventxraydetectordata_set.get()
+                exposure_index = string_to_float(s.irradeventxraydetectordata_set.get().exposure_index)
+                relative_xray_exposure = string_to_float(s.irradeventxraydetectordata_set.get().relative_xray_exposure)
             except ObjectDoesNotExist:
                 exposure_index = None
                 relative_xray_exposure = None
-            else:
-                exposure_index = string_to_float(
-                    return_for_export(s.irradeventxraydetectordata_set.get(), 'exposure_index'))
-                relative_xray_exposure = string_to_float(return_for_export(
-                    s.irradeventxraydetectordata_set.get(), 'relative_xray_exposure'))
 
             cgycm2 = string_to_float(s.convert_gym2_to_cgycm2())
 
-            entrance_exposure_at_rp = string_to_float(return_for_export(s, 'entrance_exposure_at_rp'))
+            entrance_exposure_at_rp = string_to_float(s.entrance_exposure_at_rp)
 
             try:
                 s.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
@@ -955,39 +907,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                             s.irradeventxraysourcedata_set.get().exposure_set.get().convert_uAs_to_mAs())
                     else:
                         mas = None
-
-                try:
-                    s.irradeventxraysourcedata_set.get().xrayfilters_set.all()
-                except ObjectDoesNotExist:
-                    filters = None
-                    filter_thicknesses = None
-                else:
-                    filters = ''
-                    filter_thicknesses = ''
-                    for current_filter in s.irradeventxraysourcedata_set.get().xrayfilters_set.all():
-                        if 'Aluminum' in str(current_filter.xray_filter_material):
-                            filters += 'Al'
-                        elif 'Copper' in str(current_filter.xray_filter_material):
-                            filters += 'Cu'
-                        elif 'Tantalum' in str(current_filter.xray_filter_material):
-                            filters += 'Ta'
-                        elif 'Molybdenum' in str(current_filter.xray_filter_material):
-                            filters += 'Mo'
-                        elif 'Rhodium' in str(current_filter.xray_filter_material):
-                            filters += 'Rh'
-                        elif 'Silver' in str(current_filter.xray_filter_material):
-                            filters += 'Ag'
-                        elif 'Niobium' in str(current_filter.xray_filter_material):
-                            filters += 'Nb'
-                        elif 'Europium' in str(current_filter.xray_filter_material):
-                            filters += 'Eu'
-                        elif 'Lead' in str(current_filter.xray_filter_material):
-                            filters += 'Pb'
-                        filters += ' | '
-                        filter_thicknesses += str(current_filter.xray_filter_thickness_maximum) + ' | '
-                    filters = filters[:-3]
-                    filter_thicknesses = filter_thicknesses[:-3]
-
+                filters, filter_thicknesses = _get_xray_filterinfo(s.irradeventxraysourcedata_set.get())
             try:
                 s.irradeventxraydetectordata_set.get()
             except ObjectDoesNotExist:

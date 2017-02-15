@@ -182,9 +182,8 @@ def safe_strings(string, char_set=charset.default_encoding):
 
 def replace_comma(comma_string):
     if comma_string:
-        no_comma_string = comma_string.replace(","," ").replace(";"," ")
+        no_comma_string = comma_string.replace(",", " ").replace(";", " ")
         return no_comma_string
-    return comma_string
 
 
 def export_safe(ascii_string):

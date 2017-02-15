@@ -6,7 +6,9 @@ Upgrade to OpenREM 0.8.0
 Headline changes
 ****************
 
+* Imports: No longer tries to import non-dose report Enhanced Structured Reports
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
+* Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
 
 ***************************************************
 Upgrading an OpenREM server with no internet access
