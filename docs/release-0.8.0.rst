@@ -29,7 +29,7 @@ Upgrading from version 0.7.4
     # at https://msdn.microsoft.com/en-us/library/ee634398.aspx.
     # XLSX_DATE = 'mm/dd/yyyy'
 
-* Consider settign the timezone and language in `local_settings.py`. See `local_settings.py.example`.
+* Consider setting the timezone and language in `local_settings.py`. See `local_settings.py.example`.
 
 
 
