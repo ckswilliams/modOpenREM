@@ -61,12 +61,28 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().accumxraydose_set.get(
             ).accummammographyxraydose_set.all()[1].laterality.code_meaning, "Right breast")
 
-        # Test that event level dat is recorded correctly
+        # Test that event level data is recorded correctly
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].irradeventxraysourcedata_set.get().average_glandular_dose, Decimal(1.3))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].entrance_exposure_at_rp, Decimal(3.65))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].half_value_layer, Decimal(0.535))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[1].irradeventxraysourcedata_set.get().average_glandular_dose, Decimal(1.28))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[1].entrance_exposure_at_rp, Decimal(3.60))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].half_value_layer, Decimal(0.535))
+
+        # Test that kVp data is recorded correctly
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(28.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(28.00))
+
+        #Test that mA data is recorded correctly
+        #    )[1].irradeventself.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+        #     )[0].irradeventxraysourcedata_set.get().xray_tube_current_set.get().xray_tube_current, Decimal(100.00))
+        # self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+        #  xraysourcedata_set.get().xray_tube_current_set.get().xray_tube_current, Decimal(100.00))
