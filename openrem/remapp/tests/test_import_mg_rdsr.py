@@ -35,6 +35,8 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies.count(), 1)
 
         # Test that study level data is recorded correctly
+        self.assertEqual(studies[0].study_date, datetime.date(2015, 03, 22))
+        self.assertEqual(studies[0].study_time, datetime.time(12, 47, 45))
         self.assertEqual(studies[0].accession_number, 'AJSKDL1234')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().institution_name, 'OpenREM')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().manufacturer, 'HOLOGIC, Inc.')
@@ -43,6 +45,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_name, 'Lyons^Samantha')
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_id, '00112233')
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_birth_date, datetime.date(1954, 03, 22))
+        self.assertEqual(studies[0].patientmoduleattr_set.get().patient_sex, 'F')
         self.assertEqual(studies[0].patientstudymoduleattr_set.get().patient_age, '061Y')
         self.assertAlmostEqual(studies[0].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(61))
 
