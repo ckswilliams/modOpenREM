@@ -107,7 +107,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
-        seriesrsp.station_name = str(get_value_kw('StationName', series[1]) or '')
+        seriesrsp.station_name = get_value_kw('StationName', series[1])
 
         seriesrsp.save()
 
@@ -148,7 +148,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
-        rsp.station_name = str(get_value_kw('StationName', ss[1]) or '')
+        rsp.station_name = get_value_kw('StationName', ss[1])
 
         # Series level query
         d2 = Dataset()
@@ -448,12 +448,12 @@ def qrscu(
         logger.info("Deleting any studies/series with station names that match the exclude criteria")
         for study in study_rsp:
             # check if station name is blacklisted at study-level first; if not check at series-level
-            if any(term in study.station_name.lower() for term in stationname_exc):
+            if any(term in str(study.station_name or '').lower() for term in stationname_exc):
                 study.delete()
             else:
                 series = study.dicomqrrspseries_set.all()
                 for s in series:
-                    if any(term in s.station_name.lower() for term in stationname_exc):
+                    if any(term in str(s.station_name or '').lower() for term in stationname_exc):
                         s.delete()
                 nr_series_remaining = study.dicomqrrspseries_set.all().count()
                 if (nr_series_remaining==0):
