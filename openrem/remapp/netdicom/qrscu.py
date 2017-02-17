@@ -107,7 +107,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
-        seriesrsp.station_name = get_value_kw('StationName', series[1])
+        seriesrsp.station_name = str(get_value_kw('StationName', series[1]) or '')
 
         seriesrsp.save()
 
@@ -148,7 +148,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
-        rsp.station_name = get_value_kw('StationName', ss[1])
+        rsp.station_name = str(get_value_kw('StationName', ss[1]) or '')
 
         # Series level query
         d2 = Dataset()
