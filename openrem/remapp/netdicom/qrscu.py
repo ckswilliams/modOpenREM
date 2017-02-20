@@ -413,7 +413,7 @@ def qrscu(
                             s.delete()
         nr_series_remaining = study.dicomqrrspseries_set.all().count()
         if (nr_series_remaining==0):
-        study.delete()
+            study.delete()
 
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
