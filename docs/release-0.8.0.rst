@@ -20,7 +20,7 @@ Upgrading from version 0.7.4
 ****************************
 
 * Set the date format for xlsx exports (need to check csv situation). Copy the following code into your
-  `local_settings.py` file if you want to change it from dd/mm/yyy:
+  ``local_settings.py`` file if you want to change it from ``dd/mm/yyy``:
 
 .. sourcecode:: python
 
@@ -28,6 +28,8 @@ Upgrading from version 0.7.4
     # Default in OpenREM is dd/mm/yyyy. Override it by uncommenting and customising below; a full list of codes is available
     # at https://msdn.microsoft.com/en-us/library/ee634398.aspx.
     # XLSX_DATE = 'mm/dd/yyyy'
+
+* Consider setting the timezone and language in ``local_settings.py``. See ``local_settings.py.example``.
 
 
 
