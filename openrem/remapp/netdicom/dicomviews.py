@@ -181,6 +181,7 @@ def q_process(request, *args, **kwargs):
             duplicates = form.cleaned_data.get('duplicates_field')
             desc_exclude = form.cleaned_data.get('desc_exclude_field')
             desc_include = form.cleaned_data.get('desc_include_field')
+            stationname_exclude = form.cleaned_data.get('stationname_exclude_field')
             query_id = str(uuid.uuid4())
 
             if date_from:
@@ -196,10 +197,14 @@ def q_process(request, *args, **kwargs):
                 study_desc_inc = map(unicode.lower, map(unicode.strip, desc_include.split(',')))
             else:
                 study_desc_inc = None
+            if stationname_exclude:
+                stationname_exc = map(unicode.lower, map(unicode.strip, stationname_exclude.split(',')))
+            else:
+                stationname_exc = None
 
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates,
-                               study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc)
+                               stationname_exc=stationname_exc, study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc)
 
             resp = {}
             resp['message'] = 'Request created'

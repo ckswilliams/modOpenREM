@@ -64,6 +64,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     d2.SeriesInstanceUID = ''
     d2.Modality = ''
     d2.NumberOfSeriesRelatedInstances = ''
+    d2.StationName = ''
 
     logger.debug('d2: {0}'.format(d2))
 
@@ -106,6 +107,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
+        seriesrsp.station_name = get_value_kw('StationName', series[1])
 
         seriesrsp.save()
 
@@ -146,6 +148,7 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
+        rsp.station_name = get_value_kw('StationName', ss[1])
 
         # Series level query
         d2 = Dataset()
@@ -169,7 +172,7 @@ def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True,
-        study_desc_exc=None, study_desc_inc=None,
+        stationname_exc=None, study_desc_exc=None, study_desc_inc=None,
         *args, **kwargs):
     """Query retrieve service class user function
     
@@ -295,6 +298,7 @@ def qrscu(
     d.PatientAge = ''
     d.PatientBirthDate = ''
     d.NumberOfStudyRelatedSeries = ''
+    d.StationName = ''
 
     d.StudyDate = make_dcm_date_range(date_from, date_until)
     if not d.StudyDate:
@@ -414,7 +418,7 @@ def qrscu(
         nr_series_remaining = study.dicomqrrspseries_set.all().count()
         if (nr_series_remaining==0):
             study.delete()
-
+    study_rsp = query.dicomqrrspstudy_set.all()
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now delete any that don't match the exclude and include criteria
@@ -444,6 +448,25 @@ def qrscu(
         study_rsp = query.dicomqrrspstudy_set.all()
         logger.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
                                                                                                 study_desc_inc))
+
+    if stationname_exc:
+        query.stage = "Deleting any studies/series with station names that match the exclude criteria"
+        logger.info("Deleting any studies/series with station names that match the exclude criteria")
+        for study in study_rsp:
+            # check if station name is blacklisted at study-level first; if not check at series-level
+            if any(term in str(study.station_name or '').lower() for term in stationname_exc):
+                study.delete()
+            else:
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    if any(term in str(s.station_name or '').lower() for term in stationname_exc):
+                        s.delete()
+                nr_series_remaining = study.dicomqrrspseries_set.all().count()
+                if (nr_series_remaining==0):
+                    study.delete()
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logger.info('Now have {0} studies after deleting all studies/series with station name containing: {1}'.format(study_rsp.count(),
+                                                                                                                       stationname_exc))
 
     logger.info("Release association")
     assoc.Release(0)
@@ -583,6 +606,9 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-i', '--desc_include',
                         help='Terms that must be included in study description, comma separated, quote whole string',
                         metavar='string')
+    parser.add_argument('-se', '--stationname_exclude',
+                        help='Terms to exclude in station name, comma separated, quote whole string',
+                        metavar='string')
     parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
     parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
     args = parser.parse_args()
@@ -625,6 +651,12 @@ def qrscu_script(*args, **kwargs):
         logger.info("Study description include terms are {0}".format(study_desc_inc))
     else:
         study_desc_inc = None
+
+    if args.stationname_exclude:
+        stationname_exc = map(str.lower, map(str.strip, args.stationname_exclude.split(',')))
+        logger.info("Stationname exclude terms are {0}".format(stationname_exc))
+    else:
+        stationname_exc = None
 
     duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
 
