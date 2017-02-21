@@ -110,3 +110,30 @@ class DicomQR(TestCase):
         # After pruning, two series
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 2)
+
+    def test_response_sorting_ct_philips_with_desc_no_dose_info(self):
+        """
+        Study response doesn't contain a Philips style 'dose info' series or an SR series, and study descriptions
+        are returned. Expect no series to be left after pruning, and the study response record deleted.
+        """
+        all_mods = {'CT': {'inc': True, 'mods': ['CT']},
+                    'MG': {'inc': False, 'mods': ['MG']},
+                    'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                    'DX': {'inc': False, 'mods': ['DX', 'CR']}
+                    }
+
+        query = DicomQuery.objects.get()
+        rst1 = query.dicomqrrspstudy_set.all()[0]
+        rst1_series_rsp = rst1.dicomqrrspseries_set.all()
+        rst1s3 = rst1_series_rsp[2]
+
+        # Remove the third series with the 'dose info' description
+        rst1s3.delete()
+
+        # Before the pruning, two series
+        self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 2)
+
+        qrscu._prune_series_responses(query, all_mods)
+
+        # After pruning, there should be no studies left
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 0)
