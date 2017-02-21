@@ -137,3 +137,42 @@ class DicomQR(TestCase):
 
         # After pruning, there should be no studies left
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 0)
+
+    def test_response_pruning_ct_philips_with_desc_and_sr(self):
+        """
+        Study response contains a Philips style 'dose info' series, with study descriptions available, and a structured
+        report series. Expect a single SR series to be left after pruning.
+        """
+        all_mods = {'CT': {'inc': True, 'mods': ['CT']},
+                    'MG': {'inc': False, 'mods': ['MG']},
+                    'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                    'DX': {'inc': False, 'mods': ['DX', 'CR']}
+                    }
+
+        query = DicomQuery.objects.get()
+        rst1 = query.dicomqrrspstudy_set.all()[0]
+
+        # Add in a fourth series with modality SR
+        rst1s4 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=rst1)
+        rst1s4.query_id = query.query_id
+        rst1s4.series_instance_uid = uuid.uuid4()
+        rst1s4.modality = u"SR"
+        rst1s4.series_number = 999
+        rst1s4.series_description = u"radiation dose report"
+        rst1s4.number_of_series_related_instances = 1
+        rst1s4.save()
+
+        # Re-generate the modality list
+        rst1_series_rsp = rst1.dicomqrrspseries_set.all()
+        rst1.set_modalities_in_study(list(set(val for dic in rst1_series_rsp.values('modality') for val in dic.values())))
+        rst1.save()
+
+        # Now starting with four series
+        self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 4)
+
+        qrscu._prune_series_responses(query, all_mods)
+
+        # Should now have one SR series left, identified by the series description for the purposes of this test
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
+        self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 1)
+        self.assertEqual(rst1.dicomqrrspseries_set.all()[0].series_description, u"radiation dose report")
