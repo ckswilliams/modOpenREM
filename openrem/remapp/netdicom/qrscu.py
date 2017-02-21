@@ -53,6 +53,60 @@ def _move_req(my_ae, remote_ae, d):
     logger.info("Move association released")
 
 
+def _prune_series_responses(query, all_mods):
+    study_rsp = query.dicomqrrspstudy_set.all()
+    query.stage = "Deleting series we can't use"
+    query.save()
+    logger.info("Deleting series we can't use")
+    for study in study_rsp:
+        if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
+            study.modality = 'MG'
+            study.save()
+            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
+            # be weeded out
+        if all_mods['DX']['inc']:
+            if 'CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study():
+                study.modality = 'DX'
+                study.save()
+                # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
+        if all_mods['FL']['inc']:
+            if 'RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study():
+                study.modality = 'FL'
+                study.save()
+                # Assume structured reports have modality 'SR' at series level?
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    if s.modality != 'SR':
+                        s.delete()
+        if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
+            study.modality = 'CT'
+            study.save()
+            if 'SR' in study.get_modalities_in_study():
+                series = study.dicomqrrspseries_set.all()
+                for s in series:
+                    if s.modality != 'SR':
+                        s.delete()
+            else:
+                series = study.dicomqrrspseries_set.all()
+                series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+                # if SR not present in study, only keep Philips dose info series
+                # skip this step for PACS systems returning (only) empty seriesdescriptions
+                if (series_descriptions != set([None])):
+                    for s in series:
+                        if s.series_description != 'dose info':
+                            s.delete()
+                else:
+                    for s in series:
+                        if s.number_of_series_related_instances > 5:
+                            s.delete()
+        nr_series_remaining = study.dicomqrrspseries_set.all().count()
+        if (nr_series_remaining==0):
+            study.delete()
+    study_rsp = query.dicomqrrspstudy_set.all()
+    logger.info('Now have {0} studies'.format(study_rsp.count()))
+
+
+
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     from time import sleep
     import uuid
@@ -370,56 +424,9 @@ def qrscu(
             studies_to_delete.delete()
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
-    # Now we need to delete any unwanted series
-    query.stage = "Deleting series we can't use"
-    query.save()
-    logger.info("Deleting series we can't use")
-    for study in study_rsp:
-        if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
-            study.modality = 'MG'
-            study.save()
-            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
-            # be weeded out
-        if all_mods['DX']['inc']:
-            if 'CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study():
-                study.modality = 'DX'
-                study.save()
-                # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
-        if all_mods['FL']['inc']:
-            if 'RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study():
-                study.modality = 'FL'
-                study.save()
-                # Assume structured reports have modality 'SR' at series level?
-                series = study.dicomqrrspseries_set.all()
-                for s in series:
-                    if s.modality != 'SR':
-                        s.delete()
-        if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
-            study.modality = 'CT'
-            study.save()
-            if 'SR' in study.get_modalities_in_study():
-                series = study.dicomqrrspseries_set.all()
-                for s in series:
-                    if s.modality != 'SR':
-                        s.delete()
-            else:
-                series = study.dicomqrrspseries_set.all()
-                series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-                # if SR not present in study, only keep Philips dose info series
-                # skip this step for PACS systems returning (only) empty seriesdescriptions
-                if (series_descriptions != set([None])):
-                    for s in series:
-                        if s.series_description != 'dose info':
-                            s.delete()
-                else:
-                    for s in series:
-                        if s.number_of_series_related_instances > 5:
-                            s.delete()
-        nr_series_remaining = study.dicomqrrspseries_set.all().count()
-        if (nr_series_remaining==0):
-            study.delete()
+    _prune_series_responses(query, all_mods)
+
     study_rsp = query.dicomqrrspstudy_set.all()
-    logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     # Now delete any that don't match the exclude and include criteria
     if study_desc_exc:
