@@ -18,6 +18,9 @@ OpenREM
 .. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
 
+.. image:: https://www.quantifiedcode.com/api/v1/project/ed6462bb44f4462189fd8777ab26e8dd/snapshot/origin:develop:HEAD/badge.svg
+  :target: https://www.quantifiedcode.com/app/project/ed6462bb44f4462189fd8777ab26e8dd
+  :alt: Code issues
 
 OpenREM is a Django app to extract, store and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
