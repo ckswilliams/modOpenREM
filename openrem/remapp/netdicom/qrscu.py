@@ -106,6 +106,27 @@ def _prune_series_responses(query, all_mods):
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
 
+def _prune_station_names(query, study_rsp, stationname_exc):
+    query.stage = "Deleting any studies/series with station names that match the exclude criteria"
+    logger.info("Deleting any studies/series with station names that match the exclude criteria")
+    for study in study_rsp:
+        # check if station name is blacklisted at study-level first; if not check at series-level
+        if any(term in str(study.station_name or '').lower() for term in stationname_exc):
+            study.delete()
+        else:
+            series = study.dicomqrrspseries_set.all()
+            for s in series:
+                if any(term in str(s.station_name or '').lower() for term in stationname_exc):
+                    s.delete()
+            nr_series_remaining = study.dicomqrrspseries_set.all().count()
+            if nr_series_remaining == 0:
+                study.delete()
+    study_rsp = query.dicomqrrspstudy_set.all()
+    logger.info('Now have {0} studies after deleting all studies/series with station name containing: {1}'.format(
+        study_rsp.count(),
+        stationname_exc))
+    return study_rsp
+
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     from time import sleep
@@ -457,23 +478,7 @@ def qrscu(
                                                                                                 study_desc_inc))
 
     if stationname_exc:
-        query.stage = "Deleting any studies/series with station names that match the exclude criteria"
-        logger.info("Deleting any studies/series with station names that match the exclude criteria")
-        for study in study_rsp:
-            # check if station name is blacklisted at study-level first; if not check at series-level
-            if any(term in str(study.station_name or '').lower() for term in stationname_exc):
-                study.delete()
-            else:
-                series = study.dicomqrrspseries_set.all()
-                for s in series:
-                    if any(term in str(s.station_name or '').lower() for term in stationname_exc):
-                        s.delete()
-                nr_series_remaining = study.dicomqrrspseries_set.all().count()
-                if (nr_series_remaining==0):
-                    study.delete()
-        study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info('Now have {0} studies after deleting all studies/series with station name containing: {1}'.format(study_rsp.count(),
-                                                                                                                       stationname_exc))
+        study_rsp = _prune_station_names(query, study_rsp)
 
     logger.info("Release association")
     assoc.Release(0)
