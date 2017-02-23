@@ -189,19 +189,19 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem.log',
             'formatter': 'verbose'
         },
         'qr_file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_qrscu.log',
             'formatter': 'verbose'
         },
         'store_file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
