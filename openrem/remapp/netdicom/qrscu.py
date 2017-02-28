@@ -53,79 +53,212 @@ def _move_req(my_ae, remote_ae, d):
     logger.info("Move association released")
 
 
-def _prune_series_responses(query, all_mods):
+def _filter(query, level, filter_name, filter_list, filter_type):
+    # level = series, study
+    # filter_name = station_name, sop_classes_in_study, study_description
+    # filter_list = e.g. stationnames_inc
+    # filter_type = exclude, include
+    if filter_type == 'exclude':
+        filtertype = True
+    elif filter_type == 'include':
+        filtertype = False
+
+    filter_name_desc = {
+                         'station_name'         : 'station names',
+                         'sop_classes_in_study' : 'sop classes',
+                         'study_description'    : 'study descriptions'
+                       }
+
     study_rsp = query.dicomqrrspstudy_set.all()
-    query.stage = "Deleting series we can't use"
-    query.save()
-    logger.info("Deleting series we can't use")
+    query.stage = "Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list)
+    logger.info("Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list))
     for study in study_rsp:
-        if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
-            study.modality = 'MG'
-            study.save()
-            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
-            # be weeded out
-        if all_mods['DX']['inc']:
-            if 'CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study():
-                study.modality = 'DX'
-                study.save()
-                # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
-        if all_mods['FL']['inc']:
-            if 'RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study():
-                study.modality = 'FL'
-                study.save()
-                # Assume structured reports have modality 'SR' at series level?
-                series = study.dicomqrrspseries_set.all()
-                for s in series:
-                    if s.modality != 'SR':
-                        s.delete()
-        if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
-            study.modality = 'CT'
-            study.save()
-            if 'SR' in study.get_modalities_in_study():
-                series = study.dicomqrrspseries_set.all()
-                for s in series:
-                    if s.modality != 'SR':
-                        s.delete()
-            else:
-                series = study.dicomqrrspseries_set.all()
-                series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-                # if SR not present in study, only keep Philips dose info series
-                # skip this step for PACS systems returning (only) empty seriesdescriptions
-                if (series_descriptions != set([None])):
-                    for s in series:
-                        if s.series_description != 'dose info':
-                            s.delete()
-                else:
-                    for s in series:
-                        if s.number_of_series_related_instances > 5:
-                            s.delete()
-        nr_series_remaining = study.dicomqrrspseries_set.all().count()
-        if (nr_series_remaining==0):
-            study.delete()
+        if level=='study':
+            if any(term in (getattr(study,filter_name) or '').lower() for term in filter_list) is filtertype:
+                study.delete()
+        elif level == 'series':
+            series = study.dicomqrrspseries_set.all()
+            for s in series:
+                if any(term in (getattr(s,filter_name) or '').lower() for term in filter_list) is filtertype:
+                    s.delete()
+            nr_series_remaining = study.dicomqrrspseries_set.all().count()
+            if (nr_series_remaining==0):
+                study.delete()
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info('Now have {0} studies'.format(study_rsp.count()))
 
 
-def _prune_station_names(query, study_rsp, stationname_exc):
-    query.stage = "Deleting any studies/series with station names that match the exclude criteria"
-    logger.info("Deleting any studies/series with station names that match the exclude criteria")
-    for study in study_rsp:
-        # check if station name is blacklisted at study-level first; if not check at series-level
-        if any(term in str(study.station_name or '').lower() for term in stationname_exc):
-            study.delete()
-        else:
-            series = study.dicomqrrspseries_set.all()
-            for s in series:
-                if any(term in str(s.station_name or '').lower() for term in stationname_exc):
-                    s.delete()
-            nr_series_remaining = study.dicomqrrspseries_set.all().count()
-            if nr_series_remaining == 0:
-                study.delete()
+def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
+    query.stage = "Deleting series we can't use"
+    query.save()
+    logger.info("Deleting series we can't use")
+
     study_rsp = query.dicomqrrspstudy_set.all()
-    logger.info('Now have {0} studies after deleting all studies/series with station name containing: {1}'.format(
-        study_rsp.count(),
-        stationname_exc))
-    return study_rsp
+
+    if filters['stationname_inc']:
+       _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_inc'], filter_type='include')
+
+    if filters['stationname_exc']:
+       _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_exc'], filter_type='exclude')
+
+    for study in study_rsp:
+        if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
+            study.modality = 'MG'
+            study.save()
+
+            if 'SR' in study.get_modalities_in_study() and check_sr_type_in_study(MyAE, RemoteAE, study) == 'RDSR':
+                logger.debug("Found RDSR in MG study, so keep SR and delete all other series")
+                series = study.dicomqrrspseries_set.all()
+                series.exclude(modality__exact='SR').delete()
+
+            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
+            # be weeded out
+        if all_mods['DX']['inc'] and ('CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study()):
+            study.modality = 'DX'
+            study.save()
+
+            if 'SR' in study.get_modalities_in_study() and check_sr_type_in_study(MyAE, RemoteAE, study) == 'RDSR':
+                logger.debug("Found RDSR in DX study, so keep SR and delete all other series")
+                series = study.dicomqrrspseries_set.all()
+                series.exclude(modality__exact='SR').delete()
+
+                # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
+        if all_mods['FL']['inc'] and ('RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study()):
+                study.modality = 'FL'
+                study.save()
+                # Assume structured reports have modality 'SR' at series level?
+                # No sense in checking SR?
+                series = study.dicomqrrspseries_set.all()
+                series.exclude(modality__exact='SR').delete()
+
+        if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
+            study.modality = 'CT'
+            study.save()
+            series = study.dicomqrrspseries_set.all()
+            if 'SR' in study.get_modalities_in_study():
+                SR_type = check_sr_type_in_study(MyAE, RemoteAE, study)
+                if SR_type == 'RDSR':
+                    logger.debug("Found RDSR in CT study, so keep SR and delete all other series")
+                    series.exclude(modality__exact='SR').delete()
+                elif SR_type == 'ESR':  # GE CT's with ESR instead of RDSR
+                    logger.debug("Found ESR in CT study, so keep SR and delete all other series")
+                    series.exclude(modality__exact='SR').delete()
+                else:
+                    # non-dose SR, so check for Philips dose info series
+                    series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+                    if (series_descriptions != set([None])):
+                        series.exclude(series_description__iexact='dose info').delete()
+                    else:
+                        series.filter(number_of_series_related_instances__gt=5).delete()
+            else:
+                # if SR not present in study, only keep Philips dose info series
+                # skip this step for PACS systems returning (only) empty seriesdescriptions
+                series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+                if (series_descriptions != set([None])):
+                    series.exclude(series_description__iexact='dose info').delete()
+                else:
+                    series.filter(number_of_series_related_instances__gt=5).delete()
+
+        nr_series_remaining = study.dicomqrrspseries_set.all().count()
+        if (nr_series_remaining==0):
+            logger.debug("Deleting empty study with suid {0}".format(study.study_instance_uid))
+            study.delete()
+
+
+def _prune_study_responses(query, study_rsp, all_mods, filters):
+
+    if filters['study_desc_inc']:
+      _filter(query, level='study', filter_name='study_description', filter_list=filters['study_desc_inc'], filter_type='include')
+
+    if filters['study_desc_exc']:
+      _filter(query, level='study', filter_name='study_description', filter_list=filters['study_desc_exc'], filter_type='exclude')
+
+    if filters['stationname_inc']:
+       _filter(query, level='study', filter_name='station_name', filter_list=filters['stationname_inc'], filter_type='include')
+
+    if filters['stationname_exc']:
+       _filter(query, level='study', filter_name='station_name', filter_list=filters['stationname_exc'], filter_type='exclude')
+
+    if filters['sopclassuid_inc']:
+      _filter(query, level='study', filter_name='sop_classes_in_study', filter_list=filters['sopclassuid_inc'], filter_type='include')
+
+    if filters['sopclassuid_exc']:
+      _filter(query, level='study', filter_name='sop_classes_in_study', filter_list=filters['sopclassuid_exc'], filter_type='exclude')
+
+
+
+# returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
+def check_sr_type_in_study(my_ae, remote_ae, study):
+    # select series with modality SR
+    series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
+    logger.info("nrseries with SR {0}".format(series_sr.count()))
+    sopclasses = set()
+    for s in series_sr:
+        _query_images(my_ae, remote_ae, s)
+        images = s.dicomqrrspimage_set.all()
+        sopclasses.add(images[0].sop_class_uid)
+        logger.info("studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(study.study_instance_uid,s.series_instance_uid,images.count(),sopclasses))
+    logger.info("sopclasses: {0}".format(sopclasses))
+    if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
+        return 'RDSR'
+    elif '1.2.840.10008.5.1.4.1.1.88.22' in sopclasses:
+        return 'ESR'
+    else:
+        return 'no_dose_report'
+
+
+def _query_images(my_ae, remote_ae, seriesrsp):
+    from time import sleep
+    import uuid
+    from remapp.tools.get_values import get_value_kw
+    from remapp.models import DicomQRRspImage
+    from dicom.dataset import Dataset
+    d3 = Dataset()
+    d3.QueryRetrieveLevel = "IMAGE"
+    d3.SeriesInstanceUID = seriesrsp.series_instance_uid
+    d3.SOPInstanceUID = ''
+    d3.SOPClassUID = ''
+    d3.InstanceNumber = ''
+
+    logger.debug('d3: {0}'.format(d3))
+
+    assoc_images = my_ae.RequestAssociation(remote_ae)
+
+    if not assoc_images:
+        logger.warning("Query series association must have failed, trying again")
+        sleep(2)
+        assoc_images = my_ae.RequestAssociation(remote_ae)
+        #if not assoc_images:
+        #    logger.error(
+        #        "Query instance association has failed. Me: {0}, Remote: {1}, StudyInstanceUID: {2}, SeriesInstanceUID: {3}".format(
+        #            my_ae, remote_ae, d3.SOPInstanceUID, d2.SeriesInstanceUID))
+        #    return
+
+    st3 = assoc_images.StudyRootFindSOPClass.SCU(d3, 1)
+
+    query_id = uuid.uuid4()
+
+    logger.debug('In _query_images')
+    imRspNo = 0
+
+    for images in st3:
+        if not images[1]:
+            continue
+        imRspNo += 1
+        logger.debug("Image Response {0}: {1}".format(imRspNo, images[1]))
+        imagesrsp = DicomQRRspImage.objects.create(dicom_qr_rsp_series=seriesrsp)
+        imagesrsp.query_id = query_id
+        # Mandatory tags
+        imagesrsp.sop_instance_uid = images[1].SOPInstanceUID
+        imagesrsp.sop_class_uid = images[1].SOPClassUID
+        imagesrsp.instance_number = images[1].InstanceNumber
+        if not imagesrsp.instance_number:  # despite it being mandatory!
+            imagesrsp.instance_number = None  # integer so can't be ''
+
+        imagesrsp.save()
+
+    assoc_images.Release(0)
+
 
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
@@ -189,11 +322,24 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     assoc_series.Release(0)
 
 
-def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
+def _query_study(my_ae, remote_ae, d, query, query_id):
     from decimal import Decimal
     from dicom.dataset import Dataset
     from remapp.models import DicomQRRspStudy
     from remapp.tools.get_values import get_value_kw
+    d.QueryRetrieveLevel = "STUDY"
+    d.PatientName = ''
+    d.PatientID = ''
+    d.AccessionNumber = ''
+    d.StudyDescription = ''
+    d.StudyID = ''
+    d.StudyInstanceUID = ''
+    d.StudyTime = ''
+    d.PatientAge = ''
+    d.PatientBirthDate = ''
+    d.NumberOfStudyRelatedSeries = ''
+    d.StationName = ''
+    d.SOPClassesInStudy = ''
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
@@ -224,18 +370,16 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
         rsp.station_name = get_value_kw('StationName', ss[1])
-
-        # Series level query
-        d2 = Dataset()
-        d2.StudyInstanceUID = rsp.study_instance_uid
-        _query_series(my_ae, remote_ae, d2, rsp)
+        rsp.sop_classes_in_study = get_value_kw('SOPClassesInStudy', ss[1])
+        logger.debug("SOPClassesInStudy: {0}".format(rsp.sop_classes_in_study))
 
         # Populate modalities_in_study, stored as JSON
-        try:
+        if isinstance(ss[1].ModalitiesInStudy, str):   # if single modality, then type = string ('XA')
             rsp.set_modalities_in_study(ss[1].ModalitiesInStudy.split(','))
-        except:
-            series_rsp = rsp.dicomqrrspseries_set.all()
-            rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values())))
+        else:   # if multiple modalities, type = MultiValue (['XA', 'RF'])
+            rsp.set_modalities_in_study(ss[1].ModalitiesInStudy)
+        logger.debug("ModalitiesInStudy: {0}".format(rsp.get_modalities_in_study()))
+
         rsp.modality = None  # Used later
         rsp.save()
 
@@ -246,8 +390,8 @@ def _query_study(assoc, my_ae, remote_ae, d, query, query_id):
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, inc_sr=True, duplicates=True,
-        stationname_exc=None, study_desc_exc=None, study_desc_inc=None,
+        date_from=None, date_until=None, modalities=None, inc_sr=False, duplicates=True,
+        filters=None,
         *args, **kwargs):
     """Query retrieve service class user function
     
@@ -264,10 +408,11 @@ def qrscu(
       date_from(str, optional): Date to search from, format yyyy-mm-dd (Default value = None)
       date_until(str, optional): Date to search until, format yyyy-mm-dd (Default value = None)
       modalities(list, optional): Modalities to search for, options are CT, MG, DX and FL (Default value = None)
-      inc_sr(bool, optional): Include studies that only have structured reports in (unknown modality) (Default value = True)
+      inc_sr(bool, optional): Only include studies that only have structured reports in (unknown modality) (Default value = False)
       duplicates(bool, optional): If True, studies that already exist in the database are removed from the query results (Default value = True)
-      *args: 
-      **kwargs: 
+      filters(dictionary list, optional): include en exclude lists for SOPClassUID, StationName and StudyDescription (Default value = None)
+      *args:
+      **kwargs:
 
     Returns:
       : Series Instance UIDs are stored as rows in the database to be used by a move request. Move request is
@@ -305,19 +450,6 @@ def qrscu(
             ImplicitVRLittleEndian,
             ExplicitVRBigEndian
         ]
-
-    all_mods = {'CT': {'inc': False, 'mods': ['CT']},
-                'MG': {'inc': False, 'mods': ['MG']},
-                'FL': {'inc': False, 'mods': ['RF', 'XA']},
-                'DX': {'inc': False, 'mods': ['DX', 'CR']}
-                }
-    # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
-    # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
-    # If not, then the PET-CT will be returned with everything else, and the CT will show up in the series level
-    # query. Therefore, there is no need to search for PT at any stage.
-    for m in all_mods:
-        if m in modalities:
-            all_mods[m]['inc'] = True
 
     # create application entity with Find and Move SOP classes as SCU
     MyAE = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
@@ -361,56 +493,60 @@ def qrscu(
 
     logger.info("DICOM FindSCU ... ")
     d = Dataset()
-    d.QueryRetrieveLevel = "STUDY"
-    d.PatientName = ''
-    d.PatientID = ''
-    d.AccessionNumber = ''
-    d.ModalitiesInStudy = ''
-    d.StudyDescription = ''
-    d.StudyID = ''
-    d.StudyInstanceUID = ''
-    d.StudyTime = ''
-    d.PatientAge = ''
-    d.PatientBirthDate = ''
-    d.NumberOfStudyRelatedSeries = ''
-    d.StationName = ''
+    d.StudyDate = str(make_dcm_date_range(date_from, date_until) or '')
 
-    d.StudyDate = make_dcm_date_range(date_from, date_until)
-    if not d.StudyDate:
-        d.StudyDate = ''
+    all_mods = {'CT': {'inc': False, 'mods': ['CT']},
+                'MG': {'inc': False, 'mods': ['MG']},
+                'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                'DX': {'inc': False, 'mods': ['DX', 'CR']},
+                'SR': {'inc': False, 'mods': ['SR']}
+                }
+    # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
+    # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
+    # If not, then the PET-CT will be returned with everything else, and the CT will show up in the series level
+    # query. Therefore, there is no need to search for PT at any stage.
+    for m in all_mods:
+        if m in modalities:
+            all_mods[m]['inc'] = True
 
+    # Assume that ModalitiesInStudy is a Matching Key Attribute
+    # If not, 1 query is sufficient to retrieve all relevant studies
     modality_matching = True
-    trip = 0
 
+    # query for all requested studies
+    # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
     for selection, details in all_mods.iteritems():
-        if details['inc']:  # No need to check for modality_matching here as modalities_left would also be false
+        if details['inc']:
             for mod in details['mods']:
                 query.stage = 'Currently querying for {0} studies...'.format(mod)
                 query.save()
                 logger.info('Currently querying for {0} studies...'.format(mod))
-                trip += 1
                 if modality_matching:
                     d.ModalitiesInStudy = mod
                     query_id = uuid.uuid4()
-                    _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
+                    _query_study(MyAE, RemoteAE, d, query, query_id)
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
                     for rsp in study_rsp:
                         if mod not in rsp.get_modalities_in_study():
                             modality_matching = False
                             break  # This indicates that there was no modality match, so we have everything already
 
-    if inc_sr and modality_matching:
-        query.stage = 'Currently querying for SR only studies'
-        query.save()
-        logger.info('Currently querying for SR only studies')
-        d.ModalitiesInStudy = 'SR'
-        query_id = uuid.uuid4()
-        _query_study(assoc, MyAE, RemoteAE, d, query, query_id)
-        # Nothing to gain by checking the response
+    logger.debug("modality_matching: {}".format(modality_matching))
+    logger.debug("SOPClassUIDs in study: {}".format(list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
 
     # Now we have all our studies. Time to throw away any we don't want
-    study_rsp = query.dicomqrrspstudy_set.all()
+    study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
 
+    # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
+    if modality_matching:
+        for study in study_rsp:
+            mods = study.get_modalities_in_study()
+            if inc_sr and mods != ['SR']:
+                study.delete()
+            if ('RF' in mods or 'XA' in mods) and 'SR' not in mods:
+                study.delete()
+
+    # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed.
     if duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
@@ -421,64 +557,56 @@ def qrscu(
                 study_rsp.filter(study_instance_uid__exact=uid).delete()
         logger.info('Now have {0} studies'.format(study_rsp.count()))
 
-    mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
-    logger.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
-    query.stage = "Deleting studies we didn't ask for"
-    query.save()
-    logger.info("Deleting studies we didn't ask for")
-    logger.debug("mods_in_study_set is {0}".format(mods_in_study_set))
-    for mod_set in mods_in_study_set:
-        logger.debug("mod_set is {0}".format(mod_set))
-        delete = True
-        for mod_choice, details in all_mods.iteritems():
-            logger.debug("mod_choice {0}, details {1}".format(mod_choice, details))
-            if details['inc']:
-                for mod in details['mods']:
-                    logger.info("mod is {0}, mod_set is {1}".format(mod, mod_set))
-                    if mod in mod_set:
-                        delete = False
-                        continue
-                    if inc_sr and 'SR' in mod_set:
-                        delete = False
-        if delete:
-            studies_to_delete = study_rsp.filter(modalities_in_study__exact=mod_set)
-            studies_to_delete.delete()
-    logger.info('Now have {0} studies'.format(study_rsp.count()))
-
-    _prune_series_responses(query, all_mods)
+    logger.debug("Pruning study responses")
+    _prune_study_responses(query, study_rsp, all_mods, filters)
 
     study_rsp = query.dicomqrrspstudy_set.all()
+    logger.info('Now have {0} studies'.format(study_rsp.count()))
 
-    # Now delete any that don't match the exclude and include criteria
-    if study_desc_exc:
-        query.stage = "Deleting any studies that match the exclude criteria"
-        logger.info("Deleting any studies that match the exclude criteria")
-        for study in study_rsp:
-            try:
-                if any(term in study.study_description.lower() for term in study_desc_exc):
-                    study.delete()
-            except AttributeError as e:
-                logger.warning("{0} in study exclude filter. Study kept on retrieve list.".format(e))
-        study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info(
-            'Now have {0} studies after deleting any containing any of {1}'.format(study_rsp.count(), study_desc_exc))
 
-    if study_desc_inc:
-        query.stage = "Deleting any studies that don't match the include criteria"
-        logger.info("Deleting any studies that don't match the include criteria")
-        for study in study_rsp:
-            try:
-                if not any(term in study.study_description.lower() for term in study_desc_inc):
-                    study.delete()
-            except AttributeError as e:
-                logger.warning("{0} in study include filter. Study deleted from retrieve list.".format(e))
-                study.delete()
-        study_rsp = query.dicomqrrspstudy_set.all()
-        logger.info('Now have {0} studies after deleting any not containing any of {1}'.format(study_rsp.count(),
-                                                                                                study_desc_inc))
+    for rsp in study_rsp:
+        # Series level query
+        d2 = Dataset()
+        d2.StudyInstanceUID = rsp.study_instance_uid
+        _query_series(MyAE, RemoteAE, d2, rsp)
+        if not modality_matching:
+            logger.debug("modality_matching = False, so building from series info")
+            series_rsp = rsp.dicomqrrspseries_set.all()
+            rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values()))) 
 
-    if stationname_exc:
-        study_rsp = _prune_station_names(query, study_rsp)
+
+    # if ModalitiesInStudy is not populated by PACS, manually weed out all studies that we're not interested in
+    # however.. we first have to retrieve all series, in order to build modalities_in_study
+    if not modality_matching:
+        mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
+        logger.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
+        query.stage = "Deleting studies we didn't ask for"
+        query.save()
+        logger.info("Deleting studies we didn't ask for")
+        logger.debug("mods_in_study_set is {0}".format(mods_in_study_set))
+        for mod_set in mods_in_study_set:
+            logger.info("mod_set is {0}".format(mod_set))
+            delete = True
+            for mod_choice, details in all_mods.iteritems():
+                logger.info("mod_choice {0}, details {1}".format(mod_choice, details))
+                if details['inc']:
+                    for mod in details['mods']:
+                        logger.info("mod is {0}, mod_set is {1}".format(mod, mod_set))
+                        if mod in mod_set:
+                            delete = False
+                            continue
+                        if inc_sr and mod_set == ['SR']:
+                            delete = False
+            if delete:
+                study_rsp.filter(modalities_in_study__exact=mod_set).delete()
+        logger.info('Now have {0} studies'.format(study_rsp.count()))
+
+
+    logger.debug("Pruning series responses")
+    _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters)
+
+    study_rsp = query.dicomqrrspstudy_set.all()
+    logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     logger.info("Release association")
     assoc.Release(0)
@@ -618,8 +746,17 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-i', '--desc_include',
                         help='Terms that must be included in study description, comma separated, quote whole string',
                         metavar='string')
-    parser.add_argument('-se', '--stationname_exclude',
+    parser.add_argument('-sne', '--stationname_exclude',
                         help='Terms to exclude in station name, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-sni', '--stationname_include',
+                        help='Terms to include in station name, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-sce', '--sopclassuid_exclude',
+                        help='Terms to exclude in station name, comma separated, quote whole string',
+                        metavar='string')
+    parser.add_argument('-sci', '--sopclassuid_include',
+                        help='Terms to include in station name, comma separated, quote whole string',
                         metavar='string')
     parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
     parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
@@ -636,6 +773,11 @@ def qrscu_script(*args, **kwargs):
         modalities += ['FL']
     if args.dx:
         modalities += ['DX']
+    if args.sr:
+        if not modalities:
+            parser.error("The sr option can not be combined with any other modalities!")
+        else:
+            modalities += ['SR']
 
     if not modalities:
         parser.error("At least one modality must be specified")
@@ -669,6 +811,31 @@ def qrscu_script(*args, **kwargs):
         logger.info("Stationname exclude terms are {0}".format(stationname_exc))
     else:
         stationname_exc = None
+    if args.stationname_include:
+        stationname_inc = map(str.lower, map(str.strip, args.stationname_include.split(',')))
+        logger.info("Stationname include terms are {0}".format(stationname_inc))
+    else:
+        stationname_inc = None
+
+    if args.sopclassuid_exclude:
+        sopclassuid_exc = map(str.lower, map(str.strip, args.sopclassuid_exclude.split(',')))
+        logger.info("SOPClassUID exclude terms are {0}".format(sopclassuid_exc))
+    else:
+        sopclassuid_exc = None
+    if args.sopclassuid_include:
+        sopclassuid_inc = map(str.lower, map(str.strip, args.sopclassuid_include.split(',')))
+        logger.info("SOPClassUID include terms are {0}".format(sopclassuid_inc))
+    else:
+        sopclassuid_inc = None
+
+    filters = {
+                'stationname_inc' : stationname_inc,
+                'stationname_exc' : stationname_exc,
+                'study_desc_inc'  : study_desc_inc,
+                'study_desc_exc'  : study_desc_exc,
+                'sopclassuid_inc' : sopclassuid_inc,
+                'sopclassuid_exc' : sopclassuid_exc
+              }
 
     duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
 
@@ -682,7 +849,7 @@ def qrscu_script(*args, **kwargs):
     sys.exit(
         qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
               duplicates=duplicates, date_from=args.dfrom, date_until=args.duntil,
-              study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc,
+              filters=filters
               )
     )
 
