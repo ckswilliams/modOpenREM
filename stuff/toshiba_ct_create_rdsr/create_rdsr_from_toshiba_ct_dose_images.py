@@ -276,25 +276,34 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
                                                 ##############################################
                                                 # Code here to add / update the data...
                                                 coding = Dataset()
+                                                coding2 = Dataset()
                                                 # DJP note: need to know or look up the three things below for each item
                                                 # that needs to be added.
                                                 if key == 'ProtocolName':
                                                     # First, check if there is already a ProtocolName container that has
                                                     # a protocol in it.
-                                                    protocol_exists = False
+                                                    data_exists = False
                                                     for container2b in container.ContentSequence:
                                                         for container3b in container2b:
                                                             try:
                                                                 if container3b.CodeValue == '125203':
-                                                                    protocol_exists = True
+                                                                    data_exists = True
                                                                     print container2b.TextValue
                                                                     if container2b.TextValue == '':
                                                                         # Update the protocol if it is blank
                                                                         container2b.TextValue = val
                                                             except AttributeError:
                                                                 pass
-                                                    if not protocol_exists:
+                                                    if not data_exists:
                                                         # If there is no protocol then add it
+                                                        #    (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                        #    (0040, a040) Value Type                          CS: 'TEXT'
+                                                        #    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                        #       (0008, 0100) Code Value                          SH: '125203'
+                                                        #       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                        #       (0008, 0104) Code Meaning                        LO: 'Acquisition Protocol'
+                                                        #       ---------
+                                                        #    (0040, a160) Text Value                          UT: 'TAP'
                                                         # Create the inner coding bit
                                                         coding.CodeValue = '125203'
                                                         coding.CodingSchemeDesignator = "DCM"
@@ -308,7 +317,78 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
                                                         # Sequences are lists.
                                                         prot_container.ConceptNameCodeSequence = Sequence([coding])
                                                         container.ContentSequence.append(prot_container)
-                                                        ##############################################
+
+                                                if key == 'SpiralPitchFactor':
+                                                    # First, check if there is already a SpiralPitchFactor container
+                                                    # that has a value in it.
+                                                    data_exists = False
+
+                                                    for container2b in container.ContentSequence:
+                                                        if container2b.ValueType == 'CONTAINER':
+                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                for container3b in container2b:
+                                                                    try:
+                                                                        if container3b.CodeValue == '113828':
+                                                                            data_exists = True
+                                                                            print container2b.TextValue
+                                                                            if container2b.TextValue == '':
+                                                                                # Update the protocol if it is blank
+                                                                                container2b.TextValue = val
+                                                                    except AttributeError:
+                                                                        pass
+                                                            if not data_exists:
+                                                                # If there is no protocol then add it
+                                                                #       ---------
+                                                                #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                                #       (0040, a040) Value Type                          CS: 'NUM'
+                                                                #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                                #          (0008, 0100) Code Value                          SH: '113828'
+                                                                #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                                #          (0008, 0104) Code Meaning                        LO: 'Pitch Factor'
+                                                                #          ---------
+                                                                #       (0040, a300)  Measured Value Sequence   1 item(s) ----
+                                                                #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
+                                                                #             (0008, 0100) Code Value                          SH: '{ratio}'
+                                                                #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
+                                                                #             (0008, 0103) Coding Scheme Version               SH: '1.4'
+                                                                #             (0008, 0104) Code Meaning                        LO: 'ratio'
+                                                                #             ---------
+                                                                #          (0040, a30a) Numeric Value                       DS: '0.6'
+                                                                #          ---------
+                                                                #       ---------
+
+
+
+
+                                                                # Create the first inner coding bit
+                                                                coding.CodeValue = '113828'
+                                                                coding.CodingSchemeDesignator = "DCM"
+                                                                coding.CodeMeaning = "Pitch Factor"
+                                                                # Create the second inner coding bit
+                                                                coding2.CodeValue = '{ratio}'
+                                                                coding2.CodingSchemeDesignator = "UCUM"
+                                                                coding2.CodingSchemeVersion = "1.4"
+                                                                coding2.CodeMeaning = "ratio"
+                                                                measurement_units_container = Dataset()
+                                                                measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
+                                                                # value_container = Dataset()
+                                                                measurement_units_container.MeasurementUnitsCodeSequence.NumericValue = val
+                                                                measured_value_sequence = Sequence([measurement_units_container])
+                                                                # measured_value_sequence.NumericValue = val
+                                                                # Create the outer container bit, including the protocol name
+                                                                pitch_container = Dataset()
+                                                                pitch_container.RelationshipType = "CONTAINS"
+                                                                pitch_container.ValueType = "NUM"
+                                                                pitch_container.NumericValue = val
+                                                                # Add the coding sequence into the container.
+                                                                # Sequences are lists.
+                                                                pitch_container.ConceptNameCodeSequence = Sequence(
+                                                                    [coding])
+                                                                pitch_container.MeasuredValueSequence = measured_value_sequence
+                                                                container2b.ContentSequence.append(pitch_container)
+
+                                                # The end of updating the RDSR
+                                                ##############################################
                                 except KeyError:
                                     # Either CTDIvol or DLP data is not present
                                     pass
@@ -338,8 +418,9 @@ for folder in folders:
     extra_information = find_extra_info(folder)
     extra_study_information = extra_information[0]
     extra_acquisition_information = extra_information[1]
+    update_dicom_rdsr(os.path.join(folder, 'sr.dcm_updated.dcm'), extra_study_information, extra_acquisition_information)
     # update_dicom_rdsr(os.path.join(folder, 'sr.dcm'), extra_study_information, extra_acquisition_information)
-    update_dicom_rdsr(os.path.join(folder, 'siemens.sr.dcm'), extra_study_information, extra_acquisition_information)
+    # update_dicom_rdsr(os.path.join(folder, 'siemens.sr.dcm'), extra_study_information, extra_acquisition_information)
     # Now import the updated created sr.dcm into OpenREM using the Toshiba extractor
     # ...
 
@@ -749,3 +830,6 @@ for folder in folders:
 #       ---------
 #    ---------
 # ###########################################
+
+
+
