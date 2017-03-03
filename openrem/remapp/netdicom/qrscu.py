@@ -774,7 +774,7 @@ def qrscu_script(*args, **kwargs):
     if args.dx:
         modalities += ['DX']
     if args.sr:
-        if not modalities:
+        if modalities:
             parser.error("The sr option can not be combined with any other modalities!")
         else:
             modalities += ['SR']
