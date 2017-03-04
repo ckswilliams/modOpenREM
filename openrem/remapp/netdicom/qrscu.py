@@ -65,7 +65,7 @@ def _filter(query, level, filter_name, filter_list, filter_type):
 
     filter_name_desc = {
                          'station_name'         : 'station names',
-                         'sop_classes_in_study' : 'sop classes',
+                         # 'sop_classes_in_study' : 'sop classes',
                          'study_description'    : 'study descriptions'
                        }
 
@@ -752,12 +752,12 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-sni', '--stationname_include',
                         help='Terms to include in station name, comma separated, quote whole string',
                         metavar='string')
-    parser.add_argument('-sce', '--sopclassuid_exclude',
-                        help='Terms to exclude in station name, comma separated, quote whole string',
-                        metavar='string')
-    parser.add_argument('-sci', '--sopclassuid_include',
-                        help='Terms to include in station name, comma separated, quote whole string',
-                        metavar='string')
+    # parser.add_argument('-sce', '--sopclassuid_exclude',
+    #                     help='Terms to exclude in station name, comma separated, quote whole string',
+    #                     metavar='string')
+    # parser.add_argument('-sci', '--sopclassuid_include',
+    #                     help='Terms to include in station name, comma separated, quote whole string',
+    #                     metavar='string')
     parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
     parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
     args = parser.parse_args()
@@ -817,24 +817,24 @@ def qrscu_script(*args, **kwargs):
     else:
         stationname_inc = None
 
-    if args.sopclassuid_exclude:
-        sopclassuid_exc = map(str.lower, map(str.strip, args.sopclassuid_exclude.split(',')))
-        logger.info("SOPClassUID exclude terms are {0}".format(sopclassuid_exc))
-    else:
-        sopclassuid_exc = None
-    if args.sopclassuid_include:
-        sopclassuid_inc = map(str.lower, map(str.strip, args.sopclassuid_include.split(',')))
-        logger.info("SOPClassUID include terms are {0}".format(sopclassuid_inc))
-    else:
-        sopclassuid_inc = None
+    # if args.sopclassuid_exclude:
+    #     sopclassuid_exc = map(str.lower, map(str.strip, args.sopclassuid_exclude.split(',')))
+    #     logger.info("SOPClassUID exclude terms are {0}".format(sopclassuid_exc))
+    # else:
+    #     sopclassuid_exc = None
+    # if args.sopclassuid_include:
+    #     sopclassuid_inc = map(str.lower, map(str.strip, args.sopclassuid_include.split(',')))
+    #     logger.info("SOPClassUID include terms are {0}".format(sopclassuid_inc))
+    # else:
+    #     sopclassuid_inc = None
 
     filters = {
                 'stationname_inc' : stationname_inc,
                 'stationname_exc' : stationname_exc,
                 'study_desc_inc'  : study_desc_inc,
                 'study_desc_exc'  : study_desc_exc,
-                'sopclassuid_inc' : sopclassuid_inc,
-                'sopclassuid_exc' : sopclassuid_exc
+                # 'sopclassuid_inc' : sopclassuid_inc,
+                # 'sopclassuid_exc' : sopclassuid_exc
               }
 
     duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
