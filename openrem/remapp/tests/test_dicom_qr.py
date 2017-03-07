@@ -8,8 +8,6 @@ from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries
 
 
-class QRScript(TestCase):
-
 
 class DicomQR(TestCase):
     def setUp(self):
