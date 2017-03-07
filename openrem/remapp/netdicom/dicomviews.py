@@ -178,7 +178,7 @@ def q_process(request, *args, **kwargs):
             date_until = form.cleaned_data.get('date_until_field')
             modalities = form.cleaned_data.get('modality_field')
             inc_sr = form.cleaned_data.get('inc_sr_field')
-            duplicates = form.cleaned_data.get('duplicates_field')
+            remove_duplicates = form.cleaned_data.get('duplicates_field')
             desc_exclude = form.cleaned_data.get('desc_exclude_field')
             desc_include = form.cleaned_data.get('desc_include_field')
             stationname_exclude = form.cleaned_data.get('stationname_exclude_field')
@@ -203,8 +203,9 @@ def q_process(request, *args, **kwargs):
                 stationname_exc = None
 
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
-                               date_until=date_until, modalities=modalities, inc_sr=inc_sr, duplicates=duplicates,
-                               stationname_exc=stationname_exc, study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc)
+                               date_until=date_until, modalities=modalities, inc_sr=inc_sr,
+                               remove_duplicates=remove_duplicates, stationname_exc=stationname_exc,
+                               study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc)
 
             resp = {}
             resp['message'] = 'Request created'

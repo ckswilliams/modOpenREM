@@ -390,7 +390,7 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, inc_sr=False, duplicates=True,
+        date_from=None, date_until=None, modalities=None, inc_sr=False, remove_duplicates=True,
         filters=None,
         *args, **kwargs):
     """Query retrieve service class user function
@@ -409,7 +409,7 @@ def qrscu(
       date_until(str, optional): Date to search until, format yyyy-mm-dd (Default value = None)
       modalities(list, optional): Modalities to search for, options are CT, MG, DX and FL (Default value = None)
       inc_sr(bool, optional): Only include studies that only have structured reports in (unknown modality) (Default value = False)
-      duplicates(bool, optional): If True, studies that already exist in the database are removed from the query results (Default value = True)
+      remove_duplicates(bool, optional): If True, studies that already exist in the database are removed from the query results (Default value = True)
       filters(dictionary list, optional): include en exclude lists for SOPClassUID, StationName and StudyDescription (Default value = None)
       *args:
       **kwargs:
@@ -547,7 +547,7 @@ def qrscu(
                 study.delete()
 
     # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed.
-    if duplicates:
+    if remove_duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
         logger.info(
@@ -759,7 +759,8 @@ def qrscu_script(*args, **kwargs):
     #                     help='Terms to include in station name, comma separated, quote whole string',
     #                     metavar='string')
     parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
-    parser.add_argument('-dup', action="store_true", help="Advanced: Retrieve studies that are already in database")
+    parser.add_argument('-dup', action="store_true",
+                        help="Advanced: Retrieve duplicates (studies that are already in database)")
     args = parser.parse_args()
 
     logger.info("qrscu script called")
@@ -837,7 +838,7 @@ def qrscu_script(*args, **kwargs):
                 # 'sopclassuid_exc' : sopclassuid_exc
               }
 
-    duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
+    remove_duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
 
     qrnode_up = echoscu(args.qrid, qr_scp=True)
     storenode_up = echoscu(args.storeid, store_scp=True)
@@ -848,9 +849,9 @@ def qrscu_script(*args, **kwargs):
 
     sys.exit(
         qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
-              duplicates=duplicates, date_from=args.dfrom, date_until=args.duntil,
-              filters=filters
-              )
+                    remove_duplicates=remove_duplicates, date_from=args.dfrom, date_until=args.duntil,
+                    filters=filters
+                    )
     )
 
 if __name__ == "__main__":
