@@ -10,10 +10,6 @@ from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries
 
 class QRScript(TestCase):
 
-    def test_sr_exclusive(self):
-        from remapp.netdicom.qrscu import qrscu_script
-        self.assertRaisesMessage("The sr option can not be combined with any other modalities!", qrscu_script('ct', 'sr', '1', '1'))
-
 
 class DicomQR(TestCase):
     def setUp(self):
