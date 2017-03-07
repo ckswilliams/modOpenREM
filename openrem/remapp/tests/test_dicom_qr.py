@@ -3,10 +3,14 @@
 
 import os
 from django.test import TestCase
+from mock import patch
 import uuid
 from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries
 
+
+def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
+    return 'RDSR'
 
 
 class DicomQR(TestCase):
@@ -66,13 +70,19 @@ class DicomQR(TestCase):
                     'FL': {'inc': False, 'mods': ['RF', 'XA']},
                     'DX': {'inc': False, 'mods': ['DX', 'CR']}
                     }
+        filters = {
+            'stationname_inc': None,
+            'stationname_exc': None,
+            'study_desc_inc': None,
+            'study_desc_exc': None,
+        }
 
         query = DicomQuery.objects.get()
         rst1 = query.dicomqrrspstudy_set.all()[0]
 
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 3)
 
-        qrscu._prune_series_responses(query, all_mods)
+        qrscu._prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
 
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 1)
@@ -88,6 +98,12 @@ class DicomQR(TestCase):
                     'FL': {'inc': False, 'mods': ['RF', 'XA']},
                     'DX': {'inc': False, 'mods': ['DX', 'CR']}
                     }
+        filters = {
+            'stationname_inc': None,
+            'stationname_exc': None,
+            'study_desc_inc': None,
+            'study_desc_exc': None,
+        }
 
         query = DicomQuery.objects.get()
         rst1 = query.dicomqrrspstudy_set.all()[0]
@@ -106,7 +122,7 @@ class DicomQR(TestCase):
         # Before pruning, three series
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 3)
 
-        qrscu._prune_series_responses(query, all_mods)
+        qrscu._prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
 
         # After pruning, two series
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
@@ -122,6 +138,12 @@ class DicomQR(TestCase):
                     'FL': {'inc': False, 'mods': ['RF', 'XA']},
                     'DX': {'inc': False, 'mods': ['DX', 'CR']}
                     }
+        filters = {
+            'stationname_inc': None,
+            'stationname_exc': None,
+            'study_desc_inc': None,
+            'study_desc_exc': None,
+        }
 
         query = DicomQuery.objects.get()
         rst1 = query.dicomqrrspstudy_set.all()[0]
@@ -134,11 +156,12 @@ class DicomQR(TestCase):
         # Before the pruning, two series
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 2)
 
-        qrscu._prune_series_responses(query, all_mods)
+        qrscu._prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
 
         # After pruning, there should be no studies left
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 0)
 
+    @patch("remapp.netdicom.qrscu.check_sr_type_in_study", _fake_check_sr_type_in_study_with_rdsr)
     def test_response_pruning_ct_philips_with_desc_and_sr(self):
         """
         Study response contains a Philips style 'dose info' series, with study descriptions available, and a structured
@@ -149,6 +172,12 @@ class DicomQR(TestCase):
                     'FL': {'inc': False, 'mods': ['RF', 'XA']},
                     'DX': {'inc': False, 'mods': ['DX', 'CR']}
                     }
+        filters = {
+            'stationname_inc': None,
+            'stationname_exc': None,
+            'study_desc_inc': None,
+            'study_desc_exc': None,
+        }
 
         query = DicomQuery.objects.get()
         rst1 = query.dicomqrrspstudy_set.all()[0]
@@ -171,7 +200,7 @@ class DicomQR(TestCase):
         # Now starting with four series
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 4)
 
-        qrscu._prune_series_responses(query, all_mods)
+        qrscu._prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
 
         # Should now have one SR series left, identified by the series description for the purposes of this test
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)

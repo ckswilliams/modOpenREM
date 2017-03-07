@@ -186,7 +186,6 @@ def _prune_study_responses(query, study_rsp, all_mods, filters):
       _filter(query, level='study', filter_name='sop_classes_in_study', filter_list=filters['sopclassuid_exc'], filter_type='exclude')
 
 
-
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
 def check_sr_type_in_study(my_ae, remote_ae, study):
     # select series with modality SR
