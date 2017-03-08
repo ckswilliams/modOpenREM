@@ -5,14 +5,7 @@ import sys
 import os
 from glob import glob
 from openrem.remapp.extractors import rdsr
-
-dcmtk_path = 'C:\\Users\\David\\Apps\\dcmtk-3.6.0-win32-i386\\bin'
-dcmconv = os.path.join(dcmtk_path, 'dcmconv.exe')
-dcmmkdir = os.path.join(dcmtk_path, 'dcmmkdir.exe')
-java_exe = 'C:\\Users\\David\\Apps\\doseUtility\\windows\\jre\\bin\\java.exe'
-java_options = '-Xms256m -Xmx512m -Xss1m -cp'
-pixelmed_jar = 'C:\\Users\\David\\Apps\\doseUtility\\pixelmed.jar'
-pixelmed_jar_options = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+from openremproject.settings import DCMCONV, DCMMKDIR, JAVA_EXE, JAVA_OPTIONS, PIXELMED_JAR, PIXELMED_JAR_OPTIONS
 
 
 def split_by_studyinstanceuid(dicom_path):
@@ -428,16 +421,16 @@ for arg in sys.argv[1:]:
 
         # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
         print 'Making explicit VR little endian'
-        make_explicit_vr_little_endian(folders, dcmconv)
+        make_explicit_vr_little_endian(folders, DCMCONV)
 
         # Now create a DICOMDIR for each sub-folder using dcmmkdir.
         # This is required by pixelmed.jar when creating RDSRs.
         print 'Creating DICOMDIR files'
-        make_dicomdir(folders, dcmmkdir)
+        make_dicomdir(folders, DCMMKDIR)
 
         # Now create a DICOM RDSR for each sub-folder using pixelmed.jar.
         print 'Making initial DICOM RDSR objects'
-        combined_command = java_exe + ' ' + java_options + ' ' + pixelmed_jar + ' ' + pixelmed_jar_options
+        combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
         make_dicom_rdsr(folders, combined_command, rdsr_name)
 
         # Obtain additional information from the image tags in each folder and add this information to the RDSR file.

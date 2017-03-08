@@ -82,3 +82,12 @@ TIME_ZONE = 'Europe/London'
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
+
+# Locations of various tools for DICOM RDSR creation from CT images
+DCMTK_PATH = 'C:\\Users\\David\\Apps\\dcmtk-3.6.0-win32-i386\\bin'
+DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+JAVA_EXE = 'C:\\Users\\David\\Apps\\doseUtility\\windows\\jre\\bin\\java.exe'
+JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+PIXELMED_JAR = 'C:\\Users\\David\\Apps\\doseUtility\\pixelmed.jar'
+PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
