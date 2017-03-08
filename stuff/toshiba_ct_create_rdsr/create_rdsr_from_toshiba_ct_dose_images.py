@@ -6,12 +6,12 @@ import os
 from glob import glob
 from openrem.remapp.extractors import rdsr
 
-dcmtk_path = 'D:\\Server_Apps\\dcmtk-3.6.0-win32-i386\\bin'
+dcmtk_path = 'C:\\Users\\David\\Apps\\dcmtk-3.6.0-win32-i386\\bin'
 dcmconv = os.path.join(dcmtk_path, 'dcmconv.exe')
 dcmmkdir = os.path.join(dcmtk_path, 'dcmmkdir.exe')
-java_exe = 'D:\\Server_Apps\\DoseUtility\\windows\\jre\\bin\\java.exe'
+java_exe = 'C:\\Users\\David\\Apps\\doseUtility\\windows\\jre\\bin\\java.exe'
 java_options = '-Xms256m -Xmx512m -Xss1m -cp'
-pixelmed_jar = 'D:\Server_Apps\DoseUtility\\pixelmed.jar'
+pixelmed_jar = 'C:\\Users\\David\\Apps\\doseUtility\\pixelmed.jar'
 pixelmed_jar_options = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
 
@@ -143,17 +143,33 @@ def find_extra_info(dicom_path):
 
                         acquisition_info.append(info_dictionary)
 
-                        # Update the study-level information
-                        try:
-                            if dcm.StudyDescription != '':
+                    # Update the study-level information, whether this acquisition # has been seen yet or not
+                    try:
+                        print dcm.StudyDescription
+                        if dcm.StudyDescription != '':
+                            try:
+                                if study_info['StudyDescription'] == '':
+                                    # Only update study_info['StudyDescription'] if it's empty
+                                    study_info['StudyDescription'] = dcm.StudyDescription
+                            except KeyError:
+                                # study_info['StudyDescription'] doesn't exist yet, so create it
                                 study_info['StudyDescription'] = dcm.StudyDescription
-                        except AttributeError:
-                            pass
-                        try:
-                            if dcm.RequestedProcedureDescription != '':
+                    except AttributeError:
+                        # dcm.StudyDescription isn't present
+                        pass
+
+                    try:
+                        if dcm.RequestedProcedureDescription != '':
+                            try:
+                                if study_info['RequestedProcedureDescription'] == '':
+                                    # Only update study_info['RequestedProcedureDescription'] if it's empty
+                                    study_info['RequestedProcedureDescription'] = dcm.RequestedProcedureDescription
+                            except KeyError:
+                                # study_info['RequestedProcedureDescription'] doesn't exist yet, so create it
                                 study_info['RequestedProcedureDescription'] = dcm.RequestedProcedureDescription
-                        except AttributeError:
-                            pass
+                    except AttributeError:
+                        # dcm.RequestedProcedureDescription isn't present
+                        pass
 
                 except AttributeError:
                     pass
@@ -237,7 +253,7 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
         return
 
     # Update the study-level information if it does not exist, or is an empty string.
-    for key, val in additional_study_info:
+    for key, val in additional_study_info.items():
         try:
             rdsr_val = getattr(dcm, key)
             if rdsr_val == '':
