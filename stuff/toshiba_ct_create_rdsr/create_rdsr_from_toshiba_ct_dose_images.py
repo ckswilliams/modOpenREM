@@ -1,12 +1,17 @@
-import os
+#!D:\Server_Apps\python27\python.exe
+# scripts/create_rdsr_from_toshiba_ct_dose_images
 
-folder_with_images = 'C:\\Temp\\dicom_temp'
-dcmtk_path = 'C:\\Users\\David\\Apps\\dcmtk-3.6.0-win32-i386\\bin'
+import sys
+import os
+from glob import glob
+from openrem.remapp.extractors import rdsr
+
+dcmtk_path = 'D:\\Server_Apps\\dcmtk-3.6.0-win32-i386\\bin'
 dcmconv = os.path.join(dcmtk_path, 'dcmconv.exe')
 dcmmkdir = os.path.join(dcmtk_path, 'dcmmkdir.exe')
-java_exe = 'C:\\Users\\David\\Apps\\doseUtility\\windows\\jre\\bin\\java.exe'
+java_exe = 'D:\\Server_Apps\\DoseUtility\\windows\\jre\\bin\\java.exe'
 java_options = '-Xms256m -Xmx512m -Xss1m -cp'
-pixelmed_jar = 'C:\\Users\\David\\Apps\\doseUtility\\pixelmed.jar'
+pixelmed_jar = 'D:\Server_Apps\DoseUtility\\pixelmed.jar'
 pixelmed_jar_options = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
 
@@ -193,18 +198,19 @@ def make_dicomdir(folder_list, dcmmkdir_exe):
         subprocess.call(command.split())
 
 
-def make_dicom_rdsr(folder_list, pixelmed_jar_command):
+def make_dicom_rdsr(folder_list, pixelmed_jar_command, sr_filename):
     """Parse folders of files, making a DICOM RDSR for each using pixelmed.jar.
 
     Args:
         folder_list (list): A list of full paths containing DICOM objects.
         pixelmed_jar_command (str): A string containing the pixelmed_jar command and options.
+        sr_filename (str): A string containing the filename to use when creating the rdsr.
 
     """
     import subprocess
 
     for current_folder in folder_list:
-        command = pixelmed_jar_command + ' ' + current_folder + ' ' + os.path.join(current_folder, 'sr.dcm')
+        command = pixelmed_jar_command + ' ' + current_folder + ' ' + os.path.join(current_folder, sr_filename)
         subprocess.call(command.split())
 
 
@@ -388,40 +394,56 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
                                     # Either CTDIvol or DLP data is not present
                                     pass
     dcm.save_as(rdsr_file + '_updated.dcm')
+    return rdsr_file + '_updated.dcm'
 
 
-# # Split a folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the first dose
-# # summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one dose summary per
-# # folder. N.B. I think Conquest may do this by default with incoming DICOM objects. This routine also renames the files
-# # using integer file names to ensure that they are accepted by dcmmkdir later on.
-# folders = split_by_studyinstanceuid(folder_with_images)
-#
-# # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
-# make_explicit_vr_little_endian(folders, dcmconv)
-#
-# # Now create a DICOMDIR for each sub-folder using dcmmkdir. This is required by pixelmed.jar when creating RDSRs.
-# make_dicomdir(folders, dcmmkdir)
-#
-# # Now create a DICOM RDSR for each sub-folder using pixelmed.jar.
-# combined_command = java_exe + ' ' + java_options + ' ' + pixelmed_jar + ' ' + pixelmed_jar_options
-# make_dicom_rdsr(folders, combined_command)
+if len(sys.argv) < 2:
+    sys.exit('Error: supply at least one argument - the folder containing the DICOM objects')
 
-folders = ['C:\\Temp\\dicom_temp\\1.2.392.200036.9116.2.5.1.48.1221172435.1481010015.22086']
+for arg in sys.argv[1:]:
+    rdsr_name = 'sr.dcm'
+    for folder_name in glob(arg):
+        # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
+        # first dose summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one
+        # dose summary per folder. N.B. I think Conquest may do this by default with incoming DICOM objects. This
+        # routine also renames the files using integer file names to ensure that they are accepted by dcmmkdir later on.
+        print 'Splitting into folders by StudyInstanceUID'
+        folders = split_by_studyinstanceuid(folder_name)
 
-# Now obtain additional information from the image tags in each folder and add this information to the RDSR file.
-for folder in folders:
-    extra_information = find_extra_info(folder)
-    extra_study_information = extra_information[0]
-    extra_acquisition_information = extra_information[1]
-    # update_dicom_rdsr(os.path.join(folder, 'sr.dcm_updated.dcm'), extra_study_information, extra_acquisition_information)
-    update_dicom_rdsr(os.path.join(folder, 'sr.dcm'), extra_study_information, extra_acquisition_information)
-    # update_dicom_rdsr(os.path.join(folder, 'siemens.sr.dcm'), extra_study_information, extra_acquisition_information)
-    # Now import the updated created sr.dcm into OpenREM using the Toshiba extractor
-    # ...
+        # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
+        print 'Making explicit VR little endian'
+        make_explicit_vr_little_endian(folders, dcmconv)
 
-    # Now delete all the files and folders that have been created
-    # ...
+        # Now create a DICOMDIR for each sub-folder using dcmmkdir.
+        # This is required by pixelmed.jar when creating RDSRs.
+        print 'Creating DICOMDIR files'
+        make_dicomdir(folders, dcmmkdir)
 
+        # Now create a DICOM RDSR for each sub-folder using pixelmed.jar.
+        print 'Making initial DICOM RDSR objects'
+        combined_command = java_exe + ' ' + java_options + ' ' + pixelmed_jar + ' ' + pixelmed_jar_options
+        make_dicom_rdsr(folders, combined_command, rdsr_name)
+
+        # Obtain additional information from the image tags in each folder and add this information to the RDSR file.
+        for folder in folders:
+            print 'Gathering extra information from images in ' + folder
+            extra_information = find_extra_info(folder)
+            extra_study_information = extra_information[0]
+            extra_acquisition_information = extra_information[1]
+
+            # Use the extra information to update the initial rdsr file created by DoseUtility
+            print 'Updating information in rdsr in ' + folder
+            updated_rdsr_file = update_dicom_rdsr(os.path.join(folder, rdsr_name), extra_study_information,
+                                                  extra_acquisition_information)
+
+            # Now import the updated rdsr into OpenREM using the Toshiba extractor
+            print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_file + ')'
+            rdsr(updated_rdsr_file)
+
+            # Now delete all the files and folders that have been created
+            # ...
+
+sys.exit()
 
 # DoseUtility validation complaints - will be useful to work out codes etc for putting in things like pitch
 # Found XRayRadiationDoseSR IOD
@@ -825,6 +847,3 @@ for folder in folders:
 #       ---------
 #    ---------
 # ###########################################
-
-
-
