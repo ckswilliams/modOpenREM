@@ -45,7 +45,8 @@ def split_by_studyinstanceuid(dicom_path):
 
                 file_counter += 1
 
-            except InvalidDicomError:
+            except InvalidDicomError as e:
+                print 'Invalid DICOM error: {0} when trying to read {1}'.format(e.message, os.path.join(dicom_path, filename))
                 pass
 
     return folder_list
@@ -103,6 +104,10 @@ def find_extra_info(dicom_path):
                             pass
                         try:
                             info_dictionary['ExposureTime'] = dcm.ExposureTime
+                        except AttributeError:
+                            pass
+                        try:
+                            info_dictionary['KVP'] = dcm.KVP
                         except AttributeError:
                             pass
                         try:
@@ -238,9 +243,9 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
     for container in dcm.ContentSequence:
         if container.ValueType == 'CONTAINER':
             if container.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
-                print '###########################################'
-                print container
-                print '###########################################'
+                # print '###########################################'
+                # print container
+                # print '###########################################'
                 for container2 in container.ContentSequence:
                     # The Acquisition protocol would go in at this level I think
                     if container2.ValueType == 'CONTAINER':
@@ -272,7 +277,7 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
                                         #      str(acquisition['DLP']) + ', ' + str(current_dlp)
                                         for key, val in acquisition.items():
                                             if key != 'CTDIvol' and key != 'DLP':
-                                                print key + ' -> ' + str(val)
+                                                # print key + ' -> ' + str(val)
                                                 ##############################################
                                                 # Code here to add / update the data...
                                                 coding = Dataset()
@@ -288,7 +293,7 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
                                                             try:
                                                                 if container3b[0].CodeValue == '125203':
                                                                     data_exists = True
-                                                                    print container2b.TextValue
+                                                                    # print container2b.TextValue
                                                                     if container2b.TextValue == '':
                                                                         # Update the protocol if it is blank
                                                                         container2b.TextValue = val
@@ -408,8 +413,8 @@ for folder in folders:
     extra_information = find_extra_info(folder)
     extra_study_information = extra_information[0]
     extra_acquisition_information = extra_information[1]
-    update_dicom_rdsr(os.path.join(folder, 'sr.dcm_updated.dcm'), extra_study_information, extra_acquisition_information)
-    # update_dicom_rdsr(os.path.join(folder, 'sr.dcm'), extra_study_information, extra_acquisition_information)
+    # update_dicom_rdsr(os.path.join(folder, 'sr.dcm_updated.dcm'), extra_study_information, extra_acquisition_information)
+    update_dicom_rdsr(os.path.join(folder, 'sr.dcm'), extra_study_information, extra_acquisition_information)
     # update_dicom_rdsr(os.path.join(folder, 'siemens.sr.dcm'), extra_study_information, extra_acquisition_information)
     # Now import the updated created sr.dcm into OpenREM using the Toshiba extractor
     # ...
