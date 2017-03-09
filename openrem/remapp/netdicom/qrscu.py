@@ -384,6 +384,16 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
 
     assoc_study.Release(0)
 
+def _create_association(my_ae, remote_ae):
+    # create association with remote AE
+    logger.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
+    assoc = my_ae.RequestAssociation(remote_ae)
+    return assoc
+
+def _echo(assoc):
+    echo = assoc.VerificationSOPClass.SCU(1)
+    logger.info('done with status %s', echo)
+
 
 @shared_task(name='remapp.netdicom.qrscu.qrscu')  # (name='remapp.netdicom.qrscu.qrscu', queue='qr')
 def qrscu(
@@ -427,6 +437,18 @@ def qrscu(
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
     from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
+
+    # Currently, if called from qrscu_script modalities will either be a list of modalities or it will be "SR".
+    # Web interface hasn't changed, so will be a list of modalities and or the inc_sr flag
+    # Need to normalise one way or the other.
+    if modalities is None and inc_sr is False:
+        logger.error("Query retrieve routine called with no modalities selected")
+        return
+    elif modalities is not None and inc_sr is True:
+        logger.error("Query retrieve routine should be called with a modality selection _or_ SR only query, not both")
+        return
+    elif modalities is None and inc_sr is True:
+        modalities = ["SR"]
 
     qr_scp = DicomRemoteQR.objects.get(pk=qr_scp_pk)
     if qr_scp.hostname:
@@ -472,9 +494,7 @@ def qrscu(
     query.qr_scp_fk = qr_scp
     query.save()
 
-    # create association with remote AE
-    logger.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
-    assoc = MyAE.RequestAssociation(RemoteAE)
+    assoc = _create_association(MyAE, RemoteAE)
 
     if not assoc:
         query.failed = True
@@ -487,8 +507,7 @@ def qrscu(
 
     # perform a DICOM ECHO
     logger.info("DICOM Echo ... ")
-    echo = assoc.VerificationSOPClass.SCU(1)
-    logger.info('done with status %s', echo)
+    _echo(assoc)
 
     logger.info("DICOM FindSCU ... ")
     d = Dataset()
@@ -847,7 +866,7 @@ def qrscu_script(*args, **kwargs):
             qrnode_up, storenode_up))
 
     sys.exit(
-        qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities, inc_sr=args.sr,
+        qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities,
                     remove_duplicates=remove_duplicates, date_from=args.dfrom, date_until=args.duntil,
                     filters=filters
                     )

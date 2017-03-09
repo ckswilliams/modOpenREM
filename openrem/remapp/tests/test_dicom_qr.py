@@ -6,14 +6,43 @@ from django.test import TestCase
 from mock import patch
 import uuid
 from remapp.netdicom import qrscu
-from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries
+from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomRemoteQR, DicomStoreSCP
 
 
 def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
     return 'RDSR'
 
 
-class DicomQR(TestCase):
+def _fake_ae_association_success(my_ae, remote_ae):
+    from netdicom.applicationentity import Association
+    assoc = Association(my_ae, RemoteAE=remote_ae, )
+    assoc.AssociationEstablished = True
+    return assoc
+
+def _fake_echo(assoc):
+    pass
+
+
+class QRWholeFunction(TestCase):
+
+    @patch("remapp.netdicom.qrscu._echo", _fake_echo)
+    @patch("remapp.netdicom.qrscu._create_association", _fake_ae_association_success)
+    def test_faking(self):
+        qr_scp = DicomRemoteQR.objects.create()
+        qr_scp.hostname = "qrserver"
+        qr_scp.port = 104
+        qr_scp.aetitle = "qrserver"
+        qr_scp.save()
+        store_scp = DicomStoreSCP.objects.create()
+        store_scp.aetitle = "openremstore"
+        store_scp.port = 104
+        store_scp.save()
+
+        qrscu.qrscu(qr_scp_pk=1, store_scp_pk=1, modalities=["CT",])
+
+
+
+class QRPhilipsCT(TestCase):
     def setUp(self):
         """
         """
