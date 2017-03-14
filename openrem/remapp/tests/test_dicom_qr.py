@@ -2,8 +2,13 @@
 # test_dicom_qr.py
 
 import os
+from dicom.dataset import Dataset, FileDataset
+from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from django.test import TestCase
 from mock import patch
+from netdicom.applicationentity import AE
+from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
+from testfixtures import LogCapture
 import uuid
 from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomRemoteQR, DicomStoreSCP
@@ -13,33 +18,103 @@ def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
     return 'RDSR'
 
 
-def _fake_ae_association_success(my_ae, remote_ae):
-    from netdicom.applicationentity import Association
-    assoc = Association(my_ae, RemoteAE=remote_ae, )
-    assoc.AssociationEstablished = True
-    return assoc
+#############################
+# Beginnings of test of whole function - will not proceed with this further at this stage. Will test components instead.
+#############################
+#
+# def _fake_ae_association_success(my_ae, remote_ae):
+#     from netdicom.applicationentity import Association
+#     assoc = Association(my_ae, RemoteAE=remote_ae, )
+#     assoc.AssociationEstablished = True
+#     return assoc
+#
+#
+# def _fake_echo(assoc):
+#     pass
+#
+#
+# class QRWholeFunction(TestCase):
+#
+#     @patch("remapp.netdicom.qrscu._echo", _fake_echo)
+#     @patch("remapp.netdicom.qrscu._create_association", _fake_ae_association_success)
+#     def test_faking(self):
+#         qr_scp = DicomRemoteQR.objects.create()
+#         qr_scp.hostname = "qrserver"
+#         qr_scp.port = 104
+#         qr_scp.aetitle = "qrserver"
+#         qr_scp.save()
+#         store_scp = DicomStoreSCP.objects.create()
+#         store_scp.aetitle = "openremstore"
+#         store_scp.port = 104
+#         store_scp.save()
+#
+#         qrscu.qrscu(qr_scp_pk=1, store_scp_pk=1, modalities=["CT",])
+#
+#############################
 
-def _fake_echo(assoc):
-    pass
+fake_responses = [u'US', u'CT']
 
 
-class QRWholeFunction(TestCase):
+def _fake_all_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
+    rsp = DicomQRRspStudy.objects.create(dicom_query=query)
+    rsp.query_id = query_id
+    rsp.set_modalities_in_study([u'US'])
+    rsp.save()
 
-    @patch("remapp.netdicom.qrscu._echo", _fake_echo)
-    @patch("remapp.netdicom.qrscu._create_association", _fake_ae_association_success)
-    def test_faking(self):
+
+class StudyQueryLogic(TestCase):
+    def setUp(self):
+        # Remote find/move node details
         qr_scp = DicomRemoteQR.objects.create()
         qr_scp.hostname = "qrserver"
         qr_scp.port = 104
         qr_scp.aetitle = "qrserver"
+        qr_scp.callingaet = "openrem"
         qr_scp.save()
+        # Local store node details
         store_scp = DicomStoreSCP.objects.create()
         store_scp.aetitle = "openremstore"
         store_scp.port = 104
         store_scp.save()
+        # Query db object
+        query_id = uuid.uuid4()
+        query = DicomQuery.objects.create()
+        query.query_id = query_id
+        query.complete = False
+        query.store_scp_fk = store_scp
+        query.qr_scp_fk = qr_scp
+        query.save()
 
-        qrscu.qrscu(qr_scp_pk=1, store_scp_pk=1, modalities=["CT",])
+    @patch("remapp.netdicom.qrscu._query_study", side_effect=_fake_all_modalities)
+    def test_non_modality_matching(self, study_query_mock):
+        from remapp.netdicom.qrscu import _query_for_each_modality
 
+        all_mods = {'CT': {'inc': True, 'mods': ['CT']},
+                    'MG': {'inc': True, 'mods': ['MG']},
+                    'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                    'DX': {'inc': False, 'mods': ['DX', 'CR']}
+                    }
+        query = DicomQuery.objects.get()
+        qr_scp = DicomRemoteQR.objects.get()
+
+        # Create my_ae and remote_ae
+        aec = qr_scp.aetitle
+        aet = qr_scp.callingaet
+        ts = [
+            ExplicitVRLittleEndian,
+            ImplicitVRLittleEndian,
+            ExplicitVRBigEndian
+        ]
+        my_ae = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass, StudyRootMoveSOPClass,
+                                                      VerificationSOPClass], [], ts)
+        remote_ae = dict(Address=qr_scp.hostname, Port=qr_scp.port, AET=aec.encode('ascii', 'ignore'))
+
+        d = Dataset()
+        modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
+
+        self.assertEqual(DicomQRRspStudy.objects.count(), 1)
+        self.assertEqual(study_query_mock.call_count, 1)
+        self.assertEqual(modality_matching, False)
 
 
 class QRPhilipsCT(TestCase):

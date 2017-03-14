@@ -13,10 +13,12 @@ For help on usage,
 python qrscu.py -h 
 """
 
+from celery import shared_task
 import django
 import logging
-import os, sys
-from celery import shared_task
+import os
+import sys
+import uuid
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -208,7 +210,6 @@ def check_sr_type_in_study(my_ae, remote_ae, study):
 
 def _query_images(my_ae, remote_ae, seriesrsp):
     from time import sleep
-    import uuid
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspImage
     from dicom.dataset import Dataset
@@ -262,7 +263,6 @@ def _query_images(my_ae, remote_ae, seriesrsp):
 
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     from time import sleep
-    import uuid
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
@@ -384,15 +384,46 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
 
     assoc_study.Release(0)
 
+
 def _create_association(my_ae, remote_ae):
     # create association with remote AE
     logger.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
     assoc = my_ae.RequestAssociation(remote_ae)
     return assoc
 
+
 def _echo(assoc):
     echo = assoc.VerificationSOPClass.SCU(1)
     logger.info('done with status %s', echo)
+
+
+def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
+
+    # Assume that ModalitiesInStudy is a Matching Key Attribute
+    # If not, 1 query is sufficient to retrieve all relevant studies
+    modality_matching = True
+
+    # query for all requested studies
+    # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
+    for selection, details in all_mods.iteritems():
+        if details['inc']:
+            for mod in details['mods']:
+                query.stage = 'Currently querying for {0} studies...'.format(mod)
+                query.save()
+                logger.info('Currently querying for {0} studies...'.format(mod))
+                if modality_matching:
+                    d.ModalitiesInStudy = mod
+                    query_id = uuid.uuid4()
+                    _query_study(MyAE, RemoteAE, d, query, query_id)
+                    study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+                    for rsp in study_rsp:
+                        if mod not in rsp.get_modalities_in_study():
+                            modality_matching = False
+                            logger.debug("Remote node doesn't support ModalitiesInStudy as a Matching Key")
+                            break  # This indicates that there was no modality match, so we have everything already
+    logger.debug("modality_matching: {}".format(modality_matching))
+    return modality_matching
+
 
 
 @shared_task(name='remapp.netdicom.qrscu.qrscu')  # (name='remapp.netdicom.qrscu.qrscu', queue='qr')
@@ -429,7 +460,6 @@ def qrscu(
 
     """
 
-    import uuid
     import json
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
@@ -527,29 +557,10 @@ def qrscu(
         if m in modalities:
             all_mods[m]['inc'] = True
 
-    # Assume that ModalitiesInStudy is a Matching Key Attribute
-    # If not, 1 query is sufficient to retrieve all relevant studies
-    modality_matching = True
-
     # query for all requested studies
-    # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
-    for selection, details in all_mods.iteritems():
-        if details['inc']:
-            for mod in details['mods']:
-                query.stage = 'Currently querying for {0} studies...'.format(mod)
-                query.save()
-                logger.info('Currently querying for {0} studies...'.format(mod))
-                if modality_matching:
-                    d.ModalitiesInStudy = mod
-                    query_id = uuid.uuid4()
-                    _query_study(MyAE, RemoteAE, d, query, query_id)
-                    study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-                    for rsp in study_rsp:
-                        if mod not in rsp.get_modalities_in_study():
-                            modality_matching = False
-                            break  # This indicates that there was no modality match, so we have everything already
+    modality_matching = _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE)
 
-    logger.debug("modality_matching: {}".format(modality_matching))
+    # TODO work out where this debug log should be now _query_for_each_modality is a function.
     logger.debug("SOPClassUIDs in study: {}".format(list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
 
     # Now we have all our studies. Time to throw away any we don't want
