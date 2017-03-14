@@ -6,7 +6,7 @@ from dicom.dataset import Dataset, FileDataset
 from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 from django.test import TestCase
 from mock import patch
-from netdicom import applicationentity
+from netdicom.applicationentity import AE
 from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
 from testfixtures import LogCapture
 import uuid
@@ -105,7 +105,7 @@ class StudyQueryLogic(TestCase):
             ImplicitVRLittleEndian,
             ExplicitVRBigEndian
         ]
-        my_ae = applicationentity.AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass, StudyRootMoveSOPClass,
+        my_ae = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass, StudyRootMoveSOPClass,
                                                       VerificationSOPClass], [], ts)
         remote_ae = dict(Address=qr_scp.hostname, Port=qr_scp.port, AET=aec.encode('ascii', 'ignore'))
 
