@@ -6,7 +6,7 @@ import os
 from glob import glob
 from openrem.remapp.extractors import rdsr
 from openremproject.settings import DCMCONV, DCMMKDIR, JAVA_EXE, JAVA_OPTIONS, PIXELMED_JAR, PIXELMED_JAR_OPTIONS
-
+import shutil
 
 def split_by_studyinstanceuid(dicom_path):
     """Parse a folder of files, creating a sub-folder for each StudyInstanceUID found in any DICOM files. Each DICOM
@@ -89,13 +89,18 @@ def find_extra_info(dicom_path):
                 dcm = dicom.read_file(os.path.join(dicom_path, filename))
 
                 try:
-                    # Only look at the tags if this AcquisitionNumber is new
-                    if dcm.AcquisitionNumber not in acquisitions_collected:
-                        acquisitions_collected.append(dcm.AcquisitionNumber)
+                    # Only look at the tags if the combination of AcquisitionNumber and AcquisitionTime is new
+                    acquisition_code = str(dcm.AcquisitionNumber) + '_' + dcm.AcquisitionTime
+                    if acquisition_code not in acquisitions_collected:
+                        acquisitions_collected.append(acquisition_code)
 
                         info_dictionary = {}
                         try:
                             info_dictionary['AcquisitionNumber'] = dcm.AcquisitionNumber
+                        except AttributeError:
+                            pass
+                        try:
+                            info_dictionary['AcquisitionTime'] = dcm.AcquisitionTime
                         except AttributeError:
                             pass
                         try:
@@ -154,7 +159,7 @@ def find_extra_info(dicom_path):
 
                         acquisition_info.append(info_dictionary)
 
-                    # Update the study-level information, whether this acquisition # has been seen yet or not
+                    # Update the study-level information, whether this acquisition number has been seen yet or not
                     try:
                         if dcm.StudyDescription != '':
                             try:
@@ -190,8 +195,20 @@ def find_extra_info(dicom_path):
                                 # study_info['RequestedProcedureDescription'] doesn't exist yet, so create it
                                 study_info['RequestedProcedureDescription'] = dcm.RequestedProcedureDescription
                     except AttributeError:
-                        # dcm.RequestedProcedureDescription isn't present
-                        pass
+                        # dcm.RequestedProcedureDescription isn't present. Try looking at the
+                        # RequestedProcedureDescription of RequestAttributesSequence instead
+                        try:
+                            if dcm.ProcedureCodeSequence[0].CodeMeaning != '':
+                                try:
+                                    if study_info['RequestedProcedureDescription'] == '':
+                                        # Only update study_info['RequestedProcedureDescription'] if it's empty
+                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
+                                except KeyError:
+                                    # study_info['RequestedProcedureDescription'] isn't present, so add it
+                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
+                        except AttributeError:
+                            # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
+                            pass
 
                 except AttributeError:
                     pass
@@ -278,7 +295,7 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
     for key, val in additional_study_info.items():
         try:
             rdsr_val = getattr(dcm, key)
-            print key, val
+            # print key, val
             if rdsr_val == '':
                 setattr(dcm, key, val)
         except AttributeError:
@@ -309,20 +326,12 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
                             # additional_info
                             for acquisition in additional_acquisition_info:
                                 try:
-                                    # print str(acquisition['CTDIvol']) + ', ' + str(current_ctdi_vol) + '; ' + \
-                                    #      str(acquisition['DLP']) + ', ' + str(current_dlp)
-                                    # NB. the if statement below is a bit iffy, as I think there may be an issue
-                                    # with comparing floats, but it does appear to work...
-                                    print acquisition['CTDIvol'], current_ctdi_vol
-                                    print acquisition['DLP'], current_dlp
                                     if float(acquisition['CTDIvol']) == float(current_ctdi_vol) and \
                                                     float(acquisition['DLP']) == float(current_dlp):
-                                    # if float(acquisition['CTDIvol']) == float(current_ctdi_vol):
-                                        # There's a match between CTDIvol and DLP, so see if things can be updated or
-                                        # added.
-                                        # print 'There is a match'
-                                        # print str(acquisition['CTDIvol']) + ', ' + str(current_ctdi_vol) + '; ' + \
-                                        #      str(acquisition['DLP']) + ', ' + str(current_dlp)
+                                        print '\nCTDIvol: {0} is equal to {1}'.format(float(acquisition['CTDIvol']), float(current_ctdi_vol))
+                                        print '\nand'
+                                        print '\nDLP: {0} is equal to {1}'.format(float(acquisition['DLP']), float(current_dlp))
+                                        # There's a match between CTDIvol and DLP, so see if things can be updated or added.
                                         for key, val in acquisition.items():
                                             if key != 'CTDIvol' and key != 'DLP':
                                                 print key + ' -> ' + str(val)
@@ -583,7 +592,11 @@ for arg in sys.argv[1:]:
             print 'Gathering extra information from images in ' + folder
             extra_information = find_extra_info(folder)
             extra_study_information = extra_information[0]
+            print 'Extra study information is:'
+            print extra_study_information
             extra_acquisition_information = extra_information[1]
+            print 'Extra acquisition information is:'
+            print extra_acquisition_information
 
             # Use the extra information to update the initial rdsr file created by DoseUtility
             print 'Updating information in rdsr in ' + folder
@@ -595,8 +608,9 @@ for arg in sys.argv[1:]:
                 print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_file + ')'
                 rdsr(updated_rdsr_file)
 
-            # Now delete all the files and folders that have been created
-            # ...
+        # Now delete the study and all sub-folders and files that have been created
+        print 'Deleting folder {0} and contents'.format(folder_name)
+        shutil.rmtree(folder_name)
 
 sys.exit()
 
