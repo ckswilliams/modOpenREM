@@ -1,6 +1,7 @@
 # This Python file uses the following encoding: utf-8
 # test_import_ct_rdsr_siemens.py
 
+import datetime
 import os
 from decimal import Decimal
 from django.test import TestCase
@@ -28,9 +29,17 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
 
         # Test that study level data is recorded correctly
+        self.assertEqual(study.study_date, datetime.date(1997, 01, 01))
+        self.assertEqual(study.study_time, datetime.time(00, 00, 00))
         self.assertEqual(study.accession_number, 'ACC12345601')
+        self.assertEqual(study.study_description, 'Thorax^TAP (Adult)')
+        self.assertEqual(study.modality_type, 'CT')         #Appears as 'SR' in dcmdump?
+
         self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, 'Hospital Number One Trust')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'SIEMENS')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer_model_name, 'SOMATOM Definition Flash')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().station_name, 'CTAWP00001')
+        #self.assertEqual(study.generalequipmentmoduleattr_set.get().device_serial_number, '00001')
 
         # Test that patient study level data is recorded correctly
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '067Y')
@@ -38,8 +47,92 @@ class ImportCTRDSR(TestCase):
 
         # Test that exposure data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
-                         total_number_of_irradiation_events, 4)
+            total_number_of_irradiation_events, 4)
         self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
-                         ct_dose_length_product_total, Decimal(724.52))
+            ct_dose_length_product_total, Decimal(724.52))
 
+        #Test that CT event data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].exposure_time, Decimal(8.37))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].nominal_single_collimation_width, Decimal(0.6))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].nominal_total_collimation_width, Decimal(3.6))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].exposure_time, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].nominal_single_collimation_width, Decimal(10))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].nominal_total_collimation_width, Decimal(10))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].exposure_time, Decimal(1.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].nominal_single_collimation_width, Decimal(10))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].nominal_total_collimation_width, Decimal(10))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].exposure_time, Decimal(16.01))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].nominal_single_collimation_width, Decimal(0.6))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].nominal_total_collimation_width, Decimal(38.4))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].pitch_factor, Decimal(0.6))
+
+        # Test that CT xraysource data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(35))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(35))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(39))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                exposure_time_per_rotation, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(39))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                exposure_time_per_rotation, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(560))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(176))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                exposure_time_per_rotation, Decimal(0.5))
+
+        # Test that scanning length data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].scanninglength_set.get().scanning_length, Decimal(821))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].scanninglength_set.get().scanning_length, Decimal(10))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].scanninglength_set.get().scanning_length, Decimal(10))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].scanninglength_set.get().scanning_length, Decimal(737))
 

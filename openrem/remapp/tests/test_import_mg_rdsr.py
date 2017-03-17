@@ -38,8 +38,19 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[0].study_date, datetime.date(2015, 03, 22))
         self.assertEqual(studies[0].study_time, datetime.time(12, 47, 45))
         self.assertEqual(studies[0].accession_number, 'AJSKDL1234')
+        self.assertEqual(studies[0].study_description, 'Bilateral Mammography')
+        self.assertEqual(studies[0].study_instance_uid, '1.3.6.1.4.1.5962.99.1.84038123.1638714927.1486142755307.43.0')
+        self.assertEqual(studies[0].study_id, '01')
+        self.assertEqual(studies[0].modality_type, 'MG')    #Appears as SR in dcmdump?
+
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().institution_name, 'OpenREM')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().institution_address, 'Milan')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().manufacturer, 'HOLOGIC, Inc.')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().station_name, 'Dimensions')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().institutional_department_name, 'Mammography')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().manufacturer_model_name, 'Selenia Dimensions')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().device_serial_number, '765467656')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().software_versions, 'AWS:1.8.3.63')
 
         # Test that patient level data is recorded correctly
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_name, 'Lyons^Samantha')
@@ -61,6 +72,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().accumxraydose_set.get(
             ).accummammographyxraydose_set.all()[1].laterality.code_meaning, "Right breast")
 
+
         # Test that event level data is recorded correctly
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].irradeventxraysourcedata_set.get().average_glandular_dose, Decimal(1.3))
@@ -75,14 +87,55 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[1].half_value_layer, Decimal(0.535))
 
-        # Test that kVp data is recorded correctly
+        # Test that xray source data is recorded correctly
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(28.00))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[1].irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(28.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().exposure_time, Decimal(854.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().exposure_time, Decimal(840.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(100.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(100.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().focal_spot_size, Decimal(0.3))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().focal_spot_size, Decimal(0.3))
 
-        #Test that mA data is recorded correctly
-        #    )[1].irradeventself.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #     )[0].irradeventxraysourcedata_set.get().xray_tube_current_set.get().xray_tube_current, Decimal(100.00))
-        # self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #  xraysourcedata_set.get().xray_tube_current_set.get().xray_tube_current, Decimal(100.00))
+        # Thest that X-ray filter data is recorded correctly - cant work out how to check 'cid's
+        #self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+        #    )[1].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_type, 'Strip filter')
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum, Decimal(0.05))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum, Decimal(0.05))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum, Decimal(0.05))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_maximum, Decimal(0.05))
+
+            # Test that exposure data is recorded correctly
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(90200.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(88800.00))
+
+        # Test that mechanical data is recorded correctly
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraymechanicaldata_set.get().positioner_primary_angle, Decimal(0.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraymechanicaldata_set.get().positioner_primary_angle, Decimal(0.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraymechanicaldata_set.get().compression_thickness, Decimal(43.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraymechanicaldata_set.get().compression_thickness, Decimal(43.00))
+
+        #Can't get mechanical tests to work - it cant find attirbute 'doserelateddistancemenasurements'
+        #self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+        #    )[0].irradeventxraymechanicaldata_set.get().DoseRelatedDistanceMeasurements.set_get(
+        #    ).distance_source_to_detector, Decimal(700.00))
+
+        #Cant find any classes that refer to series data for comparison
