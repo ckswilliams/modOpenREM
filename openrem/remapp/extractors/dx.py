@@ -371,8 +371,8 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     event.acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw(
         'SeriesDescription', dataset, char_set=ch)
-    # TODO: Establish why ProtocolName is extracted and never used
-    acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_seq_code_meaning(
+        'PerformedProtocolCodeSequence', dataset, char_set=ch)
     series_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
     if series_description:
         event.comment = series_description
