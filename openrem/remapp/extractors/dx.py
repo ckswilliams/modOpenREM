@@ -370,7 +370,9 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
     if not event.acquisition_protocol:
-        if get_value_kw('Manufacturer', dataset, char_set=ch) == 'TOSHIBA_MEC' and get_value_kw('SoftwareVersions', dataset, char_set=ch) == 'TM_TFD_1.0':
+        manufacturer = get_value_kw('Manufacturer', dataset, char_set=ch)
+        software_versions = get_value_kw('SoftwareVersions', dataset, char_set=ch)
+        if manufacturer == 'TOSHIBA_MEC' and software_versions == 'TM_TFD_1.0':
             event.acquisition_protocol = get_value_kw('ImageComments', dataset, char_set=ch)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw(
         'SeriesDescription', dataset, char_set=ch)
