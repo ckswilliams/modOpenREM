@@ -569,7 +569,7 @@ def mam(mg_file):
     dataset = dicom.read_file(mg_file)
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
-        if RM_DCM_MG:
+        if del_mg_im:
             logger.debug("%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
         return (1)
