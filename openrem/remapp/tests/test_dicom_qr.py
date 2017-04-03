@@ -101,6 +101,13 @@ class StudyQueryLogic(TestCase):
 
     @patch("remapp.netdicom.qrscu._query_study", side_effect=_fake_all_modalities)
     def test_non_modality_matching(self, study_query_mock):
+        """
+        Tests the study level query for each modality. Fake responses include a study with just US in, indicating the
+        study filter doesn't work and there is no point querying for any further modalities as we'll already have the
+        responses.
+        :param study_query_mock: Mocked study level response routine
+        :return: Nothing
+        """
         from remapp.netdicom.qrscu import _query_for_each_modality
 
         all_mods = {'CT': {'inc': True, 'mods': ['CT']},
