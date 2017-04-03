@@ -52,14 +52,28 @@ def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
 #
 #############################
 
-fake_responses = [u'US', u'CT']
+fake_responses = [
+    [[u'CT'], [u'OT', u'CT', u'SR'], [u'SR', u'CT']],
+    [[u'MG', u'SR'], [u'MG'], [u'OT', u'MG'], [u'PR', u'MG']]
+    ]
+
+
+def _fake_two_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
+    mods = fake_responses.pop()
+    for mod_list in mods:
+        rsp = DicomQRRspStudy.objects.create(dicom_query=query)
+        rsp.query_id = query_id
+        rsp.set_modalities_in_study(mod_list)
+        rsp.save()
 
 
 def _fake_all_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
-    rsp = DicomQRRspStudy.objects.create(dicom_query=query)
-    rsp.query_id = query_id
-    rsp.set_modalities_in_study([u'US'])
-    rsp.save()
+    mods = [[u'MG', u'SR'], [u'US', u'SR']]
+    for mod_list in mods:
+        rsp = DicomQRRspStudy.objects.create(dicom_query=query)
+        rsp.query_id = query_id
+        rsp.set_modalities_in_study(mod_list)
+        rsp.save()
 
 
 class StudyQueryLogic(TestCase):
@@ -112,10 +126,40 @@ class StudyQueryLogic(TestCase):
         d = Dataset()
         modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
 
-        self.assertEqual(DicomQRRspStudy.objects.count(), 1)
+        self.assertEqual(DicomQRRspStudy.objects.count(), 2)
         self.assertEqual(study_query_mock.call_count, 1)
         self.assertEqual(modality_matching, False)
 
+    @patch("remapp.netdicom.qrscu._query_study", side_effect=_fake_two_modalities)
+    def test_modality_matching(self, study_query_mock):
+        from remapp.netdicom.qrscu import _query_for_each_modality
+
+        all_mods = {'CT': {'inc': True, 'mods': ['CT']},
+                    'MG': {'inc': True, 'mods': ['MG']},
+                    'FL': {'inc': False, 'mods': ['RF', 'XA']},
+                    'DX': {'inc': False, 'mods': ['DX', 'CR']}
+                    }
+        query = DicomQuery.objects.get()
+        qr_scp = DicomRemoteQR.objects.get()
+
+        # Create my_ae and remote_ae
+        aec = qr_scp.aetitle
+        aet = qr_scp.callingaet
+        ts = [
+            ExplicitVRLittleEndian,
+            ImplicitVRLittleEndian,
+            ExplicitVRBigEndian
+        ]
+        my_ae = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass, StudyRootMoveSOPClass,
+                                                      VerificationSOPClass], [], ts)
+        remote_ae = dict(Address=qr_scp.hostname, Port=qr_scp.port, AET=aec.encode('ascii', 'ignore'))
+
+        d = Dataset()
+        modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
+
+        self.assertEqual(DicomQRRspStudy.objects.count(), 7)
+        self.assertEqual(study_query_mock.call_count, 2)
+        self.assertEqual(modality_matching, True)
 
 class QRPhilipsCT(TestCase):
     def setUp(self):
