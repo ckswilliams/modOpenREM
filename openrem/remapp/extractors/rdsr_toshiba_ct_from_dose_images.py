@@ -7,6 +7,21 @@ from glob import glob
 from openrem.remapp.extractors import rdsr
 from openremproject.settings import DCMCONV, DCMMKDIR, JAVA_EXE, JAVA_OPTIONS, PIXELMED_JAR, PIXELMED_JAR_OPTIONS
 import shutil
+import django
+import logging
+
+logger = logging.getLogger(__name__)
+
+# setup django/OpenREM
+basepath = os.path.dirname(__file__)
+projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
+if projectpath not in sys.path:
+    sys.path.insert(1,projectpath)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
+django.setup()
+
+from celery import shared_task
+
 
 def split_by_studyinstanceuid(dicom_path):
     """Parse a folder of files, creating a sub-folder for each StudyInstanceUID found in any DICOM files. Each DICOM
@@ -560,10 +575,8 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
     return rdsr_file + '_updated.dcm'
 
 
-if len(sys.argv) < 2:
-    sys.exit('Error: supply at least one argument - the folder containing the DICOM objects')
-
-for arg in sys.argv[1:]:
+@shared_task
+def rdsr_toshiba_ct_from_dose_images(folder_name):
     rdsr_name = 'sr.dcm'
     for folder_name in glob(arg):
         # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
@@ -608,12 +621,15 @@ for arg in sys.argv[1:]:
                 print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_file + ')'
                 rdsr(updated_rdsr_file)
 
-        # Now delete the study and all sub-folders and files that have been created
-        print 'Deleting folder {0} and contents'.format(folder_name)
-        shutil.rmtree(folder_name)
 
-sys.exit()
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        sys.exit('Error: supply exactly one argument - the folder containing the DICOM objects')
 
+    sys.exit(rdsr_toshiba_ct_from_dose_images(sys.argv[1]))
+
+    
 # DoseUtility validation complaints - will be useful to work out codes etc for putting in things like pitch
 # Found XRayRadiationDoseSR IOD
 # Found Root Template TID_10011 (CTRadiationDose)

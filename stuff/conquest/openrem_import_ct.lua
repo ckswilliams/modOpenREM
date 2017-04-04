@@ -27,7 +27,6 @@ print(station_name)
 
 if (manufacturer == 'Philips' and model_name == 'Brilliance 64') then
   print('It is a Philips Brilliance 64')
-  -- It is the Grantham Philips Brilliance 64.
   -- Look for a dose summary image and import it
   local files = assert(io.popen('dir /b ' .. study_folder_path))
   local output = files:read('*all')
@@ -37,28 +36,51 @@ if (manufacturer == 'Philips' and model_name == 'Brilliance 64') then
     current_file = study_folder_path .. '\\' .. v -- The fully qualified file name and path (Windows-specific)
     readdicom(current_file)
     if Data.SOPClassUID == '1.2.840.10008.5.1.4.1.1.7' then
-      system('d:\\Server_Apps\\python27\\python.exe d:\\Server_Apps\\python27\\Scripts\\openrem_ctphilips.py ' .. current_file)
+      system('D:\\Server_Apps\\python27\\python.exe d:\\Server_Apps\\python27\\Scripts\\openrem_ctphilips.py ' .. current_file)
       print('The system command to import a Philips CT dose image has been executed')
     end
   end
   -- Delete the study from disk
   print('Complete. Deleting study images.')
-  system('c:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
+  system('C:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
+  return
 end
 
 
--- CT1 and CT2 at Lincoln, and also Pilgrim main scanner
+-- A CT simulator
+if (manufacturer == 'TOSHIBA' and station_name == 'AQ16LB_SCAN') then
+  print('It is a Toshiba Aquilion LB study. Cannot make use of these images - deleting them.')
+  system('C:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
+  print('The system command has been executed to delete the images from the server')
+  return
+end
+
+
+-- Toshiba Aquilion scanners that produce dose summary images
 if (manufacturer == 'TOSHIBA' and model_name == 'Aquilion') then
   print('It is a Toshiba Aquilion. Running create_rdsr_from_toshiba_ct_dose_images.py script...')
-  system('d:\\Server_Apps\\python27\\python.exe d:\\Server_Apps\\python27\\Scripts\\create_rdsr_from_toshiba_ct_dose_images.py ' .. study_folder_path)
+  system('d:\\Server_Apps\\python27\\python.exe d:\\Server_Apps\\python27\\Scripts\\openrem_rdsr_toshiba_ct_from_dose_images.py ' .. study_folder_path)
   print('The system command has been executed to create the rdsr and import it')
-  -- Note: the above python script deletes the study from disk once it's been imported in to OpenREM
+  -- Delete the study from disk
+  print('Complete. Deleting study images.')
+  system('C:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
+  return
 end
 
 
--- Pilgrim modular scanner
+-- A CT scanner that sends information that can't be used
 if (manufacturer == 'TOSHIBA' and model_name == 'Aquilion PRIME') then
   print('It is a Toshiba Aquilion Prime. Cannot make use of these images - deleting them.')
-  system('c:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
+  system('C:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
   print('The system command has been executed to delete the images from the server')
+  return
+end
+
+
+-- A PET-CT scanner that sends information that can't be used
+if (station_name == 'LB_PET' and software_version == 'pet_coreload.44') then
+  print('It is a PET-CT scan from InHealth. Cannot make use of these images - deleting them.')
+  system('C:\\Windows\\system32\\cmd.exe /C rmdir /S /Q ' .. study_folder_path)
+  print('The system command has been executed to delete the images from the server')
+  return
 end
