@@ -58,18 +58,24 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[0].nominal_single_collimation_width, Decimal(0.6))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[0].nominal_total_collimation_width, Decimal(3.6))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].acquisition_protocol, 'Topogram')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].exposure_time, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].nominal_single_collimation_width, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].nominal_total_collimation_width, Decimal(10))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].acquisition_protocol, 'PreMonitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].exposure_time, Decimal(1.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].nominal_single_collimation_width, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].nominal_total_collimation_width, Decimal(10))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].acquisition_protocol, 'Monitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[3].exposure_time, Decimal(16.01))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -78,6 +84,8 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[3].nominal_total_collimation_width, Decimal(38.4))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[3].pitch_factor, Decimal(0.6))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].acquisition_protocol, 'TAP')
 
         # Test that CT xraysource data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -135,4 +143,60 @@ class ImportCTRDSR(TestCase):
                 ctirradiationeventdata_set.all()[2].scanninglength_set.get().scanning_length, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[3].scanninglength_set.get().scanning_length, Decimal(737))
+
+        #Test that CT Dose data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].mean_ctdivol, Decimal(0.14))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].dlp, Decimal(11.51))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].mean_ctdivol, Decimal(1.2))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].dlp, Decimal(1.2))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].mean_ctdivol, Decimal(3.61))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].dlp, Decimal(3.61))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].mean_ctdivol, Decimal(9.91))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].dlp, Decimal(708.2))
+
+        #Test that 'device participant' data is recorded correctly
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].deviceparticipant_set.get().
+                         device_manufacturer, 'SIEMENS')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].deviceparticipant_set.get().
+                         device_model_name, 'SOMATOM Definition Flash')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].deviceparticipant_set.get().
+                         device_serial_number, '73491')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].deviceparticipant_set.get().
+                         device_manufacturer, 'SIEMENS')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].deviceparticipant_set.get().
+                         device_model_name, 'SOMATOM Definition Flash')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].deviceparticipant_set.get().
+                         device_serial_number, '73491')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].deviceparticipant_set.get().
+                         device_manufacturer, 'SIEMENS')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].deviceparticipant_set.get().
+                         device_model_name, 'SOMATOM Definition Flash')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].deviceparticipant_set.get().
+                         device_serial_number, '73491')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].deviceparticipant_set.get().
+                         device_manufacturer, 'SIEMENS')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].deviceparticipant_set.get().
+                         device_model_name, 'SOMATOM Definition Flash')
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].deviceparticipant_set.get().
+                         device_serial_number, '73491')
 

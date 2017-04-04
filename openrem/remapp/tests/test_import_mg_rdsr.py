@@ -133,9 +133,18 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[1].irradeventxraymechanicaldata_set.get().compression_thickness, Decimal(43.00))
 
-        #Can't get mechanical tests to work - it cant find attirbute 'doserelateddistancemenasurements'
+        #this test throws an error: unsupported operand type(s) for -: 'Decimal and 'NoneType'
         #self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #    )[0].irradeventxraymechanicaldata_set.get().DoseRelatedDistanceMeasurements.set_get(
-        #    ).distance_source_to_detector, Decimal(700.00))
+        #    )[0].irradeventxraymechanicaldata_set.get().column_angulation, Decimal(0.00))
+
+
+        # Test that dose related distance measurements are recorded correctly
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[0].irradeventxraymechanicaldata_set.get().
+                doserelateddistancemeasurements_set.get().distance_source_to_detector, Decimal(700.00))
+        self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+            )[1].irradeventxraymechanicaldata_set.get().
+                doserelateddistancemeasurements_set.get().distance_source_to_detector, Decimal(700.00))
+
 
         #Cant find any classes that refer to series data for comparison
