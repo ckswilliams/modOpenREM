@@ -59,6 +59,21 @@ fake_responses = [
 
 
 def _fake_two_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
+    """
+    Mock routine that returns a set of four MG studies the first time it is called, and a set of three CT studies the
+    second time  it is called.
+
+    Used by test_modality_matching
+
+    :param my_ae:       Not used in mock
+    :param remote_ae:   Not used in mock
+    :param d:           Not used in mock
+    :param query:       Database foreign key to create DicomQRRspStudy objects
+    :param query_id:    Query ID to tie DicomQRRspStudy from this query together
+    :param args:        Not used in mock
+    :param kwargs:      Not used in mock
+    :return:            Seven MG and CT DicomQRRspStudy objects in the database
+    """
     mods = fake_responses.pop()
     for mod_list in mods:
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
@@ -68,6 +83,21 @@ def _fake_two_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
 
 
 def _fake_all_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
+    """
+    Mock routine to return a modality response that includes a study with a 'modalities in study' that does not have
+    the requested modality in.
+
+    Used by test_non_modality_matching
+
+    :param my_ae:       Not used in mock
+    :param remote_ae:   Not used in mock
+    :param d:           Not used in mock
+    :param query:       Database foreign key to create DicomQRRspStudy objects
+    :param query_id:    Query ID to tie DicomQRRspStudy from this query together
+    :param args:        Not used in mock
+    :param kwargs:      Not used in mock
+    :return:            Two DicomQRRspStudy objects in the database
+    """
     mods = [[u'MG', u'SR'], [u'US', u'SR']]
     for mod_list in mods:
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
@@ -139,6 +169,12 @@ class StudyQueryLogic(TestCase):
 
     @patch("remapp.netdicom.qrscu._query_study", side_effect=_fake_two_modalities)
     def test_modality_matching(self, study_query_mock):
+        """
+        Tests the study level query for each modality. Fake responses only include appropriate modalities, so
+        _query_for_each_modality should return modality_matching as True
+        :param study_query_mock: Mocked study level response routine
+        :return:  Nothing
+        """
         from remapp.netdicom.qrscu import _query_for_each_modality
 
         all_mods = {'CT': {'inc': True, 'mods': ['CT']},
