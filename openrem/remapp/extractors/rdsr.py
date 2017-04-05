@@ -607,7 +607,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'TargetRegion':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
             event.target_region = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                     cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Type':
