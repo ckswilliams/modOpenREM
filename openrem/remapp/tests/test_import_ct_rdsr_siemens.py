@@ -61,6 +61,11 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[0].acquisition_protocol, 'Topogram')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
+       # self.assertEqual(study.ctradiationdose_set.get().
+       #     ctirradiationeventdata_set.all()[0].comment,
+       #         'Internal techincal scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].exposure_time, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].nominal_single_collimation_width, Decimal(10))
@@ -69,6 +74,8 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].acquisition_protocol, 'PreMonitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].exposure_time, Decimal(1.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].nominal_single_collimation_width, Decimal(10))
@@ -76,6 +83,8 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[2].nominal_total_collimation_width, Decimal(10))
         self.assertEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].acquisition_protocol, 'Monitoring')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[3].exposure_time, Decimal(16.01))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -86,6 +95,8 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[3].pitch_factor, Decimal(0.6))
         self.assertEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[3].acquisition_protocol, 'TAP')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
 
         # Test that CT xraysource data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
