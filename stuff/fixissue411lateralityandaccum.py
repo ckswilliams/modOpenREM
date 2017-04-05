@@ -3,6 +3,7 @@ import os
 import sys
 import django
 import logging
+from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +15,25 @@ from remapp.models import IrradEventXRayData
 from remapp.tools.get_values import get_or_create_cid
 
 
+def _accumulatedxraydose(proj):
+    from remapp.models import AccumXRayDose, AccumMammographyXRayDose
+    from remapp.tools.get_values import get_or_create_cid
+    accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
+    accum.acquisition_plane = get_or_create_cid('113622', 'Single Plane')
+    accum.save()
+    accummam = AccumMammographyXRayDose.objects.create(accumulated_xray_dose=accum)
+    accummam.accumulated_average_glandular_dose = 0.0
+    accummam.save()
+
+
 def _accumulatedmammo_update(event):  # TID 10005
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
-    accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
+    try:
+        accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
+    except ObjectDoesNotExist:
+        _accumulatedxraydose(event.projection_xray_radiation_dose)
+        accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     accummams = accum.accummammographyxraydose_set.all()
     event_added = False
     for accummam in accummams:
