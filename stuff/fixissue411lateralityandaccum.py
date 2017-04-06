@@ -51,9 +51,9 @@ events = IrradEventXRayData.objects.filter(
 events_r = events.filter(laterality__code_meaning__exact=u"Right")
 events_l = events.filter(laterality__code_meaning__exact=u"Left")
 events_n = events.filter(laterality__isnull=True)
-print u"Total events is {0}, of which {1} are Right, {2} are Left and {3} are null (remainder {4})".format(
+print(u"Total events is {0}, of which {1} are Right, {2} are Left and {3} are null (remainder {4})".format(
     events.count(), events_r.count(), events_l.count(), events_n.count(),
-    events.count() - events_r.count() - events_l.count() - events_n.count())
+    events.count() - events_r.count() - events_l.count() - events_n.count()))
 
 for event in events_n:
     if event.acquisition_protocol[0] == u'R':
@@ -68,6 +68,6 @@ for event in events_n:
 events_r = events.filter(laterality__code_meaning__exact =u"Right")
 events_l = events.filter(laterality__code_meaning__exact =u"Left")
 events_n = events.filter(laterality__isnull=True)
-print u"Post update, total events is {0}, of which {1} are Right, {2} are Left and {3} are null (remainder {4})".format(
+print(u"Post update, total events is {0}, of which {1} are Right, {2} are Left and {3} are null (remainder {4})".format(
     events.count(), events_r.count(), events_l.count(), events_n.count(),
-    events.count() - events_r.count() - events_l.count() - events_n.count())
+    events.count() - events_r.count() - events_l.count() - events_n.count()))
