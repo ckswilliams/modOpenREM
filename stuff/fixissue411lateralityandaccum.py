@@ -25,6 +25,7 @@ def _accumulatedxraydose(proj):
     accummam.accumulated_average_glandular_dose = 0.0
     accummam.save()
 
+
 def _accumulatedmammo_update(event):  # TID 10005
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
@@ -80,6 +81,8 @@ for event in events_n:
         event.laterality = get_or_create_cid('G-A101', 'Left')
         event.save()
         _accumulatedmammo_update(event)
+    else:
+        print("Event acquisition protocol is {0} so we couldn't assign it left or right".format(event.acquisition_protocol))
 
 events_r = events.filter(laterality__code_meaning__exact =u"Right")
 events_l = events.filter(laterality__code_meaning__exact =u"Left")
