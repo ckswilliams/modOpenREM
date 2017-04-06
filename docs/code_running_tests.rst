@@ -14,7 +14,7 @@ The first thing to do is to create a local copy of the git repository, then inst
 virtualenv.
 
 You will need ``python``, ``pip``, ``git`` and ``virtualenv`` installed - see the links on the :doc:`install-prep` docs
-for the latter.
+for the latter, but you might try ``pip install virtualenv``.
 
 .. sourcecode:: console
 
@@ -28,7 +28,7 @@ Now create the virtualenv:
     mkdir veOpenREM
     virtualenv veOpenREM
     . veOpenREM/bin/activate  # Linux
-    veOpenREM\scripts\activate  # Windows
+    veOpenREM\Scripts\activate  # Windows
 
 At this stage there should be a ``(veOpenREM)`` prefix to our prompt telling us the virtualenv is activated.
 
