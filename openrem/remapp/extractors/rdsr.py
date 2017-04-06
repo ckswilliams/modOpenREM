@@ -613,7 +613,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Type':
             event.ct_acquisition_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                           cont.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'ProcedureContext':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure Context':
             event.procedure_context = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
