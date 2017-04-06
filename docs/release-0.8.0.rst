@@ -7,6 +7,7 @@ Headline changes
 ****************
 
 * Imports: No longer tries to import non-dose report Enhanced Structured Reports
+* Imports: Hologic DBT proprietary projection images now have laterality and accumulated AGD extracted correctly
 * Charts: Added mammography scatter plot, thanks to `@rijkhorst`_
 * Exports: DX and RF exports work with multiple filters, and will be displayed to max 4 sf
 

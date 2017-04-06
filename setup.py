@@ -26,6 +26,7 @@ requires = [
     'xlrd',
     'testfixtures',
     'mock',
+    'django-debug-toolbar',
     ]
 
 setup(
