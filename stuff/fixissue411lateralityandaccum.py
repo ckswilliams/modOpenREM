@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
+# Routine to fix missing laterality details for exposures extracted from Hologic DBT proprietary projection data objects
+# Also retrospectively updates the accumulated average glandular dose fields that were previously missing due to lack
+# of laterality.
+#
+# Contains hard coded DISPLAY_NAME that must be changed appropriately to identify the Hologic DBT system in your
+# database.
+# See https://bitbucket.org/openrem/openrem/issues/411
+
 import os
-import sys
 import django
 import logging
 from django.core.exceptions import ObjectDoesNotExist
@@ -14,8 +21,16 @@ django.setup()
 from remapp.models import IrradEventXRayData
 from remapp.tools.get_values import get_or_create_cid
 
+DISPLAY_NAME = "RMH Sutton RDAC 3"
+
 
 def _accumulatedxraydose(proj):
+    """
+    Borrowed from mam.py
+    Creates an AccumXRayDose table entry
+    :param proj: Projection x-ray radiation dose database entry
+    :return: Nothing
+    """
     from remapp.models import AccumXRayDose, AccumMammographyXRayDose
     from remapp.tools.get_values import get_or_create_cid
     accum = AccumXRayDose.objects.create(projection_xray_radiation_dose=proj)
@@ -27,12 +42,19 @@ def _accumulatedxraydose(proj):
 
 
 def _accumulatedmammo_update(event):  # TID 10005
+    """
+    Borrowed from mam.py
+    Updates the accumulated average glandular dose tables on a per-breast basis
+    :param event: Irradiation event database entry
+    :return: Nothing
+    """
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
     try:
         accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     except ObjectDoesNotExist:
-        print("No accumxraydose for event occurring at {0} in study no {1}".format(event.date_time_started, event.projection_xray_radiation_dose.general_study_module_attributes.id))
+        print("No accumxraydose for event occurring at {0} in study no {1}".format(event.date_time_started,
+            event.projection_xray_radiation_dose.general_study_module_attributes.id))
         _accumulatedxraydose(event.projection_xray_radiation_dose)
         accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     accummams = accum.accummammographyxraydose_set.all()
@@ -62,8 +84,9 @@ def _accumulatedmammo_update(event):  # TID 10005
         accummam.save()
     accummam.save()
 
+
 events = IrradEventXRayData.objects.filter(
-             projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name__display_name__exact = "RMH Sutton RDAC 3")
+    projection_xray_radiation_dose__general_study_module_attributes__generalequipmentmoduleattr__unique_equipment_name__display_name__exact=DISPLAY_NAME)
 
 events_r = events.filter(laterality__code_meaning__exact=u"Right")
 events_l = events.filter(laterality__code_meaning__exact=u"Left")
@@ -85,8 +108,8 @@ for event in events_n:
         print("Event acquisition protocol is {0} so we couldn't assign it left or right. Exam ID is {1}".format(
             event.acquisition_protocol, event.projection_xray_radiation_dose.general_study_module_attributes.id))
 
-events_r = events.filter(laterality__code_meaning__exact =u"Right")
-events_l = events.filter(laterality__code_meaning__exact =u"Left")
+events_r = events.filter(laterality__code_meaning__exact=u"Right")
+events_l = events.filter(laterality__code_meaning__exact=u"Left")
 events_n = events.filter(laterality__isnull=True)
 print(u"Post update, total events is {0}, of which {1} are Right, {2} are Left and {3} are null (remainder {4})".format(
     events.count(), events_r.count(), events_l.count(), events_n.count(),
