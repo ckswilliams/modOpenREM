@@ -32,6 +32,7 @@ def _accumulatedmammo_update(event):  # TID 10005
     try:
         accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     except ObjectDoesNotExist:
+        print("No accumxraydose for event occurring at {0} in study no {1}".format(event.date_time_started, event.projection_xray_radiation_dose.general_study_module_attributes.id))
         _accumulatedxraydose(event.projection_xray_radiation_dose)
         accum = event.projection_xray_radiation_dose.accumxraydose_set.get()
     accummams = accum.accummammographyxraydose_set.all()
