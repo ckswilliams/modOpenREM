@@ -82,7 +82,8 @@ for event in events_n:
         event.save()
         _accumulatedmammo_update(event)
     else:
-        print("Event acquisition protocol is {0} so we couldn't assign it left or right".format(event.acquisition_protocol))
+        print("Event acquisition protocol is {0} so we couldn't assign it left or right. Exam ID is {1}".format(
+            event.acquisition_protocol, event.projection_xray_radiation_dose.general_study_module_attributes.id))
 
 events_r = events.filter(laterality__code_meaning__exact =u"Right")
 events_l = events.filter(laterality__code_meaning__exact =u"Left")
