@@ -213,17 +213,39 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[0].procedure_context.code_meaning, 'CT without contrast')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[1].mean_ctdivol, Decimal(1.2))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[1].dlp, Decimal(1.2))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].procedure_context.code_meaning, 'CT without contrast')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[1].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[2].mean_ctdivol, Decimal(3.61))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[2].dlp, Decimal(3.61))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].procedure_context.code_meaning, 'Diagnostic radiography with contrast media')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[2].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[3].mean_ctdivol, Decimal(9.91))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[3].dlp, Decimal(708.2))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].procedure_context.code_meaning, 'Diagnostic radiography with contrast media')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[3].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
 
         #Test that 'device participant' data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().

@@ -450,6 +450,10 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[2].pitch_factor, Decimal(1.38))
         self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[5].pitch_factor, Decimal(0.98))
+        self.assertEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
 
         self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[0].exposure_time, Decimal(4.5))
@@ -691,6 +695,24 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[25].pitch_factor, Decimal(0.1))
         self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[26].pitch_factor, Decimal(0.1))
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].ctdiw_phantom_type.code_meaning, 'IEC Head Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].ctdiw_phantom_type.code_meaning, 'IEC Head Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
 
 
         # Test that CT xraysource data is recorded correctly
