@@ -25,7 +25,6 @@ def _accumulatedxraydose(proj):
     accummam.accumulated_average_glandular_dose = 0.0
     accummam.save()
 
-
 def _accumulatedmammo_update(event):  # TID 10005
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumMammographyXRayDose
