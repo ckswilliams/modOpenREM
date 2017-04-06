@@ -53,6 +53,7 @@ class ImportCTRDSR(TestCase):
             'Computed Tomography X-Ray')
         self.assertEqual(study.ctradiationdose_set.get().has_intent.code_meaning,
             'Diagnostic Intent')
+        self.assertEqual(study.ctradiationdose_set.get().source_of_dose_information.code_meaning, 'Automated Data Collection')
 
         #Test that device observer data is stored correctly
         self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
@@ -67,6 +68,7 @@ class ImportCTRDSR(TestCase):
             device_observer_physical_location_during_observation, 'Hospital Number One Trust')
         self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
             observer_type.code_meaning, 'Device')
+        self.assertEqual(study.ctradiationdose_set.get().scope_of_accumulation.code_meaning, 'Study')
 
         # Test that exposure data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
@@ -88,6 +90,9 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[0].comment,
                 'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
+        self.assertEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].target_region.code_meaning, 'Entire body')
+        self.assertEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].exposure_time, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -205,6 +210,8 @@ class ImportCTRDSR(TestCase):
                 ctirradiationeventdata_set.all()[0].mean_ctdivol, Decimal(0.14))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[0].dlp, Decimal(11.51))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.all()[0].procedure_context.code_meaning, 'CT without contrast')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.all()[1].mean_ctdivol, Decimal(1.2))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
