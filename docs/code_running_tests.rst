@@ -13,7 +13,8 @@ OpenREM is a Django application, and therefore we use Django's test-execution fr
 The first thing to do is to create a local copy of the git repository, then install all of OpenREM's dependencies in a
 virtualenv.
 
-You will need python, pip, git and virtualenv installed - the links on the :doc:`install-prep` docs for the latter.
+You will need ``python``, ``pip``, ``git`` and ``virtualenv`` installed - see the links on the :doc:`install-prep` docs
+for the latter.
 
 .. sourcecode:: console
 
@@ -22,7 +23,7 @@ You will need python, pip, git and virtualenv installed - the links on the :doc:
 
 Now create the virtualenv:
 
-.. sourcecode:: bash
+.. sourcecode:: console
 
     mkdir veOpenREM
     virtualenv veOpenREM
@@ -53,7 +54,7 @@ Run the tests!
 
 Making sure the virtualenv is activated, move to ``openremrepo/openrem`` and run:
 
-.. sourecode:: console
+.. sourcecode:: console
 
     python manage.py test remapp
 
