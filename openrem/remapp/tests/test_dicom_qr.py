@@ -80,6 +80,7 @@ def _fake_two_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):
         rsp.query_id = query_id
         rsp.set_modalities_in_study(mod_list)
         rsp.save()
+        print("mod_list is {0}".format(mod_list))
 
 
 def _fake_all_modalities(my_ae, remote_ae, d, query, query_id, *args, **kwargs):

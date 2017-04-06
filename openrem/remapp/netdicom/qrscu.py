@@ -411,6 +411,7 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
                 query.stage = 'Currently querying for {0} studies...'.format(mod)
                 query.save()
                 logger.info('Currently querying for {0} studies...'.format(mod))
+                print('Currently querying for {0} studies...'.format(mod)) # temp to find out why build is failing
                 if modality_matching:
                     d.ModalitiesInStudy = mod
                     query_id = uuid.uuid4()
