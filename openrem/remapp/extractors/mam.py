@@ -205,6 +205,8 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     event.anatomical_structure = get_or_create_cid(get_seq_code_value(
         'AnatomicRegionSequence', dataset), get_seq_code_meaning('AnatomicRegionSequence', dataset))
     laterality = get_value_kw('ImageLaterality', dataset)
+    if not laterality:
+        laterality = get_value_kw('Laterality', dataset)
     if laterality:
         if laterality.strip() == 'R':
             event.laterality = get_or_create_cid('G-A100', 'Right')

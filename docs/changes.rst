@@ -22,6 +22,7 @@ OpenREM version history
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al) again!
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
+* `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 
 0.7.4 (2016-10-17)
 ------------------
