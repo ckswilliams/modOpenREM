@@ -39,11 +39,34 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'SIEMENS')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer_model_name, 'SOMATOM Definition Flash')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().station_name, 'CTAWP00001')
-        #self.assertEqual(study.generalequipmentmoduleattr_set.get().device_serial_number, '00001')
 
         # Test that patient study level data is recorded correctly
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '067Y')
         self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(67.6))
+
+        #Test that irradiation time data is stored correctly
+        self.assertEqual(study.ctradiationdose_set.get().start_of_xray_irradiation,
+            datetime.datetime(1997, 1, 1, 0, 6, 31, 737000))
+        self.assertEqual(study.ctradiationdose_set.get().end_of_xray_irradiation,
+            datetime.datetime(1997, 1, 1, 0, 9, 47, 950000))
+        self.assertEqual(study.ctradiationdose_set.get().procedure_reported.code_meaning,
+            'Computed Tomography X-Ray')
+        self.assertEqual(study.ctradiationdose_set.get().has_intent.code_meaning,
+            'Diagnostic Intent')
+
+        #Test that device observer data is stored correctly
+        self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
+            device_observer_serial_number, '00001')
+        self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
+            device_observer_name, 'CTAWP00001')
+        self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
+            device_observer_manufacturer, 'SIEMENS')
+        self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
+            device_observer_model_name, 'SOMATOM Definition Flash')
+        self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
+            device_observer_physical_location_during_observation, 'Hospital Number One Trust')
+        self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
+            observer_type.code_meaning, 'Device')
 
         # Test that exposure data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
@@ -62,9 +85,9 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[0].acquisition_protocol, 'Topogram')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
-       # self.assertEqual(study.ctradiationdose_set.get().
-       #     ctirradiationeventdata_set.all()[0].comment,
-       #         'Internal techincal scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].comment,
+                'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].exposure_time, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -75,6 +98,9 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[1].acquisition_protocol, 'PreMonitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].comment,
+                'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].exposure_time, Decimal(1.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -85,6 +111,9 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[2].acquisition_protocol, 'Monitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].comment,
+                'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[3].exposure_time, Decimal(16.01))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -97,6 +126,22 @@ class ImportCTRDSR(TestCase):
             ctirradiationeventdata_set.all()[3].acquisition_protocol, 'TAP')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].comment,
+                'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = XYZ_EC')
+
+        self.assertEqual(
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[1].
+                ct_acquisition_type.code_meaning, 'Stationary Acquisition')
+        self.assertEqual(
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].
+                ct_acquisition_type.code_meaning, 'Stationary Acquisition')
+        self.assertEqual(
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[3].
+                ct_acquisition_type.code_meaning, 'Spiral Acquisition')
 
         # Test that CT xraysource data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
