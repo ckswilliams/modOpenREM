@@ -87,7 +87,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    os.path.join(ROOT_PROJECT,'static'),
+    os.path.join(ROOT_PROJECT, 'remapp', 'static'),
 )
 
 #
@@ -131,6 +131,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'pagination.middleware.PaginationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'openremproject.urls'
@@ -156,6 +157,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'solo',
     'crispy_forms',
+    'debug_toolbar',
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
@@ -189,19 +191,19 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem.log',
             'formatter': 'verbose'
         },
         'qr_file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_qrscu.log',
             'formatter': 'verbose'
         },
         'store_file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'

@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
@@ -21,6 +22,7 @@ OpenREM version history
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al) again!
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
+* `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 
 0.7.4 (2016-10-17)
 ------------------

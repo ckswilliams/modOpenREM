@@ -369,10 +369,15 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     event.date_time_started = make_date_time('{0}{1}'.format(event_date, event_time))
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
+    if not event.acquisition_protocol:
+        manufacturer = get_value_kw('Manufacturer', dataset, char_set=ch)
+        software_versions = get_value_kw('SoftwareVersions', dataset, char_set=ch)
+        if manufacturer == 'TOSHIBA_MEC' and software_versions == 'TM_TFD_1.0':
+            event.acquisition_protocol = get_value_kw('ImageComments', dataset, char_set=ch)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw(
         'SeriesDescription', dataset, char_set=ch)
-    # TODO: Establish why ProtocolName is extracted and never used
-    acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_seq_code_meaning(
+        'PerformedProtocolCodeSequence', dataset, char_set=ch)
     series_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
     if series_description:
         event.comment = series_description
@@ -600,13 +605,15 @@ def _generalstudymoduleattributes(dataset, g):
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription', dataset, char_set=ch)
     if not g.study_description: g.study_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
+    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
     g.modality_type = get_value_kw('Modality', dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset, char_set=ch)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset, char_set=ch)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
     g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
     # Being used to summarise protocol for study:
-    g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch)
+    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription', dataset, char_set=ch)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription', dataset, char_set=ch)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
@@ -614,9 +621,13 @@ def _generalstudymoduleattributes(dataset, g):
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
+        'ProcedureCodeSequence', dataset)
+    if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
         'RequestAttributesSequence', dataset, char_set=ch)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
+        'ProcedureCodeSequence', dataset, char_set=ch)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(
         0x00321060, dataset, char_set=ch)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
