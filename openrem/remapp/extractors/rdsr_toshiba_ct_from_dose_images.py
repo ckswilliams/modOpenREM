@@ -1,6 +1,3 @@
-#!D:\Server_Apps\python27\python.exe
-# scripts/create_rdsr_from_toshiba_ct_dose_images
-
 import sys
 import os
 from glob import glob
@@ -23,7 +20,7 @@ django.setup()
 from celery import shared_task
 
 
-def split_by_studyinstanceuid(dicom_path):
+def _split_by_studyinstanceuid(dicom_path):
     """Parse a folder of files, creating a sub-folder for each StudyInstanceUID found in any DICOM files. Each DICOM
     file is copied into the folder that matches its StudyInstanceUID. The files are renamed to have integer names
     starting with 0 and incrementing by 1 for each additional file copied.
@@ -65,7 +62,7 @@ def split_by_studyinstanceuid(dicom_path):
     return folder_list
 
 
-def find_extra_info(dicom_path):
+def _find_extra_info(dicom_path):
     """Parses a folder of files,  obtaining DICOM tag information on each acquisition present.
 
     Args:
@@ -234,7 +231,7 @@ def find_extra_info(dicom_path):
     return [study_info, acquisition_info]
 
 
-def make_explicit_vr_little_endian(folder_list, dcmconv_exe):
+def _make_explicit_vr_little_endian(folder_list, dcmconv_exe):
     """Parse folders of files, making each DICOM file explicit VR little endian using the DICOM toolkit dcmconv.exe
     command. See http://support.dcmtk.org/docs/dcmconv.html for documentation.
 
@@ -251,7 +248,7 @@ def make_explicit_vr_little_endian(folder_list, dcmconv_exe):
             subprocess.call(command.split())
 
 
-def make_dicomdir(folder_list, dcmmkdir_exe):
+def _make_dicomdir(folder_list, dcmmkdir_exe):
     """Parse folders of files, making a DICOMDIR for each using the DICOM toolkit dcmmkdir.exe command. See
     http://support.dcmtk.org/docs/dcmmkdir.html for documentation.
 
@@ -268,7 +265,7 @@ def make_dicomdir(folder_list, dcmmkdir_exe):
         subprocess.call(command.split())
 
 
-def make_dicom_rdsr(folder_list, pixelmed_jar_command, sr_filename):
+def _make_dicom_rdsr(folder_list, pixelmed_jar_command, sr_filename):
     """Parse folders of files, making a DICOM RDSR for each using pixelmed.jar.
 
     Args:
@@ -284,7 +281,7 @@ def make_dicom_rdsr(folder_list, pixelmed_jar_command, sr_filename):
         subprocess.call(command.split())
 
 
-def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_info):
+def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_info):
     """Try to update information in an RDSR file using pydicom. Match the pair of CTDIvol and DLP values found in the
     RDSR CT Acquisition with a pair of CTDIvol and DLP values in additional_info. If a match is found, use the other
     information in the additional_info element to update the corresponding CT Acquisition in the RDSR.
@@ -578,48 +575,48 @@ def update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_i
 @shared_task
 def rdsr_toshiba_ct_from_dose_images(folder_name):
     rdsr_name = 'sr.dcm'
-    for folder_name in glob(arg):
-        # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
-        # first dose summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one
-        # dose summary per folder. N.B. I think Conquest may do this by default with incoming DICOM objects. This
-        # routine also renames the files using integer file names to ensure that they are accepted by dcmmkdir later on.
-        print 'Splitting into folders by StudyInstanceUID'
-        folders = split_by_studyinstanceuid(folder_name)
 
-        # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
-        print 'Making explicit VR little endian'
-        make_explicit_vr_little_endian(folders, DCMCONV)
+    # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
+    # first dose summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one
+    # dose summary per folder. N.B. I think Conquest may do this by default with incoming DICOM objects. This
+    # routine also renames the files using integer file names to ensure that they are accepted by dcmmkdir later on.
+    print 'Splitting into folders by StudyInstanceUID'
+    folders = _split_by_studyinstanceuid(folder_name)
 
-        # Now create a DICOMDIR for each sub-folder using dcmmkdir.
-        # This is required by pixelmed.jar when creating RDSRs.
-        print 'Creating DICOMDIR files'
-        make_dicomdir(folders, DCMMKDIR)
+    # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
+    print 'Making explicit VR little endian'
+    _make_explicit_vr_little_endian(folders, DCMCONV)
 
-        # Now create a DICOM RDSR for each sub-folder using pixelmed.jar.
-        print 'Making initial DICOM RDSR objects'
-        combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
-        make_dicom_rdsr(folders, combined_command, rdsr_name)
+    # Now create a DICOMDIR for each sub-folder using dcmmkdir.
+    # This is required by pixelmed.jar when creating RDSRs.
+    print 'Creating DICOMDIR files'
+    _make_dicomdir(folders, DCMMKDIR)
 
-        # Obtain additional information from the image tags in each folder and add this information to the RDSR file.
-        for folder in folders:
-            print 'Gathering extra information from images in ' + folder
-            extra_information = find_extra_info(folder)
-            extra_study_information = extra_information[0]
-            print 'Extra study information is:'
-            print extra_study_information
-            extra_acquisition_information = extra_information[1]
-            print 'Extra acquisition information is:'
-            print extra_acquisition_information
+    # Now create a DICOM RDSR for each sub-folder using pixelmed.jar.
+    print 'Making initial DICOM RDSR objects'
+    combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
+    _make_dicom_rdsr(folders, combined_command, rdsr_name)
 
-            # Use the extra information to update the initial rdsr file created by DoseUtility
-            print 'Updating information in rdsr in ' + folder
-            updated_rdsr_file = update_dicom_rdsr(os.path.join(folder, rdsr_name), extra_study_information,
-                                                  extra_acquisition_information)
+    # Obtain additional information from the image tags in each folder and add this information to the RDSR file.
+    for folder in folders:
+        print 'Gathering extra information from images in ' + folder
+        extra_information = _find_extra_info(folder)
+        extra_study_information = extra_information[0]
+        print 'Extra study information is:'
+        print extra_study_information
+        extra_acquisition_information = extra_information[1]
+        print 'Extra acquisition information is:'
+        print extra_acquisition_information
 
-            # Now import the updated rdsr into OpenREM using the Toshiba extractor
-            if updated_rdsr_file is not None:
-                print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_file + ')'
-                rdsr(updated_rdsr_file)
+        # Use the extra information to update the initial rdsr file created by DoseUtility
+        print 'Updating information in rdsr in ' + folder
+        updated_rdsr_file = _update_dicom_rdsr(os.path.join(folder, rdsr_name), extra_study_information,
+                                              extra_acquisition_information)
+
+        # Now import the updated rdsr into OpenREM using the Toshiba extractor
+        if updated_rdsr_file is not None:
+            print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_file + ')'
+            rdsr(updated_rdsr_file)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-#!D:\Server_Apps\python27\python.exe
+#!/usr/local/bin/python
 # scripts/openrem_rdsr_toshiba_ct_from_dose_images
 
 """Script to launch the rdsr_toshiba_ct_from_dose_images module to import information from
