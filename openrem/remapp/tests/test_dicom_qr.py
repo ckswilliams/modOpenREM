@@ -200,6 +200,8 @@ class StudyQueryLogic(TestCase):
         d = Dataset()
         modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
 
+        for study in DicomQRRspStudy.objects.all():
+            print("{0} has {1} modalities".format(study.id, study.modalities_in_study))
         self.assertEqual(DicomQRRspStudy.objects.count(), 7)
         self.assertEqual(study_query_mock.call_count, 2)
         self.assertEqual(modality_matching, True)
