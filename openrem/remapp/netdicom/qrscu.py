@@ -19,6 +19,7 @@ import logging
 import os
 import sys
 import uuid
+import collections
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -544,12 +545,13 @@ def qrscu(
     d = Dataset()
     d.StudyDate = str(make_dcm_date_range(date_from, date_until) or '')
 
-    all_mods = {'CT': {'inc': False, 'mods': ['CT']},
-                'MG': {'inc': False, 'mods': ['MG']},
-                'FL': {'inc': False, 'mods': ['RF', 'XA']},
-                'DX': {'inc': False, 'mods': ['DX', 'CR']},
-                'SR': {'inc': False, 'mods': ['SR']}
-                }
+    all_mods = collections.OrderedDict()
+    all_mods['CT'] = {'inc': False, 'mods': ['CT']}
+    all_mods['MG'] = {'inc': False, 'mods': ['MG']}
+    all_mods['FL'] = {'inc': False, 'mods': ['RF', 'XA']}
+    all_mods['DX'] = {'inc': False, 'mods': ['DX', 'CR']}
+    all_mods['SR'] = {'inc': False, 'mods': ['SR']}
+
     # Reasoning regarding PET-CT: Some PACS allocate study modality PT, some CT, some depending on order received.
     # If ModalitiesInStudy is used for matching on C-Find, the CT from PET-CT will be picked up.
     # If not, then the PET-CT will be returned with everything else, and the CT will show up in the series level
