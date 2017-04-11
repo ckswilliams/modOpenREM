@@ -5,6 +5,9 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
+* `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
+* `#485`_  Imports: CT RDSR now imports 'target region' correctly
 * `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable

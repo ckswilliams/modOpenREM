@@ -205,55 +205,59 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     from xml.etree import ElementTree as ET
     source = IrradEventXRaySourceData.objects.create(irradiation_event_xray_data=event)
     for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
-            source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            try:
-                source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                                           cont.ConceptCodeSequence[0].CodeMeaning)
-            except AttributeError:
-                source.reference_point_definition = safe_strings(cont.TextValue, char_set=ch)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
-            source.average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
-            source.fluoro_mode = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                   cont.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Rate':
-            source.pulse_rate = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
-            source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
-        elif ((cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Frames') and
-                  (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER')):
-            # Philips Allura XPer systems: Private coding scheme designator: 99PHI-IXR-XPER; [number of pulses]
-            source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
-            # should be a derivation thing in here for when the no. pulses is estimated
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Duration':
-            source.irradiation_duration = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average X-Ray Tube Current':
-            source.average_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
-            source.exposure_time = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Focal Spot Size':
-            source.focal_spot_size = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anode Target Material':
-            source.anode_target_material = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                             cont.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
-            source.collimated_field_area = cont.MeasuredValueSequence[0].NumericValue
-        # TODO: xray_grid no longer exists in this table - it is a model on its own... See https://bitbucket.org/openrem/openrem/issue/181
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
-            source.xray_grid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                 cont.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Width':
-            _pulsewidth(cont.MeasuredValueSequence[0].NumericValue, source)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
-            _kvptable(cont.MeasuredValueSequence[0].NumericValue, source)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
-            _xraytubecurrent(cont.MeasuredValueSequence[0].NumericValue, source)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure':
-            _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
-            _xrayfilters(cont.ContentSequence, source)
+        try:
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP)':
+                source.dose_rp = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+                try:
+                    source.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                                               cont.ConceptCodeSequence[0].CodeMeaning)
+                except AttributeError:
+                    source.reference_point_definition = safe_strings(cont.TextValue, char_set=ch)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average Glandular Dose':
+                source.average_glandular_dose = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Mode':
+                source.fluoro_mode = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                       cont.ConceptCodeSequence[0].CodeMeaning)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Rate':
+                source.pulse_rate = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Pulses':
+                source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
+            elif ((cont.ConceptNameCodeSequence[0].CodeMeaning == 'Number of Frames') and
+                      (cont.ConceptNameCodeSequence[0].CodingSchemeDesignator == '99PHI-IXR-XPER')):
+                # Philips Allura XPer systems: Private coding scheme designator: 99PHI-IXR-XPER; [number of pulses]
+                source.number_of_pulses = cont.MeasuredValueSequence[0].NumericValue
+                # should be a derivation thing in here for when the no. pulses is estimated
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Duration':
+                source.irradiation_duration = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Average X-Ray Tube Current':
+                source.average_xray_tube_current = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure Time':
+                source.exposure_time = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Focal Spot Size':
+                source.focal_spot_size = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anode Target Material':
+                source.anode_target_material = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Collimated Field Area':
+                source.collimated_field_area = cont.MeasuredValueSequence[0].NumericValue
+            # TODO: xray_grid no longer exists in this table - it is a model on its own...
+            # See https://bitbucket.org/openrem/openrem/issue/181
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Grid':
+                source.xray_grid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                     cont.ConceptCodeSequence[0].CodeMeaning)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Pulse Width':
+                _pulsewidth(cont.MeasuredValueSequence[0].NumericValue, source)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'KVP':
+                _kvptable(cont.MeasuredValueSequence[0].NumericValue, source)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Tube Current':
+                _xraytubecurrent(cont.MeasuredValueSequence[0].NumericValue, source)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Exposure':
+                _exposure(cont.MeasuredValueSequence[0].NumericValue, source)
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'X-Ray Filters':
+                _xrayfilters(cont.ContentSequence, source)
+        except IndexError:
+            pass
     _deviceparticipant(dataset, 'source', source, ch)
     try:
         source.ii_field_size = ET.fromstring(source.irradiation_event_xray_data.comment).find('iiDiameter').get(
@@ -261,13 +265,6 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
     except:
         pass
     source.save()
-    if not source.average_xray_tube_current and source.average_glandular_dose:  # AGD to test for mammo
-        try:
-            source.average_xray_tube_current = source.xraytubecurrent_set.all().aggregate(Avg('xray_tube_current'))[
-                'xray_tube_current__avg']
-            source.save()
-        except ObjectDoesNotExist:
-            pass
     if not source.exposure_time and source.number_of_pulses:
         try:
             avg_pulse_width = source.pulsewidth_set.all().aggregate(Avg('pulse_width'))['pulse_width__avg']
@@ -276,6 +273,11 @@ def _irradiationeventxraysourcedata(dataset, event, ch):  # TID 10003b
                 source.save()
         except ObjectDoesNotExist:
             pass
+    if not source.average_xray_tube_current:
+        if source.xraytubecurrent_set.all().count() > 0:
+            source.average_xray_tube_current = source.xraytubecurrent_set.all().aggregate(
+                Avg('xray_tube_current'))['xray_tube_current__avg']
+            source.save()
 
 
 def _irradiationeventxraydetectordata(dataset, event, ch):  # TID 10003a
@@ -333,14 +335,20 @@ def _irradiationeventxraydata(dataset, proj, ch, fulldataset):  # TID 10003
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Anatomical structure':
             event.anatomical_structure = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                            cont.ConceptCodeSequence[0].CodeMeaning)
-            for cont2 in cont.ContentSequence:
-                if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
-                    event.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
-                                                         cont2.ConceptCodeSequence[0].CodeMeaning)
+            try:
+                for cont2 in cont.ContentSequence:
+                    if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Laterality':
+                        event.laterality = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
+                                                             cont2.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Image View':
             event.image_view = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                  cont.ConceptCodeSequence[0].CodeMeaning)
-            _imageviewmodifier(cont, event)
+            try:
+                _imageviewmodifier(cont, event)
+            except AttributeError:
+                pass
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Patient Table Relationship':
             event.patient_table_relationship_cid = get_or_create_cid(
                 cont.ConceptCodeSequence[0].CodeValue, cont.ConceptCodeSequence[0].CodeMeaning)
@@ -443,46 +451,48 @@ def _accumulatedmammoxraydose(dataset, accum):  # TID 10005
             accummammo.save()
 
 
-def _accumulatedprojectionxraydose(dataset, accum):  # TID 10004
+def _accumulatedfluoroxraydose(dataset, accum):  # TID 10004
+    # Name in DICOM standard for TID 10004 is Accumulated Fluoroscopy and Acquisition Projection X-Ray Dose
     from remapp.tools.get_values import get_or_create_cid
     from remapp.models import AccumProjXRayDose
     accumproj = AccumProjXRayDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
-            accumproj.fluoro_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
-            accumproj.fluoro_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
-            accumproj.total_fluoro_time = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose Area Product Total':
-            accumproj.acquisition_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose (RP) Total':
-            accumproj.acquisition_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
-            accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
-        # TODO: Remove the following four items, as they are also imported (correctly) into
-        # _accumulatedintegratedprojectionradiographydose
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-            accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
-            accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
-            accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            try:
-                accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                                              cont.ConceptCodeSequence[0].CodeMeaning)
-            except AttributeError:
-                accumproj.reference_point_definition = cont.TextValue
+        try:
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose Area Product Total':
+                accumproj.fluoro_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Fluoro Dose (RP) Total':
+                accumproj.fluoro_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Fluoro Time':
+                accumproj.total_fluoro_time = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose Area Product Total':
+                accumproj.acquisition_dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Dose (RP) Total':
+                accumproj.acquisition_dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Acquisition Time':
+                accumproj.total_acquisition_time = cont.MeasuredValueSequence[0].NumericValue
+            # TODO: Remove the following four items, as they are also imported (correctly) into
+            # _accumulatedtotalprojectionradiographydose
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
+                accumproj.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
+                accumproj.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
+                accumproj.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+                try:
+                    accumproj.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                                                  cont.ConceptCodeSequence[0].CodeMeaning)
+                except AttributeError:
+                    accumproj.reference_point_definition = cont.TextValue
+        except IndexError:
+            pass
     if accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes.modality_type == \
             'RF,DX':
-        if (accumproj.fluoro_dose_area_product_total != "" or
-                    accumproj.total_fluoro_time != "" or
-                    accumproj.acquisition_dose_area_product_total != "" or
-                    accumproj.total_acquisition_time != ""):
+        if (accumproj.fluoro_dose_area_product_total != "" and accumproj.fluoro_dose_area_product_total is not None) \
+                or (accumproj.total_fluoro_time != "" and accumproj.total_fluoro_time is not None):
             accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = 'RF'
-        elif accumproj.total_number_of_radiographic_frames != "":
+        else:
             accumproj.accumulated_xray_dose.projection_xray_radiation_dose.general_study_module_attributes. \
                 modality_type = "DX"
     accumproj.save()
@@ -501,23 +511,27 @@ def _accumulatedcassettebasedprojectionradiographydose(dataset, accum):  # TID 1
     accumcass.save()
 
 
-def _accumulatedintegratedprojectionradiographydose(dataset, accum):  # TID 10007
+def _accumulatedtotalprojectionradiographydose(dataset, accum):  # TID 10007
+    # Name in DICOM standard for TID 10007 is Accumulated Total Projection Radiography Dose
     from remapp.models import AccumIntegratedProjRadiogDose
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     accumint = AccumIntegratedProjRadiogDose.objects.create(accumulated_xray_dose=accum)
     for cont in dataset.ContentSequence:
-        if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
-            accumint.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
-            accumint.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
-            accumint.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
-            try:
-                accumint.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                                             cont.ConceptCodeSequence[0].CodeMeaning)
-            except AttributeError:
-                accumint.reference_point_definition = safe_strings(cont.TextValue)
+        try:
+            if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Area Product Total':
+                accumint.dose_area_product_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Dose (RP) Total':
+                accumint.dose_rp_total = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Radiographic Frames':
+                accumint.total_number_of_radiographic_frames = cont.MeasuredValueSequence[0].NumericValue
+            elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Reference Point Definition':
+                try:
+                    accumint.reference_point_definition_code = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
+                except AttributeError:
+                    accumint.reference_point_definition = safe_strings(cont.TextValue)
+        except IndexError:
+            pass
     accumint.save()
 
 
@@ -532,23 +546,22 @@ def _accumulatedxraydose(dataset, proj, ch):  # TID 10002
         if cont.ValueType == 'CONTAINER':
             if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Calibration':
                 _calibration(cont, accum, ch)
-    if ((proj.acquisition_device_type_cid and (
-                'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
-            (proj.procedure_reported and (
-                        'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
-        ):
-        _accumulatedprojectionxraydose(dataset, accum)
+    if proj.acquisition_device_type_cid:
+        if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+            _accumulatedfluoroxraydose(dataset, accum)
+    elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
+        _accumulatedfluoroxraydose(dataset, accum)
     if proj.procedure_reported and (proj.procedure_reported.code_meaning == 'Mammography'):
         _accumulatedmammoxraydose(dataset, accum)
-    if ((proj.acquisition_device_type_cid and ('Integrated' in proj.acquisition_device_type_cid.code_meaning)) or
-            (proj.acquisition_device_type_cid and (
-                        'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning)) or
-            (proj.procedure_reported and (
-                        'Projection X-Ray' in proj.procedure_reported.code_meaning) and not proj.acquisition_device_type_cid)
-        ):
-        _accumulatedintegratedprojectionradiographydose(dataset, accum)
-    if (proj.acquisition_device_type_cid and ('Cassette-based' in proj.acquisition_device_type_cid.code_meaning)):
-        _accumulatedcassettebasedprojectionradiographydose(dataset, accum)
+    if proj.acquisition_device_type_cid:
+        if 'Integrated' in proj.acquisition_device_type_cid.code_meaning or \
+                'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+            _accumulatedtotalprojectionradiographydose(dataset, accum)
+    elif proj.procedure_reported and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
+        _accumulatedtotalprojectionradiographydose(dataset, accum)
+    if proj.acquisition_device_type_cid:
+       if 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+            _accumulatedcassettebasedprojectionradiographydose(dataset, accum)
     accum.save()
 
 
@@ -610,13 +623,13 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'TargetRegion':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
             event.target_region = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                     cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Type':
             event.ct_acquisition_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                           cont.ConceptCodeSequence[0].CodeMeaning)
-        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'ProcedureContext':
+        elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure Context':
             event.procedure_context = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                         cont.ConceptCodeSequence[0].CodeMeaning)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Irradiation Event UID':
@@ -743,6 +756,22 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
+        if reporttype == 'projection' and proj.acquisition_device_type_cid:
+            if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'RF'
+            elif 'Integrated' in proj.acquisition_device_type_cid.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'DX'
+            elif 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
+                proj.general_study_module_attributes.modality_type = 'DX'
+            else:
+                logging.error(
+                    "Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, Station name: {1}, Study date, time: {2}, {3} ".format(
+                    proj.general_study_module_attributes.study_instance_uid,
+                    proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
+                    proj.general_study_module_attributes.study_date,
+                    proj.general_study_module_attributes.study_time
+                ))
+
         proj.save()
 
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Observer Type':
@@ -903,7 +932,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription', dataset, char_set=ch)
     g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset, char_set=ch)
-    g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset, char_set=ch)
+    g.name_of_physician_reading_study = get_value_kw('NameOfPhysiciansReadingStudy', dataset, char_set=ch)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
     g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
     g.procedure_code_value = get_seq_code_value('ProcedureCodeSequence', dataset)
