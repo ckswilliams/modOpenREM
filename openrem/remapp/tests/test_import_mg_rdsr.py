@@ -103,8 +103,6 @@ class ImportCTRDSR(TestCase):
             )[0].target_region.code_meaning, 'Breast')
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].reference_point_definition.code_meaning, 'Entrance exposure to a 4.2 cm breast thickness')
-       #self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-       #     )[0].xray_grid.code_meaning, 'Grid in')
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].laterality.code_meaning, 'Left')
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
@@ -128,8 +126,8 @@ class ImportCTRDSR(TestCase):
             )[1].target_region.code_meaning, 'Breast')
         self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[1].reference_point_definition.code_meaning, 'Entrance exposure to a 4.2 cm breast thickness')
-        # self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #     )[1].xray_grid.code_meaning, 'Grid in')
+        #self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+        #    )[1].xray_grid.code_meaning, 'Grid in')
 
         # Test that xray source data is recorded correctly
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
@@ -155,9 +153,7 @@ class ImportCTRDSR(TestCase):
 
 
 
-        # Thest that X-ray filter data is recorded correctly - cant work out how to check 'cid's
-        #self.assertEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
-        #    )[1].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_type, 'Strip filter')
+        # Test that X-ray filter data is recorded correctly
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
             )[0].irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_thickness_minimum, Decimal(0.05))
         self.assertAlmostEqual(studies[0].projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
