@@ -353,7 +353,7 @@ class QRPhilipsCT(TestCase):
         # After pruning, there should be no studies left
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 0)
 
-    @patch("remapp.netdicom.qrscu.check_sr_type_in_study", _fake_check_sr_type_in_study_with_rdsr)
+    @patch("remapp.netdicom.qrscu._check_sr_type_in_study", _fake_check_sr_type_in_study_with_rdsr)
     def test_response_pruning_ct_philips_with_desc_and_sr(self):
         """
         Study response contains a Philips style 'dose info' series, with study descriptions available, and a structured
