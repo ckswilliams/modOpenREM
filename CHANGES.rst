@@ -8,6 +8,7 @@ OpenREM version history
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
@@ -15,6 +16,7 @@ OpenREM version history
 * `#453`_  Imports: DX with min filter thickness greater than max have values switched on import
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
 * `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
+* `#447`_  Imports: Modified rdsr and ctdetail template to import and display data from Pixelmed generated Toshiba RDSR
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
 * `#442`_  Exports: Fixed RF exports with multiple filters, added tests. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
@@ -23,6 +25,7 @@ OpenREM version history
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al) again!
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
+* `#411`_  Imports: Fixed laterality and accumulated AGD failure for Hologic DBT proprietary projection images
 
 0.7.4 (2016-10-17)
 ------------------

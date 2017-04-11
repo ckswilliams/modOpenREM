@@ -58,50 +58,47 @@
     <th>Collimation (mm)</th>
     <th>X-ray modulation type</th>
     {% for event in generalstudymoduleattr.ctradiationdose_set.get.ctirradiationeventdata_set.all %}
-        {% for source in event.ctxraysourceparameters_set.all %}
-            {% if source.identification_of_the_xray_source != "B" %}
-                <tr>
-                    <td rowspan="2">{{ event.acquisition_protocol }}</td>
-                    <td rowspan="2">{{ event.ct_acquisition_type }}</td>
-                    <td rowspan="2">
-                      {{ event.mean_ctdivol|floatformat:2 }}
-                      {% if event.ctdiw_phantom_type.code_value == "113691" %}
-                        (32&nbsp;cm)
-                      {% elif event.ctdiw_phantom_type.code_value == "113690" %}
-                        (16&nbsp;cm)
-                      {% endif %}
-                    </td>
-                    <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>        
-                    <td rowspan="2">{{ event.scanninglength_set.get.scanning_length|floatformat:0 }}</td>
-                    {% if event.number_of_xray_sources < 2 %}
-                        <td rowspan="2">{{ source.kvp|floatformat:0 }}</td>
-                        <td rowspan="2">{{ source.xray_tube_current|floatformat:0 }}</td>
-                        <td rowspan="2">{{ source.maximum_xray_tube_current|floatformat:0 }}</td>
-                        <td rowspan="2">{{ source.exposure_time_per_rotation|floatformat:3 }}</td>
-                    {% else %}
-                        <td>{{ source.kvp|floatformat:0 }}</td>
-                        <td>{{ source.xray_tube_current|floatformat:0 }}</td>
-                        <td>{{ source.maximum_xray_tube_current|floatformat:0 }}</td>
-                        <td>{{ source.exposure_time_per_rotation|floatformat:3 }}</td>
-                    {% endif %}
-                    <td rowspan="2">{{ event.pitch_factor|floatformat:3 }}</td>
-                    <td rowspan="2">{{ event.exposure_time|floatformat:3 }}</td>
-                    <td rowspan="2">{{ event.nominal_single_collimation_width|floatformat:3 }}</td>
-                    <td rowspan="2">{{ event.nominal_total_collimation_width|floatformat:2 }}</td>
-                    <td rowspan="2">{{ event.xray_modulation_type }}</td>
-                </tr>
-                {% if event.number_of_xray_sources < 2 %}
-                    <tr></tr>
-                {% endif %}
-            {% else %}
-                <tr>
-                    <td>{{ source.kvp|floatformat:0 }}</td>
-                    <td>{{ source.xray_tube_current|floatformat:0 }}</td>
-                    <td>{{ source.maximum_xray_tube_current|floatformat:0 }}</td>
-                    <td>{{ source.exposure_time_per_rotation|floatformat:3 }}</td>
-                </tr>
-            {% endif %}
-        {% endfor %}
+      <tr>
+        <td rowspan="2">{{ event.acquisition_protocol }}</td>
+        <td rowspan="2">{{ event.ct_acquisition_type }}</td>
+        <td rowspan="2">
+          {{ event.mean_ctdivol|floatformat:2 }}
+          {% if event.ctdiw_phantom_type.code_value == "113691" %}
+            (32&nbsp;cm)
+          {% elif event.ctdiw_phantom_type.code_value == "113690" %}
+            (16&nbsp;cm)
+          {% endif %}
+        </td>
+        <td rowspan="2">{{ event.dlp|floatformat:2 }}</td>
+        <td rowspan="2">{{ event.scanninglength_set.get.scanning_length|floatformat:0 }}</td>
+        {% if event.number_of_xray_sources != 2 %}
+          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.kvp|floatformat:0 }}</td>
+          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.xray_tube_current|floatformat:0 }}</td>
+          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.maximum_xray_tube_current|floatformat:0 }}</td>
+          <td rowspan="2">{{ event.ctxraysourceparameters_set.get.exposure_time_per_rotation|floatformat:3 }}</td>
+        {% else %}
+          <td>{{ event.ctxraysourceparameters_set.all.0.kvp|floatformat:0 }}</td>
+          <td>{{ event.ctxraysourceparameters_set.all.0.xray_tube_current|floatformat:0 }}</td>
+          <td>{{ event.ctxraysourceparameters_set.all.0.maximum_xray_tube_current|floatformat:0 }}</td>
+          <td>{{ event.ctxraysourceparameters_set.all.0.exposure_time_per_rotation|floatformat:3 }}</td>
+        {% endif %}
+        <td rowspan="2">{{ event.pitch_factor|floatformat:3 }}</td>
+        <td rowspan="2">{{ event.exposure_time|floatformat:3 }}</td>
+        <td rowspan="2">{{ event.nominal_single_collimation_width|floatformat:3 }}</td>
+        <td rowspan="2">{{ event.nominal_total_collimation_width|floatformat:2 }}</td>
+        <td rowspan="2">{{ event.xray_modulation_type }}</td>
+      </tr>
+      {% if event.number_of_xray_sources == 2 %}
+        <tr>
+          <td>{{ event.ctxraysourceparameters_set.all.1.kvp|floatformat:0 }}</td>
+          <td>{{ event.ctxraysourceparameters_set.all.1.xray_tube_current|floatformat:0 }}</td>
+          <td>{{ event.ctxraysourceparameters_set.all.1.maximum_xray_tube_current|floatformat:0 }}</td>
+          <td>{{ event.ctxraysourceparameters_set.all.1.exposure_time_per_rotation|floatformat:3 }}</td>
+        </tr>
+      {% else %}
+        <tr></tr>
+      {% endif %}
+
         {% if event.comment != "" %}
         <tr>
             <td colspan="14"><strong>Comment</strong> {{ event.comment }}</td>

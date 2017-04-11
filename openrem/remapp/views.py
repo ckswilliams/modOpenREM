@@ -36,15 +36,24 @@ import os
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
+
+import csv
+import sys
+from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse_lazy
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, render_to_response, redirect, get_object_or_404
+from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from openremproject.settings import MEDIA_ROOT
 import remapp
+from remapp.forms import SizeUploadForm
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
+from remapp.models import SizeUpload
 
 try:
     from numpy import *
@@ -1353,16 +1362,6 @@ def study_delete(request, pk, template_name='remapp/study_confirm_delete.html'):
         return redirect(request.META['HTTP_REFERER'])
     else:
         return redirect("/openrem/")
-
-
-import os, sys, csv
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.http import HttpResponseRedirect
-from django.contrib import messages
-from openremproject.settings import MEDIA_ROOT
-from remapp.models import SizeUpload
-from remapp.forms import SizeUploadForm
 
 
 @login_required
