@@ -198,7 +198,8 @@ def _check_sr_type_in_study(my_ae, remote_ae, study):
         _query_images(my_ae, remote_ae, s)
         images = s.dicomqrrspimage_set.all()
         sopclasses.add(images[0].sop_class_uid)
-        logger.info("studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(study.study_instance_uid,s.series_instance_uid,images.count(),sopclasses))
+        logger.info("studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
+            study.study_instance_uid, s.series_instance_uid, images.count(), sopclasses))
     logger.info("sopclasses: {0}".format(sopclasses))
     if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
         return 'RDSR'
