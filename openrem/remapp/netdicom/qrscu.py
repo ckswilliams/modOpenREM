@@ -192,7 +192,7 @@ def _prune_study_responses(query, study_rsp, all_mods, filters):
 def _check_sr_type_in_study(my_ae, remote_ae, study):
     # select series with modality SR
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
-    logger.info("nrseries with SR {0}".format(series_sr.count()))
+    logger.info("Number of series with SR {0}".format(series_sr.count()))
     sopclasses = set()
     for s in series_sr:
         _query_images(my_ae, remote_ae, s)
