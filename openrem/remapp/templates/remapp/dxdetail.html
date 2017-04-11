@@ -41,7 +41,11 @@
 <table class="table table-striped table-bordered small">
     <th>Time</th>
     <th>Acquisition protocol</th>
-    <th>View</th>
+    <th>
+      Anatomy, laterality <br>
+      Targe region <br>
+      View
+    </th>
     <th>kVp</th>
     <th>mAs</th>
     <th>mA</th>
@@ -58,7 +62,12 @@
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
-        <td>{{ event.image_view }}</td>
+        <td>
+          {% if event.anatomical_structure %} {{ event.anatomical_structure }} {% endif %}
+          {% if event.laterality %}{{ event.laterality }} {% endif %}<br>
+          {% if event.target_region %}{{ event.target_region }} {% endif %}<br>
+          {% if event.image_view %}{{ event.image_view }} {% endif %}
+        </td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_set.get.convert_uAs_to_mAs|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.average_xray_tube_current|floatformat:0 }}</td>
