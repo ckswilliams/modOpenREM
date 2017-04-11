@@ -408,18 +408,15 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
     for selection, details in all_mods.items():
         if details['inc']:
             for mod in details['mods']:
-                query.stage = 'Currently querying for {0} studies...'.format(mod)
-                query.save()
-                logger.info('Currently querying for {0} studies...'.format(mod))
-                print('Currently querying for {0} studies...'.format(mod))
                 if modality_matching:
-                    print("modality_matching is true")
+                    query.stage = 'Currently querying for {0} studies...'.format(mod)
+                    query.save()
+                    logger.info('Currently querying for {0} studies...'.format(mod))
                     d.ModalitiesInStudy = mod
                     query_id = uuid.uuid4()
                     _query_study(MyAE, RemoteAE, d, query, query_id)
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
                     for rsp in study_rsp:
-                        print("{0}: mods within qrscu code are {1}".format(rsp.id, rsp.get_modalities_in_study()))
                         if mod not in rsp.get_modalities_in_study():
                             modality_matching = False
                             logger.debug("Remote node doesn't support ModalitiesInStudy as a Matching Key")

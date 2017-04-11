@@ -161,7 +161,6 @@ class StudyQueryLogic(TestCase):
         remote_ae = dict(Address=qr_scp.hostname, Port=qr_scp.port, AET=aec.encode('ascii', 'ignore'))
 
         d = Dataset()
-        print("Testing modalities do not match")
         modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
 
         self.assertEqual(DicomQRRspStudy.objects.count(), 2)
@@ -200,11 +199,8 @@ class StudyQueryLogic(TestCase):
         remote_ae = dict(Address=qr_scp.hostname, Port=qr_scp.port, AET=aec.encode('ascii', 'ignore'))
 
         d = Dataset()
-        print("Testing modalities do match")
         modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
 
-        for study in DicomQRRspStudy.objects.all():
-            print("{0} has {1} modalities".format(study.id, study.modalities_in_study))
         self.assertEqual(DicomQRRspStudy.objects.count(), 7)
         self.assertEqual(study_query_mock.call_count, 2)
         self.assertEqual(modality_matching, True)
