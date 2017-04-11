@@ -405,7 +405,7 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
 
     # query for all requested studies
     # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
-    for selection, details in all_mods.iteritems():
+    for selection, details in all_mods.items():
         if details['inc']:
             for mod in details['mods']:
                 query.stage = 'Currently querying for {0} studies...'.format(mod)

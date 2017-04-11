@@ -12,7 +12,7 @@ from testfixtures import LogCapture
 import uuid
 from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomRemoteQR, DicomStoreSCP
-
+import collections
 
 def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
     return 'RDSR'
@@ -53,8 +53,8 @@ def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
 #############################
 
 fake_responses = [
+    [[u'MG', u'SR'], [u'MG'], [u'OT', u'MG'], [u'PR', u'MG']],
     [[u'CT'], [u'OT', u'CT', u'SR'], [u'SR', u'CT']],
-    [[u'MG', u'SR'], [u'MG'], [u'OT', u'MG'], [u'PR', u'MG']]
     ]
 
 
@@ -178,11 +178,12 @@ class StudyQueryLogic(TestCase):
         """
         from remapp.netdicom.qrscu import _query_for_each_modality
 
-        all_mods = {'CT': {'inc': True, 'mods': ['CT']},
-                    'MG': {'inc': True, 'mods': ['MG']},
-                    'FL': {'inc': False, 'mods': ['RF', 'XA']},
-                    'DX': {'inc': False, 'mods': ['DX', 'CR']}
-                    }
+        all_mods = collections.OrderedDict()
+        all_mods['CT'] = {'inc': True, 'mods': ['CT']}
+        all_mods['MG'] = {'inc': True, 'mods': ['MG']}
+        all_mods['FL'] = {'inc': False, 'mods': ['RF', 'XA']}
+        all_mods['DX'] = {'inc': False, 'mods': ['DX', 'CR']}
+
         query = DicomQuery.objects.get()
         qr_scp = DicomRemoteQR.objects.get()
 
