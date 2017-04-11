@@ -108,7 +108,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.modality = 'MG'
             study.save()
 
-            if 'SR' in study.get_modalities_in_study() and check_sr_type_in_study(MyAE, RemoteAE, study) == 'RDSR':
+            if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(MyAE, RemoteAE, study) == 'RDSR':
                 logger.debug("Found RDSR in MG study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
@@ -119,7 +119,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.modality = 'DX'
             study.save()
 
-            if 'SR' in study.get_modalities_in_study() and check_sr_type_in_study(MyAE, RemoteAE, study) == 'RDSR':
+            if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(MyAE, RemoteAE, study) == 'RDSR':
                 logger.debug("Found RDSR in DX study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
@@ -138,7 +138,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.save()
             series = study.dicomqrrspseries_set.all()
             if 'SR' in study.get_modalities_in_study():
-                SR_type = check_sr_type_in_study(MyAE, RemoteAE, study)
+                SR_type = _check_sr_type_in_study(MyAE, RemoteAE, study)
                 if SR_type == 'RDSR':
                     logger.debug("Found RDSR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
@@ -189,7 +189,7 @@ def _prune_study_responses(query, study_rsp, all_mods, filters):
 
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
-def check_sr_type_in_study(my_ae, remote_ae, study):
+def _check_sr_type_in_study(my_ae, remote_ae, study):
     # select series with modality SR
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
     logger.info("nrseries with SR {0}".format(series_sr.count()))
