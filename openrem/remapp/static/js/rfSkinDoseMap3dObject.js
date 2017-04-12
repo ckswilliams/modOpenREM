@@ -1,22 +1,32 @@
+/**
+ * Function to create a 3d skin dose map object
+ * @param skinDoseMap3dCanvasName
+ * @param colourScaleName
+ */
 function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
     this.useNewColourScale = useNewColourScale;
     function useNewColourScale(new_scale) {
-        this.colourScale = chroma.scale(new_scale);
+        var _this = this;
+        _this.colourScale = chroma.scale(new_scale);
     }
 
 
     this.draw = draw;
+    /**
+     * Internal function to draw the 3d skin dose map
+     */
     function draw() {
+        var _this = this;
         var currentDose, scaledDose, newColour, i, j, k;
         k = 0;
-        for (i = 0; i < this.phantomHeight; i++) {
-            for (j = 0; j < this.phantomFlatWidth; j++) {
-                currentDose = this.skinDoseMap[j * this.phantomHeight + i];
-                scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
+        for (i = 0; i < _this.phantomHeight; i++) {
+            for (j = 0; j < _this.phantomFlatWidth; j++) {
+                currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
+                scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
-                newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
+                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureFront.image.data[k] = newColour[0];
                 dataTextureFront.image.data[k+1] = newColour[1];
@@ -26,13 +36,13 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             }
         }
         k = 0;
-        for (i = 0; i < this.phantomHeight; i++) {
-            for (j = this.phantomFlatWidth; j < this.phantomFlatWidth+this.phantomCurvedEdgeWidth; j++) {
-                currentDose = this.skinDoseMap[j * this.phantomHeight + i];
-                scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
+        for (i = 0; i < _this.phantomHeight; i++) {
+            for (j = _this.phantomFlatWidth; j < _this.phantomFlatWidth+_this.phantomCurvedEdgeWidth; j++) {
+                currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
+                scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
-                newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
+                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureLeft.image.data[k] = newColour[0];
                 dataTextureLeft.image.data[k+1] = newColour[1];
@@ -42,13 +52,13 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             }
         }
         k = 0;
-        for (i = 0; i < this.phantomHeight; i++) {
-            for (j = this.phantomFlatWidth+this.phantomCurvedEdgeWidth; j < this.phantomFlatWidth*2+this.phantomCurvedEdgeWidth; j++) {
-                currentDose = this.skinDoseMap[(j * this.phantomHeight) + i];
-                scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
+        for (i = 0; i < _this.phantomHeight; i++) {
+            for (j = _this.phantomFlatWidth+_this.phantomCurvedEdgeWidth; j < _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth; j++) {
+                currentDose = _this.skinDoseMap[(j * _this.phantomHeight) + i];
+                scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
-                newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
+                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureBack.image.data[k] = newColour[0];
                 dataTextureBack.image.data[k+1] = newColour[1];
@@ -58,13 +68,13 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
             }
         }
         k = 0;
-        for (i = 0; i < this.phantomHeight; i++) {
-            for (j = this.phantomFlatWidth*2+this.phantomCurvedEdgeWidth; j < this.phantomFlatWidth*2+this.phantomCurvedEdgeWidth*2; j++) {
-                currentDose = this.skinDoseMap[j * this.phantomHeight + i];
-                scaledDose = currentDose - (this.windowLevel - (this.windowWidth / 2.0));
+        for (i = 0; i < _this.phantomHeight; i++) {
+            for (j = _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth; j < _this.phantomFlatWidth*2+_this.phantomCurvedEdgeWidth*2; j++) {
+                currentDose = _this.skinDoseMap[j * _this.phantomHeight + i];
+                scaledDose = currentDose - (_this.windowLevel - (_this.windowWidth / 2.0));
                 if (scaledDose < 0) scaledDose = 0;
-                if (scaledDose > this.windowWidth) scaledDose = this.windowWidth;
-                newColour = this.colourScale(scaledDose / this.windowWidth).rgb();
+                if (scaledDose > _this.windowWidth) scaledDose = _this.windowWidth;
+                newColour = _this.colourScale(scaledDose / _this.windowWidth).rgb();
 
                 dataTextureRight.image.data[k] = newColour[0];
                 dataTextureRight.image.data[k+1] = newColour[1];
@@ -82,6 +92,11 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.mergeMeshes = mergeMeshes;
+    /**
+     * Internal function to merge three.js meshes
+     * @param meshes
+     * @returns {THREE.Geometry}
+     */
     function mergeMeshes (meshes) {
         var combined = new THREE.Geometry();
 
@@ -101,33 +116,42 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
 
     this.initialise = initialise;
+    /**
+     * Internal function to initialse the 3d skin dose map
+     * @param skinDoseMap
+     * @param phantomFlatWidth
+     * @param phantomCurvedEdgeWidth
+     * @param phantomHeight
+     * @param phantomCurvedRadius
+     */
     function initialise(skinDoseMap, phantomFlatWidth, phantomCurvedEdgeWidth, phantomHeight, phantomCurvedRadius) {
+        var _this = this;
 
-        this.skinDoseMap = new Array(skinDoseMap.length);
-        this.skinDoseMapWidth = 2*phantomFlatWidth + 2*phantomCurvedEdgeWidth;
-        this.skinDoseMapHeight = phantomHeight;
-        this.phantomFlatWidth = phantomFlatWidth;
-        this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
-        this.phantomHeight = phantomHeight;
-        this.phantomCurvedRadius = phantomCurvedRadius;
+        _this.skinDoseMap = new Array(skinDoseMap.length);
+        _this.skinDoseMapWidth = 2*phantomFlatWidth + 2*phantomCurvedEdgeWidth;
+        _this.skinDoseMapHeight = phantomHeight;
+        _this.phantomFlatWidth = phantomFlatWidth;
+        _this.phantomCurvedEdgeWidth = phantomCurvedEdgeWidth;
+        _this.phantomHeight = phantomHeight;
+        _this.phantomCurvedRadius = phantomCurvedRadius;
 
         var x, y, offset;
-        for (x = 0; x < this.skinDoseMapWidth; x++) {
-            for (y = 0; y < this.skinDoseMapHeight; y++) {
-                offset = this.skinDoseMapHeight * x + y;
-                this.skinDoseMap[offset] = skinDoseMap[this.skinDoseMapWidth * (this.skinDoseMapHeight - 1 - y) + x];
+        for (x = 0; x < _this.skinDoseMapWidth; x++) {
+            for (y = 0; y < _this.skinDoseMapHeight; y++) {
+                offset = _this.skinDoseMapHeight * x + y;
+                _this.skinDoseMap[offset] = skinDoseMap[_this.skinDoseMapWidth * (y) + x];
             }
         }
 
-        frontData = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
-        backData  = new Uint8Array(this.phantomFlatWidth*this.phantomHeight*4);
-        leftData  = new Uint8Array(this.phantomCurvedEdgeWidth*this.phantomHeight*4);
-        rightData = new Uint8Array(this.phantomCurvedEdgeWidth*this.phantomHeight*4);
+        frontData = new Uint8Array(_this.phantomFlatWidth*_this.phantomHeight*4);
+        backData  = new Uint8Array(_this.phantomFlatWidth*_this.phantomHeight*4);
+        leftData  = new Uint8Array(_this.phantomCurvedEdgeWidth*_this.phantomHeight*4);
+        rightData = new Uint8Array(_this.phantomCurvedEdgeWidth*_this.phantomHeight*4);
 
-        dataTextureFront = new THREE.DataTexture( frontData, this.phantomFlatWidth, this.phantomHeight,  THREE.RGBAFormat );
-        dataTextureBack  = new THREE.DataTexture( backData,  this.phantomFlatWidth, this.phantomHeight,  THREE.RGBAFormat );
-        dataTextureLeft  = new THREE.DataTexture( leftData,  this.phantomCurvedEdgeWidth, this.phantomHeight, THREE.RGBAFormat );
-        dataTextureRight = new THREE.DataTexture( rightData, this.phantomCurvedEdgeWidth, this.phantomHeight, THREE.RGBAFormat );
+        dataTextureFront = new THREE.DataTexture( frontData, _this.phantomFlatWidth, _this.phantomHeight,  THREE.RGBAFormat );
+        dataTextureBack  = new THREE.DataTexture( backData,  _this.phantomFlatWidth, _this.phantomHeight,  THREE.RGBAFormat );
+        dataTextureLeft  = new THREE.DataTexture( leftData,  _this.phantomCurvedEdgeWidth, _this.phantomHeight, THREE.RGBAFormat );
+        dataTextureRight = new THREE.DataTexture( rightData, _this.phantomCurvedEdgeWidth, _this.phantomHeight, THREE.RGBAFormat );
 
         dataTextureFront.needsUpdate = true;
         dataTextureBack.needsUpdate = true;
@@ -143,20 +167,20 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         materialLeft.map.minFilter = THREE.LinearFilter;
         materialRight.map.minFilter = THREE.LinearFilter;
 
-        var aspectRatio = this.canvas.width / this.canvas.height;
+        var aspectRatio = _this.canvas.width / _this.canvas.height;
 
-        this.scene = new THREE.Scene();
+        _this.scene = new THREE.Scene();
 
         // Set up the camera
-        this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 1, 10000);
-        this.camera.position.x = this.phantomHeight;
-        this.camera.position.y = 0;
-        this.camera.position.z = 100;
-        this.camera.lookAt( this.scene.position );
-        this.scene.add(this.camera);
+        _this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 1, 10000);
+        _this.camera.position.x = _this.phantomHeight + 0;
+        _this.camera.position.y = 0;
+        _this.camera.position.z = 100;
+        _this.camera.lookAt(_this.scene.position );
+        _this.scene.add(_this.camera);
 
-        var geometry, material;
-        this.meshes = [], geometry, material;
+        var geometry;
+        _this.meshes = [];
 
         THREE.ImageUtils.crossOrigin = 'anonymous';
 
@@ -164,96 +188,103 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         var materials = [materialBack, materialLeft, materialFront, materialRight, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial, endMaterial];
         var meshFaceMaterial = new THREE.MeshFaceMaterial(materials);
 
-        geometry = new THREE.PlaneGeometry(this.phantomFlatWidth, this.phantomHeight);
+        geometry = new THREE.PlaneGeometry(_this.phantomFlatWidth, _this.phantomHeight);
         var mesh = new THREE.Mesh(geometry);
         mesh.rotation.y = Math.PI;
-        mesh.position.z = -this.phantomCurvedRadius;
-        this.meshes.push(mesh);
+        mesh.position.z = -_this.phantomCurvedRadius;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.CylinderGeometry(this.phantomCurvedRadius, this.phantomCurvedRadius, this.phantomHeight, 32, 1, true, 0, Math.PI );
+        geometry = new THREE.CylinderGeometry(_this.phantomCurvedRadius, _this.phantomCurvedRadius, _this.phantomHeight, 32, 1, true, 0, Math.PI );
         mesh = new THREE.Mesh(geometry);
-        mesh.position.x = this.phantomFlatWidth / 2;
-        this.meshes.push(mesh);
+        mesh.position.x = _this.phantomFlatWidth / 2;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.PlaneGeometry(this.phantomFlatWidth, this.phantomHeight);
+        geometry = new THREE.PlaneGeometry(_this.phantomFlatWidth, _this.phantomHeight);
         mesh = new THREE.Mesh(geometry);
-        mesh.position.z = this.phantomCurvedRadius;
-        this.meshes.push(mesh);
+        mesh.position.z = _this.phantomCurvedRadius;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.CylinderGeometry  (this.phantomCurvedRadius, this.phantomCurvedRadius, this.phantomHeight, 32, 1, true, Math.PI, Math.PI );
+        geometry = new THREE.CylinderGeometry  (_this.phantomCurvedRadius, _this.phantomCurvedRadius, _this.phantomHeight, 32, 1, true, Math.PI, Math.PI );
         mesh = new THREE.Mesh(geometry);
-        mesh.position.x = -this.phantomFlatWidth / 2;
-        this.meshes.push(mesh);
+        mesh.position.x = -_this.phantomFlatWidth / 2;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.PlaneGeometry(this.phantomFlatWidth, this.phantomCurvedRadius*2);
+        geometry = new THREE.PlaneGeometry(_this.phantomFlatWidth, _this.phantomCurvedRadius*2);
         mesh = new THREE.Mesh(geometry);
         mesh.rotation.x = Math.PI / 2;
-        mesh.position.y = -this.phantomHeight / 2;
-        this.meshes.push(mesh);
+        mesh.position.y = -_this.phantomHeight / 2;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.PlaneGeometry(this.phantomFlatWidth, this.phantomCurvedRadius*2);
+        geometry = new THREE.PlaneGeometry(_this.phantomFlatWidth, _this.phantomCurvedRadius*2);
         mesh = new THREE.Mesh(geometry);
         mesh.rotation.x = -Math.PI / 2;
-        mesh.position.y = this.phantomHeight/ 2;
-        this.meshes.push(mesh);
+        mesh.position.y = _this.phantomHeight/ 2;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.CircleGeometry(this.phantomCurvedRadius, 32, Math.PI/2, Math.PI);
+        geometry = new THREE.CircleGeometry(_this.phantomCurvedRadius, 32, Math.PI/2, Math.PI);
         mesh = new THREE.Mesh(geometry);
         mesh.rotation.x = -Math.PI / 2;
-        mesh.position.y = this.phantomHeight / 2;
-        mesh.position.x = -this.phantomFlatWidth / 2;
-        this.meshes.push(mesh);
+        mesh.position.y = _this.phantomHeight / 2;
+        mesh.position.x = -_this.phantomFlatWidth / 2;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.CircleGeometry(this.phantomCurvedRadius, 32, -Math.PI/2, Math.PI);
+        geometry = new THREE.CircleGeometry(_this.phantomCurvedRadius, 32, -Math.PI/2, Math.PI);
         mesh = new THREE.Mesh(geometry);
         mesh.rotation.x = -Math.PI / 2;
-        mesh.position.y = this.phantomHeight / 2;
-        mesh.position.x = this.phantomFlatWidth / 2;
-        this.meshes.push(mesh);
+        mesh.position.y = _this.phantomHeight / 2;
+        mesh.position.x = _this.phantomFlatWidth / 2;
+        _this.meshes.push(mesh);
 
-        geometry = new THREE.CircleGeometry(this.phantomCurvedRadius, 32, Math.PI/2, Math.PI);
-        mesh = new THREE.Mesh(geometry);
-        mesh.rotation.x = -Math.PI / 2;
-        mesh.rotation.y = Math.PI;
-        mesh.position.y = -this.phantomHeight / 2;
-        mesh.position.x = this.phantomFlatWidth / 2;
-        this.meshes.push(mesh);
-
-        geometry = new THREE.CircleGeometry(this.phantomCurvedRadius, 32, -Math.PI/2, Math.PI);
+        geometry = new THREE.CircleGeometry(_this.phantomCurvedRadius, 32, Math.PI/2, Math.PI);
         mesh = new THREE.Mesh(geometry);
         mesh.rotation.x = -Math.PI / 2;
         mesh.rotation.y = Math.PI;
-        mesh.position.y = -this.phantomHeight / 2;
-        mesh.position.x = -this.phantomFlatWidth / 2;
-        this.meshes.push(mesh);
+        mesh.position.y = -_this.phantomHeight / 2;
+        mesh.position.x = _this.phantomFlatWidth / 2;
+        _this.meshes.push(mesh);
+
+        geometry = new THREE.CircleGeometry(_this.phantomCurvedRadius, 32, -Math.PI/2, Math.PI);
+        mesh = new THREE.Mesh(geometry);
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.rotation.y = Math.PI;
+        mesh.position.y = -_this.phantomHeight / 2;
+        mesh.position.x = -_this.phantomFlatWidth / 2;
+        _this.meshes.push(mesh);
 
         //merge all the geometries
-        geometry = mergeMeshes(this.meshes);
-        this.mesh = new THREE.Mesh(geometry, meshFaceMaterial);
-        this.scene.add(this.mesh);
+        geometry = mergeMeshes(_this.meshes);
+        _this.mesh = new THREE.Mesh(geometry, meshFaceMaterial);
+        _this.scene.add(_this.mesh);
 
         // A light source is needed for the MehLambertMaterial
         var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
         directionalLight.position.set( 0, 0, 1 );
-        this.scene.add( directionalLight );
+        _this.scene.add( directionalLight );
     }
 
 
     this.reset = reset;
+    /**
+     * Internal function to reset the 3d skin dose map
+     */
     function reset() {
-        this.mesh.position.set( 0, 0, 0 );
-        this.mesh.rotation.set( 0, 0, 0 );
-        this.mesh.scale.set( 1, 1, 1 );
-        this.mesh.updateMatrix();
+        var _this = this;
+        _this.mesh.position.set( 0, 0, 0 );
+        _this.mesh.rotation.set( 0, 0, 0 );
+        _this.mesh.scale.set( 1, 1, 1 );
+        _this.mesh.updateMatrix();
 
-        this.camera.position.x = this.phantomHeight;
-        this.camera.position.y = 0;
-        this.camera.position.z = 100;
-        this.camera.lookAt( this.scene.position );
+        _this.camera.position.x = _this.phantomHeight + 0;
+        _this.camera.position.y = 0;
+        _this.camera.position.z = 100;
+        _this.camera.lookAt(_this.scene.position);
     }
 
 
     this.animate = animate;
+    /**
+     * Internal function to animate the 3d skin dose map
+     */
     function animate() {
         requestAnimationFrame(animate);
         render();
@@ -263,7 +294,6 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
     this.canvasName = skinDoseMap3dCanvasName;
     this.canvas = document.getElementById(this.canvasName);
 
-    var colourScaleName = colourScaleName;
     this.colourScale = chroma.scale(colourScaleName);
 
     this.windowWidth = 10.0;

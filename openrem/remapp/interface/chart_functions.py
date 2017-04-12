@@ -486,7 +486,7 @@ def workload_chart_data(database_events):
     return return_structure
 
 
-def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system, db_display_name_relationship):
+def scatter_plot_data(database_events, x_field, y_field, y_value_multiplier, plot_series_per_system, db_display_name_relationship):
     """ This function calculates the data for an OpenREM Highcharts plot of average value vs. a category, as well as a
     histogram of values for each category. It is also used for OpenREM Highcharts frequency plots.
 
@@ -494,6 +494,7 @@ def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system,
         database_events: database events to use for the plot
         x_field: database field containing data for the x-axis
         y_field: database field containing data for the y-axis
+        y_value_multiplier: float value used to multiply all y_field values by
         plot_series_per_system: boolean to set whether to calculate a series for each value found in db_display_name_relationship
         db_display_name_relationship: database table and field of x-ray system display name, relative to database_events
 
@@ -517,7 +518,7 @@ def scatter_plot_data(database_events, x_field, y_field, plot_series_per_system,
         return_structure['scatterData'].append(database_events.values_list(x_field, y_field))
 
     for index in range(len(return_structure['scatterData'])):
-        return_structure['scatterData'][index] = [[floatIfValue(i[0]), floatIfValue(i[1])] for i in return_structure['scatterData'][index]]
+        return_structure['scatterData'][index] = [[floatIfValue(i[0]), floatIfValue(i[1]) * y_value_multiplier] for i in return_structure['scatterData'][index]]
 
     import numpy as np
     max_data = [0, 0]

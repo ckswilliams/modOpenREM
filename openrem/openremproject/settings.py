@@ -8,11 +8,11 @@ from __future__ import absolute_import
 
 # Debug is now set to false - you can turn it back on in local_settings if you need to
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 # Celery settings
-
 BROKER_URL = 'amqp://guest:guest@localhost//'
+BROKER_TRANSPORT_OPTIONS = {'confirm_publish': True}
 #CELERY_RESULT_BACKEND = 'amqp'
 
 
@@ -65,6 +65,9 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
+# Default date format for exporting to Excel xlsx spreadsheets - use Excel codes, override it in local_settings.py
+XLSX_DATE = 'dd/mm/yyyy'
+
 #
 # MEDIA_ROOT filepath has been moved to local_settings.py
 #
@@ -84,7 +87,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    os.path.join(ROOT_PROJECT,'static'),
+    os.path.join(ROOT_PROJECT, 'remapp', 'static'),
 )
 
 #
@@ -128,6 +131,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'pagination.middleware.PaginationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'openremproject.urls'
@@ -153,6 +157,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'solo',
     'crispy_forms',
+    'debug_toolbar',
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
@@ -186,19 +191,19 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem.log',
             'formatter': 'verbose'
         },
         'qr_file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_qrscu.log',
             'formatter': 'verbose'
         },
         'store_file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'

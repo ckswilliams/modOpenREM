@@ -70,6 +70,19 @@ For either install, just follow the defaults – no special configurations requi
 
 ..  Note::
 
+    If you encounter problems running RabbitMQ as a service under Windows then try the following:
+
+    * Create a folder called ``c:\rabbitmq``
+    * From an administrator command prompt run Advanced System Properties by typing ``sysdm.cpl``
+    * Create a new system environment variable called ``RABBITMQ_BASE`` and set its value to ``c:\rabbitmq``
+    * In the command prompt navigate to the folder containing the RabbitMQ commands and run::
+
+        rabbitmq_service.bat remove
+        rabbitmq_service.bat install
+        rabbitmq_service.bat start
+
+..  Note::
+
     Before continuing, `consider virtualenv`_
 
 Install NumPy
@@ -153,6 +166,6 @@ script (such as `openrem_rdsr.py`) without prefixing it with `python`, the
 system wide Python will be used instead. This doesn't apply to Linux, where
 once activated, the scripts can be called without a `python` prefix from anywhere.
 
-.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+.. _virtualenv: https://virtualenv.pypa.io/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
 .. _consider virtualenv: `Virtualenv and virtualenvwrapper`_

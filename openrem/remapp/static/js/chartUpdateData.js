@@ -87,7 +87,7 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
 
             temp.push({
                 y: current_value,
-                url: url_start + name_list[i] + '&date_after=' + date_after + '&date_before=' + date_before
+                url: encodeURI(url_start + name_list[i] + '&date_after=' + date_after + '&date_before=' + date_before)
             });
         }
 
@@ -129,7 +129,7 @@ function updateFrequencyChart(name_list, system_list, summary_data, url_start, c
         piechart_data[i] = {
             name: name_list[i],
             y: data_counts,
-            url: url_start + name_list[i]
+            url: encodeURI(url_start + name_list[i])
         };
     }
 
@@ -343,11 +343,24 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
 }
 
 
-function updateScatterChart(scatter_data, max_values, chart_div, system_list, colour_scale) {
+/**
+ * Function to update the data of an OpenREM HighCharts scatter plot
+ * @param scatter_data - an array[i][j][2] of x-y data pairs; i is a series with j pairs of data
+ * @param max_values - an array[2] containing the maximum x and y values in scatter_data
+ * @param chart_div - the HTML DIV that contains the HighChart
+ * @param system_list - an array[i] of series names
+ * @param x_axis_unit - the x-axis units to use for the tooltip
+ * @param y_axis_unit - the y-axis units to use for the tooltip
+ * @param tooltip_dp -  an array[2] containing the number of decimal places to use for the x and y data in the tooltip
+ * @param colour_scale - the chroma.js colour scale to use
+ */
+function updateScatterChart(scatter_data, max_values, chart_div, system_list, x_axis_unit, y_axis_unit, tooltip_dp, colour_scale) {
     var chart = $('#'+chart_div).highcharts();
     var colour_max = system_list.length;
     var i;
+    var tooltip_point_format;
 
+    tooltip_point_format = '{point.x:.' + tooltip_dp[0] + 'f} ' + x_axis_unit + '<br>{point.y:.' + tooltip_dp[1] + 'f} ' + y_axis_unit;
     for (i = 0; i < system_list.length; i++) {
         if (chart.series.length > i) {
             chart.series[i].update({
@@ -360,7 +373,7 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 },
                 tooltip: {
                     followPointer: false,
-                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                    pointFormat: tooltip_point_format
                 }
             });
         }
@@ -375,7 +388,7 @@ function updateScatterChart(scatter_data, max_values, chart_div, system_list, co
                 },
                 tooltip: {
                     followPointer: false,
-                    pointFormat: '{point.x:.0f} mm<br>{point.y:.2f} mGy'
+                    pointFormat: tooltip_point_format
                 }
             });
         }

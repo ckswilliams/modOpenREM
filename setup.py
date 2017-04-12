@@ -21,7 +21,11 @@ requires = [
     'django-qsstats-magic',
     'python-dateutil',
     'django-solo',
-    'django-crispy-forms'
+    'django-crispy-forms',
+    'pandas',
+    'xlrd',
+    'testfixtures',
+    'django-debug-toolbar',
     ]
 
 setup(
@@ -40,8 +44,8 @@ setup(
         'openrem/scripts/openrem_qr.py',
     ],
     license='GPLv3 with additional permissions',  
-    description='Radiation Exposure Monitoring for physicists',
-#    description='Developer beta only',
+#    description='Radiation Exposure Monitoring for physicists',
+    description='Developer beta only',
     long_description=README,
     url='http://openrem.org/',
     author='Ed McDonagh',

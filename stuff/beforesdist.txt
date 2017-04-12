@@ -2,10 +2,9 @@ Change the version number in
 	openrem/remapp/version.py
 	install instructions in the release notes where applicable
 	    install.rst - set to version for beta or versionless for release
-	    release-0.x.x.rst - set to version for beta or versionless for release
+	    release-0.x.x.rst - set to version (upgrades always need version specified)
 	    install-offline.rst (twice)
 	    upgrade-offline.rst (twice)
-	    release-n(-1) - set to fixed version
 	date and other details in changes and CHANGES
     Edit README.rst
     Edit description in setup.py between beta and release
@@ -18,5 +17,5 @@ rsync -av --exclude-from='../bbOpenREM/stuff/distexclude.txt' ../bbOpenREM/ .
 cp ../bbOpenREM/stuff/0002_0_7_fresh_install_add_median.py.inactive openrem/remapp/migrations/
 
 Build:
-	python setup.py sdist
+	python setup.py sdist bdist_wheel
 
