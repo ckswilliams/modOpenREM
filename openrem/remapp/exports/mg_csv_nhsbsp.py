@@ -33,7 +33,6 @@ from celery import shared_task
 from django.conf import settings
 
 
-
 @shared_task
 def mg_csv_nhsbsp(filterdict, user=None):
     """Export filtered mammography database data to a NHSBSP formatted single-sheet CSV file.
@@ -73,12 +72,14 @@ def mg_csv_nhsbsp(filterdict, user=None):
         tsk.progress = 'CSV file created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request,
+                       "Unexpected error creating temporary file - please contact an administrator: {0}".format(
+                           sys.exc_info()[0]))
         return redirect('/openrem/export/')
-        
+
     # Get the data!
-    
-    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
+
+    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG')
     f = MGSummaryListFilter.base_filters
 
     for filt in f:
@@ -89,11 +90,11 @@ def mg_csv_nhsbsp(filterdict, user=None):
             else:
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
-                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
+                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type: filterstring})
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
-        
+
     numresults = s.count()
 
     tsk.num_records = numresults
@@ -114,8 +115,8 @@ def mg_csv_nhsbsp(filterdict, user=None):
         'Density setting',
         'Age',
         'Comment',
-        'AEC density mode',		
-        ])
+        'AEC density mode',
+    ])
 
     for i, study in enumerate(s):
         e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
@@ -123,7 +124,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
             viewCode = str(exp.laterality)
             viewCode = viewCode[:1]
             if str(exp.image_view) == 'cranio-caudal':
-			    viewCode = viewCode + 'CC'
+                viewCode = viewCode + 'CC'
             elif str(exp.image_view) == 'medio-lateral oblique':
                 viewCode = viewCode + 'OB'
             else:
@@ -132,7 +133,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
             if "TUNGSTEN" in target.upper():
                 target = 'W'
             elif "MOLY" in target.upper():
-			    target = 'Mo'
+                target = 'Mo'
             elif "RHOD" in target.upper():
                 target = 'Rh'
             filterMat = str(exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material)
@@ -149,25 +150,25 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 automan = 'AUTO'
             elif "MAN" in automan.upper():
                 automan = "MANUAL"
-			
+
             writer.writerow([
                 '1',
-                i+1,
+                i + 1,
                 viewCode,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
                 filterMat,
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
                 exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
-                '', # not applicable to FFDM
-                automan,				
+                '',  # not applicable to FFDM
+                automan,
                 exp.irradeventxraysourcedata_set.get().exposure_control_mode,
-                '', # no consistent behaviour for recording density setting on FFDM units
+                '',  # no consistent behaviour for recording density setting on FFDM units
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
-                '', # not in DICOM headers
-                '', # no consistent behaviour for recording density mode on FFDM units
-                ])
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+                '',  # not in DICOM headers
+                '',  # no consistent behaviour for recording density mode on FFDM units
+            ])
+        tsk.progress = "{0} of {1}".format(i + 1, numresults)
         tsk.save()
 
     tsk.progress = 'All study data written.'
@@ -176,18 +177,19 @@ def mg_csv_nhsbsp(filterdict, user=None):
     csvfilename = "mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
-        tsk.filename.save(csvfilename,File(tmpfile))
+        tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno,
+                                                                                                            e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(
+            sys.exc_info()[0])
         tsk.status = 'ERROR'
         tsk.save()
         return
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-    
