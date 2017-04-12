@@ -123,12 +123,21 @@ def mg_csv_nhsbsp(filterdict, user=None):
         for exp in e:
             view_code = str(exp.laterality)
             view_code = view_code[:1]
-            if str(exp.image_view) == 'cranio-caudal':
-                view_code = view_code + 'CC'
-            elif str(exp.image_view) == 'medio-lateral oblique':
-                view_code = view_code + 'OB'
+            views = {'cranio-caudal': 'CC',
+                     'medio-lateral oblique': 'OB',
+                     'medio-lateral': 'ML',
+                     'latero-medial': 'LM',
+                     'latero-medial oblique': 'LMO',
+                     'caudo-cranial (from below)': 'FB',
+                     'superolateral to inferomedial oblique': 'SIO',
+                     'inferomedial to superolateral oblique': 'ISO',
+                     'cranio-caudal exaggerated laterally': 'XCCL',
+                     'cranio-caudal exaggerated medially': 'XCCM'
+                     }  # See http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
+            if str(exp.image_view) in views:
+                view_code += views[str(exp.image_view)]
             else:
-                view_code = view_code + str(exp.image_view)
+                view_code += str(exp.image_view)
             target = str(exp.irradeventxraysourcedata_set.get().anode_target_material)
             if "TUNGSTEN" in target.upper():
                 target = 'W'
