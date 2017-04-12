@@ -121,20 +121,25 @@ def mg_csv_nhsbsp(filterdict, user=None):
     for i, study in enumerate(s):
         e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
         for exp in e:
+            if u'specimen' in exp.image_view.code_meaning:
+                continue  # No point including these in the export
+            bad_acq_words = ['Scout', 'Postclip', 'Prefire', 'Biopsy', 'Postfire']
+            if any(word in exp.acquisition_protocol for word in bad_acq_words):
+                continue  # Avoid exporting biopsy related exposures
             view_code = str(exp.laterality)
             view_code = view_code[:1]
-            views = {'cranio-caudal': 'CC',
-                     'medio-lateral oblique': 'OB',
-                     'medio-lateral': 'ML',
-                     'latero-medial': 'LM',
-                     'latero-medial oblique': 'LMO',
-                     'caudo-cranial (from below)': 'FB',
-                     'superolateral to inferomedial oblique': 'SIO',
-                     'inferomedial to superolateral oblique': 'ISO',
-                     'cranio-caudal exaggerated laterally': 'XCCL',
-                     'cranio-caudal exaggerated medially': 'XCCM'
+            views = {u'cranio-caudal': u'CC',
+                     u'medio-lateral oblique': u'OB',
+                     u'medio-lateral': u'ML',
+                     u'latero-medial': u'LM',
+                     u'latero-medial oblique': u'LMO',
+                     u'caudo-cranial (from below)': u'FB',
+                     u'superolateral to inferomedial oblique': u'SIO',
+                     u'inferomedial to superolateral oblique': u'ISO',
+                     u'cranio-caudal exaggerated laterally': u'XCCL',
+                     u'cranio-caudal exaggerated medially': u'XCCM'
                      }  # See http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
-            if str(exp.image_view) in views:
+            if exp.image_view.code_meaning in views:
                 view_code += views[str(exp.image_view)]
             else:
                 view_code += str(exp.image_view)
