@@ -344,7 +344,7 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
-    logger.debug('_query_study done with status "%s"' % st)
+    logger.debug('_query_study done with status {0}'.format(st))
 
     # TODO: Replace the code below to deal with find failure
     # if not st:
@@ -371,6 +371,7 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
         rsp.station_name = get_value_kw('StationName', ss[1])
+        logger.debug("Study Description: {0}; Station Name: {1}".format(rsp.study_description, rsp.station_name))
         rsp.sop_classes_in_study = get_value_kw('SOPClassesInStudy', ss[1])
         logger.debug("SOPClassesInStudy: {0}".format(rsp.sop_classes_in_study))
 
@@ -420,6 +421,8 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
                     for rsp in study_rsp:
                         if mod not in rsp.get_modalities_in_study():
+                            # get_modalities_in_study might be blank, in which case assume we haven't matched on
+                            # modality?
                             modality_matching = False
                             logger.debug("Remote node doesn't support ModalitiesInStudy as a Matching Key")
                             break  # This indicates that there was no modality match, so we have everything already
@@ -563,11 +566,12 @@ def qrscu(
     # query for all requested studies
     modality_matching = _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE)
 
-    # TODO work out where this debug log should be now _query_for_each_modality is a function.
-    logger.debug("SOPClassUIDs in study: {}".format(list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
-
     # Now we have all our studies. Time to throw away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
+
+    logger.debug("SOPClassUIDs in study: {}".format(
+        list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
+
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     if modality_matching:
