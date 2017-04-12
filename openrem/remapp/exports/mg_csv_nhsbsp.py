@@ -126,7 +126,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
             bad_acq_words = ['Scout', 'Postclip', 'Prefire', 'Biopsy', 'Postfire']
             if any(word in exp.acquisition_protocol for word in bad_acq_words):
                 continue  # Avoid exporting biopsy related exposures
-            view_code = str(exp.laterality)
+            view_code = exp.laterality.code_meaning
             view_code = view_code[:1]
             views = {u'cranio-caudal': u'CC',
                      u'medio-lateral oblique': u'OB',
@@ -140,26 +140,26 @@ def mg_csv_nhsbsp(filterdict, user=None):
                      u'cranio-caudal exaggerated medially': u'XCCM'
                      }  # See http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
             if exp.image_view.code_meaning in views:
-                view_code += views[str(exp.image_view)]
+                view_code += views[exp.image_view.code_meaning]
             else:
-                view_code += str(exp.image_view)
-            target = str(exp.irradeventxraysourcedata_set.get().anode_target_material)
+                view_code += exp.image_view.code_meaning
+            target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
             if "TUNGSTEN" in target.upper():
                 target = 'W'
             elif "MOLY" in target.upper():
                 target = 'Mo'
             elif "RHOD" in target.upper():
                 target = 'Rh'
-            filterMat = str(exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material)
-            if "ALUM" in filterMat.upper():
-                filterMat = 'Al'
-            elif "MOLY" in filterMat.upper():
-                filterMat = 'Mo'
-            elif "RHOD" in filterMat.upper():
-                filterMat = 'Rh'
-            elif "SILV" in filterMat.upper():
-                filterMat = 'Ag'
-            automan = str(exp.irradeventxraysourcedata_set.get().exposure_control_mode)
+            filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
+            if "ALUM" in filter_mat.upper():
+                filter_mat = 'Al'
+            elif "MOLY" in filter_mat.upper():
+                filter_mat = 'Mo'
+            elif "RHOD" in filter_mat.upper():
+                filter_mat = 'Rh'
+            elif "SILV" in filter_mat.upper():
+                filter_mat = 'Ag'
+            automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
             if "AUTO" in automan.upper():
                 automan = 'AUTO'
             elif "MAN" in automan.upper():
@@ -171,7 +171,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 view_code,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
-                filterMat,
+                filter_mat,
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
                 exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
                 '',  # not applicable to FFDM
