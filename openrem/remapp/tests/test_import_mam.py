@@ -27,31 +27,30 @@ class ImportMGImg(TestCase):
 
         # Test that patient identifiable data is not stored
         self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
+        self.assertEqual(study.patientmoduleattr_set.get().patient_id, None)
+        self.assertEqual(study.patientmoduleattr_set.get().patient_birth_date, None)
 
         # Test that study level data is recorded correctly
         self.assertEqual(study.study_date, datetime.date(2013, 04, 12))
         self.assertEqual(study.study_time, datetime.time(12, 35, 46))
-        self.assertEqual(study.accession_number, 'AAAA9876')
-        self.assertEqual(study.modality_type, 'MG')
+        self.assertEqual(study.accession_number, u'AAAA9876')
+        self.assertEqual(study.modality_type, u'MG')
 
         self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, u'中心医院')
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'GE MEDICAL SYSTEMS')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, u'GE MEDICAL SYSTEMS')
         #cyrillic doesn't appear to be interpreted correctly
-        #self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_address, 'Москва')
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().station_name, 'SENODS01')
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer_model_name, 'Senograph DS ADS_43.10.1')
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().device_serial_number, '843b85b7')
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().software_versions, 'Ads Application Package VERSION ADS_43.10.1')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_address, u'Москва')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().station_name, u'SENODS01')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer_model_name, u'Senograph DS ADS_43.10.1')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().device_serial_number, u'843b85b7')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().software_versions, u'Ads Application Package VERSION ADS_43.10.1')
 
         # Test that patient study level data is recorded correctly
-        self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '001D')
-        #these values do not appear to be getting through (error says 'None')
-        #self.assertEqual(study.patientmoduleattr_set.get().patient_id, 'ABCD1234')
-        #self.assertEqual(study.patientmoduleattr_set.get().patient_birth_date, datetime.date(2013, 04, 12))
-        self.assertEqual(study.patientmoduleattr_set.get().patient_sex, 'O')
+        self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, u'001D')
+        self.assertEqual(study.patientmoduleattr_set.get().patient_sex, u'O')
 
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
-            ).acquisition_protocol, 'ROUTINE')
+            ).acquisition_protocol, u'ROUTINE')
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).percent_fibroglandular_tissue, Decimal(31))
 
@@ -71,10 +70,10 @@ class ImportMGImg(TestCase):
             grid.xray_grid.code_meaning for grid in study.projectionxrayradiationdose_set.get(
             ).irradeventxraydata_set.get().irradeventxraysourcedata_set.get().xraygrid_set.all()), True)
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
-            ).irradeventxraysourcedata_set.get().anode_target_material.code_meaning, 'Rhodium or Rhodium compound')
+            ).irradeventxraysourcedata_set.get().anode_target_material.code_meaning, u'Rhodium or Rhodium compound')
         self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning,
-            'Rhodium or Rhodium compound')
+            u'Rhodium or Rhodium compound')
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().focal_spot_size, Decimal(0.30))  # in mm
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
@@ -155,7 +154,7 @@ class ImportMGImg(TestCase):
         mam(dicom_path)
         study = GeneralStudyModuleAttr.objects.all()[0]
 
-        # Test that patient identifiable data is stored in plain text
+        # Test that patient identifiable data is stored in hash
         self.assertEqual(study.patientmoduleattr_set.get().patient_name,
                          'fe66aceb4eb0ccbd76306a485e162cc3cad8c9312b25b002ad784f72575ae500')
         self.assertEqual(study.patientmoduleattr_set.get().patient_id,
