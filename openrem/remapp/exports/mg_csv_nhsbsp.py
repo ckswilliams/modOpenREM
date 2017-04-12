@@ -121,14 +121,14 @@ def mg_csv_nhsbsp(filterdict, user=None):
     for i, study in enumerate(s):
         e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
         for exp in e:
-            viewCode = str(exp.laterality)
-            viewCode = viewCode[:1]
+            view_code = str(exp.laterality)
+            view_code = view_code[:1]
             if str(exp.image_view) == 'cranio-caudal':
-                viewCode = viewCode + 'CC'
+                view_code = view_code + 'CC'
             elif str(exp.image_view) == 'medio-lateral oblique':
-                viewCode = viewCode + 'OB'
+                view_code = view_code + 'OB'
             else:
-                viewCode = viewCode + str(exp.image_view)
+                view_code = view_code + str(exp.image_view)
             target = str(exp.irradeventxraysourcedata_set.get().anode_target_material)
             if "TUNGSTEN" in target.upper():
                 target = 'W'
@@ -154,7 +154,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
             writer.writerow([
                 '1',
                 i + 1,
-                viewCode,
+                view_code,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
                 filterMat,
