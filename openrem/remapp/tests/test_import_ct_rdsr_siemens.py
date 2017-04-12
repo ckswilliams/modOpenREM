@@ -33,7 +33,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.study_time, datetime.time(00, 00, 00))
         self.assertEqual(study.accession_number, 'ACC12345601')
         self.assertEqual(study.study_description, 'Thorax^TAP (Adult)')
-        self.assertEqual(study.modality_type, 'CT')         #Appears as 'SR' in dcmdump?
+        self.assertEqual(study.modality_type, 'CT')
 
         self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, 'Hospital Number One Trust')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'SIEMENS')
