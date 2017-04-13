@@ -160,7 +160,11 @@
                 </td>
                 <td>
                     <a href="/openrem/dx/{{ exam.id }}/">
+                      {% if exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames %}
                         {{ exam.projectionxrayradiationdose_set.get.accumxraydose_set.get.accumintegratedprojradiogdose_set.get.total_number_of_radiographic_frames }}
+                      {% else %}
+                        {{ exam.projectionxrayradiationdose_set.get.irradeventxraydata_set.all.count }}
+                      {% endif %}
                     </a>
                 </td>
                 <td>
