@@ -91,6 +91,7 @@ class ImportDXRDSR(TestCase):
         self.assertEqual(study.projectionxrayradiationdose_set.get().accumxraydose_set.get().
             accumprojxraydose_set.get().reference_point_definition, u'Unknown')
 
+
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
             ).irradeventxraysourcedata_set.get().number_of_pulses, Decimal(1))
         self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.get(
@@ -131,6 +132,7 @@ class ImportDXRDSR(TestCase):
         self.assertEqual(study.study_time, datetime.time(17, 28, 33, 689000))
         self.assertEqual(study.modality_type, u'DX')
         self.assertEqual(study.study_description, u'CR LEG')
+        self.assertEqual(study.referring_physician_name, u'Mathis^Judy')
         self.assertEqual(study.performing_physician_name, u'Nelson^Colin')
         self.assertEqual(study.operator_name, u'Clark^Laurence')
 
@@ -145,6 +147,7 @@ class ImportDXRDSR(TestCase):
        # Test that patient level data is recorded correctly
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, u'029Y')
         self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(29.5))
+        self.assertEqual(study.patientmoduleattr_set.get().patient_sex, u'F')
 
         # Test that projectionxrayradiationdose data is stored correctly
         self.assertEqual(study.projectionxrayradiationdose_set.get().procedure_reported.code_meaning, u'Projection X-Ray')
@@ -166,15 +169,304 @@ class ImportDXRDSR(TestCase):
         self.assertEqual(study.projectionxrayradiationdose_set.get().
             scope_of_accumulation.code_meaning, u'Performed Procedure Step')
         self.assertEqual(study.projectionxrayradiationdose_set.get().source_of_dose_information.
-            code_meaning, 'Manual Entry')
-        self.assertEqual(study.projectionxrayradiationdose_set.get().has_intent.code_meaning, 'Diagnostic Intent')
+            code_meaning, u'Manual Entry')
 
-        self.assertEqual(study.projectionxrayradiationdose_set.get().xray_detector_data_available.code_meaning, 'Yes')
-        self.assertEqual(study.projectionxrayradiationdose_set.get().xray_source_data_available.code_meaning, 'Yes')
-        self.assertEqual(study.projectionxrayradiationdose_set.get().xray_mechanical_data_available.code_meaning, 'Yes')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().has_intent.code_meaning, u'Diagnostic Intent')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().xray_detector_data_available.code_meaning, u'Yes')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().xray_source_data_available.code_meaning, u'Yes')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().xray_mechanical_data_available.code_meaning, u'Yes')
 
- #       error - DoesNotExist: AccumProjXRayDose matching query does not exist.
- #       self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().accumxraydose_set.get().
- #           accumprojxraydose_set.get().total_number_of_radiographic_frames, Decimal(5))
- #       self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().accumxraydose_set.get().
- #           accumprojxraydose_set.get().dose_rp_total, Decimal(0.00029927175492))
+        #Check that accumulated xray dose data is recorded correctly
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().accumxraydose_set.get().
+                        accumintegratedprojradiogdose_set.get().dose_rp_total, Decimal(0.00029927175492))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().accumxraydose_set.get().
+                        accumintegratedprojradiogdose_set.get().total_number_of_radiographic_frames, Decimal(5))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().accumxraydose_set.get().
+                        accumintegratedprojradiogdose_set.get().reference_point_definition_code.code_meaning,
+                            u'In Detector Plane')
+
+        #Check that x-ray irradiation event data is stored correctly
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            acquisition_plane.code_meaning, u'Single Plane')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            date_time_started, datetime.datetime(2016,3,9,17,3,17,534000))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradiation_event_type.code_meaning, u'Stationary Acquisition')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            acquisition_protocol, u'Thigh Right')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            anatomical_structure.code_meaning, u'Hip joint')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            target_region.code_meaning, u'Hip joint')
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            dose_area_product, Decimal(0.00000082000002))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            reference_point_definition.code_meaning, u'In Detector Plane')
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraydetectordata_set.get().exposure_index, Decimal(662.18))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraydetectordata_set.get().target_exposure_index, Decimal(226.22))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraydetectordata_set.get().deviation_index, Decimal(4.66))
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().dose_rp, Decimal(0.00005694444407))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().number_of_pulses, Decimal(1))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(48))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current, Decimal(250))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().exposure_time, Decimal(18))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(4500))
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_role_in_procedure.code_meaning,
+                u'Irradiating Device')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_name,
+                u'CAREDXEVO')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_manufacturer,
+                u'CARESTREAM')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_model_name,
+                u'DRX-Evolution')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_serial_number,
+                u'7664565786545')
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            acquisition_plane.code_meaning, u'Single Plane')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            date_time_started, datetime.datetime(2016,3,9,17,3,12,87000))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradiation_event_type.code_meaning, u'Stationary Acquisition')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            acquisition_protocol, u'Thigh Right')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            anatomical_structure.code_meaning, u'Femur')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            target_region.code_meaning, u'Femur')
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            dose_area_product, Decimal(0.00000093000002))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            reference_point_definition.code_meaning, u'In Detector Plane')
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraydetectordata_set.get().exposure_index, Decimal(583.08))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraydetectordata_set.get().target_exposure_index, Decimal(226.22))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraydetectordata_set.get().deviation_index, Decimal(4.11))
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().dose_rp, Decimal(0.00005812500021))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().number_of_pulses, Decimal(1))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(48))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current, Decimal(250))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().exposure_time, Decimal(18))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(4500))
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_role_in_procedure.code_meaning,
+                u'Irradiating Device')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_name,
+                u'CAREDXEVO')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_manufacturer,
+                u'CARESTREAM')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_model_name,
+                u'DRX-Evolution')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[1].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_serial_number,
+                u'7664565786545')
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            acquisition_plane.code_meaning, u'Single Plane')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            date_time_started, datetime.datetime(2016,3,9,17,3,55,725000))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradiation_event_type.code_meaning, u'Stationary Acquisition')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            acquisition_protocol, u'Thigh Right')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            anatomical_structure.code_meaning, u'Femur')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            target_region.code_meaning, u'Femur')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            image_view.code_meaning, u'antero-posterior')
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            dose_area_product, Decimal(0.00000057))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            reference_point_definition.code_meaning, u'In Detector Plane')
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraydetectordata_set.get().exposure_index, Decimal(663.54))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraydetectordata_set.get().target_exposure_index, Decimal(226.22))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraydetectordata_set.get().deviation_index, Decimal(4.67))
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraysourcedata_set.get().dose_rp, Decimal(0.000064772728))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraysourcedata_set.get().number_of_pulses, Decimal(1))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(48))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current, Decimal(250))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraysourcedata_set.get().exposure_time, Decimal(20))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[2].
+            irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(5000))
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_role_in_procedure.code_meaning,
+                u'Irradiating Device')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_name,
+                u'CAREDXEVO')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_manufacturer,
+                u'CARESTREAM')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_model_name,
+                u'DRX-Evolution')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_serial_number,
+                u'7664565786545')
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            acquisition_plane.code_meaning, u'Single Plane')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            date_time_started, datetime.datetime(2016,3,9,17,3,35,590000))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradiation_event_type.code_meaning, u'Stationary Acquisition')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            acquisition_protocol, u'Thigh Right')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            anatomical_structure.code_meaning, u'Femur')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            target_region.code_meaning, u'Femur')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            image_view.code_meaning, u'antero-posterior')
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            dose_area_product, Decimal(0.00000116999998))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            reference_point_definition.code_meaning, u'In Detector Plane')
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraydetectordata_set.get().exposure_index, Decimal(684.78))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraydetectordata_set.get().target_exposure_index, Decimal(226.22))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraydetectordata_set.get().deviation_index, Decimal(4.81))
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().dose_rp, Decimal(0.00006256684428))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().number_of_pulses, Decimal(1))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(49))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current, Decimal(250))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().exposure_time, Decimal(18))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(4500))
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_role_in_procedure.code_meaning,
+                u'Irradiating Device')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_name,
+                u'CAREDXEVO')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_manufacturer,
+                u'CARESTREAM')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_model_name,
+                u'DRX-Evolution')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_serial_number,
+                u'7664565786545')
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_role_in_procedure.code_meaning,
+                u'Irradiating Device')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_name,
+                u'CAREDXEVO')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_manufacturer,
+                u'CARESTREAM')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_model_name,
+                u'DRX-Evolution')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[3].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_serial_number,
+                u'7664565786545')
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            acquisition_plane.code_meaning, u'Single Plane')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            date_time_started, datetime.datetime(2016,3,9,17,3,41,533000))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradiation_event_type.code_meaning, u'Stationary Acquisition')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            acquisition_protocol, u'Thigh Right')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            anatomical_structure.code_meaning, u'Femur')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            target_region.code_meaning, u'Femur')
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            dose_area_product, Decimal(0.00000231999993))
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            reference_point_definition.code_meaning, u'In Detector Plane')
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraydetectordata_set.get().exposure_index, Decimal(683.48))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraydetectordata_set.get().target_exposure_index, Decimal(226.22))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraydetectordata_set.get().deviation_index, Decimal(4.80))
+
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().dose_rp, Decimal(0.0000568627438))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().number_of_pulses, Decimal(1))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().kvp_set.get().kvp, Decimal(48))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current, Decimal(250))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().exposure_time, Decimal(18))
+        self.assertAlmostEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().exposure_set.get().exposure, Decimal(4500))
+
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_role_in_procedure.code_meaning,
+                u'Irradiating Device')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_name,
+                u'CAREDXEVO')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_manufacturer,
+                u'CARESTREAM')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_model_name,
+                u'DRX-Evolution')
+        self.assertEqual(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[4].
+            irradeventxraysourcedata_set.get().deviceparticipant_set.get().device_serial_number,
+                u'7664565786545')
