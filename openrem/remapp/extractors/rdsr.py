@@ -718,7 +718,7 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
                     elif cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Dose Check Notification Details':
                         if ctdosecheckdetails is None:
                             ctdosecheckdetails = CtDoseCheckDetails.objects.create(ct_irradiation_event_data=event)
-                        _ctdosecheckdetails(cont2, event, ch, False)
+                        _ctdosecheckdetails(cont2, ctdosecheckdetails, ch, False)
         if cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'x-ray modulation type':
             event.xray_modulation_type = safe_strings(cont.TextValue)
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Comment':
