@@ -104,6 +104,7 @@ def _find_extra_info(dicom_path):
                     # Only look at the tags if the combination of AcquisitionNumber and AcquisitionTime is new
                     acquisition_code = str(dcm.AcquisitionNumber) + '_' + dcm.AcquisitionTime
                     if acquisition_code not in acquisitions_collected:
+                        print acquisition_code
                         acquisitions_collected.append(acquisition_code)
 
                         info_dictionary = {}
@@ -140,18 +141,24 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 pass
                         try:
-                            info_dictionary['CTDIvol'] = dcm.CTDIvol
-                        except AttributeError:
+                            # For some Toshiba CT scanners, stored as a floating point double (FD) by the
+                            # scanner, but encoded by PACS as hex
+                            if dcm[0x7005,0x1063].VR == 'FD':
+                                info_dictionary['CTDIvol'] = dcm[0x7005,0x1063].value
+                            else:
+                                info_dictionary['CTDIvol'] = unpack('<d', ''.join(dcm[0x7005,0x1063]))[0]
+                        except KeyError:
+                            print 'There was a key error when finding CTDIvol. Trying elsewhere.'
+                            print dcm.CTDIvol
                             try:
-                                # For some Toshiba CT scanners, stored as a floating point double (FD) by the
-                                # scanner, but encoded by PACS as hex
-                                if dcm[0x7005,0x1063].VR == 'FD':
-                                    info_dictionary['CTDIvol'] = dcm[0x7005,0x1063].value
-                                else:
-                                    info_dictionary['CTDIvol'] = unpack('<d', ''.join(dcm[0x7005,0x1063]))[0]
-                            except KeyError:
+                                info_dictionary['CTDIvol'] = dcm.CTDIvol
+                            except AttributeError:
                                 pass
-                            except TypeError:
+                        except TypeError:
+                            print 'There was a type error when finding CTDIvol. Trying elsewhere.'
+                            try:
+                                info_dictionary['CTDIvol'] = dcm.CTDIvol
+                            except AttributeError:
                                 pass
                         try:
                             info_dictionary['ExposureModulationType'] = dcm.ExposureModulationType
@@ -281,7 +288,7 @@ def _make_dicom_rdsr(folder_list, pixelmed_jar_command, sr_filename):
         subprocess.call(command.split())
 
 
-def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_info):
+def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_info, new_rdsr_file):
     """Try to update information in an RDSR file using pydicom. Match the pair of CTDIvol and DLP values found in the
     RDSR CT Acquisition with a pair of CTDIvol and DLP values in additional_info. If a match is found, use the other
     information in the additional_info element to update the corresponding CT Acquisition in the RDSR.
@@ -292,6 +299,9 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
         additional_acquisition_info (list): A list of dictionaries containing information on each acquisition in the CT
         study.
 
+    Returns:
+        integer (int): 1 on success; 0 if the rdsr_file could not be read.
+
     """
     import dicom
     from dicom.dataset import Dataset
@@ -301,7 +311,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
         dcm = dicom.read_file(rdsr_file)
     except IOError as e:
         print 'I/O error({0}): {1} when trying to read {2}'.format(e.errno, e.strerror, rdsr_file)
-        return
+        return 0
 
     # Update the study-level information if it does not exist, or is an empty string.
     for key, val in additional_study_info.items():
@@ -329,15 +339,20 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                             for container3 in container2.ContentSequence:
                                 if container3.ConceptNameCodeSequence[0].CodeMeaning == 'DLP':
                                     current_dlp = container3.MeasuredValueSequence[0].NumericValue
-                                    # print container3.MeasuredValueSequence[0].NumericValue
+                                    #print container3.MeasuredValueSequence[0].NumericValue
                                 if container3.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIvol':
                                     current_ctdi_vol = container3.MeasuredValueSequence[0].NumericValue
-                                    # print container3.MeasuredValueSequence[0].NumericValue
+                                    #print container3.MeasuredValueSequence[0].NumericValue
 
                             # Check to see if the current DLP and CTDIvol pair matches any of the acquisitions in
                             # additional_info
                             for acquisition in additional_acquisition_info:
                                 try:
+                                    print 'Current set is:'
+                                    print float(acquisition['CTDIvol'])
+                                    print float(current_ctdi_vol)
+                                    print float(acquisition['DLP'])
+                                    print float(current_dlp)
                                     if float(acquisition['CTDIvol']) == float(current_ctdi_vol) and \
                                                     float(acquisition['DLP']) == float(current_dlp):
                                         print '\nCTDIvol: {0} is equal to {1}'.format(float(acquisition['CTDIvol']), float(current_ctdi_vol))
@@ -568,13 +583,15 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                     # Perhaps the contents of the DLP or CTDIvol are not values
                                     pass
     
-    dcm.save_as(rdsr_file + '_updated.dcm')
-    return rdsr_file + '_updated.dcm'
+    #dcm.save_as(rdsr_file + '_updated.dcm')
+    dcm.save_as(new_rdsr_file)
+    return 1
 
 
 @shared_task
 def rdsr_toshiba_ct_from_dose_images(folder_name):
     rdsr_name = 'sr.dcm'
+    updated_rdsr_name = 'sr_updated.dcm'
 
     # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
     # first dose summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one
@@ -610,13 +627,19 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
 
         # Use the extra information to update the initial rdsr file created by DoseUtility
         print 'Updating information in rdsr in ' + folder
-        updated_rdsr_file = _update_dicom_rdsr(os.path.join(folder, rdsr_name), extra_study_information,
-                                              extra_acquisition_information)
+        initial_rdsr_name_and_path = os.path.join(folder, rdsr_name)
+        updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
+        result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
+                                              extra_acquisition_information, updated_rdsr_name_and_path)
 
         # Now import the updated rdsr into OpenREM using the Toshiba extractor
-        if updated_rdsr_file is not None:
-            print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_file + ')'
-            rdsr(updated_rdsr_file)
+        if result == 1:
+            print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_name_and_path + ')'
+            rdsr(updated_rdsr_name_and_path)
+
+    # Now delete the image folder
+    shutil.rmtree(folder_name)
+    return 0
 
 
 if __name__ == "__main__":

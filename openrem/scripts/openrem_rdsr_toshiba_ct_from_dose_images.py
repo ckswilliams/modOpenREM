@@ -8,9 +8,10 @@
     :type filename: str.
 
     Tested with:
-        * Toshiba Aquilion CX software version xxxx
-        * Toshiba Aquilion CXL software version xxxx
-        * Toshiba Aquilion CXL software version xxxx
+        * Toshiba Aquilion CXL software version V4.40ER011
+        * Toshiba Aquilion CX  software version V4.51ER014
+        * Toshiba Aquilion CXL software version V4.86ER008
+        
 """
 
 import sys

@@ -11,18 +11,21 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 
 # Celery settings
+
 BROKER_URL = 'amqp://guest:guest@localhost//'
-BROKER_TRANSPORT_OPTIONS = {'confirm_publish': True}
-#CELERY_RESULT_BACKEND = 'amqp'
-
-
-#: Only add pickle to this list if your broker is secured
-#: from unwanted access (see userguide/security.html)
+CELERY_RESULT_BACKEND = 'amqp'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_DEFAULT_QUEUE = 'default'
+# Added by DJP on 16/3/2017 to see if it stops Rabbit / Celery from timing out
+# Also see http://stackoverflow.com/questions/35325207/celery-and-rabbitmq-timeouts-and-connection-resets
+# Also see http://stackoverflow.com/questions/16040039/understanding-celery-task-prefetching
+# Both of the above suggest adding CELERY_ACKS_LATE = True, and adding '-Ofair' to the celery worker options
+# The concurrency in the celery task is also now set to 1 rather than 4 ("-c 4" to "-c 1")
+CELERY_ACKS_LATE = True
 CELERYD_PREFETCH_MULTIPLIER = 1
+
 
 from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {

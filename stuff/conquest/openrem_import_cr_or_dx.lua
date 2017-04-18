@@ -11,7 +11,7 @@ require "openrem_string_split"
 
 local manufacturers_to_ignore = {'Agfa', 'Agfa-Gevaert', 'Agfa-Gevaert AG', 'Faxitron X-Ray LLC', 'Gendex-KaVo'}
 local model_names_to_ignore = {'CR 85', 'CR 75', 'CR 35', 'CR 25', 'ADC_5146'}
-local station_names_to_ignore = {'RU0', 'ru0'}
+local station_names_to_ignore = {'RU0', 'ru0', 'CR85 Main'}
 
 local split_input_text = split(command_line, "::")
 local file_name_and_path = split_input_text[1]
@@ -20,10 +20,9 @@ local model_name = split_input_text[3]
 local station_name = split_input_text[4]
 local software_versions = split_input_text[5]
 local study_date = split_input_text[6]
-local fuji_go_dap_change_date = '20170329'
 
 
--- If any of the entries in manufacturers_to_ignore are present then the image is
+-- If any of the entries in manufacturers_to_ignore is present then the image is
 -- not useful.
 for i = 1, #manufacturers_to_ignore do
   if manufacturer == manufacturers_to_ignore[i] then
@@ -33,8 +32,7 @@ for i = 1, #manufacturers_to_ignore do
   end
 end
 
-
--- If any of the entries in model_names_to_ignore are present then the image is
+-- If any of the entries in model_names_to_ignore is present then the image is
 -- not useful.
 for i = 1, #model_names_to_ignore do
   if model_name == model_names_to_ignore[i] then
@@ -44,8 +42,7 @@ for i = 1, #model_names_to_ignore do
   end
 end
 
-
--- If any of the entries in station_names_to_ignore are present then the image is
+-- If any of the entries in station_names_to_ignore is present then the image is
 -- not useful.
 for i = 1, #station_names_to_ignore do
   if station_name == station_names_to_ignore[i] then
