@@ -383,7 +383,7 @@ class ResponseFiltering(TestCase):
         rst1.query_id = query.query_id
         rst1.study_instance_uid = uuid.uuid4()
         rst1.study_description = u"test response 1"
-        rst1.station_name = u""
+        rst1.station_name = u"badstation"
         rst1.save()
 
         rst1s1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=rst1)
@@ -416,3 +416,25 @@ class ResponseFiltering(TestCase):
         rst1_series_rsp = rst1.dicomqrrspseries_set.all()
         rst1.set_modalities_in_study(list(set(val for dic in rst1_series_rsp.values('modality') for val in dic.values())))
         rst1.save()
+
+        rst2 = DicomQRRspStudy.objects.create(dicom_query=query)
+        rst2.query_id = query.query_id
+        rst2.study_instance_uid = uuid.uuid4()
+        rst2.study_description = u"test response 2"
+        rst2.station_name = u"goodstation"
+        rst2.save()
+
+    def test_filter_include_station_name(self):
+        """
+        Test that _filter 
+        :return: None
+        """
+        from remapp.netdicom.qrscu import _filter
+
+        query = DicomQuery.objects.get()
+        _filter(query, u"study", u"station_name", [u"goodstation"], u"include")
+
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
+        rst = query.dicomqrrspstudy_set.get()
+        self.assertEqual(rst.station_name, u"goodstation")
+
