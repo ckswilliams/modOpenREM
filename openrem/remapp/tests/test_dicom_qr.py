@@ -438,3 +438,16 @@ class ResponseFiltering(TestCase):
         rst = query.dicomqrrspstudy_set.get()
         self.assertEqual(rst.station_name, u"goodstation")
 
+    def test_filter_exclude_station_name(self):
+        """
+        Test that _filter 
+        :return: None
+        """
+        from remapp.netdicom.qrscu import _filter
+
+        query = DicomQuery.objects.get()
+        _filter(query, u"study", u"station_name", [u"badstation"], u"exclude")
+
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
+        rst = query.dicomqrrspstudy_set.get()
+        self.assertEqual(rst.station_name, u"goodstation")
