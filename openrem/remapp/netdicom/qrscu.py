@@ -82,8 +82,8 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     query.stage = "Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list)
     logger.info("Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list))
     for study in study_rsp:
-        if level=='study':
-            if any(term in (getattr(study,filter_name) or '').lower() for term in filter_list) is filtertype:
+        if level == 'study':
+            if any(term in (getattr(study, filter_name) or '').lower() for term in filter_list) is filtertype:
                 study.delete()
         elif level == 'series':
             series = study.dicomqrrspseries_set.all()
