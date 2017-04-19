@@ -57,10 +57,16 @@ def _move_req(my_ae, remote_ae, d):
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
-    # level = series, study
-    # filter_name = station_name, sop_classes_in_study, study_description
-    # filter_list = e.g. stationnames_inc
-    # filter_type = exclude, include
+    """
+    Reduces Study or Series level UIDs that will have a Move command sent for by filtering against one of three 
+    variables that can be 'include only' or 'exclude'
+    :param query: Query object in database
+    :param level: 'series' or 'study'
+    :param filter_name: 'station_name', 'sop_classes_in_study', or 'study_description'
+    :param filter_list: e.g. 'stationnames_inc'
+    :param filter_type: 'exclude', 'include'
+    :return: None
+    """
     if filter_type == 'exclude':
         filtertype = True
     elif filter_type == 'include':
@@ -171,22 +177,23 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
 def _prune_study_responses(query, study_rsp, all_mods, filters):
 
     if filters['study_desc_inc']:
-      _filter(query, level='study', filter_name='study_description', filter_list=filters['study_desc_inc'], filter_type='include')
-
+        _filter(query, level='study', filter_name='study_description',
+                filter_list=filters['study_desc_inc'], filter_type='include')
     if filters['study_desc_exc']:
-      _filter(query, level='study', filter_name='study_description', filter_list=filters['study_desc_exc'], filter_type='exclude')
-
+        _filter(query, level='study', filter_name='study_description',
+                filter_list=filters['study_desc_exc'], filter_type='exclude')
     if filters['stationname_inc']:
-       _filter(query, level='study', filter_name='station_name', filter_list=filters['stationname_inc'], filter_type='include')
-
+        _filter(query, level='study', filter_name='station_name',
+                filter_list=filters['stationname_inc'], filter_type='include')
     if filters['stationname_exc']:
-       _filter(query, level='study', filter_name='station_name', filter_list=filters['stationname_exc'], filter_type='exclude')
-
+        _filter(query, level='study', filter_name='station_name',
+                filter_list=filters['stationname_exc'], filter_type='exclude')
     if filters['sopclassuid_inc']:
-      _filter(query, level='study', filter_name='sop_classes_in_study', filter_list=filters['sopclassuid_inc'], filter_type='include')
-
+        _filter(query, level='study', filter_name='sop_classes_in_study',
+                filter_list=filters['sopclassuid_inc'], filter_type='include')
     if filters['sopclassuid_exc']:
-      _filter(query, level='study', filter_name='sop_classes_in_study', filter_list=filters['sopclassuid_exc'], filter_type='exclude')
+        _filter(query, level='study', filter_name='sop_classes_in_study',
+                filter_list=filters['sopclassuid_exc'], filter_type='exclude')
 
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
@@ -566,12 +573,10 @@ def qrscu(
     # query for all requested studies
     modality_matching = _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE)
 
-    # Now we have all our studies. Time to throw away any we don't want
+    # Now we have all our studies. Time to throw duplicates and away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
-
     logger.debug("SOPClassUIDs in study: {}".format(
         list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
-
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     if modality_matching:
@@ -582,7 +587,8 @@ def qrscu(
             if ('RF' in mods or 'XA' in mods) and 'SR' not in mods:
                 study.delete()
 
-    # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed.
+    # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed, but
+    # would need to be  combined with changes to extractor scripts
     if remove_duplicates:
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
