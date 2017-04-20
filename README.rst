@@ -44,4 +44,3 @@ OpenREM currently ships with charts that use the HighCharts libraries. This is f
 For other environments please contact Highcharts for licencing. For more information, please see
 `their website <http://highcharts.com>`_, or the
 `Non-Commercial FAQ <https://shop.highsoft.com/faq#Non-Commercial-0>`_.
-
