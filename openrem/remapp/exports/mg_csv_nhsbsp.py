@@ -123,8 +123,9 @@ def mg_csv_nhsbsp(filterdict, user=None):
         for exp in e:
             if u'specimen' in exp.image_view.code_meaning:
                 continue  # No point including these in the export
-            bad_acq_words = ['Scout', 'Postclip', 'Prefire', 'Biopsy', 'Postfire']
-            if any(word in exp.acquisition_protocol for word in bad_acq_words):
+            bad_acq_words = [
+                u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
+            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
                 continue  # Avoid exporting biopsy related exposures
             try:
                 view_code = exp.laterality.code_meaning
