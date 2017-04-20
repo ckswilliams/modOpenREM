@@ -174,7 +174,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.delete()
 
 
-def _prune_study_responses(query, study_rsp, all_mods, filters):
+def _prune_study_responses(query, filters):
 
     if filters['study_desc_inc']:
         _filter(query, level='study', filter_name='study_description',
@@ -600,7 +600,7 @@ def qrscu(
         logger.info('Now have {0} studies'.format(study_rsp.count()))
 
     logger.debug("Pruning study responses")
-    _prune_study_responses(query, study_rsp, all_mods, filters)
+    _prune_study_responses(query, filters)
 
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info('Now have {0} studies'.format(study_rsp.count()))
