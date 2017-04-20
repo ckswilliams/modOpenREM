@@ -126,7 +126,10 @@ def mg_csv_nhsbsp(filterdict, user=None):
             bad_acq_words = ['Scout', 'Postclip', 'Prefire', 'Biopsy', 'Postfire']
             if any(word in exp.acquisition_protocol for word in bad_acq_words):
                 continue  # Avoid exporting biopsy related exposures
-            view_code = exp.laterality.code_meaning
+            try:
+                view_code = exp.laterality.code_meaning
+            except AttributeError:
+                continue  # Avoid exporting exposures with no laterality recorded
             view_code = view_code[:1]
             views = {u'cranio-caudal': u'CC',
                      u'medio-lateral oblique': u'OB',
@@ -139,18 +142,27 @@ def mg_csv_nhsbsp(filterdict, user=None):
                      u'cranio-caudal exaggerated laterally': u'XCCL',
                      u'cranio-caudal exaggerated medially': u'XCCM'
                      }  # See http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
-            if exp.image_view.code_meaning in views:
-                view_code += views[exp.image_view.code_meaning]
-            else:
-                view_code += exp.image_view.code_meaning
-            target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
+            try:
+                if exp.image_view.code_meaning in views:
+                    view_code += views[exp.image_view.code_meaning]
+                else:
+                    view_code += exp.image_view.code_meaning
+            except AttributeError:
+                continue  # Avoid exporting exposures with no image_view recorded
+            try:
+                target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
+            except AttributeError:
+                continue  # Avoid exporting exposures with no anode material recorded
             if "TUNGSTEN" in target.upper():
                 target = 'W'
             elif "MOLY" in target.upper():
                 target = 'Mo'
             elif "RHOD" in target.upper():
                 target = 'Rh'
-            filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
+            try:
+                filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
+            except AttributeError:
+                continue  # Avoid exporting exposures with no filter material recorded
             if "ALUM" in filter_mat.upper():
                 filter_mat = 'Al'
             elif "MOLY" in filter_mat.upper():
