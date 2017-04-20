@@ -382,7 +382,7 @@ class ResponseFiltering(TestCase):
         rst1 = DicomQRRspStudy.objects.create(dicom_query=query)
         rst1.query_id = query.query_id
         rst1.study_instance_uid = uuid.uuid4()
-        rst1.study_description = u"test response 1"
+        rst1.study_description = u"Imported  CT studies"
         rst1.station_name = u"badstation"
         rst1.save()
 
@@ -420,13 +420,20 @@ class ResponseFiltering(TestCase):
         rst2 = DicomQRRspStudy.objects.create(dicom_query=query)
         rst2.query_id = query.query_id
         rst2.study_instance_uid = uuid.uuid4()
-        rst2.study_description = u"test response 2"
+        rst2.study_description = u"Test Response 2"
         rst2.station_name = u"goodstation"
         rst2.save()
 
+        rst3 = DicomQRRspStudy.objects.create(dicom_query=query)
+        rst3.query_id = query.query_id
+        rst3.study_instance_uid = uuid.uuid4()
+        rst3.study_description = u"test response 3"
+        rst3.station_name = u"goodstation2"
+        rst3.save()
+
     def test_filter_include_station_name(self):
         """
-        Test that _filter 
+        Testing _filter with include station name of 'goodstation'. Expect two responses goodstation and goodstation2
         :return: None
         """
         from remapp.netdicom.qrscu import _filter
@@ -434,13 +441,14 @@ class ResponseFiltering(TestCase):
         query = DicomQuery.objects.get()
         _filter(query, u"study", u"station_name", [u"goodstation"], u"include")
 
-        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
-        rst = query.dicomqrrspstudy_set.get()
-        self.assertEqual(rst.station_name, u"goodstation")
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 2)
+        studies = query.dicomqrrspstudy_set.all()
+        for study in studies:
+            self.assertTrue(u"goodstation" in study.station_name)
 
     def test_filter_exclude_station_name(self):
         """
-        Test that _filter 
+        Testing _filter with exclude station name of 'badstation'. Expect two responses goodstation and goodstation2
         :return: None
         """
         from remapp.netdicom.qrscu import _filter
@@ -448,6 +456,36 @@ class ResponseFiltering(TestCase):
         query = DicomQuery.objects.get()
         _filter(query, u"study", u"station_name", [u"badstation"], u"exclude")
 
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 2)
+        studies = query.dicomqrrspstudy_set.all()
+        for study in studies:
+            self.assertFalse(u"badstation" in study.station_name)
+
+    def test_filter_exclude_study_description(self):
+        """
+        Testing _filter with exclude two study descriptions. Expect one response of goodstation
+        :return: None
+        """
+        from remapp.netdicom.qrscu import _filter
+
+        query = DicomQuery.objects.get()
+        _filter(query, u"study", u"study_description", [u"import", u"test response 3"], u"exclude")
+
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
-        rst = query.dicomqrrspstudy_set.get()
-        self.assertEqual(rst.station_name, u"goodstation")
+        study = query.dicomqrrspstudy_set.get()
+        self.assertTrue(study.station_name == u"goodstation")
+
+    def test_filter_include_study_description(self):
+        """
+        Testing _filter with include study description 'test'. Expect two responses of goodstation and goodstation2
+        :return: None
+        """
+        from remapp.netdicom.qrscu import _filter
+
+        query = DicomQuery.objects.get()
+        _filter(query, u"study", u"study_description", [u"test", ], u"include")
+
+        self.assertEqual(query.dicomqrrspstudy_set.all().count(), 2)
+        studies = query.dicomqrrspstudy_set.all()
+        for study in studies:
+            self.assertTrue(u"goodstation" in study.station_name)
