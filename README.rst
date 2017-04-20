@@ -6,19 +6,19 @@ OpenREM
 .. image:: https://coveralls.io/repos/bitbucket/openrem/openrem/badge.svg?branch=develop
     :target: https://coveralls.io/bitbucket/openrem/openrem?branch=develop
 
-.. image:: https://img.shields.io/pypi/v/openrem.svg
+.. image:: https://img.shields.io/pypi/v/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. image:: https://img.shields.io/pypi/pyversions/openrem.svg
+.. image:: https://img.shields.io/pypi/pyversions/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. image:: https://img.shields.io/pypi/dm/openrem.svg
+.. image:: https://img.shields.io/pypi/dm/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg
+.. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
 
-.. image:: https://www.quantifiedcode.com/api/v1/project/ed6462bb44f4462189fd8777ab26e8dd/snapshot/origin:develop:HEAD/badge.svg
+.. image:: https://www.quantifiedcode.com/api/v1/project/ed6462bb44f4462189fd8777ab26e8dd/snapshot/origin:develop:HEAD/badge.svg?
     :target: https://www.quantifiedcode.com/app/project/ed6462bb44f4462189fd8777ab26e8dd
     :alt: QuantifiedCode issues
 
