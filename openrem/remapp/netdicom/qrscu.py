@@ -63,7 +63,7 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     :param query: Query object in database
     :param level: 'series' or 'study'
     :param filter_name: 'station_name', 'sop_classes_in_study', or 'study_description'
-    :param filter_list: e.g. 'stationnames_inc'
+    :param filter_list: list of lower case search words or phrases, or SOP classes
     :param filter_type: 'exclude', 'include'
     :return: None
     """
