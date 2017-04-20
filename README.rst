@@ -12,9 +12,6 @@ OpenREM
 .. image:: https://img.shields.io/pypi/pyversions/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. image:: https://img.shields.io/pypi/dm/openrem.svg?
-    :target: https://badge.fury.io/py/openrem
-
 .. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
 
