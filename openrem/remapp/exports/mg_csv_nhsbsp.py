@@ -146,6 +146,38 @@ def mg_csv_nhsbsp(filterdict, user=None):
             except AttributeError:
                 exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no image_view recorded
+            if u'specimen' in exp.image_view.code_meaning:
+                exp.nccpm_view = None
+                continue  # No point including these in the export
+            bad_acq_words = [
+                u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
+            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
+                exp.nccpm_view = None
+                continue  # Avoid exporting biopsy related exposures
+            try:
+                target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
+            except AttributeError:
+                exp.nccpm_view = None
+                continue  # Avoid exporting exposures with no anode material recorded
+            if "TUNGSTEN" in target.upper():
+                target = 'W'
+            elif "MOLY" in target.upper():
+                target = 'Mo'
+            elif "RHOD" in target.upper():
+                target = 'Rh'
+            try:
+                filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
+            except AttributeError:
+                exp.nccpm_view = None
+                continue  # Avoid exporting exposures with no filter material recorded
+            if "ALUM" in filter_mat.upper():
+                filter_mat = 'Al'
+            elif "MOLY" in filter_mat.upper():
+                filter_mat = 'Mo'
+            elif "RHOD" in filter_mat.upper():
+                filter_mat = 'Rh'
+            elif "SILV" in filter_mat.upper():
+                filter_mat = 'Ag'
         unique_views = set()
         for exp in exposures:
             if exp.nccpm_view:
@@ -160,34 +192,6 @@ def mg_csv_nhsbsp(filterdict, user=None):
         for exp in exposures:
             if not exp.nccpm_view:
                 continue  # Avoid exporting exposures with no view code
-            if u'specimen' in exp.image_view.code_meaning:
-                continue  # No point including these in the export
-            bad_acq_words = [
-                u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
-            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
-                continue  # Avoid exporting biopsy related exposures
-            try:
-                target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
-            except AttributeError:
-                continue  # Avoid exporting exposures with no anode material recorded
-            if "TUNGSTEN" in target.upper():
-                target = 'W'
-            elif "MOLY" in target.upper():
-                target = 'Mo'
-            elif "RHOD" in target.upper():
-                target = 'Rh'
-            try:
-                filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
-            except AttributeError:
-                continue  # Avoid exporting exposures with no filter material recorded
-            if "ALUM" in filter_mat.upper():
-                filter_mat = 'Al'
-            elif "MOLY" in filter_mat.upper():
-                filter_mat = 'Mo'
-            elif "RHOD" in filter_mat.upper():
-                filter_mat = 'Rh'
-            elif "SILV" in filter_mat.upper():
-                filter_mat = 'Ag'
             automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
             if "AUTO" in automan.upper():
                 automan = 'AUTO'
