@@ -119,19 +119,14 @@ def mg_csv_nhsbsp(filterdict, user=None):
     ])
 
     for i, study in enumerate(s):
-        e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
-        for exp in e:
-            if u'specimen' in exp.image_view.code_meaning:
-                continue  # No point including these in the export
-            bad_acq_words = [
-                u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
-            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
-                continue  # Avoid exporting biopsy related exposures
+        exposures = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
+        for exp in exposures:
             try:
-                view_code = exp.laterality.code_meaning
+                laterality = exp.laterality.code_meaning
             except AttributeError:
-                continue  # Avoid exporting exposures with no laterality recorded
-            view_code = view_code[:1]
+                exp.nccpm_view = None
+                continue
+            exp.nccpm_view = laterality[:1]
             views = {u'cranio-caudal': u'CC',
                      u'medio-lateral oblique': u'OB',
                      u'medio-lateral': u'ML',
@@ -145,11 +140,32 @@ def mg_csv_nhsbsp(filterdict, user=None):
                      }  # See http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
             try:
                 if exp.image_view.code_meaning in views:
-                    view_code += views[exp.image_view.code_meaning]
+                    exp.nccpm_view += views[exp.image_view.code_meaning]
                 else:
-                    view_code += exp.image_view.code_meaning
+                    exp.nccpm_view += exp.image_view.code_meaning
             except AttributeError:
+                exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no image_view recorded
+        unique_views = set()
+        for exp in exposures:
+            if exp.nccpm_view:
+                if exp.nccpm_view not in unique_views:
+                    unique_views.add(exp.nccpm_view)
+                else:
+                    for x in range(20):
+                        if exp.nccpm_view + str(x+2) not in unique_views:
+                            exp.nccpm_view += str(x+2)
+                            unique_views.add(exp.nccpm_view)
+                            break
+        for exp in exposures:
+            if not exp.nccpm_view:
+                continue  # Avoid exporting exposures with no view code
+            if u'specimen' in exp.image_view.code_meaning:
+                continue  # No point including these in the export
+            bad_acq_words = [
+                u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
+            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
+                continue  # Avoid exporting biopsy related exposures
             try:
                 target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
             except AttributeError:
@@ -181,7 +197,7 @@ def mg_csv_nhsbsp(filterdict, user=None):
             writer.writerow([
                 '1',
                 i + 1,
-                view_code,
+                exp.nccpm_view,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
                 filter_mat,
