@@ -109,11 +109,11 @@ The data can then be copied and pasted into the NCCPM database.
 If there are a mixture of 2D and tomography exposures, providing you can separate them by virtue of the filter used,
 then you should further prepare the data as follows:
 
-1. Copy the sheet to a new sheet
-1. In the first sheet, filter for the target and filter combination used for used for the tomographic exposures and
+#. Copy the sheet to a new sheet
+#. In the first sheet, filter for the target and filter combination used for used for the tomographic exposures and
    delete those rows.
-1. In the second sheet, filter for the target and filter combinations used for 2D exposures and delete those rows.
-1. Change the survey number on the 2D sheet and the the survey number on the tomographic sheet as appropriate, with the
+#. In the second sheet, filter for the target and filter combinations used for 2D exposures and delete those rows.
+#. Change the survey number on the 2D sheet and the the survey number on the tomographic sheet as appropriate, with the
    tomographic survey number bing one more than the 2D survey number.
 
 Where patients have had both 2D and tomographic exposures in the same study, NCCPM will be able to match them up as they
