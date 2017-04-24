@@ -89,19 +89,19 @@ NHSBSP Mammography exports
 This export is specific to the UK NHS Breast Screening Programme and generates the source data in the format required
 for the  dose audit database developed by the National Co-ordinating Centre for the Physics of Mammography.
 
-It has been modified to clean up the data to remove exposures hat are unlikely to be wanted in the submitted data, such
+It has been modified to clean up the data to remove exposures that are unlikely to be wanted in the submitted data, such
 as exposures with any of the following in the protocol name::
 
     scout, postclip, prefire, biopsy, postfire, stereo, specimin, artefact
 
-The view codes have been modified to match the NCCPM convention, ie medio-lateral oblique is recorded as ``OB`` instead
+The view codes have been modified to match the NCCPM convention, i.e. medio-lateral oblique is recorded as ``OB`` instead
 of ``MLO``. The other codes are mapped to the `ACR MQCM 1999 Equivalent code.`_
 
 Each patient is numbered from starting from 1. Each view for any one patient has a unique view code, so if a second
 cranio-caudal exposure is made to the left breast the view codes will be LCC and LCC2.
 
 The survey number is left as 1. This needs to be modified as appropriate. The easiest way to do this in Excel is to
-change the first two or three rows, select those cells that have been changed, then double click on the botto-right
+change the first two or three rows, select those cells that have been changed, then double click on the bottom-right
 corner of the selection box to copy-down the value to all the remaining cells below.
 
 The data can then be copied and pasted into the NCCPM database.
