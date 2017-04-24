@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
