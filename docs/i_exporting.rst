@@ -12,7 +12,7 @@ in the OpenREM interface. The following exports are currently available (version
 * CT advanced, XLSX muliple-sheets
 * Fluoroscopy basic, single sheet csv
 * Mammography, single sheet csv
-* Mammography NHSBSP, single sheet csv designed to satisfy NHSPSB reporting
+* `Mammography NHSBSP`_, single sheet csv designed to satisfy NHSPSB reporting
 * Radiographic, single sheet csv
 * Radiographic, XLSX multiple sheets
 
@@ -84,8 +84,9 @@ by ticking the delete checkbox and clicking the delete button at the bottom:
 Specific modality export information
 ====================================
 
-NHSBSP Mammography exports
---------------------------
+Mammography NHSBSP
+------------------
+
 This export is specific to the UK NHS Breast Screening Programme and generates the source data in the format required
 for the  dose audit database developed by the National Co-ordinating Centre for the Physics of Mammography.
 
@@ -118,44 +119,6 @@ then you should further prepare the data as follows:
 
 Where patients have had both 2D and tomographic exposures in the same study, NCCPM will be able to match them up as they
 will have the same patient number in both surveys.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
