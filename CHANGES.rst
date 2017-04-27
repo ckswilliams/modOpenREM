@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
