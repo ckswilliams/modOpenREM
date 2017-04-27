@@ -15,6 +15,16 @@ function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
         legend: {
             enabled: true
         },
+        plotOptions: {
+            series: {
+                boostThreshold: 1
+            }
+        },
+        boost: {
+            seriesThreshold: 2,
+            useGPUTranslations: true,
+		    usePreAllocated: true
+        },
         xAxis: {
             min: 0,
             max: 100,
