@@ -34,13 +34,16 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
     from django.db.models import Avg, Count, Min, Max, FloatField, When, Case, Sum, IntegerField
     from remapp.models import Median
     import numpy as np
+    from django.db.models.functions import Lower
+
+    database_events = database_events.annotate(db_series_names_lower=Lower(db_series_names))
 
     return_structure = {}
 
     if plot_average or plot_freq:
         # Obtain a list of series names
-        return_structure['series_names'] = list(database_events.values_list(db_series_names, flat=True).distinct()
-                                                .order_by(db_series_names))
+        return_structure['series_names'] = list(database_events.values_list('db_series_names_lower', flat=True).distinct()
+                                                .order_by('db_series_names_lower'))
 
         if plot_series_per_system:
             # Obtain a list of x-ray systems
@@ -60,7 +63,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                     if exclude_constant_angle:
                         # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             mean=Avg(
                                 Case(
                                     When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -79,21 +82,21 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                     default=1, output_field=IntegerField()
                                 )
                             )
-                        ).order_by(db_series_names))
+                        ).order_by('db_series_names_lower'))
                     else:
                         # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             mean=Avg(db_value_name) * value_multiplier,
                             median=Median(db_value_name) * value_multiplier,
-                            num=Count(db_value_name)).order_by(db_series_names))
+                            num=Count(db_value_name)).order_by('db_series_names_lower'))
 
             elif plot_average:
                 # Calculate the mean, median and frequency for all data combined
 
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         mean=Avg(
                             Case(
                                 When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -112,30 +115,30 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                 default=1, output_field=IntegerField()
                             )
                         )
-                    ).order_by(db_series_names))
+                    ).order_by('db_series_names_lower'))
                 else:
                     # Don't exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         mean=Avg(db_value_name) * value_multiplier,
                         median=Median(db_value_name) * value_multiplier,
-                        num=Count(db_value_name)).order_by(db_series_names))
+                        num=Count(db_value_name)).order_by('db_series_names_lower'))
 
             else:
                 # Just calculate frequency of each series
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         num=Sum(
                             Case(
                                 When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=0),
                                 default=1, output_field=IntegerField()
                             )
                         )
-                    ).order_by(db_series_names))
+                    ).order_by('db_series_names_lower'))
                 else:
                     # Don't exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
-                        num=Count(db_value_name)).order_by(db_series_names))
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
+                        num=Count(db_value_name)).order_by('db_series_names_lower'))
 
         elif median_available and plot_average_choice == 'median':
 
@@ -146,7 +149,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                     if exclude_constant_angle:
                         # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             median=Median(
                                 Case(
                                     When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -159,20 +162,20 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                     default=1, output_field=IntegerField()
                                 )
                             )
-                        ).order_by(db_series_names))
+                        ).order_by('db_series_names_lower'))
                     else:
                         # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             median=Median(db_value_name) * value_multiplier,
-                            num=Count(db_value_name)).order_by(db_series_names))
+                            num=Count(db_value_name)).order_by('db_series_names_lower'))
 
             elif plot_average:
                 # Calculate the median and frequency for all data combined
 
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         median=Median(
                             Case(
                                 When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -185,12 +188,12 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                 default=1, output_field=IntegerField()
                             )
                         )
-                    ).order_by(db_series_names))
+                    ).order_by('db_series_names_lower'))
                 else:
                     # Don't exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         median=Median(db_value_name) * value_multiplier,
-                        num=Count(db_value_name)).order_by(db_series_names))
+                        num=Count(db_value_name)).order_by('db_series_names_lower'))
 
             elif plot_series_per_system and plot_freq:
                 # Just calculate frequency of each series
@@ -198,35 +201,35 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                     if exclude_constant_angle:
                         # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             num=Sum(
                                 Case(
                                     When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=0),
                                     default=1, output_field=IntegerField()
                                 )
                             )
-                        ).order_by(db_series_names))
+                        ).order_by('db_series_names_lower'))
                     else:
                         # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
-                            num=Count(db_value_name)).order_by(db_series_names))
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
+                            num=Count(db_value_name)).order_by('db_series_names_lower'))
             else:
                 # Just calculate frequency of each series
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         num=Sum(
                             Case(
                                 When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=0),
                                 default=1, output_field=IntegerField()
                             )
                         )
-                    ).order_by(db_series_names))
+                    ).order_by('db_series_names_lower'))
                 else:
                     # Don't exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
-                        num=Count(db_value_name)).order_by(db_series_names))
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
+                        num=Count(db_value_name)).order_by('db_series_names_lower'))
 
         else:
 
@@ -237,7 +240,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                     if exclude_constant_angle:
                         # Exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             mean=Avg(
                                 Case(
                                     When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -250,20 +253,20 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                     default=1, output_field=IntegerField()
                                 )
                             )
-                        ).order_by(db_series_names))
+                        ).order_by('db_series_names_lower'))
                     else:
                         # Don't exclude "Constant Angle Acquisitions" from the calculations
                         return_structure['summary'].append(database_events.filter(
-                            **{db_display_name_relationship: system}).values(db_series_names).annotate(
+                            **{db_display_name_relationship: system}).values('db_series_names_lower').annotate(
                             mean=Avg(db_value_name) * value_multiplier,
-                            num=Count(db_value_name)).order_by(db_series_names))
+                            num=Count(db_value_name)).order_by('db_series_names_lower'))
 
             elif plot_average:
                 # Calculate the mean and frequency for all data combined
 
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         mean=Avg(
                             Case(
                                 When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -276,29 +279,29 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                                 default=1, output_field=IntegerField()
                             )
                         )
-                    ).order_by(db_series_names))
+                    ).order_by('db_series_names_lower'))
                 else:
                     # Don't exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         mean=Avg(db_value_name) * value_multiplier,
-                        num=Count(db_value_name)).order_by(db_series_names))
+                        num=Count(db_value_name)).order_by('db_series_names_lower'))
 
             else:
                 # Just calculate frequency of each series
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
                         num=Sum(
                             Case(
                                 When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=0),
                                 default=1, output_field=IntegerField()
                             )
                         )
-                    ).order_by(db_series_names))
+                    ).order_by('db_series_names_lower'))
                 else:
                     # Don't exclude "Constant Angle Acquisitions" from the calculations
-                    return_structure['summary'].append(database_events.values(db_series_names).annotate(
-                        num=Count(db_value_name)).order_by(db_series_names))
+                    return_structure['summary'].append(database_events.values('db_series_names_lower').annotate(
+                        num=Count(db_value_name)).order_by('db_series_names_lower'))
 
         # Force each item in return_structure['summary'] to be a list
         for index in range(len(return_structure['summary'])):
@@ -309,26 +312,26 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
             for index in range(len(return_structure['system_list'])):
                 missing_names =\
                     list(set(return_structure['series_names']) -
-                         set([d[db_series_names] for d in return_structure['summary'][index]]))
+                         set([d['db_series_names_lower'] for d in return_structure['summary'][index]]))
                 for missing_name in missing_names:
                     if plot_average:
                         if median_available and plot_average_choice == 'both':
                             (return_structure['summary'][index]).append(
-                                {'median': 0, 'mean': 0, db_series_names: missing_name, 'num': 0})
+                                {'median': 0, 'mean': 0, 'db_series_names_lower': missing_name, 'num': 0})
                         elif median_available and plot_average_choice == 'median':
                             (return_structure['summary'][index]).append(
-                                {'median': 0, db_series_names: missing_name, 'num': 0})
+                                {'median': 0, 'db_series_names_lower': missing_name, 'num': 0})
                         else:
                             (return_structure['summary'][index]).append(
-                                {'mean': 0, db_series_names: missing_name, 'num': 0})
+                                {'mean': 0, 'db_series_names_lower': missing_name, 'num': 0})
                     elif plot_freq:
                         (return_structure['summary'][index]).append(
-                            {db_series_names: missing_name, 'num': 0})
+                            {'db_series_names_lower': missing_name, 'num': 0})
 
                 # Rearrange the list into the same order as series_names
                 summary_temp = []
                 for series_name in return_structure['series_names']:
-                    summary_temp.append(filter(lambda item: item[db_series_names] == series_name,
+                    summary_temp.append(filter(lambda item: item['db_series_names_lower'] == series_name,
                                                return_structure['summary'][index])[0])
                 return_structure['summary'][index] = summary_temp
 
@@ -340,7 +343,7 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
 
         if exclude_constant_angle:
             # Exclude "Constant Angle Acquisitions" from the calculations
-            value_ranges = database_events.values(db_series_names).annotate(
+            value_ranges = database_events.values('db_series_names_lower').annotate(
                 min_value=Min(
                     Case(
                         When(ctradiationdose__ctirradiationeventdata__ct_acquisition_type__code_meaning__exact='Constant Angle Acquisition', then=None),
@@ -353,21 +356,21 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
                         default=db_value_name, output_field=FloatField()
                     )
                 )
-            ).order_by(db_series_names)
+            ).order_by('db_series_names_lower')
         else:
             # Don't exclude "Constant Angle Acquisitions" from the calculations
-            value_ranges = database_events.values(db_series_names).annotate(
+            value_ranges = database_events.values('db_series_names_lower').annotate(
                     min_value=Min(db_value_name, output_field=FloatField()),
-                    max_value=Max(db_value_name, output_field=FloatField())).order_by(db_series_names)
+                    max_value=Max(db_value_name, output_field=FloatField())).order_by('db_series_names_lower')
 
         for system_i, system in enumerate(return_structure['system_list']):
             for series_i, series_name in enumerate(return_structure['series_names']):
                 if plot_series_per_system:
                     subqs = database_events.filter(**{
                             db_display_name_relationship: system,
-                            db_series_names: series_name})
+                            'db_series_names_lower': series_name})
                 else:
-                    subqs = database_events.filter(**{db_series_names: series_name})
+                    subqs = database_events.filter(**{'db_series_names_lower': series_name})
 
                 if exclude_constant_angle:
                     # Exclude "Constant Angle Acquisitions" from the calculations
@@ -425,11 +428,14 @@ def average_chart_over_time_data(database_events, db_series_names, db_value_name
     import qsstats
     from django.db.models import Min, Avg
     from remapp.models import Median
+    from django.db.models.functions import Lower
+
+    database_events = database_events.annotate(db_series_names_lower=Lower(db_series_names))
 
     return_structure = dict()
 
     return_structure['series_names'] = list(database_events.values_list(
-        db_series_names, flat=True).distinct().order_by(db_series_names))
+        'db_series_names_lower', flat=True).distinct().order_by('db_series_names_lower'))
 
     start_date = database_events.aggregate(Min(db_date_field)).get(db_date_field+'__min')
     today = datetime.date.today()
@@ -440,7 +446,7 @@ def average_chart_over_time_data(database_events, db_series_names, db_value_name
         return_structure['mean_over_time'] = [None] * len(return_structure['series_names'])
 
     for i, series_name in enumerate(return_structure['series_names']):
-        subqs = database_events.filter(**{db_series_names: series_name})
+        subqs = database_events.filter(**{'db_series_names_lower': series_name})
 
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
             qss = qsstats.QuerySetStats(subqs, db_date_time_field, aggregate=Avg(db_value_name) * value_multiplier)
