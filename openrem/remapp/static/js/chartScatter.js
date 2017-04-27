@@ -23,7 +23,7 @@ function chartScatter(default_title, render_div, x_axis_title, y_axis_title) {
         boost: {
             seriesThreshold: 2,
             useGPUTranslations: true,
-		    usePreAllocated: true
+            usePreAllocated: true
         },
         xAxis: {
             min: 0,
