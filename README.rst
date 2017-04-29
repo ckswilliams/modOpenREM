@@ -6,18 +6,18 @@ OpenREM
 .. image:: https://coveralls.io/repos/bitbucket/openrem/openrem/badge.svg?branch=develop
     :target: https://coveralls.io/bitbucket/openrem/openrem?branch=develop
 
-.. image:: https://img.shields.io/pypi/v/openrem.svg
+.. image:: https://img.shields.io/pypi/v/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. image:: https://img.shields.io/pypi/pyversions/openrem.svg
+.. image:: https://img.shields.io/pypi/pyversions/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
-.. .. image:: https://img.shields.io/pypi/dm/openrem.svg
-    :target: https://badge.fury.io/py/openrem
-
-.. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg
+.. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
 
+.. image:: https://www.quantifiedcode.com/api/v1/project/ed6462bb44f4462189fd8777ab26e8dd/snapshot/origin:develop:HEAD/badge.svg?
+    :target: https://www.quantifiedcode.com/app/project/ed6462bb44f4462189fd8777ab26e8dd
+    :alt: QuantifiedCode issues
 
 OpenREM is a Django app to extract, store and export Radiation Exposure
 Monitoring related information, primarily from DICOM files.
@@ -41,4 +41,3 @@ OpenREM currently ships with charts that use the HighCharts libraries. This is f
 For other environments please contact Highcharts for licencing. For more information, please see
 `their website <http://highcharts.com>`_, or the
 `Non-Commercial FAQ <https://shop.highsoft.com/faq#Non-Commercial-0>`_.
-

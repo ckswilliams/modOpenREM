@@ -50,3 +50,42 @@ configured at installation. See the install config section on :ref:`mediarootset
 
 The ``openrem.log`` has general logging information, the other two are specific to the DICOM store and DICOM
 query-retrieve functions if you are making use of them.
+
+You can increase the verbosity of the log files by changing the log 'level' to ``DEBUG``, or you can decrease the
+verbosity to ``WARNING``, 'ERROR', or 'CRITICAL'. The default is ``INFO``.
+
+Starting again!
+===============
+
+If for any reason you want to start again with the database, then this is how you might do it:
+
+SLQite3 database
+----------------
+
+* Delete or rename your existing database file (location will be described in your ``local_settings.py`` file)
+* :ref:`database_creation`
+
+Any database
+------------
+
+These instructions will also allow you to keep any user settings if you use an SQLite3 database.
+
+In a shell/command window, move into the openrem folder:
+
+* Ubuntu linux: ``cd /usr/local/lib/python2.7/dist-packages/openrem/``
+* Other linux: ``cd /usr/lib/python2.7/site-packages/openrem/``
+* Windows: ``cd C:\Python27\Lib\site-packages\openrem\``
+* Virtualenv: ``cd lib/python2.7/site-packages/openrem/``
+
+Run the django python shell:
+
+.. sourcecode:: python
+
+    python manage.py shell
+
+    from remapp.models import GeneralStudyModuleAttr
+    a = GeneralStudyModuleAttr.objects.all()
+    a.count()  # Just to see that we are doing something!
+    a.delete()
+    a.count()
+    exit()

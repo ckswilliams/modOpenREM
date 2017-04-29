@@ -21,7 +21,7 @@ class ExportMammoCSV(TestCase):
 
         PatientIDSettings.objects.create()
 
-        dicom_file = "test_files/MG-Im-GE-SenDS-scaled.dcm"
+        dicom_file = os.path.join("test_files", "MG-Im-GE-SenDS-scaled.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
         dicom_path = os.path.join(root_tests, dicom_file)
 

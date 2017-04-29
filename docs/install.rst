@@ -178,6 +178,28 @@ progressively less logging.
     LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
     LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
 
+Time zone
+^^^^^^^^^
+
+Configure the local timezone in order to get correct times in the logfiles.
+The default timezone is set at 'Europe/London'. Valid options can be found here: 
+http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+
+.. sourcecode:: python
+
+    TIME_ZONE = 'Europe/London'
+
+Language
+^^^^^^^^
+
+Configure the local language. Default language is set at us-english. Valid options can be found here: 
+http://www.i18nguy.com/unicode/language-identifiers.html
+
+.. sourcecode:: python
+
+    LANGUAGE_CODE = 'en-us'
+
+.. _database_creation:
 
 Create the database
 -------------------
