@@ -40,6 +40,7 @@ Contents:
     troubleshooting
     code
     releasenotes
+    systemdiagram
 
 ******************
 Indices and tables
