@@ -593,12 +593,20 @@ def qrscu(
                 study_rsp.filter(study_instance_uid__exact=uid).delete()
         logger.info('Now have {0} studies'.format(study_rsp.count()))
 
-    logger.debug("Pruning study responses")
-    _prune_study_responses(query, filters)
+    filter_logs = []
+    if filters['study_desc_inc']:
+        filter_logs += ["study description includes {0}, ".format(", ".join(filters['study_desc_inc']))]
+    if filters['study_desc_exc']:
+        filter_logs += ["study description excludes {0}, ".format(", ".join(filters['study_desc_exc']))]
+    if filters['stationname_inc']:
+        filter_logs += ["station name includes {0}, ".format(", ".join(filters['stationname_inc']))]
+    if filters['stationname_exc']:
+        filter_logs += ["station name excludes {0}, ".format(", ".join(filters['stationname_exc']))]
 
+    logger.info("Pruning study responses based on {0}".format("".join(filter_logs)))
+    _prune_study_responses(query, filters)
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info('Now have {0} studies'.format(study_rsp.count()))
-
 
     for rsp in study_rsp:
         # Series level query
