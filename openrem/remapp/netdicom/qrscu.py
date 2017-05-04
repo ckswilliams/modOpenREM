@@ -188,12 +188,6 @@ def _prune_study_responses(query, filters):
     if filters['stationname_exc']:
         _filter(query, level='study', filter_name='station_name',
                 filter_list=filters['stationname_exc'], filter_type='exclude')
-    # if filters['sopclassuid_inc']:
-    #     _filter(query, level='study', filter_name='sop_classes_in_study',
-    #             filter_list=filters['sopclassuid_inc'], filter_type='include')
-    # if filters['sopclassuid_exc']:
-    #     _filter(query, level='study', filter_name='sop_classes_in_study',
-    #             filter_list=filters['sopclassuid_exc'], filter_type='exclude')
 
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
