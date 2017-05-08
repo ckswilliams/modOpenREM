@@ -310,7 +310,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         if not seriesrsp.series_number:  # despite it being mandatory!
             seriesrsp.series_number = None  # integer so can't be ''
         # Optional useful tags
-        seriesrsp.series_description = get_value_kw('SeriesDescription',series[1])
+        seriesrsp.series_description = get_value_kw('SeriesDescription', series[1])
         if seriesrsp.series_description:
             seriesrsp.series_description = ''.join(seriesrsp.series_description).strip().lower()
         seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
@@ -371,8 +371,6 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
         rsp.station_name = get_value_kw('StationName', ss[1])
         logger.debug("Study Description: {0}; Station Name: {1}".format(rsp.study_description, rsp.station_name))
-        rsp.sop_classes_in_study = get_value_kw('SOPClassesInStudy', ss[1])
-        logger.debug("SOPClassesInStudy: {0}".format(rsp.sop_classes_in_study))
 
         # Populate modalities_in_study, stored as JSON
         if isinstance(ss[1].ModalitiesInStudy, str):   # if single modality, then type = string ('XA')
@@ -571,6 +569,8 @@ def qrscu(
         list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
+    # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
+    # if remote doesn't match on modality it won't return a populated ModalitiesInStudy.
     if modality_matching:
         for study in study_rsp:
             mods = study.get_modalities_in_study()
