@@ -17,12 +17,13 @@
   {% endif %}
   <table class="table table-bordered table-hover row-clickable">
     <row>
-      <th>Display name</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
+      <th>Display name</th><th>User defined modality</th><th>Institution</th><th>Department</th><th>Manufacturer</th><th>Model</th><th>Station name</th><th>Serial no.</th><th>Software version</th><th>Gantry ID</th>
     </row>
 
     {% for eachname in name_list %}
       <tr>
         <td><a style="text-decoration: none">{{ eachname.display_name }}</a></td>
+        <td><a style="text-decoration: none">{{ eachname.user_defined_modality }}</a></td>
         <td><a style="text-decoration: none">{{ eachname.institution_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachname.institutional_department_name }}</a></td>
         <td><a style="text-decoration: none">{{ eachname.manufacturer }}</a></td>

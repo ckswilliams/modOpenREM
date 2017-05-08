@@ -316,6 +316,7 @@ class UniqueEquipmentNames(models.Model):
     gantry_id = models.TextField(blank=True, null=True)
     gantry_id_hash = models.CharField(max_length=64, blank=True, null=True)
     display_name = models.TextField(blank=True, null=True)
+    user_defined_modality = models.TextField(max_length=16, blank=True)
     hash_generated = models.BooleanField(default=False)
 
     class Meta:

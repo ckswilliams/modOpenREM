@@ -709,7 +709,7 @@ def _ctaccumulateddosedata(dataset, ct, ch):  # TID 10012
 
 
 def _projectionxrayradiationdose(dataset, g, reporttype, ch):
-    from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, ObserverContext
+    from remapp.models import ProjectionXRayRadiationDose, CtRadiationDose, ObserverContext, GeneralEquipmentModuleAttr
     from remapp.tools.get_values import get_or_create_cid, safe_strings
     from remapp.tools.dcmdatetime import make_date_time
     if reporttype == 'projection':
@@ -718,6 +718,10 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         proj = CtRadiationDose.objects.create(general_study_module_attributes=g)
     else:
         pass
+    # set modality to user defined modality type for this system (if not set it is set to an empty value)
+    equip = GeneralEquipmentModuleAttr.objects.get(general_study_module_attributes=g)
+    proj.general_study_module_attributes.modality_type = equip.unique_equipment_name.user_defined_modality
+
     for cont in dataset.ContentSequence:
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Procedure reported':
             proj.procedure_reported = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -728,9 +732,9 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Has Intent':
                         proj.has_intent = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
                                                             cont2.ConceptCodeSequence[0].CodeMeaning)
-            if 'Mammography' in proj.procedure_reported.code_meaning:
+            if (not proj.general_study_module_attributes.modality_type) and ('Mammography' in proj.procedure_reported.code_meaning):
                 proj.general_study_module_attributes.modality_type = 'MG'
-            elif 'Projection X-Ray' in proj.procedure_reported.code_meaning:
+            elif (not proj.general_study_module_attributes.modality_type) and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
                 proj.general_study_module_attributes.modality_type = 'RF,DX'
         elif cont.ConceptNameCodeSequence[0].CodeMeaning.lower() == 'acquisition device type':
             proj.acquisition_device_type_cid = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
@@ -756,7 +760,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Source of Dose Information':
             proj.source_of_dose_information = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                                 cont.ConceptCodeSequence[0].CodeMeaning)
-        if reporttype == 'projection' and proj.acquisition_device_type_cid:
+        if (not equip.unique_equipment_name.user_defined_modality) and (reporttype == 'projection') and (proj.acquisition_device_type_cid):
             if 'Fluoroscopy-Guided' in proj.acquisition_device_type_cid.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'RF'
             elif 'Integrated' in proj.acquisition_device_type_cid.code_meaning:
@@ -978,8 +982,8 @@ def _rsdr2db(dataset):
 
     g = GeneralStudyModuleAttr.objects.create()
     ch = get_value_kw('SpecificCharacterSet', dataset)
-    _generalstudymoduleattributes(dataset, g, ch)
     _generalequipmentmoduleattributes(dataset, g, ch)
+    _generalstudymoduleattributes(dataset, g, ch)
     _patientstudymoduleattributes(dataset, g)
     _patientmoduleattributes(dataset, g, ch)
 
