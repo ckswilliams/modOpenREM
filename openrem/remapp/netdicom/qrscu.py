@@ -565,8 +565,6 @@ def qrscu(
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
-    logger.debug("SOPClassUIDs in study: {}".format(
-        list(set(val for dic in study_rsp.values('sop_classes_in_study') for val in dic.values()))))
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
