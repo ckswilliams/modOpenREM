@@ -263,7 +263,6 @@ def _query_images(my_ae, remote_ae, seriesrsp):
     assoc_images.Release(0)
 
 
-
 def _query_series(my_ae, remote_ae, d2, studyrsp):
     from time import sleep
     from remapp.tools.get_values import get_value_kw
@@ -276,6 +275,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     d2.NumberOfSeriesRelatedInstances = ''
     d2.StationName = ''
 
+    logger.debug('In _query_series')
     logger.debug('d2: {0}'.format(d2))
 
     assoc_series = my_ae.RequestAssociation(remote_ae)
@@ -294,7 +294,6 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
 
     query_id = uuid.uuid4()
 
-    logger.debug('In _query_series')
     seRspNo = 0
 
     for series in st2:
@@ -341,7 +340,6 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
     d.PatientBirthDate = ''
     d.NumberOfStudyRelatedSeries = ''
     d.StationName = ''
-    d.SOPClassesInStudy = ''
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
