@@ -581,7 +581,7 @@ def qrscu(
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
     # if remote doesn't match on modality it won't return a populated ModalitiesInStudy.
-    if modality_matching:
+    if modalities_returned:
         for study in study_rsp:
             mods = study.get_modalities_in_study()
             if inc_sr and mods != ['SR']:
@@ -621,8 +621,8 @@ def qrscu(
         d2 = Dataset()
         d2.StudyInstanceUID = rsp.study_instance_uid
         _query_series(MyAE, RemoteAE, d2, rsp)
-        if not modality_matching:
-            logger.debug("modality_matching = False, so building from series info")
+        if not modalities_returned:
+            logger.debug("modalities_returned = False, so building from series info")
             series_rsp = rsp.dicomqrrspseries_set.all()
             rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values()))) 
 
