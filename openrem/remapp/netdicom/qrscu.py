@@ -398,10 +398,21 @@ def _echo(assoc):
 
 
 def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
+    """
+    Uses _query_study for each modality we've asked for, and populates study level response data in the database
+    :param all_mods: dict of dicts indicating which modalities to request
+    :param query: DicomQuery object
+    :param d: Dataset object containing StudyDate
+    :param MyAE: Calling AE Title
+    :param RemoteAE: Called AE Title
+    :return: modalities_returned = whether ModalitiesInStudy is returned populated; modality_matching = whether
+             responses have been filtered based on requested modality
+    """
 
     # Assume that ModalitiesInStudy is a Matching Key Attribute
     # If not, 1 query is sufficient to retrieve all relevant studies
     modality_matching = True
+    modalities_returned = False
 
     # query for all requested studies
     # if ModalitiesInStudy is not supported by the PACS set modality_matching to False and stop querying further
@@ -416,15 +427,16 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
                     query_id = uuid.uuid4()
                     _query_study(MyAE, RemoteAE, d, query, query_id)
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
-                    for rsp in study_rsp:
-                        if mod not in rsp.get_modalities_in_study():
-                            # get_modalities_in_study might be blank, in which case assume we haven't matched on
-                            # modality?
-                            modality_matching = False
-                            logger.debug("Remote node doesn't support ModalitiesInStudy as a Matching Key")
-                            break  # This indicates that there was no modality match, so we have everything already
-    logger.debug("modality_matching: {}".format(modality_matching))
-    return modality_matching
+                    for rsp in study_rsp:  # First check if modalities in study has been populated
+                        if rsp.get_modalities_in_study():
+                            modalities_returned = True
+                            # Then check for inappropriate responses
+                            if mod not in rsp.get_modalities_in_study():
+                                modality_matching = False
+                                logger.debug("Remote node returns but doesn't match against ModalitiesInStudy")
+                                break  # This indicates that there was no modality match, so we have everything already
+    logger.debug("modalitie_returned: {0}; modality_matching: {1}".format(modalities_returned, modality_matching))
+    return modalities_returned, modality_matching
 
 
 
@@ -561,7 +573,7 @@ def qrscu(
             all_mods[m]['inc'] = True
 
     # query for all requested studies
-    modality_matching = _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE)
+    modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE)
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
     study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
