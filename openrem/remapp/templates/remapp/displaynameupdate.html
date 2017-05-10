@@ -5,7 +5,7 @@
 {% block navhelp %}
         <li>
             <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_displaynames.html#changing-x-ray-system-display-names" target="_blank" data-toggle="tooltip" title="Display name documentation - opens in a new tab">
-                Changing display names
+                Changing display names and / or modality type
             </a>
         </li>
 {% endblock %}
@@ -38,8 +38,19 @@
   </table>
 
   {% if admin.admingroup %}
-      Enter new display name to be used for all of the above systems:
-      <input name="new_display_name" type="text" value="" /><br>
+  	  <table>
+  	  <tr>
+  	  	<td>Enter new display name to be used for all of the above systems:</td>
+  	  	<td><input name="new_display_name" type="text" value="" /></td>
+  	  </tr>
+  	  <tr>
+      	<td>And / or enter a user defined modality type for all of the above systems:</td>
+      	<td><select name="new_user_defined_modality">
+        	  <option value="">[Not changed]</option>
+      		  <option value="DX">DX</option>
+      		  <option value="RF">RF</option>
+      	</select></td>
+      </tr>
       <input id="pks" name="pks" type="hidden" value="" />
 
       <script>
