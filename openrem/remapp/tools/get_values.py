@@ -165,6 +165,13 @@ def return_for_export(model, field):
         return None
 
 
+def string_to_float(string_number):
+    try:
+        return float(string_number)
+    except TypeError:
+        return None
+
+
 def safe_strings(string, char_set=charset.default_encoding):
     try:
         python_char_set = charset.python_encoding[char_set]
@@ -175,9 +182,8 @@ def safe_strings(string, char_set=charset.default_encoding):
 
 def replace_comma(comma_string):
     if comma_string:
-        no_comma_string = comma_string.replace(","," ").replace(";"," ")
+        no_comma_string = comma_string.replace(",", " ").replace(";", " ")
         return no_comma_string
-    return comma_string
 
 
 def export_safe(ascii_string):

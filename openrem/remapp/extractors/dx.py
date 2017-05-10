@@ -86,9 +86,14 @@ def _xrayfilters(filttype, material, thickmax, thickmin, source):
             filters.xray_filter_material = get_or_create_cid('C-132F9', 'Lead or Lead compound')
         if material.strip().lower() == 'tantalum':
             filters.xray_filter_material = get_or_create_cid('C-156F9', 'Tantalum or Tantalum compound')
-    if thickmax:
+    if thickmax is not None and thickmin is not None:
+        if thickmax < thickmin:
+            tempmin = thickmax
+            thickmax = thickmin
+            thickmin = tempmin
+    if thickmax is not None:
         filters.xray_filter_thickness_maximum = thickmax
-    if thickmin:
+    if thickmin is not None:
         filters.xray_filter_thickness_minimum = thickmin
     filters.save()
 
@@ -102,9 +107,6 @@ def _xrayfiltersnone(source):
 
 
 def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source):
-    from dicom.valuerep import MultiValue
-    if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
-        xray_filter_material = xray_filter_material.split(',')
     for i, material in enumerate(xray_filter_material):
         try:
             thickmax = None
@@ -116,6 +118,74 @@ def _xray_filters_multiple(xray_filter_material, xray_filter_thickness_maximum, 
             _xrayfilters('FLAT', material, thickmax, thickmin, source)
         except IndexError:
             pass
+
+def _xray_filters_prep(dataset, source):
+    from dicom.valuerep import MultiValue
+    from remapp.tools.get_values import get_value_kw
+
+    xray_filter_type = get_value_kw('FilterType', dataset)
+    xray_filter_material = get_value_kw('FilterMaterial', dataset)
+
+    # Explicit no filter, register as such
+    if xray_filter_type == 'NONE':
+        _xrayfiltersnone(source)
+        return
+    # Implicit no filter, just ignore
+    if xray_filter_material is None:
+        return
+
+    # Get multiple filters into dicom MultiValue or lists
+    if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
+        xray_filter_material = xray_filter_material.split(',')
+
+    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+        else:
+            xray_filter_thickness_minimum = None
+
+    try:
+        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+        else:
+            xray_filter_thickness_maximum = None
+
+    if type(xray_filter_material) is list:
+        _xray_filters_multiple(
+            xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
+    else:
+        # deal with known Siemens filter records
+        siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
+        if xray_filter_type in siemens_filters:
+            if xray_filter_type == "CU_0.1_MM":
+                thickmax = 0.1
+                thickmin = 0.1
+            elif xray_filter_type == "CU_0.2_MM":
+                thickmax = 0.2
+                thickmin = 0.2
+            elif xray_filter_type == "CU_0.3_MM":
+                thickmax = 0.3
+                thickmin = 0.3
+            _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
+        else:
+            _xrayfilters(
+                xray_filter_type, xray_filter_material, xray_filter_thickness_maximum,
+                xray_filter_thickness_minimum, source
+            )
 
 
 def _kvp(dataset, source):
@@ -231,59 +301,7 @@ def _irradiationeventxraysourcedata(dataset, event):
     source.grid_period = get_value_kw('GridPeriod', dataset)
     source.grid_focal_distance = get_value_kw('GridFocalDistance', dataset)
     source.save()
-    xray_filter_type = get_value_kw('FilterType', dataset)
-    xray_filter_material = get_value_kw('FilterMaterial', dataset)
-
-    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except ValueError:  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187052, thick2)
-            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-        else:
-            xray_filter_thickness_minimum = None
-
-    try:
-        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except ValueError:  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187054, thick2)
-            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-        else:
-            xray_filter_thickness_maximum = None
-
-    if xray_filter_type:
-        if xray_filter_type == 'NONE':
-            _xrayfiltersnone(source)
-        elif xray_filter_type == 'MULTIPLE' and xray_filter_material:
-            _xray_filters_multiple(
-                xray_filter_material, xray_filter_thickness_maximum, xray_filter_thickness_minimum, source)
-        else:
-            siemens_filters = ("CU_0.1_MM", "CU_0.2_MM", "CU_0.3_MM")
-            if xray_filter_type in siemens_filters:
-                if xray_filter_type == "CU_0.1_MM":
-                    thickmax = 0.1
-                    thickmin = 0.1
-                elif xray_filter_type == "CU_0.2_MM":
-                    thickmax = 0.2
-                    thickmin = 0.2
-                elif xray_filter_type == "CU_0.3_MM":
-                    thickmax = 0.3
-                    thickmin = 0.3
-                _xrayfilters("FLAT", "COPPER", thickmax, thickmin, source)
-            else:
-                _xrayfilters(
-                    xray_filter_type, xray_filter_material, xray_filter_thickness_maximum,
-                    xray_filter_thickness_minimum, source
-                )
+    _xray_filters_prep(dataset, source)
     _kvp(dataset, source)
     _exposure(dataset, source)
 
@@ -351,10 +369,15 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
     event.date_time_started = make_date_time('{0}{1}'.format(event_date, event_time))
     event.irradiation_event_type = get_or_create_cid('113611', 'Stationary Acquisition')
     event.acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
+    if not event.acquisition_protocol:
+        manufacturer = get_value_kw('Manufacturer', dataset, char_set=ch)
+        software_versions = get_value_kw('SoftwareVersions', dataset, char_set=ch)
+        if manufacturer == 'TOSHIBA_MEC' and software_versions == 'TM_TFD_1.0':
+            event.acquisition_protocol = get_value_kw('ImageComments', dataset, char_set=ch)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw(
         'SeriesDescription', dataset, char_set=ch)
-    # TODO: Establish why ProtocolName is extracted and never used
-    acquisition_protocol = get_value_kw('ProtocolName', dataset, char_set=ch)
+    if not event.acquisition_protocol: event.acquisition_protocol = get_seq_code_meaning(
+        'PerformedProtocolCodeSequence', dataset, char_set=ch)
     series_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
     if series_description:
         event.comment = series_description
@@ -582,13 +605,15 @@ def _generalstudymoduleattributes(dataset, g):
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription', dataset, char_set=ch)
     if not g.study_description: g.study_description = get_value_kw('SeriesDescription', dataset, char_set=ch)
+    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
     g.modality_type = get_value_kw('Modality', dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset, char_set=ch)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset, char_set=ch)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
     g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
     # Being used to summarise protocol for study:
-    g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch)
+    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('ProtocolName', dataset, char_set=ch)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription', dataset, char_set=ch)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription', dataset, char_set=ch)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
@@ -596,9 +621,13 @@ def _generalstudymoduleattributes(dataset, g):
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
+        'ProcedureCodeSequence', dataset)
+    if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
         'RequestAttributesSequence', dataset, char_set=ch)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
+        'ProcedureCodeSequence', dataset, char_set=ch)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(
         0x00321060, dataset, char_set=ch)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(

@@ -46,6 +46,11 @@ ALLOWED_HOSTS = [
     '*',
 ]
 
+# Date format for exporting data to Excel xlsx files.
+# Default in OpenREM is dd/mm/yyyy. Override it by uncommenting and customising below; a full list of codes is available
+# at https://msdn.microsoft.com/en-us/library/ee634398.aspx.
+# XLSX_DATE = 'mm/dd/yyyy'
+
 # Logging configuration
 # Set the log file location. The example places the log file in the media directory. Change as required - on linux
 # systems you might put these in a subdirectory of /var/log/. If you want all the logs in one file, set the filename
@@ -67,3 +72,13 @@ LOGGING['handlers']['store_file']['formatter'] = 'verbose'  # Store SCP logs
 LOGGING['loggers']['remapp']['level'] = 'INFO'                    # General logs
 LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
 LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
+
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# In a Windows environment this must be set to your system time zone.
+TIME_ZONE = 'Europe/London'
+
+# Language code for this installation. All choices can be found here:
+# http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en-us'

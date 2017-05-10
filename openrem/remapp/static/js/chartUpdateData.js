@@ -87,7 +87,7 @@ function updateOverTimeChart(name_list, over_time_data, series_colours, url_star
 
             temp.push({
                 y: current_value,
-                url: url_start + name_list[i] + '&date_after=' + date_after + '&date_before=' + date_before
+                url: encodeURI(url_start + name_list[i] + '&date_after=' + date_after + '&date_before=' + date_before)
             });
         }
 
@@ -129,7 +129,7 @@ function updateFrequencyChart(name_list, system_list, summary_data, url_start, c
         piechart_data[i] = {
             name: name_list[i],
             y: data_counts,
-            url: url_start + name_list[i]
+            url: encodeURI(url_start + name_list[i])
         };
     }
 

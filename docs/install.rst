@@ -128,6 +128,15 @@ after a hostname allows for FQDNs (eg doseserver.ad.trust.nhs.uk).
 Alternatively, a single ``'*'`` allows any host, but removes the security
 the feature gives you.
 
+Customised date format in xlsx exports
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+# TODO: check csv situation
+The default date form at for OpenREM xlsx exports is dd/mm/yyyy. If you wish to customise this, uncomment the
+`XLSX_DATE` line, for example the standard US date format would be::
+
+    XLSX_DATE = 'mm/dd/yyyy'
+
 .. _local_settings_logfile:
 
 Log file
@@ -169,6 +178,28 @@ progressively less logging.
     LOGGING['loggers']['remapp.netdicom.qrscu']['level'] = 'INFO'     # Query Retrieve SCU logs
     LOGGING['loggers']['remapp.netdicom.storescp']['level'] = 'INFO'  # Store SCP logs
 
+Time zone
+^^^^^^^^^
+
+Configure the local timezone in order to get correct times in the logfiles.
+The default timezone is set at 'Europe/London'. Valid options can be found here: 
+http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+
+.. sourcecode:: python
+
+    TIME_ZONE = 'Europe/London'
+
+Language
+^^^^^^^^
+
+Configure the local language. Default language is set at us-english. Valid options can be found here: 
+http://www.i18nguy.com/unicode/language-identifiers.html
+
+.. sourcecode:: python
+
+    LANGUAGE_CODE = 'en-us'
+
+.. _database_creation:
 
 Create the database
 -------------------
