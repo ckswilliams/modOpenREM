@@ -26,6 +26,7 @@ OpenREM version history
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
 * `#440`_  Charts: Fixed a bug in sorting.js so that undefined strings are handled correctly
 * `#439`_  Charts: Added controls for plotting a series per system and calculation histogram data to each filtered view
+* `#438`_  Skin dose maps: skin dose maps successfully calculated from existing studies; indication of assumed or extracted data shown
 * `#431`_  Imports: fixed DX imports with MultiValue filter values (Cu+Al) again!
 * `#430`_  Exports: Fixed DX exports with multiple filters again, added tests
 * `#429`_  Charts: Added new mammo scatter plots. Thanks to `@rijkhorst`_
