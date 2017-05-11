@@ -98,6 +98,15 @@ def _filter(query, level, filter_name, filter_list, filter_type):
 
 
 def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
+    """
+    For each study level response, remove any series that we know can't be used.
+    :param MyAE: Calling AE Tile
+    :param RemoteAE: Called AE Title
+    :param query: Current DicomQuery object
+    :param all_mods: Ordered dict of dicts detailing modalities we are interested in
+    :param filters: Include and exclude lists for StationName (and StudyDescription)
+    :return Series level response database rows are deleted if not useful
+    """
     query.stage = "Deleting series we can't use"
     query.save()
     logger.info("Deleting series we can't use")
@@ -105,10 +114,12 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
     study_rsp = query.dicomqrrspstudy_set.all()
 
     if filters['stationname_inc']:
-       _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_inc'], filter_type='include')
+        _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_inc'],
+                filter_type='include')
 
     if filters['stationname_exc']:
-       _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_exc'], filter_type='exclude')
+        _filter(query, level='series', filter_name='station_name', filter_list=filters['stationname_exc'],
+                filter_type='exclude')
 
     for study in study_rsp:
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
@@ -192,16 +203,23 @@ def _prune_study_responses(query, filters):
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
 def _check_sr_type_in_study(my_ae, remote_ae, study):
+    """
+    Checks at an image level whether SR in study is RDSR, ESR, or something else (Radiologist's report for example)
+    :param my_ae: Calling AE Title
+    :param remote_ae: Called AE Title
+    :param study: Study to check SR type of
+    :return: String of 'RDSR', 'ESR', or 'no_dose_report'
+    """
     # select series with modality SR
     series_sr = study.dicomqrrspseries_set.filter(modality__exact='SR')
     logger.info("Number of series with SR {0}".format(series_sr.count()))
     sopclasses = set()
-    for s in series_sr:
-        _query_images(my_ae, remote_ae, s)
-        images = s.dicomqrrspimage_set.all()
+    for sr in series_sr:
+        _query_images(my_ae, remote_ae, sr)
+        images = sr.dicomqrrspimage_set.all()
         sopclasses.add(images[0].sop_class_uid)
         logger.info("studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
-            study.study_instance_uid, s.series_instance_uid, images.count(), sopclasses))
+            study.study_instance_uid, sr.series_instance_uid, images.count(), sopclasses))
     logger.info("sopclasses: {0}".format(sopclasses))
     if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
         return 'RDSR'
@@ -464,7 +482,7 @@ def qrscu(
       modalities(list, optional): Modalities to search for, options are CT, MG, DX and FL (Default value = None)
       inc_sr(bool, optional): Only include studies that only have structured reports in (unknown modality) (Default value = False)
       remove_duplicates(bool, optional): If True, studies that already exist in the database are removed from the query results (Default value = True)
-      filters(dictionary list, optional): include en exclude lists for SOPClassUID, StationName and StudyDescription (Default value = None)
+      filters(dictionary list, optional): include and exclude lists for StationName and StudyDescription (Default value = None)
       *args:
       **kwargs:
 
@@ -626,9 +644,6 @@ def qrscu(
             series_rsp = rsp.dicomqrrspseries_set.all()
             rsp.set_modalities_in_study(list(set(val for dic in series_rsp.values('modality') for val in dic.values()))) 
 
-
-    # if ModalitiesInStudy is not populated by PACS, manually weed out all studies that we're not interested in
-    # however.. we first have to retrieve all series, in order to build modalities_in_study
     if not modality_matching:
         mods_in_study_set = set(val for dic in study_rsp.values('modalities_in_study') for val in dic.values())
         logger.debug("mods in study are: {0}".format(study_rsp.values('modalities_in_study')))
@@ -639,7 +654,7 @@ def qrscu(
         for mod_set in mods_in_study_set:
             logger.info("mod_set is {0}".format(mod_set))
             delete = True
-            for mod_choice, details in all_mods.iteritems():
+            for mod_choice, details in all_mods.items():
                 logger.info("mod_choice {0}, details {1}".format(mod_choice, details))
                 if details['inc']:
                     for mod in details['mods']:
