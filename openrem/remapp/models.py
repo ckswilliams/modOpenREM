@@ -157,7 +157,7 @@ class DicomQRRspSeries(models.Model):
     series_description = models.TextField(blank=True, null=True)
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
     station_name = models.CharField(max_length=16, blank=True, null=True)
-    sop_classes_in_series = models.TextField(blank=True,null=True)
+    sop_class_in_series = models.TextField(blank=True,null=True)
 
 
 class DicomQRRspImage(models.Model):

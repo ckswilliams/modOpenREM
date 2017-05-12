@@ -218,12 +218,20 @@ def _check_sr_type_in_study(my_ae, remote_ae, study):
         _query_images(my_ae, remote_ae, sr)
         images = sr.dicomqrrspimage_set.all()
         sopclasses.add(images[0].sop_class_uid)
+        sr.sop_class_in_series = images[0].sop_class_uid
+        sr.save()
         logger.info("studyuid: {0}   seriesuid: {1}   nrimages: {2}   sopclasses: {3}".format(
             study.study_instance_uid, sr.series_instance_uid, images.count(), sopclasses))
     logger.info("sopclasses: {0}".format(sopclasses))
     if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
+        for sr in series_sr:
+            if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.67':
+                sr.delete()
         return 'RDSR'
     elif '1.2.840.10008.5.1.4.1.1.88.22' in sopclasses:
+        for sr in series_sr:
+            if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.22':
+                sr.delete()
         return 'ESR'
     else:
         return 'no_dose_report'
@@ -234,6 +242,9 @@ def _query_images(my_ae, remote_ae, seriesrsp):
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspImage
     from dicom.dataset import Dataset
+
+    logger.debug('In _query_images')
+
     d3 = Dataset()
     d3.QueryRetrieveLevel = "IMAGE"
     d3.SeriesInstanceUID = seriesrsp.series_instance_uid
@@ -249,17 +260,16 @@ def _query_images(my_ae, remote_ae, seriesrsp):
         logger.warning("Query series association must have failed, trying again")
         sleep(2)
         assoc_images = my_ae.RequestAssociation(remote_ae)
-        #if not assoc_images:
-        #    logger.error(
-        #        "Query instance association has failed. Me: {0}, Remote: {1}, StudyInstanceUID: {2}, SeriesInstanceUID: {3}".format(
-        #            my_ae, remote_ae, d3.SOPInstanceUID, d2.SeriesInstanceUID))
-        #    return
+        if not assoc_images:
+            logger.error(
+               "Query instance association failed. Me: {0}, Remote: {1}, Study UID: {2}, Se UID {3}, Im {4}".format(
+                   my_ae, remote_ae, d3.SOPInstanceUID, d3.SeriesInstanceUID, d3.InstanceNumber))
+            return
 
     st3 = assoc_images.StudyRootFindSOPClass.SCU(d3, 1)
 
     query_id = uuid.uuid4()
 
-    logger.debug('In _query_images')
     imRspNo = 0
 
     for images in st3:
@@ -273,7 +283,7 @@ def _query_images(my_ae, remote_ae, seriesrsp):
         imagesrsp.sop_instance_uid = images[1].SOPInstanceUID
         imagesrsp.sop_class_uid = images[1].SOPClassUID
         imagesrsp.instance_number = images[1].InstanceNumber
-        if not imagesrsp.instance_number:  # despite it being mandatory!
+        if not imagesrsp.instance_number:  # just in case!!
             imagesrsp.instance_number = None  # integer so can't be ''
 
         imagesrsp.save()
