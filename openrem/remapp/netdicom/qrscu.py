@@ -133,7 +133,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
 
             # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
             # be weeded out
-        if all_mods['DX']['inc'] and ('CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study()):
+        elif all_mods['DX']['inc'] and ('CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study()):
             study.modality = 'DX'
             study.save()
 
@@ -143,15 +143,19 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 series.exclude(modality__exact='SR').delete()
 
                 # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
-        if all_mods['FL']['inc'] and ('RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study()):
+
+        elif all_mods['FL']['inc'] and ('RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study()):
                 study.modality = 'FL'
                 study.save()
-                # Assume structured reports have modality 'SR' at series level?
-                # No sense in checking SR?
+                sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study)
+                logger.debug("FL study, check_sr_type returned {0}".format(sr_type))
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
+                if sr_type == "no_dose_report":
+                    study.delete()
+                    logger.debug("FL study, no RDSR or ESR. Deleted.")
 
-        if all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
+        elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
             study.modality = 'CT'
             study.save()
             series = study.dicomqrrspseries_set.all()
