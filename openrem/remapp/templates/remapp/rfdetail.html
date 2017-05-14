@@ -307,15 +307,17 @@
         {% endif %}
 
     </div>
-
 <table class="table table-striped table-bordered small">
-    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th><th>Orientation</th>
+    <th>Time</th><th>Acquisition protocol</th><th>Event type</th><th>Pulse rate <span style="white-space:nowrap">(s<sup>-1</sup>)</span></th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Dose at reference point (mGy)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Primary angle (&deg;)</th><th>Secondary angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th><th>Orientation</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
+        <td>{{ event.irradiation_event_type }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
         <td>{{ event.convert_gym2_to_cgycm2|floatformat:3 }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
@@ -331,6 +333,7 @@
             {% endfor %}
         </td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
+        <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_secondary_angle|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
 		    <td>{{ event.patient_table_relationship_cid|title }}, {{ event.patient_orientation_cid|title }}, {{ event.patient_orientation_modifier_cid|title }}
