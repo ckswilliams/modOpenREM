@@ -45,6 +45,17 @@
                 </li>
                 <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
+            <br>
+            <table>
+                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th>
+                {% for irr_type in study_totals %}
+                    <tr>
+                    {% for irr_element in irr_type %}
+                        <td>{{ irr_element }}</td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
             </ul>
         </div>
 
