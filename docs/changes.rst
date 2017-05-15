@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
