@@ -327,8 +327,8 @@
         <td>{{ event.irradiation_event_type }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
-        <td>{{ event.convert_gym2_to_cgycm2|floatformat:3 }}</td>
-        <td>{{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy|floatformat:1 }}</td>
+        <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
+        <td><script>document.write({{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy }}.toPrecision(3));</script></td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
