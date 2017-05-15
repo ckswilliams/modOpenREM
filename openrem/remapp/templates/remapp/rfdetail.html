@@ -319,7 +319,22 @@
 
     </div>
 <table class="table table-striped table-bordered small">
-    <th>Time</th><th>Acquisition protocol</th><th>Event type</th><th>Pulse rate <span style="white-space:nowrap">(s<sup>-1</sup>)</span></th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Dose at reference point (mGy)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Primary angle (&deg;)</th><th>Secondary angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th><th>Orientation</th>
+  <th>Time</th>
+  <th>Acquisition protocol</th>
+  <th>Event type</th>
+  <th>Pulse rate <span style="white-space:nowrap">(s<sup>-1</sup>)</span></th>
+  <th>Plane</th>
+  <th>DAP (cGy.cm<sup>2</sup>)</th>
+  <th>Dose at reference point (mGy)</th>
+  <th>Exposure time (ms)</th>
+  <th>kVp</th>
+  <th>mA</th>
+  <th>Filters (mm)</th>
+  <th>Primary angle (&deg;)</th>
+  <th>Secondary angle (&deg;)</th>
+  <th>Detector size (mm)</th>
+  <th>SDD (mm)</th>
+  <th>Orientation</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
