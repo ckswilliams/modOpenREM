@@ -615,9 +615,18 @@ def rf_detail_view(request, pk=None):
     """
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
+    from django.db.models import Sum
+    import numpy as np
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
+        stu_inc_totals = GeneralStudyModuleAttr.objects.filter(pk=pk).annotate(
+            sum_dap = Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
+            sum_dose_rp = Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
+        ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+        stu_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+        stu_irr_types = stu_inc_totals.values_list('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
+        study_totals = np.column_stack((stu_irr_types, stu_totals)).tolist()
     except:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
@@ -638,7 +647,8 @@ def rf_detail_view(request, pk=None):
 
     return render_to_response(
         'remapp/rfdetail.html',
-        {'generalstudymoduleattr': study, 'admin': admin},
+        {'generalstudymoduleattr': study, 'admin': admin,
+         'study_totals': study_totals},
         context_instance=RequestContext(request)
     )
 
