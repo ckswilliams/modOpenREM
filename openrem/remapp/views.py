@@ -1652,15 +1652,15 @@ def display_names_view(request):
     #if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
     #so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
     ct_names = f.filter(Q(user_defined_modality="CT") | (
-                        Q(user_defined_modality="") & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
     mg_names = f.filter(Q(user_defined_modality="MG") | (
-                        Q(user_defined_modality="") & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
     dx_names = f.filter(Q(user_defined_modality="DX") | (
-                        Q(user_defined_modality="") & (Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
-                                                       Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+                        Q(user_defined_modality__isnull=True) & (Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+                                                                 Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
     rf_names = f.filter(Q(user_defined_modality="RF") | (
-                        Q(user_defined_modality="") & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
-    ot_names = f.filter(~Q(user_defined_modality="") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+    ot_names = f.filter(~Q(user_defined_modality__isnull=True) | (
                         ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
                         ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
                         ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
