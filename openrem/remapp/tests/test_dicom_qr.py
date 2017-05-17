@@ -489,3 +489,57 @@ class ResponseFiltering(TestCase):
         studies = query.dicomqrrspstudy_set.all()
         for study in studies:
             self.assertTrue(u"goodstation" in study.station_name)
+
+def _fake_image_query(my_ae, remote_ae, sr):
+    return
+
+class PruneSeriesResponses(TestCase):
+    """
+    Test case for the study or series level filtering for desired or otherwise station names, study descriptions etc
+    Function tested is qrscu._filter
+    """
+    def setUp(self):
+        """
+        """
+
+        self.all_mods = {'CT': {'inc': True, 'mods': ['CT']},
+                    'MG': {'inc': True, 'mods': ['MG']},
+                    'FL': {'inc': True, 'mods': ['RF', 'XA']},
+                    'DX': {'inc': True, 'mods': ['DX', 'CR']}
+                    }
+        self.filters = {
+            'stationname_inc': None,
+            'stationname_exc': None,
+            'study_desc_inc': None,
+            'study_desc_exc': None,
+        }
+
+
+        query = DicomQuery.objects.create()
+        query.query_id = "MammoNoSR"
+        query.save()
+
+        rst1 = DicomQRRspStudy.objects.create(dicom_query=query)
+        rst1.query_id = query.query_id
+        rst1.study_instance_uid = uuid.uuid4()
+        rst1.study_description = u"MG study no SR"
+        rst1.set_modalities_in_study(['MG'])
+        rst1.save()
+
+        rst1s1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=rst1)
+        rst1s1.query_id = query.query_id
+        rst1s1.series_instance_uid = uuid.uuid4()
+        rst1s1.modality = u"MG"
+        rst1s1.series_number = 1
+        rst1s1.number_of_series_related_instances = 1
+        rst1s1.save()
+
+    def test_prune_ser_resp_mg_no_sr(self):
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.get(query_id__exact="MammoNoSR")
+        all_mods = self.all_mods
+        filters = self.filters
+        _prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
