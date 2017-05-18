@@ -670,8 +670,8 @@ class PruneSeriesResponses(TestCase):
     @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
     def test_prune_ser_resp_dx_with_sr(self):
         """
-        Test _prune_series_responses with DX exam with two SRs, one RDSR and one Basic SR.
-        :return: DX series and basic SR series should be deleted.
+        Test _prune_series_responses with DX exam with three SRs, one RDSR, one ESR and one Basic SR.
+        :return: DX series, ESR and basic SR series should be deleted.
         """
         from remapp.netdicom.qrscu import _prune_series_responses
 
@@ -679,48 +679,62 @@ class PruneSeriesResponses(TestCase):
         query.query_id = "DXWithSR"
         query.save()
 
-        st2 = DicomQRRspStudy.objects.create(dicom_query=query)
-        st2.query_id = query.query_id
-        st2.study_instance_uid = uuid.uuid4()
-        st2.study_description = u"DX study with RDSR"
-        st2.set_modalities_in_study(['DX', 'SR'])
-        st2.save()
+        st1 = DicomQRRspStudy.objects.create(dicom_query=query)
+        st1.query_id = query.query_id
+        st1.study_instance_uid = uuid.uuid4()
+        st1.study_description = u"DX study with RDSR"
+        st1.set_modalities_in_study(['DX', 'SR'])
+        st1.save()
 
-        st2_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
-        st2_se1.query_id = query.query_id
-        st2_se1.series_instance_uid = uuid.uuid4()
-        st2_se1.modality = u"DX"
-        st2_se1.series_number = 1
-        st2_se1.number_of_series_related_instances = 1
-        st2_se1.save()
+        st1_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se1.query_id = query.query_id
+        st1_se1.series_instance_uid = uuid.uuid4()
+        st1_se1.modality = u"DX"
+        st1_se1.series_number = 1
+        st1_se1.number_of_series_related_instances = 1
+        st1_se1.save()
 
-        st2_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
-        st2_se2.query_id = query.query_id
-        st2_se2.series_instance_uid = uuid.uuid4()
-        st2_se2.modality = u"SR"
-        st2_se2.series_number = 2
-        st2_se2.number_of_series_related_instances = 1
-        st2_se2.save()
+        st1_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se2.query_id = query.query_id
+        st1_se2.series_instance_uid = uuid.uuid4()
+        st1_se2.modality = u"SR"
+        st1_se2.series_number = 2
+        st1_se2.number_of_series_related_instances = 1
+        st1_se2.save()
 
-        st2_se2_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st2_se2)
-        st2_se2_im1.query_id = query.query_id
-        st2_se2_im1.sop_instance_uid = uuid.uuid4()
-        st2_se2_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.67'
-        st2_se2_im1.save()
+        st1_se2_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se2)
+        st1_se2_im1.query_id = query.query_id
+        st1_se2_im1.sop_instance_uid = uuid.uuid4()
+        st1_se2_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.67'
+        st1_se2_im1.save()
 
-        st2_se3 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
-        st2_se3.query_id = query.query_id
-        st2_se3.series_instance_uid = uuid.uuid4()
-        st2_se3.modality = u"SR"
-        st2_se3.series_number = 3
-        st2_se3.number_of_series_related_instances = 1
-        st2_se3.save()
+        st1_se3 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se3.query_id = query.query_id
+        st1_se3.series_instance_uid = uuid.uuid4()
+        st1_se3.modality = u"SR"
+        st1_se3.series_number = 3
+        st1_se3.number_of_series_related_instances = 1
+        st1_se3.save()
 
-        st2_se3_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st2_se3)
-        st2_se3_im1.query_id = query.query_id
-        st2_se3_im1.sop_instance_uid = uuid.uuid4()
-        st2_se3_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.11'
-        st2_se3_im1.save()
+        st1_se3_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se3)
+        st1_se3_im1.query_id = query.query_id
+        st1_se3_im1.sop_instance_uid = uuid.uuid4()
+        st1_se3_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.11'
+        st1_se3_im1.save()
+
+        st1_se4 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se4.query_id = query.query_id
+        st1_se4.series_instance_uid = uuid.uuid4()
+        st1_se4.modality = u"SR"
+        st1_se4.series_number = 4
+        st1_se4.number_of_series_related_instances = 1
+        st1_se4.save()
+
+        st1_se4_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se4)
+        st1_se4_im1.query_id = query.query_id
+        st1_se4_im1.sop_instance_uid = uuid.uuid4()
+        st1_se4_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.22'
+        st1_se4_im1.save()
 
         query = DicomQuery.objects.get(query_id__exact="DXWithSR")
         all_mods = self.all_mods
