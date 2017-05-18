@@ -514,8 +514,6 @@ class PruneSeriesResponses(TestCase):
             'study_desc_exc': None,
         }
 
-
-
     def test_prune_ser_resp_mg_no_sr(self):
         """
         Test _prune_series_responses with mammo exam with no SR.
@@ -552,7 +550,7 @@ class PruneSeriesResponses(TestCase):
         self.assertEqual(series.count(), 1)
 
     @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
-    def test_prune_ser_resp_mv_with_sr(self):
+    def test_prune_ser_resp_mg_with_sr(self):
         """
         Test _prune_series_responses with mammo exam with two SRs, one RDSR and one Basic SR.
         :return: MG series and basic SR series should be deleted.
@@ -607,6 +605,124 @@ class PruneSeriesResponses(TestCase):
         st2_se3_im1.save()
 
         query = DicomQuery.objects.get(query_id__exact="MammoWithSR")
+        all_mods = self.all_mods
+        filters = self.filters
+        _prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        sr_instance = series[0].dicomqrrspimage_set.get()
+        self.assertEqual(sr_instance.sop_class_uid, u'1.2.840.10008.5.1.4.1.1.88.67')
+
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_cr_no_rdsr(self):
+        """
+        Test _prune_series_responses with CR exam with no RDSR but with Basic SR.
+        :return: Basic SR deleted, study.modality set to "DX"
+        """
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.create()
+        query.query_id = "CRNoRDSR"
+        query.save()
+
+        st1 = DicomQRRspStudy.objects.create(dicom_query=query)
+        st1.query_id = query.query_id
+        st1.study_instance_uid = uuid.uuid4()
+        st1.study_description = u"CR study no SR"
+        st1.set_modalities_in_study(['CR', 'SR'])
+        st1.save()
+
+        st1_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se1.query_id = query.query_id
+        st1_se1.series_instance_uid = uuid.uuid4()
+        st1_se1.modality = u"CR"
+        st1_se1.series_number = 1
+        st1_se1.number_of_series_related_instances = 1
+        st1_se1.save()
+
+        st1_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st1)
+        st1_se2.query_id = query.query_id
+        st1_se2.series_instance_uid = uuid.uuid4()
+        st1_se2.modality = u"SR"
+        st1_se2.series_number = 2
+        st1_se2.number_of_series_related_instances = 1
+        st1_se2.save()
+
+        st1_se2_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st1_se2)
+        st1_se2_im1.query_id = query.query_id
+        st1_se2_im1.sop_instance_uid = uuid.uuid4()
+        st1_se2_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.11'
+        st1_se2_im1.save()
+
+        query = DicomQuery.objects.get(query_id__exact="CRNoRDSR")
+        all_mods = self.all_mods
+        filters = self.filters
+        _prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        self.assertEqual(series[0].modality, u"CR")
+        self.assertEqual(studies[0].modality, u"DX")
+
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_dx_with_sr(self):
+        """
+        Test _prune_series_responses with DX exam with two SRs, one RDSR and one Basic SR.
+        :return: DX series and basic SR series should be deleted.
+        """
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.create()
+        query.query_id = "DXWithSR"
+        query.save()
+
+        st2 = DicomQRRspStudy.objects.create(dicom_query=query)
+        st2.query_id = query.query_id
+        st2.study_instance_uid = uuid.uuid4()
+        st2.study_description = u"DX study with RDSR"
+        st2.set_modalities_in_study(['DX', 'SR'])
+        st2.save()
+
+        st2_se1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se1.query_id = query.query_id
+        st2_se1.series_instance_uid = uuid.uuid4()
+        st2_se1.modality = u"DX"
+        st2_se1.series_number = 1
+        st2_se1.number_of_series_related_instances = 1
+        st2_se1.save()
+
+        st2_se2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se2.query_id = query.query_id
+        st2_se2.series_instance_uid = uuid.uuid4()
+        st2_se2.modality = u"SR"
+        st2_se2.series_number = 2
+        st2_se2.number_of_series_related_instances = 1
+        st2_se2.save()
+
+        st2_se2_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st2_se2)
+        st2_se2_im1.query_id = query.query_id
+        st2_se2_im1.sop_instance_uid = uuid.uuid4()
+        st2_se2_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.67'
+        st2_se2_im1.save()
+
+        st2_se3 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=st2)
+        st2_se3.query_id = query.query_id
+        st2_se3.series_instance_uid = uuid.uuid4()
+        st2_se3.modality = u"SR"
+        st2_se3.series_number = 3
+        st2_se3.number_of_series_related_instances = 1
+        st2_se3.save()
+
+        st2_se3_im1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=st2_se3)
+        st2_se3_im1.query_id = query.query_id
+        st2_se3_im1.sop_instance_uid = uuid.uuid4()
+        st2_se3_im1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.11'
+        st2_se3_im1.save()
+
+        query = DicomQuery.objects.get(query_id__exact="DXWithSR")
         all_mods = self.all_mods
         filters = self.filters
         _prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)

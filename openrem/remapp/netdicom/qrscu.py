@@ -141,6 +141,10 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 logger.debug("Found RDSR in DX study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
+            elif 'SR' in study.get_modalities_in_study():
+                logger.debug("SR in DX study not RDSR, so deleting")
+                series = study.dicomqrrspseries_set.all()
+                series.filter(modality__exact='SR').delete()
 
                 # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
 
