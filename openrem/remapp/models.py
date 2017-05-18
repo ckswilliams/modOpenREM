@@ -613,6 +613,12 @@ class IrradEventXRaySourceData(models.Model):  # TID 10003b
     grid_period = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
     grid_focal_distance = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
 
+    def convert_gy_to_mgy(self):
+        """Converts Gy to mGy for display in web interface
+        """
+        if self.dose_rp:
+            return 1000*self.dose_rp
+
 
 class XrayGrid(models.Model):
     """Content ID 10017 X-Ray Grid
