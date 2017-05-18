@@ -221,6 +221,10 @@ def _check_sr_type_in_study(my_ae, remote_ae, study):
     for sr in series_sr:
         _query_images(my_ae, remote_ae, sr)
         images = sr.dicomqrrspimage_set.all()
+        if images.count() == 0:
+            logger.debug("Oops, series {0} of study instance UID {1} doesn't have any images in!".format(
+                sr.series_number, study.study_instance_uid))
+            continue
         sopclasses.add(images[0].sop_class_uid)
         sr.sop_class_in_series = images[0].sop_class_uid
         sr.save()

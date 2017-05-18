@@ -11,7 +11,7 @@ from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, Veri
 from testfixtures import LogCapture
 import uuid
 from remapp.netdicom import qrscu
-from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomRemoteQR, DicomStoreSCP
+from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage, DicomRemoteQR, DicomStoreSCP
 import collections
 
 def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
@@ -514,25 +514,71 @@ class PruneSeriesResponses(TestCase):
             'study_desc_exc': None,
         }
 
+        mg1_query = DicomQuery.objects.create()
+        mg1_query.query_id = "MammoNoSR"
+        mg1_query.save()
 
-        query = DicomQuery.objects.create()
-        query.query_id = "MammoNoSR"
-        query.save()
+        mg_st1 = DicomQRRspStudy.objects.create(dicom_query=mg1_query)
+        mg_st1.query_id = mg1_query.query_id
+        mg_st1.study_instance_uid = uuid.uuid4()
+        mg_st1.study_description = u"MG study no SR"
+        mg_st1.set_modalities_in_study(['MG'])
+        mg_st1.save()
 
-        rst1 = DicomQRRspStudy.objects.create(dicom_query=query)
-        rst1.query_id = query.query_id
-        rst1.study_instance_uid = uuid.uuid4()
-        rst1.study_description = u"MG study no SR"
-        rst1.set_modalities_in_study(['MG'])
-        rst1.save()
+        mg_st1_s1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=mg_st1)
+        mg_st1_s1.query_id = mg1_query.query_id
+        mg_st1_s1.series_instance_uid = uuid.uuid4()
+        mg_st1_s1.modality = u"MG"
+        mg_st1_s1.series_number = 1
+        mg_st1_s1.number_of_series_related_instances = 1
+        mg_st1_s1.save()
 
-        rst1s1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=rst1)
-        rst1s1.query_id = query.query_id
-        rst1s1.series_instance_uid = uuid.uuid4()
-        rst1s1.modality = u"MG"
-        rst1s1.series_number = 1
-        rst1s1.number_of_series_related_instances = 1
-        rst1s1.save()
+        mg2_query = DicomQuery.objects.create()
+        mg2_query.query_id = "MammoWithSR"
+        mg2_query.save()
+
+        mg_st2 = DicomQRRspStudy.objects.create(dicom_query=mg2_query)
+        mg_st2.query_id = mg2_query.query_id
+        mg_st2.study_instance_uid = uuid.uuid4()
+        mg_st2.study_description = u"MG study with SR"
+        mg_st2.set_modalities_in_study(['MG', 'SR'])
+        mg_st2.save()
+
+        mg_st2_s1 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=mg_st2)
+        mg_st2_s1.query_id = mg2_query.query_id
+        mg_st2_s1.series_instance_uid = uuid.uuid4()
+        mg_st2_s1.modality = u"MG"
+        mg_st2_s1.series_number = 1
+        mg_st2_s1.number_of_series_related_instances = 1
+        mg_st2_s1.save()
+
+        mg_st2_s2 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=mg_st2)
+        mg_st2_s2.query_id = mg2_query.query_id
+        mg_st2_s2.series_instance_uid = uuid.uuid4()
+        mg_st2_s2.modality = u"SR"
+        mg_st2_s2.series_number = 2
+        mg_st2_s2.number_of_series_related_instances = 1
+        mg_st2_s2.save()
+
+        mg_st2_s2_i1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=mg_st2_s2)
+        mg_st2_s2_i1.query_id = mg2_query.query_id
+        mg_st2_s2_i1.sop_instance_uid = uuid.uuid4()
+        mg_st2_s2_i1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.67'
+        mg_st2_s2_i1.save()
+
+        mg_st2_s3 = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=mg_st2)
+        mg_st2_s3.query_id = mg2_query.query_id
+        mg_st2_s3.series_instance_uid = uuid.uuid4()
+        mg_st2_s3.modality = u"SR"
+        mg_st2_s3.series_number = 3
+        mg_st2_s3.number_of_series_related_instances = 1
+        mg_st2_s3.save()
+
+        mg_st2_s3_i1 = DicomQRRspImage.objects.create(dicom_qr_rsp_series=mg_st2_s3)
+        mg_st2_s3_i1.query_id = mg2_query.query_id
+        mg_st2_s3_i1.sop_instance_uid = uuid.uuid4()
+        mg_st2_s3_i1.sop_class_uid = u'1.2.840.10008.5.1.4.1.1.88.11'
+        mg_st2_s3_i1.save()
 
     def test_prune_ser_resp_mg_no_sr(self):
         from remapp.netdicom.qrscu import _prune_series_responses
@@ -543,3 +589,20 @@ class PruneSeriesResponses(TestCase):
         _prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+
+    @patch("remapp.netdicom.qrscu._query_images", _fake_image_query)
+    def test_prune_ser_resp_mv_with_sr(self):
+        from remapp.netdicom.qrscu import _prune_series_responses
+
+        query = DicomQuery.objects.get(query_id__exact="MammoWithSR")
+        all_mods = self.all_mods
+        filters = self.filters
+        _prune_series_responses("MyAE", "RemoteAE", query, all_mods, filters)
+        studies = query.dicomqrrspstudy_set.all()
+        self.assertEqual(studies.count(), 1)
+        series = studies[0].dicomqrrspseries_set.all()
+        self.assertEqual(series.count(), 1)
+        sr_instance = series[0].dicomqrrspimage_set.get()
+        self.assertEqual(sr_instance.sop_class_uid, u'1.2.840.10008.5.1.4.1.1.88.67')
