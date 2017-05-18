@@ -159,9 +159,6 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 logger.debug("FL study, check_sr_type returned {0}".format(sr_type))
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
-                if sr_type == "no_dose_report":
-                    study.delete()
-                    logger.debug("FL study, no RDSR or ESR. Deleted.")
 
         elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
             study.modality = 'CT'
@@ -250,6 +247,8 @@ def _check_sr_type_in_study(my_ae, remote_ae, study):
                 sr.delete()
         return 'ESR'
     else:
+        for sr in series_sr:
+            sr.delete()
         return 'no_dose_report'
 
 
