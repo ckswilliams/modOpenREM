@@ -33,7 +33,6 @@ from celery import shared_task
 from django.conf import settings
 
 
-
 @shared_task
 def mg_csv_nhsbsp(filterdict, user=None):
     """Export filtered mammography database data to a NHSBSP formatted single-sheet CSV file.
@@ -73,12 +72,14 @@ def mg_csv_nhsbsp(filterdict, user=None):
         tsk.progress = 'CSV file created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request,
+                       "Unexpected error creating temporary file - please contact an administrator: {0}".format(
+                           sys.exc_info()[0]))
         return redirect('/openrem/export/')
-        
+
     # Get the data!
-    
-    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG')
+
+    s = GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG')
     f = MGSummaryListFilter.base_filters
 
     for filt in f:
@@ -89,11 +90,11 @@ def mg_csv_nhsbsp(filterdict, user=None):
             else:
                 filterstring = (filterdict[filt])[0]
             if filterstring != '':
-                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type : filterstring})
-    
+                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type: filterstring})
+
     tsk.progress = 'Required study filter complete.'
     tsk.save()
-        
+
     numresults = s.count()
 
     tsk.num_records = numresults
@@ -114,60 +115,107 @@ def mg_csv_nhsbsp(filterdict, user=None):
         'Density setting',
         'Age',
         'Comment',
-        'AEC density mode',		
-        ])
+        'AEC density mode',
+    ])
 
     for i, study in enumerate(s):
-        e = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
-        for exp in e:
-            viewCode = str(exp.laterality)
-            viewCode = viewCode[:1]
-            if str(exp.image_view) == 'cranio-caudal':
-			    viewCode = viewCode + 'CC'
-            elif str(exp.image_view) == 'medio-lateral oblique':
-                viewCode = viewCode + 'OB'
-            else:
-                viewCode = viewCode + str(exp.image_view)
-            target = str(exp.irradeventxraysourcedata_set.get().anode_target_material)
+        exposures = study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()
+        for exp in exposures:
+            try:
+                laterality = exp.laterality.code_meaning
+            except AttributeError:
+                exp.nccpm_view = None
+                continue
+            exp.nccpm_view = laterality[:1]
+            views = {u'cranio-caudal': u'CC',
+                     u'medio-lateral oblique': u'OB',
+                     u'medio-lateral': u'ML',
+                     u'latero-medial': u'LM',
+                     u'latero-medial oblique': u'LMO',
+                     u'caudo-cranial (from below)': u'FB',
+                     u'superolateral to inferomedial oblique': u'SIO',
+                     u'inferomedial to superolateral oblique': u'ISO',
+                     u'cranio-caudal exaggerated laterally': u'XCCL',
+                     u'cranio-caudal exaggerated medially': u'XCCM'
+                     }  # See http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4014.html
+            try:
+                if exp.image_view.code_meaning in views:
+                    exp.nccpm_view += views[exp.image_view.code_meaning]
+                else:
+                    exp.nccpm_view += exp.image_view.code_meaning
+            except AttributeError:
+                exp.nccpm_view = None
+                continue  # Avoid exporting exposures with no image_view recorded
+            if u'specimen' in exp.image_view.code_meaning:
+                exp.nccpm_view = None
+                continue  # No point including these in the export
+            bad_acq_words = [
+                u'scout', u'postclip', u'prefire', u'biopsy', u'postfire', u'stereo', u'specimen', u'artefact']
+            if any(word in exp.acquisition_protocol.lower() for word in bad_acq_words):
+                exp.nccpm_view = None
+                continue  # Avoid exporting biopsy related exposures
+            try:
+                target = exp.irradeventxraysourcedata_set.get().anode_target_material.code_meaning
+            except AttributeError:
+                exp.nccpm_view = None
+                continue  # Avoid exporting exposures with no anode material recorded
             if "TUNGSTEN" in target.upper():
                 target = 'W'
             elif "MOLY" in target.upper():
-			    target = 'Mo'
+                target = 'Mo'
             elif "RHOD" in target.upper():
                 target = 'Rh'
-            filterMat = str(exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material)
-            if "ALUM" in filterMat.upper():
-                filterMat = 'Al'
-            elif "MOLY" in filterMat.upper():
-                filterMat = 'Mo'
-            elif "RHOD" in filterMat.upper():
-                filterMat = 'Rh'
-            elif "SILV" in filterMat.upper():
-                filterMat = 'Ag'
-            automan = str(exp.irradeventxraysourcedata_set.get().exposure_control_mode)
+            try:
+                filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
+            except AttributeError:
+                exp.nccpm_view = None
+                continue  # Avoid exporting exposures with no filter material recorded
+            if "ALUM" in filter_mat.upper():
+                filter_mat = 'Al'
+            elif "MOLY" in filter_mat.upper():
+                filter_mat = 'Mo'
+            elif "RHOD" in filter_mat.upper():
+                filter_mat = 'Rh'
+            elif "SILV" in filter_mat.upper():
+                filter_mat = 'Ag'
+        unique_views = set()
+        for exp in exposures:
+            if exp.nccpm_view:
+                if exp.nccpm_view not in unique_views:
+                    unique_views.add(exp.nccpm_view)
+                else:
+                    for x in range(20):
+                        if exp.nccpm_view + str(x+2) not in unique_views:
+                            exp.nccpm_view += str(x+2)
+                            unique_views.add(exp.nccpm_view)
+                            break
+        for exp in exposures:
+            if not exp.nccpm_view:
+                continue  # Avoid exporting exposures with no view code
+            automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
             if "AUTO" in automan.upper():
                 automan = 'AUTO'
             elif "MAN" in automan.upper():
                 automan = "MANUAL"
-			
+
             writer.writerow([
                 '1',
-                i+1,
-                viewCode,
+                i + 1,
+                exp.nccpm_view,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
                 target,
-                filterMat,
+                filter_mat,
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
                 exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
-                '', # not applicable to FFDM
-                automan,				
+                '',  # not applicable to FFDM
+                automan,
                 exp.irradeventxraysourcedata_set.get().exposure_control_mode,
-                '', # no consistent behaviour for recording density setting on FFDM units
+                '',  # no consistent behaviour for recording density setting on FFDM units
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
-                '', # not in DICOM headers
-                '', # no consistent behaviour for recording density mode on FFDM units
-                ])
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+                '',  # not in DICOM headers
+                '',  # no consistent behaviour for recording density mode on FFDM units
+            ])
+        tsk.progress = "{0} of {1}".format(i + 1, numresults)
         tsk.save()
 
     tsk.progress = 'All study data written.'
@@ -176,18 +224,19 @@ def mg_csv_nhsbsp(filterdict, user=None):
     csvfilename = "mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
-        tsk.filename.save(csvfilename,File(tmpfile))
+        tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno,
+                                                                                                            e.strerror)
         tsk.status = 'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(
+            sys.exc_info()[0])
         tsk.status = 'ERROR'
         tsk.save()
         return
     tsk.status = 'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
-    

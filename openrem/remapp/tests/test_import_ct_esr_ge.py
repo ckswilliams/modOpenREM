@@ -38,11 +38,24 @@ class ImportCTRDSR(TestCase):
 
         # Test that study level data is recorded correctly
         self.assertEqual(studies[0].accession_number, '0012345.12345678')
+        self.assertEqual(studies[0].study_date, datetime.date(2006, 8, 23))
+        self.assertEqual(studies[0].study_time, datetime.time(11, 40, 14))
+        self.assertEqual(studies[0].study_description, 'Colonography')
+        self.assertEqual(studies[0].performing_physician_name, 'Doctor^Doctor')
+        self.assertEqual(studies[0].name_of_physician_reading_study, 'Radiologist^Doctor')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().institution_name, 'An Optima Hospital')
         self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().manufacturer, 'GE Medical Systems')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().manufacturer_model_name, 'Optima CT660')
+        self.assertEqual(studies[0].generalequipmentmoduleattr_set.get().station_name, 'geoptima')
+
         self.assertEqual(studies[1].accession_number, '001234512345678')
+        self.assertEqual(studies[1].study_date, datetime.date(2013, 2, 28))
+        self.assertEqual(studies[1].study_time, datetime.time(11, 37, 31))
+        self.assertEqual(studies[1].study_description, 'FACIAL BONES')
         self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().institution_name, 'A VCT Hospital')
         self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().manufacturer, 'GE Medical Systems')
+        self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().manufacturer_model_name, 'LightSpeed VCT')
+        self.assertEqual(studies[1].generalequipmentmoduleattr_set.get().station_name, 'VCTScanner')
 
         # Test that patient level data is recorded correctly
         self.assertEqual(studies[0].patientmoduleattr_set.get().patient_name, 'Patient^Optima')
@@ -55,6 +68,35 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(studies[1].patientstudymoduleattr_set.get().patient_age, '89Y')
         self.assertAlmostEqual(studies[1].patientstudymoduleattr_set.get().patient_age_decimal, Decimal(89.8))
 
+        # Test that irradiation time data is stored correctly
+        self.assertEqual(studies[0].ctradiationdose_set.get().start_of_xray_irradiation,
+                         datetime.datetime(2006, 8, 23, 11, 40, 14))
+        self.assertEqual(studies[0].ctradiationdose_set.get().end_of_xray_irradiation,
+                         datetime.datetime(2006, 8, 23, 11, 48, 40))
+        self.assertEqual(studies[1].ctradiationdose_set.get().start_of_xray_irradiation,
+                         datetime.datetime(2013, 2, 28, 11, 37, 31))
+        self.assertEqual(studies[1].ctradiationdose_set.get().end_of_xray_irradiation,
+                         datetime.datetime(2013, 2, 28, 11, 52, 07))
+
+        # Test that device observer data is stored correctly
+        self.assertEqual(studies[0].ctradiationdose_set.get().observercontext_set.get().
+                         device_observer_name, 'geoptima')
+        self.assertEqual(studies[0].ctradiationdose_set.get().observercontext_set.get().
+                         device_observer_manufacturer, 'GE Medical Systems')
+        self.assertEqual(studies[0].ctradiationdose_set.get().observercontext_set.get().
+                         device_observer_model_name, 'Optima CT660')
+        self.assertEqual(studies[0].ctradiationdose_set.get().observercontext_set.get().
+                         observer_type.code_meaning, 'Device')
+
+        self.assertEqual(studies[1].ctradiationdose_set.get().observercontext_set.get().
+                         device_observer_name, 'vct')
+        self.assertEqual(studies[1].ctradiationdose_set.get().observercontext_set.get().
+                         device_observer_manufacturer, 'GE Medical Systems')
+        self.assertEqual(studies[1].ctradiationdose_set.get().observercontext_set.get().
+                         device_observer_model_name, 'LightSpeed VCT')
+        self.assertEqual(studies[1].ctradiationdose_set.get().observercontext_set.get().
+                         observer_type.code_meaning, 'Device')
+
         # Test that exposure summary data is recorded correctly
         self.assertEqual(studies[0].ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          total_number_of_irradiation_events, 6)
@@ -65,11 +107,919 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(studies[1].ctradiationdose_set.get().ctaccumulateddosedata_set.get().
                          ct_dose_length_product_total, Decimal(2002.39))
 
-        # Test that event level dat is recorded correctly
+        # Test that CT dose data is recorded correctly
+        self.assertAlmostEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].mean_ctdivol, Decimal(3.23))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].dlp, Decimal(155.97))
         self.assertAlmostEqual(
             studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].mean_ctdivol, Decimal(5.3))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].dlp, Decimal(259.85))
+
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].mean_ctdivol, Decimal(8.74))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].dlp, Decimal(429.19))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[6].mean_ctdivol, Decimal(4.93))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[6].dlp, Decimal(246.69))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[11].mean_ctdivol, Decimal(6.23))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[11].dlp, Decimal(3.12))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[12].mean_ctdivol, Decimal(22.26))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[12].dlp, Decimal(890.26))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[22].mean_ctdivol, Decimal(176.12))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[22].dlp, Decimal(352.24))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[23].mean_ctdivol, Decimal(29.31))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[23].dlp, Decimal(14.66))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[24].mean_ctdivol, Decimal(29.31))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[24].dlp, Decimal(14.66))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[25].mean_ctdivol, Decimal(31.66))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[25].dlp, Decimal(15.83))
         self.assertAlmostEqual(
             studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[26].mean_ctdivol, Decimal(32.83))
+        self.assertAlmostEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[26].dlp, Decimal(16.41))
+
+        self.assertEqual(
+           studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].target_region.code_meaning, 'Abdomen')
+        self.assertEqual(
+           studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[1].target_region.code_meaning, 'Abdomen')
+        self.assertEqual(
+           studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].target_region.code_meaning, 'Abdomen')
+        self.assertEqual(
+           studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[3].target_region.code_meaning, 'Abdomen')
+        self.assertEqual(
+           studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[4].target_region.code_meaning, 'Abdomen')
+        self.assertEqual(
+           studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].target_region.code_meaning, 'Abdomen')
+
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[1].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[3].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[4].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[6].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[7].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[8].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[9].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[10].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[11].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[12].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[13].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[14].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[15].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[16].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[17].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[18].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[19].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[20].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[21].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[22].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[23].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[24].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[25].target_region.code_meaning, 'Unknown')
+        self.assertEqual(
+           studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[26].target_region.code_meaning, 'Unknown')
+
+        self.assertEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[1].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].
+                ct_acquisition_type.code_meaning, 'Spiral Acquisition')
+        self.assertEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[3].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[4].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[0].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].
+                ct_acquisition_type.code_meaning, 'Spiral Acquisition')
+
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[1].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[3].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[4].
+                ct_acquisition_type.code_meaning, 'Stationary Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[5].
+                ct_acquisition_type.code_meaning, 'Spiral Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[6].
+                ct_acquisition_type.code_meaning, 'Spiral Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[7].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[8].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[9].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[10].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[11].
+                ct_acquisition_type.code_meaning, 'Stationary Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[12].
+                ct_acquisition_type.code_meaning, 'Sequenced Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[13].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[14].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[15].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[16].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[17].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[18].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[19].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[20].
+                ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[21].
+                ct_acquisition_type.code_meaning, 'Stationary Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[22].
+                ct_acquisition_type.code_meaning, 'Stationary Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[23].
+                ct_acquisition_type.code_meaning, 'Sequenced Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[24].
+                ct_acquisition_type.code_meaning, 'Sequenced Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[25].
+                ct_acquisition_type.code_meaning, 'Sequenced Acquisition')
+        self.assertEqual(
+            studies[1].ctradiationdose_set.get().ctirradiationeventdata_set.all()[26].
+                ct_acquisition_type.code_meaning, 'Sequenced Acquisition')
+
+
+        # Test that scanning length data is recorded correctly
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].scanninglength_set.get().scanning_length, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].scanninglength_set.get().scanning_length, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].scanninglength_set.get().scanning_length, Decimal(418.75))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].scanninglength_set.get().scanning_length, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].scanninglength_set.get().scanning_length, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].scanninglength_set.get().scanning_length, Decimal(443.75))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].scanninglength_set.get().scanning_length, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].scanninglength_set.get().scanning_length, Decimal(468.12))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].scanninglength_set.get().scanning_length, Decimal(468.12))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].scanninglength_set.get().scanning_length, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].scanninglength_set.get().scanning_length, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].scanninglength_set.get().scanning_length, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].scanninglength_set.get().scanning_length, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].scanninglength_set.get().scanning_length, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].scanninglength_set.get().scanning_length, Decimal(397.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].scanninglength_set.get().scanning_length, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].scanninglength_set.get().scanning_length, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].scanninglength_set.get().scanning_length, Decimal(18.75))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].scanninglength_set.get().scanning_length, Decimal(0))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].scanninglength_set.get().scanning_length, Decimal(0))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].scanninglength_set.get().scanning_length, Decimal(0))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].scanninglength_set.get().scanning_length, Decimal(0))
+
+        # Test that CT event data is recorded correctly
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].exposure_time, Decimal(5.6))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].exposure_time, Decimal(5.6))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].exposure_time, Decimal(5.27))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].exposure_time, Decimal(5.6))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].exposure_time, Decimal(5.6))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].exposure_time, Decimal(7.47))
+
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].nominal_single_collimation_width, Decimal(0.62))
+
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].nominal_total_collimation_width, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].nominal_total_collimation_width, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].nominal_total_collimation_width, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].nominal_total_collimation_width, Decimal(560))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].nominal_total_collimation_width, Decimal(5))
+
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].number_of_xray_sources, Decimal(1))
+
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].pitch_factor, Decimal(1.38))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].pitch_factor, Decimal(0.98))
+        self.assertEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].exposure_time, Decimal(7))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].exposure_time, Decimal(12.67))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].exposure_time, Decimal(7.28))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].exposure_time, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].exposure_time, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].exposure_time, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].exposure_time, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].exposure_time, Decimal(0.7))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].exposure_time, Decimal(7))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].exposure_time, Decimal(4.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].exposure_time, Decimal(1.2))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].exposure_time, Decimal(10.01))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].exposure_time, Decimal(10))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].exposure_time, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].exposure_time, Decimal(9))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].exposure_time, Decimal(4))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].nominal_single_collimation_width, Decimal(1.25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].nominal_single_collimation_width, Decimal(0.62))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].nominal_single_collimation_width, Decimal(0.62))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].nominal_total_collimation_width, Decimal(2.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].nominal_total_collimation_width, Decimal(2.5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].nominal_total_collimation_width, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].nominal_total_collimation_width, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].nominal_total_collimation_width, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].nominal_total_collimation_width, Decimal(500))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].nominal_total_collimation_width, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].nominal_total_collimation_width, Decimal(450))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].nominal_total_collimation_width, Decimal(20))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].nominal_total_collimation_width, Decimal(5))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].nominal_total_collimation_width, Decimal(5))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].number_of_xray_sources, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].number_of_xray_sources, Decimal(1))
+
+
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].pitch_factor, Decimal(0.97))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].pitch_factor, Decimal(1.38))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].pitch_factor, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].pitch_factor, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].pitch_factor, Decimal(1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].pitch_factor, Decimal(0.1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].pitch_factor, Decimal(0.1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].pitch_factor, Decimal(0.1))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].pitch_factor, Decimal(0.1))
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].ctdiw_phantom_type.code_meaning, 'IEC Head Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].ctdiw_phantom_type.code_meaning, 'IEC Head Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+        self.assertEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+
+
+        # Test that CT xraysource data is recorded correctly
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(10))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(20))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(85))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(10))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(20))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(560))
+
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(10))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(20))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(85))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(10))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(20))
+        self.assertAlmostEqual(studies[0].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(100))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].ctxraysourceparameters_set.get().
+                kvp, Decimal(120))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(50))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(30))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].ctxraysourceparameters_set.get().
+                maximum_xray_tube_current, Decimal(70))
+
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[4].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[5].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[6].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[7].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[8].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[9].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[10].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[11].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[12].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[13].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[14].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[15].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[16].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[17].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[18].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[19].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[20].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(80))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[21].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(40))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[22].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(200))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[23].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(25))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[24].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(50))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[25].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(30))
+        self.assertAlmostEqual(studies[1].ctradiationdose_set.get().
+            ctirradiationeventdata_set.all()[26].ctxraysourceparameters_set.get().
+                xray_tube_current, Decimal(70))
+
+
 
 
 class ImportNonDoseSR(TestCase):
