@@ -130,8 +130,12 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 logger.debug("Found RDSR in MG study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
+            elif 'SR' in study.get_modalities_in_study():
+                logger.debug("SR in DX study not RDSR, so deleting")
+                series = study.dicomqrrspseries_set.all()
+                series.filter(modality__exact='SR').delete()
 
-            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
+                # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
             # be weeded out
         elif all_mods['DX']['inc'] and ('CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study()):
             study.modality = 'DX'
