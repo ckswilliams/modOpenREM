@@ -135,9 +135,9 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 series = study.dicomqrrspseries_set.all()
                 series.filter(modality__exact='SR').delete()
 
-                # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
+            # ToDo: query each series at image level in case SOP Class UID is returned and raw/processed duplicates can
             # be weeded out
-        elif all_mods['DX']['inc'] and ('CR' in study.get_modalities_in_study() or 'DX' in study.get_modalities_in_study()):
+        elif all_mods['DX']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('CR', 'DX')):
             study.modality = 'DX'
             study.save()
 
@@ -152,7 +152,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
 
                 # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
 
-        elif all_mods['FL']['inc'] and ('RF' in study.get_modalities_in_study() or 'XA' in study.get_modalities_in_study()):
+        elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
                 study.modality = 'FL'
                 study.save()
                 sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study)
@@ -844,12 +844,6 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-sni', '--stationname_include',
                         help='Terms to include in station name, comma separated, quote whole string',
                         metavar='string')
-    # parser.add_argument('-sce', '--sopclassuid_exclude',
-    #                     help='Terms to exclude in station name, comma separated, quote whole string',
-    #                     metavar='string')
-    # parser.add_argument('-sci', '--sopclassuid_include',
-    #                     help='Terms to include in station name, comma separated, quote whole string',
-    #                     metavar='string')
     parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (studies that are already in database)")
