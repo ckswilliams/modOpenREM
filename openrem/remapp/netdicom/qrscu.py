@@ -824,12 +824,12 @@ def qrscu_script(*args, **kwargs):
 
     # parse commandline
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
-    parser.add_argument('qrid', type=int, help='Database ID of the remote QR node')
-    parser.add_argument('storeid', type=int, help='Database ID of the local store node')
-    parser.add_argument('-ct', action="store_true", help='Query for CT studies')
-    parser.add_argument('-mg', action="store_true", help='Query for mammography studies')
-    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies')
-    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies')
+    parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
+    parser.add_argument('store_id', type=int, help='Database ID of the local store node')
+    parser.add_argument('-ct', action="store_true", help='Query for CT studies. Do not use with -sr')
+    parser.add_argument('-mg', action="store_true", help='Query for mammography studies. Do not use with -sr')
+    parser.add_argument('-fl', action="store_true", help='Query for fluoroscopy studies. Do not use with -sr')
+    parser.add_argument('-dx', action="store_true", help='Query for planar X-ray studies. Do not use with -sr')
     parser.add_argument('-f', '--dfrom', help='Date from, format yyyy-mm-dd', metavar='yyyy-mm-dd')
     parser.add_argument('-t', '--duntil', help='Date until, format yyyy-mm-dd', metavar='yyyy-mm-dd')
     parser.add_argument('-e', '--desc_exclude',
@@ -844,7 +844,8 @@ def qrscu_script(*args, **kwargs):
     parser.add_argument('-sni', '--stationname_include',
                         help='Terms to include in station name, comma separated, quote whole string',
                         metavar='string')
-    parser.add_argument('-sr', action="store_true", help='Advanced: Query for structured report only studies')
+    parser.add_argument('-sr', action="store_true",
+                        help='Advanced: Query for structured report only studies. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (studies that are already in database)")
     args = parser.parse_args()
@@ -862,7 +863,7 @@ def qrscu_script(*args, **kwargs):
         modalities += ['DX']
     if args.sr:
         if modalities:
-            parser.error("The sr option can not be combined with any other modalities!")
+            parser.error("The sr option can not be combined with any other modalities")
         else:
             modalities += ['SR']
 
@@ -904,37 +905,26 @@ def qrscu_script(*args, **kwargs):
     else:
         stationname_inc = None
 
-    # if args.sopclassuid_exclude:
-    #     sopclassuid_exc = map(str.lower, map(str.strip, args.sopclassuid_exclude.split(',')))
-    #     logger.info("SOPClassUID exclude terms are {0}".format(sopclassuid_exc))
-    # else:
-    #     sopclassuid_exc = None
-    # if args.sopclassuid_include:
-    #     sopclassuid_inc = map(str.lower, map(str.strip, args.sopclassuid_include.split(',')))
-    #     logger.info("SOPClassUID include terms are {0}".format(sopclassuid_inc))
-    # else:
-    #     sopclassuid_inc = None
-
     filters = {
                 'stationname_inc' : stationname_inc,
                 'stationname_exc' : stationname_exc,
                 'study_desc_inc'  : study_desc_inc,
                 'study_desc_exc'  : study_desc_exc,
-                # 'sopclassuid_inc' : sopclassuid_inc,
-                # 'sopclassuid_exc' : sopclassuid_exc
               }
 
     remove_duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
 
-    qrnode_up = echoscu(args.qrid, qr_scp=True)
-    storenode_up = echoscu(args.storeid, store_scp=True)
+    qr_node_up = echoscu(args.qr_id, qr_scp=True)
+    store_node_up = echoscu(args.store_id, store_scp=True)
 
-    if qrnode_up is not "Success" or storenode_up is not "Success":
+    if qr_node_up is not "Success" or store_node_up is not "Success":
+        logger.error("Query-retrieve aborted: DICOM nodes not ready. QR SCP echo is {0}, Store SCP echo is {1}".format(
+            qr_node_up, store_node_up))
         sys.exit("Query-retrieve aborted: DICOM nodes not ready. QR SCP echo is {0}, Store SCP echo is {1}".format(
-            qrnode_up, storenode_up))
+            qr_node_up, store_node_up))
 
     sys.exit(
-        qrscu.delay(qr_scp_pk=args.qrid, store_scp_pk=args.storeid, move=True, modalities=modalities,
+        qrscu.delay(qr_scp_pk=args.qr_id, store_scp_pk=args.store_id, move=True, modalities=modalities,
                     remove_duplicates=remove_duplicates, date_from=args.dfrom, date_until=args.duntil,
                     filters=filters
                     )
