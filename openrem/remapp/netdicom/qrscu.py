@@ -487,8 +487,7 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
 def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
-        date_from=None, date_until=None, modalities=None, inc_sr=False, remove_duplicates=True,
-        filters=None,
+        date_from=None, date_until=None, modalities=None, inc_sr=False, remove_duplicates=True, filters=None,
         *args, **kwargs):
     """Query retrieve service class user function
     
@@ -524,6 +523,11 @@ def qrscu(
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
     from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
+
+    logger.debug("qrscu args passed: qr_scp_pk={0}, store_scp_pk={1}, implicit={2}, explicit={3}, move={4}, "
+                 "query_id={5}, date_from={6}, date_until={7}, modalities={8}, inc_sr={9}, remove_duplicates={10}, "
+                 "filters={11}".format(qr_scp_pk, store_scp_pk, implicit, explicit, move, query_id,
+                                       date_from, date_until, modalities, inc_sr, remove_duplicates, filters))
 
     # Currently, if called from qrscu_script modalities will either be a list of modalities or it will be "SR".
     # Web interface hasn't changed, so will be a list of modalities and or the inc_sr flag
@@ -926,7 +930,7 @@ def qrscu_script(*args, **kwargs):
     sys.exit(
         qrscu.delay(qr_scp_pk=args.qr_id, store_scp_pk=args.store_id, move=True, modalities=modalities,
                     remove_duplicates=remove_duplicates, date_from=args.dfrom, date_until=args.duntil,
-                    filters=filters
+                    filters=filters,
                     )
     )
 

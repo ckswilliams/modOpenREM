@@ -182,6 +182,7 @@ def q_process(request, *args, **kwargs):
             desc_exclude = form.cleaned_data.get('desc_exclude_field')
             desc_include = form.cleaned_data.get('desc_include_field')
             stationname_exclude = form.cleaned_data.get('stationname_exclude_field')
+            stationname_include = form.cleaned_data.get('stationname_include_field')
             query_id = str(uuid.uuid4())
 
             if date_from:
@@ -201,11 +202,22 @@ def q_process(request, *args, **kwargs):
                 stationname_exc = map(unicode.lower, map(unicode.strip, stationname_exclude.split(',')))
             else:
                 stationname_exc = None
+            if stationname_include:
+                stationname_inc = map(unicode.lower, map(unicode.strip, stationname_include.split(',')))
+            else:
+                stationname_inc = None
+
+            filters = {
+                'stationname_inc': stationname_inc,
+                'stationname_exc': stationname_exc,
+                'study_desc_inc': study_desc_inc,
+                'study_desc_exc': study_desc_exc,
+            }
 
             task = qrscu.delay(qr_scp_pk=rh_pk, store_scp_pk=store_pk, query_id=query_id, date_from=date_from,
                                date_until=date_until, modalities=modalities, inc_sr=inc_sr,
-                               remove_duplicates=remove_duplicates, stationname_exc=stationname_exc,
-                               study_desc_exc=study_desc_exc, study_desc_inc=study_desc_inc)
+                               remove_duplicates=remove_duplicates, filters=filters,
+                               )
 
             resp = {}
             resp['message'] = 'Request created'
