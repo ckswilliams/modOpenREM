@@ -428,9 +428,9 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
     assoc_study.Release(0)
 
 
-def _create_association(my_ae, remote_ae):
+def _create_association(my_ae, remote_host, remote_port, remote_ae):
     # create association with remote AE
-    logger.info("Request association with {0} ({1} {2} {3})".format(qr_scp.name, rh, rp, aec))
+    logger.info("Request association with {0} ({1} {2} from {3})".format(remote_ae, remote_host, remote_port, my_ae))
     assoc = my_ae.RequestAssociation(remote_ae)
     return assoc
 
@@ -478,7 +478,7 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
                                 modality_matching = False
                                 logger.debug("Remote node returns but doesn't match against ModalitiesInStudy")
                                 break  # This indicates that there was no modality match, so we have everything already
-    logger.debug("modalitie_returned: {0}; modality_matching: {1}".format(modalities_returned, modality_matching))
+    logger.debug("modalities_returned: {0}; modality_matching: {1}".format(modalities_returned, modality_matching))
     return modalities_returned, modality_matching
 
 
@@ -516,6 +516,7 @@ def qrscu(
 
     """
 
+    from datetime import datetime
     import json
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
@@ -524,6 +525,7 @@ def qrscu(
     from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
     from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
 
+    debug_timer = datetime.now()
     logger.debug("qrscu args passed: qr_scp_pk={0}, store_scp_pk={1}, implicit={2}, explicit={3}, move={4}, "
                  "query_id={5}, date_from={6}, date_until={7}, modalities={8}, inc_sr={9}, remove_duplicates={10}, "
                  "filters={11}".format(qr_scp_pk, store_scp_pk, implicit, explicit, move, query_id,
@@ -532,6 +534,7 @@ def qrscu(
     # Currently, if called from qrscu_script modalities will either be a list of modalities or it will be "SR".
     # Web interface hasn't changed, so will be a list of modalities and or the inc_sr flag
     # Need to normalise one way or the other.
+    logger.debug("Checking for modality selection and sr_only clash")
     if modalities is None and inc_sr is False:
         logger.error("Query retrieve routine called with no modalities selected")
         return
@@ -571,12 +574,15 @@ def qrscu(
     MyAE.OnAssociateRequest = OnAssociateRequest
     # MyAE.OnReceiveStore = OnReceiveStore
     MyAE.start()
+    logger.debug("MyAE {0} started".format(MyAE))
 
     # remote application entity
     RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
+    logger.debug("Remote AE is {0}".format(RemoteAE))
 
     if not query_id:
         query_id = uuid.uuid4()
+    logger.debug("Query_id is {0}".format(query_id))
 
     query = DicomQuery.objects.create()
     query.query_id = query_id
@@ -585,7 +591,9 @@ def qrscu(
     query.qr_scp_fk = qr_scp
     query.save()
 
-    assoc = _create_association(MyAE, RemoteAE)
+    logger.debug("About to start association")
+    assoc = _create_association(MyAE, rh, rp, RemoteAE)
+    logger.debug("Association created: {0}".format(assoc))
 
     if not assoc:
         query.failed = True
@@ -593,6 +601,7 @@ def qrscu(
         query.complete = True
         query.save()
         MyAE.Quit()
+        logger.error("Query_id {0} to {1} failed as association was unsuccessful".format(query_id, RemoteAE))
         return
     logger.info("assoc is ... %s", assoc)
 
@@ -623,22 +632,26 @@ def qrscu(
     modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE)
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
+    logger.debug("Time to throw away any studies or series that are not useful before requesting moves")
     study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
     # if remote doesn't match on modality it won't return a populated ModalitiesInStudy.
     if modalities_returned:
+        logger.debug("Modalities_returned is true, so doing some preliminary pruning")
         for study in study_rsp:
             mods = study.get_modalities_in_study()
             if inc_sr and mods != ['SR']:
                 study.delete()
             if ('RF' in mods or 'XA' in mods) and 'SR' not in mods:
                 study.delete()
+    logger.debug("Finished first prune")
 
     # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed, but
     # would need to be  combined with changes to extractor scripts
     if remove_duplicates:
+        logger.debug("About to remove ny studies we already have in the database")
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
         query.save()
         logger.info(
@@ -712,6 +725,9 @@ def qrscu(
     query.complete = True
     query.stage = "Query complete"
     query.save()
+
+    logger.debug("Query {0} complete. Move is {1}. Query took {2}".format(
+        query.query_id, move, datetime.now() - debug_timer))
 
     if move:
         movescu.delay(str(query.query_id))
