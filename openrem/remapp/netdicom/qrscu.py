@@ -552,7 +552,8 @@ def qrscu(
         logger.error("Query retrieve routine called with no modalities selected")
         return
     elif modalities is not None and inc_sr is True:
-        logger.error("Query retrieve routine should be called with a modality selection _or_ SR only query, not both")
+        logger.error("Query retrieve routine should be called with a modality selection _or_ SR only query, not both"
+                     "Modalities is {0}, inc_sr is {1}".format(modalities, inc_sr))
         return
     elif modalities is None and inc_sr is True:
         modalities = ["SR"]
