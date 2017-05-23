@@ -188,6 +188,15 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 else:
                     series.filter(number_of_series_related_instances__gt=5).delete()
 
+        elif all_mods['SR']['inc']:
+            sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study)
+            if sr_type == 'RDSR':
+                logger.debug("SR only query, found RDSR, deleted other SRs")
+            elif sr_type == 'ESR':
+                logger.debug("SR only query, found ESR, deleted other SRs")
+            elif sr_type == 'no_dose_report':
+                logger.debug("No RDSR or ESR found. Study will be deleted.")
+
         nr_series_remaining = study.dicomqrrspseries_set.all().count()
         if (nr_series_remaining==0):
             logger.debug("Deleting empty study with suid {0}".format(study.study_instance_uid))
@@ -239,15 +248,18 @@ def _check_sr_type_in_study(my_ae, remote_ae, study):
     if '1.2.840.10008.5.1.4.1.1.88.67' in sopclasses:
         for sr in series_sr:
             if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.67':
+                logger.debug("Have RDSR, deleting non-RDSR SR")
                 sr.delete()
         return 'RDSR'
     elif '1.2.840.10008.5.1.4.1.1.88.22' in sopclasses:
         for sr in series_sr:
             if sr.sop_class_in_series != '1.2.840.10008.5.1.4.1.1.88.22':
+                logger.debug("Have ESR, deleting non-RDSR, non-ESR SR")
                 sr.delete()
         return 'ESR'
     else:
         for sr in series_sr:
+            logger.debug("Deleting non-RDSR, non-ESR SR")
             sr.delete()
         return 'no_dose_report'
 
