@@ -470,6 +470,7 @@ def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE):
                     query_id = uuid.uuid4()
                     _query_study(MyAE, RemoteAE, d, query, query_id)
                     study_rsp = query.dicomqrrspstudy_set.filter(query_id__exact=query_id)
+                    logger.debug("Queried for {0}, now have {1} study level responses".format(mod, study_rsp.count()))
                     for rsp in study_rsp:  # First check if modalities in study has been populated
                         if rsp.get_modalities_in_study():
                             modalities_returned = True
@@ -633,27 +634,33 @@ def qrscu(
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
     logger.debug("Time to throw away any studies or series that are not useful before requesting moves")
-    study_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
+    distinct_rsp = query.dicomqrrspstudy_set.all().distinct('study_instance_uid')
+    try:
+        create_error = distinct_rsp.count()  # To trigger error if using SLQite3 or other unsupported db for distinct()
+        study_rsp = distinct_rsp
+    except NotImplementedError:
+        study_rsp = query.dicomqrrspstudy_set.all()
 
     # Performing some cleanup if modality_matching=True (prevents having to retrieve unnecessary series)
     # We are assuming that if remote matches on modality it will populate ModalitiesInStudy and conversely
     # if remote doesn't match on modality it won't return a populated ModalitiesInStudy.
-    if modalities_returned:
-        logger.debug("Modalities_returned is true, so doing some preliminary pruning")
+    if modalities_returned and inc_sr:
+        logger.info("Modalities_returned is true and we only want studies with only SR in; removing everything else.")
         for study in study_rsp:
             mods = study.get_modalities_in_study()
-            if inc_sr and mods != ['SR']:
+            if mods != ['SR']:
                 study.delete()
-            if ('RF' in mods or 'XA' in mods) and 'SR' not in mods:
-                study.delete()
-    logger.debug("Finished first prune")
+    logger.debug("Finished removing studies that have anything other than SR in.")
 
     # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed, but
     # would need to be  combined with changes to extractor scripts
     if remove_duplicates:
-        logger.debug("About to remove ny studies we already have in the database")
+        logger.debug("About to remove any studies we already have in the database")
         query.stage = 'Checking to see if any response studies are already in the OpenREM database'
-        query.save()
+        try:
+            query.save()
+        except Exception as e:
+            logger.error("query.save in remove duplicates didn't work because of {0}".format(e))
         logger.info(
             'Checking to see if any of the {0} studies are already in the OpenREM database'.format(study_rsp.count()))
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
