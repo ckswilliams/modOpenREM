@@ -292,7 +292,12 @@ class DicomQueryForm(forms.Form):
                 ),
             ),
         )
+
     def clean(self):
+        """
+        Validate the form data to clear modality selections if sr_only is selected.
+        :return: Form with modalities _or_ sr_only selected
+        """
         qr_logger = logging.getLogger('remapp.netdicom.qrscu')
 
         cleaned_data = super(DicomQueryForm, self).clean()
