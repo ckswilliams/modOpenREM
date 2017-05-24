@@ -72,12 +72,6 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     elif filter_type == 'include':
         filtertype = False
 
-    filter_name_desc = {
-                         'station_name'         : 'station names',
-                         # 'sop_classes_in_study' : 'sop classes',
-                         'study_description'    : 'study descriptions'
-                       }
-
     study_rsp = query.dicomqrrspstudy_set.all()
     query.stage = "Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list)
     logger.info("Filter at {0} level on {1} that {2} {3}".format(level, filter_name, filter_type, filter_list))
@@ -206,17 +200,29 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
 def _prune_study_responses(query, filters):
 
     if filters['study_desc_inc']:
+        logger.debug("About to filter on study_desc_inc: {0}, currently have {1} studies.".format(
+            filters['study_desc_inc'], query.dicomqrrspstudy_set.all().count()))
         _filter(query, level='study', filter_name='study_description',
                 filter_list=filters['study_desc_inc'], filter_type='include')
+        logger.debug("Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
     if filters['study_desc_exc']:
+        logger.debug("About to filter on study_desc_exc: {0}, currently have {1} studies.".format(
+            filters['study_desc_exc'], query.dicomqrrspstudy_set.all().count()))
         _filter(query, level='study', filter_name='study_description',
                 filter_list=filters['study_desc_exc'], filter_type='exclude')
+        logger.debug("Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
     if filters['stationname_inc']:
+        logger.debug("About to filter on stationname_inc: {0}, currently have {1} studies.".format(
+            filters['stationname_inc'], query.dicomqrrspstudy_set.all().count()))
         _filter(query, level='study', filter_name='station_name',
                 filter_list=filters['stationname_inc'], filter_type='include')
+        logger.debug("Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
     if filters['stationname_exc']:
+        logger.debug("About to filter on stationname_exc: {0}, currently have {1} studies.".format(
+            filters['stationname_exc'], query.dicomqrrspstudy_set.all().count()))
         _filter(query, level='study', filter_name='station_name',
                 filter_list=filters['stationname_exc'], filter_type='exclude')
+        logger.debug("Filtering done. Now have {0} studies".format(query.dicomqrrspstudy_set.all().count()))
 
 
 # returns SR-type: RDSR or ESR; otherwise returns 'no_dose_report'
@@ -663,7 +669,7 @@ def qrscu(
             mods = study.get_modalities_in_study()
             if mods != ['SR']:
                 study.delete()
-    logger.debug("Finished removing studies that have anything other than SR in.")
+        logger.debug("Finished removing studies that have anything other than SR in.")
 
     # FIXME: why not perform at series level? Fixes the problem of additional series that might be missed, but
     # would need to be  combined with changes to extractor scripts
@@ -679,7 +685,8 @@ def qrscu(
         for uid in study_rsp.values_list('study_instance_uid', flat=True):
             if GeneralStudyModuleAttr.objects.filter(study_instance_uid=uid).exists():
                 study_rsp.filter(study_instance_uid__exact=uid).delete()
-        logger.info('Now have {0} studies'.format(study_rsp.count()))
+        study_rsp = query.dicomqrrspstudy_set.all()
+        logger.info('After removing studies we already have in the db, {0} studies are left'.format(study_rsp.count()))
 
     filter_logs = []
     if filters['study_desc_inc']:
@@ -691,7 +698,7 @@ def qrscu(
     if filters['stationname_exc']:
         filter_logs += ["station name excludes {0}, ".format(", ".join(filters['stationname_exc']))]
 
-    logger.info("Pruning study responses based on {0}".format("".join(filter_logs)))
+    logger.info("Pruning study responses based on inc/exc options: {0}".format("".join(filter_logs)))
     _prune_study_responses(query, filters)
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info('Now have {0} studies'.format(study_rsp.count()))
