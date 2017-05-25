@@ -148,6 +148,15 @@ class ImportCarestreamDRXRevolution(TestCase):
         Imports a known radigraphic image file derived from a Carestream DRX Revolution image.
         """
         from remapp.extractors import dx
+        from remapp.models import PatientIDSettings
+
+        pid = PatientIDSettings.objects.create()
+        pid.name_stored = True
+        pid.name_hashed = False
+        pid.id_stored = True
+        pid.id_hashed = False
+        pid.dob_stored = True
+        pid.save()
 
         dx_carestream_drx_revolution = os.path.join("test_files", "DX-Im-Carestream_DRX.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
