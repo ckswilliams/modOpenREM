@@ -45,6 +45,17 @@
                 </li>
                 <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
+            <br>
+            <table class="table table-condensed table-bordered small">
+                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th>
+                {% for irr_type in study_totals %}
+                    <tr>
+                    <td>{{ irr_type.0 }}</td>
+                    <td><script>document.write({{ irr_type.1 }}.toFixed(2));</script></td>
+                    <td><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></td>
+                    </tr>
+                {% endfor %}
+            </table>
             </ul>
         </div>
 
@@ -94,12 +105,16 @@
                             <td><a id="phantomDimensions" class="no-decoration"></a> cm (HxWxD)</td>
                         </tr>
                         <tr>
-                            <td>Assumed patient height: </td>
+                            <td id="patientHeightLabel">Assumed patient height: </td>
                             <td><a id="patientHeight" class="no-decoration"></a> m</td>
                         </tr>
                         <tr>
-                            <td>Assumed patient mass: </td>
+                            <td id="patientMassLabel">Assumed patient mass: </td>
                             <td><a id="patientMass" class="no-decoration"></a> kg</td>
+                        </tr>
+                        <tr>
+                            <td id="patientOrientationLabel">Assumed patient orientation: </td>
+                            <td><a id="patientOrientation" class="no-decoration"></a></td>
                         </tr>
                     </table>
                 </div>
@@ -303,15 +318,32 @@
         {% endif %}
 
     </div>
-
 <table class="table table-striped table-bordered small">
-    <th>Time</th><th>Acquisition protocol</th><th>Plane</th><th>DAP (cGy.cm<sup>2</sup>)</th><th>Exposure time (ms)</th><th>kVp</th><th>mA</th><th>Filters (mm)</th><th>Angle (&deg;)</th><th>Detector size (mm)</th><th>SDD (mm)</th><th>Orientation</th>
+  <th>Time</th>
+  <th>Acquisition protocol</th>
+  <th>Event type</th>
+  <th>Pulse rate <span style="white-space:nowrap">(s<sup>-1</sup>)</span></th>
+  <th>Plane</th>
+  <th>DAP (cGy.cm<sup>2</sup>)</th>
+  <th>Dose at reference point (mGy)</th>
+  <th>Exposure time (ms)</th>
+  <th>kVp</th>
+  <th>mA</th>
+  <th>Filters (mm)</th>
+  <th>Primary angle (&deg;)</th>
+  <th>Secondary angle (&deg;)</th>
+  <th>Detector size (mm)</th>
+  <th>SDD (mm)</th>
+  <th>Orientation</th>
     {% for event in generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.all %}
     <tr>
         <td>{{ event.date_time_started|time:"H:i.s" }}</td>
         <td>{{ event.acquisition_protocol }}</td>
+        <td>{{ event.irradiation_event_type }}</td>
+        <td>{{ event.irradeventxraysourcedata_set.get.pulse_rate|floatformat:2 }}</td>
         <td>{{ event.acquisition_plane }}</td>
-        <td>{{ event.convert_gym2_to_cgycm2|floatformat:3 }}</td>
+        <td><script>document.write({{ event.convert_gym2_to_cgycm2 }}.toPrecision(3));</script></td>
+        <td><script>document.write({{ event.irradeventxraysourcedata_set.get.convert_gy_to_mgy }}.toPrecision(3));</script></td>
         <td>{{ event.irradeventxraysourcedata_set.get.exposure_time|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.xraytubecurrent_set.get.xray_tube_current|floatformat:1 }}</td>
@@ -327,6 +359,7 @@
             {% endfor %}
         </td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_primary_angle|floatformat:1 }}</td>
+        <td>{{ event.irradeventxraymechanicaldata_set.get.positioner_secondary_angle|floatformat:1 }}</td>
         <td>{{ event.irradeventxraysourcedata_set.get.ii_field_size }}</td>
         <td>{{ event.irradeventxraymechanicaldata_set.get.doserelateddistancemeasurements_set.get.distance_source_to_detector|floatformat:0 }}</td>
 		    <td>{{ event.patient_table_relationship_cid|title }}, {{ event.patient_orientation_cid|title }}, {{ event.patient_orientation_modifier_cid|title }}
