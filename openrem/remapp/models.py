@@ -364,7 +364,7 @@ class ContextID(models.Model):
     + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. \
     This assumes they are used correctly.
     """
-    code_value = models.CharField(max_length=16)
+    code_value = models.TextField()
     code_meaning = models.TextField(blank=True, null=True)
     cid_table = models.CharField(max_length=16, blank=True)
 
@@ -406,9 +406,9 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     performing_physician_name = models.TextField(blank=True, null=True)
     operator_name = models.TextField(blank=True, null=True)
     modality_type = models.CharField(max_length=16, blank=True, null=True)
-    procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    procedure_code_value = models.TextField(blank=True, null=True)
     procedure_code_meaning = models.TextField(blank=True, null=True)
-    requested_procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    requested_procedure_code_value = models.TextField(blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
