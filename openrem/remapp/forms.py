@@ -206,6 +206,7 @@ class GeneralChartOptionsDisplayForm(forms.Form):
     plotSeriesPerSystem = forms.BooleanField(label='Plot a series per system', required=False)
     plotHistograms = forms.BooleanField(label='Calculate histogram data', required=False)
     plotHistogramBins = forms.IntegerField(label='Number of histogram bins', min_value=2, max_value=40, required=False)
+    plotCaseInsensitiveCategories = forms.BooleanField(label='Case-insensitive categories', required=False)
 
 class UpdateDisplayNamesForm(forms.Form):
     display_names = forms.CharField()
