@@ -50,7 +50,7 @@ class ExportDXxlsx(TestCase):
         dxxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
 
         import xlrd
-        task = Exports.objects.all()[0]
+        task = Exports.objects.order_by('id')[0]
 
         book = xlrd.open_workbook(task.filename.path)
         all_data_sheet = book.sheet_by_name('All data')
@@ -83,7 +83,7 @@ class ExportDXxlsx(TestCase):
         dxxlsx(filter_set, pid=pid, name=name, patid=patient_id, user=self.user)
 
         import xlrd
-        task = Exports.objects.all()[0]
+        task = Exports.objects.order_by('id')[0]
 
         book = xlrd.open_workbook(task.filename.path)
         aec_sheet = book.sheet_by_name('aec')
