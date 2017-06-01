@@ -23,7 +23,7 @@ class ImportCTRDSR(TestCase):
         dicom_path = os.path.join(root_tests, dicom_file)
 
         rdsr(dicom_path)
-        study = GeneralStudyModuleAttr.objects.all()[0]
+        study = GeneralStudyModuleAttr.objects.order_by('id')[0]
 
         # Test that patient identifiable data is not stored
         self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
@@ -78,210 +78,210 @@ class ImportCTRDSR(TestCase):
 
         #Test that CT event data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].exposure_time, Decimal(8.37))
+            ctirradiationeventdata_set.order_by('id')[0].exposure_time, Decimal(8.37))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].nominal_single_collimation_width, Decimal(0.6))
+            ctirradiationeventdata_set.order_by('id')[0].nominal_single_collimation_width, Decimal(0.6))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].nominal_total_collimation_width, Decimal(3.6))
+            ctirradiationeventdata_set.order_by('id')[0].nominal_total_collimation_width, Decimal(3.6))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].acquisition_protocol, 'Topogram')
+            ctirradiationeventdata_set.order_by('id')[0].acquisition_protocol, 'Topogram')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
+            ctirradiationeventdata_set.order_by('id')[0].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].comment,
+            ctirradiationeventdata_set.order_by('id')[0].comment,
                 'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
-        self.assertEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].target_region.code_meaning, 'Entire body')
-        self.assertEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].
+        self.assertEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')[0].target_region.code_meaning, 'Entire body')
+        self.assertEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')[0].
                 ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].exposure_time, Decimal(0.5))
+            ctirradiationeventdata_set.order_by('id')[1].exposure_time, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].nominal_single_collimation_width, Decimal(10))
+            ctirradiationeventdata_set.order_by('id')[1].nominal_single_collimation_width, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].nominal_total_collimation_width, Decimal(10))
+            ctirradiationeventdata_set.order_by('id')[1].nominal_total_collimation_width, Decimal(10))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].acquisition_protocol, 'PreMonitoring')
+            ctirradiationeventdata_set.order_by('id')[1].acquisition_protocol, 'PreMonitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+            ctirradiationeventdata_set.order_by('id')[1].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].comment,
+            ctirradiationeventdata_set.order_by('id')[1].comment,
                 'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[2].exposure_time, Decimal(1.5))
+            ctirradiationeventdata_set.order_by('id')[2].exposure_time, Decimal(1.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[2].nominal_single_collimation_width, Decimal(10))
+            ctirradiationeventdata_set.order_by('id')[2].nominal_single_collimation_width, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[2].nominal_total_collimation_width, Decimal(10))
+            ctirradiationeventdata_set.order_by('id')[2].nominal_total_collimation_width, Decimal(10))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[2].acquisition_protocol, 'Monitoring')
+            ctirradiationeventdata_set.order_by('id')[2].acquisition_protocol, 'Monitoring')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
+            ctirradiationeventdata_set.order_by('id')[2].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[2].comment,
+            ctirradiationeventdata_set.order_by('id')[2].comment,
                 'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = OFF')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].exposure_time, Decimal(16.01))
+            ctirradiationeventdata_set.order_by('id')[3].exposure_time, Decimal(16.01))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].nominal_single_collimation_width, Decimal(0.6))
+            ctirradiationeventdata_set.order_by('id')[3].nominal_single_collimation_width, Decimal(0.6))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].nominal_total_collimation_width, Decimal(38.4))
+            ctirradiationeventdata_set.order_by('id')[3].nominal_total_collimation_width, Decimal(38.4))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].pitch_factor, Decimal(0.6))
+            ctirradiationeventdata_set.order_by('id')[3].pitch_factor, Decimal(0.6))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].acquisition_protocol, 'TAP')
+            ctirradiationeventdata_set.order_by('id')[3].acquisition_protocol, 'TAP')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
+            ctirradiationeventdata_set.order_by('id')[3].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[3].comment,
+            ctirradiationeventdata_set.order_by('id')[3].comment,
                 'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = XYZ_EC')
 
         self.assertEqual(
-            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[0].
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')[0].
                 ct_acquisition_type.code_meaning, 'Constant Angle Acquisition')
         self.assertEqual(
-            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[1].
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')[1].
                 ct_acquisition_type.code_meaning, 'Stationary Acquisition')
         self.assertEqual(
-            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')[2].
                 ct_acquisition_type.code_meaning, 'Stationary Acquisition')
         self.assertEqual(
-            study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[3].
+            study.ctradiationdose_set.get().ctirradiationeventdata_set.order_by('id')[3].
                 ct_acquisition_type.code_meaning, 'Spiral Acquisition')
 
         # Test that CT xraysource data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.get().
                 kvp, Decimal(120))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.get().
                 maximum_xray_tube_current, Decimal(35))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[0].ctxraysourceparameters_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.get().
                 xray_tube_current, Decimal(35))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+            ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.get().
                 kvp, Decimal(120))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+            ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.get().
                 maximum_xray_tube_current, Decimal(40))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-            ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+            ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.get().
                 xray_tube_current, Decimal(39))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.get().
                 exposure_time_per_rotation, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].ctxraysourceparameters_set.get().
                 kvp, Decimal(120))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].ctxraysourceparameters_set.get().
                 maximum_xray_tube_current, Decimal(40))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].ctxraysourceparameters_set.get().
                 xray_tube_current, Decimal(39))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].ctxraysourceparameters_set.get().
                 exposure_time_per_rotation, Decimal(0.5))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].ctxraysourceparameters_set.get().
                 kvp, Decimal(120))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].ctxraysourceparameters_set.get().
                 maximum_xray_tube_current, Decimal(560))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].ctxraysourceparameters_set.get().
                 xray_tube_current, Decimal(176))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].ctxraysourceparameters_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].ctxraysourceparameters_set.get().
                 exposure_time_per_rotation, Decimal(0.5))
 
         # Test that scanning length data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].scanninglength_set.get().scanning_length, Decimal(821))
+                ctirradiationeventdata_set.order_by('id')[0].scanninglength_set.get().scanning_length, Decimal(821))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].scanninglength_set.get().scanning_length, Decimal(10))
+                ctirradiationeventdata_set.order_by('id')[1].scanninglength_set.get().scanning_length, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].scanninglength_set.get().scanning_length, Decimal(10))
+                ctirradiationeventdata_set.order_by('id')[2].scanninglength_set.get().scanning_length, Decimal(10))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].scanninglength_set.get().scanning_length, Decimal(737))
+                ctirradiationeventdata_set.order_by('id')[3].scanninglength_set.get().scanning_length, Decimal(737))
 
         #Test that CT Dose data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].mean_ctdivol, Decimal(0.14))
+                ctirradiationeventdata_set.order_by('id')[0].mean_ctdivol, Decimal(0.14))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].dlp, Decimal(11.51))
+                ctirradiationeventdata_set.order_by('id')[0].dlp, Decimal(11.51))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].procedure_context.code_meaning, 'CT without contrast')
+                ctirradiationeventdata_set.order_by('id')[0].procedure_context.code_meaning, 'CT without contrast')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].number_of_xray_sources, Decimal(1))
+                ctirradiationeventdata_set.order_by('id')[0].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+                ctirradiationeventdata_set.order_by('id')[0].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].mean_ctdivol, Decimal(1.2))
+                ctirradiationeventdata_set.order_by('id')[1].mean_ctdivol, Decimal(1.2))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].dlp, Decimal(1.2))
+                ctirradiationeventdata_set.order_by('id')[1].dlp, Decimal(1.2))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].procedure_context.code_meaning, 'CT without contrast')
+                ctirradiationeventdata_set.order_by('id')[1].procedure_context.code_meaning, 'CT without contrast')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].number_of_xray_sources, Decimal(1))
+                ctirradiationeventdata_set.order_by('id')[1].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+                ctirradiationeventdata_set.order_by('id')[1].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].mean_ctdivol, Decimal(3.61))
+                ctirradiationeventdata_set.order_by('id')[2].mean_ctdivol, Decimal(3.61))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].dlp, Decimal(3.61))
+                ctirradiationeventdata_set.order_by('id')[2].dlp, Decimal(3.61))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].procedure_context.code_meaning, 'Diagnostic radiography with contrast media')
+                ctirradiationeventdata_set.order_by('id')[2].procedure_context.code_meaning, 'Diagnostic radiography with contrast media')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].number_of_xray_sources, Decimal(1))
+                ctirradiationeventdata_set.order_by('id')[2].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+                ctirradiationeventdata_set.order_by('id')[2].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].mean_ctdivol, Decimal(9.91))
+                ctirradiationeventdata_set.order_by('id')[3].mean_ctdivol, Decimal(9.91))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].dlp, Decimal(708.2))
+                ctirradiationeventdata_set.order_by('id')[3].dlp, Decimal(708.2))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].procedure_context.code_meaning, 'Diagnostic radiography with contrast media')
+                ctirradiationeventdata_set.order_by('id')[3].procedure_context.code_meaning, 'Diagnostic radiography with contrast media')
         self.assertAlmostEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].number_of_xray_sources, Decimal(1))
+                ctirradiationeventdata_set.order_by('id')[3].number_of_xray_sources, Decimal(1))
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
+                ctirradiationeventdata_set.order_by('id')[3].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
 
         #Test that 'device participant' data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].deviceparticipant_set.get().
                          device_manufacturer, 'SIEMENS')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].deviceparticipant_set.get().
                          device_model_name, 'SOMATOM Definition Flash')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[0].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].deviceparticipant_set.get().
                          device_serial_number, '73491')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].deviceparticipant_set.get().
                          device_manufacturer, 'SIEMENS')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].deviceparticipant_set.get().
                          device_model_name, 'SOMATOM Definition Flash')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[1].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].deviceparticipant_set.get().
                          device_serial_number, '73491')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].deviceparticipant_set.get().
                          device_manufacturer, 'SIEMENS')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].deviceparticipant_set.get().
                          device_model_name, 'SOMATOM Definition Flash')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[2].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[2].deviceparticipant_set.get().
                          device_serial_number, '73491')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].deviceparticipant_set.get().
                          device_manufacturer, 'SIEMENS')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].deviceparticipant_set.get().
                          device_model_name, 'SOMATOM Definition Flash')
         self.assertEqual(study.ctradiationdose_set.get().
-                ctirradiationeventdata_set.all()[3].deviceparticipant_set.get().
+                ctirradiationeventdata_set.order_by('id')[3].deviceparticipant_set.get().
                          device_serial_number, '73491')
 
