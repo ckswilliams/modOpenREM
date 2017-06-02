@@ -732,7 +732,7 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
                     if cont2.ConceptNameCodeSequence[0].CodeMeaning == 'Has Intent':
                         proj.has_intent = get_or_create_cid(cont2.ConceptCodeSequence[0].CodeValue,
                                                             cont2.ConceptCodeSequence[0].CodeMeaning)
-            if (not proj.general_study_module_attributes.modality_type) and ('Mammography' in proj.procedure_reported.code_meaning):
+            if 'Mammography' in proj.procedure_reported.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'MG'
             elif (not proj.general_study_module_attributes.modality_type) and ('Projection X-Ray' in proj.procedure_reported.code_meaning):
                 proj.general_study_module_attributes.modality_type = 'RF,DX'
