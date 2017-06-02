@@ -377,9 +377,10 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
         seriesrsp.station_name = get_value_kw('StationName', series[1])
-        logger.debug("Series Response {0}: Modality {1}, StudyUID {2}, Series No. {3}, Series description {4}".format(
-            seRspNo, seriesrsp.modality, d2.StudyInstanceUID,
-            seriesrsp.series_number, seriesrsp.series_description))
+        logger.debug("Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
+                        "Series description {5}".format(
+                            seRspNo, seriesrsp.modality, seriesrsp.station_name, d2.StudyInstanceUID,
+                            seriesrsp.series_number, seriesrsp.series_description))
 
         seriesrsp.save()
 
