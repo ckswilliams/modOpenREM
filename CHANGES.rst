@@ -5,8 +5,9 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
-* `#502`_  Testing: Tests now work with SQLite3 and PostgreSQL databases
+* `#502`_  Testing: tests now work with SQLite3 and PostgreSQL databases
 * `#501`_  Imports: Changed field type for CodeValue  from 16 chars to text, allows for illegal long values
+* `#500`_  Imports: Philips SC Dose Info with missing time stamps now import
 * `#499`_  Imports: Now aborts gracefully with error log if no template in RDSR
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series

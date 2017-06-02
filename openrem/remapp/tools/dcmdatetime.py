@@ -40,8 +40,10 @@ def get_date(tag,dataset):
     import datetime
     if (tag in dataset):
         dicomdate = getattr(dataset,tag)
-        if dicomdate != '':
+        try:
             return datetime.datetime.strptime(dicomdate, "%Y%m%d")
+        except ValueError:
+            return None
 
 def get_time(tag,dataset):
     """Get DICOM time string and return Python time.
@@ -60,7 +62,10 @@ def get_time(tag,dataset):
             dicomtime = re.split('\+|-',dicomtime)[0]
         if '.' in dicomtime:
             return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
-        return datetime.datetime.strptime(dicomtime, "%H%M%S")
+        try:
+            return datetime.datetime.strptime(dicomtime, "%H%M%S")
+        except ValueError:
+            return None
 
 def get_date_time(tag,dataset):
     """Get DICOM date time string and return Python date time.
@@ -79,7 +84,10 @@ def get_date_time(tag,dataset):
             dicomdatetime = re.split('\+|-',dicomdatetime)[0]
         if '.' in dicomdatetime:
             return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
-        return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
+        try:
+            return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
+        except ValueError:
+            return None
 
 def make_date(dicomdate):
     """Given a DICOM date, return a Python date.
@@ -89,7 +97,10 @@ def make_date(dicomdate):
     :returns:           Python date value
     """
     import datetime
-    return datetime.datetime.strptime(dicomdate, "%Y%m%d")
+    try:
+        return datetime.datetime.strptime(dicomdate, "%Y%m%d")
+    except ValueError:
+        return None
 
 def make_time(dicomtime):
     """Given a DICOM time, return a Python time.
@@ -104,7 +115,10 @@ def make_time(dicomtime):
         dicomtime = re.split('\+|-', dicomtime)[0]
     if '.' in dicomtime:
         return datetime.datetime.strptime(dicomtime, "%H%M%S.%f")
-    return datetime.datetime.strptime(dicomtime, "%H%M%S")
+    try:
+        return datetime.datetime.strptime(dicomtime, "%H%M%S")
+    except ValueError:
+        return None
 
 def make_date_time(dicomdatetime):
     """Given a DICOM date time, return a Python date time.
@@ -123,7 +137,10 @@ def make_date_time(dicomdatetime):
         return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S.%f")
     elif len(dicomdatetime) <= 8:
         return datetime.datetime.strptime(dicomdatetime, "%Y%m%d")
-    return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
+    try:
+        return datetime.datetime.strptime(dicomdatetime, "%Y%m%d%H%M%S")
+    except ValueError:
+        return None
 
 def make_dcm_date(pythondate):
     """Given a Python date, return a DICOM date
@@ -135,7 +152,10 @@ def make_dcm_date(pythondate):
     if type(pythondate) is not datetime.date:
         return None
 
-    return pythondate.strftime("%Y%m%d")
+    try:
+        return pythondate.strftime("%Y%m%d")
+    except ValueError:
+        return None
 
 def make_dcm_date_range(date1=None, date2=None):
     """Given one or two dates of the form yyyy-mm-dd, return a DICOM date range

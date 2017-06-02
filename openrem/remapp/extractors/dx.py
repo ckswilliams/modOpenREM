@@ -637,6 +637,8 @@ def _generalstudymoduleattributes(dataset, g):
         model = get_value_kw("ManufacturerModelName", dataset, char_set=ch)
         if manufacturer and model and 'canon' in manufacturer.lower() and 'cxdi' in model.lower():
             g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+        if manufacturer and model and 'carestream health' in manufacturer.lower() and 'drx-revolution' in model.lower():
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
     g.save()
 
     _generalequipmentmoduleattributes(dataset, g, ch)
