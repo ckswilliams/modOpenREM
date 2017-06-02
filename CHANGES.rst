@@ -5,6 +5,8 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#502`_  Testing: tests now work with SQLite3 and PostgreSQL databases
+* `#499`_  Imports: Now aborts gracefully with error log if no template in RDSR
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
