@@ -9,8 +9,11 @@ from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
 
 
 
-class ImportCTRDSR(TestCase):
-    def test_import_ct_sr_philips(self):
+class ImportCTPhilipsSC(TestCase):
+    """
+    Class for testing Philips SC Dose Info series
+    """
+    def test_missing_time_stamps(self):
         """
         Imports known Philips Secondary Capture object. Initially just checks it is imported as the missing
         time stamps caused the import to fail before the issue #500 changes
