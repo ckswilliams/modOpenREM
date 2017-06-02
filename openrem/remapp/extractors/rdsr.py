@@ -939,10 +939,15 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset, char_set=ch)
-    if dataset.ContentTemplateSequence[0].TemplateIdentifier == '10001':
-        _projectionxrayradiationdose(dataset, g, 'projection', ch)
-    elif dataset.ContentTemplateSequence[0].TemplateIdentifier == '10011':
-        _projectionxrayradiationdose(dataset, g, 'ct', ch)
+    try:
+        if dataset.ContentTemplateSequence[0].TemplateIdentifier == '10001':
+            _projectionxrayradiationdose(dataset, g, 'projection', ch)
+        elif dataset.ContentTemplateSequence[0].TemplateIdentifier == '10011':
+            _projectionxrayradiationdose(dataset, g, 'ct', ch)
+    except AttributeError:
+        logger.error("Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
+            g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset, ch)))
+        g.delete()
     g.save()
     if not g.requested_procedure_code_meaning:
         if (('RequestAttributesSequence' in dataset) and dataset[
@@ -977,6 +982,8 @@ def _rsdr2db(dataset):
             return
 
     g = GeneralStudyModuleAttr.objects.create()
+    if not g:  # Allows import to be aborted if no template found
+        return
     ch = get_value_kw('SpecificCharacterSet', dataset)
     _generalstudymoduleattributes(dataset, g, ch)
     _generalequipmentmoduleattributes(dataset, g, ch)

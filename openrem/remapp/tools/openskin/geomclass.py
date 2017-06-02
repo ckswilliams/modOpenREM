@@ -192,8 +192,8 @@ class Phantom_3:
         self.phantom_flat_dist = roundFlat
         self.phantom_curved_dist = roundCircumference
 
-        self.width = 2 * roundCircumference + 2 * roundFlat
-        self.height = round(torso, 0)
+        self.width = int(2 * roundCircumference + 2 * roundFlat)
+        self.height = int(round(torso, 0))
         self.phantomType = "3d"
         self.phantomMap = np.empty((self.width, self.height), dtype=object)
         self.normalMap = np.empty((self.width, self.height), dtype=object)

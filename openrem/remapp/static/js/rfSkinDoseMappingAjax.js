@@ -73,6 +73,11 @@ $(document).ready(function() {
                     $('#phantomDimensions').html(json.phantom_height + 'x' + json.phantom_width + 'x' + json.phantom_depth);
                     $('#patientHeight').html((json.patient_height / 100).toFixed(2));
                     $('#patientMass').html(json.patient_mass.toFixed(1));
+                    $('#patientOrientation').html(json.patient_orientation);
+
+                    if (json.patient_height_source.indexOf('extracted') >= 0) $('#patientHeightLabel').html('Extracted patient height: ');
+                    if (json.patient_mass_source.indexOf('extracted') >= 0) $('#patientMassLabel').html('Extracted patient mass: ');
+                    if (json.patient_orientation_source.indexOf('extracted') >= 0) $('#patientHeightLabel').html('Extracted patient orientation: ');
 
                     $('input[name=windowWidthSlider]').prop({
                         'max': skinDoseMapObj.windowWidth,

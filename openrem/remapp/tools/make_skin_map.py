@@ -59,8 +59,11 @@ def make_skin_map(study_pk=None):
 
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)
+
+        pat_mass_source = 'assumed'
         try:
             pat_mass = float(study.patientstudymoduleattr_set.get().patient_weight)
+            pat_mass_source = 'extracted'
         except ValueError:
             pat_mass = 73.2
         except TypeError:
@@ -69,8 +72,10 @@ def make_skin_map(study_pk=None):
         if pat_mass == 0.0:
             pat_mass = 73.2
 
+        pat_height_source = 'assumed'
         try:
             pat_height = float(study.patientstudymoduleattr_set.get().patient_size) * 100
+            pat_height_source = 'extracted'
         except ValueError:
             pat_height = 178.6
         except TypeError:
@@ -78,12 +83,16 @@ def make_skin_map(study_pk=None):
 
         if pat_height == 0.0:
             pat_height = 178.6
+            pat_height_source = 'assumed'
+
+        pat_pos_source = 'assumed'
         if study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid:
             patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid)[0] + "f" + str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]				
-            patPos = patPos.upper()				
+            patPos = patPos.upper()
+            pat_pos_source = 'extracted'
         else:
-            patPos = None
-			
+            patPos = 'HFS'
+
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D', patPos=patPos,
                                              pat_mass=pat_mass, pat_height=pat_height,
                                              table_thick=0.5, table_width=40.0, table_length=150.0,
@@ -181,6 +190,10 @@ def make_skin_map(study_pk=None):
             'phantom_curved_dist': my_exp_map.phantom.phantom_curved_dist,
             'patient_height': pat_height,
             'patient_mass': pat_mass,
+            'patient_orientation': patPos,
+            'patient_height_source': pat_height_source,
+            'patient_mass_source': pat_mass_source,
+            'patient_orientation_source': pat_pos_source,
             'skin_map_version': __skin_map_version__
         }
 
