@@ -37,13 +37,13 @@ class DXFilterTests(TestCase):
 
         _xray_filters_prep(ds, source)
 
-        self.assertEqual(source.xrayfilters_set.all().count(), 2,
+        self.assertEqual(source.xrayfilters_set.order_by('id').count(), 2,
                          "Testing Kodak old style, two filters should have been stored, {0} were".format(
-                             source.xrayfilters_set.all().count()
+                             source.xrayfilters_set.order_by('id').count()
                          ))
-        self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
+        self.assertEqual(source.xrayfilters_set.order_by('id')[0].xray_filter_material.code_meaning,
                          "Niobium or Niobium compound")
-        self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,
+        self.assertEqual(source.xrayfilters_set.order_by('id')[1].xray_filter_material.code_meaning,
                          "Europium or Europium compound")
 
 
@@ -67,10 +67,10 @@ class DXFilterTests(TestCase):
 
         _xray_filters_prep(ds, source)
 
-        self.assertEqual(source.xrayfilters_set.all().count(), 2, 'Wrong number of filters recorded')
-        self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
+        self.assertEqual(source.xrayfilters_set.order_by('id').count(), 2, 'Wrong number of filters recorded')
+        self.assertEqual(source.xrayfilters_set.order_by('id')[0].xray_filter_material.code_meaning,
                          "Aluminum or Aluminum compound")
-        self.assertEqual(source.xrayfilters_set.all()[1].xray_filter_material.code_meaning,
+        self.assertEqual(source.xrayfilters_set.order_by('id')[1].xray_filter_material.code_meaning,
                          "Copper or Copper compound")
 
 
@@ -94,8 +94,8 @@ class DXFilterTests(TestCase):
 
         _xray_filters_prep(ds, source)
 
-        self.assertEqual(source.xrayfilters_set.all().count(), 1)
-        self.assertEqual(source.xrayfilters_set.all()[0].xray_filter_material.code_meaning,
+        self.assertEqual(source.xrayfilters_set.order_by('id').count(), 1)
+        self.assertEqual(source.xrayfilters_set.order_by('id')[0].xray_filter_material.code_meaning,
                          "Lead or Lead compound")
 
 
@@ -136,7 +136,7 @@ class ImportCarestreamDR7500(TestCase):
     def test_filter_thickness_order(self):
         from remapp.models import XrayFilters
 
-        all_filters = XrayFilters.objects.all()
+        all_filters = XrayFilters.objects.order_by('id')
         for exposure in all_filters:
             self.assertGreaterEqual(exposure.xray_filter_thickness_maximum, exposure.xray_filter_thickness_minimum)
 
