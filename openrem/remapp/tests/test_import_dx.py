@@ -139,3 +139,33 @@ class ImportCarestreamDR7500(TestCase):
         all_filters = XrayFilters.objects.order_by('id')
         for exposure in all_filters:
             self.assertGreaterEqual(exposure.xray_filter_thickness_maximum, exposure.xray_filter_thickness_minimum)
+
+
+class ImportCarestreamDRXRevolution(TestCase):
+
+    def setUp(self):
+        """
+        Imports a known radigraphic image file derived from a Carestream DRX Revolution image.
+        """
+        from remapp.extractors import dx
+        from remapp.models import PatientIDSettings
+
+        pid = PatientIDSettings.objects.create()
+        pid.name_stored = True
+        pid.name_hashed = False
+        pid.id_stored = True
+        pid.id_hashed = False
+        pid.dob_stored = True
+        pid.save()
+
+        dx_carestream_drx_revolution = os.path.join("test_files", "DX-Im-Carestream_DRX.dcm")
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dx(os.path.join(root_tests, dx_carestream_drx_revolution))
+
+    def test_requested_procedure_name(self):
+        """
+        Tests the imported value of requested procedure code meaning against what is expected.
+        """
+        study = GeneralStudyModuleAttr.objects.all()[0]
+
+        self.assertEqual(study.requested_procedure_code_meaning, u'XR CHEST')
