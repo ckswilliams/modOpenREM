@@ -40,4 +40,5 @@ class ImportCTRDSR(TestCase):
                          ct_dose_length_product_total, Decimal(349.7))
 
         # Test that event level exposure data is recorded correctly (note: not much is in the source file)
-        self.assertAlmostEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.all()[2].mean_ctdivol, Decimal(24.7))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.
+                               order_by('id')[2].mean_ctdivol, Decimal(24.7))
