@@ -144,8 +144,6 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 series = study.dicomqrrspseries_set.all()
                 series.filter(modality__exact='SR').delete()
 
-                # ToDo: query each series at image level in case SOP Class UID is returned and real CR can be removed
-
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
                 study.modality = 'FL'
                 study.save()
