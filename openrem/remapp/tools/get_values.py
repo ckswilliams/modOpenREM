@@ -46,12 +46,6 @@ def get_value_kw(tag, dataset):
     if tag in dataset:
         val = getattr(dataset, tag)
         if val != '':
-            if type(val) is str or type(val) is PersonName:
-                try:
-                    python_char_set = charset.python_encoding[char_set]
-                except KeyError:
-                    python_char_set = charset.default_encoding
-                val = smart_text(val, encoding=python_char_set)
             return val
 
 
