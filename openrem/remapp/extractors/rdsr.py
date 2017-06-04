@@ -799,15 +799,15 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     from remapp.tools.get_values import get_value_kw
     from remapp.tools.hash_id import hash_id
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
-    equip.manufacturer = get_value_kw("Manufacturer", dataset, ch)
-    equip.institution_name = get_value_kw("InstitutionName", dataset, ch)
-    equip.institution_address = get_value_kw("InstitutionAddress", dataset, ch)
-    equip.station_name = get_value_kw("StationName", dataset, ch)
-    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset, ch)
-    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset, ch)
-    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset, ch)
-    equip.software_versions = get_value_kw("SoftwareVersions", dataset, ch)
-    equip.gantry_id = get_value_kw("GantryID", dataset, ch)
+    equip.manufacturer = get_value_kw("Manufacturer", dataset)
+    equip.institution_name = get_value_kw("InstitutionName", dataset)
+    equip.institution_address = get_value_kw("InstitutionAddress", dataset)
+    equip.station_name = get_value_kw("StationName", dataset)
+    equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset)
+    equip.manufacturer_model_name = get_value_kw("ManufacturerModelName", dataset)
+    equip.device_serial_number = get_value_kw("DeviceSerialNumber", dataset)
+    equip.software_versions = get_value_kw("SoftwareVersions", dataset)
+    equip.gantry_id = get_value_kw("GantryID", dataset)
     equip.spatial_resolution = get_value_kw("SpatialResolution", dataset)
     equip.date_of_last_calibration = get_date("DateOfLastCalibration", dataset)
     equip.time_of_last_calibration = get_time("TimeOfLastCalibration", dataset)
@@ -894,13 +894,13 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
 
     patient_id_settings = PatientIDSettings.objects.get()
     if patient_id_settings.name_stored:
-        name = get_value_kw("PatientName", dataset, ch)
+        name = get_value_kw("PatientName", dataset)
         if name and patient_id_settings.name_hashed:
             name = hash_id(name)
             pat.name_hashed = True
         pat.patient_name = name
     if patient_id_settings.id_stored:
-        patid = get_value_kw("PatientID", dataset, ch)
+        patid = get_value_kw("PatientID", dataset)
         if patid and patient_id_settings.id_hashed:
             patid = hash_id(patid)
             pat.id_hashed = True
@@ -921,20 +921,20 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
-    g.referring_physician_name = get_value_kw('ReferringPhysicianName', dataset, char_set=ch)
-    g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification', dataset, char_set=ch)
-    g.study_id = get_value_kw('StudyID', dataset, char_set=ch)
-    accession_number = get_value_kw('AccessionNumber', dataset, char_set=ch)
+    g.referring_physician_name = get_value_kw('ReferringPhysicianName', dataset)
+    g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification', dataset)
+    g.study_id = get_value_kw('StudyID', dataset)
+    accession_number = get_value_kw('AccessionNumber', dataset)
     patient_id_settings = PatientIDSettings.objects.get()
     if accession_number and patient_id_settings.accession_hashed:
         accession_number = hash_id(accession_number)
         g.accession_hashed = True
     g.accession_number = accession_number
-    g.study_description = get_value_kw('StudyDescription', dataset, char_set=ch)
-    g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset, char_set=ch)
-    g.name_of_physician_reading_study = get_value_kw('NameOfPhysiciansReadingStudy', dataset, char_set=ch)
-    g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset, char_set=ch)
-    g.operator_name = get_value_kw('OperatorsName', dataset, char_set=ch)
+    g.study_description = get_value_kw('StudyDescription', dataset)
+    g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset)
+    g.name_of_physician_reading_study = get_value_kw('NameOfPhysiciansReadingStudy', dataset)
+    g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset)
+    g.operator_name = get_value_kw('OperatorsName', dataset)
     g.procedure_code_value = get_seq_code_value('ProcedureCodeSequence', dataset)
     g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
@@ -946,21 +946,21 @@ def _generalstudymoduleattributes(dataset, g, ch):
             _projectionxrayradiationdose(dataset, g, 'ct', ch)
     except AttributeError:
         logger.error("Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
-            g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset, ch)))
+            g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
         g.delete()
     g.save()
     if not g.requested_procedure_code_meaning:
         if (('RequestAttributesSequence' in dataset) and dataset[
             0x40, 0x275].VM):  # Ugly hack to prevent issues with zero length LS16 sequence
             req = dataset.RequestAttributesSequence
-            g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', req[0], char_set=ch)
+            g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', req[0])
             # Sometimes the above is true, but there is no RequestedProcedureDescription in that sequence, but
             # there is a basic field as below.
             if not g.requested_procedure_code_meaning:
-                g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset, char_set=ch)
+                g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset)
             g.save()
         else:
-            g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset)
             g.save()
 
 

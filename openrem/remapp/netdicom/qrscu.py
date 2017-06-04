@@ -100,7 +100,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         if not seriesrsp.series_number:  # despite it being mandatory!
             seriesrsp.series_number = None  # integer so can't be ''
         # Optional useful tags
-        seriesrsp.series_description = get_value_kw('SeriesDescription',series[1])
+        seriesrsp.series_description = get_value_kw('SeriesDescription', series[1])
         if seriesrsp.series_description:
             seriesrsp.series_description = ''.join(seriesrsp.series_description).strip().lower()
         seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])

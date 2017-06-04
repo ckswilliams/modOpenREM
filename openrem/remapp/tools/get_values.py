@@ -34,15 +34,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_value_kw(tag, dataset, char_set=charset.default_encoding):
+def get_value_kw(tag, dataset):
     """Get DICOM value by keyword reference.
 
     :param tag:         DICOM keyword, no spaces or plural as per dictionary.
     :type tag:          str.
     :param dataset:     The DICOM dataset containing the tag.
     :type dataset:      dataset
-    :param char_set:    The SpecificCharacterSet value from the DICOM object, if present
-    :type char_set:     str
     :returns:           str. -- value
     """
     if tag in dataset:
