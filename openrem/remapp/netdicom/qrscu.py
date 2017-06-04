@@ -282,6 +282,7 @@ def _query_images(my_ae, remote_ae, seriesrsp):
     d3.SOPInstanceUID = ''
     d3.SOPClassUID = ''
     d3.InstanceNumber = ''
+    d3.SpecificCharacterSet = ''
 
     logger.debug('d3: {0}'.format(d3))
 
@@ -306,6 +307,7 @@ def _query_images(my_ae, remote_ae, seriesrsp):
     for images in st3:
         if not images[1]:
             continue
+        images[1].decode()
         imRspNo += 1
         logger.debug("Image Response {0}: {1}".format(imRspNo, images[1]))
         imagesrsp = DicomQRRspImage.objects.create(dicom_qr_rsp_series=seriesrsp)
@@ -333,6 +335,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     d2.Modality = ''
     d2.NumberOfSeriesRelatedInstances = ''
     d2.StationName = ''
+    d2.SpecificCharacterSet = ''
 
     logger.debug('In _query_series')
     logger.debug('d2: {0}'.format(d2))
@@ -358,6 +361,7 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
     for series in st2:
         if not series[1]:
             continue
+        series[1].decode()
         seRspNo += 1
         seriesrsp = DicomQRRspSeries.objects.create(dicom_qr_rsp_study=studyrsp)
         seriesrsp.query_id = query_id
@@ -402,6 +406,7 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
     d.PatientBirthDate = ''
     d.NumberOfStudyRelatedSeries = ''
     d.StationName = ''
+    d.SpecificCharacterSet = ''
 
     assoc_study = my_ae.RequestAssociation(remote_ae)
     st = assoc_study.StudyRootFindSOPClass.SCU(d, 1)
@@ -421,6 +426,7 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
     for ss in st:
         if not ss[1]:
             continue
+        ss[1].decode()
         rspno += 1
         rsp = DicomQRRspStudy.objects.create(dicom_query=query)
         rsp.query_id = query_id
