@@ -172,12 +172,20 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
             for (i = 0; i < system_list.length; i++) {
                 (data_counts[i]).push(histogram_data[i][j][0]);
                 (data_bins[i]).push(histogram_data[i][j][1]);
+                if (summary_data[i][j].num == null) summary_data[i][j].num = 0;
                 current_counts += parseFloat(summary_data[i][j].num);
-                if (average_choice == "mean" || average_choice == "both") {
+                if (average_choice == "mean") {
+                    if (summary_data[i][j].mean == null) summary_data[i][j].mean = 0;
                     current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
                 }
-                else {
+                else if (average_choice == "median") {
+                    if (summary_data[i][j].median == null) summary_data[i][j].median = 0;
                     current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
+                }
+                else {
+                    if (summary_data[i][j].mean == null) summary_data[i][j].mean = 0;
+                    if (summary_data[i][j].median == null) summary_data[i][j].median = 0;
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
                 }
             }
             total_counts_per_name.push(current_counts);
@@ -189,12 +197,20 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
             current_counts = 0;
             current_value = 0;
             for (i = 0; i < system_list.length; i++) {
+                if (summary_data[i][j].num === null) summary_data[i][j].num = 0;
                 current_counts += parseFloat(summary_data[i][j].num);
-                if (average_choice == "mean" || average_choice == "both") {
+                if (average_choice == "mean") {
+                    if (summary_data[i][j].mean == null) summary_data[i][j].mean = 0;
                     current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
                 }
-                else {
+                else if (average_choice == "median") {
+                    if (summary_data[i][j].median == null) summary_data[i][j].median = 0;
                     current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].median);
+                }
+                else {
+                    if (summary_data[i][j].mean == null) summary_data[i][j].mean = 0;
+                    if (summary_data[i][j].median == null) summary_data[i][j].median = 0;
+                    current_value += parseFloat(summary_data[i][j].num) * parseFloat(summary_data[i][j].mean);
                 }
             }
             total_counts_per_name.push(current_counts);
@@ -206,14 +222,14 @@ function updateAverageChart(name_list, system_list, summary_data, histogram_data
         var mean_data = []; while(mean_data.push([]) < system_list.length);
         for (i = 0; i < system_list.length; i++) {
             for (j = 0; j < name_list.length; j++) {
-                var current_mean = summary_data[i][j].mean != null ? summary_data[i][j].mean : 0;
-                var current_num = summary_data[i][j].num != null ? summary_data[i][j].num : 0;
+                //var current_mean = summary_data[i][j].mean != null ? summary_data[i][j].mean : 0;
+                //var current_num = summary_data[i][j].num != null ? summary_data[i][j].num : 0;
                 (mean_data[i]).push({
                     name: name_list[j],
-                    y: summary_data[i][j].mean,
+                    y: parseFloat(summary_data[i][j].mean),
                     freq: summary_data[i][j].num,
                     bins: data_bins[i][j],
-                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + current_mean.toFixed(1) + ' mean<br>(n=' + current_num + ')',
+                    tooltip: system_list[i] + '<br>' + name_list[j] + '<br>' + parseFloat(summary_data[i][j].mean).toFixed(1) + ' mean<br>(n=' + summary_data[i][j].num + ')',
                     drilldown: calc_histograms ? system_list[i]+name_list[j] : null,
                     total_counts: total_counts_per_name[j],
                     avg_value: average_value_per_name[j]
