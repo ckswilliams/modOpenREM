@@ -138,31 +138,8 @@ def _xray_filters_prep(dataset, source):
     if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
         xray_filter_material = xray_filter_material.split(',')
 
-    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187052, thick2)
-            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-        else:
-            xray_filter_thickness_minimum = None
-
-    try:
-        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187054, thick2)
-            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-        else:
-            xray_filter_thickness_maximum = None
+    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
 
     if type(xray_filter_material) is list:
         _xray_filters_multiple(
@@ -776,6 +753,35 @@ def _dx2db(dataset):
                     _create_event(dataset)
 
 
+def _fix_kodak_filters(dataset):
+    """
+    Replace floats with commas in with multivalue floats: as found in older Carestream/Kodak units such as the DR7500
+    :param dataset: DICOM dataset
+    :return: Repaired DICOM dataset
+    """
+    from remapp.tools.get_values import get_value_kw
+
+    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+
+    try:
+        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+
+
 @shared_task
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
@@ -798,7 +804,12 @@ def dx(dig_file):
         del_dx_im = False
 
     dataset = dicom.read_file(dig_file)
-    dataset.decode()
+    try:
+        dataset.decode()
+    except ValueError as e:
+        if "Invalid tag (0018, 7052): invalid literal for float" in e.message:
+            _fix_kodak_filters(dataset)
+            dataset.decode()
     isdx = _test_if_dx(dataset)
     if not isdx:
         return '{0} is not a DICOM DX radiographic image'.format(dig_file)
