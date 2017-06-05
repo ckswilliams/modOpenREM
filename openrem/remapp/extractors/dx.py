@@ -798,6 +798,7 @@ def dx(dig_file):
         del_dx_im = False
 
     dataset = dicom.read_file(dig_file)
+    dataset.decode()
     isdx = _test_if_dx(dataset)
     if not isdx:
         return '{0} is not a DICOM DX radiographic image'.format(dig_file)

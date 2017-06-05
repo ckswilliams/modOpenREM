@@ -368,6 +368,7 @@ def ct_philips(philips_file):
         del_ct_phil = False
 
     dataset = dicom.read_file(philips_file)
+    dataset.decode()
     if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' or dataset.SeriesDescription != 'Dose Info':
         return '{0} is not a Philips CT dose report image'.format(philips_file)
 

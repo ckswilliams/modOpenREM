@@ -1024,6 +1024,7 @@ def rdsr(rdsr_file):
         del_rdsr = False
 
     dataset = dicom.read_file(rdsr_file)
+    dataset.decode()
 
     if dataset.SOPClassUID in ('1.2.840.10008.5.1.4.1.1.88.67', '1.2.840.10008.5.1.4.1.1.88.22') and \
             dataset.ConceptNameCodeSequence[0].CodeValue == '113701':
