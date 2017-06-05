@@ -24,6 +24,7 @@ function sortChartDataToDefault(sorting_field, sorting_direction, chart_div) {
 function updateWorkloadChart(workload_data, chart_div, colour_scale) {
     var day_names = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     var day_total = 0;
+    var week_total = 0;
     var workload_series_data = [];
     var drilldown_series_data = [];
     var temp_time, i, j, temp;
@@ -32,6 +33,7 @@ function updateWorkloadChart(workload_data, chart_div, colour_scale) {
         temp = [];
         for (j = 0; j < 24; j++) {
             day_total += workload_data[i][j];
+            week_total += workload_data[i][j];
             temp_time = "0" + j;
             temp_time = temp_time.substr(temp_time.length-2);
             temp.push({name: temp_time + ':00', y: workload_data[i][j], color: colour_scale(j/(23)).hex()});
@@ -52,6 +54,8 @@ function updateWorkloadChart(workload_data, chart_div, colour_scale) {
     }
 
     var chart = $('#'+chart_div).highcharts();
+    chart.title.textStr = chart.title.textStr + '<br>(n = ' + week_total + ')';
+    chart.options.chart.mainTitleText = chart.title.textStr;
     chart.options.drilldown.series = drilldown_series_data;
     chart.series[0].setData(workload_series_data);
     chart.options.exporting.sourceWidth = $(window).width();
