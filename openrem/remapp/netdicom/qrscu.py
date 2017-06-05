@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #!/usr/bin/python
 
 """
@@ -372,15 +373,15 @@ def _query_series(my_ae, remote_ae, d2, studyrsp):
         if not seriesrsp.series_number:  # despite it being mandatory!
             seriesrsp.series_number = None  # integer so can't be ''
         # Optional useful tags
-        seriesrsp.series_description = get_value_kw('SeriesDescription', series[1])
+        seriesrsp.series_description = get_value_kw(u'SeriesDescription', series[1])
         if seriesrsp.series_description:
             seriesrsp.series_description = ''.join(seriesrsp.series_description).strip().lower()
         seriesrsp.number_of_series_related_instances = get_value_kw('NumberOfSeriesRelatedInstances', series[1])
         if not seriesrsp.number_of_series_related_instances:
             seriesrsp.number_of_series_related_instances = None  # integer so can't be ''
         seriesrsp.station_name = get_value_kw('StationName', series[1])
-        logger.debug("Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
-                        "Series description {5}".format(
+        logger.debug(u"Series Response {0}: Modality {1}, StationName {2}, StudyUID {3}, Series No. {4}, "
+                        u"Series description {5}".format(
                             seRspNo, seriesrsp.modality, seriesrsp.station_name, d2.StudyInstanceUID,
                             seriesrsp.series_number, seriesrsp.series_description))
 
@@ -438,7 +439,7 @@ def _query_study(my_ae, remote_ae, d, query, query_id):
         # Optional and special keys
         rsp.study_description = get_value_kw("StudyDescription", ss[1])
         rsp.station_name = get_value_kw('StationName', ss[1])
-        logger.debug("Study Description: {0}; Station Name: {1}".format(rsp.study_description, rsp.station_name))
+        logger.debug(u"Study Description: {0}; Station Name: {1}".format(rsp.study_description, rsp.station_name))
 
         # Populate modalities_in_study, stored as JSON
         if isinstance(ss[1].ModalitiesInStudy, str):   # if single modality, then type = string ('XA')
