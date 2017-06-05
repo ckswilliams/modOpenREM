@@ -26,7 +26,7 @@ class ImportMGImg(TestCase):
 
         from remapp.models import GeneralStudyModuleAttr
         testingstudy = GeneralStudyModuleAttr.objects.all()[0]
-        print(u"Still in mam, retrieved record from database. Values is {0}, type is {1}".format(
+        print(u"In test, retrieved record from database. Values is {0}, type is {1}".format(
             testingstudy.generalequipmentmoduleattr_set.get().institution_name,
             type(testingstudy.generalequipmentmoduleattr_set.get().institution_name)))
 
