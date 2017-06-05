@@ -268,6 +268,7 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer", dataset)
     equip.institution_name = get_value_kw("InstitutionName", dataset)
+    print("In extractor, {0} of type {1}".format(equip.institution_name, type(equip.institution_name)))
     equip.institution_address = get_value_kw("InstitutionAddress", dataset)
     equip.station_name = get_value_kw("StationName", dataset)
     equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset)
@@ -318,6 +319,12 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.unique_equipment_name = UniqueEquipmentNames(pk=equip_display_name.pk)
 
     equip.save()
+    print("After save, {0} of type {1}".format(equip.institution_name, type(equip.institution_name)))
+    from remapp.models import GeneralStudyModuleAttr
+    testingstudy = GeneralStudyModuleAttr.objects.all()[0]
+    print("Still in mam, retrieved record from database. Values is {0}, type is {1}".format(
+        testingstudy.generalequipmentmoduleattr_set.get().institution_name,
+    type(testingstudy.generalequipmentmoduleattr_set.get().institution_name)))
 
 
 def _patientstudymoduleattributes(dataset, g):  # C.7.2.2
@@ -568,6 +575,7 @@ def mam(mg_file):
         del_mg_im = False
 
     dataset = dicom.read_file(mg_file)
+    dataset.decode()
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
         if del_mg_im:
