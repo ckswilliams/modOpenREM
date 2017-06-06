@@ -306,7 +306,7 @@ class QRPhilipsCT(TestCase):
 
         query = DicomQuery.objects.get()
         rst1 = query.dicomqrrspstudy_set.all()[0]
-        rst1_series_rsp = rst1.dicomqrrspseries_set.all()
+        rst1_series_rsp = rst1.dicomqrrspseries_set.order_by('id')
         rst1s3 = rst1_series_rsp[2]
 
         # Remove the third series with the 'dose info' description
