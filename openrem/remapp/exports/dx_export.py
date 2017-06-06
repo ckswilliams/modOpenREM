@@ -281,7 +281,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
             cgycm2,
         ]
 
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
 
             try:
                 exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
@@ -500,7 +500,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     sheetlist = {}
     protocolslist = []
     for exams in e:
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
             if s.acquisition_protocol:
                 safeprotocol = s.acquisition_protocol
             else:
@@ -667,7 +667,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             total_number_of_radiographic_frames,
             cgycm2,
         ]
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
 
             try:
                 exposure_control_mode = s.irradeventxraysourcedata_set.get().exposure_control_mode
@@ -755,7 +755,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         
         # Now we need to write a sheet per series protocol for each 'exams'.
         
-        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
+        for s in exams.projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id'):
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'

@@ -138,6 +138,8 @@ class DicomQRRspStudy(models.Model):
     modalities_in_study = models.CharField(max_length=100, blank=True, null=True)
     study_description = models.TextField(blank=True, null=True)
     number_of_study_related_series = models.IntegerField(blank=True, null=True)
+    sop_classes_in_study = models.TextField(blank=True, null=True)
+    station_name = models.CharField(max_length=16, blank=True, null=True)
 
     def set_modalities_in_study(self, x):
         self.modalities_in_study = json.dumps(x)
@@ -154,6 +156,8 @@ class DicomQRRspSeries(models.Model):
     modality = models.CharField(max_length=16, blank=True, null=True)
     series_description = models.TextField(blank=True, null=True)
     number_of_series_related_instances = models.IntegerField(blank=True, null=True)
+    station_name = models.CharField(max_length=16, blank=True, null=True)
+    sop_class_in_series = models.TextField(blank=True,null=True)
 
 
 class DicomQRRspImage(models.Model):
@@ -364,7 +368,7 @@ class ContextID(models.Model):
     + Could be prefilled from the tables in DICOM 3.16, but is actually populated as the codes occur. \
     This assumes they are used correctly.
     """
-    code_value = models.CharField(max_length=16)
+    code_value = models.TextField()
     code_meaning = models.TextField(blank=True, null=True)
     cid_table = models.CharField(max_length=16, blank=True)
 
@@ -406,9 +410,9 @@ class GeneralStudyModuleAttr(models.Model):  # C.7.2.1
     performing_physician_name = models.TextField(blank=True, null=True)
     operator_name = models.TextField(blank=True, null=True)
     modality_type = models.CharField(max_length=16, blank=True, null=True)
-    procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    procedure_code_value = models.TextField(blank=True, null=True)
     procedure_code_meaning = models.TextField(blank=True, null=True)
-    requested_procedure_code_value = models.CharField(max_length=16, blank=True, null=True)
+    requested_procedure_code_value = models.TextField(blank=True, null=True)
     requested_procedure_code_meaning = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
@@ -611,6 +615,12 @@ class IrradEventXRaySourceData(models.Model):  # TID 10003b
     grid_aspect_ratio = models.TextField(blank=True, null=True)
     grid_period = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
     grid_focal_distance = models.DecimalField(max_digits=16, decimal_places=6, blank=True, null=True)
+
+    def convert_gy_to_mgy(self):
+        """Converts Gy to mGy for display in web interface
+        """
+        if self.dose_rp:
+            return 1000*self.dose_rp
 
 
 class XrayGrid(models.Model):
