@@ -16,7 +16,13 @@ OpenREM version history
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
 * `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
+* `#473`_  Query Retrieve: Added tests
+* `#472`_  Query Retrieve: Overhauled the query retrieve routines
+* `#470`_  Query Retrieve: Optimised CT filtering
+* `#468`_  Query Retrieve: Station names can now be used for filtering if returned
+* `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
