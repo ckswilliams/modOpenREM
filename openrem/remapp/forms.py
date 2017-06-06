@@ -3,8 +3,11 @@ from django.utils.safestring import mark_safe
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
+import logging
 from openremproject import settings
 from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings
+
+logger = logging.getLogger()
 
 DAYS = 'days'
 WEEKS = 'weeks'
@@ -215,10 +218,11 @@ class UpdateDisplayNamesForm(forms.Form):
 class DicomQueryForm(forms.Form):
     """Form for launching DICOM Query
     """
+    from datetime import date
 
     MODALITIES = (
         ('CT', 'CT'),
-        ('FL', 'Fluoroscopy'),
+        ('FL', 'Fluoroscopy (XA and RF)'),
         ('DX', 'DX, including CR'),
         ('MG', 'Mammography'),
     )
@@ -227,7 +231,7 @@ class DicomQueryForm(forms.Form):
     store_scp_field = forms.ChoiceField(choices=[], widget=forms.Select(attrs={"class": "form-control"}))
     date_from_field = forms.DateField(label='Date from',
                                       widget=forms.DateInput(attrs={"class": "form-control datepicker", }),
-                                      required=False,
+                                      required=False, initial=date.today().isoformat(),
                                       help_text="Format yyyy-mm-dd, restrict as much as possible for best results")
     date_until_field = forms.DateField(label='Date until',
                                        widget=forms.DateInput(attrs={"class": "form-control datepicker", }),
@@ -235,7 +239,8 @@ class DicomQueryForm(forms.Form):
                                        help_text="Format yyyy-mm-dd, restrict as much as possible for best results")
     modality_field = forms.MultipleChoiceField(
         choices=MODALITIES, widget=forms.CheckboxSelectMultiple(
-            attrs={"checked": ""}), required=True, help_text="At least one modality must be ticked")
+            attrs={"checked": ""}), required=False, help_text=("At least one modality must be ticked - if SR only is "
+                                                              "ticked (Advanced) these modalities will be ignored"))
     inc_sr_field = forms.BooleanField(label='Include SR only studies?', required=False, initial=False,
                                       help_text="Normally only useful if querying a store holding just DICOM Radiation Dose Structured Reports")
     duplicates_field = forms.BooleanField(label='Ignore studies already in the database?', required=False, initial=True,
@@ -245,6 +250,12 @@ class DicomQueryForm(forms.Form):
                                          help_text="Comma separated list of terms")
     desc_include_field = forms.CharField(required=False,
                                          label="Only keep studies with these terms in the study description:",
+                                         help_text="Comma separated list of terms")
+    stationname_exclude_field = forms.CharField(required=False,
+                                         label="Exclude studies or series with these terms in the station name:",
+                                         help_text="Comma separated list of terms")
+    stationname_include_field = forms.CharField(required=False,
+                                         label="Only keep studies or series with these terms in the station name:",
                                          help_text="Comma separated list of terms")
 
     def __init__(self, *args, **kwargs):
@@ -270,6 +281,8 @@ class DicomQueryForm(forms.Form):
                 ),
                 'desc_exclude_field',
                 'desc_include_field',
+                'stationname_exclude_field',
+                'stationname_include_field',
                 Accordion(
                     AccordionGroup(
                         'Advanced',
@@ -281,6 +294,22 @@ class DicomQueryForm(forms.Form):
             ),
         )
 
+    def clean(self):
+        """
+        Validate the form data to clear modality selections if sr_only is selected.
+        :return: Form with modalities _or_ sr_only selected
+        """
+        qr_logger = logging.getLogger('remapp.netdicom.qrscu')
+
+        cleaned_data = super(DicomQueryForm, self).clean()
+        mods = cleaned_data.get("modality_field")
+        inc_sr = cleaned_data.get("inc_sr_field")
+        qr_logger.debug("Form mods are {0}, inc_sr is {1}".format(mods, inc_sr))
+        if inc_sr:
+            self.cleaned_data['modality_field'] = None
+        elif not mods:
+            raise forms.ValidationError("You must select at least one modality (or Advanced SR Only)")
+        return cleaned_data
 
 class DicomDeleteSettingsForm(forms.ModelForm):
     """Form for configuring whether DICOM objects are stored or deleted once processed
