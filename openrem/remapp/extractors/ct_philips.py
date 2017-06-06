@@ -132,7 +132,7 @@ def _ctradiationdose(dataset, g, ch):
     proj.has_intent = get_or_create_cid('R-408C3', 'Diagnostic Intent')
     proj.scope_of_accumulation = get_or_create_cid('113014', 'Study')
     commentdose = get_value_kw('CommentsOnRadiationDose', dataset)
-    commentprotocolfile = get_value_num(0x00e11061, dataset, char_set=ch)
+    commentprotocolfile = get_value_num(0x00e11061, dataset)
     commentstudydescription = get_value_kw('StudyDescription', dataset)
     if not commentdose:
         commentdose = ''
@@ -315,7 +315,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
         g.procedure_code_value = get_seq_code_value('ScheduledProtocolCodeSequence',
                                                     dataset.RequestAttributesSequence[0])
         g.procedure_code_meaning = get_seq_code_meaning('ScheduledProtocolCodeSequence',
-                                                        dataset.RequestAttributesSequence[0], char_set=ch)
+                                                        dataset.RequestAttributesSequence[0])
     g.requested_procedure_code_meaning = get_value_kw('RequestedProcedureDescription', dataset)
     g.save()
     _ctradiationdose(dataset, g, ch)

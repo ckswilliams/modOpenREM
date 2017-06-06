@@ -936,9 +936,9 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset)
     g.operator_name = get_value_kw('OperatorsName', dataset)
     g.procedure_code_value = get_seq_code_value('ProcedureCodeSequence', dataset)
-    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
-    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset, char_set=ch)
+    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
     try:
         if dataset.ContentTemplateSequence[0].TemplateIdentifier == '10001':
             _projectionxrayradiationdose(dataset, g, 'projection', ch)

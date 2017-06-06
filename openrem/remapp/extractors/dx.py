@@ -353,7 +353,7 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
             event.acquisition_protocol = get_value_kw('ImageComments', dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription', dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_seq_code_meaning(
-        'PerformedProtocolCodeSequence', dataset, char_set=ch)
+        'PerformedProtocolCodeSequence', dataset)
     series_description = get_value_kw('SeriesDescription', dataset)
     if series_description:
         event.comment = series_description
@@ -581,19 +581,19 @@ def _generalstudymoduleattributes(dataset, g):
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription', dataset)
     if not g.study_description: g.study_description = get_value_kw('SeriesDescription', dataset)
-    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     g.modality_type = get_value_kw('Modality', dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset)
     g.operator_name = get_value_kw('OperatorsName', dataset)
     # Being used to summarise protocol for study:
-    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('ProtocolName', dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription', dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription', dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
-    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset, char_set=ch)
+    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
@@ -601,20 +601,19 @@ def _generalstudymoduleattributes(dataset, g):
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'RequestAttributesSequence', dataset, char_set=ch)
+        'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'ProcedureCodeSequence', dataset, char_set=ch)
-    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(
-        0x00321060, dataset, char_set=ch)
+        'ProcedureCodeSequence', dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(0x00321060, dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'PerformedProtocolCodeSequence', dataset, char_set=ch)
+        'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning:
         manufacturer = get_value_kw("Manufacturer", dataset)
         model = get_value_kw("ManufacturerModelName", dataset)
         if manufacturer and model and 'canon' in manufacturer.lower() and 'cxdi' in model.lower():
-            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset)
         if manufacturer and model and 'carestream health' in manufacturer.lower() and 'drx-revolution' in model.lower():
-            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset)
     g.save()
 
     _generalequipmentmoduleattributes(dataset, g, ch)
