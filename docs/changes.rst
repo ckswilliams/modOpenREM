@@ -19,6 +19,7 @@ OpenREM version history
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
 * `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
 * `#473`_  Query Retrieve: Added tests
+* `#472`_  Query Retrieve: Overhauled the query retrieve routines
 * `#470`_  Query Retrieve: Optimised CT filtering
 * `#468`_  Query Retrieve: Station names can now be used for filtering if returned
 * `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
