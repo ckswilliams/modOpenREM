@@ -162,11 +162,14 @@ def _ctradiationdose(dataset, g, ch):
     else:
         # Come back and set start and end of irradiation after creating the x-ray events
         proj.start_of_xray_irradiation = events.aggregate(Min('date_time_started'))['date_time_started__min']
-        latestlength = int(events.latest('date_time_started').exposure_time * 1000)  # in microseconds
-        lastevent = events.aggregate(Max('date_time_started'))['date_time_started__max']
-        if lastevent and latestlength:
-            last = lastevent + timedelta(microseconds=latestlength)
-            proj.end_of_xray_irradiation = last
+        try:
+            latestlength = int(events.latest('date_time_started').exposure_time * 1000)  # in microseconds
+            lastevent = events.aggregate(Max('date_time_started'))['date_time_started__max']
+            if lastevent and latestlength:
+                last = lastevent + timedelta(microseconds=latestlength)
+                proj.end_of_xray_irradiation = last
+        except TypeError:
+            pass
         proj.save()
 
 
