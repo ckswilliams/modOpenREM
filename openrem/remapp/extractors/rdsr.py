@@ -764,8 +764,8 @@ def _projectionxrayradiationdose(dataset, g, reporttype, ch):
             elif 'Cassette-based' in proj.acquisition_device_type_cid.code_meaning:
                 proj.general_study_module_attributes.modality_type = 'DX'
             else:
-                logging.error(
-                    "Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, Station name: {1}, Study date, time: {2}, {3} ".format(
+                logging.error(u"Acquisition device type code exists, but the value wasn't matched. Study UID: {0}, "
+                              u"Station name: {1}, Study date, time: {2}, {3} ".format(
                     proj.general_study_module_attributes.study_instance_uid,
                     proj.general_study_module_attributes.generalequipmentmoduleattr_set.get().station_name,
                     proj.general_study_module_attributes.study_date,
@@ -945,7 +945,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
         elif dataset.ContentTemplateSequence[0].TemplateIdentifier == '10011':
             _projectionxrayradiationdose(dataset, g, 'ct', ch)
     except AttributeError:
-        logger.error("Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
+        logger.error(u"Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
             g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
         g.delete()
     g.save()
@@ -1028,10 +1028,10 @@ def rdsr(rdsr_file):
 
     if dataset.SOPClassUID in ('1.2.840.10008.5.1.4.1.1.88.67', '1.2.840.10008.5.1.4.1.1.88.22') and \
             dataset.ConceptNameCodeSequence[0].CodeValue == '113701':
-        logger.debug('rdsr.py extracting from {0}'.format(rdsr_file))
+        logger.debug(u'rdsr.py extracting from {0}'.format(rdsr_file))
         _rsdr2db(dataset)
     else:
-        logger.warning('rdsr.py not attempting to extract from {0}, not a radiation dose structured report'.format(
+        logger.warning(u'rdsr.py not attempting to extract from {0}, not a radiation dose structured report'.format(
             rdsr_file))
 
     if del_rdsr:
@@ -1044,6 +1044,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the DICOM RDSR file')
+        sys.exit(u'Error: Supply exactly one argument - the DICOM RDSR file')
 
     sys.exit(rdsr(sys.argv[1]))
