@@ -652,7 +652,7 @@ def _create_event(dataset):
         return 0
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
     if same_study_uid.count() != 1:
-        print "Duplicate study UIDs in database! Could be a problem."
+        print(u"Duplicate study UIDs in database! Could be a problem.")
         for dup in same_study_uid:
             if dup.modality_type:
                 same_study_uid = dup
@@ -671,7 +671,7 @@ def _create_event(dataset):
             if event_date_time == events.date_time_started:
                 return 0
     except Exception as e:
-        logger.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
+        logger.warning(u"DX study UID %s, event UID %s failed at check for identical event. Error %s",
                        study_uid, event_uid, e)
     # study exists, but event doesn't
     ch = get_value_kw('SpecificCharacterSet', dataset)
@@ -714,7 +714,7 @@ def _dx2db(dataset):
         if study_in_db == 1:
             _generalstudymoduleattributes(dataset, g)
         elif not study_in_db:
-            sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
+            sys.exit(u"Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
             sleep(random())
             # Check if other instance(s) has deleted the study yet
@@ -811,7 +811,7 @@ def dx(dig_file):
             dataset.decode()
     isdx = _test_if_dx(dataset)
     if not isdx:
-        return '{0} is not a DICOM DX radiographic image'.format(dig_file)
+        return u'{0} is not a DICOM DX radiographic image'.format(dig_file)
 
     _dx2db(dataset)
 
@@ -825,6 +825,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the DICOM DX radiographic image file')
+        sys.exit(u'Error: Supply exactly one argument - the DICOM DX radiographic image file')
 
     sys.exit(dx(sys.argv[1]))
