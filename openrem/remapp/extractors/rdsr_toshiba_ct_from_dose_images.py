@@ -56,7 +56,8 @@ def _split_by_studyinstanceuid(dicom_path):
                 file_counter += 1
 
             except InvalidDicomError as e:
-                print 'Invalid DICOM error: {0} when trying to read {1}'.format(e.message, os.path.join(dicom_path, filename))
+                print 'Invalid DICOM error: {0} when trying to read {1}'.format(e.message,
+                                                                                os.path.join(dicom_path, filename))
                 pass
 
     return folder_list
@@ -269,7 +270,8 @@ def _make_dicomdir(folder_list, dcmmkdir_exe):
     import subprocess
 
     for current_folder in folder_list:
-        command = dcmmkdir_exe + ' --recurse --output-file ' + os.path.join(current_folder, 'DICOMDIR') + ' --input-directory ' + current_folder
+        command = dcmmkdir_exe + ' --recurse --output-file ' + \
+                  os.path.join(current_folder, 'DICOMDIR') + ' --input-directory ' + current_folder
         subprocess.call(command.split())
 
 
@@ -318,6 +320,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     for key, val in additional_study_info.items():
         try:
             rdsr_val = getattr(dcm, key)
+            # print key, val
             if rdsr_val == '':
                 setattr(dcm, key, val)
         except AttributeError:
@@ -327,6 +330,9 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     for container in dcm.ContentSequence:
         if container.ValueType == 'CONTAINER':
             if container.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
+                # print '###########################################'
+                # print container
+                # print '###########################################'
                 for container2 in container.ContentSequence:
                     # The Acquisition protocol would go in at this level I think
                     if container2.ValueType == 'CONTAINER':
@@ -336,10 +342,13 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                             for container3 in container2.ContentSequence:
                                 if container3.ConceptNameCodeSequence[0].CodeMeaning == 'DLP':
                                     current_dlp = container3.MeasuredValueSequence[0].NumericValue
+                                    # print container3.MeasuredValueSequence[0].NumericValue
                                 if container3.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIvol':
                                     current_ctdi_vol = container3.MeasuredValueSequence[0].NumericValue
+                                    # print container3.MeasuredValueSequence[0].NumericValue
 
-                            # Check to see if the current DLP and CTDIvol pair matches any of the acquisitions in additional_info
+                            # Check to see if the current DLP and CTDIvol pair matches any of the acquisitions in
+                            # additional_info
                             for acquisition in additional_acquisition_info:
                                 try:
                                     print 'Current set is:'
@@ -470,7 +479,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                     for container2b in container.ContentSequence:
                                                         if container2b.ValueType == 'CONTAINER':
                                                             if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                print 'Found CT Acquisition Parameters...'
+                                                                print 'Found CT Acquisition Parameters in KVP section...'
                                                                 for container3b in container2b:
                                                                     for container4b in container3b:
                                                                         try:
@@ -480,14 +489,17 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                 for container5b in container4b:
                                                                                     try:
                                                                                         if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113733':
+                                                                                            print 'KVP data exists'
                                                                                             kvp_data_exists = True
                                                                                     except AttributeError:
+                                                                                        print 'KVP data does not exist'
                                                                                         pass
                                                                         except AttributeError:
                                                                             # Likely there's no ConceptNameCodeSequence attribute
                                                                             pass
 
                                                                 if not source_parameters_exists:
+                                                                    print 'Creating source container in KVP section'
                                                                     # There is no x-ray source parameters section, so add it
                                                                     # Create the x-ray source container
                                                                     source_container = Dataset()
@@ -500,6 +512,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     source_container.ConceptNameCodeSequence = Sequence([coding])
 
                                                                     # Create the kVp container that will go in to the x-ray source container
+                                                                    print 'Creating KVP container'
                                                                     kvp_container = Dataset()
                                                                     kvp_container.RelationshipType = "CONTAINS"
                                                                     kvp_container.ValueType = "NUM"
@@ -526,54 +539,171 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     try:
                                                                         # Append it to an existing ContentSequence
                                                                         container2b.ContentSequence.append(source_container)
+                                                                        print 'Appended source container with KVP data in'
                                                                     except TypeError:
                                                                         # ContentSequence doesn't exist, so add it
                                                                         container2b.ContentSequence = Sequence([source_container])
+                                                                        print 'Added source container with KVP data in'
 
                                                                     source_parameters_exists = True
                                                                     kvp_data_exists = True
 
                                                                 elif not kvp_data_exists:
+                                                                    print 'Source paramters exists but there is no KVP data - adding it'
                                                                     # CT X-ray Source Parameters exists, but there is no kVp data
                                                                     for container3b in container2b:
+                                                                        for container4b in container3b:
+                                                                            try:
+                                                                                if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
+                                                                                    # Create the kVp container that will go in to the x-ray source container
+                                                                                    print 'Found the CT X-ray Source Parameters sequence'
+                                                                                    kvp_container = Dataset()
+                                                                                    kvp_container.RelationshipType = "CONTAINS"
+                                                                                    kvp_container.ValueType = "NUM"
+                                                                                    coding2 = Dataset()
+                                                                                    coding2.CodeValue = '113733'
+                                                                                    coding2.CodingSchemeDesignator = "DCM"
+                                                                                    coding2.CodeMeaning = "KVP"
+                                                                                    kvp_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                                    coding3 = Dataset()
+                                                                                    coding3.CodeValue = 'kV'
+                                                                                    coding3.CodingSchemeDesignator = "UCUM"
+                                                                                    coding3.CodingSchemeVersion = "1.4"
+                                                                                    coding3.CodeMeaning = "kV"
+                                                                                    measurement_units_container = Dataset()
+                                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                                    measurement_units_container.NumericValue = val
+                                                                                    measured_value_sequence = Sequence([measurement_units_container])
+                                                                                    kvp_container.MeasuredValueSequence = measured_value_sequence
+
+                                                                                    # Add the kVp container inside the x-ray source container
+                                                                                    container4b.ContentSequence.append(kvp_container)
+                                                                                    print 'Appended source container with KVP data in'
+
+                                                                                    kvp_data_exists = True
+
+                                                                            except AttributeError:
+                                                                                # Likely there's no ConceptNameCodeSequence attribute
+                                                                                pass
+
+                                                if key == 'ExposureTime':
+                                                    # First, check if there is already an exposure time per rotation value in an x-ray source parameters container inside
+                                                    # a CT Acquisition Parameters container...
+                                                    source_parameters_exists = False
+                                                    exposure_time_per_rotation_data_exists = False
+
+                                                    for container2b in container.ContentSequence:
+                                                        if container2b.ValueType == 'CONTAINER':
+                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                print 'Found CT Acquisition Parameters in ExposureTime section...'
+                                                                for container3b in container2b:
+                                                                    for container4b in container3b:
                                                                         try:
-                                                                            if container3b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-ray Source Parameters':
-                                                                                # Create the kVp container that will go in to the x-ray source container
-                                                                                kvp_container = Dataset()
-                                                                                kvp_container.RelationshipType = "CONTAINS"
-                                                                                kvp_container.ValueType = "NUM"
-                                                                                coding2 = Dataset()
-                                                                                coding2.CodeValue = '113733'
-                                                                                coding2.CodingSchemeDesignator = "DCM"
-                                                                                coding2.CodeMeaning = "KVP"
-                                                                                kvp_container.ConceptNameCodeSequence = Sequence([coding2])
-                                                                                coding3 = Dataset()
-                                                                                coding3.CodeValue = 'kV'
-                                                                                coding3.CodingSchemeDesignator = "UCUM"
-                                                                                coding3.CodingSchemeVersion = "1.4"
-                                                                                coding3.CodeMeaning = "kV"
-                                                                                measurement_units_container = Dataset()
-                                                                                measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
-                                                                                measurement_units_container.NumericValue = val
-                                                                                measured_value_sequence = Sequence([measurement_units_container])
-                                                                                kvp_container.MeasuredValueSequence = measured_value_sequence
+                                                                            if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
+                                                                                source_parameters_exists = True
 
-                                                                                # Add the kVp container inside the x-ray source container
-                                                                                try:
-                                                                                    # Append it to an existing ContentSequence
-                                                                                    container3b.ContentSequence.append(kvp_container)
-                                                                                except TypeError:
-                                                                                    # ContentSequence doesn't exist, so add it
-                                                                                    container3b.ContentSequence = Sequence([kvp_container])
-
-                                                                                kvp_data_exists = True
-
+                                                                                for container5b in container4b:
+                                                                                    try:
+                                                                                        if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113843':
+                                                                                            print 'Exposure time per rotation data exists'
+                                                                                            exposure_time_per_rotation_data_exists = True
+                                                                                    except AttributeError:
+                                                                                        print 'Exposure time per rotation data does not exist'
+                                                                                        pass
                                                                         except AttributeError:
                                                                             # Likely there's no ConceptNameCodeSequence attribute
                                                                             pass
 
-                                                                            # The end of updating the RDSR
-                                                                            ##############################################
+                                                                if not source_parameters_exists:
+                                                                    print 'Creating source container in ExposureTime section'
+                                                                    # There is no x-ray source parameters section, so add it
+                                                                    # Create the x-ray source container
+                                                                    source_container = Dataset()
+                                                                    source_container.RelationshipType = "CONTAINS"
+                                                                    source_container.ValueType = "CONTAINER"
+                                                                    coding = Dataset()
+                                                                    coding.CodeValue = '113831'
+                                                                    coding.CodingSchemeDesignator = "DCM"
+                                                                    coding.CodeMeaning = "CT X-Ray Source Parameters"
+                                                                    source_container.ConceptNameCodeSequence = Sequence([coding])
+
+                                                                    # Create the kVp container that will go in to the x-ray source container
+                                                                    print 'Creating Exposure time per rotation container'
+                                                                    exposure_time_per_rotation_container = Dataset()
+                                                                    exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
+                                                                    exposure_time_per_rotation_container.ValueType = "NUM"
+                                                                    coding2 = Dataset()
+                                                                    coding2.CodeValue = '113843'
+                                                                    coding2.CodingSchemeDesignator = "DCM"
+                                                                    coding2.CodeMeaning = "Exposure Time per Rotation"
+                                                                    exposure_time_per_rotation_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                    coding3 = Dataset()
+                                                                    coding3.CodeValue = 's'
+                                                                    coding3.CodingSchemeDesignator = "UCUM"
+                                                                    coding3.CodingSchemeVersion = "1.4"
+                                                                    coding3.CodeMeaning = "s"
+                                                                    measurement_units_container = Dataset()
+                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                    measurement_units_container.NumericValue = str(float(val) / 1000)
+                                                                    measured_value_sequence = Sequence([measurement_units_container])
+                                                                    exposure_time_per_rotation_container.MeasuredValueSequence = measured_value_sequence
+
+                                                                    # Put the exposure time per rotation container inside the x-ray source container
+                                                                    source_container.ContentSequence = Sequence([exposure_time_per_rotation_container])
+
+                                                                    # Add the source_container to the rdsr contents
+                                                                    try:
+                                                                        # Append it to an existing ContentSequence
+                                                                        container2b.ContentSequence.append(source_container)
+                                                                        print 'Appended source container with ExposureTime data in'
+                                                                    except TypeError:
+                                                                        # ContentSequence doesn't exist, so add it
+                                                                        container2b.ContentSequence = Sequence([source_container])
+                                                                        print 'Added source container with ExposureTime data in'
+
+                                                                    source_parameters_exists = True
+                                                                    exposure_time_per_rotation_data_exists = True
+
+                                                                elif not exposure_time_per_rotation_data_exists:
+                                                                    print 'Source paramters exists but there is no ExposureTime data - adding it'
+                                                                    # CT X-ray Source Parameters exists, but there is no exposure time per rotation data
+                                                                    for container3b in container2b:
+                                                                        for container4b in container3b:
+                                                                            try:
+                                                                                if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
+                                                                                    # Create the exposure time per rotation container that will go in to the x-ray source container
+                                                                                    print 'Found the CT X-ray Source Parameters sequence'
+                                                                                    exposure_time_per_rotation_container = Dataset()
+                                                                                    exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
+                                                                                    exposure_time_per_rotation_container.ValueType = "NUM"
+                                                                                    coding2 = Dataset()
+                                                                                    coding2.CodeValue = '113843'
+                                                                                    coding2.CodingSchemeDesignator = "DCM"
+                                                                                    coding2.CodeMeaning = "Exposure Time per Rotation"
+                                                                                    exposure_time_per_rotation_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                                    coding3 = Dataset()
+                                                                                    coding3.CodeValue = 's'
+                                                                                    coding3.CodingSchemeDesignator = "UCUM"
+                                                                                    coding3.CodingSchemeVersion = "1.4"
+                                                                                    coding3.CodeMeaning = "s"
+                                                                                    measurement_units_container = Dataset()
+                                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                                    measurement_units_container.NumericValue = str(float(val) / 1000)
+                                                                                    measured_value_sequence = Sequence([measurement_units_container])
+                                                                                    exposure_time_per_rotation_container.MeasuredValueSequence = measured_value_sequence
+
+                                                                                    # Add the exposure time per rotation container inside the x-ray source container
+                                                                                    container4b.ContentSequence.append(exposure_time_per_rotation_container)
+                                                                                    print 'Appended source container with ExposureTime data in'
+
+                                                                                    exposure_time_per_rotation_data_exists = True
+
+                                                                            except AttributeError:
+                                                                                # Likely there's no ConceptNameCodeSequence attribute
+                                                                                pass
+
+                                    # The end of updating the RDSR
+                                    ##############################################
                                 except KeyError:
                                     # Either CTDIvol or DLP data is not present
                                     pass
@@ -635,7 +765,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
             rdsr(updated_rdsr_name_and_path)
 
     # Now delete the image folder
-    shutil.rmtree(folder_name)
+    #shutil.rmtree(folder_name)
     return 0
 
 
