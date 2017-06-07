@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -140,8 +141,8 @@ def _ctradiationdose(dataset, g, ch):
         commentprotocolfile = ''
     if not commentstudydescription:
         commentstudydescription = ''
-    proj.comment = '<DoseComment SRData="{0}" /> <ProtocolFilename SRData="{1}" /> <StudyDescription SRData="{2}" />'.format(
-        commentdose, commentprotocolfile, commentstudydescription)
+    proj.comment = (u'<DoseComment SRData="{0}" /> <ProtocolFilename SRData="{1}" /> <StudyDescription '
+                    u'SRData="{2}" />'.format(commentdose, commentprotocolfile, commentstudydescription))
     proj.source_of_dose_information = get_or_create_cid('113866', 'Copied From Image Attributes')
     proj.save()
     _ctaccumulateddosedata(dataset, proj, ch)
@@ -157,7 +158,7 @@ def _ctradiationdose(dataset, g, ch):
         study_time = g.study_time.time()
         accession_number = g.accession_number
         logger.warning(
-            "There were no events in ct_philips import, or they couldn't be read. {0} {1} {2} {3} {4} {5}".format(
+            u"There were no events in ct_philips import, or they couldn't be read. {0} {1} {2} {3} {4} {5}".format(
                 station_name, manufacturer, manufacturer_model_name, study_date, study_time, accession_number))
     else:
         # Come back and set start and end of irradiation after creating the x-ray events
@@ -369,8 +370,9 @@ def ct_philips(philips_file):
 
     dataset = dicom.read_file(philips_file)
     dataset.decode()
-    if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' or dataset.SeriesDescription != 'Dose Info':
-        return '{0} is not a Philips CT dose report image'.format(philips_file)
+    if dataset.SOPClassUID != '1.2.840.10008.5.1.4.1.1.7' or dataset.Manufacturer != 'Philips' \
+            or dataset.SeriesDescription != 'Dose Info':
+        return u'{0} is not a Philips CT dose report image'.format(philips_file)
 
     _philips_ct2db(dataset)
 
@@ -384,6 +386,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the Philips dose report image')
+        sys.exit(u'Error: Supply exactly one argument - the Philips dose report image')
 
     sys.exit(ct_philips(sys.argv[1]))

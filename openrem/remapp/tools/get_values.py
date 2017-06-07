@@ -93,7 +93,7 @@ def get_seq_code_meaning(sequence, dataset):
     :returns:           str. -- code meaning
     """
     if sequence in dataset:
-        seq = getattr(dataset,sequence)
+        seq = getattr(dataset, sequence)
         if seq and hasattr(seq[0], 'CodeMeaning'):
             meaning = seq[0].CodeMeaning
             if meaning != '':
@@ -120,8 +120,8 @@ def get_or_create_cid(codevalue, codemeaning):
             cid.save()
         code = ContextID.objects.filter(code_value__exact = codevalue)
         if code.count() > 1:
-            logger.warning(u"Duplicate entry in the ContextID table: %s/%s, import continuing",
-                            codevalue, codemeaning)
+            logger.warning(u"Duplicate entry in the ContextID table: {0}/{1}, import continuing".format(
+                codevalue, codemeaning))
         return code[0]
 
 
