@@ -56,8 +56,7 @@ def _split_by_studyinstanceuid(dicom_path):
                 file_counter += 1
 
             except InvalidDicomError as e:
-                print 'Invalid DICOM error: {0} when trying to read {1}'.format(e.message,
-                                                                                os.path.join(dicom_path, filename))
+                print 'Invalid DICOM error: {0} when trying to read {1}'.format(e.message, os.path.join(dicom_path, filename))
                 pass
 
     return folder_list
@@ -222,12 +221,10 @@ def _find_extra_info(dicom_path):
                                 try:
                                     if study_info['RequestedProcedureDescription'] == '':
                                         # Only update study_info['RequestedProcedureDescription'] if it's empty
-                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[
-                                            0].CodeMeaning
+                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
                                 except KeyError:
                                     # study_info['RequestedProcedureDescription'] isn't present, so add it
-                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[
-                                        0].CodeMeaning
+                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
@@ -270,8 +267,7 @@ def _make_dicomdir(folder_list, dcmmkdir_exe):
     import subprocess
 
     for current_folder in folder_list:
-        command = dcmmkdir_exe + ' --recurse --output-file ' + \
-                  os.path.join(current_folder, 'DICOMDIR') + ' --input-directory ' + current_folder
+        command = dcmmkdir_exe + ' --recurse --output-file ' + os.path.join(current_folder, 'DICOMDIR') + ' --input-directory ' + current_folder
         subprocess.call(command.split())
 
 
@@ -765,7 +761,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
             rdsr(updated_rdsr_name_and_path)
 
     # Now delete the image folder
-    #shutil.rmtree(folder_name)
+    shutil.rmtree(folder_name)
     return 0
 
 
