@@ -40,6 +40,9 @@ def average_chart_inc_histogram_data(database_events, db_display_name_relationsh
     from remapp.models import Median
     import numpy as np
 
+    # Exclude all zero value events from the calculations
+    database_events = database_events.exclude(**{db_value_name: 0})
+
     if case_insensitive_categories:
         from django.db.models.functions import Lower
         database_events = database_events.annotate(db_series_names_to_use=Lower(db_series_names))
@@ -441,6 +444,9 @@ def average_chart_over_time_data(database_events, db_series_names, db_value_name
     from django.db.models import Min, Avg
     from remapp.models import Median
 
+    # Exclude all zero value events from the calculations
+    database_events = database_events.exclude(**{db_value_name: 0})
+
     return_structure = dict()
 
     if case_insensitive_categories:
@@ -523,6 +529,11 @@ def scatter_plot_data(database_events, x_field, y_field, y_value_multiplier, plo
     Returns:
         A structure containing the x-y data.
     """
+    from django.db.models import Q
+
+    # Exclude all zero value events from the calculations
+    database_events = database_events.exclude(Q(**{x_field: 0}) | Q(**{y_field: 0}))
+
     return_structure = dict()
 
     if plot_series_per_system:
