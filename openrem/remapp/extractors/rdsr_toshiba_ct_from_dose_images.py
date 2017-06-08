@@ -79,6 +79,8 @@ def _find_extra_info(dicom_path):
         SpiralPitchFactor
         CTDIvol
         ExposureModulationType
+        NominalTotalCollimationWidth
+        NominalSingleCollimationWidth
         DeviceSerialNumber
         StudyDescription
         RequestedProcedureDescription
@@ -128,6 +130,13 @@ def _find_extra_info(dicom_path):
                         try:
                             info_dictionary['KVP'] = dcm.KVP
                             # print dcm.KVP
+                        except AttributeError:
+                            pass
+                        try:
+                            # For some Toshiba CT scanners there is information on the detector configuration
+                            if dcm.Manufacturer.lower() == 'toshiba':
+                                info_dictionary['NominalSingleCollimationWidth'] = float(dcm[0x7005, 0x1008].value)
+                                info_dictionary['NominalTotalCollimationWidth'] = dcm[0x7005, 0x1009].value.count('1') * float(dcm[0x7005, 0x1008].value)
                         except AttributeError:
                             pass
                         try:
@@ -221,10 +230,12 @@ def _find_extra_info(dicom_path):
                                 try:
                                     if study_info['RequestedProcedureDescription'] == '':
                                         # Only update study_info['RequestedProcedureDescription'] if it's empty
-                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
+                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[
+                                            0].CodeMeaning
                                 except KeyError:
                                     # study_info['RequestedProcedureDescription'] isn't present, so add it
-                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
+                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[
+                                        0].CodeMeaning
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
@@ -410,8 +421,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
                                                     for container2b in container.ContentSequence:
                                                         if container2b.ValueType == 'CONTAINER':
-                                                            if container2b.ConceptNameCodeSequence[
-                                                                0].CodeMeaning == 'CT Acquisition Parameters':
+                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
                                                                 for container3b in container2b:
                                                                     for container4b in container3b:
                                                                         try:
@@ -450,21 +460,165 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     coding2.CodingSchemeVersion = "1.4"
                                                                     coding2.CodeMeaning = "ratio"
                                                                     measurement_units_container = Dataset()
-                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence(
-                                                                        [coding2])
+                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
                                                                     measurement_units_container.NumericValue = val
-                                                                    measured_value_sequence = Sequence(
-                                                                        [measurement_units_container])
+                                                                    measured_value_sequence = Sequence([measurement_units_container])
                                                                     # Create the outer container bit
                                                                     pitch_container = Dataset()
                                                                     pitch_container.RelationshipType = "CONTAINS"
                                                                     pitch_container.ValueType = "NUM"
                                                                     # Add the coding sequence into the container.
                                                                     # Sequences are lists.
-                                                                    pitch_container.ConceptNameCodeSequence = Sequence(
-                                                                        [coding])
+                                                                    pitch_container.ConceptNameCodeSequence = Sequence([coding])
                                                                     pitch_container.MeasuredValueSequence = measured_value_sequence
                                                                     container2b.ContentSequence.append(pitch_container)
+
+                                                if key == 'NominalSingleCollimationWidth':
+                                                    # First, check if there is already a NominalSingleCollimationWidth container
+                                                    # that has a value in it.
+                                                    data_exists = False
+
+                                                    for container2b in container.ContentSequence:
+                                                        if container2b.ValueType == 'CONTAINER':
+                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                for container3b in container2b:
+                                                                    for container4b in container3b:
+                                                                        try:
+                                                                            if container4b.ConceptNameCodeSequence[0].CodeValue == '113826':
+                                                                                data_exists = True
+                                                                        except AttributeError:
+                                                                            pass
+                                                                if not data_exists:
+                                                                    # If there is no NominalSingleCollimationWidth then add it
+                                                                    #       ---------
+                                                                    #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                                    #       (0040, a040) Value Type                          CS: 'NUM'
+                                                                    #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                                    #          (0008, 0100) Code Value                          SH: '113826'
+                                                                    #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                                    #          (0008, 0104) Code Meaning                        LO: 'Nominal Single Collimation Width'
+                                                                    #          ---------
+                                                                    #       (0040, a300)  Measured Value Sequence   1 item(s) ----
+                                                                    #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
+                                                                    #             (0008, 0100) Code Value                          SH: 'mm'
+                                                                    #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
+                                                                    #             (0008, 0103) Coding Scheme Version               SH: '1.4'
+                                                                    #             (0008, 0104) Code Meaning                        LO: 'mm'
+                                                                    #             ---------
+                                                                    #          (0040, a30a) Numeric Value                       DS: '0.6'
+                                                                    #          ---------
+                                                                    #       ---------
+                                                                    # Create the first inner coding bit
+                                                                    coding.CodeValue = '113826'
+                                                                    coding.CodingSchemeDesignator = "DCM"
+                                                                    coding.CodeMeaning = "Nominal Single Collimation Width"
+                                                                    # Create the second inner coding bit
+                                                                    coding2.CodeValue = 'mm'
+                                                                    coding2.CodingSchemeDesignator = "UCUM"
+                                                                    coding2.CodingSchemeVersion = "1.4"
+                                                                    coding2.CodeMeaning = "mm"
+                                                                    measurement_units_container = Dataset()
+                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
+                                                                    measurement_units_container.NumericValue = val
+                                                                    measured_value_sequence = Sequence([measurement_units_container])
+                                                                    # Create the outer container bit
+                                                                    pitch_container = Dataset()
+                                                                    pitch_container.RelationshipType = "CONTAINS"
+                                                                    pitch_container.ValueType = "NUM"
+                                                                    # Add the coding sequence into the container.
+                                                                    # Sequences are lists.
+                                                                    pitch_container.ConceptNameCodeSequence = Sequence([coding])
+                                                                    pitch_container.MeasuredValueSequence = measured_value_sequence
+                                                                    container2b.ContentSequence.append(pitch_container)
+
+                                                if key == 'NominalTotalCollimationWidth':
+                                                    # First, check if there is already a NominalSingleCollimationWidth container
+                                                    # that has a value in it.
+                                                    data_exists = False
+
+                                                    for container2b in container.ContentSequence:
+                                                        if container2b.ValueType == 'CONTAINER':
+                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                for container3b in container2b:
+                                                                    for container4b in container3b:
+                                                                        try:
+                                                                            if container4b.ConceptNameCodeSequence[0].CodeValue == '113827':
+                                                                                data_exists = True
+                                                                        except AttributeError:
+                                                                            pass
+                                                                if not data_exists:
+                                                                    # If there is no NominalSingleCollimationWidth then add it
+                                                                    #       ---------
+                                                                    #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                                    #       (0040, a040) Value Type                          CS: 'NUM'
+                                                                    #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                                    #          (0008, 0100) Code Value                          SH: '113827'
+                                                                    #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                                    #          (0008, 0104) Code Meaning                        LO: 'Nominal Total Collimation Width'
+                                                                    #          ---------
+                                                                    #       (0040, a300)  Measured Value Sequence   1 item(s) ----
+                                                                    #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
+                                                                    #             (0008, 0100) Code Value                          SH: 'mm'
+                                                                    #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
+                                                                    #             (0008, 0103) Coding Scheme Version               SH: '1.4'
+                                                                    #             (0008, 0104) Code Meaning                        LO: 'mm'
+                                                                    #             ---------
+                                                                    #          (0040, a30a) Numeric Value                       DS: '38.4'
+                                                                    #          ---------
+                                                                    #       ---------
+                                                                    # Create the first inner coding bit
+                                                                    coding.CodeValue = '113827'
+                                                                    coding.CodingSchemeDesignator = "DCM"
+                                                                    coding.CodeMeaning = "Nominal Total Collimation Width"
+                                                                    # Create the second inner coding bit
+                                                                    coding2.CodeValue = 'mm'
+                                                                    coding2.CodingSchemeDesignator = "UCUM"
+                                                                    coding2.CodingSchemeVersion = "1.4"
+                                                                    coding2.CodeMeaning = "mm"
+                                                                    measurement_units_container = Dataset()
+                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
+                                                                    measurement_units_container.NumericValue = val
+                                                                    measured_value_sequence = Sequence([measurement_units_container])
+                                                                    # Create the outer container bit
+                                                                    pitch_container = Dataset()
+                                                                    pitch_container.RelationshipType = "CONTAINS"
+                                                                    pitch_container.ValueType = "NUM"
+                                                                    # Add the coding sequence into the container.
+                                                                    # Sequences are lists.
+                                                                    pitch_container.ConceptNameCodeSequence = Sequence([coding])
+                                                                    pitch_container.MeasuredValueSequence = measured_value_sequence
+                                                                    container2b.ContentSequence.append(pitch_container)
+
+                                                if key == 'ExposureModulationType':
+                                                    # First, check if there is already an ExposureModulationType container
+                                                    # that has a value in it.
+                                                    # First, check if there is already a ProtocolName container that has a protocol in it.
+                                                    data_exists = False
+                                                    for container2b in container.ContentSequence:
+                                                        for container3b in container2b:
+                                                            try:
+                                                                if container3b[0].CodeValue == '113842':
+                                                                    data_exists = True
+                                                                    # print container2b.TextValue
+                                                                    if container2b.TextValue == '':
+                                                                        # Update the X-Ray Modulation Type if it is blank
+                                                                        container2b.TextValue = val
+                                                            except AttributeError:
+                                                                pass
+                                                    if not data_exists:
+                                                        # Create the inner coding bit
+                                                        coding.CodeValue = '113842'
+                                                        coding.CodingSchemeDesignator = "DCM"
+                                                        coding.CodeMeaning = "X-Ray Modulation Type"
+                                                        # Create the outer container bit, including the protocol name
+                                                        prot_container = Dataset()
+                                                        prot_container.RelationshipType = "CONTAINS"
+                                                        prot_container.ValueType = "TEXT"
+                                                        prot_container.TextValue = val
+                                                        # Add the coding sequence into the container.
+                                                        # Sequences are lists.
+                                                        prot_container.ConceptNameCodeSequence = Sequence([coding])
+                                                        container.ContentSequence.append(prot_container)
 
                                                 if key == 'KVP':
                                                     # First, check if there is already a kVp value in an x-ray source parameters container inside
