@@ -211,7 +211,7 @@ LOGGING = {
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
         },
-        'store_file': {
+        'extractor_file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': 'openrem_extractor.log',
