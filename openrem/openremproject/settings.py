@@ -211,6 +211,12 @@ LOGGING = {
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
         },
+        'store_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'openrem_extractor.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django.request': {
@@ -229,6 +235,11 @@ LOGGING = {
         },
         'remapp.netdicom.storescp': {
             'handlers': ['store_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'remapp.extractors.rdsr_toshiba_ct_from_dose_images': {
+            'handlers': ['extractor_file'],
             'level': 'INFO',
             'propagate': False,
         },

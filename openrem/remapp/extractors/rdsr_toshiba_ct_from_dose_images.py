@@ -7,8 +7,6 @@ import shutil
 import django
 import logging
 
-logger = logging.getLogger(__name__)
-
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
 projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
@@ -19,6 +17,7 @@ django.setup()
 
 from celery import shared_task
 
+logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
 
 def _split_by_studyinstanceuid(dicom_path):
     """Parse a folder of files, creating a sub-folder for each StudyInstanceUID found in any DICOM files. Each DICOM
@@ -230,12 +229,10 @@ def _find_extra_info(dicom_path):
                                 try:
                                     if study_info['RequestedProcedureDescription'] == '':
                                         # Only update study_info['RequestedProcedureDescription'] if it's empty
-                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[
-                                            0].CodeMeaning
+                                        study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
                                 except KeyError:
                                     # study_info['RequestedProcedureDescription'] isn't present, so add it
-                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[
-                                        0].CodeMeaning
+                                    study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
@@ -317,23 +314,28 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     from dicom.dataset import Dataset
     from dicom.sequence import Sequence
 
+    logger.debug('Trying to open initial RDSR file')
     try:
         dcm = dicom.read_file(rdsr_file)
+        logger.debug('RDSR file opened: {0}'.format(rdsr_file))
     except IOError as e:
-        print 'I/O error({0}): {1} when trying to read {2}'.format(e.errno, e.strerror, rdsr_file)
+        logger.debug('I/O error({0}): {1} when trying to read {2}'.format(e.errno, e.strerror, rdsr_file))
         return 0
 
     # Update the study-level information if it does not exist, or is an empty string.
+    logger.debug('Updating study-level data')
     for key, val in additional_study_info.items():
         try:
             rdsr_val = getattr(dcm, key)
-            # print key, val
+            logger.debug('{0}: {1}'.format(key, val))
             if rdsr_val == '':
                 setattr(dcm, key, val)
         except AttributeError:
             setattr(dcm, key, val)
+    logger.debug('Study level data updated')
 
     # Now go through each CT Aquisition container in the rdsr file and see if any of the information should be updated.
+    logger.debug('Updating acquisition data')
     for container in dcm.ContentSequence:
         if container.ValueType == 'CONTAINER':
             if container.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
@@ -344,29 +346,24 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                     # The Acquisition protocol would go in at this level I think
                     if container2.ValueType == 'CONTAINER':
                         if container2.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose':
-                            current_dlp = ''
-                            current_ctdi_vol = ''
+                            logger.debug('Found CT Dose container')
+                            current_dlp = '0'
+                            current_ctdi_vol = '0'
                             for container3 in container2.ContentSequence:
                                 if container3.ConceptNameCodeSequence[0].CodeMeaning == 'DLP':
                                     current_dlp = container3.MeasuredValueSequence[0].NumericValue
-                                    # print container3.MeasuredValueSequence[0].NumericValue
+                                    logger.debug('Found DLP value: {0}'.format(current_dlp))
                                 if container3.ConceptNameCodeSequence[0].CodeMeaning == 'Mean CTDIvol':
                                     current_ctdi_vol = container3.MeasuredValueSequence[0].NumericValue
-                                    # print container3.MeasuredValueSequence[0].NumericValue
+                                    logger.debug('Found CTDIvol value: {0}'.format(current_ctdi_vol))
 
                             # Check to see if the current DLP and CTDIvol pair matches any of the acquisitions in
                             # additional_info
                             for acquisition in additional_acquisition_info:
                                 try:
-                                    print 'Current set is:'
-                                    print float(acquisition['CTDIvol'])
-                                    print float(current_ctdi_vol)
-                                    print float(acquisition['DLP'])
-                                    print float(current_dlp)
+                                    logger.debug('Trying to match DLP and CTDIvol. Current values: {0}, {1}'.format(float(acquisition['DLP']), float(acquisition['CTDIvol'])))
                                     if float(acquisition['CTDIvol']) == float(current_ctdi_vol) and float(acquisition['DLP']) == float(current_dlp):
-                                        print '\nCTDIvol: {0} is equal to {1}'.format(float(acquisition['CTDIvol']), float(current_ctdi_vol))
-                                        print '\nand'
-                                        print '\nDLP: {0} is equal to {1}'.format(float(acquisition['DLP']), float(current_dlp))
+                                        logger.debug('DLP and CTDIvol match')
                                         # There's a match between CTDIvol and DLP, so see if things can be updated or added.
                                         for key, val in acquisition.items():
                                             if key != 'CTDIvol' and key != 'DLP':
@@ -375,7 +372,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                 # Code here to add / update the data...
                                                 coding = Dataset()
                                                 coding2 = Dataset()
-                                                # DJP note: need to know or look up the three things below for each item that needs to be added.
                                                 if key == 'ProtocolName':
                                                     # First, check if there is already a ProtocolName container that has a protocol in it.
                                                     data_exists = False
@@ -384,7 +380,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                             try:
                                                                 if container3b[0].CodeValue == '125203':
                                                                     data_exists = True
-                                                                    # print container2b.TextValue
                                                                     if container2b.TextValue == '':
                                                                         # Update the protocol if it is blank
                                                                         container2b.TextValue = val
@@ -415,8 +410,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                         container.ContentSequence.append(prot_container)
 
                                                 if key == 'SpiralPitchFactor':
-                                                    # First, check if there is already a SpiralPitchFactor container
-                                                    # that has a value in it.
+                                                    # First, check if there is already a SpiralPitchFactor container that has a value in it.
                                                     data_exists = False
 
                                                     for container2b in container.ContentSequence:
@@ -427,7 +421,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                         try:
                                                                             if container4b.ConceptNameCodeSequence[0].CodeValue == '113828':
                                                                                 data_exists = True
-                                                                                # print container4b.MeasuredValueSequence[0].NumericValue
                                                                         except AttributeError:
                                                                             pass
                                                                 if not data_exists:
@@ -474,8 +467,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     container2b.ContentSequence.append(pitch_container)
 
                                                 if key == 'NominalSingleCollimationWidth':
-                                                    # First, check if there is already a NominalSingleCollimationWidth container
-                                                    # that has a value in it.
+                                                    # First, check if there is already a NominalSingleCollimationWidth container that has a value in it.
                                                     data_exists = False
 
                                                     for container2b in container.ContentSequence:
@@ -532,8 +524,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     container2b.ContentSequence.append(pitch_container)
 
                                                 if key == 'NominalTotalCollimationWidth':
-                                                    # First, check if there is already a NominalSingleCollimationWidth container
-                                                    # that has a value in it.
+                                                    # First, check if there is already a NominalSingleCollimationWidth container that has a value in it.
                                                     data_exists = False
 
                                                     for container2b in container.ContentSequence:
@@ -590,16 +581,13 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     container2b.ContentSequence.append(pitch_container)
 
                                                 if key == 'ExposureModulationType':
-                                                    # First, check if there is already an ExposureModulationType container
-                                                    # that has a value in it.
-                                                    # First, check if there is already a ProtocolName container that has a protocol in it.
+                                                    # First, check if there is already an ExposureModulationType container that has a value in it.
                                                     data_exists = False
                                                     for container2b in container.ContentSequence:
                                                         for container3b in container2b:
                                                             try:
                                                                 if container3b[0].CodeValue == '113842':
                                                                     data_exists = True
-                                                                    # print container2b.TextValue
                                                                     if container2b.TextValue == '':
                                                                         # Update the X-Ray Modulation Type if it is blank
                                                                         container2b.TextValue = val
@@ -622,14 +610,13 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
                                                 if key == 'KVP':
                                                     # First, check if there is already a kVp value in an x-ray source parameters container inside
-                                                    # a CT Acquisition Parameters container...
+                                                    # a CT Acquisition Parameters container
                                                     source_parameters_exists = False
                                                     kvp_data_exists = False
 
                                                     for container2b in container.ContentSequence:
                                                         if container2b.ValueType == 'CONTAINER':
                                                             if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                print 'Found CT Acquisition Parameters in KVP section...'
                                                                 for container3b in container2b:
                                                                     for container4b in container3b:
                                                                         try:
@@ -639,17 +626,14 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                 for container5b in container4b:
                                                                                     try:
                                                                                         if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113733':
-                                                                                            print 'KVP data exists'
                                                                                             kvp_data_exists = True
                                                                                     except AttributeError:
-                                                                                        print 'KVP data does not exist'
                                                                                         pass
                                                                         except AttributeError:
                                                                             # Likely there's no ConceptNameCodeSequence attribute
                                                                             pass
 
                                                                 if not source_parameters_exists:
-                                                                    print 'Creating source container in KVP section'
                                                                     # There is no x-ray source parameters section, so add it
                                                                     # Create the x-ray source container
                                                                     source_container = Dataset()
@@ -662,7 +646,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     source_container.ConceptNameCodeSequence = Sequence([coding])
 
                                                                     # Create the kVp container that will go in to the x-ray source container
-                                                                    print 'Creating KVP container'
                                                                     kvp_container = Dataset()
                                                                     kvp_container.RelationshipType = "CONTAINS"
                                                                     kvp_container.ValueType = "NUM"
@@ -689,24 +672,20 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     try:
                                                                         # Append it to an existing ContentSequence
                                                                         container2b.ContentSequence.append(source_container)
-                                                                        print 'Appended source container with KVP data in'
                                                                     except TypeError:
                                                                         # ContentSequence doesn't exist, so add it
                                                                         container2b.ContentSequence = Sequence([source_container])
-                                                                        print 'Added source container with KVP data in'
 
                                                                     source_parameters_exists = True
                                                                     kvp_data_exists = True
 
                                                                 elif not kvp_data_exists:
-                                                                    print 'Source paramters exists but there is no KVP data - adding it'
                                                                     # CT X-ray Source Parameters exists, but there is no kVp data
                                                                     for container3b in container2b:
                                                                         for container4b in container3b:
                                                                             try:
                                                                                 if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
                                                                                     # Create the kVp container that will go in to the x-ray source container
-                                                                                    print 'Found the CT X-ray Source Parameters sequence'
                                                                                     kvp_container = Dataset()
                                                                                     kvp_container.RelationshipType = "CONTAINS"
                                                                                     kvp_container.ValueType = "NUM"
@@ -728,7 +707,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
                                                                                     # Add the kVp container inside the x-ray source container
                                                                                     container4b.ContentSequence.append(kvp_container)
-                                                                                    print 'Appended source container with KVP data in'
 
                                                                                     kvp_data_exists = True
 
@@ -738,14 +716,13 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
                                                 if key == 'ExposureTime':
                                                     # First, check if there is already an exposure time per rotation value in an x-ray source parameters container inside
-                                                    # a CT Acquisition Parameters container...
+                                                    # a CT Acquisition Parameters container.
                                                     source_parameters_exists = False
                                                     exposure_time_per_rotation_data_exists = False
 
                                                     for container2b in container.ContentSequence:
                                                         if container2b.ValueType == 'CONTAINER':
                                                             if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                print 'Found CT Acquisition Parameters in ExposureTime section...'
                                                                 for container3b in container2b:
                                                                     for container4b in container3b:
                                                                         try:
@@ -755,17 +732,14 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                 for container5b in container4b:
                                                                                     try:
                                                                                         if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113843':
-                                                                                            print 'Exposure time per rotation data exists'
                                                                                             exposure_time_per_rotation_data_exists = True
                                                                                     except AttributeError:
-                                                                                        print 'Exposure time per rotation data does not exist'
                                                                                         pass
                                                                         except AttributeError:
                                                                             # Likely there's no ConceptNameCodeSequence attribute
                                                                             pass
 
                                                                 if not source_parameters_exists:
-                                                                    print 'Creating source container in ExposureTime section'
                                                                     # There is no x-ray source parameters section, so add it
                                                                     # Create the x-ray source container
                                                                     source_container = Dataset()
@@ -778,7 +752,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     source_container.ConceptNameCodeSequence = Sequence([coding])
 
                                                                     # Create the kVp container that will go in to the x-ray source container
-                                                                    print 'Creating Exposure time per rotation container'
                                                                     exposure_time_per_rotation_container = Dataset()
                                                                     exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
                                                                     exposure_time_per_rotation_container.ValueType = "NUM"
@@ -805,24 +778,20 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                     try:
                                                                         # Append it to an existing ContentSequence
                                                                         container2b.ContentSequence.append(source_container)
-                                                                        print 'Appended source container with ExposureTime data in'
                                                                     except TypeError:
                                                                         # ContentSequence doesn't exist, so add it
                                                                         container2b.ContentSequence = Sequence([source_container])
-                                                                        print 'Added source container with ExposureTime data in'
 
                                                                     source_parameters_exists = True
                                                                     exposure_time_per_rotation_data_exists = True
 
                                                                 elif not exposure_time_per_rotation_data_exists:
-                                                                    print 'Source paramters exists but there is no ExposureTime data - adding it'
                                                                     # CT X-ray Source Parameters exists, but there is no exposure time per rotation data
                                                                     for container3b in container2b:
                                                                         for container4b in container3b:
                                                                             try:
                                                                                 if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
                                                                                     # Create the exposure time per rotation container that will go in to the x-ray source container
-                                                                                    print 'Found the CT X-ray Source Parameters sequence'
                                                                                     exposure_time_per_rotation_container = Dataset()
                                                                                     exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
                                                                                     exposure_time_per_rotation_container.ValueType = "NUM"
@@ -844,7 +813,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
                                                                                     # Add the exposure time per rotation container inside the x-ray source container
                                                                                     container4b.ContentSequence.append(exposure_time_per_rotation_container)
-                                                                                    print 'Appended source container with ExposureTime data in'
 
                                                                                     exposure_time_per_rotation_data_exists = True
 
@@ -860,8 +828,11 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                 except ValueError:
                                     # Perhaps the contents of the DLP or CTDIvol are not values
                                     pass
+    logger.debug('Updated acquisition data')
 
+    logger.debug('Saving updated RDSR file')
     dcm.save_as(new_rdsr_file)
+    logger.debug('Updated RDSR file saved')
     return 1
 
 
@@ -874,8 +845,9 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     # first dose summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one
     # dose summary per folder. N.B. I think Conquest may do this by default with incoming DICOM objects. This
     # routine also renames the files using integer file names to ensure that they are accepted by dcmmkdir later on.
-    print 'Splitting into folders by StudyInstanceUID'
+    logger.debug('Splitting into folders by StudyInstanceUID')
     folders = _split_by_studyinstanceuid(folder_name)
+    logger.debug('Splitting into folders by StudyInstanceUID complete')
 
     # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
     # print 'Making explicit VR little endian'
@@ -887,13 +859,14 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     # _make_dicomdir(folders, DCMMKDIR)
 
     # Now create a DICOM RDSR for each sub-folder using pixelmed.jar.
-    print 'Making initial DICOM RDSR objects'
+    logger.debug('Making initial DICOM RDSR objects')
     combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
     _make_dicom_rdsr(folders, combined_command, rdsr_name)
+    logger.debug('Making initial DICOM RDSR objects complete')
 
     # Obtain additional information from the image tags in each folder and add this information to the RDSR file.
     for folder in folders:
-        print 'Gathering extra information from images in ' + folder
+        logger.debug('Gathering extra information from images in ' + folder)
         extra_information = _find_extra_info(folder)
         extra_study_information = extra_information[0]
         print 'Extra study information is:'
@@ -901,21 +874,28 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
         extra_acquisition_information = extra_information[1]
         print 'Extra acquisition information is:'
         print extra_acquisition_information
+        logger.debug('Gathered extra information from images')
 
         # Use the extra information to update the initial rdsr file created by DoseUtility
-        print 'Updating information in rdsr in ' + folder
+        logger.debug('Updating information in rdsr in ' + folder)
         initial_rdsr_name_and_path = os.path.join(folder, rdsr_name)
         updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
-        result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
-                                    extra_acquisition_information, updated_rdsr_name_and_path)
+        result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information, extra_acquisition_information, updated_rdsr_name_and_path)
+        logger.debug('Updated information in rdsr')
 
         # Now import the updated rdsr into OpenREM using the Toshiba extractor
         if result == 1:
-            print 'Importing updated rdsr in to OpenREM (' + updated_rdsr_name_and_path + ')'
+            logger.debug('Importing updated rdsr in to OpenREM (' + updated_rdsr_name_and_path + ')')
             rdsr(updated_rdsr_name_and_path)
+            logger.debug('Imported in to OpenREM')
+        else:
+            logger.debug('Not imported to OpenREM. Result is: ' + result)
 
     # Now delete the image folder
+    logger.debug('Removing study folder')
     shutil.rmtree(folder_name)
+    logger.debug('Removing study folder complete')
+    logger.debug('Reached end of rdsr_toshiba_ct_from_dose_images routine')
     return 0
 
 
