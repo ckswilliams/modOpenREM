@@ -36,12 +36,11 @@ The default text for ``display name`` is set to a combination of
 User defined modality field
 ===========================
 
-Based on the information in the DICOM dose structured report OpenREM determines
-the modality type of a system. However sometimes this mechanism failes because
-vendors use templates meant for RF also for DX systems. Therefore it is possible
-from version 0.8.0 to set a modality type for each system manually. If a
-modality type is set manually this overrides the value that would be determined
-automatically.
+OpenREM determines the modality type of a system based on the information in
+the DICOM dose structured report . However sometimes this mechanism failes
+because vendors use templates meant for RF also for DX systems. Therefore it
+is possible from version 0.8.0 to set a modality type for each system manually.
+A manually set modality type overrides the automatically determined value.
 
 
 Viewing x-ray system display names and user defined modality
@@ -102,8 +101,8 @@ edit these parameters. Click on the ``Update`` button to confirm your changes:
 
    Example of the page for updating a display name and user defined modality
 
-You change multiple rows at once. For display names you may wish to do this if
-a system has a software upgrade, for example, as this will generate a new
+You can change multiple rows at once. For display names you may wish to do this
+if a system has a software upgrade, for example, as this will generate a new
 default display name for studies carried out after the software upgrade has
 taken place. The studies from these will be grouped together as a single entry
 on the OpenREM homepage and individual modality pages.
