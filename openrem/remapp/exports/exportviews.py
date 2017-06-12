@@ -291,9 +291,9 @@ def export(request):
 
     exptsks = Exports.objects.all().order_by('-export_date')
     
-    current = exptsks.filter(status__contains = 'CURRENT')
-    complete = exptsks.filter(status__contains = 'COMPLETE')
-    errors = exptsks.filter(status__contains = 'ERROR')
+    current = exptsks.filter(status__contains = u'CURRENT')
+    complete = exptsks.filter(status__contains = u'COMPLETE')
+    errors = exptsks.filter(status__contains = u'ERROR')
     
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -336,16 +336,16 @@ def download(request, task_id):
     try:
         exp = Exports.objects.get(task_id__exact = task_id)
     except:
-        messages.error(request, "Can't match the task ID, export aborted")
+        messages.error(request, u"Can't match the task ID, export aborted")
         return redirect('/openrem/export/')
 
     if not exportperm:
-        messages.error(request, "You don't have permission to export data")
+        messages.error(request, u"You don't have permission to export data")
         return redirect('/openrem/export/')
 
     if exp.includes_pid and not pidperm:
         messages.error(request,
-                       "You don't have permission to export data that includes patient identifiable information")
+                       u"You don't have permission to export data that includes patient identifiable information")
         return redirect('/openrem/export/')
 
     file_path = os.path.join(MEDIA_ROOT, exp.filename.name)
@@ -354,7 +354,7 @@ def download(request, task_id):
     response = HttpResponse(file_wrapper, content_type=file_mimetype )
     response['X-Sendfile'] = file_path
     response['Content-Length'] = os.stat(file_path).st_size
-    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(exp.filename)
+    response['Content-Disposition'] = u'attachment; filename=%s' % smart_str(exp.filename)
     return response
 
 @csrf_exempt
@@ -380,11 +380,11 @@ def deletefile(request):
             try:
                 export.filename.delete()
                 export.delete()
-                messages.success(request, "Export file and database entry deleted successfully.")
+                messages.success(request, u"Export file and database entry deleted successfully.")
             except OSError as e:
-                messages.error(request, "Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
+                messages.error(request, u"Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
             except:
-                messages.error(request, "Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
+                messages.error(request, u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
     
     return HttpResponseRedirect(reverse(exportviews.export))
 
