@@ -25,6 +25,7 @@ requires = [
     'pandas',
     'xlrd',
     'testfixtures',
+    'mock',
     'django-debug-toolbar',
     ]
 

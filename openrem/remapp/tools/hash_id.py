@@ -41,6 +41,10 @@ def hash_id(id_string, *args, **kwargs):
     import hashlib
 
     if id_string:
-        if isinstance(id_string, dicom.multival.MultiValue):
+        # print("hash_id id_string before is of type {0}".format(type(id_string)))
+        if isinstance(id_string, (dicom.multival.MultiValue, list, dicom.valuerep.PersonNameUnicode)):
             id_string = ''.join(id_string)
-        return hashlib.sha256(smart_bytes(id_string, encoding='utf-8')).hexdigest()
+        id_string = smart_bytes(id_string, encoding='utf-8')
+        # print("hash_id id_string after is of type {0}".format(type(id_string)))
+        # print(id_string)
+        return hashlib.sha256(id_string).hexdigest()

@@ -44,8 +44,8 @@ def get_not_pt(dataset, char_set=charset.default_encoding):
     :returns:           str. -- xml style string if any trigger values are found.
     """
     from remapp.tools.get_values import get_value_kw
-    patient_id = get_value_kw('PatientID', dataset, char_set=char_set)
-    patient_name = get_value_kw('PatientName', dataset, char_set=char_set)
+    patient_id = get_value_kw('PatientID', dataset)
+    patient_name = get_value_kw('PatientName', dataset)
     id_indicators = ['phy', 'test', 'qa']
     name_indicators = ['phys', 'test', 'qa']
     id_contains = []
