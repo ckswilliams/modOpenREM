@@ -140,6 +140,7 @@ class ImportCarestreamDR7500(TestCase):
         dx(dx_carestream_dr7500_1_path)
         dx(dx_carestream_dr7500_2_path)
 
+    def test_dr7500_and_xr220(self):
         studies = GeneralStudyModuleAttr.objects.all()
 
         # Test that five studies have been imported
