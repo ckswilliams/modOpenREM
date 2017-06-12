@@ -95,11 +95,11 @@ class ImportCarestreamDR7500(TestCase):
         dx_carestream_dr7500_2 = os.path.join("test_files", "DX-Im-Carestream_DR7500-2.dcm")
         root_tests = os.path.dirname(os.path.abspath(__file__))
 
-        dx(dx_ge_xr220_1_path)
-        dx(dx_ge_xr220_2_path)
-        dx(dx_ge_xr220_3_path)
-        dx(dx_carestream_dr7500_1_path)
-        dx(dx_carestream_dr7500_2_path)
+        dx(os.path.join(root_tests, dx_ge_xr220_1))
+        dx(os.path.join(root_tests, dx_ge_xr220_2))
+        dx(os.path.join(root_tests, dx_ge_xr220_3))
+        dx(os.path.join(root_tests, dx_carestream_dr7500_1))
+        dx(os.path.join(root_tests, dx_carestream_dr7500_2))
 
     def test_dr7500_and_xr220(self):
         studies = GeneralStudyModuleAttr.objects.all()
