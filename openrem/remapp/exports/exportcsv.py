@@ -59,12 +59,12 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = exportCT2excel.request.id
-    tsk.modality = "CT"
-    tsk.export_type = "CSV export"
+    tsk.modality = u"CT"
+    tsk.export_type = u"CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -76,53 +76,53 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
 
-        tsk.progress = 'CSV file created'
+        tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
         
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.save()
         
     numresults = e.count()
 
-    tsk.progress = '{0} studies in query.'.format(numresults)
+    tsk.progress = u'{0} studies in query.'.format(numresults)
     tsk.num_records = numresults
     tsk.save()
 
     headings = []
     if pid and name:
-        headings += ['Patient name']
+        headings += [u'Patient name']
     if pid and patid:
-        headings += ['Patient ID']
+        headings += [u'Patient ID']
     headings += [
-        'Institution name', 
-        'Manufacturer', 
-        'Model name',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Operator',
-        'Study date',
+        u'Institution name',
+        u'Manufacturer',
+        u'Model name',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Operator',
+        u'Study date',
     ]
     if pid and (name or patid):
         headings += [
-            'Date of birth',
+            u'Date of birth',
         ]
     headings += [
-        'Patient age',
-        'Patient sex',
-        'Patient height', 
-        'Patient mass (kg)',
-        'Test patient?',
-        'Study description',
-        'Requested procedure',
-        'Number of events',
-        'DLP total (mGy.cm)',
+        u'Patient age',
+        u'Patient sex',
+        u'Patient height',
+        u'Patient mass (kg)',
+        u'Test patient?',
+        u'Study description',
+        u'Requested procedure',
+        u'Number of events',
+        u'DLP total (mGy.cm)',
         ]
 
     from django.db.models import Max
@@ -130,31 +130,31 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
         headings += [
-            'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Type',
-            'E' + str(h+1) + ' Exposure time',
-            'E' + str(h+1) + ' Scanning length',
-            'E' + str(h+1) + ' Slice thickness',
-            'E' + str(h+1) + ' Total collimation',
-            'E' + str(h+1) + ' Pitch',
-            'E' + str(h+1) + ' No. sources',
-            'E' + str(h+1) + ' CTDIvol',
-            'E' + str(h+1) + ' DLP',
-            'E' + str(h+1) + ' S1 name',
-            'E' + str(h+1) + ' S1 kVp',
-            'E' + str(h+1) + ' S1 max mA',
-            'E' + str(h+1) + ' S1 mA',
-            'E' + str(h+1) + ' S1 Exposure time/rotation',
-            'E' + str(h+1) + ' S2 name',
-            'E' + str(h+1) + ' S2 kVp',
-            'E' + str(h+1) + ' S2 max mA',
-            'E' + str(h+1) + ' S2 mA',
-            'E' + str(h+1) + ' S2 Exposure time/rotation',
-            'E' + str(h+1) + ' mA Modulation type',
+            u'E' + str(h+1) + u' Protocol',
+            u'E' + str(h+1) + u' Type',
+            u'E' + str(h+1) + u' Exposure time',
+            u'E' + str(h+1) + u' Scanning length',
+            u'E' + str(h+1) + u' Slice thickness',
+            u'E' + str(h+1) + u' Total collimation',
+            u'E' + str(h+1) + u' Pitch',
+            u'E' + str(h+1) + u' No. sources',
+            u'E' + str(h+1) + u' CTDIvol',
+            u'E' + str(h+1) + u' DLP',
+            u'E' + str(h+1) + u' S1 name',
+            u'E' + str(h+1) + u' S1 kVp',
+            u'E' + str(h+1) + u' S1 max mA',
+            u'E' + str(h+1) + u' S1 mA',
+            u'E' + str(h+1) + u' S1 Exposure time/rotation',
+            u'E' + str(h+1) + u' S2 name',
+            u'E' + str(h+1) + u' S2 kVp',
+            u'E' + str(h+1) + u' S2 max mA',
+            u'E' + str(h+1) + u' S2 mA',
+            u'E' + str(h+1) + u' S2 Exposure time/rotation',
+            u'E' + str(h+1) + u' mA Modulation type',
             ]
     writer.writerow(headings)
 
-    tsk.progress = 'CSV header row written.'
+    tsk.progress = u'CSV header row written.'
     tsk.save()
 
     for i, exams in enumerate(e):
@@ -303,38 +303,38 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
                         maximum_xray_tube_current,
                         xray_tube_current,
                         exposure_time_per_rotation,
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
-                        'n/a',
+                        u'n/a',
+                        u'n/a',
+                        u'n/a',
+                        u'n/a',
+                        u'n/a',
                         ]
                 except:
-                        examdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
+                        examdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
             examdata += [s.xray_modulation_type,]
 
         writer.writerow(examdata)
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = u"{0} of {1}".format(i+1, numresults)
         tsk.save()
-    tsk.progress = 'All study data written.'
+    tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = "ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = u"ctexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
@@ -365,13 +365,13 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk = Exports.objects.create()
     tsk.task_id = exportMG2excel.request.id
     if tsk.task_id is None:  # Required when testing without celery
-        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
-    tsk.modality = "MG"
-    tsk.export_type = "CSV export"
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
+    tsk.modality = u"MG"
+    tsk.export_type = u"CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -383,21 +383,21 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
 
-        tsk.progress = 'CSV file created'
+        tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
         
     # Get the data!
 
     if pid:
-        df_filtered_qs = MGFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+        df_filtered_qs = MGFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
     else:
-        df_filtered_qs = MGSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'MG'))
+        df_filtered_qs = MGSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = u'MG'))
     s = df_filtered_qs.qs
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.save()
         
     numresults = s.count()
@@ -407,48 +407,48 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     headings = []
     if pid and name:
-        headings += ['Patient name']
+        headings += [u'Patient name']
     if pid and patid:
-        headings += ['Patient ID']
+        headings += [u'Patient ID']
     headings += [
-        'Institution name',
-        'Manufacturer',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Study UID',
-        'Study date',
-        'Study time',
+        u'Institution name',
+        u'Manufacturer',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Study UID',
+        u'Study date',
+        u'Study time',
     ]
     if pid and (name or patid):
         headings += [
-            'Date of birth',
+            u'Date of birth',
         ]
     headings += [
-        'Patient age',
-        'Patient sex',
-        'Number of events',
-        'Study description',
-        'View',
-        'Laterality',
-        'Acquisition',
-        'Thickness',
-        'Radiological thickness',
-        'Force',
-        'Mag',
-        'Area',
-        'Mode',
-        'Target',
-        'Filter',
-        'Focal spot size',
-        'kVp',
-        'mA',
-        'ms',
-        'uAs',
-        'ESD',
-        'AGD',
-        '% Fibroglandular tissue',
-        'Exposure mode description'
+        u'Patient age',
+        u'Patient sex',
+        u'Number of events',
+        u'Study description',
+        u'View',
+        u'Laterality',
+        u'Acquisition',
+        u'Thickness',
+        u'Radiological thickness',
+        u'Force',
+        u'Mag',
+        u'Area',
+        u'Mode',
+        u'Target',
+        u'Filter',
+        u'Focal spot size',
+        u'kVp',
+        u'mA',
+        u'ms',
+        u'uAs',
+        u'ESD',
+        u'AGD',
+        u'% Fibroglandular tissue',
+        u'Exposure mode description'
         ]
 
     writer.writerow(headings)
@@ -604,28 +604,28 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 export_safe(exp.comment),
                 ]
             writer.writerow(row)
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = u"{0} of {1}".format(i+1, numresults)
         tsk.save()
 
-    tsk.progress = 'All study data written.'
+    tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = "mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = u"mgexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
