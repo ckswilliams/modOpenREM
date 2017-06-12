@@ -1,6 +1,7 @@
 Viewing and editing individual x-ray system display names and set user defined modality using the web interface
 ***************************************************************************************************************
 *New in 0.7.0*
+
 *Functionality changed in 0.8.0*
 
 .. contents::
@@ -57,8 +58,8 @@ Viewing x-ray system display names and user defined modality
 If you log in as a normal user then the ``Config`` menu becomes available
 at the right-hand end of the navigation bar at the top of the screen.
 
-The third option, ``View display names``, takes you to a page where you can
-view the list of x-ray systems with data in OpenREM together with their
+The third option, ``View display names & modality``, takes you to a page where
+you can view the list of x-ray systems with data in OpenREM together with their
 current display name and user defined modality. If the user defined modality
 is not set, the value contains ``None``. The x-ray systems are grouped
 into modalities and displayed in five tables: CT; mammography; DX and CR;
@@ -85,8 +86,8 @@ Changing x-ray system display names and user defined modality
 
 If you wish to make changes to a display name or to the user defined
 modality then you must log in as a user that is in the ``admingroup``. You will
-then be able to use the ``View and edit display names`` item under the ``Config``
-menu:
+then be able to use the ``Display names & modality`` item under the
+``Config`` menu:
 
 This will take you to a page where you can view the list of x-ray systems with
 data in OpenREM. If you wish to change a display name or the user defined modality
