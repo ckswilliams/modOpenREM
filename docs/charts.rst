@@ -99,6 +99,9 @@ showing those that correspond to what is contained in the histogram bin.
 
 Clicking on a legend entry toggles the visibility of the corresponding series.
 
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
+
 =============================================================
 2. Pie chart showing the frequency of each item in a category
 =============================================================
@@ -118,6 +121,10 @@ Clicking on any of the pie chart segments will filter the displayed studies,
 showing only the studies that correspond to what is contained in that segment.
 As for the bar charts, this doesn't work perfectly, as the category filtering
 isn't exact.
+
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
+
 
 ============================================================
 3. Line chart showing how an average value changes over time
@@ -141,6 +148,9 @@ across a range of dates and then releasing the mouse button will zoom in on
 that selection.
 
 Clicking on a legend entry toggles the visibility of the corresponding series.
+
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
 
 =============================================================
 4. Pie chart showing the number of events per day of the week
@@ -166,6 +176,9 @@ Each segment represents a day of the week, and shows the number of events that
 have taken place on that day (figure 9). Clicking on one of the segments will
 take you to a pie chart that shows the number of events per on that day (figure
 10).
+
+All data, including zero blank dose values are included in the data
+calculations for this chart type.
 
 =============================================
 5. Scatter plot showing one value vs. another
@@ -200,6 +213,9 @@ can be seen again.
 
 Clicking on a system's legend entry toggles the display of the corresponding
 series on the chart.
+
+Only data with non-zero and non-blank dose values are included in the chart
+data calculations.
 
 ********************
 Exporting chart data
