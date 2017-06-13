@@ -49,16 +49,17 @@ def _create_sheets(book, protocolslist, protocolheaders):
     """
     sheetlist = {}
     for protocol in protocolslist:
-        tabtext = protocol.lower().replace(" ","_")
-        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
-        tabtext = tabtext.translate(translation_table) # remove illegal characters
+        tabtext = protocol.lower().replace(u" ", u"_")
+        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
+                             (u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
+        tabtext = tabtext.translate(translation_table)  # remove illegal characters
         tabtext = tabtext[:31]
         if tabtext not in sheetlist:
             sheetlist[tabtext] = {
-                'sheet': book.add_worksheet(tabtext),
-                'count':0,
-                'protocolname':[protocol]}
-            sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
+                u'sheet': book.add_worksheet(tabtext),
+                u'count': 0,
+                u'protocolname':[protocol]}
+            sheetlist[tabtext]['sheet'].write_row(0, 0, protocolheaders)
         else:
             if protocol not in sheetlist[tabtext]['protocolname']:
                 sheetlist[tabtext]['protocolname'].append(protocol)
@@ -234,7 +235,7 @@ def _rf_common_get_data(source, pid=None, name=None, patid=None):
         ]
         if 'Single' in accum['plane']:
             examdata += [
-                '','','','','','','','',''
+                u'', u'', u'', u'', u'', u'', u'', u'', u''
             ]
 
     return examdata
@@ -247,72 +248,72 @@ def _rf_common_headers(pid=None, name=None, patid=None):
     if pid and patid:
         pidheadings += ['Patient ID']
     commonheaders = pidheadings + [
-        'Institution',
-        'Manufacturer',
-        'Model name',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Operator',
-        'Physician',
-        'Study date',
+        u'Institution',
+        u'Manufacturer',
+        u'Model name',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Operator',
+        u'Physician',
+        u'Study date',
     ]
     if pid and (name or patid):
         commonheaders += [
-            'Date of birth',
+            u'Date of birth',
         ]
     commonheaders += [
-        'Patient age',
-        'Patient sex',
-        'Patient height',
-        'Patient mass (kg)',
-        'Test patient?',
-        'Study description',
-        'Requested procedure',
-        'A DAP total (Gy.m^2)',
-        'A Dose RP total',
-        'A Fluoro DAP total',
-        'A Fluoro dose RP total',
-        'A Fluoro time total',
-        'A Acquisition DAP total',
-        'A Acquisition dose RP total',
-        'A Acquisition time total',
-        'A Number of events',
-        'B DAP total (Gy.m^2)',
-        'B Dose RP total',
-        'B Fluoro DAP total',
-        'B Fluoro dose RP total',
-        'B Fluoro time total',
-        'B Acquisition DAP total',
-        'B Acquisition dose RP total',
-        'B Acquisition time total',
-        'B Number of events',
+        u'Patient age',
+        u'Patient sex',
+        u'Patient height',
+        u'Patient mass (kg)',
+        u'Test patient?',
+        u'Study description',
+        u'Requested procedure',
+        u'A DAP total (Gy.m^2)',
+        u'A Dose RP total',
+        u'A Fluoro DAP total',
+        u'A Fluoro dose RP total',
+        u'A Fluoro time total',
+        u'A Acquisition DAP total',
+        u'A Acquisition dose RP total',
+        u'A Acquisition time total',
+        u'A Number of events',
+        u'B DAP total (Gy.m^2)',
+        u'B Dose RP total',
+        u'B Fluoro DAP total',
+        u'B Fluoro dose RP total',
+        u'B Fluoro time total',
+        u'B Acquisition DAP total',
+        u'B Acquisition dose RP total',
+        u'B Acquisition time total',
+        u'B Number of events',
     ]
     return commonheaders
 
 
 def _get_xray_filterinfo(source):
     try:
-        filters = ''
-        filter_thicknesses = ''
+        filters = u''
+        filter_thicknesses = u''
         for current_filter in source.xrayfilters_set.all():
-            if 'Aluminum' in str(current_filter.xray_filter_material):
+            if u'Aluminum' in str(current_filter.xray_filter_material):
                 filters += u'Al'
-            elif 'Copper' in str(current_filter.xray_filter_material):
+            elif u'Copper' in str(current_filter.xray_filter_material):
                 filters += u'Cu'
-            elif 'Tantalum' in str(current_filter.xray_filter_material):
+            elif u'Tantalum' in str(current_filter.xray_filter_material):
                 filters += u'Ta'
-            elif 'Molybdenum' in str(current_filter.xray_filter_material):
+            elif u'Molybdenum' in str(current_filter.xray_filter_material):
                 filters += u'Mo'
-            elif 'Rhodium' in str(current_filter.xray_filter_material):
+            elif u'Rhodium' in str(current_filter.xray_filter_material):
                 filters += u'Rh'
-            elif 'Silver' in str(current_filter.xray_filter_material):
+            elif u'Silver' in str(current_filter.xray_filter_material):
                 filters += u'Ag'
-            elif 'Niobium' in str(current_filter.xray_filter_material):
+            elif u'Niobium' in str(current_filter.xray_filter_material):
                 filters += u'Nb'
-            elif 'Europium' in str(current_filter.xray_filter_material):
+            elif u'Europium' in str(current_filter.xray_filter_material):
                 filters += u'Eu'
-            elif 'Lead' in str(current_filter.xray_filter_material):
+            elif u'Lead' in str(current_filter.xray_filter_material):
                 filters += u'Pb'
             else:
                 filters += str(current_filter.xray_filter_material)
@@ -322,7 +323,7 @@ def _get_xray_filterinfo(source):
             if thicknesses[0] is not None and thicknesses[1] is not None:
                 thick = sum(thicknesses) / len(thicknesses)
             elif thicknesses[0] is None and thicknesses[1] is None:
-                thick = ''
+                thick = u''
             elif thicknesses[0] is not None:
                 thick = thicknesses[0]
             elif thicknesses[1] is not None:
@@ -363,13 +364,13 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     tsk.task_id = rfxlsx.request.id
     if tsk.task_id is None:  # Required when testing without celery
-        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
-    tsk.modality = "RF"
-    tsk.export_type = "XLSX export"
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
+    tsk.modality = u"RF"
+    tsk.export_type = u"XLSX export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -380,10 +381,10 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         tmpxlsx = TemporaryFile()
         book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE, 'strings_to_numbers':  False})
-        tsk.progress = 'Workbook created'
+        tsk.progress = u'Workbook created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
     # Get the data
@@ -393,12 +394,12 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
     e = df_filtered_qs.qs
     
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
     tsk.save()
 
     # Add summary sheet and all data sheet
-    summarysheet = book.add_worksheet("Summary")
+    summarysheet = book.add_worksheet(u"Summary")
     wsalldata = book.add_worksheet('All data')
     date_column = 8
     if pid and name:
@@ -415,7 +416,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     num_groups_max = 0
     for row,exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
+        tsk.progress = u'Writing study {0} of {1} to All data sheet'.format(row + 1, e.count())
         tsk.save()
 
         examdata = _rf_common_get_data(exams, pid, name, patid)
@@ -563,45 +564,45 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
         wsalldata.write_row(row+1,0, examdata)
 
-    tsk.progress = 'Generating headers for the all data sheet...'
+    tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
     alldataheaders = _rf_common_headers(pid, name, patid)
 
     for h in xrange(num_groups_max):
         alldataheaders += [
-            'G' + str(h+1) + ' Type',
-            'G' + str(h+1) + ' Protocol',
-            'G' + str(h+1) + ' No. exposures',
-            'G' + str(h+1) + ' Plane',
-            'G' + str(h+1) + ' Pulse rate',
-            'G' + str(h+1) + ' Field size',
-            'G' + str(h+1) + ' Filter material',
-            'G' + str(h+1) + ' Filter thickness (average)',
-            'G' + str(h+1) + ' kVp min',
-            'G' + str(h+1) + ' kVp max',
-            'G' + str(h+1) + ' kVp mean',
-            'G' + str(h+1) + ' mA min',
-            'G' + str(h+1) + ' mA max',
-            'G' + str(h+1) + ' mA mean',
-            'G' + str(h+1) + ' pulse width min',
-            'G' + str(h+1) + ' pulse width max',
-            'G' + str(h+1) + ' pulse width mean',
-            'G' + str(h+1) + ' Exp time min (ms)',
-            'G' + str(h+1) + ' Exp time max (ms)',
-            'G' + str(h+1) + ' Exp time mean (ms)',
-            'G' + str(h+1) + ' DAP min (Gy.m^2)',
-            'G' + str(h+1) + ' DAP max (Gy.m^2)',
-            'G' + str(h+1) + ' DAP mean (Gy.m^2)',
-            'G' + str(h+1) + ' Ref point dose min (Gy)',
-            'G' + str(h+1) + ' Ref point dose max (Gy)',
-            'G' + str(h+1) + ' Ref point dose mean (Gy)',
-            'G' + str(h+1) + ' Primary angle min',
-            'G' + str(h+1) + ' Primary angle max',
-            'G' + str(h+1) + ' Primary angle mean',
-            'G' + str(h+1) + ' Secondary angle min',
-            'G' + str(h+1) + ' Secondary angle max',
-            'G' + str(h+1) + ' Secondary angle mean',
+            u'G' + str(h+1) + u' Type',
+            u'G' + str(h+1) + u' Protocol',
+            u'G' + str(h+1) + u' No. exposures',
+            u'G' + str(h+1) + u' Plane',
+            u'G' + str(h+1) + u' Pulse rate',
+            u'G' + str(h+1) + u' Field size',
+            u'G' + str(h+1) + u' Filter material',
+            u'G' + str(h+1) + u' Filter thickness (average)',
+            u'G' + str(h+1) + u' kVp min',
+            u'G' + str(h+1) + u' kVp max',
+            u'G' + str(h+1) + u' kVp mean',
+            u'G' + str(h+1) + u' mA min',
+            u'G' + str(h+1) + u' mA max',
+            u'G' + str(h+1) + u' mA mean',
+            u'G' + str(h+1) + u' pulse width min',
+            u'G' + str(h+1) + u' pulse width max',
+            u'G' + str(h+1) + u' pulse width mean',
+            u'G' + str(h+1) + u' Exp time min (ms)',
+            u'G' + str(h+1) + u' Exp time max (ms)',
+            u'G' + str(h+1) + u' Exp time mean (ms)',
+            u'G' + str(h+1) + u' DAP min (Gy.m^2)',
+            u'G' + str(h+1) + u' DAP max (Gy.m^2)',
+            u'G' + str(h+1) + u' DAP mean (Gy.m^2)',
+            u'G' + str(h+1) + u' Ref point dose min (Gy)',
+            u'G' + str(h+1) + u' Ref point dose max (Gy)',
+            u'G' + str(h+1) + u' Ref point dose mean (Gy)',
+            u'G' + str(h+1) + u' Primary angle min',
+            u'G' + str(h+1) + u' Primary angle max',
+            u'G' + str(h+1) + u' Primary angle mean',
+            u'G' + str(h+1) + u' Secondary angle min',
+            u'G' + str(h+1) + u' Secondary angle max',
+            u'G' + str(h+1) + u' Secondary angle mean',
             ]
     wsalldata.write_row('A1', alldataheaders)
     common_header_columns = 32
@@ -617,7 +618,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
         
     # Generate list of protocols in queryset and create worksheets for each
-    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()
 
     protocolslist = []
@@ -631,26 +632,26 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 protocolslist.append(safeprotocol)
     protocolslist.sort()
 
-    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
     protocolheaders = _rf_common_headers(pid, name, patid) + [
-        'Time',
-        'Type',
-        'Protocol',
-        'Plane',
-        'Pulse rate',
-        'Field size',
-        'Filter material',
-        'Filter thickness',
-        'kVp',
-        'mA',
-        'Pulse width',
-        'Exposure time',
-        'DAP (cGy.cm^2)',
-        'Ref point dose (Gy)',
-        'Primary angle',
-        'Secondary angle',
+        u'Time',
+        u'Type',
+        u'Protocol',
+        u'Plane',
+        u'Pulse rate',
+        u'Field size',
+        u'Filter material',
+        u'Filter thickness',
+        u'kVp',
+        u'mA',
+        u'Pulse width',
+        u'Exposure time',
+        u'DAP (cGy.cm^2)',
+        u'Ref point dose (Gy)',
+        u'Primary angle',
+        u'Secondary angle',
     ]
 
     sheetlist = _create_sheets(book, protocolslist, protocolheaders)
@@ -745,7 +746,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             sheetlist[tab]['sheet'].set_column(date_column+1, date_column+1, 10) # DOB column
 
     # Populate summary sheet
-    tsk.progress = 'Now populating the summary sheet...'
+    tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
 
     import pkg_resources  # part of setuptools
@@ -754,74 +755,74 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
-        vers = ''
+        vers = u''
 
     version = vers
     titleformat = book.add_format()
     titleformat.set_font_size=(22)
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
-    toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = 'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
+    linetwostring = u'OpenREM is copyright 2017 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 
     # Number of exams
-    summarysheet.write(3,0,"Total number of exams")
-    summarysheet.write(3,1,e.count())
+    summarysheet.write(3, 0, u"Total number of exams")
+    summarysheet.write(3, 1, e.count())
 
     # Generate list of Study Descriptions
-    summarysheet.write(5,0,"Study Description")
-    summarysheet.write(5,1,"Frequency")
+    summarysheet.write(5, 0, u"Study Description")
+    summarysheet.write(5, 1, u"Frequency")
     from django.db.models import Count
     study_descriptions = e.values("study_description").annotate(n=Count("pk"))
     for row, item in enumerate(study_descriptions.order_by('n').reverse()):
-        summarysheet.write(row+6,0,item['study_description'])
-        summarysheet.write(row+6,1,item['n'])
+        summarysheet.write(row+6, 0, item['study_description'])
+        summarysheet.write(row+6, 1, item['n'])
     summarysheet.set_column('A:A', 25)
 
     # Generate list of Requested Procedures
-    summarysheet.write(5,3,"Requested Procedure")
-    summarysheet.write(5,4,"Frequency")
+    summarysheet.write(5, 3, u"Requested Procedure")
+    summarysheet.write(5, 4, u"Frequency")
     from django.db.models import Count
     requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
     for row, item in enumerate(requested_procedure.order_by('n').reverse()):
-        summarysheet.write(row+6,3,item['requested_procedure_code_meaning'])
-        summarysheet.write(row+6,4,item['n'])
+        summarysheet.write(row+6, 3, item['requested_procedure_code_meaning'])
+        summarysheet.write(row+6, 4, item['n'])
     summarysheet.set_column('D:D', 25)
 
     # Generate list of Series Protocols
-    summarysheet.write(5,6,"Series Protocol")
-    summarysheet.write(5,7,"Frequency")
+    summarysheet.write(5, 6, u"Series Protocol")
+    summarysheet.write(5, 7, u"Frequency")
     sortedprotocols = sorted(sheetlist.iteritems(), key=lambda (k,v): v['count'], reverse=True)
     for row, item in enumerate(sortedprotocols):
-        summarysheet.write(row+6,6,', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
-        summarysheet.write(row+6,7,item[1]['count'])
+        summarysheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
+        summarysheet.write(row+6, 7, item[1]['count'])
     summarysheet.set_column('G:G', 15)
 
 
     book.close()
-    tsk.progress = 'XLSX book written.'
+    tsk.progress = u'XLSX book written.'
     tsk.save()
 
-    xlsxfilename = "rfexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfilename = u"rfexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(
             e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(
             sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
@@ -850,12 +851,12 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = exportFL2excel.request.id
-    tsk.modality = "RF"
-    tsk.export_type = "CSV export"
+    tsk.modality = u"RF"
+    tsk.export_type = u"CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -867,21 +868,23 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
 
-        tsk.progress = 'CSV file created'
+        tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
     # Get the data!
 
     if pid:
-        df_filtered_qs = RFFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+        df_filtered_qs = RFFilterPlusPid(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact='RF'))
     else:
-        df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact = 'RF'))
+        df_filtered_qs = RFSummaryListFilter(filterdict, queryset=GeneralStudyModuleAttr.objects.filter(
+            modality_type__exact='RF'))
     e = df_filtered_qs.qs
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.save()
 
     numresults = e.count()
@@ -895,47 +898,47 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
     if pid and patid:
         headings += ['Patient ID']
     headings += [
-        'Manufacturer',
-        'Model name',
-        'Institution name',
-        'Display name',
-        'Accession number',
-        'Study date',
+        u'Manufacturer',
+        u'Model name',
+        u'Institution name',
+        u'Display name',
+        u'Accession number',
+        u'Study date',
     ]
     if pid and (name or patid):
         headings += [
-            'Date of birth',
+            u'Date of birth',
         ]
     headings += [
-        'Patient age',
-        'Patient sex',
-        'Patient height',
-        'Patient mass (kg)',
-        'Not patient?',
-        'Study description',
-        'Physician',
-        'Operator',
-        'Number of events',
-        'Plane',
-        'DAP total (Gy.m2)',
-        'RP dose total (Gy)',
-        'Fluoro DAP total (Gy.m2)',
-        'Fluoro RP dose total (Gy)',
-        'Total fluoro time (ms)',
-        'Acquisition DAP total (Gy.m2)',
-        'Acquisition RP dose total (Gy)',
-        'Total acquisition time (ms)',
-        'RP definition',
-        'Plane (if bi-plane)',
-        'DAP total (Gy.m2)',
-        'RP dose total (Gy)',
-        'Fluoro DAP total (Gy.m2)',
-        'Fluoro RP dose total (Gy)',
-        'Total fluoro time (ms)',
-        'Acquisition DAP total (Gy.m2)',
-        'Acquisition RP dose total (Gy)',
-        'Total acquisition time (ms)',
-        'RP definition',
+        u'Patient age',
+        u'Patient sex',
+        u'Patient height',
+        u'Patient mass (kg)',
+        u'Not patient?',
+        u'Study description',
+        u'Physician',
+        u'Operator',
+        u'Number of events',
+        u'Plane',
+        u'DAP total (Gy.m2)',
+        u'RP dose total (Gy)',
+        u'Fluoro DAP total (Gy.m2)',
+        u'Fluoro RP dose total (Gy)',
+        u'Total fluoro time (ms)',
+        u'Acquisition DAP total (Gy.m2)',
+        u'Acquisition RP dose total (Gy)',
+        u'Total acquisition time (ms)',
+        u'RP definition',
+        u'Plane (if bi-plane)',
+        u'DAP total (Gy.m2)',
+        u'RP dose total (Gy)',
+        u'Fluoro DAP total (Gy.m2)',
+        u'Fluoro RP dose total (Gy)',
+        u'Total fluoro time (ms)',
+        u'Acquisition DAP total (Gy.m2)',
+        u'Acquisition RP dose total (Gy)',
+        u'Total acquisition time (ms)',
+        u'RP definition',
     ]
     writer.writerow(headings)
     for i, exams in enumerate(e):
@@ -968,7 +971,8 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
         except ObjectDoesNotExist:
             device_observer_name = None
         else:
-            device_observer_name = export_safe(return_for_export(exams.projectionxrayradiationdose_set.get().observercontext_set.get(), 'device_observer_name'))
+            device_observer_name = export_safe(return_for_export(exams.projectionxrayradiationdose_set.get(
+                ).observercontext_set.get(), 'device_observer_name'))
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -976,8 +980,10 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
             institution_name = None
             display_name = None
         else:
-            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
-            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
+            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(
+                ), 'institution_name'))
+            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(
+                ).unique_equipment_name, 'display_name'))
 
         try:
             exams.patientmoduleattr_set.get()
@@ -1050,42 +1056,42 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 accum['reference_point_definition'],
             ]
         writer.writerow(row)
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = u"{0} of {1}".format(i+1, numresults)
         tsk.save()
 
 
-    tsk.progress = 'All study data written.'
+    tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = "rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = u"rfexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
 
 @shared_task
 def rfopenskin(studyid):
-    """Export filtered RF database data to multi-sheet Microsoft XSLX files.
+    u"""Export filtered RF database data to multi-sheet Microsoft XSLX files.
 
     :param studyid: RF study database ID.
     :type studyud: int
 
-    """
+    u"""
 
     import sys, datetime
     from tempfile import TemporaryFile
@@ -1099,22 +1105,22 @@ def rfopenskin(studyid):
     tsk = Exports.objects.create()
 
     tsk.task_id = rfopenskin.request.id
-    tsk.modality = "RF"
-    tsk.export_type = "OpenSkin RF csv export"
+    tsk.modality = u"RF"
+    tsk.export_type = u"OpenSkin RF csv export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     tsk.save()
 
     try:
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
 
-        tsk.progress = 'CSV file created, starting to populate with events'
+        tsk.progress = u'CSV file created, starting to populate with events'
         tsk.save()
     except:
-        messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
     # Get the data
@@ -1127,22 +1133,22 @@ def rfopenskin(studyid):
         try:
             study.patientmoduleattr_set.get()
         except ObjectDoesNotExist:
-            patient_sex = ''
+            patient_sex = u''
         else:
             patient_sex = study.patientmoduleattr_set.get().patient_sex
 
         try:
             event.irradeventxraysourcedata_set.get()
         except ObjectDoesNotExist:
-            reference_point_definition = ''
-            dose_rp = ''
-            fluoro_mode = ''
-            pulse_rate = ''
-            number_of_pulses = ''
-            exposure_time = ''
-            focal_spot_size = ''
-            irradiation_duration = ''
-            average_xray_tube_current = ''
+            reference_point_definition = u''
+            dose_rp = u''
+            fluoro_mode = u''
+            pulse_rate = u''
+            number_of_pulses = u''
+            exposure_time = u''
+            focal_spot_size = u''
+            irradiation_duration = u''
+            average_xray_tube_current = u''
         else:
             reference_point_definition = event.irradeventxraysourcedata_set.get().reference_point_definition
             dose_rp = event.irradeventxraysourcedata_set.get().dose_rp
@@ -1157,11 +1163,11 @@ def rfopenskin(studyid):
         try:
             event.irradeventxraymechanicaldata_set.get()
         except ObjectDoesNotExist:
-            positioner_primary_angle = ''
-            positioner_secondary_angle = ''
-            positioner_primary_end_angle = ''
-            positioner_secondary_end_angle = ''
-            column_angulation = ''
+            positioner_primary_angle = u''
+            positioner_secondary_angle = u''
+            positioner_primary_end_angle = u''
+            positioner_secondary_end_angle = u''
+            column_angulation = u''
         else:
             positioner_primary_angle = event.irradeventxraymechanicaldata_set.get().positioner_primary_angle
             positioner_secondary_angle = event.irradeventxraymechanicaldata_set.get().positioner_secondary_angle
@@ -1172,58 +1178,58 @@ def rfopenskin(studyid):
         try:
             for filter in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
                 try:
-                    if "Copper" in filter.xray_filter_material.code_meaning:
+                    if u"Copper" in filter.xray_filter_material.code_meaning:
                         xray_filter_type = filter.xray_filter_type
                         xray_filter_material = filter.xray_filter_material
                         xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
                         xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
                 except AttributeError:
-                        xray_filter_type = ''
-                        xray_filter_material = ''
-                        xray_filter_thickness_minimum = ''
-                        xray_filter_thickness_maximum = ''
+                        xray_filter_type = u''
+                        xray_filter_material = u''
+                        xray_filter_thickness_minimum = u''
+                        xray_filter_thickness_maximum = u''
         except ObjectDoesNotExist:
-            xray_filter_type = ''
-            xray_filter_material = ''
-            xray_filter_thickness_minimum = ''
-            xray_filter_thickness_maximum = ''
+            xray_filter_type = u''
+            xray_filter_material = u''
+            xray_filter_thickness_minimum = u''
+            xray_filter_thickness_maximum = u''
 
         try:
             event.irradeventxraysourcedata_set.get().kvp_set.get()
         except ObjectDoesNotExist:
-            kvp = ''
+            kvp = u''
         else:
             kvp = event.irradeventxraysourcedata_set.get().kvp_set.get().kvp
 
         try:
             event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get()
         except ObjectDoesNotExist:
-            xray_tube_current = ''
+            xray_tube_current = u''
         else:
             xray_tube_current = event.irradeventxraysourcedata_set.get().xraytubecurrent_set.get().xray_tube_current
 
         try:
             event.irradeventxraysourcedata_set.get().pulsewidth_set.get()
         except ObjectDoesNotExist:
-            pulse_width = ''
+            pulse_width = u''
         else:
             pulse_width = event.irradeventxraysourcedata_set.get().pulsewidth_set.get().pulse_width
 
         try:
             event.irradeventxraysourcedata_set.get().exposure_set.get()
         except ObjectDoesNotExist:
-            exposure = ''
+            exposure = u''
         else:
             exposure = event.irradeventxraysourcedata_set.get().exposure_set.get().exposure
 
         try:
             event.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get()
         except ObjectDoesNotExist:
-            distance_source_to_detector = ''
-            distance_source_to_isocenter = ''
-            table_longitudinal_position = ''
-            table_lateral_position = ''
-            table_height_position = ''
+            distance_source_to_detector = u''
+            distance_source_to_isocenter = u''
+            table_longitudinal_position = u''
+            table_lateral_position = u''
+            table_height_position = u''
         else:
             distance_source_to_detector = event.irradeventxraymechanicaldata_set.get(
             ).doserelateddistancemeasurements_set.get().distance_source_to_detector
@@ -1236,13 +1242,13 @@ def rfopenskin(studyid):
             table_height_position = event.irradeventxraymechanicaldata_set.get(
             ).doserelateddistancemeasurements_set.get().table_height_position
 
-        acquisition_protocol = export_safe(return_for_export(event, 'acquisition_protocol'))
+        acquisition_protocol = export_safe(return_for_export(event, u'acquisition_protocol'))
 
         data = [
-            'Anon',
+            u'Anon',
             patient_sex,
             study.study_instance_uid,
-            '',
+            u'',
             event.acquisition_plane,
             event.date_time_started,
             event.irradiation_event_type,
@@ -1280,26 +1286,26 @@ def rfopenskin(studyid):
             export_safe(event.comment),
         ]
         writer.writerow(data)
-        tsk.progress = "{0} of {1}".format(i, numevents)
+        tsk.progress = u"{0} of {1}".format(i, numevents)
         tsk.save()
-    tsk.progress = 'All study data written.'
+    tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = "OpenSkinExport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = u"OpenSkinExport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(csvfilename,File(tmpfile))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
