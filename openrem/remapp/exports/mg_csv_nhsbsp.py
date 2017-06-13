@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2014  The Royal Marsden NHS Foundation Trust and Jonathan Cole
 #
@@ -55,12 +56,12 @@ def mg_csv_nhsbsp(filterdict, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = mg_csv_nhsbsp.request.id
-    tsk.modality = "MG"
-    tsk.export_type = "NHSBSP CSV export"
+    tsk.modality = u"MG"
+    tsk.export_type = u"NHSBSP CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     tsk.includes_pid = False
     tsk.export_user_id = user
     tsk.save()
@@ -69,11 +70,11 @@ def mg_csv_nhsbsp(filterdict, user=None):
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile)
 
-        tsk.progress = 'CSV file created'
+        tsk.progress = u'CSV file created'
         tsk.save()
     except:
         messages.error(request,
-                       "Unexpected error creating temporary file - please contact an administrator: {0}".format(
+                       u"Unexpected error creating temporary file - please contact an administrator: {0}".format(
                            sys.exc_info()[0]))
         return redirect('/openrem/export/')
 
@@ -89,10 +90,10 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 filterstring = filterdict[filt]
             else:
                 filterstring = (filterdict[filt])[0]
-            if filterstring != '':
-                s = s.filter(**{f[filt].name + '__' + f[filt].lookup_type: filterstring})
+            if filterstring != u'':
+                s = s.filter(**{f[filt].name + u'__' + f[filt].lookup_type: filterstring})
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.save()
 
     numresults = s.count()
@@ -101,21 +102,21 @@ def mg_csv_nhsbsp(filterdict, user=None):
     tsk.save()
 
     writer.writerow([
-        'Survey number',
-        'Patient number',
-        'View code',
-        'kV',
-        'Anode',
-        'Filter',
-        'Thickness',
-        'mAs',
-        'large cassette used',
-        'auto/man',
-        'Auto mode',
-        'Density setting',
-        'Age',
-        'Comment',
-        'AEC density mode',
+        u'Survey number',
+        u'Patient number',
+        u'View code',
+        u'kV',
+        u'Anode',
+        u'Filter',
+        u'Thickness',
+        u'mAs',
+        u'large cassette used',
+        u'auto/man',
+        u'Auto mode',
+        u'Density setting',
+        u'Age',
+        u'Comment',
+        u'AEC density mode',
     ])
 
     for i, study in enumerate(s):
@@ -159,25 +160,25 @@ def mg_csv_nhsbsp(filterdict, user=None):
             except AttributeError:
                 exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no anode material recorded
-            if "TUNGSTEN" in target.upper():
-                target = 'W'
-            elif "MOLY" in target.upper():
-                target = 'Mo'
-            elif "RHOD" in target.upper():
-                target = 'Rh'
+            if u"TUNGSTEN" in target.upper():
+                target = u'W'
+            elif u"MOLY" in target.upper():
+                target = u'Mo'
+            elif u"RHOD" in target.upper():
+                target = u'Rh'
             try:
                 filter_mat = exp.irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning
             except AttributeError:
                 exp.nccpm_view = None
                 continue  # Avoid exporting exposures with no filter material recorded
-            if "ALUM" in filter_mat.upper():
-                filter_mat = 'Al'
-            elif "MOLY" in filter_mat.upper():
-                filter_mat = 'Mo'
-            elif "RHOD" in filter_mat.upper():
-                filter_mat = 'Rh'
-            elif "SILV" in filter_mat.upper():
-                filter_mat = 'Ag'
+            if u"ALUM" in filter_mat.upper():
+                filter_mat = u'Al'
+            elif u"MOLY" in filter_mat.upper():
+                filter_mat = u'Mo'
+            elif u"RHOD" in filter_mat.upper():
+                filter_mat = u'Rh'
+            elif u"SILV" in filter_mat.upper():
+                filter_mat = u'Ag'
         unique_views = set()
         for exp in exposures:
             if exp.nccpm_view:
@@ -193,13 +194,13 @@ def mg_csv_nhsbsp(filterdict, user=None):
             if not exp.nccpm_view:
                 continue  # Avoid exporting exposures with no view code
             automan = exp.irradeventxraysourcedata_set.get().exposure_control_mode
-            if "AUTO" in automan.upper():
-                automan = 'AUTO'
-            elif "MAN" in automan.upper():
-                automan = "MANUAL"
+            if u"AUTO" in automan.upper():
+                automan = u'AUTO'
+            elif u"MAN" in automan.upper():
+                automan = u"MANUAL"
 
             writer.writerow([
-                '1',
+                u'1',
                 i + 1,
                 exp.nccpm_view,
                 exp.irradeventxraysourcedata_set.get().kvp_set.get().kvp,
@@ -207,36 +208,36 @@ def mg_csv_nhsbsp(filterdict, user=None):
                 filter_mat,
                 exp.irradeventxraymechanicaldata_set.get().compression_thickness,
                 exp.irradeventxraysourcedata_set.get().exposure_set.get().exposure / 1000,
-                '',  # not applicable to FFDM
+                u'',  # not applicable to FFDM
                 automan,
                 exp.irradeventxraysourcedata_set.get().exposure_control_mode,
-                '',  # no consistent behaviour for recording density setting on FFDM units
+                u'',  # no consistent behaviour for recording density setting on FFDM units
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get().patient_age_decimal,
-                '',  # not in DICOM headers
-                '',  # no consistent behaviour for recording density mode on FFDM units
+                u'',  # not in DICOM headers
+                u'',  # no consistent behaviour for recording density mode on FFDM units
             ])
-        tsk.progress = "{0} of {1}".format(i + 1, numresults)
+        tsk.progress = u"{0} of {1}".format(i + 1, numresults)
         tsk.save()
 
-    tsk.progress = 'All study data written.'
+    tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = "mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = u"mg_nhsbsp_{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno,
+        tsk.progress = u"Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno,
                                                                                                             e.strerror)
-        tsk.status = 'ERROR'
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(
             sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.status = u'ERROR'
         tsk.save()
         return
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
