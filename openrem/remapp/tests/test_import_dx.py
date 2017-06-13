@@ -211,10 +211,6 @@ class ImportCarestreamDR7500(TestCase):
             irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(500))
         self.assertAlmostEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[1].
             irradeventxraysourcedata_set.get().average_xray_tube_current, Decimal(500))
-        self.assertEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
-            irradeventxraysourcedata_set.get().xray_grid, 'dd')
-
-
 
         self.assertEqual(studies[1].projectionxrayradiationdose_set.get().irradeventxraydata_set.order_by('id')[0].
             irradeventxraysourcedata_set.get().xrayfilters_set.get().xray_filter_material.code_meaning,
