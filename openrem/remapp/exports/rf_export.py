@@ -400,7 +400,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet(u"Summary")
-    wsalldata = book.add_worksheet('All data')
+    wsalldata = book.add_worksheet(u'All data')
     date_column = 8
     if pid and name:
         date_column += 1
@@ -731,7 +731,7 @@ def rfxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                     pos_primary_angle,
                     pos_secondary_angle,
                 ]
-                sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'],0,examdata)
+                sheetlist[tab]['sheet'].write_row(sheetlist[tab]['count'], 0, examdata)
         tabcolumns = 49
         if pid and name:
             tabcolumns += 1
@@ -894,9 +894,9 @@ def exportFL2excel(filterdict, pid=False, name=None, patid=None, user=None):
 
     headings = []
     if pid and name:
-        headings += ['Patient name']
+        headings += [u'Patient name']
     if pid and patid:
-        headings += ['Patient ID']
+        headings += [u'Patient ID']
     headings += [
         u'Manufacturer',
         u'Model name',
