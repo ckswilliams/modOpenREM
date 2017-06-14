@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -186,14 +187,14 @@ def _ct_get_series_data(s):
                 maximum_xray_tube_current,
                 xray_tube_current,
                 exposure_time_per_rotation,
-                'n/a',
-                'n/a',
-                'n/a',
-                'n/a',
-                'n/a',
+                u'n/a',
+                u'n/a',
+                u'n/a',
+                u'n/a',
+                u'n/a',
                 ]
         except:
-                seriesdata += ['n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a','n/a',]
+                seriesdata += [u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', u'n/a', ]
     seriesdata += [
         s.xray_modulation_type,
         str(s.comment),
@@ -225,13 +226,13 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     tsk.task_id = ctxlsx.request.id
     if tsk.task_id is None:  # Required when testing without celery
-        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
-    tsk.modality = "CT"
-    tsk.export_type = "XLSX export"
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
+    tsk.modality = u"CT"
+    tsk.export_type = u"XLSX export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -243,7 +244,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         tmpxlsx = TemporaryFile()
         book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE,
                                  'strings_to_numbers':  False})
-        tsk.progress = 'Workbook created'
+        tsk.progress = u'Workbook created'
         tsk.save()
     except:
         # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
@@ -252,7 +253,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.num_records = e.count()
     tsk.save()
 
@@ -260,8 +261,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     textformat = book.add_format({'num_format': '@'})
 
     # Add summary sheet and all data sheet
-    summarysheet = book.add_worksheet("Summary")
-    wsalldata = book.add_worksheet('All data')       
+    summarysheet = book.add_worksheet(u"Summary")
+    wsalldata = book.add_worksheet(u'All data')
     date_column = 7
     if pid and name:
         date_column += 1
@@ -279,61 +280,61 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Some prep
     pidheadings = []
     if pid and name:
-        pidheadings += ['Patient name']
+        pidheadings += [u'Patient name']
     if pid and patid:
-        pidheadings += ['Patient ID']
+        pidheadings += [u'Patient ID']
     commonheaders = pidheadings + [
-        'Institution',
-        'Manufacturer', 
-        'Model',
-        'Station name',
-        'Display name',
-        'Accession number',
-        'Operator',
-        'Study Date',
+        u'Institution',
+        u'Manufacturer',
+        u'Model',
+        u'Station name',
+        u'Display name',
+        u'Accession number',
+        u'Operator',
+        u'Study Date',
     ]
     if pid and (name or patid):
         commonheaders += [
-            'Date of birth',
+            u'Date of birth',
         ]
     commonheaders += [
-        'Age',
-        'Sex',
-        'Height', 
-        'Mass (kg)', 
-        'Test patient?',
-        'Study description',
-        'Requested procedure',
-        'No. events',
-        'DLP total (mGy.cm)',
+        u'Age',
+        u'Sex',
+        u'Height',
+        u'Mass (kg)',
+        u'Test patient?',
+        u'Study description',
+        u'Requested procedure',
+        u'No. events',
+        u'DLP total (mGy.cm)',
         ]
     protocolheaders = commonheaders + [
-        'Protocol',
-        'Type',
-        'Exposure time',
-        'Scanning length',
-        'Slice thickness',
-        'Total collimation',
-        'Pitch',
-        'No. sources',
-        'CTDIvol',
-        'DLP',
-        'S1 name',
-        'S1 kVp',
-        'S1 max mA',
-        'S1 mA',
-        'S1 Exposure time/rotation',
-        'S2 name',
-        'S2 kVp',
-        'S2 max mA',
-        'S2 mA',
-        'S2 Exposure time/rotation',
-        'mA Modulation type',
-        'Comments',
+        u'Protocol',
+        u'Type',
+        u'Exposure time',
+        u'Scanning length',
+        u'Slice thickness',
+        u'Total collimation',
+        u'Pitch',
+        u'No. sources',
+        u'CTDIvol',
+        u'DLP',
+        u'S1 name',
+        u'S1 kVp',
+        u'S1 max mA',
+        u'S1 mA',
+        u'S1 Exposure time/rotation',
+        u'S2 name',
+        u'S2 kVp',
+        u'S2 max mA',
+        u'S2 mA',
+        u'S2 Exposure time/rotation',
+        u'mA Modulation type',
+        u'Comments',
         ]
         
     # Generate list of protocols in queryset and create worksheets for each
-    tsk.progress = 'Generating list of protocols in the dataset...'
+    tsk.progress = u'Generating list of protocols in the dataset...'
     tsk.save()
 
     sheetlist = {}
@@ -348,12 +349,13 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 protocolslist.append(safeprotocol)
     protocolslist.sort()
 
-    tsk.progress = 'Creating an Excel safe version of protocol names and creating a worksheet for each...'
+    tsk.progress = u'Creating an Excel safe version of protocol names and creating a worksheet for each...'
     tsk.save()
 
     for protocol in protocolslist:
-        tabtext = protocol.lower().replace(" ","_")
-        translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
+        tabtext = protocol.lower().replace(u" ", u"_")
+        translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
+                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
         tabtext = tabtext.translate(translation_table) # remove illegal characters
         tabtext = tabtext[:31]
         if tabtext not in sheetlist:
@@ -379,33 +381,33 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     alldataheaders = commonheaders
 
-    tsk.progress = 'Generating headers for the all data sheet...'
+    tsk.progress = u'Generating headers for the all data sheet...'
     tsk.save()
 
     for h in xrange(max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']):
         alldataheaders += [
-            'E' + str(h+1) + ' Protocol',
-            'E' + str(h+1) + ' Type',
-            'E' + str(h+1) + ' Exposure time',
-            'E' + str(h+1) + ' Scanning length',
-            'E' + str(h+1) + ' Slice thickness',
-            'E' + str(h+1) + ' Total collimation',
-            'E' + str(h+1) + ' Pitch',
-            'E' + str(h+1) + ' No. sources',
-            'E' + str(h+1) + ' CTDIvol',
-            'E' + str(h+1) + ' DLP',
-            'E' + str(h+1) + ' S1 name',
-            'E' + str(h+1) + ' S1 kVp',
-            'E' + str(h+1) + ' S1 max mA',
-            'E' + str(h+1) + ' S1 mA',
-            'E' + str(h+1) + ' S1 Exposure time/rotation',
-            'E' + str(h+1) + ' S2 name',
-            'E' + str(h+1) + ' S2 kVp',
-            'E' + str(h+1) + ' S2 max mA',
-            'E' + str(h+1) + ' S2 mA',
-            'E' + str(h+1) + ' S2 Exposure time/rotation',
-            'E' + str(h+1) + ' mA Modulation type',
-            'E' + str(h+1) + ' Comments',
+            u'E' + str(h+1) + u' Protocol',
+            u'E' + str(h+1) + u' Type',
+            u'E' + str(h+1) + u' Exposure time',
+            u'E' + str(h+1) + u' Scanning length',
+            u'E' + str(h+1) + u' Slice thickness',
+            u'E' + str(h+1) + u' Total collimation',
+            u'E' + str(h+1) + u' Pitch',
+            u'E' + str(h+1) + u' No. sources',
+            u'E' + str(h+1) + u' CTDIvol',
+            u'E' + str(h+1) + u' DLP',
+            u'E' + str(h+1) + u' S1 name',
+            u'E' + str(h+1) + u' S1 kVp',
+            u'E' + str(h+1) + u' S1 max mA',
+            u'E' + str(h+1) + u' S1 mA',
+            u'E' + str(h+1) + u' S1 Exposure time/rotation',
+            u'E' + str(h+1) + u' S2 name',
+            u'E' + str(h+1) + u' S2 kVp',
+            u'E' + str(h+1) + u' S2 max mA',
+            u'E' + str(h+1) + u' S2 mA',
+            u'E' + str(h+1) + u' S2 Exposure time/rotation',
+            u'E' + str(h+1) + u' mA Modulation type',
+            u'E' + str(h+1) + u' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
     numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 8
@@ -414,7 +416,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     for row,exams in enumerate(e):
 
-        tsk.progress = 'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
+        tsk.progress = u'Writing study {0} of {1} to All data sheet and individual protocol sheets'.format(row + 1, numrows)
         tsk.save()
 
         allexamdata = _ct_common_get_data(exams, pid, name, patid)
@@ -428,8 +430,9 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
-            tabtext = protocol.lower().replace(" ","_")
-            translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
+            tabtext = protocol.lower().replace(u" ", u"_")
+            translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
+                                 ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
             tabtext = tabtext.translate(translation_table) # remove illegal characters
             tabtext = tabtext[:31]
             sheetlist[tabtext]['count'] += 1
@@ -444,7 +447,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
     # Populate summary sheet
-    tsk.progress = 'Now populating the summary sheet...'
+    tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
 
     import pkg_resources  # part of setuptools
@@ -453,72 +456,72 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     try:
         vers = pkg_resources.require("openrem")[0].version
     except:
-        vers = ''
+        vers = u''
 
     version = vers
     titleformat = book.add_format()
     titleformat.set_font_size=(22)
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
-    toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = 'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
-    summarysheet.write(0,0, toplinestring, titleformat)
-    summarysheet.write(1,0, linetwostring)
+    toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
+    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    summarysheet.write(0, 0, toplinestring, titleformat)
+    summarysheet.write(1, 0, linetwostring)
 
     # Number of exams
-    summarysheet.write(3,0,"Total number of exams")
-    summarysheet.write(3,1,e.count())
+    summarysheet.write(3, 0, u"Total number of exams")
+    summarysheet.write(3, 1, e.count())
 
     # Generate list of Study Descriptions
-    summarysheet.write(5,0,"Study Description")
-    summarysheet.write(5,1,"Frequency")
+    summarysheet.write(5, 0, u"Study Description")
+    summarysheet.write(5, 1, u"Frequency")
     from django.db.models import Count
     study_descriptions = e.values("study_description").annotate(n=Count("pk"))
     for row, item in enumerate(study_descriptions.order_by('n').reverse()):
-        summarysheet.write(row+6,0,item['study_description'])
-        summarysheet.write(row+6,1,item['n'])
+        summarysheet.write(row+6, 0, item['study_description'])
+        summarysheet.write(row+6, 1, item['n'])
     summarysheet.set_column('A:A', 25)
 
     # Generate list of Requested Procedures
-    summarysheet.write(5,3,"Requested Procedure")
-    summarysheet.write(5,4,"Frequency")
+    summarysheet.write(5, 3, u"Requested Procedure")
+    summarysheet.write(5, 4, u"Frequency")
     from django.db.models import Count
     requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
     for row, item in enumerate(requested_procedure.order_by('n').reverse()):
-        summarysheet.write(row+6,3,item['requested_procedure_code_meaning'])
-        summarysheet.write(row+6,4,item['n'])
+        summarysheet.write(row+6, 3, item['requested_procedure_code_meaning'])
+        summarysheet.write(row+6, 4, item['n'])
     summarysheet.set_column('D:D', 25)
 
     # Generate list of Series Protocols
-    summarysheet.write(5,6,"Series Protocol")
-    summarysheet.write(5,7,"Frequency")
+    summarysheet.write(5, 6, u"Series Protocol")
+    summarysheet.write(5, 7, u"Frequency")
     sortedprotocols = sorted(sheetlist.iteritems(), key=lambda (k,v): v['count'], reverse=True)
     for row, item in enumerate(sortedprotocols):
-        summarysheet.write(row+6,6,', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
-        summarysheet.write(row+6,7,item[1]['count'])
+        summarysheet.write(row+6, 6, u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
+        summarysheet.write(row+6, 7, item[1]['count'])
     summarysheet.set_column('G:G', 15)
 
 
     book.close()
-    tsk.progress = 'XLSX book written.'
+    tsk.progress = u'XLSX book written.'
     tsk.save()
 
-    xlsxfilename = "ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfilename = u"ctexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
     except OSError as e:
-        tsk.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
