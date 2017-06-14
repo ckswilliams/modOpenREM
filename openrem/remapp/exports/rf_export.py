@@ -51,7 +51,7 @@ def _create_sheets(book, protocolslist, protocolheaders):
     for protocol in protocolslist:
         tabtext = protocol.lower().replace(u" ", u"_")
         translation_table = {ord(u'['): ord(u'('), ord(u']'): ord(u')'), ord(u':'): ord(u';'), ord(u'*'): ord(u'#'),
-                             (u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
+                             ord(u'?'): ord(u';'), ord(u'/'): ord(u'|'), ord(u'\\'): ord(u'|')}
         tabtext = tabtext.translate(translation_table)  # remove illegal characters
         tabtext = tabtext[:31]
         if tabtext not in sheetlist:
