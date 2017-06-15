@@ -178,10 +178,14 @@ def replace_comma(comma_string):
         return no_comma_string
 
 
-def export_safe(ascii_string):
-    if ascii_string:
-        # I'm not convinced the next line is a good idea, particularly when we are confident (day forward) values are
-        # stored as UTF-8. Will need to be tested.
-        utf8_string = ascii_string.encode("utf-8")
-        safe_string = replace_comma(utf8_string)
-        return safe_string
+def export_csv_prep(unicode_string):
+    """
+    Built-in csv module can't deal with unicode strings without specifying an encoding. Hence encode to utf-8 before
+    writing.
+    :param unicode_string: String to encode as utf-8
+    :return: UTF-8 encoded string with no commas or semicolons.
+    """
+    if unicode_string:
+        utf8_string = unicode_string.encode("utf-8")
+        csv_safe_string = replace_comma(utf8_string)
+        return csv_safe_string

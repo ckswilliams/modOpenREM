@@ -53,7 +53,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from django.core.exceptions import ObjectDoesNotExist
     from django.contrib import messages
     from remapp.models import Exports
-    from remapp.tools.get_values import return_for_export, export_safe
+    from remapp.tools.get_values import return_for_export, export_csv_prep
     from remapp.interface.mod_filters import ct_acq_filter
 
     tsk = Exports.objects.create()
@@ -170,9 +170,9 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 patient_birth_date = return_for_export(exams.patientmoduleattr_set.get(), 'patient_birth_date')
                 if name:
-                    patient_name = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
+                    patient_name = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'patient_name'))
                 if patid:
-                    patient_id = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
+                    patient_id = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'patient_id'))
 
         try:
             exams.generalequipmentmoduleattr_set.get()
@@ -183,11 +183,11 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             station_name = None
             display_name = None
         else:
-            institution_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
-            manufacturer = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-            manufacturer_model_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name'))
-            station_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
-            display_name = export_safe(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
+            institution_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'institution_name'))
+            manufacturer = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer'))
+            manufacturer_model_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'manufacturer_model_name'))
+            station_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get(), 'station_name'))
+            display_name = export_csv_prep(return_for_export(exams.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
 
         try:
             exams.patientmoduleattr_set.get()
@@ -196,7 +196,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             not_patient = None
         else:
             patient_sex = return_for_export(exams.patientmoduleattr_set.get(), 'patient_sex')
-            not_patient = export_safe(return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator'))
+            not_patient = export_csv_prep(return_for_export(exams.patientmoduleattr_set.get(), 'not_patient_indicator'))
 
         try:
             exams.patientstudymoduleattr_set.get()
@@ -229,8 +229,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             manufacturer_model_name,
             station_name,
             display_name,
-            export_safe(exams.accession_number),
-            export_safe(exams.operator_name),
+            export_csv_prep(exams.accession_number),
+            export_csv_prep(exams.operator_name),
             exams.study_date,
         ]
         if pid and (name or patid):
@@ -243,8 +243,8 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             patient_size,
             patient_weight,
             not_patient,
-            export_safe(exams.study_description),
-            export_safe(exams.requested_procedure_code_meaning),
+            export_csv_prep(exams.study_description),
+            export_csv_prep(exams.requested_procedure_code_meaning),
             total_number_of_irradiation_events,
             ct_dose_length_product_total,
             ]
@@ -259,7 +259,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 scanning_length = s.scanninglength_set.get().scanning_length
 
             examdata += [
-                export_safe(s.acquisition_protocol),
+                export_csv_prep(s.acquisition_protocol),
                 s.ct_acquisition_type,
                 s.exposure_time,
                 scanning_length,
@@ -358,7 +358,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
-    from remapp.tools.get_values import return_for_export, export_safe
+    from remapp.tools.get_values import return_for_export, export_csv_prep
     from django.core.exceptions import ObjectDoesNotExist
     import uuid
 
@@ -469,9 +469,9 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 else:
                     patient_birth_date = return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_birth_date')
                     if name:
-                        patient_name = export_safe(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_name'))
+                        patient_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_name'))
                     if patid:
-                        patient_id = export_safe(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_id'))
+                        patient_id = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.patientmoduleattr_set.get(), 'patient_id'))
 
             try:
                 exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get()
@@ -481,10 +481,10 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 station_name = None
                 display_name = None
             else:
-                institution_name = export_safe(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name'))
-                manufacturer = export_safe(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer'))
-                station_name = export_safe(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name'))
-                display_name = export_safe(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
+                institution_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'institution_name'))
+                manufacturer = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'manufacturer'))
+                station_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(), 'station_name'))
+                display_name = export_csv_prep(return_for_export(exp.projection_xray_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get().unique_equipment_name, 'display_name'))
 
             try:
                 exp.projection_xray_radiation_dose.general_study_module_attributes.patientstudymoduleattr_set.get()
@@ -568,7 +568,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 manufacturer,
                 station_name,
                 display_name,
-                export_safe(exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number),
+                export_csv_prep(exp.projection_xray_radiation_dose.general_study_module_attributes.accession_number),
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_instance_uid,
                 exp.projection_xray_radiation_dose.general_study_module_attributes.study_date,
                 exp.date_time_started,
@@ -581,16 +581,16 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 patient_age_decimal,
                 patient_sex,
                 exp.projection_xray_radiation_dose.irradeventxraydata_set.count(),
-                export_safe(exp.projection_xray_radiation_dose.general_study_module_attributes.study_description),
+                export_csv_prep(exp.projection_xray_radiation_dose.general_study_module_attributes.study_description),
                 exp.image_view,
                 exp.laterality,
-                export_safe(exp.acquisition_protocol),
+                export_csv_prep(exp.acquisition_protocol),
                 compression_thickness,
                 radiological_thickness,
                 compression_force,
                 magnification_factor,
                 collimated_field_area,
-                export_safe(exposure_control_mode),
+                export_csv_prep(exposure_control_mode),
                 anode_target_material,
                 xray_filter_material,
                 focal_spot_size,
@@ -601,7 +601,7 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 exp.entrance_exposure_at_rp,
                 average_glandular_dose,
                 exp.percent_fibroglandular_tissue,
-                export_safe(exp.comment),
+                export_csv_prep(exp.comment),
                 ]
             writer.writerow(row)
         tsk.progress = "{0} of {1}".format(i+1, numresults)
