@@ -139,7 +139,7 @@ def websizeimport(csv_pk = None, *args, **kwargs):
             try:
                 csvrecord.logfile.save(logfile,headerrow)
             except OSError as e:
-                csvrecord.progress = "Errot saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+                csvrecord.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
                 csvrecord.status = 'ERROR'
                 csvrecord.save()
                 return

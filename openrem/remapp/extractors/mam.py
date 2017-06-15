@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -268,7 +269,10 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip = GeneralEquipmentModuleAttr.objects.create(general_study_module_attributes=study)
     equip.manufacturer = get_value_kw("Manufacturer", dataset)
     equip.institution_name = get_value_kw("InstitutionName", dataset)
-    print(u"In extractor, {0} of type {1}".format(equip.institution_name, type(equip.institution_name)))
+    try:
+        test_unicode = u"In extractor, {0} of type {1}".format(equip.institution_name, type(equip.institution_name))
+    except UnicodeDecodeError:
+        logger.error("Non ASCII string not properly decoded: {0}".format(equip.institution_name))
     equip.institution_address = get_value_kw("InstitutionAddress", dataset)
     equip.station_name = get_value_kw("StationName", dataset)
     equip.institutional_department_name = get_value_kw("InstitutionalDepartmentName", dataset)
@@ -319,12 +323,6 @@ def _generalequipmentmoduleattributes(dataset, study, ch):
     equip.unique_equipment_name = UniqueEquipmentNames(pk=equip_display_name.pk)
 
     equip.save()
-    print(u"After save, {0} of type {1}".format(equip.institution_name, type(equip.institution_name)))
-    from remapp.models import GeneralStudyModuleAttr
-    testingstudy = GeneralStudyModuleAttr.objects.all()[0]
-    print(u"Still in mam, retrieved record from database. Values is {0}, type is {1}".format(
-        testingstudy.generalequipmentmoduleattr_set.get().institution_name,
-        type(testingstudy.generalequipmentmoduleattr_set.get().institution_name)))
 
 
 def _patientstudymoduleattributes(dataset, g):  # C.7.2.2
@@ -443,14 +441,14 @@ def _create_event(dataset):
 
     study_uid = get_value_kw('StudyInstanceUID', dataset)
     event_uid = get_value_kw('SOPInstanceUID', dataset)
-    logger.debug("In _create_event. Study %s, event %s", study_uid, event_uid)
+    logger.debug(u"In _create_event. Study %s, event %s", study_uid, event_uid)
     inst_in_db = check_uid.check_uid(event_uid, 'Event')
     if inst_in_db:
-        logger.debug("Instance %s already in db", event_uid)
+        logger.debug(u"Instance %s already in db", event_uid)
         return 0
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
     if same_study_uid.count() != 1:
-        print "Duplicate study UIDs in database! Could be a problem."
+        print(u"Duplicate study UIDs in database! Could be a problem.")
         for dup in same_study_uid:
             if dup.modality_type:
                 same_study_uid = dup
@@ -467,7 +465,7 @@ def _create_event(dataset):
                 if event_date_time == events.date_time_started:
                     return 0
         except Exception as e:
-            logger.warning("MG study UID %s, event UID %s failed at check for identical event. Error %s",
+            logger.warning(u"MG study UID %s, event UID %s failed at check for identical event. Error %s",
                            study_uid, event_uid, e)
     # study exists, but event doesn't
     _irradiationeventxraydata(dataset, same_study_uid.get().projectionxrayradiationdose_set.get())
@@ -491,9 +489,9 @@ def _mammo2db(dataset):
 
     study_uid = get_value_kw('StudyInstanceUID', dataset)
     if not study_uid:
-        sys.exit('No UID returned')
+        sys.exit(u'No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
-    logger.info("In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
+    logger.info(u"In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
 
     if study_in_db == 1:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
@@ -505,13 +503,13 @@ def _mammo2db(dataset):
         g.study_instance_uid = get_value_kw('StudyInstanceUID', dataset)
         g.save()
         event_uid = get_value_kw('SOPInstanceUID', dataset)
-        logger.debug("Created new mammo study %s, event %s", study_uid, event_uid)
+        logger.debug(u"Created new mammo study %s, event %s", study_uid, event_uid)
         # check again
         study_in_db = check_uid.check_uid(study_uid)
         if study_in_db == 1:
             _generalstudymoduleattributes(dataset, g)
         elif not study_in_db:
-            sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
+            sys.exit(u"Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
             sleep(random())
             # Check if other instance(s) has deleted the study yet
@@ -579,17 +577,17 @@ def mam(mg_file):
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
         if del_mg_im:
-            logger.debug("%s id not a mammo file, deleting", mg_file)
+            logger.debug(u"%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
         return (1)
 
     _mammo2db(dataset)
 
     if del_mg_im:
-        logger.debug("Mammo %s processing complete, deleting file", mg_file)
+        logger.debug(u"Mammo %s processing complete, deleting file", mg_file)
         os.remove(mg_file)
     else:
-        logger.debug("Mammo %s processing complete, file remains", mg_file)
+        logger.debug(u"Mammo %s processing complete, file remains", mg_file)
 
     return 0
 
@@ -598,6 +596,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the DICOM mammography image file')
+        sys.exit(u'Error: Supply exactly one argument - the DICOM mammography image file')
 
     sys.exit(mam(sys.argv[1]))

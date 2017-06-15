@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -138,31 +138,8 @@ def _xray_filters_prep(dataset, source):
     if ',' in xray_filter_material and not isinstance(xray_filter_material, MultiValue):
         xray_filter_material = xray_filter_material.split(',')
 
-    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
-        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187052, thick2)
-            xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
-        else:
-            xray_filter_thickness_minimum = None
-
-    try:
-        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
-        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
-        thickval = thick.__getattribute__('value')
-        if ',' in thickval:
-            thickval = thickval.replace(',', '\\')
-            thick2 = thick._replace(value=thickval)
-            dict.__setitem__(dataset, 0x187054, thick2)
-            xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
-        else:
-            xray_filter_thickness_maximum = None
+    xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
 
     if type(xray_filter_material) is list:
         _xray_filters_multiple(
@@ -376,7 +353,7 @@ def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
             event.acquisition_protocol = get_value_kw('ImageComments', dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_value_kw('SeriesDescription', dataset)
     if not event.acquisition_protocol: event.acquisition_protocol = get_seq_code_meaning(
-        'PerformedProtocolCodeSequence', dataset, char_set=ch)
+        'PerformedProtocolCodeSequence', dataset)
     series_description = get_value_kw('SeriesDescription', dataset)
     if series_description:
         event.comment = series_description
@@ -604,19 +581,19 @@ def _generalstudymoduleattributes(dataset, g):
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription', dataset)
     if not g.study_description: g.study_description = get_value_kw('SeriesDescription', dataset)
-    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    if not g.study_description: g.study_description = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     g.modality_type = get_value_kw('Modality', dataset)
     g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset)
     g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset)
     g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset)
     g.operator_name = get_value_kw('OperatorsName', dataset)
     # Being used to summarise protocol for study:
-    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset, char_set=ch)
+    g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('ProtocolName', dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('StudyDescription', dataset)
     if not g.procedure_code_meaning: g.procedure_code_meaning = get_value_kw('SeriesDescription', dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
-    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset, char_set=ch)
+    g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
@@ -624,20 +601,19 @@ def _generalstudymoduleattributes(dataset, g):
     if not g.requested_procedure_code_value: g.requested_procedure_code_value = get_seq_code_value(
         'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'RequestAttributesSequence', dataset, char_set=ch)
+        'RequestAttributesSequence', dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'ProcedureCodeSequence', dataset, char_set=ch)
-    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(
-        0x00321060, dataset, char_set=ch)
+        'ProcedureCodeSequence', dataset)
+    if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_value_num(0x00321060, dataset)
     if not g.requested_procedure_code_meaning: g.requested_procedure_code_meaning = get_seq_code_meaning(
-        'PerformedProtocolCodeSequence', dataset, char_set=ch)
+        'PerformedProtocolCodeSequence', dataset)
     if not g.requested_procedure_code_meaning:
         manufacturer = get_value_kw("Manufacturer", dataset)
         model = get_value_kw("ManufacturerModelName", dataset)
         if manufacturer and model and 'canon' in manufacturer.lower() and 'cxdi' in model.lower():
-            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset)
         if manufacturer and model and 'carestream health' in manufacturer.lower() and 'drx-revolution' in model.lower():
-            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset, char_set=ch)
+            g.requested_procedure_code_meaning = get_value_num(0x00081030, dataset)
     g.save()
 
     _generalequipmentmoduleattributes(dataset, g, ch)
@@ -676,7 +652,7 @@ def _create_event(dataset):
         return 0
     same_study_uid = GeneralStudyModuleAttr.objects.filter(study_instance_uid__exact=study_uid)
     if same_study_uid.count() != 1:
-        print "Duplicate study UIDs in database! Could be a problem."
+        print(u"Duplicate study UIDs in database! Could be a problem.")
         for dup in same_study_uid:
             if dup.modality_type:
                 same_study_uid = dup
@@ -695,7 +671,7 @@ def _create_event(dataset):
             if event_date_time == events.date_time_started:
                 return 0
     except Exception as e:
-        logger.warning("DX study UID %s, event UID %s failed at check for identical event. Error %s",
+        logger.warning(u"DX study UID %s, event UID %s failed at check for identical event. Error %s",
                        study_uid, event_uid, e)
     # study exists, but event doesn't
     ch = get_value_kw('SpecificCharacterSet', dataset)
@@ -738,7 +714,7 @@ def _dx2db(dataset):
         if study_in_db == 1:
             _generalstudymoduleattributes(dataset, g)
         elif not study_in_db:
-            sys.exit("Something went wrong, GeneralStudyModuleAttr wasn't created")
+            sys.exit(u"Something went wrong, GeneralStudyModuleAttr wasn't created")
         elif study_in_db > 1:
             sleep(random())
             # Check if other instance(s) has deleted the study yet
@@ -776,6 +752,35 @@ def _dx2db(dataset):
                     _create_event(dataset)
 
 
+def _fix_kodak_filters(dataset):
+    """
+    Replace floats with commas in with multivalue floats: as found in older Carestream/Kodak units such as the DR7500
+    :param dataset: DICOM dataset
+    :return: Repaired DICOM dataset
+    """
+    from remapp.tools.get_values import get_value_kw
+
+    try:  # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+        xray_filter_thickness_minimum = get_value_kw('FilterThicknessMinimum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187052)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187052, thick2)
+
+    try:
+        xray_filter_thickness_maximum = get_value_kw('FilterThicknessMaximum', dataset)
+    except (ValueError):  # Assumes ValueError will be a comma separated pair of numbers, as per Kodak.
+        thick = dict.__getitem__(dataset, 0x187054)  # pydicom black magic as suggested by
+        thickval = thick.__getattribute__('value')
+        if ',' in thickval:
+            thickval = thickval.replace(',', '\\')
+            thick2 = thick._replace(value=thickval)
+            dict.__setitem__(dataset, 0x187054, thick2)
+
+
 @shared_task
 def dx(dig_file):
     """Extract radiation dose structured report related data from DX radiographic images
@@ -798,9 +803,15 @@ def dx(dig_file):
         del_dx_im = False
 
     dataset = dicom.read_file(dig_file)
+    try:
+        dataset.decode()
+    except ValueError as e:
+        if "Invalid tag (0018, 7052): invalid literal for float" in e.message:
+            _fix_kodak_filters(dataset)
+            dataset.decode()
     isdx = _test_if_dx(dataset)
     if not isdx:
-        return '{0} is not a DICOM DX radiographic image'.format(dig_file)
+        return u'{0} is not a DICOM DX radiographic image'.format(dig_file)
 
     _dx2db(dataset)
 
@@ -814,6 +825,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        sys.exit('Error: Supply exactly one argument - the DICOM DX radiographic image file')
+        sys.exit(u'Error: Supply exactly one argument - the DICOM DX radiographic image file')
 
     sys.exit(dx(sys.argv[1]))

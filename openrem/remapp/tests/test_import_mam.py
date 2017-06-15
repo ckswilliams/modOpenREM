@@ -24,12 +24,6 @@ class ImportMGImg(TestCase):
 
         mam(dicom_path)
 
-        from remapp.models import GeneralStudyModuleAttr
-        testingstudy = GeneralStudyModuleAttr.objects.all()[0]
-        print(u"In test, retrieved record from database. Values is {0}, type is {1}".format(
-            testingstudy.generalequipmentmoduleattr_set.get().institution_name,
-            type(testingstudy.generalequipmentmoduleattr_set.get().institution_name)))
-
         study = GeneralStudyModuleAttr.objects.all()[0]
 
         # Test that patient identifiable data is not stored
@@ -47,7 +41,6 @@ class ImportMGImg(TestCase):
             study.generalequipmentmoduleattr_set.get().institution_name)
         self.assertEqual(institution_name_string, u"Institution name is 中心医院")
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, u'GE MEDICAL SYSTEMS')
-        #cyrillic doesn't appear to be interpreted correctly
         self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_address, u'Москва')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().station_name, u'SENODS01')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer_model_name, u'Senograph DS ADS_43.10.1')

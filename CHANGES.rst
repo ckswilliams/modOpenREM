@@ -11,12 +11,19 @@ OpenREM version history
 * `#499`_  Imports: Now aborts gracefully with error log if no template in RDSR
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
+* `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
 * `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
+* `#473`_  Query Retrieve: Added tests
+* `#472`_  Query Retrieve: Overhauled the query retrieve routines
+* `#470`_  Query Retrieve: Optimised CT filtering
+* `#468`_  Query Retrieve: Station names can now be used for filtering if returned
+* `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
