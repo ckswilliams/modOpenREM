@@ -1242,7 +1242,7 @@ def rfopenskin(studyid):
             table_height_position = event.irradeventxraymechanicaldata_set.get(
             ).doserelateddistancemeasurements_set.get().table_height_position
 
-        acquisition_protocol = export_csv_prep(return_for_export(event, u'acquisition_protocol'))
+        acquisition_protocol = export_csv_prep(return_for_export(event, 'acquisition_protocol'))
 
         data = [
             u'Anon',
