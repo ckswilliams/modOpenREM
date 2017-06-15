@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -37,17 +38,18 @@ def get_not_pt(dataset, char_set=charset.default_encoding):
     Some values that might indicate a study was for QA or similar purposes
     are not recorded in the database, for example patient name. Therefore
     this module attempts to find such indications and creates an xml
-    style string that can be recorded in the database.
+    style string that can be recorded in the database on study import.
 
     :param dataset:     The DICOM dataset.
     :type dataset:      dataset
     :returns:           str. -- xml style string if any trigger values are found.
     """
     from remapp.tools.get_values import get_value_kw
+    from openremproject.settings import ID_INDICATORS, NAME_INDICATORS
     patient_id = get_value_kw('PatientID', dataset)
     patient_name = get_value_kw('PatientName', dataset)
-    id_indicators = ['phy', 'test', 'qa']
-    name_indicators = ['phys', 'test', 'qa']
+    id_indicators = ID_INDICATORS
+    name_indicators = NAME_INDICATORS
     id_contains = []
     name_contains = []
     if patient_id:
@@ -57,5 +59,5 @@ def get_not_pt(dataset, char_set=charset.default_encoding):
         name_contains = [indicator
                          for indicator in name_indicators if indicator in patient_name.lower()]
     if id_contains or name_contains:
-        return '<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
-                                                                              str(name_contains)[1:-1])
+        return u'<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
+                                                                               str(name_contains)[1:-1])
