@@ -77,7 +77,7 @@ $(document).ready(function() {
 
                     if (json.patient_height_source.indexOf('extracted') >= 0) $('#patientHeightLabel').html('Extracted patient height: ');
                     if (json.patient_mass_source.indexOf('extracted') >= 0) $('#patientMassLabel').html('Extracted patient mass: ');
-                    if (json.patient_orientation_source.indexOf('extracted') >= 0) $('#patientHeightLabel').html('Extracted patient orientation: ');
+                    if (json.patient_orientation_source.indexOf('extracted') >= 0) $('#patientOrientationLabel').html('Extracted patient orientation: ');
 
                     $('input[name=windowWidthSlider]').prop({
                         'max': skinDoseMapObj.windowWidth,
