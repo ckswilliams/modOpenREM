@@ -19,6 +19,10 @@ Functionality that will be available
 * Phantom dimensions calculated from the height and mass of the patient
 * Data can be calculated on import to OpenREM, or on demand when a study is
   viewed
+* Data is recalculated automatically if the patient height or mass stored in
+  the database differs from the values stored in the skin dose map data file.
+  This is useful when patient size information has imported in to OpenREM after
+  the initial skin dose map data has been calculated
 * 3D skin dose map data shown graphically as a 2D image and a 3D model
 * The user can change the maximum and minimum displayed dose; alternatively,
   window level and width can be adjusted
