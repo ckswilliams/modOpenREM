@@ -688,14 +688,42 @@ def rf_detail_view_skin_map(request, pk=None):
         skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
 
     from remapp.version import __skin_map_version__
+
+    # If patient weight is missing from the database then db_pat_mass will be undefined
+    try:
+        db_pat_mass = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_weight)
+    except ValueError:
+        db_pat_mass = 73.2
+    except TypeError:
+        db_pat_mass = 73.2
+
+    # If patient weight is missing from the database then db_pat_mass will be undefined
+    try:
+        db_pat_height = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_size) * 100
+    except ValueError:
+        db_pat_height = 178.6
+    except TypeError:
+        db_pat_height = 178.6
+
     loaded_existing_data = False
+    pat_mass_unchanged = False
+    pat_height_unchanged = False
     if os.path.exists(skin_map_path):
         with gzip.open(skin_map_path, 'rb') as f:
             existing_skin_map_data = pickle.load(f)
         try:
             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
-                return_structure = existing_skin_map_data
-                loaded_existing_data = True
+                # Round the float values to 1 decimal place and convert to string before comparing
+                if str(round(existing_skin_map_data['patient_height'], 1)) == str(round(db_pat_height, 1)):
+                    pat_height_unchanged = True
+
+                # Round the float values to 1 decimal place and convert to string before comparing
+                if str(round(existing_skin_map_data['patient_mass'], 1)) == str(round(db_pat_mass, 1)):
+                    pat_mass_unchanged = True
+
+                if pat_height_unchanged and pat_mass_unchanged:
+                    return_structure = existing_skin_map_data
+                    loaded_existing_data = True
         except KeyError:
             pass
 
