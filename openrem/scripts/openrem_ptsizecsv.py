@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #!/usr/local/bin/python
 # scripts/openrem_ptsizecsv
 
