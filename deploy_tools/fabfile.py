@@ -29,7 +29,8 @@ def _get_latest_source(source_folder):
         run('cd {0} && git fetch'.format(source_folder))
     else:
         run('git clone {0} {1}'.format(REPO_URL, source_folder))
-    current_commit = local("git log -n 1 --format=%H", capture=True)
+    # current_commit = local("git log -n 1 --format=%H", capture=True)
+    current_commit = env.BITBUCKET_TAG
     run('cd {0} && git reset --hard {1}'.format(source_folder, current_commit))
 
 
