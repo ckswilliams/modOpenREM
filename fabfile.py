@@ -10,7 +10,7 @@ REPO_URL = 'https://bitbucket.org/openrem/openrem.git'
 
 def deploy():
     import os
-    print("tag is {0}".format('$BITBUCKET_TAG'))
+    print("tag is {0}".format(local("echo $BITBUCKET_TAG", capture=True)))
     site_folder = '/home/{0}/sites/{1}'.format(env.user, env.host)
     source_folder = site_folder + '/source'
     _create_directory_structure_if_necessary(site_folder)
