@@ -12,6 +12,7 @@ OpenREM version history
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
 * `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
+* `#493`_  Charts: Added user option to made chart categories all lower case
 * `#492`_  Exports: Each view is now unique for NHSBSP mammo exports as required by the NCCPM database
 * `#489`_  Exports: NHSBSP mammo exports deals with all views, excludes biopsies and specimens
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
