@@ -1,20 +1,22 @@
 function chartWorkload(render_div, category_type) {
+
     var chart = new Highcharts.Chart({
         exporting: {
             fallbackToExportServer: false
         },
         chart: {
             renderTo: render_div,
+            mainTitleText: category_type + ' per<br>day of the week',
             plotBackgroundColor: null,
             plotShadow: false,
             events: {
                 drilldown: function(e) {
                     this.viewData(false, false, true);
-                    this.setTitle({ text: category_type + ' per hour,<br>'+e.point.name, align:'left', verticalAlign:'top', y:50, x:50 });
+                    this.setTitle({ text: category_type + ' per hour,<br>'+e.point.name+' (n='+e.point.y+')', align:'left', verticalAlign:'top', y:50, x:50 });
                 },
                 drillup: function() {
                     this.viewData(false, false, true);
-                    this.setTitle({ text: category_type + ' per<br>day of the week', align:'center', verticalAlign:'middle', y:70, x:0 });
+                    this.setTitle({ text: this.options.chart.mainTitleText, align:'center', verticalAlign:'middle', y:40, x:0 });
                 }
             }
         },
@@ -22,7 +24,7 @@ function chartWorkload(render_div, category_type) {
             text: category_type + ' per<br>day of the week',
             align: 'center',
             verticalAlign: 'middle',
-            y: 70
+            y: 40
         },
         tooltip: {
             pointFormat: '{point.percentage:.1f} %<br/>n={point.y}'
