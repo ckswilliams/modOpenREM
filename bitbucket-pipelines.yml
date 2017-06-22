@@ -4,13 +4,16 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - mv openrem/openremproject/local_settings.py{.example,}
-          - mv openrem/openremproject/wsgi.py{.example,}
-          - pip install -U tox
-          - tox -e ci
-          - ssh deploy@dev.openrem.org date
-          - pip install fabric
+#          - mv openrem/openremproject/local_settings.py{.example,}
+#          - mv openrem/openremproject/wsgi.py{.example,}
+#          - pip install -U tox
+#          - tox -e ci
+#          - ssh deploy@dev.openrem.org date
+#          - pip install fabric
+          - echo $BB_OPENREM_KEY
+          - echo $DEV_DEPLOY_DB
+          - echo $BITBUCKET_COMMIT
           - mkdir -p ~/.ssh
           - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
           - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
-          - fab deploy:host=deploy@dev.openrem.org
+#          - fab deploy:host=deploy@dev.openrem.org
