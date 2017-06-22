@@ -19,4 +19,4 @@ pipelines:
           - mkdir -p ~/.ssh
           - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
           - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
-#          - fab deploy:host=deploy@dev.openrem.org
+          - fab deploy:host=deploy@dev.openrem.org

@@ -9,7 +9,6 @@ import random
 REPO_URL = 'https://bitbucket.org/openrem/openrem.git'
 
 def deploy():
-    # print("branch is {0}".format(local("echo $BITBUCKET_BRANCH", capture=True)))
     site_folder = '/home/{0}/sites/{1}'.format(env.user, env.host)
     source_folder = site_folder + '/source'
     _create_directory_structure_if_necessary(site_folder)
@@ -31,7 +30,7 @@ def _get_latest_source(source_folder):
     else:
         run('git clone {0} {1}'.format(REPO_URL, source_folder))
     # current_commit = local("git log -n 1 --format=%H", capture=True)
-    current_commit = env.BITBUCKET_TAG
+    current_commit = local("echo $BITBUCKET_COMMIT", capture=True)
     run('cd {0} && git reset --hard {1}'.format(source_folder, current_commit))
 
 
