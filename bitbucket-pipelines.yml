@@ -9,7 +9,7 @@ pipelines:
 #          - pip install -U tox
 #          - tox -e ci
 #          - ssh deploy@dev.openrem.org date
-#          - pip install fabric
+          - pip install fabric
           - echo $BB_OPENREM_KEY
           - echo $DEV_DEPLOY_DB
           - echo $BITBUCKET_COMMIT
