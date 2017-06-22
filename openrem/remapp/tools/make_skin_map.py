@@ -1,4 +1,4 @@
-
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -60,10 +60,10 @@ def make_skin_map(study_pk=None):
     if study_pk:
         study = GeneralStudyModuleAttr.objects.get(pk=study_pk)
 
-        pat_mass_source = 'assumed'
+        pat_mass_source = u'assumed'
         try:
             pat_mass = float(study.patientstudymoduleattr_set.get().patient_weight)
-            pat_mass_source = 'extracted'
+            pat_mass_source = u'extracted'
         except ValueError:
             pat_mass = 73.2
         except TypeError:
@@ -72,10 +72,10 @@ def make_skin_map(study_pk=None):
         if pat_mass == 0.0:
             pat_mass = 73.2
 
-        pat_height_source = 'assumed'
+        pat_height_source = u'assumed'
         try:
             pat_height = float(study.patientstudymoduleattr_set.get().patient_size) * 100
-            pat_height_source = 'extracted'
+            pat_height_source = u'extracted'
         except ValueError:
             pat_height = 178.6
         except TypeError:
@@ -83,15 +83,17 @@ def make_skin_map(study_pk=None):
 
         if pat_height == 0.0:
             pat_height = 178.6
-            pat_height_source = 'assumed'
+            pat_height_source = u'assumed'
 
-        pat_pos_source = 'assumed'
+        pat_pos_source = u'assumed'
         if study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid:
-            patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_table_relationship_cid)[0] + "f" + str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]				
+            patPos = str(study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all(
+                        )[0].patient_table_relationship_cid)[0] + "f" + str(study.projectionxrayradiationdose_set.get(
+                        ).irradeventxraydata_set.all()[0].patient_orientation_modifier_cid)[0]
             patPos = patPos.upper()
-            pat_pos_source = 'extracted'
+            pat_pos_source = u'extracted'
         else:
-            patPos = 'HFS'
+            patPos = u'HFS'
 
         my_exp_map = calc_exp_map.CalcExpMap(phantom_type='3D', patPos=patPos,
                                              pat_mass=pat_mass, pat_height=pat_height,
@@ -99,19 +101,22 @@ def make_skin_map(study_pk=None):
                                              matt_thick=4.0)
 
         for irrad in study.projectionxrayradiationdose_set.get().irradeventxraydata_set.all():
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position:
-                delta_x = float(
-                    irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_longitudinal_position) / 10.0
+            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                        ).table_longitudinal_position:
+                delta_x = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                ).table_longitudinal_position) / 10.0
             else:
                 delta_x = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position:
-                delta_y = float(
-                    irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_lateral_position) / 10.0
+            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                        ).table_lateral_position:
+                delta_y = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                        ).table_lateral_position) / 10.0
             else:
                 delta_y = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position:
-                delta_z = float(
-                    irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().table_height_position) / 10.0
+            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                        ).table_height_position:
+                delta_z = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                        ).table_height_position) / 10.0
             else:
                 delta_z = 0.0
             if irrad.irradeventxraymechanicaldata_set.get().positioner_primary_angle:
@@ -122,11 +127,14 @@ def make_skin_map(study_pk=None):
                 angle_y = float(irrad.irradeventxraymechanicaldata_set.get().positioner_secondary_angle)
             else:
                 angle_y = 0.0
-            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter:
-                d_ref = float(
-                    irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get().distance_source_to_isocenter) / 10.0 - 15.0
+            if irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                                        ).distance_source_to_isocenter:
+                d_ref = float(irrad.irradeventxraymechanicaldata_set.get().doserelateddistancemeasurements_set.get(
+                                                                        ).distance_source_to_isocenter) / 10.0 - 15.0
             else:
-                d_ref = None  # This will result in failure to calculate skin dose map. Need a sensible default, or a lookup to a user-entered value
+                # This will result in failure to calculate skin dose map. Need a sensible default, or a lookup to a
+                # user-entered value
+                d_ref = None
             if irrad.dose_area_product:
                 dap = float(irrad.dose_area_product)
             else:
@@ -171,8 +179,9 @@ def make_skin_map(study_pk=None):
         import numpy as np
 
         # Flip the skin dose map left-right so the view is from the front
-       # my_exp_map.my_dose.fliplr()
-        my_exp_map.my_dose.totalDose = np.roll(my_exp_map.my_dose.totalDose, int(my_exp_map.phantom.phantom_flat_dist / 2),
+        # my_exp_map.my_dose.fliplr()
+        my_exp_map.my_dose.totalDose = np.roll(my_exp_map.my_dose.totalDose,
+                                               int(my_exp_map.phantom.phantom_flat_dist / 2),
                                                axis=0)
         try:
             my_exp_map.my_dose.totalDose = np.rot90(my_exp_map.my_dose.totalDose)
@@ -201,7 +210,8 @@ def make_skin_map(study_pk=None):
         try:
             study_date = study.study_date
             if study_date:
-                skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', "{0:0>4}".format(study_date.year), "{0:0>2}".format(study_date.month), "{0:0>2}".format(study_date.day))
+                skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', "{0:0>4}".format(study_date.year),
+                                             "{0:0>2}".format(study_date.month), "{0:0>2}".format(study_date.day))
             else:
                 skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps')
         except:

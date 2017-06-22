@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #!/usr/local/bin/python
 # scripts/openrem_ctphilips
 
@@ -16,7 +17,7 @@ from glob import glob
 from openrem.remapp.extractors import ct_philips
 
 if len(sys.argv) < 2:
-    sys.exit('Error: Supply at least one argument - the Philips dose report image')
+    sys.exit(u'Error: Supply at least one argument - the Philips dose report image')
 
 for arg in sys.argv[1:]:
     for filename in glob(arg):

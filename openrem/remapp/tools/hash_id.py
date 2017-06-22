@@ -1,3 +1,4 @@
+# This Python file uses the following encoding: utf-8
 #    OpenREM - Radiation Exposure Monitoring tools for the physicist
 #    Copyright (C) 2012,2013  The Royal Marsden NHS Foundation Trust
 #
@@ -41,6 +42,8 @@ def hash_id(id_string, *args, **kwargs):
     import hashlib
 
     if id_string:
-        if isinstance(id_string, dicom.multival.MultiValue):
+        # print("hash_id id_string before is of type {0}".format(type(id_string)))
+        if isinstance(id_string, (dicom.multival.MultiValue, list, dicom.valuerep.PersonNameUnicode)):
             id_string = ''.join(id_string)
-        return hashlib.sha256(smart_bytes(id_string, encoding='utf-8')).hexdigest()
+        id_string = smart_bytes(id_string, encoding='utf-8')
+        return hashlib.sha256(id_string).hexdigest()

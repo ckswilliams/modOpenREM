@@ -232,6 +232,10 @@ LOGGING = {
     }
 }
 
+# Not patient indicators: please override in local_settings.py
+ID_INDICATORS = [u'phy', u'test', u'qa']
+NAME_INDICATORS = [u'phys', u'test', u'qa']
+
 try:
     LOCAL_SETTINGS
 except NameError:

@@ -39,8 +39,8 @@ from django.conf import settings
 def _get_xray_filterinfo(source):
     from django.core.exceptions import ObjectDoesNotExist
     try:
-        filters = ''
-        filter_thicknesses = ''
+        filters = u''
+        filter_thicknesses = u''
         for current_filter in source.xrayfilters_set.all():
             if 'Aluminum' in str(current_filter.xray_filter_material):
                 filters += u'Al'
@@ -107,12 +107,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     tsk = Exports.objects.create()
 
     tsk.task_id = exportDX2excel.request.id
-    tsk.modality = "DX"
-    tsk.export_type = "CSV export"
+    tsk.modality = u"DX"
+    tsk.export_type = u"CSV export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
-    tsk.progress = 'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.progress = u'Query filters imported, task started'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -124,7 +124,7 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tmpfile = TemporaryFile()
         writer = csv.writer(tmpfile, dialect=csv.excel)
 
-        tsk.progress = 'CSV file created'
+        tsk.progress = u'CSV file created'
         tsk.save()
     except:
         # messages.error(request, "Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
@@ -137,12 +137,12 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
     # Remove duplicate entries from the results - hopefully no longer necessary, left here in case. Needs testing
     # e = e.filter(projectionxrayradiationdose__general_study_module_attributes__study_instance_uid__isnull = False).distinct()
 
-    tsk.progress = 'Required study filter complete.'
+    tsk.progress = u'Required study filter complete.'
     tsk.save()
         
     numresults = e.count()
 
-    tsk.progress = '{0} studies in query.'.format(numresults)
+    tsk.progress = u'{0} studies in query.'.format(numresults)
     tsk.num_records = numresults
     tsk.save()
 
@@ -343,30 +343,30 @@ def exportDX2excel(filterdict, pid=False, name=None, patid=None, user=None):
         for index, item in enumerate(examdata):
             if item is None:
                 examdata[index] = ''
-            if isinstance(item, basestring) and ',' in item:
-                examdata[index] = item.replace(',', ';')
+            if isinstance(item, basestring) and u',' in item:
+                examdata[index] = item.replace(u',', u';')
         writer.writerow([unicode(datastring).encode("utf-8") for datastring in examdata])
-        tsk.progress = "{0} of {1}".format(i+1, numresults)
+        tsk.progress = u"{0} of {1}".format(i+1, numresults)
         tsk.save()
-    tsk.progress = 'All study data written.'
+    tsk.progress = u'All study data written.'
     tsk.save()
 
-    csvfilename = "dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    csvfilename = u"dxexport{0}.csv".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(csvfilename, File(tmpfile))
     except OSError as e:
         tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
         tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()
 
@@ -396,13 +396,13 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     tsk.task_id = dxxlsx.request.id
     if tsk.task_id is None:  # Required when testing without celery
-        tsk.task_id = 'NotCelery-{0}'.format(uuid.uuid4())
-    tsk.modality = "DX"
-    tsk.export_type = "XLSX export"
+        tsk.task_id = u'NotCelery-{0}'.format(uuid.uuid4())
+    tsk.modality = u"DX"
+    tsk.export_type = u"XLSX export"
     datestamp = datetime.datetime.now()
     tsk.export_date = datestamp
     tsk.progress = u'Query filters imported, task started'
-    tsk.status = 'CURRENT'
+    tsk.status = u'CURRENT'
     if pid and (name or patid):
         tsk.includes_pid = True
     else:
@@ -513,7 +513,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     tsk.save()
 
     for protocol in protocolslist:
-        tabtext = protocol.lower().replace(" ","_")
+        tabtext = protocol.lower().replace(u" ", u"_")
         translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'), ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
         tabtext = tabtext.translate(translation_table) # remove illegal characters
         tabtext = tabtext[:31]
@@ -759,7 +759,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             protocol = s.acquisition_protocol
             if not protocol:
                 protocol = u'Unknown'
-            tabtext = protocol.lower().replace(" ","_")
+            tabtext = protocol.lower().replace(u" ", u"_")
             translation_table = {ord('['):ord('('), ord(']'):ord(')'), ord(':'):ord(';'), ord('*'):ord('#'),
                                  ord('?'):ord(';'), ord('/'):ord('|'), ord('\\'):ord('|')}
             tabtext = tabtext.translate(translation_table)  # remove illegal characters
@@ -971,7 +971,7 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     # Could at this point go through each sheet adding on the auto filter as we now know how many of each there are...
     
     # Populate summary sheet
-    tsk.progress = 'Now populating the summary sheet...'
+    tsk.progress = u'Now populating the summary sheet...'
     tsk.save()
 
     import pkg_resources  # part of setuptools
@@ -987,18 +987,18 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     titleformat.set_font_size=(22)
     titleformat.set_font_color=('#FF0000')
     titleformat.set_bold()
-    toplinestring = 'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
-    linetwostring = 'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
+    toplinestring = u'XLSX Export from OpenREM version {0} on {1}'.format(version, str(datetime.datetime.now()))
+    linetwostring = u'OpenREM is copyright 2016 The Royal Marsden NHS Foundation Trust, and available under the GPL. See http://openrem.org'
     summarysheet.write(0,0, toplinestring, titleformat)
     summarysheet.write(1,0, linetwostring)
 
     # Number of exams
-    summarysheet.write(3,0,"Total number of exams")
+    summarysheet.write(3,0, u"Total number of exams")
     summarysheet.write(3,1,e.count())
 
     # Generate list of Study Descriptions
-    summarysheet.write(5,0,"Study Description")
-    summarysheet.write(5,1,"Frequency")
+    summarysheet.write(5,0, u"Study Description")
+    summarysheet.write(5,1, u"Frequency")
     from django.db.models import Count
     study_descriptions = e.values("study_description").annotate(n=Count("pk"))
     for row, item in enumerate(study_descriptions.order_by('n').reverse()):
@@ -1007,8 +1007,8 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     summarysheet.set_column('A:A', 25)
 
     # Generate list of Requested Procedures
-    summarysheet.write(5,3,"Requested Procedure")
-    summarysheet.write(5,4,"Frequency")
+    summarysheet.write(5,3, u"Requested Procedure")
+    summarysheet.write(5,4, u"Frequency")
     from django.db.models import Count
     requested_procedure = e.values("requested_procedure_code_meaning").annotate(n=Count("pk"))
     for row, item in enumerate(requested_procedure.order_by('n').reverse()):
@@ -1017,34 +1017,34 @@ def dxxlsx(filterdict, pid=False, name=None, patid=None, user=None):
     summarysheet.set_column('D:D', 25)
 
     # Generate list of Series Protocols
-    summarysheet.write(5,6,"Series Protocol")
-    summarysheet.write(5,7,"Frequency")
+    summarysheet.write(5,6, u"Series Protocol")
+    summarysheet.write(5,7, u"Frequency")
     sortedprotocols = sorted(sheetlist.iteritems(), key=lambda (k,v): v['count'], reverse=True)
     for row, item in enumerate(sortedprotocols):
-        summarysheet.write(row+6,6,', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
+        summarysheet.write(row+6,6,u', '.join(item[1]['protocolname'])) # Join as can't write a list to a single cell.
         summarysheet.write(row+6,7,item[1]['count'])
     summarysheet.set_column('G:G', 15)
 
 
     book.close()
-    tsk.progress = 'XLSX book written.'
+    tsk.progress = u'XLSX book written.'
     tsk.save()
 
-    xlsxfilename = "dxexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
+    xlsxfilename = u"dxexport{0}.xlsx".format(datestamp.strftime("%Y%m%d-%H%M%S%f"))
 
     try:
         tsk.filename.save(xlsxfilename,File(tmpxlsx))
     except OSError as e:
-        tsk.progress = "Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
-        tsk.status = 'ERROR'
+        tsk.progress = u"Error saving export file - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror)
+        tsk.status = u'ERROR'
         tsk.save()
         return
     except:
-        tsk.progress = "Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
-        tsk.status = 'ERROR'
+        tsk.progress = u"Unexpected error saving export file - please contact an administrator: {0}".format(sys.exc_info()[0])
+        tsk.status = u'ERROR'
         tsk.save()
         return
 
-    tsk.status = 'COMPLETE'
+    tsk.status = u'COMPLETE'
     tsk.processtime = (datetime.datetime.now() - datestamp).total_seconds()
     tsk.save()

@@ -37,6 +37,6 @@ class HashIDTests(TestCase):
         Test hash of non-ASCII values return the expected hash
         :return:
         """
-        id = '123íä日本語文字列'
+        id = u'123íä日本語文字列'
         hashed_id = 'a74d459c48304dfdb56808558f783e1761eef18b4a59f5c1b3fef348b809f434'
         self.assertEqual(hash_id(id),hashed_id)
