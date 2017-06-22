@@ -66,10 +66,10 @@ def _update_static_files(source_folder):
 
 def _update_database(source_folder):
     run(
-        'cd {0}'
+        'cd {0}/openrem'
         ' && ../virtualenv/bin/python manage.py makemigrations remapp --noinput'.format(source_folder)
     )
     run(
-        'cd {0}'
+        'cd {0}/openrem'
         ' && ../virtualenv/bin/python manage.py migrate --noinput'.format(source_folder)
     )
