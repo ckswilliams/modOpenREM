@@ -17,6 +17,7 @@ def deploy():
     _update_virtualenv(source_folder)
     _update_static_files(source_folder)
     _update_database(source_folder)
+    _restart_gunicorn()
 
 
 def _create_directory_structure_if_necessary(site_folder):
@@ -72,4 +73,10 @@ def _update_database(source_folder):
     run(
         'cd {0}'
         ' && ../virtualenv/bin/python openrem/manage.py migrate --noinput'.format(source_folder)
+    )
+
+
+def _restart_gunicorn():
+    run(
+        'sudo /usr/sbin/service gunicorn-{0} restart'.format(env.host)
     )
