@@ -21,8 +21,8 @@ pipelines:
             - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
             - fab deploy:host=deploy@dev.openrem.org
-    '*stage':  # Commits to any branch ending in 'stage' are tested and will in future be deployed to testing.openrem.org
-      - step:  # deploying to dev.openrem.org for now
+    '*stage':  # Commits to any branch ending in 'stage' are tested and deployed to testing.openrem.org
+      - step:
           script:
             - mv openrem/openremproject/local_settings.py{.example,}
             - mv openrem/openremproject/wsgi.py{.example,}
@@ -32,4 +32,4 @@ pipelines:
             - mkdir -p ~/.ssh
             - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
-            - fab deploy:host=deploy@dev.openrem.org
+            - fab deploy:host=deploy@testing.openrem.org
