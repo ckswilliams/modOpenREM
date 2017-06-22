@@ -15,7 +15,7 @@ pipelines:
           - echo $BITBUCKET_COMMIT
           - echo $BB_OPENREM_KEY2
           - echo $TEST_ACCOUNT_LEVEL
-#          - mkdir -p ~/.ssh
-#          - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
-#          - (umask  077 ; echo $BB_OPENREM_KEY | base64 --decode > ~/.ssh/id_rsa)
+          - mkdir -p ~/.ssh
+          - cat deploy_tools/my_known_hosts >> ~/.ssh/known_hosts
+          - (umask  077 ; echo $BB_OPENREM_KEY2 | base64 --decode > ~/.ssh/id_rsa)
 #          - fab deploy:host=deploy@dev.openrem.org
