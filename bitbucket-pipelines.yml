@@ -8,5 +8,6 @@ pipelines:
           - mv openrem/openremproject/wsgi.py{.example,}
           - pip install -U tox
           - tox -e ci
+          - ssh deploy@dev.openrem.org date
           - pip install fabric
           - fab deploy:host=deploy@dev.openrem.org
