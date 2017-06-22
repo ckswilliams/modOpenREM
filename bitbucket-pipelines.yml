@@ -4,7 +4,9 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - mv openrem/openremproject/local_settings.py{.example,}
-          - mv openrem/openremproject/wsgi.py{.example,}
-          - pip install -U tox
-          - tox -e ci
+          - echo $BITBUCKET_BRANCH
+          - echo $BITBUCKET_TAG
+#          - mv openrem/openremproject/local_settings.py{.example,}
+#          - mv openrem/openremproject/wsgi.py{.example,}
+#          - pip install -U tox
+#          - tox -e ci
