@@ -5,10 +5,17 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
+* `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
+* `#508`_  Testing: DX sample files are now tested
+* `#505`_  Charts: n is now displayed on charts
+* `#504`_  Charts: Fixed issue with null values
+* `#503`_  Internationalisation: more robust decoding and use of unicode throughout
 * `#502`_  Testing: tests now work with SQLite3 and PostgreSQL databases
 * `#501`_  Imports: Changed field type for CodeValue  from 16 chars to text, allows for illegal long values
 * `#500`_  Imports: Philips SC Dose Info with missing time stamps now import
 * `#499`_  Imports: Now aborts gracefully with error log if no template in RDSR
+* `#498`_  Exports: Missing units added to header fields
 * `#497`_  Interface: Detailed fluoro study view: added irradiation type, pulse rate, dose to ref. point, secondary angle, total DAP and ref. point dose from each irradition type
 * `#495`_  Charts: Reduced time taken to render scatter plots with multiple series
 * `#494`_  Charts: Charts now ignore non-zero data when calculating mean, median and number of events
@@ -18,6 +25,7 @@ OpenREM version history
 * `#487`_  Imports: CT RDSR now imports 'procedure context' correctly
 * `#486`_  Imports: CT RDSR now imports 'NameOfPhysiciansReadingStudy' correctly
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
+* `#476`_  Imports: Mixed latin-1 and UTF8 characters now imported, but need to be handled better if possible
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
 * `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
 * `#473`_  Query Retrieve: Added tests
@@ -25,6 +33,7 @@ OpenREM version history
 * `#470`_  Query Retrieve: Optimised CT filtering
 * `#468`_  Query Retrieve: Station names can now be used for filtering if returned
 * `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
+* `#464`_  Imports: DX RDSR now imported properly
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
