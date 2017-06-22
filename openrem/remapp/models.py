@@ -294,6 +294,8 @@ class UserProfile(models.Model):
 
     plotHistograms = models.BooleanField(default=False)
 
+    plotCaseInsensitiveCategories = models.BooleanField(default=False)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
