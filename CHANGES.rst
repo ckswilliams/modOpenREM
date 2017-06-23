@@ -27,7 +27,7 @@ OpenREM version history
 * `#485`_  Imports: CT RDSR now imports 'target region' correctly
 * `#476`_  Imports: Mixed latin-1 and UTF8 characters now imported, but need to be handled better if possible
 * `#475`_  Query Retrieve: Made -sr a stand-alone option - it has a very niche use-case!
-* `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` qill now be respected
+* `#474`_  Logging: Changing to DEBUG logging level in ``local_settings.py`` will now be respected
 * `#473`_  Query Retrieve: Added tests
 * `#472`_  Query Retrieve: Overhauled the query retrieve routines
 * `#470`_  Query Retrieve: Optimised CT filtering
