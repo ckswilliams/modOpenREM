@@ -23,6 +23,7 @@ class ImportMGImg(TestCase):
         dicom_path = os.path.join(root_tests, dicom_file)
 
         mam(dicom_path)
+
         study = GeneralStudyModuleAttr.objects.all()[0]
 
         # Test that patient identifiable data is not stored
@@ -36,9 +37,10 @@ class ImportMGImg(TestCase):
         self.assertEqual(study.accession_number, u'AAAA9876')
         self.assertEqual(study.modality_type, u'MG')
 
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, u'中心医院')
+        institution_name_string = u"Institution name is {0}".format(
+            study.generalequipmentmoduleattr_set.get().institution_name)
+        self.assertEqual(institution_name_string, u"Institution name is 中心医院")
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, u'GE MEDICAL SYSTEMS')
-        #cyrillic doesn't appear to be interpreted correctly
         self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_address, u'Москва')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().station_name, u'SENODS01')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer_model_name, u'Senograph DS ADS_43.10.1')
