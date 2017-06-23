@@ -43,6 +43,8 @@ OpenREM version history
 * `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
 * `#448`_  Documentation: Added a diagram showing the relationship between the OpenREM system components
 * `#447`_  Imports: Modified rdsr and ctdetail template to import and display data from Pixelmed generated Toshiba RDSR
+* `#445`_  Interface: Added function for user to determine between DX and fluoro for ambiguous modalities
+* `#444`_  Imports: DX systems that submit RDSRs that look like fluoro can now be reclassified using `#445`_
 * `#443`_  Exports: Accession number and ID are now exported to XLSX as text. Thanks to `@LuukO`_
 * `#442`_  Exports: Fixed RF exports with multiple filters, added tests. Thanks to `@LuukO`_
 * `#441`_  Charts: Fixed a bug that broke chart links containing non-ASCII characters
