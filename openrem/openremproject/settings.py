@@ -192,19 +192,25 @@ LOGGING = {
         },
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+			'maxBytes': 10*1024*1024,
+            'backupCount': 5,
             'filename': 'openrem.log',
             'formatter': 'verbose'
         },
         'qr_file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+			'maxBytes': 10*1024*1024,
+            'backupCount': 5,
             'filename': 'openrem_qrscu.log',
             'formatter': 'verbose'
         },
         'store_file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+			'maxBytes': 10*1024*1024,
+            'backupCount': 5,
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
         },
