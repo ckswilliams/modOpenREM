@@ -177,3 +177,16 @@ def export_csv_prep(unicode_string):
         utf8_string = unicode_string.encode("utf-8")
         csv_safe_string = replace_comma(utf8_string)
         return csv_safe_string
+
+
+def list_to_string(dicom_value):
+    """
+    Turn multivalue names into a single string for correct encoding and pretty reproduction
+    :param dicom_value: returned DICOM value, usually a name field. Might be single (string) or multivalue (list)
+    :return: string of name(s)
+    """
+    from dicom.dataelem import isMultiValue
+    if dicom_value:
+        if isMultiValue(dicom_value):
+            dicom_value = ' | '.join(dicom_value)
+        return dicom_value
