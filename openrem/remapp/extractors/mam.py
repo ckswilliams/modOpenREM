@@ -382,7 +382,7 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
 def _generalstudymoduleattributes(dataset, g):
     from datetime import datetime
     from remapp.models import PatientIDSettings
-    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
+    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value, list_to_string
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
@@ -392,8 +392,8 @@ def _generalstudymoduleattributes(dataset, g):
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
-    g.referring_physician_name = get_value_kw('ReferringPhysicianName', dataset)
-    g.referring_physician_identification = get_value_kw('ReferringPhysicianIdentification', dataset)
+    g.referring_physician_name = list_to_string(get_value_kw('ReferringPhysicianName', dataset))
+    g.referring_physician_identification = list_to_string(get_value_kw('ReferringPhysicianIdentification', dataset))
     g.study_id = get_value_kw('StudyID', dataset)
     accession_number = get_value_kw('AccessionNumber', dataset)
     patient_id_settings = PatientIDSettings.objects.get()
@@ -403,10 +403,10 @@ def _generalstudymoduleattributes(dataset, g):
     g.accession_number = accession_number
     g.study_description = get_value_kw('StudyDescription', dataset)
     g.modality_type = get_value_kw('Modality', dataset)
-    g.physician_of_record = get_value_kw('PhysicianOfRecord', dataset)
-    g.name_of_physician_reading_study = get_value_kw('NameOfPhysicianReadingStudy', dataset)
-    g.performing_physician_name = get_value_kw('PerformingPhysicianName', dataset)
-    g.operator_name = get_value_kw('OperatorsName', dataset)
+    g.physician_of_record = list_to_string(get_value_kw('PhysicianOfRecord', dataset))
+    g.name_of_physician_reading_study = list_to_string(get_value_kw('NameOfPhysicianReadingStudy', dataset))
+    g.performing_physician_name = list_to_string(get_value_kw('PerformingPhysicianName', dataset))
+    g.operator_name = list_to_string(get_value_kw('OperatorsName', dataset))
     g.procedure_code_meaning = get_value_kw('ProtocolName', dataset)  # Being used to summarise protocol for study
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)

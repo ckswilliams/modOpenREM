@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
 * `#508`_  Testing: DX sample files are now tested

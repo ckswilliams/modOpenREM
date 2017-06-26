@@ -293,7 +293,7 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
 def _generalstudymoduleattributes(dataset, g, ch):
     from datetime import datetime
     from remapp.models import PatientIDSettings
-    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value
+    from remapp.tools.get_values import get_value_kw, get_seq_code_meaning, get_seq_code_value, list_to_string
     from remapp.tools.dcmdatetime import get_date, get_time
     from remapp.tools.hash_id import hash_id
 
@@ -301,7 +301,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.study_date = get_date('StudyDate', dataset)
     g.study_time = get_time('StudyTime', dataset)
     g.study_workload_chart_time = datetime.combine(datetime.date(datetime(1900, 1, 1)), datetime.time(g.study_time))
-    g.referring_physician_name = get_value_kw('RequestingPhysician', dataset)
+    g.referring_physician_name = list_to_string(get_value_kw('RequestingPhysician', dataset))
     g.study_id = get_value_kw('StudyID', dataset)
     accession_number = get_value_kw('AccessionNumber', dataset)
     patient_id_settings = PatientIDSettings.objects.get()
@@ -311,7 +311,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.accession_number = accession_number
     g.modality_type = 'CT'
     g.study_description = get_value_kw('ProtocolName', dataset)
-    g.operator_name = get_value_kw('OperatorsName', dataset)
+    g.operator_name = list_to_string(get_value_kw('OperatorsName', dataset))
     if 'RequestAttributesSequence' in dataset:
         g.procedure_code_value = get_seq_code_value('ScheduledProtocolCodeSequence',
                                                     dataset.RequestAttributesSequence[0])
