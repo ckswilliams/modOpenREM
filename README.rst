@@ -35,7 +35,7 @@ Please feel free to fork the repository and send me pull requests. See
 `the website <http://openrem.org/getinvolved>`_ for more information.
 
 There is a developer demo site, which at times has a working demo of recent code, but might not, and 
-might be broken. It can be found at http://djp-openremdemo.rhcloud.com/openrem/
+might be broken. It can be found at http://dev.openrem.org
 
 OpenREM currently ships with charts that use the HighCharts libraries. This is free to use in a non-commercial setting.
 For other environments please contact Highcharts for licencing. For more information, please see
