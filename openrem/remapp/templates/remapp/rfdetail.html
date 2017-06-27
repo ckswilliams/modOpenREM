@@ -44,6 +44,8 @@
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
                 </li>
                 <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
+                <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
+                <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
             <br>
             <table class="table table-condensed table-bordered small">
