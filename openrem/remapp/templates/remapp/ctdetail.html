@@ -30,6 +30,7 @@
     </li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Comment: {{ generalstudymoduleattr.ctradiationdose_set.get.comment }} </li>
+    <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
     <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
 </ul>
