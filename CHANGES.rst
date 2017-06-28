@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#518`_  Importing: Fixed imports where CT Target Region isn't specified
 * `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
