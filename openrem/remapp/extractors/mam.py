@@ -491,7 +491,7 @@ def _mammo2db(dataset):
     if not study_uid:
         sys.exit(u'No UID returned')
     study_in_db = check_uid.check_uid(study_uid)
-    logger.info(u"In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
+    logger.debug(u"In mam.py. Study_UID %s, study_in_db %s", study_uid, study_in_db)
 
     if study_in_db == 1:
         sleep(2.)  # Give initial event a chance to get to save on _projectionxrayradiationdose
