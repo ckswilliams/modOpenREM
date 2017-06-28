@@ -24,19 +24,19 @@ class ImportCTRDSR(TestCase):
         study = GeneralStudyModuleAttr.objects.all()[0]
 
         # Test that study level data is recorded correctly
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, 'OpenREM centre medical')
-        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'GE MEDICAL SYSTEMS')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, u'OpenREM centre médical')
+        self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, u'GE MEDICAL SYSTEMS')
 
         # Test that patient study level data is recorded correctly
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '100Y')
         self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(100.0))
 
-        # # Test that summary level exposure data is recorded correctly
-        # self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
-        #                  total_number_of_irradiation_events, 1)
-        # self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
-        #                  ct_dose_length_product_total, Decimal(349.7))
-        #
-        # # Test that event level exposure data is recorded correctly (note: not much is in the source file)
-        # self.assertAlmostEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.
-        #                        order_by('id')[2].mean_ctdivol, Decimal(24.7))
+        # Test that summary level exposure data is recorded correctly
+        self.assertEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+                         total_number_of_irradiation_events, 2)
+        self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
+                         ct_dose_length_product_total, Decimal(586.34))
+
+        # Test that event level exposure data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().ctirradiationeventdata_set.
+                               order_by('id')[0].mean_ctdivol, Decimal(60.41))

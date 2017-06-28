@@ -625,8 +625,19 @@ def _ctirradiationeventdata(dataset, ct, ch):  # TID 10013
         if cont.ConceptNameCodeSequence[0].CodeMeaning == 'Acquisition Protocol':
             event.acquisition_protocol = safe_strings(cont.TextValue, char_set=ch)
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'Target Region':
-            event.target_region = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
-                                                    cont.ConceptCodeSequence[0].CodeMeaning)
+            try:
+                event.target_region = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
+                                                        cont.ConceptCodeSequence[0].CodeMeaning)
+            except AttributeError:
+                logger.info(u'Target Region ConceptNameCodeSequence exists, but no content. Study UID {0} from {1}, '
+                               u'{2}, {3}'.format(
+                                event.ct_radiation_dose.general_study_module_attributes.study_instance_uid,
+                                event.ct_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(
+                                    ).manufacturer,
+                                event.ct_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(
+                                    ).manufacturer_model_name,
+                                event.ct_radiation_dose.general_study_module_attributes.generalequipmentmoduleattr_set.get(
+                                    ).station_name))
         elif cont.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Type':
             event.ct_acquisition_type = get_or_create_cid(cont.ConceptCodeSequence[0].CodeValue,
                                                           cont.ConceptCodeSequence[0].CodeMeaning)
