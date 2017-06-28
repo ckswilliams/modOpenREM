@@ -944,16 +944,20 @@ def _generalstudymoduleattributes(dataset, g, ch):
     g.procedure_code_meaning = get_seq_code_meaning('ProcedureCodeSequence', dataset)
     g.requested_procedure_code_value = get_seq_code_value('RequestedProcedureCodeSequence', dataset)
     g.requested_procedure_code_meaning = get_seq_code_meaning('RequestedProcedureCodeSequence', dataset)
+    g.save()
+
     try:
-        if dataset.ContentTemplateSequence[0].TemplateIdentifier == '10001':
-            _projectionxrayradiationdose(dataset, g, 'projection', ch)
-        elif dataset.ContentTemplateSequence[0].TemplateIdentifier == '10011':
-            _projectionxrayradiationdose(dataset, g, 'ct', ch)
+        template_identifier = dataset.ContentTemplateSequence[0].TemplateIdentifier
     except AttributeError:
         logger.error(u"Study UID {0} of modality {1} has no template sequence - incomplete RDSR. Aborting.".format(
             g.study_instance_uid, get_value_kw("ManufacturerModelName", dataset)))
         g.delete()
-    g.save()
+        return
+    if template_identifier == '10001':
+        _projectionxrayradiationdose(dataset, g, 'projection', ch)
+    elif template_identifier == '10011':
+        _projectionxrayradiationdose(dataset, g, 'ct', ch)
+
     if not g.requested_procedure_code_meaning:
         if (('RequestAttributesSequence' in dataset) and dataset[
             0x40, 0x275].VM):  # Ugly hack to prevent issues with zero length LS16 sequence
