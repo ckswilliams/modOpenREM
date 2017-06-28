@@ -294,6 +294,8 @@ class UserProfile(models.Model):
 
     plotHistograms = models.BooleanField(default=False)
 
+    plotCaseInsensitiveCategories = models.BooleanField(default=False)
+
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -320,6 +322,7 @@ class UniqueEquipmentNames(models.Model):
     gantry_id = models.TextField(blank=True, null=True)
     gantry_id_hash = models.CharField(max_length=64, blank=True, null=True)
     display_name = models.TextField(blank=True, null=True)
+    user_defined_modality = models.CharField(max_length=16, blank=True, null=True)
     hash_generated = models.BooleanField(default=False)
 
     class Meta:

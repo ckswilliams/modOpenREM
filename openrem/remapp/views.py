@@ -208,7 +208,8 @@ def dx_summary_chart_data(request):
                              user_profile.plotDXAcquisitionMeankVp, user_profile.plotDXAcquisitionMeanmAs,
                              user_profile.plotDXStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
-                             user_profile.plotHistogramBins, user_profile.plotHistograms)
+                             user_profile.plotHistogramBins, user_profile.plotHistograms,
+                             user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -221,7 +222,7 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                          plot_acquisition_mean_kvp, plot_acquisition_mean_mas,
                          plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems,
-                         plot_histogram_bins, plot_histograms):
+                         plot_histogram_bins, plot_histograms, plot_case_insensitive_categories):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
@@ -273,7 +274,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisition_names'] = result['series_names']
@@ -290,7 +292,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_request_mean_dap, plot_request_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['request_names'] = result['series_names']
@@ -307,7 +310,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_study_mean_dap, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['study_names'] = result['series_names']
@@ -324,7 +328,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_acquisition_mean_kvp, 0,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionkVpSystemList'] = result['system_list']
         return_structure['acquisition_kvp_names'] = result['series_names']
@@ -341,7 +346,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                                   plot_acquisition_mean_mas, 0,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionmAsSystemList'] = result['system_list']
         return_structure['acquisition_mas_names'] = result['series_names']
@@ -356,7 +362,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                               'study_date',
                                               'projectionxrayradiationdose__irradeventxraydata__date_time_started',
                                               median_available, plot_average_choice,
-                                              1000000, plot_acquisition_mean_dap_over_time_period)
+                                              1000000, plot_acquisition_mean_dap_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianDAPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -371,7 +378,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                               'study_date',
                                               'projectionxrayradiationdose__irradeventxraydata__date_time_started',
                                               median_available, plot_average_choice,
-                                              1, plot_acquisition_mean_dap_over_time_period)
+                                              1, plot_acquisition_mean_dap_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMediankVpoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -385,7 +393,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                                               'study_date',
                                               'projectionxrayradiationdose__irradeventxraydata__date_time_started',
                                               median_available, plot_average_choice,
-                                              0.001, plot_acquisition_mean_dap_over_time_period)
+                                              0.001, plot_acquisition_mean_dap_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['acquisitionMedianmAsoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -566,14 +575,15 @@ def rf_summary_chart_data(request):
         rf_plot_calculations(f, median_available, user_profile.plotAverageChoice,
                              user_profile.plotSeriesPerSystem, user_profile.plotHistogramBins,
                              user_profile.plotRFStudyPerDayAndHour, user_profile.plotRFStudyFreq,
-                             user_profile.plotRFStudyDAP, user_profile.plotHistograms)
+                             user_profile.plotRFStudyDAP, user_profile.plotHistograms,
+                             user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
 
 def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap,
-                         plot_histograms):
+                         plot_histograms, plot_case_insensitive_categories):
     from remapp.models import IrradEventXRayData, Median
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
 
@@ -598,7 +608,8 @@ def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_p
                                                   plot_study_dap, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
@@ -688,14 +699,42 @@ def rf_detail_view_skin_map(request, pk=None):
         skin_map_path = os.path.join(MEDIA_ROOT, 'skin_maps', 'skin_map_'+str(pk)+'.p')
 
     from remapp.version import __skin_map_version__
+
+    # If patient weight is missing from the database then db_pat_mass will be undefined
+    try:
+        db_pat_mass = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_weight)
+    except ValueError:
+        db_pat_mass = 73.2
+    except TypeError:
+        db_pat_mass = 73.2
+
+    # If patient weight is missing from the database then db_pat_mass will be undefined
+    try:
+        db_pat_height = float(GeneralStudyModuleAttr.objects.get(pk=pk).patientstudymoduleattr_set.get().patient_size) * 100
+    except ValueError:
+        db_pat_height = 178.6
+    except TypeError:
+        db_pat_height = 178.6
+
     loaded_existing_data = False
+    pat_mass_unchanged = False
+    pat_height_unchanged = False
     if os.path.exists(skin_map_path):
         with gzip.open(skin_map_path, 'rb') as f:
             existing_skin_map_data = pickle.load(f)
         try:
             if existing_skin_map_data['skin_map_version'] == __skin_map_version__:
-                return_structure = existing_skin_map_data
-                loaded_existing_data = True
+                # Round the float values to 1 decimal place and convert to string before comparing
+                if str(round(existing_skin_map_data['patient_height'], 1)) == str(round(db_pat_height, 1)):
+                    pat_height_unchanged = True
+
+                # Round the float values to 1 decimal place and convert to string before comparing
+                if str(round(existing_skin_map_data['patient_mass'], 1)) == str(round(db_pat_mass, 1)):
+                    pat_mass_unchanged = True
+
+                if pat_height_unchanged and pat_mass_unchanged:
+                    return_structure = existing_skin_map_data
+                    loaded_existing_data = True
         except KeyError:
             pass
 
@@ -842,7 +881,7 @@ def ct_summary_chart_data(request):
                              user_profile.plotCTStudyMeanCTDI,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
-                             user_profile.plotHistogramBins, user_profile.plotHistograms)
+                             user_profile.plotHistogramBins, user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
 
     return JsonResponse(return_structure, safe=False)
 
@@ -852,7 +891,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                          plot_study_mean_ctdi,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
-                         plot_histograms):
+                         plot_histograms, plot_case_insensitive_categories):
     from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
     from django.utils.datastructures import MultiValueDictKeyError
 
@@ -905,7 +944,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
                                                   exclude_constant_angle=True,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionSystemList'] = result['system_list']
         return_structure['acquisitionNameList'] = result['series_names']
@@ -923,7 +963,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
                                                   exclude_constant_angle=True,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['acquisitionSystemListCTDI'] = result['system_list']
         return_structure['acquisitionNameListCTDI'] = result['series_names']
@@ -940,7 +981,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_study_mean_dlp, plot_study_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemList'] = result['system_list']
         return_structure['studyNameList'] = result['series_names']
@@ -958,7 +1000,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
                                                   exclude_constant_angle=True,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['studySystemListCTDI'] = result['system_list']
         return_structure['studyNameListCTDI'] = result['series_names']
@@ -975,7 +1018,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_request_mean_dlp, plot_request_freq,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  calculate_histograms=plot_histograms)
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
 
         return_structure['requestSystemList'] = result['system_list']
         return_structure['requestNameList'] = result['series_names']
@@ -989,7 +1033,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                               'ctradiationdose__ctaccumulateddosedata__ct_dose_length_product_total',
                                               'study_date', 'study_date',
                                               median_available, plot_average_choice,
-                                              1, plot_study_mean_dlp_over_time_period)
+                                              1, plot_study_mean_dlp_over_time_period,
+                                              case_insensitive_categories=plot_case_insensitive_categories)
         if median_available and (plot_average_choice == 'median' or plot_average_choice == 'both'):
             return_structure['studyMedianDLPoverTime'] = result['median_over_time']
         if plot_average_choice == 'mean' or plot_average_choice == 'both':
@@ -1659,16 +1704,23 @@ def display_names_view(request):
 
     f = UniqueEquipmentNames.objects.order_by('display_name')
 
-    ct_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT").distinct()
-    mg_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG").distinct()
-    dx_names = f.filter(Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") | Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
-    rf_names = f.filter(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF").distinct()
-    ot_names = f.filter(~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") & ~Q(
-        generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")).distinct()
+    #if user_defined_modality is filled, we should use this value, otherwise the value of modality type in the general_study module
+    #so we look if the concatenation of the user_defined_modality (empty if not used) and modality_type starts with a specific modality type
+    ct_names = f.filter(Q(user_defined_modality="CT") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT"))).distinct()
+    mg_names = f.filter(Q(user_defined_modality="MG") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG"))).distinct()
+    dx_names = f.filter(Q(user_defined_modality="DX") | (
+                        Q(user_defined_modality__isnull=True) & (Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") |
+                                                                 Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR")))).distinct()
+    rf_names = f.filter(Q(user_defined_modality="RF") | (
+                        Q(user_defined_modality__isnull=True) & Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF"))).distinct()
+    ot_names = f.filter(~Q(user_defined_modality__isnull=True) | (
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="RF") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="MG") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CT") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="DX") &
+                        ~Q(generalequipmentmoduleattr__general_study_module_attributes__modality_type="CR"))).distinct()
 
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
@@ -1707,14 +1759,34 @@ def display_name_update(request):
     from remapp.forms import UpdateDisplayNamesForm
 
     if request.method == 'POST':
+        error_message = ''
         new_display_name = request.POST.get('new_display_name')
+        new_user_defined_modality = request.POST.get('new_user_defined_modality')
         for pk in request.POST.get('pks').split(','):
             display_name_data = UniqueEquipmentNames.objects.get(pk=int(pk))
             if not display_name_data.hash_generated:
                 display_name_gen_hash(display_name_data)
-            display_name_data.display_name = new_display_name
+            if new_display_name:
+                display_name_data.display_name = new_display_name
+            if new_user_defined_modality and (not display_name_data.user_defined_modality == new_user_defined_modality):
+                #See if change is valid otherwise return validation error
+                #Assuming modality is always the same, so we take the first
+                try:
+                    modality = GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk)[0].modality_type
+                except:
+                    modality = ''
+                if (modality == 'DX') or (modality == 'CR') or (modality == 'RF'):
+                    display_name_data.user_defined_modality = new_user_defined_modality
+                    # We can't reimport as new modality type, instead we just change the modality type value
+                    GeneralStudyModuleAttr.objects.filter(generalequipmentmoduleattr__unique_equipment_name__pk=pk).update(modality_type=new_user_defined_modality)
+                elif not modality:
+                    error_message = error_message + 'Can\'t determine modality type for ' + display_name_data.display_name + ', user defined modality type not set.\n'
+                else:
+                    error_message = error_message + 'Modality type change is not allowed for ' + display_name_data.display_name + ' (only changing from DX to RF and vice versa is allowed).\n'
             display_name_data.save()
 
+        if error_message:
+            messages.error(request, error_message)
         return HttpResponseRedirect('/openrem/viewdisplaynames/')
 
     else:
@@ -1772,6 +1844,7 @@ def chart_options_view(request):
             user_profile.plotSeriesPerSystem = general_form.cleaned_data['plotSeriesPerSystem']
             user_profile.plotHistogramBins = general_form.cleaned_data['plotHistogramBins']
             user_profile.plotHistograms = general_form.cleaned_data['plotHistograms']
+            user_profile.plotCaseInsensitiveCategories = general_form.cleaned_data['plotCaseInsensitiveCategories']
 
             user_profile.plotCTAcquisitionMeanDLP = ct_form.cleaned_data['plotCTAcquisitionMeanDLP']
             user_profile.plotCTAcquisitionMeanCTDI = ct_form.cleaned_data['plotCTAcquisitionMeanCTDI']
@@ -1834,7 +1907,8 @@ def chart_options_view(request):
                          'plotInitialSortingDirection': user_profile.plotInitialSortingDirection,
                          'plotSeriesPerSystem': user_profile.plotSeriesPerSystem,
                          'plotHistogramBins': user_profile.plotHistogramBins,
-                         'plotHistograms': user_profile.plotHistograms}
+                         'plotHistograms': user_profile.plotHistograms,
+                         'plotCaseInsensitiveCategories': user_profile.plotCaseInsensitiveCategories}
 
     ct_form_data = {'plotCTAcquisitionMeanDLP': user_profile.plotCTAcquisitionMeanDLP,
                     'plotCTAcquisitionMeanCTDI': user_profile.plotCTAcquisitionMeanCTDI,

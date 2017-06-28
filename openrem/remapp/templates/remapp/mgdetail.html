@@ -33,20 +33,38 @@
         {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
     </li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
+    <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
-    <li>Number of events: {{ generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</li>
-    <li>Accumulated AGD:
-        {% for breast in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all %}
-            {% if breast.laterality.code_meaning == "Left breast" %}
-                Left:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }} mGy
-            {% elif breast.laterality.code_meaning == "Right breast" %}
-                Right:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }} mGy
-            {% elif breast.laterality.code_meaning == "Both breasts" %}
-                Both:&nbsp;{{ breast.accumulated_average_glandular_dose|floatformat:3 }} mGy
-            {% endif %}
-        {% endfor %}
-    </li>
 </ul>
+<div class="row">
+  <div class="col-md-3">
+    <table class="table table-condensed table-bordered small">
+      <tr>
+        <th>Total number of events</th>
+        <td>{{ generalstudymoduleattr.projectionxrayradiationdose_set.get.irradeventxraydata_set.count }}</td>
+      </tr>
+      {% for breast in generalstudymoduleattr.projectionxrayradiationdose_set.get.accumxraydose_set.get.accummammographyxraydose_set.all %}
+        {% if breast.laterality.code_meaning == "Left breast" %}
+          <tr>
+            <th>Accumulated AGD: Left</th>
+            <td>{{ breast.accumulated_average_glandular_dose|floatformat:3 }} mGy</td>
+          </tr>
+        {% elif breast.laterality.code_meaning == "Right breast" %}
+          <tr>
+            <th>Accumulated AGD: Right</th>
+            <td>{{ breast.accumulated_average_glandular_dose|floatformat:3 }} mGy</td>
+          </tr>
+        {% elif breast.laterality.code_meaning == "Both breasts" %}
+          <tr>
+            <th>Accumulated AGD: Both breasts</th>
+            <td>{{ breast.accumulated_average_glandular_dose|floatformat:3 }} mGy</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
 
 <table class="table table-striped table-bordered small">
     <th>Time</th>

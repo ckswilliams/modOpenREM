@@ -105,17 +105,17 @@
                       <li><a href="/openrem/chartoptions">Chart options</a></li>
                       <li><a href="/openrem/charts_off">Switch charts off</a></li>
                       {% if not admin.admingroup %}
-                        <li><a href="/openrem/viewdisplaynames">View display names</a></li>
+                        <li><a href="/openrem/viewdisplaynames">View display names & modality</a></li>
                       {% endif %}
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
-                        <li class="dropdown-header">System level config</li>
-                        <li><a href="/admin/auth/user/">Manage users</a></li>
-                        <li><a href="/openrem/viewdisplaynames">View and edit display names</a></li>
-                        <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object delete settings</a> </li>
-                        <li><a href="/openrem/admin/dicomsummary">DICOM network configuration</a></li>
-                        <li><a href="/admin/patientidsettings/1/">Patient ID settings</a> </li>
-                        <li><a href="/admin/skindosemapsettings/1/">Skin dose map settings</a> </li>
+                        <li class="dropdown-header">System level settings</li>
+                        <li><a href="/admin/auth/user/">Users</a></li>
+                        <li><a href="/openrem/viewdisplaynames">Display names & modality</a></li>
+                        <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
+                        <li><a href="/openrem/admin/dicomsummary">DICOM networking</a></li>
+                        <li><a href="/admin/patientidsettings/1/">Patient ID</a> </li>
+                        <li><a href="/admin/skindosemapsettings/1/">Skin dose map</a> </li>
                       {% endif %}
                     </ul>
                 </li>
@@ -175,9 +175,9 @@
       <hr>
       <footer>
 {% if admin.openremversion %}
-        <p>OpenREM version {{ admin.openremversion }} is &copy; 2016 The Royal Marsden NHS Foundation Trust</p>
+        <p>OpenREM version {{ admin.openremversion }} is &copy; 2017 The Royal Marsden NHS Foundation Trust</p>
 {% else %}
-        <p>OpenREM is &copy; 2015 The Royal Marsden NHS Foundation Trust</p>
+        <p>OpenREM is &copy; 2017 The Royal Marsden NHS Foundation Trust</p>
 {% endif %}
       </footer>
 

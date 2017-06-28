@@ -34,6 +34,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.accession_number, 'ACC12345601')
         self.assertEqual(study.study_description, 'Thorax^TAP (Adult)')
         self.assertEqual(study.modality_type, 'CT')
+        self.assertEqual(study.referring_physician_name, u'Müller')
 
         self.assertEqual(study.generalequipmentmoduleattr_set.get().institution_name, 'Hospital Number One Trust')
         self.assertEqual(study.generalequipmentmoduleattr_set.get().manufacturer, 'SIEMENS')
@@ -285,3 +286,27 @@ class ImportCTRDSR(TestCase):
                 ctirradiationeventdata_set.order_by('id')[3].deviceparticipant_set.get().
                          device_serial_number, '73491')
 
+    def test_import_ct_rdsr_siemens_dual_source(self):
+        """
+        Imports a known RDSR file derived from a Siemens Definition Flash dual source RDSR, and tests all the values
+        imported against those expected.
+        """
+        PatientIDSettings.objects.create()
+
+        dicom_file = "test_files/CT-RDSR-Siemens_Flash-QA-DS.dcm"
+        root_tests = os.path.dirname(os.path.abspath(__file__))
+        dicom_path = os.path.join(root_tests, dicom_file)
+
+        rdsr(dicom_path)
+        study = GeneralStudyModuleAttr.objects.order_by('id')[0]
+
+        # Test that patient identifiable data is not stored
+        self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
+
+        # Test that study level data is recorded correctly
+        self.assertEqual(study.study_date, datetime.date(2013, 06, 11))
+        self.assertEqual(study.study_time, datetime.time(14, 04, 19, 468000))
+        self.assertEqual(study.accession_number, '74624646290')
+        self.assertEqual(study.study_description, 'Specials^PhysicsTesting (Adult)')
+        self.assertEqual(study.modality_type, 'CT')
+        self.assertEqual(study.referring_physician_name, u'Müller | Smith')

@@ -30,23 +30,30 @@
     </li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Comment: {{ generalstudymoduleattr.ctradiationdose_set.get.comment }} </li>
+    <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
+    <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>
     <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
-    <li>
-        Total number of events:
-        {{ generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}
-    </li>
-    <li>
-        Total DLP:
-        {{ generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }}
-        mGy.cm
-    </li>
 </ul>
+<div class="row">
+  <div class="col-md-3">
+    <table class="table table-condensed table-bordered small">
+      <tr>
+        <th>Total number of events</th>
+        <td>{{ generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get.total_number_of_irradiation_events }}</td>
+      </tr>
+      <tr>
+        <th>Total DLP </th>
+        <td>{{ generalstudymoduleattr.ctradiationdose_set.get.ctaccumulateddosedata_set.get.ct_dose_length_product_total|floatformat:2 }} mGy&middot;cm</td>
+      </tr>
+    </table>
+  </div>
+</div>
 
 <table class="table table-striped table-bordered small">
     <th>Acquisition protocol</th>
     <th>Type</th>
     <th>CTDI<sub>vol</sub> (mGy)</th>
-    <th>DLP (mGy.cm)</th>
+    <th>DLP (mGy&middot;cm)</th>
     <th>Scanning length (mm)</th>
     <th>kVp</th>
     <th>mA</th>

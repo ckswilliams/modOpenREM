@@ -195,19 +195,25 @@ LOGGING = {
         },
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+			'maxBytes': 10*1024*1024,
+            'backupCount': 5,
             'filename': 'openrem.log',
             'formatter': 'verbose'
         },
         'qr_file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+			'maxBytes': 10*1024*1024,
+            'backupCount': 5,
             'filename': 'openrem_qrscu.log',
             'formatter': 'verbose'
         },
         'store_file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
+			'maxBytes': 10*1024*1024,
+            'backupCount': 5,
             'filename': 'openrem_storescp.log',
             'formatter': 'verbose'
         },
@@ -245,6 +251,10 @@ LOGGING = {
         },
     }
 }
+
+# Not patient indicators: please override in local_settings.py
+ID_INDICATORS = [u'phy', u'test', u'qa']
+NAME_INDICATORS = [u'phys', u'test', u'qa']
 
 try:
     LOCAL_SETTINGS
