@@ -968,7 +968,7 @@ def _generalstudymoduleattributes(dataset, g, ch):
         _projectionxrayradiationdose(dataset, g, 'projection', ch)
     elif template_identifier == '10011':
         _projectionxrayradiationdose(dataset, g, 'ct', ch)
-
+    g.save()
     if not g.requested_procedure_code_meaning:
         if (('RequestAttributesSequence' in dataset) and dataset[
             0x40, 0x275].VM):  # Ugly hack to prevent issues with zero length LS16 sequence
