@@ -1,0 +1,29 @@
+{% extends "remapp/base.html" %}
+
+{% block mainblock %}
+
+{% if admin.admingroup %}
+
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <h1>Not patient indicators</h1>
+
+      <h2>IDs</h2>
+      <ul>
+      {% for id in ids %}
+        <li>{{ id.not_patient_id }}</li>
+      {% endfor %}
+      </ul>
+
+      <h2>Names</h2>
+      <ul>
+      {% for name in names %}
+        <li>{{ name.not_patient_name }}</li>
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+{% endif %}
+
+{% endblock %}

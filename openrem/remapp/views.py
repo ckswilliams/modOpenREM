@@ -1970,6 +1970,28 @@ def chart_options_view(request):
 
 
 @login_required
+def not_patient_indicators(request):
+    """Displays current not-patient indicators
+    """
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    not_patient_ids = NotPatientIndicatorsID.objects.all()
+    not_patient_names = NotPatientIndicatorsName.objects.all()
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/notpatient.html',
+        {'ids': not_patient_ids, 'names': not_patient_names, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
     """

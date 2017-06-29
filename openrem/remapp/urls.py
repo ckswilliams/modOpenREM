@@ -90,6 +90,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
     url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomDeleteSettingsUpdate.as_view(), name='dicom_delete_settings_update'),
     url(r'^admin/skindosemapsettings/(?P<pk>\d+)/$', SkinDoseMapCalcSettingsUpdate.as_view(), name='skin_dose_map_settings_update'),
+    url(r'^admin/notpatientindicators/', 'not_patient_indicators', name='not_patient_indicators'),
 )
 
 urlpatterns += patterns('remapp.exports.exportviews',

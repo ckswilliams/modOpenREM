@@ -37,6 +37,26 @@ from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
 
+class NotPatientIndicatorsID(models.Model):
+    """
+    Table to record strings that indicate a patient ID is really a test or QA ID
+    """
+    not_patient_id = models.TextField()
+
+    def get_absolute_url(self):
+        return reverse('not_patient_indicators')
+
+
+class NotPatientIndicatorsName(models.Model):
+    """
+    Table to record strings that indicate a patient name is really a test or QA name
+    """
+    not_patient_name = models.TextField()
+
+    def get_absolute_url(self):
+        return reverse('not_patient_indicators')
+
+
 class SkinDoseMapCalcSettings(SingletonModel):
     enable_skin_dose_maps = models.BooleanField(default=False, verbose_name="Enable skin dose maps?")
     calc_on_import = models.BooleanField(default=True, verbose_name="Calculate skin dose map on import?")
