@@ -62,7 +62,9 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
     <h3>Modifying not-patient indicators</h3>
+{% if not admin.admingroup %}
     <p><i>This is only applicable to users in the 'admingroup'</i></p>
+{% endif %}
 {% if admin.admingroup %}
     <p>To modify the non-patient indicators list, use the <a href="/admin/remapp/">Site administration tools</a></p>
 {% endif %}
