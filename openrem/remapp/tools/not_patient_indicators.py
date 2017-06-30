@@ -29,10 +29,8 @@
 
 """
 
-from dicom import charset
 
-
-def get_not_pt(dataset, char_set=charset.default_encoding):
+def get_not_pt(dataset):
     """Looks for indications that a study might be a test or QA study.
     
     Some values that might indicate a study was for QA or similar purposes
@@ -44,20 +42,31 @@ def get_not_pt(dataset, char_set=charset.default_encoding):
     :type dataset:      dataset
     :returns:           str. -- xml style string if any trigger values are found.
     """
+    import fnmatch
     from remapp.tools.get_values import get_value_kw
-    from openremproject.settings import ID_INDICATORS, NAME_INDICATORS
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
     patient_id = get_value_kw('PatientID', dataset)
     patient_name = get_value_kw('PatientName', dataset)
-    id_indicators = ID_INDICATORS
-    name_indicators = NAME_INDICATORS
+
+    id_indicators = NotPatientIndicatorsID.objects.all()
+    name_indicators = NotPatientIndicatorsName.objects.all()
+
     id_contains = []
     name_contains = []
+
     if patient_id:
-        id_contains = [indicator
-                       for indicator in id_indicators if indicator in patient_id.lower()]
+        for pattern in id_indicators:
+            if fnmatch.fnmatch(patient_id.lower(), pattern.lower()):
+                id_contains += pattern
+
     if patient_name:
-        name_contains = [indicator
-                         for indicator in name_indicators if indicator in patient_name.lower()]
+        for pattern in name_indicators:
+            if fnmatch.fnmatch(patient_name.lower(), pattern.lower()):
+                name_contains += pattern
+
     if id_contains or name_contains:
-        return u'<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
-                                                                               str(name_contains)[1:-1])
+        return u'IDs: {0} | Names: {1}'.format(unicode(id_contains)[1:-1], unicode(name_contains)[1:-1])
+
+        # return u'<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
+        #                                                                        str(name_contains)[1:-1])
