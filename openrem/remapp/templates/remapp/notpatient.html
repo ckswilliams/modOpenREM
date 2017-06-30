@@ -2,28 +2,72 @@
 
 {% block mainblock %}
 
-{% if admin.admingroup %}
 
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h1>Not patient indicators</h1>
-
-      <h2>IDs</h2>
-      <ul>
-      {% for id in ids %}
-        <li>{{ id.not_patient_id }}</li>
-      {% endfor %}
-      </ul>
-
-      <h2>Names</h2>
-      <ul>
-      {% for name in names %}
-        <li>{{ name.not_patient_name }}</li>
-      {% endfor %}
-      </ul>
-    </div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <h1>Not patient indicators</h1>
+    <p>
+      On import, the patient name and patient ID is compared to the items in this list. The name and ID are compared in
+      lower-case. If any of the following strings are contained in the patient name or ID, then the following things
+      happen:
+    </p>
+    <ul>
+      <li>that string is placed in the 'not-patient indicator' field</li>
+      <li>the study is excluded from the filtered study list if 'Include possible test data' is set to no</li>
+      <li>the string is printed on the 'Test patient indicators?' line of the study detail page</li>
+      <li>the string is included in the study export XLSX or CSV files in the 'Test patient?' column</li>
+    </ul>
+    <h3>Example:</h3>
+    <p>
+      Suppose the list below contained the string 'ph' in the ID column and 'QA' in the name column. If a study with
+      the patient ID 'PPH23148236' and patient name of 'Srour^Saraqa' was imported, then the following would be
+      recorded in the database and displayed in the interface and exports as described above:
+    </p>
+    <ul>
+      <li>&lt;IDContains Data="'ph'" /&gt; &lt;NameContains Data="'qa'" /&gt;</li>
+    </ul>
+    <h3>Warning!</h3>
+    <p>
+      There are two things to note from the example given:
+      <ol>
+        <li>The string you use to indicate test studies might be part of a real patient name</li>
+        <li>
+          Any strings in the list below will be displayed in the interface and exports, so don't include real names in
+          this list!
+        </li>
+      </ol>
+    </p>
   </div>
+</div>
+<div class="row">
+  <div class="col-md-3 col-md-offset-3">
+    <h2>IDs</h2>
+    <ul>
+    {% for id in ids %}
+      <li>{{ id.not_patient_id }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+  <div class="col-md-3">
+    <h2>Names</h2>
+    <ul>
+    {% for name in names %}
+      <li>{{ name.not_patient_name }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
 
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <h3>Modifying not-patient indicators</h3>
+    <p><i>This is only applicable to users in the 'admingroup'</i></p>
+{% if admin.admingroup %}
+    <p>To modify the non-patient indicators list, use the <a href="/admin/remapp/">Site administration tools</a></p>
 {% endif %}
+  </div>
+</div>
+
 
 {% endblock %}
