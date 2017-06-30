@@ -7,20 +7,20 @@
   <div class="col-md-6 col-md-offset-3">
     <h1>Not patient indicators</h1>
     <p>
-      On import, the patient name and patient ID is compared to the items in this list. The name and ID are compared in
+      On import, the patient name and patient ID are compared to the items in this list. The name and ID are compared in
       lower-case. If any of the following strings are contained in the patient name or ID, then the following things
       happen:
     </p>
     <ul>
-      <li>that string is placed in the 'not-patient indicator' field</li>
-      <li>the study is excluded from the filtered study list if 'Include possible test data' is set to no</li>
-      <li>the string is printed on the 'Test patient indicators?' line of the study detail page</li>
-      <li>the string is included in the study export XLSX or CSV files in the 'Test patient?' column</li>
+      <li>that string is placed in the <em>not_patient_indicator</em> database field</li>
+      <li>the study is excluded from the filtered study list if <em>Include possible test data</em> is set to <em>No</em></li>
+      <li>the string is printed on the <em>Test patient indicators?</em> line of the study detail page</li>
+      <li>the string is included in the study export XLSX or CSV files in the <em>Test patient?</em> column</li>
     </ul>
     <h3>Example:</h3>
     <p>
-      Suppose the list below contained the string 'ph' in the ID column and 'QA' in the name column. If a study with
-      the patient ID 'PPH23148236' and patient name of 'Srour^Saraqa' was imported, then the following would be
+      Suppose the list below contained the string <em>ph</em> in the ID column and <em>QA</em> in the name column. If a study with
+      the patient ID <em>PPH23148236</em> and patient name of <em>Srour^Saraqa</em> was imported, then the following would be
       recorded in the database and displayed in the interface and exports as described above:
     </p>
     <ul>
