@@ -49,24 +49,24 @@ def get_not_pt(dataset):
     patient_id = get_value_kw('PatientID', dataset)
     patient_name = get_value_kw('PatientName', dataset)
 
-    id_indicators = NotPatientIndicatorsID.objects.all()
-    name_indicators = NotPatientIndicatorsName.objects.all()
+    id_indicators = NotPatientIndicatorsID.objects.order_by('id')
+    name_indicators = NotPatientIndicatorsName.objects.order_by('id')
 
     id_contains = []
     name_contains = []
 
     if patient_id:
         for pattern in id_indicators:
-            if fnmatch.fnmatch(patient_id.lower(), pattern.lower()):
-                id_contains += pattern
+            if fnmatch.fnmatch(patient_id.lower(), pattern.not_patient_id.lower()):
+                id_contains += [pattern.not_patient_id]
 
     if patient_name:
         for pattern in name_indicators:
-            if fnmatch.fnmatch(patient_name.lower(), pattern.lower()):
-                name_contains += pattern
+            if fnmatch.fnmatch(patient_name.lower(), pattern.not_patient_name.lower()):
+                name_contains += [pattern.not_patient_name]
 
     if id_contains or name_contains:
-        return u'IDs: {0} | Names: {1}'.format(unicode(id_contains)[1:-1], unicode(name_contains)[1:-1])
+        return u'IDs: {0} | Names: {1}'.format(u' '.join(id_contains), u' '.join(name_contains))
 
         # return u'<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
         #                                                                        str(name_contains)[1:-1])
