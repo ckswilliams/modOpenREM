@@ -40,7 +40,7 @@ class NotPatientIndicatorTests(TestCase):
         ds.PatientName = u'Physics^LBDAlignment'
         ds.PatientID = u'12345'
 
-        self.assertEqual(get_not_pt(ds), u'IDs:  | Names: PHYSICS*')
+        self.assertEqual(get_not_pt(ds), u'IDs:  | Names: physics*')
 
     def test_names(self):
         """Tests multiple name patterns matching simultaneously"""
@@ -48,7 +48,7 @@ class NotPatientIndicatorTests(TestCase):
         ds.PatientName = u'Physics^LBDAlignmentTest'
         ds.PatientID = u'12345'
 
-        self.assertEqual(get_not_pt(ds), u'IDs:  | Names: *TEST* PHYSICS*')
+        self.assertEqual(get_not_pt(ds), u'IDs:  | Names: *test* physics*')
 
     def test_names_and_id(self):
         """Tests both name and ID patterns matching together"""
@@ -56,4 +56,4 @@ class NotPatientIndicatorTests(TestCase):
         ds.PatientName = u'Physics^LBDAlignmentTest'
         ds.PatientID = u'PHY12345'
 
-        self.assertEqual(get_not_pt(ds), u'IDs: PHY* | Names: *TEST* PHYSICS*')
+        self.assertEqual(get_not_pt(ds), u'IDs: phy* | Names: *test* physics*')
