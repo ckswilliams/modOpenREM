@@ -58,15 +58,12 @@ def get_not_pt(dataset):
     if patient_id:
         for pattern in id_indicators:
             if fnmatch.fnmatch(patient_id.lower(), pattern.not_patient_id.lower()):
-                id_contains += [pattern.not_patient_id]
+                id_contains += [pattern.not_patient_id.lower()]
 
     if patient_name:
         for pattern in name_indicators:
             if fnmatch.fnmatch(patient_name.lower(), pattern.not_patient_name.lower()):
-                name_contains += [pattern.not_patient_name]
+                name_contains += [pattern.not_patient_name.lower()]
 
     if id_contains or name_contains:
         return u'IDs: {0} | Names: {1}'.format(u' '.join(id_contains), u' '.join(name_contains))
-
-        # return u'<IDContains Data="{0}" /> <NameContains Data="{1}" />'.format(str(id_contains)[1:-1],
-        #                                                                        str(name_contains)[1:-1])

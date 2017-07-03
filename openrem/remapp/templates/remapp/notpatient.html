@@ -5,69 +5,127 @@
 
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <h1>Not patient indicators</h1>
-    <p>
-      On import, the patient name and patient ID are compared to the items in this list. The name and ID are compared in
-      lower-case. If any of the following strings are contained in the patient name or ID, then the following things
-      happen:
-    </p>
-    <ul>
-      <li>that string is placed in the <em>not_patient_indicator</em> database field</li>
-      <li>the study is excluded from the filtered study list if <em>Include possible test data</em> is set to <em>No</em></li>
-      <li>the string is printed on the <em>Test patient indicators?</em> line of the study detail page</li>
-      <li>the string is included in the study export XLSX or CSV files in the <em>Test patient?</em> column</li>
-    </ul>
-    <h3>Example:</h3>
-    <p>
-      Suppose the list below contained the string <em>ph</em> in the ID column and <em>QA</em> in the name column. If a study with
-      the patient ID <em>PPH23148236</em> and patient name of <em>Srour^Saraqa</em> was imported, then the following would be
-      recorded in the database and displayed in the interface and exports as described above:
-    </p>
-    <ul>
-      <li>&lt;IDContains Data="'ph'" /&gt; &lt;NameContains Data="'qa'" /&gt;</li>
-    </ul>
-    <h3>Warning!</h3>
-    <p>
-      There are two things to note from the example given:
-      <ol>
-        <li>The string you use to indicate test studies might be part of a real patient name</li>
-        <li>
-          Any strings in the list below will be displayed in the interface and exports, so don't include real names in
-          this list!
-        </li>
-      </ol>
-    </p>
+    <h1>Not-patient indicators</h1>
   </div>
 </div>
 <div class="row">
   <div class="col-md-3 col-md-offset-3">
-    <h2>IDs</h2>
-    <ul>
-    {% for id in ids %}
-      <li>{{ id.not_patient_id }}</li>
-    {% endfor %}
-    </ul>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <a class="btn btn-primary pull-right btn-sm" href="/admin/remapp/notpatientindicatorsid/" role="button">
+          Modify ID patterns
+        </a>
+        <h3 class="panel-title">ID matching patterns</h3>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-bordered">
+      {% for id in ids %}
+        <tr>
+          <td><code>{{ id.not_patient_id }}</code></td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
   </div>
   <div class="col-md-3">
-    <h2>Names</h2>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <a class="btn btn-primary pull-right btn-sm" href="/admin/remapp/notpatientindicatorsname/" role="button">
+          Modify Name patterns
+        </a>
+        <h3 class="panel-title">Name matching patterns</h3>
+        <div class="clearfix"></div>
+      </div>
+      <table class="table table-bordered">
+      {% for name in names %}
+        <tr>
+          <td><code>{{ name.not_patient_name }}</code></td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <p>
+      On import, the patient name and patient ID are compared to the matching patterns in this list. The name and ID are
+      compared in
+      lower-case. If any of the following patterns are contained in the patient name or ID, then the following things
+      happen:
+    </p>
     <ul>
-    {% for name in names %}
-      <li>{{ name.not_patient_name }}</li>
-    {% endfor %}
+      <li>that pattern is placed in the <strong>not_patient_indicator</strong> database field</li>
+      <li>the study is excluded from the filtered study list if <strong>Include possible test data</strong> is set to
+        <strong>No</strong></li>
+      <li>the pattern is printed on the <strong>Test patient indicators?</strong> line of the study detail page</li>
+      <li>the pattern is included in the study export XLSX or CSV files in the <strong>Test patient?</strong> column</li>
     </ul>
+    <div class="panel panel-info">
+      <div class="panel-heading"><h3 class="panel-title">Example</h3></div>
+      <div class="panel-body">
+        <dl class="dl-horizontal">
+          <dt>ID matching pattern</dt>
+          <dt>Name matching pattern</dt>
+          <dd><code>*QA*</code></dd>
+          <dt>Study patient ID</dt>
+          <dd>PPH23148236</dd>
+          <dt>Study patient name</dt>
+          <dd>Srour^Saraqa</dd>
+        </dl>
+        <p>
+          <strong>Resultant not-patient indicator recorded:</strong>
+        </p>
+        <blockquote><p>IDs: *ph* | Names: *qa*</p></blockquote>
+      </div>
+    </div>
+
+    <div class="panel panel-warning">
+      <div class="panel-heading"><h3 class="panel-title">Warning!</h3></div>
+      <div class="panel-body">
+      <p>
+        There are two things to note from the example given:
+        <ol>
+        <li>The pattern you use to indicate test studies <strong>might match real patient names/IDs</strong></li>
+          <li>
+            Any strings in the list below will be displayed in the interface and exports, so don't include real names in
+            this list!
+          </li>
+        </ol>
+      </p>
+      </div>
+    </div>
   </div>
 </div>
 
-
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <h3>Modifying not-patient indicators</h3>
+  <div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Modifying not-patient indicator patterns</h3>
+  </div>
+  <div class="panel-body">
 {% if not admin.admingroup %}
     <p><i>This is only applicable to users in the 'admingroup'</i></p>
 {% endif %}
 {% if admin.admingroup %}
-    <p>To modify the non-patient indicators list, use the <a href="/admin/remapp/">Site administration tools</a></p>
+  <p>To modify the non-patient indicators list, use the <a href="/admin/remapp/">Site administration tools</a></p>
+  <p>
+    To add in the patterns that will match the behaviour of version 0.7.4 and earlier,
+    <a href="/admin/notpatientindicators/restore074/">click here</a>.
+  </p>
+  <p>How to use the wildcards:</p>
+  <table class="table table-bordered">
+  <tr><th>Pattern</th><th>Meaning</th></tr>
+    <tr><td><code>*</code></td><td>matches everything</td></tr>
+    <tr><td><code>?</code></td><td>matches any single character</td></tr>
+    <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
+    <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
+  </table>
+
 {% endif %}
+  </div>
+  </div>
   </div>
 </div>
 

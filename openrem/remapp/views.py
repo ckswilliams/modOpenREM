@@ -49,8 +49,8 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from openremproject.settings import MEDIA_ROOT
 import remapp
+from openremproject.settings import MEDIA_ROOT
 from remapp.forms import SizeUploadForm
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
 from remapp.models import SizeUpload
@@ -1989,6 +1989,28 @@ def not_patient_indicators(request):
         {'ids': not_patient_ids, 'names': not_patient_names, 'admin': admin},
         context_instance=RequestContext(request)
     )
+
+
+@login_required
+def not_patient_indicators_as_074(request):
+    """Add patterns to no-patient indicators to replicate 0.7.4 behaviour"""
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    not_patient_ids = NotPatientIndicatorsID.objects.all()
+    not_patient_names = NotPatientIndicatorsName.objects.all()
+
+    id_indicators = [u'*phy*', u'*test*', u'*qa*']
+    name_indicators = [u'*phys*', u'*test*', u'*qa*']
+
+    for id_indicator in id_indicators:
+        if not not_patient_ids.filter(not_patient_id__iexact=id_indicator):
+            NotPatientIndicatorsID(not_patient_id=id_indicator).save()
+
+    for name_indicator in name_indicators:
+        if not not_patient_names.filter(not_patient_name__iexact=name_indicator):
+            NotPatientIndicatorsName(not_patient_name=name_indicator).save()
+
+    return redirect(reverse_lazy('not_patient_indicators'))
 
 
 @login_required
