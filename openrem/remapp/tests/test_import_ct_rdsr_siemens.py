@@ -6,11 +6,20 @@ import os
 from decimal import Decimal
 from django.test import TestCase
 from remapp.extractors import rdsr
-from remapp.models import GeneralStudyModuleAttr, PatientIDSettings
-
+from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, NotPatientIndicatorsID, NotPatientIndicatorsName
 
 
 class ImportCTRDSR(TestCase):
+    def setUp(self):
+        """Adds the not-patient patterns to match against - set to be the same as in release 0.7.4"""
+        NotPatientIndicatorsID(not_patient_id=u'*qa*').save()
+        NotPatientIndicatorsID(not_patient_id=u'*phy*').save()
+        NotPatientIndicatorsID(not_patient_id=u'*test*').save()
+        NotPatientIndicatorsName(not_patient_name=u'*phys*').save()
+        NotPatientIndicatorsName(not_patient_name=u'*test*').save()
+        NotPatientIndicatorsName(not_patient_name=u'*qa*').save()
+
+
     def test_import_ct_rdsr_siemens(self):
         """
         Imports a known RDSR file derived from a Siemens Definition Flash single source RDSR, and tests all the values
@@ -27,6 +36,7 @@ class ImportCTRDSR(TestCase):
 
         # Test that patient identifiable data is not stored
         self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
+        self.assertEqual(study.patientmoduleattr_set.get().not_patient_indicator, None)
 
         # Test that study level data is recorded correctly
         self.assertEqual(study.study_date, datetime.date(1997, 01, 01))
@@ -302,6 +312,8 @@ class ImportCTRDSR(TestCase):
 
         # Test that patient identifiable data is not stored
         self.assertEqual(study.patientmoduleattr_set.get().patient_name, None)
+        # Test that not-patient indicators are identified
+        self.assertEqual(study.patientmoduleattr_set.get().not_patient_indicator, u'IDs: *qa* | Names: ')
 
         # Test that study level data is recorded correctly
         self.assertEqual(study.study_date, datetime.date(2013, 06, 11))
