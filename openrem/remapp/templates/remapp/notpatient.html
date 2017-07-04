@@ -6,6 +6,7 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
     <h1>Not-patient indicators</h1>
+    <p>Find QA and test studies in your anonymised data by matching against strings with wildcards</p>
   </div>
 </div>
 <div class="row">
@@ -18,13 +19,18 @@
         <h3 class="panel-title">ID matching patterns</h3>
         <div class="clearfix"></div>
       </div>
-      <table class="table table-bordered">
-      {% for id in ids %}
-        <tr>
-          <td><code>{{ id.not_patient_id }}</code></td>
-        </tr>
-      {% endfor %}
-      </table>
+      <div class="panel-body">
+        {% if ids.count < 1 %}
+          <p>Nothing set yet, see below for examples</p>
+        {% endif %}
+        <table class="table table-bordered">
+        {% for id in ids %}
+          <tr>
+            <td><code>{{ id.not_patient_id }}</code></td>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
     </div>
   </div>
   <div class="col-md-3">
@@ -36,13 +42,18 @@
         <h3 class="panel-title">Name matching patterns</h3>
         <div class="clearfix"></div>
       </div>
-      <table class="table table-bordered">
-      {% for name in names %}
-        <tr>
-          <td><code>{{ name.not_patient_name }}</code></td>
-        </tr>
-      {% endfor %}
-      </table>
+      <div class="panel-body">
+        {% if names.count < 1 %}
+          <p>Nothing set yet, see below for examples</p>
+        {% endif %}
+        <table class="table table-bordered">
+        {% for name in names %}
+          <tr>
+            <td><code>{{ name.not_patient_name }}</code></td>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -78,6 +89,15 @@
           <strong>Resultant not-patient indicator recorded:</strong>
         </p>
         <blockquote><p>IDs: *ph* | Names: *qa*</p></blockquote>
+          <h4>How to use the wildcards:</h4>
+          <table class="table table-bordered">
+          <tr><th>Pattern</th><th>Meaning</th></tr>
+            <tr><td><code>*</code></td><td>matches everything</td></tr>
+            <tr><td><code>?</code></td><td>matches any single character</td></tr>
+            <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
+            <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
+          </table>
+
       </div>
     </div>
 
@@ -115,14 +135,6 @@
     To add in the patterns that will match the behaviour of version 0.7.4 and earlier,
     <a href="/admin/notpatientindicators/restore074/">click here</a>.
   </p>
-  <p>How to use the wildcards:</p>
-  <table class="table table-bordered">
-  <tr><th>Pattern</th><th>Meaning</th></tr>
-    <tr><td><code>*</code></td><td>matches everything</td></tr>
-    <tr><td><code>?</code></td><td>matches any single character</td></tr>
-    <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
-    <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
-  </table>
 
 {% endif %}
   </div>
