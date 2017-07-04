@@ -11,9 +11,9 @@
 </div>
 <div class="row">
   <div class="col-md-3 col-md-offset-3">
-    <div class="panel panel-info">
+    <div class="panel panel-primary">
       <div class="panel-heading">
-        <a class="btn btn-primary pull-right btn-sm" href="/admin/remapp/notpatientindicatorsid/" role="button">
+        <a class="btn btn-default pull-right btn-sm" href="/admin/remapp/notpatientindicatorsid/" role="button">
           Modify ID patterns
         </a>
         <h3 class="panel-title">ID matching patterns</h3>
@@ -21,7 +21,7 @@
       </div>
       <div class="panel-body">
         {% if ids.count < 1 %}
-          <p>Nothing set yet, see below for examples</p>
+          <p>Nothing set yet, see below for examples, or to set the patterns to match the 0.7.4 release</p>
         {% endif %}
         <table class="table table-bordered">
         {% for id in ids %}
@@ -34,9 +34,9 @@
     </div>
   </div>
   <div class="col-md-3">
-    <div class="panel panel-info">
+    <div class="panel panel-primary">
       <div class="panel-heading">
-        <a class="btn btn-primary pull-right btn-sm" href="/admin/remapp/notpatientindicatorsname/" role="button">
+        <a class="btn btn-default pull-right btn-sm" href="/admin/remapp/notpatientindicatorsname/" role="button">
           Modify Name patterns
         </a>
         <h3 class="panel-title">Name matching patterns</h3>
@@ -44,7 +44,7 @@
       </div>
       <div class="panel-body">
         {% if names.count < 1 %}
-          <p>Nothing set yet, see below for examples</p>
+          <p>Nothing set yet, see below for examples, or to set the patterns to match the 0.7.4 release</p>
         {% endif %}
         <table class="table table-bordered">
         {% for name in names %}
@@ -75,29 +75,34 @@
     <div class="panel panel-info">
       <div class="panel-heading"><h3 class="panel-title">Example</h3></div>
       <div class="panel-body">
-        <dl class="dl-horizontal">
-          <dt>ID matching pattern</dt>
-          <dd><code>*ph*</code></dd>
-          <dt>Name matching pattern</dt>
-          <dd><code>*QA*</code></dd>
-          <dt>Study patient ID</dt>
-          <dd>PPH23148236</dd>
-          <dt>Study patient name</dt>
-          <dd>Srour^Saraqa</dd>
-        </dl>
-        <p>
-          <strong>Resultant not-patient indicator recorded:</strong>
-        </p>
-        <blockquote><p>IDs: *ph* | Names: *qa*</p></blockquote>
-          <h4>How to use the wildcards:</h4>
-          <table class="table table-bordered">
-          <tr><th>Pattern</th><th>Meaning</th></tr>
-            <tr><td><code>*</code></td><td>matches everything</td></tr>
-            <tr><td><code>?</code></td><td>matches any single character</td></tr>
-            <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
-            <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
-          </table>
-
+        <div class="row">
+          <div class="col-md-6">
+            <dl class="dl-horizontal">
+              <dt>ID matching pattern</dt>
+              <dd><code>*ph*</code></dd>
+              <dt>Name matching pattern</dt>
+              <dd><code>*QA*</code></dd>
+              <dt>Study patient ID</dt>
+              <dd>PPH23148236</dd>
+              <dt>Study patient name</dt>
+              <dd>Srour^Saraqa</dd>
+            </dl>
+            <p>
+              <strong>Resultant not-patient indicator recorded:</strong>
+            </p>
+            <blockquote><p>IDs: *ph* | Names: *qa*</p></blockquote>
+          </div>
+          <div class="col-md-6">
+            <h4>How to use the wildcards:</h4>
+            <table class="table table-bordered">
+            <tr><th>Pattern</th><th>Meaning</th></tr>
+              <tr><td><code>*</code></td><td>matches everything</td></tr>
+              <tr><td><code>?</code></td><td>matches any single character</td></tr>
+              <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
+              <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
