@@ -4,16 +4,16 @@
 
 
 <div class="row">
-  <div class="col-md-6 col-md-offset-3">
+  <div class="col-md-10 col-md-offset-1">
     <h1>Not-patient indicators</h1>
     <p>Find QA and test studies in your anonymised data by matching against strings with wildcards</p>
   </div>
 </div>
 <div class="row">
-  <div class="col-md-3 col-md-offset-3">
-    <div class="panel panel-info">
+  <div class="col-md-5 col-md-offset-1">
+    <div class="panel panel-primary">
       <div class="panel-heading">
-        <a class="btn btn-primary pull-right btn-sm" href="/admin/remapp/notpatientindicatorsid/" role="button">
+        <a class="btn btn-default pull-right btn-sm" href="/admin/remapp/notpatientindicatorsid/" role="button">
           Modify ID patterns
         </a>
         <h3 class="panel-title">ID matching patterns</h3>
@@ -21,7 +21,7 @@
       </div>
       <div class="panel-body">
         {% if ids.count < 1 %}
-          <p>Nothing set yet, see below for examples</p>
+          <p>Nothing set yet, see below for examples, or to set the patterns to match the 0.7.4 release</p>
         {% endif %}
         <table class="table table-bordered">
         {% for id in ids %}
@@ -33,10 +33,10 @@
       </div>
     </div>
   </div>
-  <div class="col-md-3">
-    <div class="panel panel-info">
+  <div class="col-md-5">
+    <div class="panel panel-primary">
       <div class="panel-heading">
-        <a class="btn btn-primary pull-right btn-sm" href="/admin/remapp/notpatientindicatorsname/" role="button">
+        <a class="btn btn-default pull-right btn-sm" href="/admin/remapp/notpatientindicatorsname/" role="button">
           Modify Name patterns
         </a>
         <h3 class="panel-title">Name matching patterns</h3>
@@ -44,7 +44,7 @@
       </div>
       <div class="panel-body">
         {% if names.count < 1 %}
-          <p>Nothing set yet, see below for examples</p>
+          <p>Nothing set yet, see below for examples, or to set the patterns to match the 0.7.4 release</p>
         {% endif %}
         <table class="table table-bordered">
         {% for name in names %}
@@ -58,12 +58,11 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-md-6 col-md-offset-3">
+  <div class="col-md-8 col-md-offset-2">
     <p>
       On import, the patient name and patient ID are compared to the matching patterns in this list. The name and ID are
-      compared in
-      lower-case. If any of the following patterns are contained in the patient name or ID, then the following things
-      happen:
+      compared in lower-case and make use of wildcards. If any of the patterns match the patient name or ID, then the
+      following things happen:
     </p>
     <ul>
       <li>that pattern is placed in the <strong>not_patient_indicator</strong> database field</li>
@@ -72,55 +71,67 @@
       <li>the pattern is printed on the <strong>Test patient indicators?</strong> line of the study detail page</li>
       <li>the pattern is included in the study export XLSX or CSV files in the <strong>Test patient?</strong> column</li>
     </ul>
-    <div class="panel panel-info">
-      <div class="panel-heading"><h3 class="panel-title">Example</h3></div>
-      <div class="panel-body">
-        <dl class="dl-horizontal">
-          <dt>ID matching pattern</dt>
-          <dd><code>*ph*</code></dd>
-          <dt>Name matching pattern</dt>
-          <dd><code>*QA*</code></dd>
-          <dt>Study patient ID</dt>
-          <dd>PPH23148236</dd>
-          <dt>Study patient name</dt>
-          <dd>Srour^Saraqa</dd>
-        </dl>
-        <p>
-          <strong>Resultant not-patient indicator recorded:</strong>
-        </p>
-        <blockquote><p>IDs: *ph* | Names: *qa*</p></blockquote>
-          <h4>How to use the wildcards:</h4>
-          <table class="table table-bordered">
-          <tr><th>Pattern</th><th>Meaning</th></tr>
-            <tr><td><code>*</code></td><td>matches everything</td></tr>
-            <tr><td><code>?</code></td><td>matches any single character</td></tr>
-            <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
-            <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
-          </table>
-
-      </div>
-    </div>
-
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-5 col-md-offset-1">
+    <h4>For example:</h4>
+    <table class="table table-bordered">
+      <tr>
+        <th>ID matching pattern</th>
+        <td><code>*ph*</code></td>
+      </tr>
+      <tr>
+        <th>Name matching pattern</th>
+        <td><code>*QA*</code></td>
+      </tr>
+      <tr>
+        <th>Study patient ID</th>
+        <td>PPH23148236</td>
+      </tr>
+      <tr>
+        <th>Study patient name</th>
+        <td>Srour^Saraqa</td>
+      </tr>
+      <tr>
+        <th>Resultant not-patient indicator recorded:</th>
+        <td>IDs: *ph* | Names: *qa*</td>
+      </tr>
+    </table>
+  </div>
+  <div class="col-md-5">
+    <h4>How to use the wildcards:</h4>
+    <table class="table table-bordered">
+    <tr><th>Pattern</th><th>Meaning</th></tr>
+      <tr><td><code>*</code></td><td>matches everything</td></tr>
+      <tr><td><code>?</code></td><td>matches any single character</td></tr>
+      <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
+      <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
     <div class="panel panel-warning">
       <div class="panel-heading"><h3 class="panel-title">Warning!</h3></div>
       <div class="panel-body">
       <p>
-        There are two things to note from the example given:
-        <ol>
+        <ul>
         <li>The pattern you use to indicate test studies <strong>might match real patient names/IDs</strong></li>
           <li>
             Any strings in the list below will be displayed in the interface and exports, so don't include real names in
             this list!
           </li>
-        </ol>
+        </ul>
       </p>
       </div>
     </div>
   </div>
 </div>
 
+
 <div class="row">
-  <div class="col-md-6 col-md-offset-3">
+  <div class="col-md-10 col-md-offset-1">
   <div class="panel panel-primary">
   <div class="panel-heading">
     <h3 class="panel-title">Modifying not-patient indicator patterns</h3>
