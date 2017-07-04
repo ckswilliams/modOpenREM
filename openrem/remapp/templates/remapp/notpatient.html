@@ -1,7 +1,17 @@
 {% extends "remapp/base.html" %}
 
-{% block mainblock %}
+{% block confnav %}<li class="dropdown active">{% endblock %}
 
+{% block navhelp %}
+        <li>
+{#            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_not_patient_indicator.html" target="_blank" data-toggle="tooltip" title="Not-patient indicators documentation - opens in a new tab">#}
+            <a href="http://docs.openrem.org/en/issue510notpatientindb/i_not_patient_indicator.html" target="_blank" data-toggle="tooltip" title="Not-patient indicators documentation - opens in a new tab">
+                Not-patient indicator documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block mainblock %}
 
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
