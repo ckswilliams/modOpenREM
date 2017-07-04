@@ -21,7 +21,7 @@ the following table:
 ========= ===================================
 Pattern   Meaning
 ========= ===================================
- *	       matches everything
+ \*	       matches everything
  ?	       matches any single character
  [seq]	   matches any character in seq
  [!seq]    matches any character not in seq
