@@ -46,8 +46,8 @@
   <div class="col-md-5">
     <div class="panel panel-primary">
       <div class="panel-heading">
-        <a class="btn btn-default pull-right btn-sm" href="/admin/remapp/notpatientindicatorsname/" role="button">
-          Modify Name patterns
+        <a class="btn btn-default pull-right btn-sm" href="/admin/notpatientindicators/names/add/" role="button">
+          Add Name patterns
         </a>
         <h3 class="panel-title">Name matching patterns</h3>
         <div class="clearfix"></div>
@@ -59,7 +59,11 @@
         <table class="table table-bordered">
         {% for name in names %}
           <tr>
-            <td><code>{{ name.not_patient_name }}</code></td>
+            <td>
+              <code>{{ name.not_patient_name }}</code>
+              <a href="/openrem/admin/notpatientindicators/names/{{ name.id }}/delete/" role="button" class="pull-right btn btn-default">Delete</a>
+              <a href="/openrem/admin/notpatientindicators/names/{{ name.id }}/" role="button" class="pull-right btn btn-default">Modify</a>
+            </td>
           </tr>
         {% endfor %}
         </table>
