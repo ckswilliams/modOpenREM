@@ -2195,3 +2195,50 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
         else:
             messages.info(self.request, "No changes made")
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
+
+
+class NotPatientNameCreate(CreateView):
+    from remapp.forms import NotPatientNameForm
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    form_class = NotPatientNameForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientNameUpdate(UpdateView):
+    from remapp.forms import NotPatientNameForm
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    form_class = NotPatientNameForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientNameDelete(DeleteView):
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    success_url = reverse_lazy('not_patient_indicators')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
