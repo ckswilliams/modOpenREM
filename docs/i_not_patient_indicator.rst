@@ -16,7 +16,7 @@ Setting the patterns to identify non-patient studies
 ****************************************************
 
 The patient name and the ID are matched against the patterns you configure. The patterns make use of wildcards as per
-the following table:
+the following table, and are case insensitive:
 
 ========= ===================================
 Pattern   Meaning
@@ -28,5 +28,17 @@ Pattern   Meaning
 ========= ===================================
 
 To match all studies where the patient name begins with  ``physics``, the pattern should be set to ``physics*``. This
-would match ``Physics^RoutIQ`` but not match ``Testing^Physics``.
+would match ``Physics^RoutIQ`` but not match ``Testing^Physics``. The patient name in DICOM is normally formatted
+``Family name^Given name^Middle name^Prefix^Suffix``. Therefore to match any studies where the first name is ``Test``,
+you would set the pattern to be ``*^test*``.
+
+If your test patient name always starts with ``PHY`` and then a number, you might use this pattern: ``phy[0-9]*``.
+Here we have used a range for the sequence to match any number, but it will only match one character per sequence, so a
+``*`` is required to match all the characters after the first number. This pattern will match ``Phy12345`` but not
+``Phyliss``.
+
+The pattern list for patient name and the list for patient ID are separate, so both need to be populated to meet your
+requirements.
+
+
 
