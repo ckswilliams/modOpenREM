@@ -34,8 +34,8 @@ you would set the pattern to be ``*^test*``.
 
 If your test patient name always starts with ``PHY`` and then a number, you might use this pattern: ``phy[0-9]*``.
 Here we have used a range for the sequence to match any number, but it will only match one character per sequence, so a
-``*`` is required to match all the characters after the first number. This pattern will match ``Phy12345`` but not
-``Phyliss``.
+``*`` is required to match all the characters after the first number. This pattern will match ``Phy12345`` and
+``PHY6test`` but not ``Phyliss``.
 
 The pattern list for patient name and the list for patient ID are separate, so both need to be populated to meet your
 requirements.
