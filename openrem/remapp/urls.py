@@ -37,7 +37,7 @@ from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
 from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
 from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
-
+from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
 urlpatterns = patterns('remapp.views',
 
@@ -96,7 +96,10 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/notpatientindicators/names/add/$', NotPatientNameCreate.as_view(), name='notpatientname_add'),
     url(r'^admin/notpatientindicators/names/(?P<pk>\d+)/$', NotPatientNameUpdate.as_view(), name='notpatientname_update'),
     url(r'^admin/notpatientindicators/names/(?P<pk>\d+)/delete/$', NotPatientNameDelete.as_view(), name='notpatientname_delete'),
-)
+    url(r'^admin/notpatientindicators/id/add/$', NotPatientIDCreate.as_view(), name='notpatienid_add'),
+    url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/$', NotPatientIDUpdate.as_view(), name='notpatientid_update'),
+    url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
+   )
 
 urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^export/$', 'export'),

@@ -24,8 +24,8 @@
   <div class="col-md-5 col-md-offset-1">
     <div class="panel panel-primary">
       <div class="panel-heading">
-        <a class="btn btn-default pull-right btn-sm" href="/admin/remapp/notpatientindicatorsid/" role="button">
-          Modify ID patterns
+        <a class="btn btn-default pull-right btn-sm" href="/admin/notpatientindicators/id/add/" role="button">
+          Add ID patterns
         </a>
         <h3 class="panel-title">ID matching patterns</h3>
         <div class="clearfix"></div>
@@ -37,7 +37,10 @@
         <table class="table table-bordered">
         {% for id in ids %}
           <tr>
-            <td><code>{{ id.not_patient_id }}</code></td>
+            <td>              <code>{{ id.not_patient_id }}</code>
+              <a href="/openrem/admin/notpatientindicators/id/{{ id.id }}/delete/" role="button" class="pull-right"> Delete</a>
+              <a href="/openrem/admin/notpatientindicators/id/{{ id.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
+            </td>
           </tr>
         {% endfor %}
         </table>

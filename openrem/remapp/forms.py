@@ -5,7 +5,8 @@ from crispy_forms.layout import Layout, Submit, HTML, Div
 from crispy_forms.bootstrap import FormActions, PrependedText, InlineCheckboxes, Accordion, AccordionGroup
 import logging
 from openremproject import settings
-from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, NotPatientIndicatorsName
+from remapp.models import DicomDeleteSettings, DicomRemoteQR, DicomStoreSCP, SkinDoseMapCalcSettings, \
+    NotPatientIndicatorsName, NotPatientIndicatorsID
 
 logger = logging.getLogger()
 
@@ -500,4 +501,39 @@ class NotPatientNameForm(forms.ModelForm):
         fields = ['not_patient_name',]
         labels = {
             'not_patient_name': "pattern for name matching",
+        }
+
+class NotPatientIDForm(forms.ModelForm):
+    """Form for configuring not-patient ID patterns
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(NotPatientIDForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.form_class = 'form-horizontal'
+        self.helper.label_class = 'col-md-8'
+        self.helper.field_class = 'col-md-4'
+        self.helper.layout = Layout(
+            Div(
+                'not_patient_id',
+            ),
+            FormActions(
+                Submit('submit', 'Submit')
+            ),
+            Div(
+                HTML("""
+                <div class="col-lg-4 col-lg-offset-4">
+                    <a href="/openrem/admin/notpatientindicators/" role="button" class="btn btn-default">
+                        Cancel and return to not-patient indicator summary page
+                    </a>
+                </div>
+                """)
+            )
+        )
+
+    class Meta:
+        model = NotPatientIndicatorsID
+        fields = ['not_patient_id',]
+        labels = {
+            'not_patient_id': "pattern for ID matching",
         }

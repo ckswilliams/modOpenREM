@@ -2242,3 +2242,49 @@ class NotPatientNameDelete(DeleteView):
             admin[group.name] = True
         context['admin'] = admin
         return context
+
+class NotPatientIDCreate(CreateView):
+    from remapp.forms import NotPatientIDForm
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    form_class = NotPatientIDForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientIDUpdate(UpdateView):
+    from remapp.forms import NotPatientIDForm
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    form_class = NotPatientIDForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientIDDelete(DeleteView):
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    success_url = reverse_lazy('not_patient_indicators')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
