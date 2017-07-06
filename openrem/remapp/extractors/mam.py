@@ -151,7 +151,9 @@ def _irradiationeventxraymechanicaldata(dataset,event):
     from remapp.tools.get_values import get_value_kw
     mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = get_value_kw('BodyPartThickness',dataset)
-    mech.compression_force = float(get_value_kw('CompressionForce', dataset))
+    compression_force = get_value_kw('CompressionForce', dataset)
+    if compression_force:
+        mech.compression_force = float(compression_force)
     mech.magnification_factor = get_value_kw('EstimatedRadiographicMagnificationFactor',dataset)
     mech.column_angulation = get_value_kw('PositionerPrimaryAngle',dataset)
     mech.save()
