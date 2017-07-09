@@ -154,21 +154,20 @@
 
 <div class="row">
   <div class="col-md-10 col-md-offset-1">
-  <div class="panel panel-primary">
+  <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">Modifying not-patient indicator patterns</h3>
+    <h3 class="panel-title">Replicating behaviour of release 0.7.4 and earlier</h3>
   </div>
   <div class="panel-body">
 {% if not admin.admingroup %}
     <p><i>This is only applicable to users in the 'admingroup'</i></p>
 {% endif %}
 {% if admin.admingroup %}
-  <p>To modify the non-patient indicators list, use the <a href="/admin/remapp/">Site administration tools</a></p>
-  <p>
-    To add in the patterns that will match the behaviour of version 0.7.4 and earlier,
-    <a href="/admin/notpatientindicators/restore074/">click here</a>.
-  </p>
-
+    <p>
+      OpenREM releases before 0.8 had the not-patient identification patterns hard-coded. From release 0.8.0 the
+      patterns are (admin) user configurable, but will start with no patterns in place. To add the patterns that would
+      maintain the behaviour of previous releases, <a href="/admin/notpatientindicators/restore074/">click here</a>.
+    </p>
 {% endif %}
   </div>
   </div>
