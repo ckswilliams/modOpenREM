@@ -17,17 +17,19 @@ This has the following advantages:
 Configure what is deleted
 *************************
 
-Use the ``Config`` menu and select ``DICOM object deletion``:
-
 .. figure:: img/ConfigMenu.png
+    :figwidth: 30 %
     :align: right
     :alt: Config menu
 
     The ``Config`` menu
 
+Use the ``Config`` menu and select ``DICOM object deletion``:
+
 This will open the configuration page:
 
 .. figure:: img/DicomDeletePolicyMod.png
+    :figwidth: 60 %
     :align: center
     :alt: Modify DICOM object delete settings
 
