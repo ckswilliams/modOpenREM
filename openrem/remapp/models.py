@@ -37,6 +37,13 @@ from django.core.urlresolvers import reverse
 from solo.models import SingletonModel
 
 
+class AdminTaskQuestions(SingletonModel):
+    """
+    Record if admin tasks have been dealt with
+    """
+    ask_revert_to_074_question = models.BooleanField(default=True)
+
+
 class NotPatientIndicatorsID(models.Model):
     """
     Table to record strings that indicate a patient ID is really a test or QA ID

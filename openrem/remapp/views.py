@@ -1270,7 +1270,7 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
+    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -1393,6 +1393,10 @@ def openrem_home(request):
             }
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
+
+    if admin['admingroup']:
+        not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
+        admin['not_patient_indicator_question'] = not_patient_indicator_question
 
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
