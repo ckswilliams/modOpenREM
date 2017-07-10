@@ -18,6 +18,7 @@ Setting the patterns to identify non-patient studies
 Use the ``Config`` menu and select ``Not-patient indicators``:
 
 .. figure:: img/ConfigMenu.png
+    :figwidth: 25 %
     :align: right
     :alt: Config menu
 
