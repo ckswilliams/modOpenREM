@@ -189,6 +189,7 @@ Configure the settings
     :align: center
     :alt: Initial home page with no users in groups
 .. figure:: img/ConfigMenu.png
+    :figwidth: 30 %
     :align: right
     :alt: Configuration menu
 

@@ -62,7 +62,7 @@ Click the ``Modify`` link in the row of the pattern you wish to modify.
 Deleting patterns
 =================
 
-Click the ``Delete`` link in the row of the pattern you wish to modify. You will be asked to confirm the deletion.
+Click the ``Delete`` link in the row of the pattern you wish to delete. You will be asked to confirm the deletion.
 
 **************************************************
 Replicating behaviour of release 0.7.4 and earlier

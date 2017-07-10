@@ -76,7 +76,7 @@ fluoroscopy; and other.
 Changing x-ray system display names and user defined modality
 =============================================================
 
-.. figure:: img/AdminMenu.png
+.. figure:: img/ConfigMenu.png
    :align: right
    :alt: Admin menu
    :width: 235px
