@@ -15,6 +15,14 @@ deleted or converted to a hash (see :doc:`patientid` for details).
 Setting the patterns to identify non-patient studies
 ****************************************************
 
+Use the ``Config`` menu and select ``Not-patient indicators``:
+
+.. figure:: img/ConfigMenu.png
+    :align: right
+    :alt: Config menu
+
+    The ``Config`` menu
+
 The patient name and the ID are matched against the patterns you configure. The patterns make use of wildcards as per
 the following table, and are case insensitive:
 
@@ -40,5 +48,12 @@ Here we have used a range for the sequence to match any number, but it will only
 The pattern list for patient name and the list for patient ID are separate, so both need to be populated to meet your
 requirements.
 
+**************************************************
+Replicating behaviour of release 0.7.4 and earlier
+**************************************************
 
+
+OpenREM releases before 0.8 had the not-patient identification patterns hard-coded. From release 0.8.0 the patterns are
+(admin) user configurable, but will start with no patterns in place. To add the patterns that would maintain the
+behaviour of previous releases, use the link at the bottom of the config page, or the link in the add/modify pages.
 
