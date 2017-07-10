@@ -35,6 +35,10 @@ This will open the configuration page:
 
     Modify DICOM object deletion policy
 
+.. raw:: html
+
+    <div class="clearfix"></div>
+
 The initial settings are to not delete anything. However, you are likely to want to delete objects that don't match any
 import filters, and also to delete images such as mammo, DX and Philips CT, as these will take up space much more
 quickly than the radiation dose structured reports.
