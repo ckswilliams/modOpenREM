@@ -1,4 +1,16 @@
 /**
+ * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not
+ * supported in Internet Explorer
+ * @param x - the base to use
+ * @param y - the number for which the logarithm is required
+ * @returns {number} - the base x logarithm of y
+ */
+function getBaseLog(x, y) {
+    return Math.log(y) / Math.log(x);
+}
+
+
+/**
  * Function to convert a url to an array of key pairs
  * @param url
  * @returns {{}}
@@ -160,15 +172,3 @@ $(document).ready(function() {
     });
     return false;
 });
-
-
-/**
- * Returns the logarithm of y with base x (ie. logxy). This is used as an alternative to Math.log10 which is not
- * supported in Internet Explorer
- * @param x - the base to use
- * @param y - the number for which the logarithm is required
- * @returns {number} - the base x logarithm of y
- */
-function getBaseLog(x, y) {
-    return Math.log(y) / Math.log(x);
-}
