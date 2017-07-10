@@ -59,9 +59,19 @@
     <h4>Replicating behaviour of release 0.7.4 and earlier</h4>
     <p>
       OpenREM releases before 0.8 had the not-patient identification patterns hard-coded. From release 0.8.0 the
-      patterns are (admin) user configurable, but will start with no patterns in place. To add the patterns that would
-      maintain the behaviour of previous releases, <a href="/admin/notpatientindicators/restore074/">click here</a>.
+      patterns are (admin) user configurable, but will start with no patterns in place.
     </p>
+{% if admin.admingroup %}
+    <p>
+      To add the patterns that would maintain the behaviour of previous releases,
+      <a href="/admin/notpatientindicators/restore074/">click here</a>.
+    </p>
+{% endif %}
+{% if not admin.admingroup %}
+    <p>
+      Log in as an admin in order to add the patterns that would maintain the behaviour of previous releases.
+    </p>
+{% endif %}
   </div>
 </div>
 

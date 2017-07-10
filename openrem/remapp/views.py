@@ -1996,20 +1996,26 @@ def not_patient_indicators_as_074(request):
     """Add patterns to no-patient indicators to replicate 0.7.4 behaviour"""
     from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
 
-    not_patient_ids = NotPatientIndicatorsID.objects.all()
-    not_patient_names = NotPatientIndicatorsName.objects.all()
+    if request.user.groups.filter(name="admingroup"):
+        not_patient_ids = NotPatientIndicatorsID.objects.all()
+        not_patient_names = NotPatientIndicatorsName.objects.all()
 
-    id_indicators = [u'*phy*', u'*test*', u'*qa*']
-    name_indicators = [u'*phys*', u'*test*', u'*qa*']
+        id_indicators = [u'*phy*', u'*test*', u'*qa*']
+        name_indicators = [u'*phys*', u'*test*', u'*qa*']
 
-    for id_indicator in id_indicators:
-        if not not_patient_ids.filter(not_patient_id__iexact=id_indicator):
-            NotPatientIndicatorsID(not_patient_id=id_indicator).save()
+        for id_indicator in id_indicators:
+            if not not_patient_ids.filter(not_patient_id__iexact=id_indicator):
+                NotPatientIndicatorsID(not_patient_id=id_indicator).save()
 
-    for name_indicator in name_indicators:
-        if not not_patient_names.filter(not_patient_name__iexact=name_indicator):
-            NotPatientIndicatorsName(not_patient_name=name_indicator).save()
+        for name_indicator in name_indicators:
+            if not not_patient_names.filter(not_patient_name__iexact=name_indicator):
+                NotPatientIndicatorsName(not_patient_name=name_indicator).save()
 
+        messages.success(request, "0.7.4 style not-patient indicators restored")
+        return redirect(reverse_lazy('not_patient_indicators'))
+
+    else:
+        messages.error(request, "Only members of the admingroup are allowed to modify not-patient indicators")
     return redirect(reverse_lazy('not_patient_indicators'))
 
 

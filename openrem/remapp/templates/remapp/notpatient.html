@@ -18,15 +18,22 @@
     <h1>Not-patient indicators</h1>
     <p>Find QA and test studies in your anonymised data by matching against strings with wildcards when the study is
     imported into OpenREM</p>
+{% if not admin.admingroup %}
+    <p>
+      Log in as an administrator to be able to modify the patterns.
+    </p>
+{% endif %}
   </div>
 </div>
 <div class="row">
   <div class="col-md-5 col-md-offset-1">
     <div class="panel panel-primary">
       <div class="panel-heading">
+{% if admin.admingroup %}
         <a class="btn btn-default pull-right btn-sm" href="/admin/notpatientindicators/id/add/" role="button">
           Add ID patterns
         </a>
+{% endif %}
         <h3 class="panel-title">ID matching patterns</h3>
         <div class="clearfix"></div>
       </div>
@@ -38,8 +45,10 @@
         {% for id in ids %}
           <tr>
             <td>              <code>{{ id.not_patient_id }}</code>
+{% if admin.admingroup %}
               <a href="/openrem/admin/notpatientindicators/id/{{ id.id }}/delete/" role="button" class="pull-right"> Delete</a>
               <a href="/openrem/admin/notpatientindicators/id/{{ id.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
+{% endif %}
             </td>
           </tr>
         {% endfor %}
@@ -50,9 +59,11 @@
   <div class="col-md-5">
     <div class="panel panel-primary">
       <div class="panel-heading">
+{% if admin.admingroup %}
         <a class="btn btn-default pull-right btn-sm" href="/admin/notpatientindicators/names/add/" role="button">
           Add name patterns
         </a>
+{% endif %}
         <h3 class="panel-title">Name matching patterns</h3>
         <div class="clearfix"></div>
       </div>
@@ -65,8 +76,10 @@
           <tr>
             <td>
               <code>{{ name.not_patient_name }}</code>
+{% if admin.admingroup %}
               <a href="/openrem/admin/notpatientindicators/names/{{ name.id }}/delete/" role="button" class="pull-right"> Delete</a>
               <a href="/openrem/admin/notpatientindicators/names/{{ name.id }}/" role="button" class="pull-right">Modify&nbsp;</a>
+{% endif %}
             </td>
           </tr>
         {% endfor %}
