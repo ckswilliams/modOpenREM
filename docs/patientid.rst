@@ -27,7 +27,7 @@ Configure what is stored
     :align: right
     :alt: Configuration menu
 
-On the Config menu, select ``Patient ID``.
+On the Config menu, select ``Patient ID``:
 
 .. raw:: html
 

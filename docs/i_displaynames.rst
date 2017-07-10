@@ -89,6 +89,10 @@ modality then you must log in as a user that is in the ``admingroup``. You will
 then be able to use the ``Display names & modality`` item under the
 ``Config`` menu:
 
+.. raw:: html
+
+    <div class="clearfix"></div>
+
 This will take you to a page where you can view the list of x-ray systems with
 data in OpenREM. If you wish to change a display name or the user defined modality
 then click on the corresponding row. The resulting page will allow you to
