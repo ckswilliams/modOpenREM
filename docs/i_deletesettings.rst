@@ -30,7 +30,7 @@ This will open the configuration page:
 
 .. figure:: img/DicomDeletePolicyMod.png
     :figwidth: 60 %
-    :align: center
+    :align: left
     :alt: Modify DICOM object delete settings
 
     Modify DICOM object deletion policy
