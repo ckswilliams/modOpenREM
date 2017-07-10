@@ -15,14 +15,14 @@ deleted or converted to a hash (see :doc:`patientid` for details).
 Setting the patterns to identify non-patient studies
 ****************************************************
 
-Use the ``Config`` menu and select ``Not-patient indicators``:
-
 .. figure:: img/ConfigMenu.png
-    :figwidth: 25 %
+    :figwidth: 30 %
     :align: right
     :alt: Config menu
 
     The ``Config`` menu
+
+Use the ``Config`` menu and select ``Not-patient indicators``:
 
 The patient name and the ID are matched against the patterns you configure. The patterns make use of wildcards as per
 the following table, and are case insensitive:
