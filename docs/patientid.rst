@@ -26,7 +26,7 @@ Configure what is stored
     :align: center
     :alt: Configuration menu
 
-On the Config menu, select ``Patient ID settings``. The initial settings are as follows:
+On the Config menu, select ``Patient ID``. The initial settings are as follows:
 
 .. figure:: img/ModifyPtIDStorage.png
     :align: center

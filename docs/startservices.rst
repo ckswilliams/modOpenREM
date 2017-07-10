@@ -193,7 +193,7 @@ Configure the settings
     :alt: Configuration menu
 
 * After the first users are configured, this link will no longer be presented and instead you can go to
-  ``Config -> Manage users``.
+  ``Config -> Users``.
 * You will need the superuser username and password you created just after creating the database. The groups are
 
     + ``viewgroup`` can browse the data only

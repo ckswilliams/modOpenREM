@@ -17,11 +17,11 @@ This has the following advantages:
 Configure what is deleted
 *************************
 
-Use the ``Config`` menu and select ``DICOM object delete settings``:
+Use the ``Config`` menu and select ``DICOM object deletion``:
 
-.. figure:: img/ConfigMenuDelete.png
+.. figure:: img/ConfigMenu.png
     :align: right
-    :alt: Config menu with delete option highlighted
+    :alt: Config menu
 
     The ``Config`` menu
 
