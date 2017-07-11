@@ -1396,7 +1396,7 @@ def openrem_home(request):
 
     admin_questions = {}
     admin_questions_true = False
-    if admin['admingroup']:
+    if request.user.groups.filter(name="admingroup"):
         not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
         admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
         if any(value for value in admin_questions.values()):
