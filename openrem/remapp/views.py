@@ -1394,12 +1394,17 @@ def openrem_home(request):
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
 
+    admin_questions = {}
+    admin_questions_true = False
     if admin['admingroup']:
         not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
-        admin['not_patient_indicator_question'] = not_patient_indicator_question
+        admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
+        if any(value for value in admin_questions.values()):
+            admin_questions_true = True
 
     return render(request, "remapp/home.html",
-                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
+                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
+                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true})
 
 
 @login_required
