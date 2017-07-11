@@ -19,13 +19,12 @@ from remapp.models import (
     UniqueEquipmentNames, DicomStoreSCP, DicomRemoteQR, DicomDeleteSettings,
     DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage,
 )
-from .models import NotPatientIndicatorsName, NotPatientIndicatorsID
-
-
+from .models import NotPatientIndicatorsName, NotPatientIndicatorsID, AdminTaskQuestions
 from django.contrib import admin
 from solo.admin import SingletonModelAdmin
 from remapp.models import PatientIDSettings
 
+admin.site.register(AdminTaskQuestions)
 # admin.site.register(PatientIDSettings, SingletonModelAdmin)
 #
 # admin.site.register(GeneralStudyModuleAttr)
