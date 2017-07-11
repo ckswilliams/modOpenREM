@@ -62,22 +62,25 @@
 
   {% if admin.admingroup %}
     {% if admin_questions_true %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Admin tasks</h3>
-        </div>
-        <div class="panel-body">
-          <table class="table table-bordered">
-            {% for question, value in admin_questions.items %}
-              {% if value %}
-              <tr>
-                <td>{{ question }}</td>
-              </tr>
-              {% endif %}
-            {% endfor %}
-          </table>
-        </div>
-      </div>
+      <table class="table table-bordered">
+        {% if admin_questions.not_patient_indicator_question %}
+          <tr>
+            <td>
+              <strong>Admin question:</strong> Identifying non-patient exposures has changed in release 0.8. Would you
+              like this install to match the behaviour of release 0.7.4 and earlier?
+              <a href="/admin/adminquestions/hide_not_patient/" role="button" class="btn btn-default pull-right">
+                Hide
+              </a>
+              <a href="/admin/notpatientindicators/restore074/" role="button" class="btn btn-default pull-right">
+                Restore 0.7.4 patterns
+              </a>
+              <a href="/openrem/admin/notpatientindicators/" role="button" class="btn btn-default pull-right">
+                More information
+              </a>
+            </td>
+          </tr>
+        {% endif %}
+      </table>
     {% endif %}
   {% endif %}
 {% endblock %}

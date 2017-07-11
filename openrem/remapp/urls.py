@@ -99,6 +99,7 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/notpatientindicators/id/add/$', NotPatientIDCreate.as_view(), name='notpatienid_add'),
     url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/$', NotPatientIDUpdate.as_view(), name='notpatientid_update'),
     url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
+    url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
    )
 
 urlpatterns += patterns('remapp.exports.exportviews',

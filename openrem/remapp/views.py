@@ -1399,8 +1399,10 @@ def openrem_home(request):
     if request.user.groups.filter(name="admingroup"):
         not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
         admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
-        if any(value for value in admin_questions.values()):
-            admin_questions_true = True
+        # if any(value for value in admin_questions.itervalues()):
+        #     admin_questions_true = True  # Don't know why this doesn't work
+        if not_patient_indicator_question:
+            admin_questions_true = True  # Doing this instead
 
     return render(request, "remapp/home.html",
                   {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
@@ -2025,6 +2027,22 @@ def not_patient_indicators_as_074(request):
 
     else:
         messages.error(request, "Only members of the admingroup are allowed to modify not-patient indicators")
+    return redirect(reverse_lazy('not_patient_indicators'))
+
+
+@login_required
+def admin_questions_hide_not_patient(request):
+    """Hides the not-patient revert to 0.7.4 question"""
+    from remapp.models import AdminTaskQuestions
+
+    if request.user.groups.filter(name="admingroup"):
+        admin_question = AdminTaskQuestions.objects.all()[0]
+        admin_question.ask_revert_to_074_question = False
+        admin_question.save()
+        messages.success(request, u"Identifying not-patient exposure question won't be shown again")
+        return redirect(reverse_lazy('home'))
+    else:
+        messages.error(request, u"Only members of the admingroup are allowed config this question")
     return redirect(reverse_lazy('not_patient_indicators'))
 
 
