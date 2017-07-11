@@ -10,3 +10,4 @@ openrem/openremproject/wsgi.py
 .tox
 OpenREM.egg-info/
 .coverage
+coverage.xml
