@@ -190,7 +190,7 @@ def _accumulatedmammo_update(dataset, event):  # TID 10005
     accummam.save()
 
 
-def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
+def _irradiationeventxraydata(dataset, proj):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
