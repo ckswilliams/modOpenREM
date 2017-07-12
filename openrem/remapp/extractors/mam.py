@@ -569,6 +569,7 @@ def mam(mg_file):
     try:
         del_settings = DicomDeleteSettings.objects.get()
         del_mg_im = del_settings.del_mg_im
+        del_no_match = del_settings.del_no_match
     except ObjectDoesNotExist:
         del_mg_im = False
 
@@ -576,8 +577,8 @@ def mam(mg_file):
     dataset.decode()
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
-        if del_mg_im:
-            logger.debug(u"%s id not a mammo file, deleting", mg_file)
+        if del_no_match:
+            logger.debug("%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
         return (1)
 
