@@ -1,3 +1,30 @@
+function retrieveProgress(json ) {
+    $.ajax({
+        url: "/openrem/admin/moveupdate",
+        data: {
+            queryID: json.queryID
+        },
+        type: "POST",
+        dataType: "json",
+        success: function( json ) {
+            $( "#move-status" ).html( json.message );
+            if (json.status !== "move complete") setTimeout(function(){
+                var data = {
+                    queryID: json.queryID
+                };
+                retrieveProgress( data );
+            }, 500);
+        },
+        error: function( xhr, status, errorThrown ) {
+            alert( "Sorry, there was a problem getting the status!" );
+            console.log( "Error: " + errorThrown );
+            console.log( "Status: " + status );
+            console.dir( xhr );
+        }
+
+    });
+
+}
 function queryProgress(json ) {
     $.ajax({
         url: "/openrem/admin/queryupdate",
@@ -25,7 +52,7 @@ function queryProgress(json ) {
                 $("#move").click(function(){
                     // console.log("In the move function");
                     var queryID = $(this).data("id");
-                    console.log(queryID);
+                    // console.log(queryID);
                     $( "#move-button").html( "" );
                     $.ajax({
                         url: "/openrem/admin/queryretrieve",
@@ -47,35 +74,6 @@ function queryProgress(json ) {
             // console.log( "Error: " + errorThrown );
             // console.log( "Status: " + status );
             // console.dir( xhr );
-        }
-
-    });
-
-}
-
-
-function retrieveProgress(json ) {
-    $.ajax({
-        url: "/openrem/admin/moveupdate",
-        data: {
-            queryID: json.queryID
-        },
-        type: "POST",
-        dataType: "json",
-        success: function( json ) {
-            $( "#move-status" ).html( json.message );
-            if (json.status !== "move complete") setTimeout(function(){
-                var data = {
-                    queryID: json.queryID
-                };
-                retrieveProgress( data );
-            }, 500);
-        },
-        error: function( xhr, status, errorThrown ) {
-            alert( "Sorry, there was a problem getting the status!" );
-            console.log( "Error: " + errorThrown );
-            console.log( "Status: " + status );
-            console.dir( xhr );
         }
 
     });
