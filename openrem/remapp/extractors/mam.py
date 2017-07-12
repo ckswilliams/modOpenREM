@@ -258,7 +258,7 @@ def _projectionxrayradiationdose(dataset, g, ch):
     proj.xray_mechanical_data_available = get_or_create_cid('R-0038D', 'Yes')
     proj.save()
     _accumulatedxraydose(dataset, proj)
-    _irradiationeventxraydata(dataset, proj, ch)
+    _irradiationeventxraydata(dataset, proj)
 
 
 def _generalequipmentmoduleattributes(dataset, study, ch):
