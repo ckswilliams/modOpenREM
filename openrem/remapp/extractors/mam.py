@@ -115,12 +115,13 @@ def _irradiationeventxraysourcedata(dataset, event):
     source.exposure_time = get_value_kw('ExposureTime', dataset)
     source.focal_spot_size = get_value_kw('FocalSpots', dataset)
     anode_target_material = get_value_kw('AnodeTargetMaterial', dataset)
-    if anode_target_material.strip().lower() == 'molybdenum':
-        source.anode_target_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
-    if anode_target_material.strip().lower() == 'rhodium':
-        source.anode_target_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
-    if anode_target_material.strip().lower() == 'tungsten':
-        source.anode_target_material = get_or_create_cid('C-164F9', 'Tungsten or Tungsten compound')
+    if anode_target_material:
+        if anode_target_material.strip().lower() == 'molybdenum':
+            source.anode_target_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
+        if anode_target_material.strip().lower() == 'rhodium':
+            source.anode_target_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
+        if anode_target_material.strip().lower() == 'tungsten':
+            source.anode_target_material = get_or_create_cid('C-164F9', 'Tungsten or Tungsten compound')
     collimated_field_area = get_value_kw('FieldOfViewDimensions', dataset)
     if collimated_field_area:
         source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
