@@ -10,58 +10,80 @@
 {% endblock %}
 
 
-      {% block toprow %}
-      <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database browser and export</h1>
+{% block toprow %}
+  <h1><img src="{{ STATIC_URL }}img/openrem0055.png" height="55" width="55" class="openrem-logo">OpenREM database browser and export</h1>
 
-      {% if not users_in_groups.any %}
-        <div class="panel panel-danger">
-          <div class="panel-heading">
-              <h3 class="panel-title">There are no users in any of the groups</h3>
-          </div>
-          <div class="panel-body">
-              <p>
-                  You will need to allocate users to a group before using this system -
-                  <a href="/admin/auth/user/">you can do this here.</a> You will need to know the superuser
-                  username and password you used when you installed the database.
-              </p>
-              <p>
-                  Make sure there is at least one Admin user. You can return to the user config
-                  page later by using the 'Manage users' link on the admin menu.
-              </p>
-          </div>
-        </div>
-      {% elif not users_in_groups.admin %}
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-              <h3 class="panel-title">There are no users in the admin group</h3>
-          </div>
-          <div class="panel-body">
-              <p>
-                  Make sure there is at least one Admin user &mdash; <a href="/admin/auth/user/">you can do this here.</a> You
-                  will need to know the superuser
-                  username and password you used when you installed the database.
-              </p>
-              <p>
-                  You can return to the user config
-                  page later by using the 'Manage users' link on the admin menu.
-              </p>
-          </div>
-        </div>
+  {% if not users_in_groups.any %}
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">There are no users in any of the groups</h3>
+      </div>
+      <div class="panel-body">
+        <p>
+          You will need to allocate users to a group before using this system -
+          <a href="/admin/auth/user/">you can do this here.</a> You will need to know the superuser
+          username and password you used when you installed the database.
+        </p>
+        <p>
+          Make sure there is at least one Admin user. You can return to the user config
+          page later by using the 'Manage users' link on the admin menu.
+        </p>
+      </div>
+    </div>
+  {% elif not users_in_groups.admin %}
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">There are no users in the admin group</h3>
+      </div>
+      <div class="panel-body">
+        <p>
+          Make sure there is at least one Admin user &mdash; <a href="/admin/auth/user/">you can do this here.</a> You
+          will need to know the superuser
+          username and password you used when you installed the database.
+        </p>
+        <p>
+          You can return to the user config
+          page later by using the 'Manage users' link on the admin menu.
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
+  <p>
+    There are {{ homedata.total }} studies in this database. Page last refreshed on {% now "jS F Y \a\t H:i" %}.
+    {% if user.is_authenticated %}
+      {% if request.user.userprofile.plotCharts %}
+        Chart plotting on.
+      {% else %}
+        Chart plotting off.
       {% endif %}
+    {% endif %}
+  </p>
 
-      <p>
-          There are {{ homedata.total }} studies in this database. Page last refreshed on {% now "jS F Y \a\t H:i" %}.
-          {% if user.is_authenticated %}
-              {% if request.user.userprofile.plotCharts %}
-                  Chart plotting on.
-              {% else %}
-                  Chart plotting off.
-              {% endif %}
-          {% else %}
-              Chart plotting status unknown - <a href="/login/?next={{ request.get_full_path|urlencode }}">login</a>
-          {% endif %}
-      </p>
-      {% endblock %}
+  {% if admin.admingroup %}
+    {% if admin_questions_true %}
+      <table class="table table-bordered">
+        {% if admin_questions.not_patient_indicator_question %}
+          <tr>
+            <td>
+              <strong>Admin question:</strong> Identifying non-patient exposures has changed in release 0.8. Would you
+              like this install to match the behaviour of release 0.7.4 and earlier?
+              <a href="/admin/adminquestions/hide_not_patient/" role="button" class="btn btn-default pull-right">
+                Hide
+              </a>
+              <a href="/admin/notpatientindicators/restore074/" role="button" class="btn btn-default pull-right">
+                Restore 0.7.4 patterns
+              </a>
+              <a href="/openrem/admin/notpatientindicators/" role="button" class="btn btn-default pull-right">
+                More information
+              </a>
+            </td>
+          </tr>
+        {% endif %}
+      </table>
+    {% endif %}
+  {% endif %}
+{% endblock %}
 
 
       {% block mainblock %}

@@ -345,7 +345,7 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex', dataset)
     patient_birth_date = get_date('PatientBirthDate', dataset)
-    pat.not_patient_indicator = get_not_pt(dataset, char_set=ch)
+    pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal(

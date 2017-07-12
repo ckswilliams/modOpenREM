@@ -13,7 +13,7 @@ the following:
 * OpenREM to be able to query retrieve a third-party system (PACS or modality), using the OpenREM Store SCP or a third
   party one, such as Conquest
 
-To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
+To configure a DICOM Store SCP, on the ``Config`` menu select ``DICOM networking``, then click
 ``Add new Store`` and fill in the details (see figure 1):
 
 .. figure:: img/netdicomstorescp.png
@@ -129,7 +129,7 @@ Query retrieve of third-party system, such as a PACS or modality
 
 To Query-Retrieve a remote host, you will need to configure both a local Store SCP and the remote host.
 
-To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM network configuration``, then click
+To configure a remote query retrieve SCP, on the ``Config`` menu select ``DICOM networking``, then click
 ``Add new QR Node`` and fill in the details:
 
 * Name of QR node: This is the *friendly name*, such as ``PACS QR``
