@@ -32,7 +32,7 @@
 
 def get_not_pt(dataset):
     """Looks for indications that a study might be a test or QA study.
-    
+
     Some values that might indicate a study was for QA or similar purposes
     are not recorded in the database, for example patient name. Therefore
     this module attempts to find such indications and creates an xml

@@ -60,7 +60,7 @@ def _update_virtualenv(source_folder):
 
 def _update_static_files(source_folder):
     run(
-        'cd {0}' 
+        'cd {0}'
         ' && ../virtualenv/bin/python openrem/manage.py collectstatic --noinput'.format(source_folder)
     )
 
