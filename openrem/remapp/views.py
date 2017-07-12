@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -412,8 +412,6 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
 def dx_detail_view(request, pk=None):
     """Detail view for a DX study
     """
-    from django.contrib import messages
-    from remapp.models import GeneralStudyModuleAttr
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
@@ -584,8 +582,7 @@ def rf_summary_chart_data(request):
 def rf_plot_calculations(f, median_available, plot_average_choice, plot_series_per_systems,
                          plot_histogram_bins, plot_study_per_day_and_hour, plot_study_freq, plot_study_dap,
                          plot_histograms, plot_case_insensitive_categories):
-    from remapp.models import IrradEventXRayData, Median
-    from interface.chart_functions import average_chart_inc_histogram_data, average_chart_over_time_data, workload_chart_data
+    from interface.chart_functions import average_chart_inc_histogram_data, workload_chart_data
 
     return_structure = {}
 
@@ -671,8 +668,6 @@ def rf_detail_view_skin_map(request, pk=None):
     from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from django.http import JsonResponse
-    from openremproject.settings import MEDIA_ROOT
-    import os
     import cPickle as pickle
     import gzip
 
@@ -839,16 +834,9 @@ def ct_summary_list_filter(request):
 
 @login_required
 def ct_summary_chart_data(request):
-    from remapp.interface.mod_filters import CTSummaryListFilter, CTFilterPlusPid, ct_acq_filter
+    from remapp.interface.mod_filters import ct_acq_filter
     from openremproject import settings
     from django.http import JsonResponse
-
-    # if request.user.groups.filter(name='pidgroup'):
-    #     f = CTFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-    #         modality_type__exact='CT').order_by().distinct())
-    # else:
-    #     f = CTSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(
-    #         modality_type__exact='CT').order_by().distinct())
 
     if request.user.groups.filter(name='pidgroup'):
         pid = True
@@ -1097,16 +1085,12 @@ def mg_summary_list_filter(request):
         create_user_profile(sender=request.user, instance=request.user, created=True)
         user_profile = request.user.userprofile
 
-    if user_profile.median_available and 'postgresql' in settings.DATABASES['default']['ENGINE']:
-        median_available = True
-    elif 'postgresql' in settings.DATABASES['default']['ENGINE']:
+    if 'postgresql' in settings.DATABASES['default']['ENGINE']:
         user_profile.median_available = True
         user_profile.save()
-        median_available = True
     else:
         user_profile.median_available = False
         user_profile.save()
-        median_available = False
 
     # Obtain the chart options from the request
     chart_options_form = MGChartOptionsForm(request.GET)
@@ -1270,12 +1254,10 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
+    from remapp.models import PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from datetime import datetime
-    import pytz
     from collections import OrderedDict
-    utc = pytz.UTC
 
     test_dicom_store_settings = DicomDeleteSettings.objects.all()
     if not test_dicom_store_settings:
@@ -1501,7 +1483,7 @@ def size_process(request, *args, **kwargs):
             csvrecord.id_type = request.POST['id_type']
             csvrecord.save()
 
-            job = websizeimport.delay(csv_pk=kwargs['pk'])
+            websizeimport.delay(csv_pk=kwargs['pk'])
 
             return HttpResponseRedirect("/openrem/admin/sizeimports")
 
@@ -1514,7 +1496,7 @@ def size_process(request, *args, **kwargs):
         csvrecord = SizeUpload.objects.all().filter(id__exact=kwargs['pk'])
         with open(os.path.join(MEDIA_ROOT, csvrecord[0].sizefile.name), 'rb') as csvfile:
             try:
-                dialect = csv.Sniffer().sniff(csvfile.read(1024))
+                # dialect = csv.Sniffer().sniff(csvfile.read(1024))
                 csvfile.seek(0)
                 if csv.Sniffer().has_header(csvfile.read(1024)):
                     csvfile.seek(0)
@@ -1558,10 +1540,6 @@ def size_imports(request, *args, **kwargs):
 
     :param request:
     """
-    from django.template import RequestContext
-    from django.shortcuts import render_to_response
-    from remapp.models import SizeUpload
-
     if not request.user.groups.filter(name="importsizegroup") and not request.user.groups.filter(name="admingroup"):
         messages.error(request, "You are not in the import size group - please contact your administrator")
         return redirect('/openrem/')
@@ -1592,7 +1570,6 @@ def size_delete(request):
     :param request: Contains the task ID
     :type request: POST
     """
-    from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
     from remapp.models import SizeUpload
@@ -1624,7 +1601,6 @@ def size_abort(request, pk):
     """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
-    from django.shortcuts import get_object_or_404
     from remapp.models import SizeUpload
 
     size_import = get_object_or_404(SizeUpload, pk=pk)
@@ -1656,7 +1632,6 @@ def size_download(request, task_id):
     import os
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
-    from django.shortcuts import redirect
     from django.contrib import messages
     from openremproject.settings import MEDIA_ROOT
     from remapp.models import SizeUpload
