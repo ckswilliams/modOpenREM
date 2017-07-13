@@ -51,10 +51,7 @@ def include_pid(request, name, pat_id):
     :return: dict, with pidgroup, include_names and include_pat_id as bools
     """
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
+    pid = bool(request.user.groups.filter(name='pidgroup'))
 
     include_names = False
     include_pat_id = False
@@ -283,7 +280,7 @@ def export(request):
     current = exptsks.filter(status__contains = u'CURRENT')
     complete = exptsks.filter(status__contains = u'COMPLETE')
     errors = exptsks.filter(status__contains = u'ERROR')
-    
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
