@@ -14,7 +14,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of 
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -1030,8 +1030,6 @@ def rdsr(rdsr_file):
 
     :param filename: relative or absolute path to Radiation Dose Structured Report.
     :type filename: str.
-    
-
     """
 
     import dicom

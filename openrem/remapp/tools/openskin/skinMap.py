@@ -174,7 +174,7 @@ def skinMapToPng(colour, totalDose, filename, testPhantom, encode_16_bit_colour=
     elif encode_16_bit_colour:
         # White at 10 Gy
         threshDose = Decimal(10)
-        totalDose = (totalDose * Decimal(65535)) / threshDose 
+        totalDose = (totalDose * Decimal(65535)) / threshDose
 
         r, g = divmod(totalDose, 255)
         # r is the number of times 255 goes into totalDose; g is the remainder

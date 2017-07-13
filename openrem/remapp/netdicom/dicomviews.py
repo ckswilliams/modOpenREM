@@ -108,8 +108,8 @@ def q_update(request):
 
     resp = {}
     data = request.POST
-    query_id = data.get('query_id')
-    resp['query_id'] = query_id
+    query_id = data.get('queryID')
+    resp['queryID'] = query_id
     try:
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:
@@ -222,7 +222,7 @@ def q_process(request, *args, **kwargs):
             resp = {}
             resp['message'] = u'Request created'
             resp['status'] = u'not complete'
-            resp['query_id'] = query_id
+            resp['queryID'] = query_id
 
             return HttpResponse(json.dumps(resp), content_type='application/json')
         else:
@@ -303,8 +303,8 @@ def r_start(request):
     from remapp.netdicom.qrscu import movescu
     resp = {}
     data = request.POST
-    query_id = data.get('query_id')
-    resp['query_id'] = query_id
+    query_id = data.get('queryID')
+    resp['queryID'] = query_id
 
     movescu.delay(query_id)
 
@@ -318,8 +318,8 @@ def r_update(request):
 
     resp = {}
     data = request.POST
-    query_id = data.get('query_id')
-    resp['query_id'] = query_id
+    query_id = data.get('queryID')
+    resp['queryID'] = query_id
     try:
         query = DicomQuery.objects.get(query_id=query_id)
     except ObjectDoesNotExist:

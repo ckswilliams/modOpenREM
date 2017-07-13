@@ -2,7 +2,7 @@
 #!/usr/local/bin/python
 # scripts/openrem_dx
 
-"""Script to launch the mam module to import information from radiographic images 
+"""Script to launch the mam module to import information from radiographic images
 
     :param filename: relative or absolute path to radiographic DICOM image file.
     :type filename: str.

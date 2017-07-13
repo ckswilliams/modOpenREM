@@ -10,7 +10,7 @@ datasets, this application entity must support the CT Image Storage
 SOP Class as SCP as well. For this example to work, there must be an
 SCP listening on the specified host and port.
 
-For help on usage, 
+For help on usage,
 python qrscu.py -h 
 """
 
@@ -517,7 +517,7 @@ def qrscu(
         date_from=None, date_until=None, modalities=None, inc_sr=False, remove_duplicates=True, filters=None,
         *args, **kwargs):
     """Query retrieve service class user function
-    
+
     Queries a pre-configured remote query retrieve service class provider for dose metric related objects,
     making use of the filter parameters provided. Can automatically trigger a c-move (retrieve) operation.
 
@@ -554,7 +554,7 @@ def qrscu(
 
     debug_timer = datetime.now()
     logger.debug(u"qrscu args passed: qr_scp_pk={0}, store_scp_pk={1}, implicit={2}, explicit={3}, move={4}, "
-                 u"query_id={5}, date_from={6}, date_until={7}, modalities={8}, inc_sr={9}, remove_duplicates={10}, "
+                 u"queryID={5}, date_from={6}, date_until={7}, modalities={8}, inc_sr={9}, remove_duplicates={10}, "
                  u"filters={11}".format(qr_scp_pk, store_scp_pk, implicit, explicit, move, query_id,
                                        date_from, date_until, modalities, inc_sr, remove_duplicates, filters))
 
