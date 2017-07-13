@@ -33,28 +33,11 @@ really for testing). To view the OpenREM interface on another computer, you need
 
 .. sourcecode:: console
 
-    python manage.py runserver --insecure 192.168.1.10:8000
+    python manage.py runserver --insecure 0.0.0.0:8000
 
-Make sure you **change the IP address** to the address of the server! On Windows you can find the IP address information
-by typing
-
-.. sourcecode:: console
-
-    ipconfig
-
-You are looking for a line that has ``IPv4 Address`` followed by four numbers with dots between, similar to the
-numbers before the colon in the command above.
-
-With a linux server, type
-
-.. sourcecode:: console
-
-    ip add
-
-Again you are looking for the same dotted number, this time it will be after ``inet``. In both examples, you might
-have several to choose from depending on how many network cards (real or virtual) your computer has. Determining
-which one is which is probably beyond the scope of these instructions! If you get the IP address completely wrong,
-the command will fail with the error: ``Error: That IP address can't be assigned-to.``
+This will enable the web service to be available from other computers on the network. If your server has several
+network cards and you want to restrict it to one, then you can use a real address rather than ``0.0.0.0``. Likewise you can
+specify the port (here it is ``8000``).
 
 In a web browser on a different computer on the same network, go to http://192.168.1.10:8000/ (**changing the IP address**
 to the one you are running the server on) and you should see the OpenREM interface and the message about creating users.
@@ -189,11 +172,12 @@ Configure the settings
     :align: center
     :alt: Initial home page with no users in groups
 .. figure:: img/ConfigMenu.png
+    :figwidth: 30 %
     :align: right
     :alt: Configuration menu
 
 * After the first users are configured, this link will no longer be presented and instead you can go to
-  ``Config -> Manage users``.
+  ``Config -> Users``.
 * You will need the superuser username and password you created just after creating the database. The groups are
 
     + ``viewgroup`` can browse the data only

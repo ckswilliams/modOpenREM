@@ -9,3 +9,4 @@ See also: ``local_settings.py`` :ref:`localsettingsconfig`
 
     i_deletesettings
     i_displaynames
+    i_not_patient_indicator

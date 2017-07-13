@@ -36,7 +36,8 @@ from remapp.models import AccumProjXRayDose, GeneralStudyModuleAttr
 from remapp.views import DicomStoreCreate, DicomStoreUpdate, DicomStoreDelete
 from remapp.views import DicomQRCreate, DicomQRUpdate, DicomQRDelete
 from remapp.views import PatientIDSettingsUpdate, DicomDeleteSettingsUpdate, SkinDoseMapCalcSettingsUpdate
-
+from remapp.views import NotPatientNameCreate, NotPatientNameUpdate, NotPatientNameDelete
+from remapp.views import NotPatientIDCreate, NotPatientIDUpdate, NotPatientIDDelete
 
 urlpatterns = patterns('remapp.views',
 
@@ -90,7 +91,16 @@ urlpatterns = patterns('remapp.views',
     url(r'^admin/patientidsettings/(?P<pk>\d+)/$', PatientIDSettingsUpdate.as_view(), name='patient_id_settings_update'),
     url(r'^admin/dicomdelsettings/(?P<pk>\d+)/$', DicomDeleteSettingsUpdate.as_view(), name='dicom_delete_settings_update'),
     url(r'^admin/skindosemapsettings/(?P<pk>\d+)/$', SkinDoseMapCalcSettingsUpdate.as_view(), name='skin_dose_map_settings_update'),
-)
+    url(r'^admin/notpatientindicators/$', 'not_patient_indicators', name='not_patient_indicators'),
+    url(r'^admin/notpatientindicators/restore074/$', 'not_patient_indicators_as_074', name='not_patient_indicators_as_074'),
+    url(r'^admin/notpatientindicators/names/add/$', NotPatientNameCreate.as_view(), name='notpatientname_add'),
+    url(r'^admin/notpatientindicators/names/(?P<pk>\d+)/$', NotPatientNameUpdate.as_view(), name='notpatientname_update'),
+    url(r'^admin/notpatientindicators/names/(?P<pk>\d+)/delete/$', NotPatientNameDelete.as_view(), name='notpatientname_delete'),
+    url(r'^admin/notpatientindicators/id/add/$', NotPatientIDCreate.as_view(), name='notpatienid_add'),
+    url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/$', NotPatientIDUpdate.as_view(), name='notpatientid_update'),
+    url(r'^admin/notpatientindicators/id/(?P<pk>\d+)/delete/$', NotPatientIDDelete.as_view(), name='notpatientid_delete'),
+    url(r'^admin/adminquestions/hide_not_patient/$', 'admin_questions_hide_not_patient', name='admin_questions_hide_not_patient'),
+   )
 
 urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^export/$', 'export'),

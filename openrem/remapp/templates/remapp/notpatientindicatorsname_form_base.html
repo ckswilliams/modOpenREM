@@ -1,0 +1,83 @@
+{% extends "remapp/base.html" %}
+
+{% block navhelp %}
+        <li>
+{#            <a href="http://docs.openrem.org/en/{{ admin.docsversion }}/i_not_patient_indicator.html" target="_blank" data-toggle="tooltip" title="Not-patient indicators documentation - opens in a new tab">#}
+            <a href="http://docs.openrem.org/en/issue510notpatientindb/i_not_patient_indicator.html" target="_blank" data-toggle="tooltip" title="Not-patient indicators documentation - opens in a new tab">
+                Not-patient indicator documentation
+            </a>
+        </li>
+{% endblock %}
+
+{% block confnav %}<li class="dropdown active">{% endblock %}
+
+{% block mainblock %}		
+
+<div class="row">
+  <div class="col-md-offset-3 col-md-6">
+    <h3>Create or modify name patterns</h3>
+    <p>
+      Use this form to create or modify the name patterns
+    </p>
+
+    {% if admin.admingroup %}
+      {% load crispy_forms_tags %}
+      {% crispy form %}
+    {% else %}
+      <p>
+        <strong>Only users in the Admin group can create or modify name patterns.</strong>
+      </p>
+    {% endif %}
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-offset-3 col-md-6">
+    <h4>Guidelines</h4>
+    <p>
+      The patient name and the ID are matched against the patterns you configure. The patterns make use of wildcards as
+      per the following table, and are case insensitive:
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-offset-4 col-md-4">
+    <table class="table table-bordered">
+      <tr><th>Pattern</th><th>Meaning</th></tr>
+      <tr><td><code>*</code></td><td>matches everything</td></tr>
+      <tr><td><code>?</code></td><td>matches any single character</td></tr>
+      <tr><td><code>[seq]</code></td><td>matches any character in seq</td></tr>
+      <tr><td><code>[!seq]</code></td><td>matches any character not in seq</td></tr>
+    </table>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-offset-3 col-md-6">
+    <p>
+      To match all studies where the patient name begins with <code>physics</code>, the pattern should be set to
+      <code>physics*</code>. This would match <code>Physics^RoutIQ</code> but not match <code>Testing^Physics</code>
+      because there was no wildcard at the start of the pattern. The patient name in DICOM is normally formatted
+      <code>Family name^Given name^Middle name^Prefix^Suffix</code>. Therefore to match any studies where the first name
+      is <code>Test</code>, you would set the pattern to be <code>*^test*</code> (although this would also match a
+      middle name, prefix or suffix equal to <code>test</code> if they were present!
+    </p>
+    <p>
+      If your test patient name always starts with <code>PHY</code> and then a number, you might use this pattern:
+      <code>phy[0-9]*</code>. Here we have used a range for the sequence to match any number, but it will only match one
+      character per sequence, so a <code>*</code> is required to match all the characters after the first number. This
+      pattern will match <code>Phy12345</code> and <code>PHY6test</code> but not <code>Phyliss</code>.
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-offset-3 col-md-6">
+    <h4>Replicating behaviour of release 0.7.4 and earlier</h4>
+    <p>
+      OpenREM releases before 0.8 had the not-patient identification patterns hard-coded. From release 0.8.0 the
+      patterns are (admin) user configurable, but will start with no patterns in place. To add the patterns that would
+      maintain the behaviour of previous releases, <a href="/admin/notpatientindicators/restore074/">click here</a>.
+    </p>
+  </div>
+</div>
+
+
+{% endblock %}	

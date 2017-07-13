@@ -76,7 +76,7 @@ fluoroscopy; and other.
 Changing x-ray system display names and user defined modality
 =============================================================
 
-.. figure:: img/AdminMenu.png
+.. figure:: img/ConfigMenu.png
    :align: right
    :alt: Admin menu
    :width: 235px
@@ -88,6 +88,10 @@ If you wish to make changes to a display name or to the user defined
 modality then you must log in as a user that is in the ``admingroup``. You will
 then be able to use the ``Display names & modality`` item under the
 ``Config`` menu:
+
+.. raw:: html
+
+    <div class="clearfix"></div>
 
 This will take you to a page where you can view the list of x-ray systems with
 data in OpenREM. If you wish to change a display name or the user defined modality

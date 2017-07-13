@@ -1,41 +1,28 @@
-// chartContainer is the div that holds the HighChart; p is the property to sort on; d is the direction of sort: 1 for
-// ascending, anything else for descending; s is the series index to sort: the rest are then sorted to match.
-function anySeriesSort(chartContainer, p, d, s) {
-    var chart = $(chartContainer).highcharts();
-    if(chart.series.length != 0) {
-        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
-
-            // Create an array to hold each series
-            var chartDataNew = [];
-            for (var i = 0; i < chart.series.length; i++) {
-                chartDataNew.push([]);
-
-                for (var j = 0; j < chart.series[0].data.length; j++) {
-                    chartDataNew[i].push({
-                        name: chart.series[i].data[j].name,
-                        y: chart.series[i].data[j].y,
-                        x: chart.series[i].data[j].j,
-                        freq: chart.series[i].data[j].freq,
-                        drilldown: chart.series[i].data[j].drilldown,
-                        category: chart.series[i].data[j].name,
-                        tooltip: chart.series[i].data[j].tooltip,
-                        bins: chart.series[i].data[j].bins,
-                        total_counts: chart.series[i].data[j].total_counts,
-                        avg_value: chart.series[i].data[j].avg_value
-                    });
+// a is an array of objects; p is the property to sort on; d is the direction of sort: 1 for ascending, anything else
+// for descending.
+function bubbleSort(a, p, d) {
+    var swapped, temp;
+    do {
+        swapped = false;
+        for (var i=0; i < a.length-1; i++) {
+            if (d == 1) {
+                if (a[i][p] > a[i + 1][p]) {
+                    temp = a[i];
+                    a[i] = a[i + 1];
+                    a[i + 1] = temp;
+                    swapped = true;
                 }
             }
-
-            bubbleSort(chartDataNew[0], p, d);
-            rebuildAnySeries(chartContainer, chartDataNew, s);
-            for (i = 1; i < chart.series.length; i++) {
-                bubbleSort(chartDataNew[i], 'x', 1);
+            else {
+                if (a[i][p] < a[i + 1][p]) {
+                    temp = a[i];
+                    a[i] = a[i + 1];
+                    a[i + 1] = temp;
+                    swapped = true;
+                }
             }
-            chart.xAxis[0].isDirty = true;
-            chart.yAxis[0].isDirty = true;
-            chart.redraw({duration: 1000});
         }
-    }
+    } while (swapped);
 }
 
 
@@ -99,29 +86,42 @@ function rebuildAnySeries(chartContainer, chartData, s) {
 }
 
 
-// a is an array of objects; p is the property to sort on; d is the direction of sort: 1 for ascending, anything else
-// for descending.
-function bubbleSort(a, p, d) {
-    var swapped, temp;
-    do {
-        swapped = false;
-        for (var i=0; i < a.length-1; i++) {
-            if (d == 1) {
-                if (a[i][p] > a[i + 1][p]) {
-                    temp = a[i];
-                    a[i] = a[i + 1];
-                    a[i + 1] = temp;
-                    swapped = true;
+// chartContainer is the div that holds the HighChart; p is the property to sort on; d is the direction of sort: 1 for
+// ascending, anything else for descending; s is the series index to sort: the rest are then sorted to match.
+function anySeriesSort(chartContainer, p, d, s) {
+    var chart = $(chartContainer).highcharts();
+    if(chart.series.length != 0) {
+        if (typeof chart.series[0].chart.drilldownLevels == "undefined" || typeof chart.series[0].chart.series[0].drilldownLevel == "Object" || chart.series[0].chart.drilldownLevels.length == 0) {
+
+            // Create an array to hold each series
+            var chartDataNew = [];
+            for (var i = 0; i < chart.series.length; i++) {
+                chartDataNew.push([]);
+
+                for (var j = 0; j < chart.series[0].data.length; j++) {
+                    chartDataNew[i].push({
+                        name: chart.series[i].data[j].name,
+                        y: chart.series[i].data[j].y,
+                        x: chart.series[i].data[j].j,
+                        freq: chart.series[i].data[j].freq,
+                        drilldown: chart.series[i].data[j].drilldown,
+                        category: chart.series[i].data[j].name,
+                        tooltip: chart.series[i].data[j].tooltip,
+                        bins: chart.series[i].data[j].bins,
+                        total_counts: chart.series[i].data[j].total_counts,
+                        avg_value: chart.series[i].data[j].avg_value
+                    });
                 }
             }
-            else {
-                if (a[i][p] < a[i + 1][p]) {
-                    temp = a[i];
-                    a[i] = a[i + 1];
-                    a[i + 1] = temp;
-                    swapped = true;
-                }
+
+            bubbleSort(chartDataNew[0], p, d);
+            rebuildAnySeries(chartContainer, chartDataNew, s);
+            for (i = 1; i < chart.series.length; i++) {
+                bubbleSort(chartDataNew[i], 'x', 1);
             }
+            chart.xAxis[0].isDirty = true;
+            chart.yAxis[0].isDirty = true;
+            chart.redraw({duration: 1000});
         }
-    } while (swapped);
+    }
 }

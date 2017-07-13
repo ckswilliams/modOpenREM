@@ -3,13 +3,19 @@
  */
 function skinDoseMap3dPersonObject() {
 
-    this.mergeMeshes = mergeMeshes;
+    this.phantomHeight = 10;
+
+    this.camera = 0;
+    this.scene = 0;
+    this.mesh = 0;
+
+
     /**
      * Internal function to merge three.js meshes together
      * @param meshes
      * @returns {THREE.Geometry}
      */
-    function mergeMeshes (meshes) {
+    this.mergeMeshes = function (meshes) {
         var combined = new THREE.Geometry();
 
         var last_face = 0, j;
@@ -24,15 +30,14 @@ function skinDoseMap3dPersonObject() {
         }
 
         return combined;
-    }
+    };
 
 
-    this.initialise = initialise;
     /**
      * Internal function to initialise the 3d person
      * @param phantomHeight
      */
-    function initialise(phantomHeight) {
+    this.initialise = function (phantomHeight) {
         var _this = this;
 
         _this.phantomHeight = phantomHeight;
@@ -134,25 +139,17 @@ function skinDoseMap3dPersonObject() {
         geometry = _this.mergeMeshes(meshes);
         _this.mesh = new THREE.Mesh(geometry, meshFaceMaterial);
         _this.scene.add(_this.mesh);
-    }
+    };
 
 
-    this.reset = reset;
     /**
      * Internal function to reset the 3d person
      */
-    function reset() {
+    this.reset = function () {
         var _this = this;
         _this.mesh.position.set( 0, 0, 0 );
         _this.mesh.rotation.set( 0, 0, 0 );
         _this.mesh.scale.set( 1, 1, 1 );
         _this.mesh.updateMatrix();
-    }
-
-
-    this.phantomHeight = 10;
-
-    this.camera = 0;
-    this.scene = 0;
-    this.mesh = 0;
+    };
 }

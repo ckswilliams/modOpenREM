@@ -115,12 +115,13 @@ def _irradiationeventxraysourcedata(dataset, event):
     source.exposure_time = get_value_kw('ExposureTime', dataset)
     source.focal_spot_size = get_value_kw('FocalSpots', dataset)
     anode_target_material = get_value_kw('AnodeTargetMaterial', dataset)
-    if anode_target_material.strip().lower() == 'molybdenum':
-        source.anode_target_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
-    if anode_target_material.strip().lower() == 'rhodium':
-        source.anode_target_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
-    if anode_target_material.strip().lower() == 'tungsten':
-        source.anode_target_material = get_or_create_cid('C-164F9', 'Tungsten or Tungsten compound')
+    if anode_target_material:
+        if anode_target_material.strip().lower() == 'molybdenum':
+            source.anode_target_material = get_or_create_cid('C-150F9', 'Molybdenum or Molybdenum compound')
+        if anode_target_material.strip().lower() == 'rhodium':
+            source.anode_target_material = get_or_create_cid('C-167F9', 'Rhodium or Rhodium compound')
+        if anode_target_material.strip().lower() == 'tungsten':
+            source.anode_target_material = get_or_create_cid('C-164F9', 'Tungsten or Tungsten compound')
     collimated_field_area = get_value_kw('FieldOfViewDimensions', dataset)
     if collimated_field_area:
         source.collimated_field_area = float(collimated_field_area[0]) * float(collimated_field_area[1]) / 1000000
@@ -153,7 +154,9 @@ def _irradiationeventxraymechanicaldata(dataset, event):
     from remapp.tools.get_values import get_value_kw
     mech = IrradEventXRayMechanicalData.objects.create(irradiation_event_xray_data=event)
     mech.compression_thickness = get_value_kw('BodyPartThickness', dataset)
-    mech.compression_force = float(get_value_kw('CompressionForce', dataset))
+    compression_force = get_value_kw('CompressionForce', dataset)
+    if compression_force:
+        mech.compression_force = float(compression_force)
     mech.magnification_factor = get_value_kw('EstimatedRadiographicMagnificationFactor', dataset)
     mech.column_angulation = get_value_kw('PositionerPrimaryAngle', dataset)
     mech.save()
@@ -345,7 +348,7 @@ def _patientmoduleattributes(dataset, g, ch):  # C.7.1.1
     pat = PatientModuleAttr.objects.create(general_study_module_attributes=g)
     pat.patient_sex = get_value_kw('PatientSex', dataset)
     patient_birth_date = get_date('PatientBirthDate', dataset)
-    pat.not_patient_indicator = get_not_pt(dataset, char_set=ch)
+    pat.not_patient_indicator = get_not_pt(dataset)
     patientatt = PatientStudyModuleAttr.objects.get(general_study_module_attributes=g)
     if patient_birth_date:
         patientatt.patient_age_decimal = Decimal(
@@ -569,6 +572,7 @@ def mam(mg_file):
     try:
         del_settings = DicomDeleteSettings.objects.get()
         del_mg_im = del_settings.del_mg_im
+        del_no_match = del_settings.del_no_match
     except ObjectDoesNotExist:
         del_mg_im = False
 
@@ -576,8 +580,8 @@ def mam(mg_file):
     dataset.decode()
     ismammo = _test_if_mammo(dataset)
     if not ismammo:
-        if del_mg_im:
-            logger.debug(u"%s id not a mammo file, deleting", mg_file)
+        if del_no_match:
+            logger.debug("%s id not a mammo file, deleting", mg_file)
             os.remove(mg_file)
         return (1)
 

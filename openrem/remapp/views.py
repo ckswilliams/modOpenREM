@@ -49,8 +49,8 @@ from django.shortcuts import render, render_to_response, redirect, get_object_or
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from openremproject.settings import MEDIA_ROOT
 import remapp
+from openremproject.settings import MEDIA_ROOT
 from remapp.forms import SizeUploadForm
 from remapp.models import GeneralStudyModuleAttr, create_user_profile
 from remapp.models import SizeUpload
@@ -1270,7 +1270,7 @@ def mg_detail_view(request, pk=None):
 
 
 def openrem_home(request):
-    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings
+    from remapp.models import GeneralStudyModuleAttr, PatientIDSettings, DicomDeleteSettings, AdminTaskQuestions
     from django.db.models import Q  # For the Q "OR" query used for DX and CR
     from datetime import datetime
     import pytz
@@ -1394,8 +1394,19 @@ def openrem_home(request):
         ordereddata = OrderedDict(sorted(modalitydata.items(), key=lambda t: t[1]['latest'], reverse=True))
         homedata[modality] = ordereddata
 
+    admin_questions = {}
+    admin_questions_true = False
+    if request.user.groups.filter(name="admingroup"):
+        not_patient_indicator_question = AdminTaskQuestions.get_solo().ask_revert_to_074_question
+        admin_questions['not_patient_indicator_question'] = not_patient_indicator_question
+        # if any(value for value in admin_questions.itervalues()):
+        #     admin_questions_true = True  # Don't know why this doesn't work
+        if not_patient_indicator_question:
+            admin_questions_true = True  # Doing this instead
+
     return render(request, "remapp/home.html",
-                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups})
+                  {'homedata': homedata, 'admin': admin, 'users_in_groups': users_in_groups,
+                   'admin_questions': admin_questions, 'admin_questions_true': admin_questions_true})
 
 
 @login_required
@@ -1970,6 +1981,72 @@ def chart_options_view(request):
 
 
 @login_required
+def not_patient_indicators(request):
+    """Displays current not-patient indicators
+    """
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    not_patient_ids = NotPatientIndicatorsID.objects.all()
+    not_patient_names = NotPatientIndicatorsName.objects.all()
+
+    admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+
+    for group in request.user.groups.all():
+        admin[group.name] = True
+
+    # Render list page with the documents and the form
+    return render_to_response(
+        'remapp/notpatient.html',
+        {'ids': not_patient_ids, 'names': not_patient_names, 'admin': admin},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
+def not_patient_indicators_as_074(request):
+    """Add patterns to no-patient indicators to replicate 0.7.4 behaviour"""
+    from remapp.models import NotPatientIndicatorsID, NotPatientIndicatorsName
+
+    if request.user.groups.filter(name="admingroup"):
+        not_patient_ids = NotPatientIndicatorsID.objects.all()
+        not_patient_names = NotPatientIndicatorsName.objects.all()
+
+        id_indicators = [u'*phy*', u'*test*', u'*qa*']
+        name_indicators = [u'*phys*', u'*test*', u'*qa*']
+
+        for id_indicator in id_indicators:
+            if not not_patient_ids.filter(not_patient_id__iexact=id_indicator):
+                NotPatientIndicatorsID(not_patient_id=id_indicator).save()
+
+        for name_indicator in name_indicators:
+            if not not_patient_names.filter(not_patient_name__iexact=name_indicator):
+                NotPatientIndicatorsName(not_patient_name=name_indicator).save()
+
+        messages.success(request, "0.7.4 style not-patient indicators restored")
+        return redirect(reverse_lazy('not_patient_indicators'))
+
+    else:
+        messages.error(request, "Only members of the admingroup are allowed to modify not-patient indicators")
+    return redirect(reverse_lazy('not_patient_indicators'))
+
+
+@login_required
+def admin_questions_hide_not_patient(request):
+    """Hides the not-patient revert to 0.7.4 question"""
+    from remapp.models import AdminTaskQuestions
+
+    if request.user.groups.filter(name="admingroup"):
+        admin_question = AdminTaskQuestions.objects.all()[0]
+        admin_question.ask_revert_to_074_question = False
+        admin_question.save()
+        messages.success(request, u"Identifying not-patient exposure question won't be shown again")
+        return redirect(reverse_lazy('home'))
+    else:
+        messages.error(request, u"Only members of the admingroup are allowed config this question")
+    return redirect(reverse_lazy('not_patient_indicators'))
+
+
+@login_required
 def dicom_summary(request):
     """Displays current DICOM configuration
     """
@@ -2151,3 +2228,96 @@ class SkinDoseMapCalcSettingsUpdate(UpdateView):
         else:
             messages.info(self.request, "No changes made")
         return super(SkinDoseMapCalcSettingsUpdate, self).form_valid(form)
+
+
+class NotPatientNameCreate(CreateView):
+    from remapp.forms import NotPatientNameForm
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    form_class = NotPatientNameForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientNameUpdate(UpdateView):
+    from remapp.forms import NotPatientNameForm
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    form_class = NotPatientNameForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientNameDelete(DeleteView):
+    from remapp.models import NotPatientIndicatorsName
+
+    model = NotPatientIndicatorsName
+    success_url = reverse_lazy('not_patient_indicators')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+class NotPatientIDCreate(CreateView):
+    from remapp.forms import NotPatientIDForm
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    form_class = NotPatientIDForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientIDUpdate(UpdateView):
+    from remapp.forms import NotPatientIDForm
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    form_class = NotPatientIDForm
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context
+
+
+class NotPatientIDDelete(DeleteView):
+    from remapp.models import NotPatientIndicatorsID
+
+    model = NotPatientIndicatorsID
+    success_url = reverse_lazy('not_patient_indicators')
+
+    def get_context_data(self, **context):
+        context[self.context_object_name] = self.object
+        admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
+        for group in self.request.user.groups.all():
+            admin[group.name] = True
+        context['admin'] = admin
+        return context

@@ -1,3 +1,23 @@
+/**
+ * Function to convert an angle in degrees into radians
+ * @param angle
+ * @returns {number}
+ */
+function toRadians(angle) {
+    return angle * (Math.PI / 180);
+}
+
+
+/**
+ * Function to convert an angle in radians to degrees
+ * @param angle
+ * @returns {number}
+ */
+function toDegrees(angle) {
+    return angle * (180 / Math.PI);
+}
+
+
 var isDragging3d = false;
 var previousMousePosition3d = {
     x: 0,
@@ -82,26 +102,6 @@ window.requestAnimFrame = (function(){
             window.setTimeout(callback, 1000 / 60);
         };
 })();
-
-
-/**
- * Function to convert an angle in degrees into radians
- * @param angle
- * @returns {number}
- */
-function toRadians(angle) {
-    return angle * (Math.PI / 180);
-}
-
-
-/**
- * Function to convert an angle in radians to degrees
- * @param angle
- * @returns {number}
- */
-function toDegrees(angle) {
-    return angle * (180 / Math.PI);
-}
 
 
 /**

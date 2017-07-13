@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="Ed McDonagh">
-    <meta name="copyright" content="2013-2016 The Royal Marsden NHS Foundation Trust">
+    <meta name="copyright" content="2013-2017 The Royal Marsden NHS Foundation Trust">
     <meta name="licence" content="GPLv3">
     <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">
 
@@ -106,6 +106,7 @@
                       <li><a href="/openrem/charts_off">Switch charts off</a></li>
                       {% if not admin.admingroup %}
                         <li><a href="/openrem/viewdisplaynames">View display names & modality</a></li>
+                        <li><a href="/admin/notpatientindicators">View not-patient indicators</a> </li>
                       {% endif %}
                       {% if admin.admingroup %}
                         <li role="separator" class="divider"></li>
@@ -115,6 +116,7 @@
                         <li><a href="/openrem/admin/dicomdelsettings/1/">DICOM object deletion</a> </li>
                         <li><a href="/openrem/admin/dicomsummary">DICOM networking</a></li>
                         <li><a href="/admin/patientidsettings/1/">Patient ID</a> </li>
+                        <li><a href="/admin/notpatientindicators">Not-patient indicators</a> </li>
                         <li><a href="/admin/skindosemapsettings/1/">Skin dose map</a> </li>
                       {% endif %}
                     </ul>
@@ -175,7 +177,7 @@
       <hr>
       <footer>
 {% if admin.openremversion %}
-        <p>OpenREM version {{ admin.openremversion }} is &copy; 2017 The Royal Marsden NHS Foundation Trust</p>
+        <p>OpenREM version {{ admin.openremversion }} is &copy; 2013-2017 The Royal Marsden NHS Foundation Trust</p>
 {% else %}
         <p>OpenREM is &copy; 2017 The Royal Marsden NHS Foundation Trust</p>
 {% endif %}

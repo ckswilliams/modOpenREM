@@ -5,18 +5,58 @@
  */
 function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
-    this.useNewColourScale = useNewColourScale;
-    function useNewColourScale(new_scale) {
+    this.canvasName = skinDoseMap3dCanvasName;
+    this.canvas = document.getElementById(this.canvasName);
+
+    this.colourScale = chroma.scale(colourScaleName);
+
+    this.windowWidth = 10.0;
+    this.windowLevel = 5.0;
+
+    this.skinDoseMap = [];
+
+    this.phantomHeight = 10;
+    this.phantomFlatWidth = 10;
+    this.phantomCurvedEdgeWidth = 10;
+    this.phantomCurvedRadius = 10;
+
+    this.skinDoseMapWidth = 10;
+    this.skinDoseMapHeight = 10;
+
+    var frontData = [];
+    var backData = [];
+    var leftData = [];
+    var rightData = [];
+
+    this.camera = 0;
+    this.scene = 0;
+    this.mesh = 0;
+
+    var dataTextureFront = 0;
+    var dataTextureBack = 0;
+    var dataTextureLeft = 0;
+    var dataTextureRight = 0;
+
+    var materialFront = 0;
+    var materialBack = 0;
+    var materialLeft = 0;
+    var materialRight = 0;
+
+
+    /**
+     * Internal function to create a new colour scale
+     * @param new_scale
+     */
+    this.useNewColourScale = function (new_scale) {
         var _this = this;
         _this.colourScale = chroma.scale(new_scale);
-    }
+    };
 
 
-    this.draw = draw;
     /**
      * Internal function to draw the 3d skin dose map
      */
-    function draw() {
+    this.draw = function () {
         var _this = this;
         var currentDose, scaledDose, newColour, i, j, k;
         k = 0;
@@ -88,16 +128,15 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         dataTextureBack.needsUpdate  = true;
         dataTextureLeft.needsUpdate  = true;
         dataTextureRight.needsUpdate = true;
-    }
+    };
 
 
-    this.mergeMeshes = mergeMeshes;
     /**
      * Internal function to merge three.js meshes
      * @param meshes
      * @returns {THREE.Geometry}
      */
-    function mergeMeshes (meshes) {
+    this.mergeMeshes = function (meshes) {
         var combined = new THREE.Geometry();
 
         var last_face = 0, j;
@@ -112,10 +151,9 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         }
 
         return combined;
-    }
+    };
 
 
-    this.initialise = initialise;
     /**
      * Internal function to initialse the 3d skin dose map
      * @param skinDoseMap
@@ -124,7 +162,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
      * @param phantomHeight
      * @param phantomCurvedRadius
      */
-    function initialise(skinDoseMap, phantomFlatWidth, phantomCurvedEdgeWidth, phantomHeight, phantomCurvedRadius) {
+    this.initialise = function (skinDoseMap, phantomFlatWidth, phantomCurvedEdgeWidth, phantomHeight, phantomCurvedRadius) {
         var _this = this;
 
         _this.skinDoseMap = new Array(skinDoseMap.length);
@@ -153,11 +191,6 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         dataTextureLeft  = new THREE.DataTexture( leftData,  _this.phantomCurvedEdgeWidth, _this.phantomHeight, THREE.RGBAFormat );
         dataTextureRight = new THREE.DataTexture( rightData, _this.phantomCurvedEdgeWidth, _this.phantomHeight, THREE.RGBAFormat );
 
-        dataTextureFront.needsUpdate = true;
-        dataTextureBack.needsUpdate = true;
-        dataTextureLeft.needsUpdate = true;
-        dataTextureRight.needsUpdate = true;
-
         materialFront = new THREE.MeshLambertMaterial( { map: dataTextureFront } );
         materialBack  = new THREE.MeshLambertMaterial( { map: dataTextureBack  } );
         materialLeft  = new THREE.MeshLambertMaterial( { map: dataTextureLeft  } );
@@ -173,7 +206,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
 
         // Set up the camera
         _this.camera = new THREE.PerspectiveCamera(50, aspectRatio, 1, 10000);
-        _this.camera.position.x = _this.phantomHeight + 0;
+        _this.camera.position.x = _this.phantomHeight;
         _this.camera.position.y = 0;
         _this.camera.position.z = 100;
         _this.camera.lookAt(_this.scene.position );
@@ -252,7 +285,7 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         _this.meshes.push(mesh);
 
         //merge all the geometries
-        geometry = mergeMeshes(_this.meshes);
+        geometry = _this.mergeMeshes(_this.meshes);
         _this.mesh = new THREE.Mesh(geometry, meshFaceMaterial);
         _this.scene.add(_this.mesh);
 
@@ -260,71 +293,31 @@ function skinDoseMap3dObject(skinDoseMap3dCanvasName, colourScaleName) {
         var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
         directionalLight.position.set( 0, 0, 1 );
         _this.scene.add( directionalLight );
-    }
+    };
 
 
-    this.reset = reset;
     /**
      * Internal function to reset the 3d skin dose map
      */
-    function reset() {
+    this.reset = function () {
         var _this = this;
         _this.mesh.position.set( 0, 0, 0 );
         _this.mesh.rotation.set( 0, 0, 0 );
         _this.mesh.scale.set( 1, 1, 1 );
         _this.mesh.updateMatrix();
 
-        _this.camera.position.x = _this.phantomHeight + 0;
+        _this.camera.position.x = _this.phantomHeight;
         _this.camera.position.y = 0;
         _this.camera.position.z = 100;
         _this.camera.lookAt(_this.scene.position);
-    }
+    };
 
 
-    this.animate = animate;
     /**
      * Internal function to animate the 3d skin dose map
      */
-    function animate() {
+    this.animate = function () {
         requestAnimationFrame(animate);
         render();
-    }
-
-
-    this.canvasName = skinDoseMap3dCanvasName;
-    this.canvas = document.getElementById(this.canvasName);
-
-    this.colourScale = chroma.scale(colourScaleName);
-
-    this.windowWidth = 10.0;
-    this.windowLevel = 5.0;
-
-    var skinDoseMap = [];
-
-    this.phantomHeight = 10;
-    this.phantomFlatWidth = 10;
-    this.phantomCurvedEdgeWidth = 10;
-    this.phantomCurvedRadius = 10;
-
-    this.skinDoseMapWidth = 10;
-    this.skinDoseMapHeight = 10;
-
-    var frontData = [];
-    var backData = [];
-    var leftData = [];
-    var rightData = [];
-
-    this.camera = 0;
-    this.scene = 0;
-    this.mesh = 0;
-
-    var dataTextureFront = 0;
-    var dataTextureBack = 0;
-    var dataTextureLeft = 0;
-    var dataTextureRight = 0;
-
-    var materialFront = 0;
-    var materialBack = 0;
-    var materialLeft = 0;
-    var materialRight = 0;
+    };
 }
