@@ -42,21 +42,28 @@ import remapp
 logger = logging.getLogger(__name__)
 
 
-def sanitise_include_pid(name, pat_id):
+def include_pid(request, name, pat_id):
+
+    if request.user.groups.filter(name='pidgroup'):
+        pid = True
+    else:
+        pid = False
+
     include_names = False
     include_pat_id = False
-    try:
-        if int(name):  # Will be unicode from URL
-            include_names = True
-    except ValueError:  # If anything else comes in, just don't export that column
-        pass
-    try:
-        if int(pat_id):
-            include_pat_id = True
-    except ValueError:
-        pass
+    if pid:
+        try:
+            if int(name):  # Will be unicode from URL
+                include_names = True
+        except ValueError:  # If anything else comes in, just don't export that column
+            pass
+        try:
+            if int(pat_id):
+                include_pat_id = True
+        except ValueError:
+            pass
 
-    return include_names, include_pat_id
+    return {'pidgroup': pid, 'include_names': include_names, 'include_pat_id': include_pat_id}
 
 
 @csrf_exempt
@@ -70,17 +77,12 @@ def ctcsv1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportCT2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportCT2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = exportCT2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to CSV job is {0}'.format(job))
-
     return redirect('/openrem/export/')
 
 
@@ -95,15 +97,11 @@ def ctxlsx1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.xlsx import ctxlsx
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = ctxlsx.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = ctxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export CT to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -120,15 +118,11 @@ def dxcsv1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.dx_export import exportDX2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportDX2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = exportDX2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export DX to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -144,15 +138,11 @@ def dxxlsx1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.dx_export import dxxlsx
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = dxxlsx.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = dxxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export DX to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -168,15 +158,11 @@ def flcsv1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.rf_export import exportFL2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportFL2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = exportFL2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export Fluoro to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -192,15 +178,11 @@ def rfxlsx1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.rf_export import rfxlsx
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = rfxlsx.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = rfxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export Fluoro to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -227,15 +209,11 @@ def mgcsv1(request, name=None, patid=None):
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportMG2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    include_names, include_pat_id = sanitise_include_pid(name, patid)
+    pid = include_pid(request, name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportMG2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        job = exportMG2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
         logger.debug(u'Export MG to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
@@ -330,7 +308,7 @@ def download(request, task_id):
         return redirect('/openrem/export/')
 
     file_path = os.path.join(MEDIA_ROOT, exp.filename.name)
-    file_wrapper = FileWrapper(file(file_path,'rb'))
+    file_wrapper = FileWrapper(file(file_path, 'rb'))
     file_mimetype = mimetypes.guess_type(file_path)
     response = HttpResponse(file_wrapper, content_type=file_mimetype )
     response['X-Sendfile'] = file_path
