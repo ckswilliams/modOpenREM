@@ -33,12 +33,31 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import json
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import remapp
+
+logger = logging.getLogger(__name__)
+
+
+def sanitise_include_pid(name, pat_id):
+    include_names = False
+    include_pat_id = False
+    try:
+        if int(name):  # Will be unicode from URL
+            include_names = True
+    except ValueError:  # If anything else comes in, just don't export that column
+        pass
+    try:
+        if int(pat_id):
+            include_pat_id = True
+    except ValueError:
+        pass
+
+    return include_names, include_pat_id
+
 
 @csrf_exempt
 @login_required
@@ -56,17 +75,11 @@ def ctcsv1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportCT2excel.delay(request.GET, pid, name, patid, request.user.id)
+        job = exportCT2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export CT to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -87,19 +100,14 @@ def ctxlsx1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = ctxlsx.delay(request.GET, pid, name, patid, request.user.id)
-    
+        job = ctxlsx.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export CT to XLSX job is {0}'.format(job))
+
     return redirect('/openrem/export/')
+
 
 @csrf_exempt
 @login_required
@@ -117,17 +125,11 @@ def dxcsv1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportDX2excel.delay(request.GET, pid, name, patid, request.user.id)
+        job = exportDX2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export DX to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -147,18 +149,12 @@ def dxxlsx1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = dxxlsx.delay(request.GET, pid, name, patid, request.user.id)
-    
+        job = dxxlsx.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export DX to XLSX job is {0}'.format(job))
+
     return redirect('/openrem/export/')
 
 @csrf_exempt
@@ -177,18 +173,12 @@ def flcsv1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportFL2excel.delay(request.GET, pid, name, patid, request.user.id)
-    
+        job = exportFL2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export Fluoro to CSV job is {0}'.format(job))
+
     return redirect('/openrem/export/')
 
 @csrf_exempt
@@ -207,17 +197,11 @@ def rfxlsx1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = rfxlsx.delay(request.GET, pid, name, patid, request.user.id)
+        job = rfxlsx.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export Fluoro to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -232,6 +216,7 @@ def rfopenskin(request, pk):
 
     if request.user.groups.filter(name="exportgroup"):
         job = rfopenskin.delay(export.pk)
+        logger.debug(u'Export Fluoro to openSkin CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -247,17 +232,11 @@ def mgcsv1(request, name=None, patid=None):
     else:
         pid = False
 
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    include_names, include_pat_id = sanitise_include_pid(name, patid)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportMG2excel.delay(request.GET, pid, name, patid, request.user.id)
+        job = exportMG2excel.delay(request.GET, pid, include_names, include_pat_id, request.user.id)
+        logger.debug(u'Export MG to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -275,7 +254,8 @@ def mgnhsbsp(request):
 
     if request.user.groups.filter(name="exportgroup"):
         job = mg_csv_nhsbsp.delay(request.GET, request.user.id)
-    
+        logger.debug(u'Export MG to CSV NHSBSP job is {0}'.format(job))
+
     return redirect('/openrem/export/')
 
 @csrf_exempt
@@ -288,7 +268,6 @@ def export(request):
     from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import Exports
-    from remapp.exports.exportcsv import exportCT2excel
 
     exptsks = Exports.objects.all().order_by('-export_date')
     
