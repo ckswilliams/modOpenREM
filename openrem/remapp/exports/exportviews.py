@@ -270,7 +270,7 @@ def export(request):
     from remapp.models import Exports
 
     exptsks = Exports.objects.all().order_by('-export_date')
-    
+
     current = exptsks.filter(status__contains = u'CURRENT')
     complete = exptsks.filter(status__contains = u'COMPLETE')
     errors = exptsks.filter(status__contains = u'ERROR')
@@ -280,9 +280,11 @@ def export(request):
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    if 'task_id' in request.session.keys() and request.session['task_id']:
-        task_id = request.session['task_id']
-    return render_to_response('remapp/exports.html', locals(), context_instance=RequestContext(request))
+    # if 'task_id' in request.session.keys() and request.session['task_id']:
+    #     task_id = request.session['task_id']
+    return render_to_response('remapp/exports.html', {'admin': admin,
+                                                      'current': current, 'complete': complete, 'errors': errors},
+                              context_instance=RequestContext(request))
 
 
 @login_required
@@ -298,7 +300,7 @@ def download(request, task_id):
 
     """
     import mimetypes
-    import os
+    from django.core.exceptions import ObjectDoesNotExist
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
     from django.shortcuts import redirect
@@ -307,7 +309,6 @@ def download(request, task_id):
     from remapp.models import Exports
 
     exportperm = False
-    adminperm = False
     pidperm = False
     if request.user.groups.filter(name="exportgroup"):
         exportperm = True
@@ -315,17 +316,17 @@ def download(request, task_id):
         pidperm = True
     try:
         exp = Exports.objects.get(task_id__exact = task_id)
-    except:
-        messages.error(request, u"Can't match the task ID, export aborted")
+    except ObjectDoesNotExist:
+        messages.error(request, u"Can't match the task ID, download aborted")
         return redirect('/openrem/export/')
 
     if not exportperm:
-        messages.error(request, u"You don't have permission to export data")
+        messages.error(request, u"You don't have permission to download exported data")
         return redirect('/openrem/export/')
 
     if exp.includes_pid and not pidperm:
         messages.error(request,
-                       u"You don't have permission to export data that includes patient identifiable information")
+                       u"You don't have permission to download export data that includes patient identifiable information")
         return redirect('/openrem/export/')
 
     file_path = os.path.join(MEDIA_ROOT, exp.filename.name)
@@ -345,11 +346,10 @@ def deletefile(request):
     :param request: Contains the task ID
     :type request: POST
     """
-    import os, sys
+    import sys
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from openremproject.settings import MEDIA_ROOT
     from remapp.models import Exports
     from remapp.exports import exportviews
     
@@ -377,10 +377,10 @@ def export_abort(request, pk):
     """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
-    from django.shortcuts import render, redirect, get_object_or_404
+    from django.shortcuts import get_object_or_404
     from remapp.models import Exports
 
-    export = get_object_or_404(Exports, pk=pk)    
+    export = get_object_or_404(Exports, pk=pk)
 
     if request.user.groups.filter(name="exportgroup"):
         revoke(export.task_id, terminate=True)
