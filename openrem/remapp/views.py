@@ -1312,26 +1312,10 @@ def openrem_home(request):
             user_profile = request.user.userprofile
 
     if request.user.is_authenticated():
-        if homedata['mg']:
-            user_profile.displayMG = True
-        else:
-            user_profile.displayMG = False
-
-        if homedata['ct']:
-            user_profile.displayCT = True
-        else:
-            user_profile.displayCT = False
-
-        if homedata['rf']:
-            user_profile.displayRF = True
-        else:
-            user_profile.displayRF = False
-
-        if homedata['dx']:
-            user_profile.displayDX = True
-        else:
-            user_profile.displayDX = False
-
+        user_profile.displayMG = bool(homedata['mg'])
+        user_profile.displayCT = bool(homedata['ct'])
+        user_profile.displayRF = bool(homedata['rf'])
+        user_profile.displayDX = bool(homedata['dx'])
         user_profile.save()
 
     admin = dict(openremversion=remapp.__version__, docsversion=remapp.__docs_version__)

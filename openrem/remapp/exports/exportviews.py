@@ -370,7 +370,7 @@ def deletefile(request):
                 messages.error(request, u"Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
             except:
                 messages.error(request, u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
-    
+
     return HttpResponseRedirect(reverse(exportviews.export))
 
 
