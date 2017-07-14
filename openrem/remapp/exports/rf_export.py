@@ -68,7 +68,6 @@ def _create_sheets(book, protocolslist, protocolheaders):
 
 def _get_db_value(qs, location):
     """Get value from database, testing to see if it exists
-    
     :rtype : attribute or queryset
     """
     try:

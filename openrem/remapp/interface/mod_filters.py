@@ -13,7 +13,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of 
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -355,7 +355,7 @@ class DXSummaryListFilter(django_filters.FilterSet):
         fields = [
             'date_after', 
             'date_before', 
-            'institution_name', 
+            'institution_name',
             'study_description',
             'acquisition_protocol',
             'patient_age_min',

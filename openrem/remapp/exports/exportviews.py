@@ -33,197 +33,184 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 
-import json
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 import remapp
 
+logger = logging.getLogger(__name__)
+
+
+def include_pid(request, name, pat_id):
+    """
+    Check if user is allowed to export PID, then check if they have asked to.
+    :param request: request so we can determine the user and therefore groups
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
+    :return: dict, with pidgroup, include_names and include_pat_id as bools
+    """
+
+    pid = bool(request.user.groups.filter(name='pidgroup'))
+
+    include_names = False
+    include_pat_id = False
+    if pid:
+        try:
+            if int(name):  # Will be unicode from URL
+                include_names = True
+        except ValueError:  # If anything else comes in, just don't export that column
+            pass
+        try:
+            if int(pat_id):
+                include_pat_id = True
+        except ValueError:
+            pass
+
+    return {'pidgroup': pid, 'include_names': include_names, 'include_pat_id': include_pat_id}
+
+
 @csrf_exempt
 @login_required
-def ctcsv1(request, name=None, patid=None):
+def ctcsv1(request, name=None, pat_id=None):
     """View to launch celery task to export CT studies to csv file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportCT2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportCT2excel.delay(request.GET, pid, name, patid, request.user.id)
-
+        job = exportCT2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export CT to CSV job is {0}'.format(job))
     return redirect('/openrem/export/')
 
 
 @csrf_exempt
 @login_required
-def ctxlsx1(request, name=None, patid=None):
+def ctxlsx1(request, name=None, pat_id=None):
     """View to launch celery task to export CT studies to xlsx file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
     from remapp.exports.xlsx import ctxlsx
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = ctxlsx.delay(request.GET, pid, name, patid, request.user.id)
-    
+        job = ctxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export CT to XLSX job is {0}'.format(job))
+
     return redirect('/openrem/export/')
+
 
 @csrf_exempt
 @login_required
-def dxcsv1(request, name=None, patid=None):
+def dxcsv1(request, name=None, pat_id=None):
     """View to launch celery task to export DX and CR studies to csv file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
     from remapp.exports.dx_export import exportDX2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportDX2excel.delay(request.GET, pid, name, patid, request.user.id)
+        job = exportDX2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export DX to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
 @csrf_exempt
 @login_required
-def dxxlsx1(request, name=None, patid=None):
+def dxxlsx1(request, name=None, pat_id=None):
     """View to launch celery task to export DX and CR studies to xlsx file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param pat_id: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
     from remapp.exports.dx_export import dxxlsx
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = dxxlsx.delay(request.GET, pid, name, patid, request.user.id)
-    
+        job = dxxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export DX to XLSX job is {0}'.format(job))
+
     return redirect('/openrem/export/')
 
 @csrf_exempt
 @login_required
-def flcsv1(request, name=None, patid=None):
+def flcsv1(request, name=None, pat_id=None):
     """View to launch celery task to export fluoroscopy studies to csv file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
     from remapp.exports.rf_export import exportFL2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportFL2excel.delay(request.GET, pid, name, patid, request.user.id)
-    
+        job = exportFL2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export Fluoro to CSV job is {0}'.format(job))
+
     return redirect('/openrem/export/')
 
 @csrf_exempt
 @login_required
-def rfxlsx1(request, name=None, patid=None):
+def rfxlsx1(request, name=None, pat_id=None):
     """View to launch celery task to export fluoroscopy studies to xlsx file
 
     :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
     :type request: GET
     """
     from django.shortcuts import redirect
     from remapp.exports.rf_export import rfxlsx
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = rfxlsx.delay(request.GET, pid, name, patid, request.user.id)
+        job = rfxlsx.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export Fluoro to XLSX job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
 @csrf_exempt
 @login_required
 def rfopenskin(request, pk):
+    """
+    Create csv export suitable for import to standalone openSkin
+    :param request: request object
+    :param pk: primary key of study in GeneralStudyModuleAttr table
+    """
     from django.shortcuts import redirect, get_object_or_404
     from remapp.exports.rf_export import rfopenskin
     from remapp.models import GeneralStudyModuleAttr
@@ -232,32 +219,30 @@ def rfopenskin(request, pk):
 
     if request.user.groups.filter(name="exportgroup"):
         job = rfopenskin.delay(export.pk)
+        logger.debug(u'Export Fluoro to openSkin CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
 
 @csrf_exempt
 @login_required
-def mgcsv1(request, name=None, patid=None):
+def mgcsv1(request, name=None, pat_id=None):
+    """
+    Launches export of mammo data to CSV
+    :param request: Contains the database filtering parameters. Also used to get user group.
+    :param name: string, 0 or 1 from URL indicating if names should be exported
+    :param patid: string, 0 or 1 from URL indicating if patient ID should be exported
+    :return:
+    """
     from django.shortcuts import redirect
     from remapp.exports.exportcsv import exportMG2excel
 
-    if request.user.groups.filter(name='pidgroup'):
-        pid = True
-    else:
-        pid = False
-
-    try:
-        name = int(name)
-    except:
-        name = None
-    try:
-        patid = int(patid)
-    except:
-        patid = None
+    pid = include_pid(request, name, pat_id)
 
     if request.user.groups.filter(name="exportgroup"):
-        job = exportMG2excel.delay(request.GET, pid, name, patid, request.user.id)
+        job = exportMG2excel.delay(request.GET, pid['pidgroup'], pid['include_names'],
+                                   pid['include_pat_id'], request.user.id)
+        logger.debug(u'Export MG to CSV job is {0}'.format(job))
 
     return redirect('/openrem/export/')
 
@@ -275,7 +260,8 @@ def mgnhsbsp(request):
 
     if request.user.groups.filter(name="exportgroup"):
         job = mg_csv_nhsbsp.delay(request.GET, request.user.id)
-    
+        logger.debug(u'Export MG to CSV NHSBSP job is {0}'.format(job))
+
     return redirect('/openrem/export/')
 
 @csrf_exempt
@@ -288,22 +274,23 @@ def export(request):
     from django.template import RequestContext
     from django.shortcuts import render_to_response
     from remapp.models import Exports
-    from remapp.exports.exportcsv import exportCT2excel
 
     exptsks = Exports.objects.all().order_by('-export_date')
-    
+
     current = exptsks.filter(status__contains = u'CURRENT')
     complete = exptsks.filter(status__contains = u'COMPLETE')
     errors = exptsks.filter(status__contains = u'ERROR')
-    
+
     admin = {'openremversion': remapp.__version__, 'docsversion': remapp.__docs_version__}
 
     for group in request.user.groups.all():
         admin[group.name] = True
 
-    if 'task_id' in request.session.keys() and request.session['task_id']:
-        task_id = request.session['task_id']
-    return render_to_response('remapp/exports.html', locals(), context_instance=RequestContext(request))
+    # if 'task_id' in request.session.keys() and request.session['task_id']:
+    #     task_id = request.session['task_id']
+    return render_to_response('remapp/exports.html', {'admin': admin,
+                                                      'current': current, 'complete': complete, 'errors': errors},
+                              context_instance=RequestContext(request))
 
 
 @login_required
@@ -314,12 +301,11 @@ def download(request, task_id):
     for downloading the patient size import logfiles.
 
     :param request: Used to get user group.
-    :param file_name: Passes name of file to be downloaded.
-    :type filename: string
+    :param task_id: ID of the export or logfile
 
     """
     import mimetypes
-    import os
+    from django.core.exceptions import ObjectDoesNotExist
     from django.core.servers.basehttp import FileWrapper
     from django.utils.encoding import smart_str
     from django.shortcuts import redirect
@@ -328,35 +314,35 @@ def download(request, task_id):
     from remapp.models import Exports
 
     exportperm = False
-    adminperm = False
     pidperm = False
     if request.user.groups.filter(name="exportgroup"):
         exportperm = True
     if request.user.groups.filter(name="pidgroup"):
         pidperm = True
     try:
-        exp = Exports.objects.get(task_id__exact = task_id)
-    except:
-        messages.error(request, u"Can't match the task ID, export aborted")
+        exp = Exports.objects.get(task_id__exact=task_id)
+    except ObjectDoesNotExist:
+        messages.error(request, u"Can't match the task ID, download aborted")
         return redirect('/openrem/export/')
 
     if not exportperm:
-        messages.error(request, u"You don't have permission to export data")
+        messages.error(request, u"You don't have permission to download exported data")
         return redirect('/openrem/export/')
 
     if exp.includes_pid and not pidperm:
         messages.error(request,
-                       u"You don't have permission to export data that includes patient identifiable information")
+                       u"You don't have permission to download export data that includes patient identifiable information")
         return redirect('/openrem/export/')
 
     file_path = os.path.join(MEDIA_ROOT, exp.filename.name)
-    file_wrapper = FileWrapper(file(file_path,'rb'))
+    file_wrapper = FileWrapper(file(file_path, 'rb'))
     file_mimetype = mimetypes.guess_type(file_path)
     response = HttpResponse(file_wrapper, content_type=file_mimetype )
     response['X-Sendfile'] = file_path
     response['Content-Length'] = os.stat(file_path).st_size
     response['Content-Disposition'] = u'attachment; filename=%s' % smart_str(exp.filename)
     return response
+
 
 @csrf_exempt
 @login_required
@@ -366,28 +352,27 @@ def deletefile(request):
     :param request: Contains the task ID
     :type request: POST
     """
-    import os, sys
+    import sys
     from django.http import HttpResponseRedirect
     from django.core.urlresolvers import reverse
     from django.contrib import messages
-    from openremproject.settings import MEDIA_ROOT
     from remapp.models import Exports
     from remapp.exports import exportviews
-    
-    
+
     for task in request.POST:
-        exports = Exports.objects.filter(task_id__exact = request.POST[task])
-        for export in exports:
+        exports = Exports.objects.filter(task_id__exact=request.POST[task])
+        for export_object in exports:
             try:
-                export.filename.delete()
-                export.delete()
+                export_object.filename.delete()
+                export_object.delete()
                 messages.success(request, u"Export file and database entry deleted successfully.")
             except OSError as e:
                 messages.error(request, u"Export file delete failed - please contact an administrator. Error({0}): {1}".format(e.errno, e.strerror))
             except:
                 messages.error(request, u"Unexpected error - please contact an administrator: {0}".format(sys.exc_info()[0]))
-    
+
     return HttpResponseRedirect(reverse(exportviews.export))
+
 
 @login_required
 def export_abort(request, pk):
@@ -398,13 +383,13 @@ def export_abort(request, pk):
     """
     from celery.task.control import revoke
     from django.http import HttpResponseRedirect
-    from django.shortcuts import render, redirect, get_object_or_404
+    from django.shortcuts import get_object_or_404
     from remapp.models import Exports
 
-    export = get_object_or_404(Exports, pk=pk)    
+    export_task = get_object_or_404(Exports, pk=pk)
 
     if request.user.groups.filter(name="exportgroup"):
-        revoke(export.task_id, terminate=True)
-        export.delete()
+        revoke(export_task.task_id, terminate=True)
+        export_task.delete()
 
     return HttpResponseRedirect("/openrem/export/")

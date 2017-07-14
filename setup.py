@@ -44,7 +44,7 @@ setup(
         'openrem/scripts/openrem_store.py',
         'openrem/scripts/openrem_qr.py',
     ],
-    license='GPLv3 with additional permissions',  
+    license='GPLv3 with additional permissions',
 #    description='Radiation Exposure Monitoring for physicists',
     description='Developer beta only',
     long_description=README,

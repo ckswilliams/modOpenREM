@@ -7,7 +7,7 @@ Storage SOP Class as SCU. For this example to work, there must be an
 SCP listening on the specified host and port.
 
 For help on usage, 
-python storescu.py -h 
+python storescu.py -h
 """
 
 import sys
@@ -34,8 +34,8 @@ elif args.explicit:
     ts = [ExplicitVRLittleEndian]
 else:
     ts = [
-        ExplicitVRLittleEndian, 
-        ImplicitVRLittleEndian, 
+        ExplicitVRLittleEndian,
+        ImplicitVRLittleEndian,
         ExplicitVRBigEndian
         ]
 

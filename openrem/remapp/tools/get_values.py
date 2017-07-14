@@ -102,7 +102,7 @@ def get_seq_code_meaning(sequence, dataset):
 
 def get_or_create_cid(codevalue, codemeaning):
     """Create a code_value code_meaning pair entry in the ContextID
-    table if it doesn't already exist. 
+    table if it doesn't already exist.
 
     :param codevalue:   Code value as defined in the DICOM standard part 16
     :type codevalue:    int.

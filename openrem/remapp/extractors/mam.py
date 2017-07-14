@@ -14,7 +14,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of 
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -193,7 +193,7 @@ def _accumulatedmammo_update(dataset, event):  # TID 10005
     accummam.save()
 
 
-def _irradiationeventxraydata(dataset, proj, ch):  # TID 10003
+def _irradiationeventxraydata(dataset, proj):  # TID 10003
     # TODO: review model to convert to cid where appropriate, and add additional fields
     from remapp.models import IrradEventXRayData
     from remapp.tools.get_values import get_value_kw, get_or_create_cid, get_seq_code_value, get_seq_code_meaning
@@ -261,7 +261,7 @@ def _projectionxrayradiationdose(dataset, g, ch):
     proj.xray_mechanical_data_available = get_or_create_cid('R-0038D', 'Yes')
     proj.save()
     _accumulatedxraydose(dataset, proj)
-    _irradiationeventxraydata(dataset, proj, ch)
+    _irradiationeventxraydata(dataset, proj)
 
 
 def _generalequipmentmoduleattributes(dataset, study, ch):

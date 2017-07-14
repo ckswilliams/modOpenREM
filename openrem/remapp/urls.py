@@ -13,7 +13,7 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
+#    Foundation trust in connection with this Program in any press or
 #    other public announcement without the prior written consent of 
 #    The Royal Marsden NHS Foundation Trust.
 #
@@ -104,14 +104,14 @@ urlpatterns = patterns('remapp.views',
 
 urlpatterns += patterns('remapp.exports.exportviews',
     url(r'^export/$', 'export'),
-    url(r'^exportctcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'ctcsv1'),
-    url(r'^exportctxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'ctxlsx1'),
-    url(r'^exportdxcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'dxcsv1'),
-    url(r'^exportdxxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'dxxlsx1'),
-    url(r'^exportflcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'flcsv1'),
-    url(r'^exportrfxlsx1/(?P<name>\w+)/(?P<patid>\w+)/$', 'rfxlsx1'),
+    url(r'^exportctcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'ctcsv1'),
+    url(r'^exportctxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'ctxlsx1'),
+    url(r'^exportdxcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'dxcsv1'),
+    url(r'^exportdxxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'dxxlsx1'),
+    url(r'^exportflcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'flcsv1'),
+    url(r'^exportrfxlsx1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'rfxlsx1'),
     url(r'^exportrfopenskin/(?P<pk>\d+)$', 'rfopenskin'),
-    url(r'^exportmgcsv1/(?P<name>\w+)/(?P<patid>\w+)/$', 'mgcsv1'),
+    url(r'^exportmgcsv1/(?P<name>\w+)/(?P<pat_id>\w+)/$', 'mgcsv1'),
     url(r'^exportmgnhsbsp/$', 'mgnhsbsp'),
     url(r'^download/(?P<task_id>[a-f0-9-]{36})$', 'download'),
     url(r'^deletefile/$', 'deletefile'),
