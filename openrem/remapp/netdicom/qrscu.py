@@ -11,7 +11,7 @@ SOP Class as SCP as well. For this example to work, there must be an
 SCP listening on the specified host and port.
 
 For help on usage,
-python qrscu.py -h 
+python qrscu.py -h
 """
 
 from celery import shared_task
@@ -148,12 +148,12 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                 series.filter(modality__exact='SR').delete()
 
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
-                study.modality = 'FL'
-                study.save()
-                sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study, query.query_id)
-                logger.debug(u"FL study, check_sr_type returned {0}".format(sr_type))
-                series = study.dicomqrrspseries_set.all()
-                series.exclude(modality__exact='SR').delete()
+            study.modality = 'FL'
+            study.save()
+            sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study, query.query_id)
+            logger.debug(u"FL study, check_sr_type returned {0}".format(sr_type))
+            series = study.dicomqrrspseries_set.all()
+            series.exclude(modality__exact='SR').delete()
 
         elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
             study.modality = 'CT'
@@ -273,7 +273,6 @@ def _check_sr_type_in_study(my_ae, remote_ae, study, query_id):
 
 def _query_images(my_ae, remote_ae, seriesrsp, query_id):
     from time import sleep
-    from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspImage
     from dicom.dataset import Dataset
 
@@ -394,8 +393,6 @@ def _query_series(my_ae, remote_ae, d2, studyrsp, query_id):
 
 
 def _query_study(my_ae, remote_ae, d, query, query_id):
-    from decimal import Decimal
-    from dicom.dataset import Dataset
     from remapp.models import DicomQRRspStudy
     from remapp.tools.get_values import get_value_kw
     d.QueryRetrieveLevel = "STUDY"
@@ -563,13 +560,13 @@ def qrscu(
     """
 
     from datetime import datetime
-    import json
+
     from netdicom.applicationentity import AE
-    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass, Status
-    from dicom.dataset import Dataset, FileDataset
+    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
+    from dicom.dataset import Dataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
-    from remapp.tools.dcmdatetime import make_date, make_dcm_date_range
+    from remapp.tools.dcmdatetime import make_dcm_date_range
 
     debug_timer = datetime.now()
     logger.debug(u"qrscu args passed: qr_scp_pk={0}, store_scp_pk={1}, implicit={2}, explicit={3}, move={4}, "
@@ -788,7 +785,7 @@ def movescu(query_id):
     """C-Move request element of query-retrieve service class user
 
     Args:
-      query_id: 
+      query_id:
 
     Returns:
 
@@ -798,7 +795,7 @@ def movescu(query_id):
     from dicom.dataset import Dataset
     from netdicom.applicationentity import AE
     from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
-    from remapp.models import DicomQuery, DicomRemoteQR, DicomStoreSCP
+    from remapp.models import DicomQuery
 
     query = DicomQuery.objects.get(query_id=query_id)
     query.move_complete = False
