@@ -623,8 +623,8 @@ def qrscu(
     logger.debug(u"my_ae {0} started".format(my_ae))
 
     # remote application entity
-    RemoteAE = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
-    logger.debug(u"Remote AE is {0}".format(RemoteAE))
+    remote_ae = dict(Address=rh, Port=rp, AET=aec.encode('ascii', 'ignore'))
+    logger.debug(u"Remote AE is {0}".format(remote_ae))
 
     if not query_id:
         query_id = uuid.uuid4()
@@ -637,7 +637,7 @@ def qrscu(
     query.qr_scp_fk = qr_scp
     query.save()
 
-    assoc = _create_association(my_ae, rh, rp, RemoteAE, query)
+    assoc = _create_association(my_ae, rh, rp, remote_ae, query)
     if not assoc:
         logger.warning(u"Query_id {0}: Query aborted as could not create initial association.")
         return
@@ -676,7 +676,7 @@ def qrscu(
             all_mods[m]['inc'] = True
 
     # query for all requested studies
-    modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, RemoteAE)
+    modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae)
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
     logger.debug(u"Time to throw away any studies or series that are not useful before requesting moves")
@@ -734,7 +734,7 @@ def qrscu(
         # Series level query
         d2 = Dataset()
         d2.StudyInstanceUID = rsp.study_instance_uid
-        _query_series(my_ae, RemoteAE, d2, rsp, query_id)
+        _query_series(my_ae, remote_ae, d2, rsp, query_id)
         if not modalities_returned:
             logger.debug(u"modalities_returned = False, so building from series info")
             series_rsp = rsp.dicomqrrspseries_set.all()
@@ -765,7 +765,7 @@ def qrscu(
         logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
     logger.debug(u"Pruning series responses")
-    _prune_series_responses(my_ae, RemoteAE, query, all_mods, filters)
+    _prune_series_responses(my_ae, remote_ae, query, all_mods, filters)
 
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
