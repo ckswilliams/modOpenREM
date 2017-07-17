@@ -14,9 +14,9 @@ from remapp.netdicom import qrscu
 from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQRRspImage, DicomRemoteQR, DicomStoreSCP
 import collections
 
-def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study):
-    return 'RDSR'
 
+def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, study, query_id):
+    return 'RDSR'
 
 
 fake_responses = [
@@ -171,6 +171,7 @@ class StudyQueryLogic(TestCase):
         self.assertEqual(DicomQRRspStudy.objects.count(), 7)
         self.assertEqual(study_query_mock.call_count, 2)
         self.assertEqual(modality_matching, True)
+
 
 class QRPhilipsCT(TestCase):
     def setUp(self):
@@ -353,7 +354,12 @@ class QRPhilipsCT(TestCase):
 
         # Re-generate the modality list
         rst1_series_rsp = rst1.dicomqrrspseries_set.all()
-        rst1.set_modalities_in_study(list(set(val for dic in rst1_series_rsp.values('modality') for val in dic.values())))
+        rst1.set_modalities_in_study(
+            list(
+                set(
+                    val for dic in rst1_series_rsp.values('modality') for val in dic.values()
+                )
+            ))
         rst1.save()
 
         # Now starting with four series
@@ -365,6 +371,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 1)
         self.assertEqual(rst1.dicomqrrspseries_set.all()[0].series_description, u"radiation dose report")
+
 
 class ResponseFiltering(TestCase):
     """
@@ -414,7 +421,12 @@ class ResponseFiltering(TestCase):
         rst1s3.save()
 
         rst1_series_rsp = rst1.dicomqrrspseries_set.all()
-        rst1.set_modalities_in_study(list(set(val for dic in rst1_series_rsp.values('modality') for val in dic.values())))
+        rst1.set_modalities_in_study(
+            list(
+                set(
+                    val for dic in rst1_series_rsp.values('modality') for val in dic.values()
+                )
+            ))
         rst1.save()
 
         rst2 = DicomQRRspStudy.objects.create(dicom_query=query)
@@ -490,8 +502,10 @@ class ResponseFiltering(TestCase):
         for study in studies:
             self.assertTrue(u"goodstation" in study.station_name)
 
-def _fake_image_query(my_ae, remote_ae, sr):
+
+def _fake_image_query(my_ae, remote_ae, sr, query_id):
     return
+
 
 class PruneSeriesResponses(TestCase):
     """
@@ -872,10 +886,10 @@ class PruneSeriesResponsesCT(TestCase):
         """
 
         self.all_mods = {'CT': {'inc': True, 'mods': ['CT']},
-                    'MG': {'inc': True, 'mods': ['MG']},
-                    'FL': {'inc': True, 'mods': ['RF', 'XA']},
-                    'DX': {'inc': True, 'mods': ['DX', 'CR']}
-                    }
+                         'MG': {'inc': True, 'mods': ['MG']},
+                         'FL': {'inc': True, 'mods': ['RF', 'XA']},
+                         'DX': {'inc': True, 'mods': ['DX', 'CR']}
+                         }
         self.filters = {
             'stationname_inc': None,
             'stationname_exc': None,
