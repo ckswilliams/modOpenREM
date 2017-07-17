@@ -788,8 +788,10 @@ def ct_summary_list_filter(request):
             user_profile.plotCTStudyMeanDLP = chart_options_form.cleaned_data['plotCTStudyMeanDLP']
             user_profile.plotCTStudyMeanCTDI = chart_options_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = chart_options_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTStudyNumEvents = chart_options_form.cleaned_data['plotCTStudyNumEvents']
             user_profile.plotCTRequestMeanDLP = chart_options_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = chart_options_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTRequestNumEvents = chart_options_form.cleaned_data['plotCTRequestNumEvents']
             user_profile.plotCTStudyPerDayAndHour = chart_options_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = chart_options_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = chart_options_form.cleaned_data[
@@ -808,8 +810,10 @@ def ct_summary_list_filter(request):
                          'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                          'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                          'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                         'plotCTStudyNumEvents': user_profile.plotCTStudyNumEvents,
                          'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                          'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                         'plotCTRequestNumEvents': user_profile.plotCTRequestNumEvents,
                          'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                          'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
                          'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
@@ -865,8 +869,8 @@ def ct_summary_chart_data(request):
 
     return_structure =\
         ct_plot_calculations(f, user_profile.plotCTAcquisitionFreq, user_profile.plotCTAcquisitionMeanCTDI, user_profile.plotCTAcquisitionMeanDLP,
-                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP,
-                             user_profile.plotCTStudyMeanCTDI,
+                             user_profile.plotCTRequestFreq, user_profile.plotCTRequestMeanDLP, user_profile.plotCTRequestNumEvents,
+                             user_profile.plotCTStudyFreq, user_profile.plotCTStudyMeanDLP, user_profile.plotCTStudyMeanCTDI, user_profile.plotCTStudyNumEvents,
                              user_profile.plotCTStudyMeanDLPOverTime, user_profile.plotCTStudyMeanDLPOverTimePeriod, user_profile.plotCTStudyPerDayAndHour,
                              median_available, user_profile.plotAverageChoice, user_profile.plotSeriesPerSystem,
                              user_profile.plotHistogramBins, user_profile.plotHistograms, user_profile.plotCaseInsensitiveCategories)
@@ -875,8 +879,8 @@ def ct_summary_chart_data(request):
 
 
 def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, plot_acquisition_mean_dlp,
-                         plot_request_freq, plot_request_mean_dlp, plot_study_freq, plot_study_mean_dlp,
-                         plot_study_mean_ctdi,
+                         plot_request_freq, plot_request_mean_dlp, plot_request_num_events,
+                         plot_study_freq, plot_study_mean_dlp, plot_study_mean_ctdi, plot_study_num_events,
                          plot_study_mean_dlp_over_time, plot_study_mean_dlp_over_time_period, plot_study_per_day_and_hour,
                          median_available, plot_average_choice, plot_series_per_systems, plot_histogram_bins,
                          plot_histograms, plot_case_insensitive_categories):
@@ -885,14 +889,14 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
 
     return_structure = {}
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour or plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
             if f.form.data['acquisition_protocol']:
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
 
-    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
+    if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_num_events or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -907,7 +911,7 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         except MultiValueDictKeyError:
             study_events = f.qs
 
-    if plot_request_mean_dlp or plot_request_freq:
+    if plot_request_mean_dlp or plot_request_freq or plot_request_num_events:
         try:
             if f.form.data['acquisition_protocol']:
                 # The user has filtered on acquisition_protocol, so need to use the slow method of querying the database
@@ -997,6 +1001,26 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         if plot_histograms:
             return_structure['studyHistogramDataCTDI'] = result['histogram_data']
 
+    if plot_study_num_events:
+        result = average_chart_inc_histogram_data(study_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'study_description',
+                                                  'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
+                                                  1,
+                                                  plot_study_num_events, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  exclude_constant_angle=True,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['studySummaryNumEvents'] = result['summary']
+        if not plot_study_mean_dlp and not plot_study_freq:
+            return_structure['studySystemList'] = result['system_list']
+            return_structure['studyNameList'] = result['series_names']
+        if plot_study_num_events and plot_histograms:
+            return_structure['studyHistogramDataNumEvents'] = result['histogram_data']
+
     if plot_request_mean_dlp or plot_request_freq:
         result = average_chart_inc_histogram_data(request_events,
                                                   'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
@@ -1014,6 +1038,26 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
         return_structure['requestSummary'] = result['summary']
         if plot_request_mean_dlp and plot_histograms:
             return_structure['requestHistogramData'] = result['histogram_data']
+
+    if plot_request_num_events:
+        result = average_chart_inc_histogram_data(request_events,
+                                                  'generalequipmentmoduleattr__unique_equipment_name_id__display_name',
+                                                  'requested_procedure_code_meaning',
+                                                  'ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events',
+                                                  1,
+                                                  plot_request_num_events, 0,
+                                                  plot_series_per_systems, plot_average_choice,
+                                                  median_available, plot_histogram_bins,
+                                                  exclude_constant_angle=True,
+                                                  calculate_histograms=plot_histograms,
+                                                  case_insensitive_categories=plot_case_insensitive_categories)
+
+        return_structure['requestSummaryNumEvents'] = result['summary']
+        if not plot_request_mean_dlp and not plot_request_freq:
+            return_structure['requestSystemList'] = result['system_list']
+            return_structure['requestNameList'] = result['series_names']
+        if plot_request_num_events and plot_histograms:
+            return_structure['requestHistogramDataNumEvents'] = result['histogram_data']
 
     if plot_study_mean_dlp_over_time:
         result = average_chart_over_time_data(study_events,
@@ -1822,8 +1866,10 @@ def chart_options_view(request):
             user_profile.plotCTStudyMeanDLP = ct_form.cleaned_data['plotCTStudyMeanDLP']
             user_profile.plotCTStudyMeanCTDI = ct_form.cleaned_data['plotCTStudyMeanCTDI']
             user_profile.plotCTStudyFreq = ct_form.cleaned_data['plotCTStudyFreq']
+            user_profile.plotCTStudyNumEvents = ct_form.cleaned_data['plotCTStudyNumEvents']
             user_profile.plotCTRequestMeanDLP = ct_form.cleaned_data['plotCTRequestMeanDLP']
             user_profile.plotCTRequestFreq = ct_form.cleaned_data['plotCTRequestFreq']
+            user_profile.plotCTRequestNumEvents = ct_form.cleaned_data['plotCTRequestNumEvents']
             user_profile.plotCTStudyPerDayAndHour = ct_form.cleaned_data['plotCTStudyPerDayAndHour']
             user_profile.plotCTStudyMeanDLPOverTime = ct_form.cleaned_data['plotCTStudyMeanDLPOverTime']
             user_profile.plotCTStudyMeanDLPOverTimePeriod = ct_form.cleaned_data['plotCTStudyMeanDLPOverTimePeriod']
@@ -1886,8 +1932,10 @@ def chart_options_view(request):
                     'plotCTStudyMeanDLP': user_profile.plotCTStudyMeanDLP,
                     'plotCTStudyMeanCTDI': user_profile.plotCTStudyMeanCTDI,
                     'plotCTStudyFreq': user_profile.plotCTStudyFreq,
+                    'plotCTStudyNumEvents': user_profile.plotCTStudyNumEvents,
                     'plotCTRequestMeanDLP': user_profile.plotCTRequestMeanDLP,
                     'plotCTRequestFreq': user_profile.plotCTRequestFreq,
+                    'plotCTRequestNumEvents': user_profile.plotCTRequestNumEvents,
                     'plotCTStudyPerDayAndHour': user_profile.plotCTStudyPerDayAndHour,
                     'plotCTStudyMeanDLPOverTime': user_profile.plotCTStudyMeanDLPOverTime,
                     'plotCTStudyMeanDLPOverTimePeriod': user_profile.plotCTStudyMeanDLPOverTimePeriod,
