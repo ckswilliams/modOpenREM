@@ -21,6 +21,8 @@ import os
 import sys
 import uuid
 import collections
+from remapp.netdicom.tools import OnAssociateRequest, OnAssociateResponse, _create_ae
+
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -32,29 +34,20 @@ django.setup()
 
 logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
-# call back
-def OnAssociateResponse(association):
-    logger.info(u"Association response received")
 
-
-def OnAssociateRequest(association):
-    logger.info(u"Association resquested")
-    return True
-
-
-def _move_req(my_ae, remote_ae, d):
-    logger.debug(u"Requesting move association")
+def _move_req(my_ae, remote_ae, d, study_no, series_no):
+    logger.debug(u"Requesting move association for study {0} and series {1}".format(study_no, series_no))
     assocMove = my_ae.RequestAssociation(remote_ae)
-    logger.info(u"Move association requested")
-    gen = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
+    logger.info(u"Move association requested for study {0} and series {1}".format(study_no, series_no))
+    move_generator = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     try:
-        for gg in gen:
-            logger.info(u"gg is %s", gg)
+        for move_status in move_generator:
+            logger.debug(u"move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
     except KeyError as e:
-        logger.error(u"{0} in qrscu._move_req. Request is {1}".format(e, d))
-    logger.debug(u"Releasing move association")
+        logger.error(u"{0} in qrscu._move_req. Request is {1}, study {2} series {3}".format(e, d, study_no, series_no))
+    logger.debug(u"Releasing move association for study {0} and series {1}".format(study_no, series_no))
     assocMove.Release(0)
-    logger.info(u"Move association released")
+    logger.info(u"Move association released for study {0} and series {1}".format(study_no, series_no))
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
@@ -610,12 +603,7 @@ def qrscu(
             ExplicitVRBigEndian
         ]
 
-    # create application entity with Find and Move SOP classes as SCU
-    my_ae = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
-                                                 StudyRootMoveSOPClass,
-                                                 VerificationSOPClass], [], ts)
-    my_ae.OnAssociateResponse = OnAssociateResponse
-    my_ae.OnAssociateRequest = OnAssociateRequest
+    my_ae = _create_ae(aet.encode('ascii', 'ignore'), transfer_syntax=ts)
     my_ae.start()
     logger.debug(u"my_ae {0} started".format(my_ae))
 
@@ -782,21 +770,16 @@ def qrscu(
 
 @shared_task(name='remapp.netdicom.qrscu.movescu')  # (name='remapp.netdicom.qrscu.movescu', queue='qr')
 def movescu(query_id):
-    """C-Move request element of query-retrieve service class user
-
-    Args:
-      query_id:
-
-    Returns:
-
+    """
+    C-Move request element of query-retrieve service class user
+    :param query_id: UUID of query in the DicomQuery table
+    :return: None
     """
     from time import sleep
-    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from dicom.dataset import Dataset
-    from netdicom.applicationentity import AE
-    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from remapp.models import DicomQuery
 
+    logger.debug(u"Query_id {0}: Starting move request".format(query_id))
     query = DicomQuery.objects.get(query_id=query_id)
     query.move_complete = False
     query.failed = False
@@ -804,26 +787,15 @@ def movescu(query_id):
     qr_scp = query.qr_scp_fk
     store_scp = query.store_scp_fk
 
-    ts = [
-        ExplicitVRLittleEndian,
-        ImplicitVRLittleEndian,
-        ExplicitVRBigEndian
-    ]
+    my_ae = _create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
+    my_ae.start()
+    logger.debug(u"Move AE my_ae {0} started".format(my_ae))
 
+    # remote application entity
     if qr_scp.hostname:
         rh = qr_scp.hostname
     else:
         rh = qr_scp.ip
-
-    my_ae = AE(store_scp.aetitle.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass,
-                                                                StudyRootMoveSOPClass,
-                                                                VerificationSOPClass], [], ts)
-    my_ae.OnAssociateResponse = OnAssociateResponse
-    my_ae.OnAssociateRequest = OnAssociateRequest
-    # MyAE.OnReceiveStore = OnReceiveStore
-    my_ae.start()
-
-    # remote application entity
     remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii', 'ignore'))
 
     query.stage = u"Preparing to start move request"
@@ -860,14 +832,15 @@ def movescu(query_id):
                 num_objects
             ))
             query.save()
-            _move_req(my_ae, remote_ae, d)
             logger.info(u"_move_req launched")
+            _move_req(my_ae, remote_ae, d, study_no, series_no)
 
     query.move_complete = True
     query.save()
     logger.info(u"Move complete")
 
     my_ae.Quit()
+    logger.debug(u"Move AE my_ae quit")
 
     sleep(10)
     query.delete()
