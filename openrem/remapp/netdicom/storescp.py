@@ -1,14 +1,7 @@
 # This Python file uses the following encoding: utf-8
 #!/usr/bin/python
 """
-Storage SCP example.
-
-This demonstrates a simple application entity that support a number of
-Storage service classes. For this example to work, you need an SCU
-sending to this host on specified port.
-
-For help on usage,
-python storescp.py -h
+Storage SCP
 """
 import errno
 import logging
@@ -33,9 +26,7 @@ try:
         sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
-from netdicom import AE
 from netdicom.SOPclass import StorageSOPClass, VerificationSOPClass
-from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt
 

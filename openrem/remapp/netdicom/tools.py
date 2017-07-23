@@ -26,7 +26,6 @@
 # Includes an extra 1. after the root UID to enable future use for
 # anthing else.
 
-from celery import shared_task
 import logging
 from netdicom.applicationentity import AE
 from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
