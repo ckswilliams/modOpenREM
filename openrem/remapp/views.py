@@ -1010,7 +1010,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_study_num_events, 0,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  exclude_constant_angle=True,
                                                   calculate_histograms=plot_histograms,
                                                   case_insensitive_categories=plot_case_insensitive_categories)
 
@@ -1048,7 +1047,6 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                                                   plot_request_num_events, 0,
                                                   plot_series_per_systems, plot_average_choice,
                                                   median_available, plot_histogram_bins,
-                                                  exclude_constant_angle=True,
                                                   calculate_histograms=plot_histograms,
                                                   case_insensitive_categories=plot_case_insensitive_categories)
 
