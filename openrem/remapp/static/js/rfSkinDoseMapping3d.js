@@ -25,9 +25,26 @@ var previousMousePosition3d = {
 };
 
 
+var ongoingTouches = [];
+
+function copyTouch(touch) {
+  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
+}
+
+function ongoingTouchIndexById(idToFind) {
+  for (var i = 0; i < ongoingTouches.length; i++) {
+    var id = ongoingTouches[i].identifier;
+
+    if (id == idToFind) {
+      return i;
+    }
+  }
+  return -1;    // not found
+}
+
 // jQuery mouse event handlers for the DIV that contains the 3D skin dose map
 $("#skinDoseMap3d")
-    .on('mousedown', function() {
+    .on('mousedown', function(e) {
         isDragging3d = true;
     })
     .on('mousemove', function(e) {
@@ -54,6 +71,48 @@ $("#skinDoseMap3d")
             x: e.offsetX,
             y: e.offsetY
         };
+    })
+    .on('touchstart', function(e) {
+        isDragging3d = true;
+        var touches = e.originalEvent.changedTouches;
+        for (var i = 0; i < touches.length; i++) {
+            ongoingTouches.push(copyTouch(touches[i]));
+        }
+    })
+    .on('touchmove', function(e) {
+        e.preventDefault();
+
+        var touches = e.originalEvent.changedTouches;
+
+        var deltaMove = {
+            x: touches[0].pageX-previousMousePosition3d.x,
+            y: touches[0].pageY-previousMousePosition3d.y
+        };
+
+        for (var i = 0; i < touches.length; i++) {
+            var idx = ongoingTouchIndexById(touches[i].identifier);
+
+            if (idx >= 0) {
+                ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
+
+                if (isDragging3d) {
+                    var deltaRotationQuaternion = new THREE.Quaternion()
+                        .setFromEuler(new THREE.Euler(
+                            toRadians(deltaMove.y * 1),
+                            toRadians(deltaMove.x * 1),
+                            0,
+                            'XYZ'
+                        ));
+                    skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
+                    skinDoseMap3dPersonObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dPersonObj.mesh.quaternion);
+                }
+
+                previousMousePosition3d = {
+                    x: touches[i].pageX,
+                    y: touches[i].pageY
+                };
+            }
+        }
     })
     .on('mousewheel', function(e) {
         e.preventDefault();
@@ -88,9 +147,10 @@ $("#skinDoseMap3d")
     });
 
 
-$(document).on('mouseup', function() {
-    isDragging3d = false;
-});
+$(document)
+    .on('mouseup touchend', function (e) {
+        isDragging3d = false
+    });
 
 
 // shim layer with setTimeout fallback
