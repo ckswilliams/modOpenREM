@@ -31,7 +31,7 @@ var touchEventCache = [];
 var prevPinchDiff = -1;
 
 function copyTouch(touch) {
-  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
+  return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY, clientX: touch.clientX, clientY: touch.clientY };
 }
 
 function ongoingTouchIndexById(idToFind) {
@@ -124,10 +124,16 @@ skinDoseMap3dElement
     })
     .on('touchstart', function(e) {
         isDragging3d = true;
-        touchEventCache.push(e); // Cache the event to support 2-finger gestures
-        var touches = e.originalEvent.changedTouches;
+
+        var changedTouches = e.originalEvent.changedTouches;
+        for (var i = 0; i < changedTouches.length; i++) {
+            ongoingTouches.push(copyTouch(changedTouches[i]));
+        }
+
+        // Cache the event to support 2-finger gestures
+        var touches = e.originalEvent.touches;
         for (var i = 0; i < touches.length; i++) {
-            ongoingTouches.push(copyTouch(touches[i]));
+            touchEventCache.push(copyTouch(touches[i]));
         }
     })
     .on('touchmove', function(e) {
@@ -157,7 +163,7 @@ skinDoseMap3dElement
         }
 
         // If one pointer is down rotate the object based on the movement
-        else if (touchEventCache.length === 1) {
+        if (ongoingTouches.length === 1) {
 
             var touches = e.originalEvent.changedTouches;
 
