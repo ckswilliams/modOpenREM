@@ -154,9 +154,7 @@ skinDoseMap3dElement
             var y_diff = touchEventCache[0].clientY - touchEventCache[1].clientY;
             var curDiff = Math.sqrt(x_diff*x_diff + y_diff*y_diff);
 
-            if (prevPinchDiff > 0) {
-                zoom_3d_map(prevPinchDiff - curDiff);
-            }
+            zoom_3d_map(prevPinchDiff - curDiff);
 
             // Cache the distance for the next move event
             prevPinchDiff = curDiff;
