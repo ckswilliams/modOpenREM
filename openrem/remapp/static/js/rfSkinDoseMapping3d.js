@@ -19,6 +19,7 @@ function toDegrees(angle) {
 
 
 var isDragging3d = false;
+var firstMouseMove = true;
 var previousMousePosition3d = {
     x: 0,
     y: 0
@@ -26,6 +27,8 @@ var previousMousePosition3d = {
 
 
 var ongoingTouches = [];
+var touchEventCache = [];
+var prevPinchDiff = -1;
 
 function copyTouch(touch) {
   return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY };
@@ -42,16 +45,35 @@ function ongoingTouchIndexById(idToFind) {
   return -1;    // not found
 }
 
+function remove_event(e) {
+ // Remove this event from the target's cache
+ for (var i = 0; i < touchEventCache.length; i++) {
+   if (touchEventCache[i].pointerId == e.pointerId) {
+     touchEventCache.splice(i, 1);
+     break;
+   }
+ }
+}
+
 // jQuery mouse event handlers for the DIV that contains the 3D skin dose map
 $("#skinDoseMap3d")
     .on('mousedown', function(e) {
         isDragging3d = true;
     })
     .on('mousemove', function(e) {
-        var deltaMove = {
-            x: e.offsetX-previousMousePosition3d.x,
-            y: e.offsetY-previousMousePosition3d.y
-        };
+        if (firstMouseMove == true) {
+            var deltaMove = {
+                x: 0,
+                y: 0
+            };
+            firstMouseMove = false;
+        }
+        else {
+            var deltaMove = {
+                x: e.offsetX - previousMousePosition3d.x,
+                y: e.offsetY - previousMousePosition3d.y
+            };
+        }
 
         if(isDragging3d) {
 
@@ -74,6 +96,7 @@ $("#skinDoseMap3d")
     })
     .on('touchstart', function(e) {
         isDragging3d = true;
+        touchEventCache.push(e); // Cache the event to support 2-finger gestures
         var touches = e.originalEvent.changedTouches;
         for (var i = 0; i < touches.length; i++) {
             ongoingTouches.push(copyTouch(touches[i]));
@@ -82,35 +105,93 @@ $("#skinDoseMap3d")
     .on('touchmove', function(e) {
         e.preventDefault();
 
+        // Find this event in the cache and update its record with this event
+        for (var i = 0; i < touchEventCache.length; i++) {
+            if (e.pointerId == touchEventCache[i].pointerId) {
+                touchEventCache[i] = e;
+                break;
+            }
+        }
+
+
+        // If two pointers are down, check for pinch gestures
+        if (touchEventCache.length == 2) {
+            // Calculate the distance between the two pointers
+            var curDiff = Math.abs(touchEventCache[0].clientX - touchEventCache[1].clientX);
+
+            if (prevPinchDiff > 0) {
+                if (curDiff > prevPinchDiff) {
+                    // The distance between the two pointers has increased
+                    console.log("Pinch moving OUT -> Zoom in", e);
+                }
+                if (curDiff < prevPinchDiff) {
+                    // The distance between the two pointers has decreased
+                    console.log("Pinch moving IN -> Zoom out", ev);
+                }
+            }
+
+            // Cache the distance for the next move event
+            prevPinchDiff = curDiff;
+        }
+        // If one pointer is down rotate the object based on the movement
+        else if (touchEventCache.length == 1) {
+
+            var touches = e.originalEvent.changedTouches;
+
+            if (firstMouseMove == true) {
+                var deltaMove = {
+                    x: 0,
+                    y: 0
+                };
+                firstMouseMove = false;
+            }
+            else {
+                var deltaMove = {
+                    x: touches[0].pageX - previousMousePosition3d.x,
+                    y: touches[0].pageY - previousMousePosition3d.y
+                };
+            }
+
+            for (var i = 0; i < touches.length; i++) {
+                var idx = ongoingTouchIndexById(touches[i].identifier);
+
+                if (idx >= 0) {
+                    ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
+
+                    if (isDragging3d) {
+                        var deltaRotationQuaternion = new THREE.Quaternion()
+                            .setFromEuler(new THREE.Euler(
+                                toRadians(deltaMove.y * 1),
+                                toRadians(deltaMove.x * 1),
+                                0,
+                                'XYZ'
+                            ));
+                        skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
+                        skinDoseMap3dPersonObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dPersonObj.mesh.quaternion);
+                    }
+
+                    previousMousePosition3d = {
+                        x: touches[i].pageX,
+                        y: touches[i].pageY
+                    };
+                }
+            }
+        }
+    })
+    .on('touchend', function(e) {
+        isDragging3d = false;
+
+        // Remove this pointer from the cache
+        remove_event(e)
+
+        // If the number of pointers down is less than two then reset diff tracker
+        if (touchEventCache.length < 2) prevPinchDiff = -1;
+
         var touches = e.originalEvent.changedTouches;
-
-        var deltaMove = {
-            x: touches[0].pageX-previousMousePosition3d.x,
-            y: touches[0].pageY-previousMousePosition3d.y
-        };
-
         for (var i = 0; i < touches.length; i++) {
             var idx = ongoingTouchIndexById(touches[i].identifier);
-
             if (idx >= 0) {
-                ongoingTouches.splice(idx, 1, copyTouch(touches[i]));  // swap in the new touch record
-
-                if (isDragging3d) {
-                    var deltaRotationQuaternion = new THREE.Quaternion()
-                        .setFromEuler(new THREE.Euler(
-                            toRadians(deltaMove.y * 1),
-                            toRadians(deltaMove.x * 1),
-                            0,
-                            'XYZ'
-                        ));
-                    skinDoseMap3dObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dObj.mesh.quaternion);
-                    skinDoseMap3dPersonObj.mesh.quaternion.multiplyQuaternions(deltaRotationQuaternion, skinDoseMap3dPersonObj.mesh.quaternion);
-                }
-
-                previousMousePosition3d = {
-                    x: touches[i].pageX,
-                    y: touches[i].pageY
-                };
+                ongoingTouches.splice(idx, 1);  // remove it; we're done
             }
         }
     })
