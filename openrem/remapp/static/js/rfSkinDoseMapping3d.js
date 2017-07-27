@@ -48,7 +48,7 @@ function ongoingTouchIndexById(idToFind) {
 function remove_event(e) {
  // Remove this event from the target's cache
  for (var i = 0; i < touchEventCache.length; i++) {
-   if (touchEventCache[i].identifier === e.originalEvent.touches[0]) {
+   if (touchEventCache[i].identifier === e.originalEvent.touches[0].identifier) {
      touchEventCache.splice(i, 1);
      break;
    }
