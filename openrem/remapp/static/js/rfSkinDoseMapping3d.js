@@ -38,7 +38,7 @@ function ongoingTouchIndexById(idToFind) {
   for (var i = 0; i < ongoingTouches.length; i++) {
     var id = ongoingTouches[i].identifier;
 
-    if (id == idToFind) {
+    if (id === idToFind) {
       return i;
     }
   }
@@ -48,20 +48,48 @@ function ongoingTouchIndexById(idToFind) {
 function remove_event(e) {
  // Remove this event from the target's cache
  for (var i = 0; i < touchEventCache.length; i++) {
-   if (touchEventCache[i].pointerId == e.pointerId) {
+   if (touchEventCache[i].pointerId === e.pointerId) {
      touchEventCache.splice(i, 1);
      break;
    }
  }
 }
 
+function zoom_3d_map(d) {
+    var cPos = skinDoseMap3dObj.camera.position;
+    if (isNaN(cPos.x) || isNaN(cPos.y) || isNaN(cPos.y))
+        return;
+
+    var r = cPos.x * cPos.x + cPos.y * cPos.y;
+    var sqr = Math.sqrt(r);
+    var sqrZ = Math.sqrt(cPos.z * cPos.z + r);
+
+    var nx = cPos.x + ((r === 0) ? 0 : (d * cPos.x / sqr));
+    var ny = cPos.y + ((r === 0) ? 0 : (d * cPos.y / sqr));
+    var nz = cPos.z + ((sqrZ === 0) ? 0 : (d * cPos.z / sqrZ));
+
+    if (isNaN(nx) || isNaN(ny) || isNaN(nz))
+        return;
+
+    var r_new = nx * nx + ny * ny;
+    if (r_new > 100) {
+        cPos.x = nx;
+        cPos.y = ny;
+        cPos.z = nz;
+    }
+
+    skinDoseMap3dObj.camera.lookAt(skinDoseMap3dObj.scene.position);
+}
+
+skinDoseMap3dElement = $("#skinDoseMap3d");
+
 // jQuery mouse event handlers for the DIV that contains the 3D skin dose map
-$("#skinDoseMap3d")
-    .on('mousedown', function(e) {
+skinDoseMap3dElement
+    .on('mousedown', function() {
         isDragging3d = true;
     })
     .on('mousemove', function(e) {
-        if (firstMouseMove == true) {
+        if (firstMouseMove === true) {
             var deltaMove = {
                 x: 0,
                 y: 0
@@ -107,38 +135,33 @@ $("#skinDoseMap3d")
 
         // Find this event in the cache and update its record with this event
         for (var i = 0; i < touchEventCache.length; i++) {
-            if (e.pointerId == touchEventCache[i].pointerId) {
+            if (e.pointerId === touchEventCache[i].pointerId) {
                 touchEventCache[i] = e;
                 break;
             }
         }
 
-
         // If two pointers are down, check for pinch gestures
-        if (touchEventCache.length == 2) {
+        if (touchEventCache.length === 2) {
             // Calculate the distance between the two pointers
-            var curDiff = Math.abs(touchEventCache[0].clientX - touchEventCache[1].clientX);
+            var x_diff = touchEventCache[0].clientX - touchEventCache[1].clientX;
+            var y_diff = touchEventCache[0].clientY - touchEventCache[1].clientY;
+            var curDiff = Math.sqrt(x_diff*x_diff + y_diff*y_diff);
 
             if (prevPinchDiff > 0) {
-                if (curDiff > prevPinchDiff) {
-                    // The distance between the two pointers has increased
-                    console.log("Pinch moving OUT -> Zoom in", e);
-                }
-                if (curDiff < prevPinchDiff) {
-                    // The distance between the two pointers has decreased
-                    console.log("Pinch moving IN -> Zoom out", ev);
-                }
+                zoom_3d_map(prevPinchDiff - curDiff);
             }
 
             // Cache the distance for the next move event
             prevPinchDiff = curDiff;
         }
+
         // If one pointer is down rotate the object based on the movement
-        else if (touchEventCache.length == 1) {
+        else if (touchEventCache.length === 1) {
 
             var touches = e.originalEvent.changedTouches;
 
-            if (firstMouseMove == true) {
+            if (firstMouseMove === true) {
                 var deltaMove = {
                     x: 0,
                     y: 0
@@ -182,7 +205,7 @@ $("#skinDoseMap3d")
         isDragging3d = false;
 
         // Remove this pointer from the cache
-        remove_event(e)
+        remove_event(e);
 
         // If the number of pointers down is less than two then reset diff tracker
         if (touchEventCache.length < 2) prevPinchDiff = -1;
@@ -199,37 +222,15 @@ $("#skinDoseMap3d")
         e.preventDefault();
         e.stopPropagation();
 
-        var d = ((typeof e.originalEvent.wheelDelta != "undefined")?(-e.originalEvent.wheelDelta):e.originalEvent.detail);
+        var d = ((typeof e.originalEvent.wheelDelta !== "undefined")?(-e.originalEvent.wheelDelta):e.originalEvent.detail);
         d = 10 * ((d>0)?1:-1);
 
-        var cPos = skinDoseMap3dObj.camera.position;
-        if (isNaN(cPos.x) || isNaN(cPos.y) || isNaN(cPos.y))
-            return;
-
-        var r = cPos.x*cPos.x + cPos.y*cPos.y;
-        var sqr = Math.sqrt(r);
-        var sqrZ = Math.sqrt(cPos.z*cPos.z + r);
-
-        var nx = cPos.x + ((r==0)?0   :(d * cPos.x/sqr));
-        var ny = cPos.y + ((r==0)?0   :(d * cPos.y/sqr));
-        var nz = cPos.z + ((sqrZ==0)?0:(d * cPos.z/sqrZ));
-
-        if (isNaN(nx) || isNaN(ny) || isNaN(nz))
-            return;
-
-        var r_new = nx*nx + ny*ny;
-        if (r_new > 100) {
-            cPos.x = nx;
-            cPos.y = ny;
-            cPos.z = nz;
-        }
-
-        skinDoseMap3dObj.camera.lookAt( skinDoseMap3dObj.scene.position );
+        zoom_3d_map(d);
     });
 
 
 $(document)
-    .on('mouseup touchend', function (e) {
+    .on('mouseup touchend', function () {
         isDragging3d = false
     });
 
@@ -277,7 +278,7 @@ function webglAvailable() {
 }
 
 
-skinDoseMap3dCanvas = $('#skinDoseMap3d')[0]; // The first element is the HTML DOM Object
+skinDoseMap3dCanvas = skinDoseMap3dElement[0]; // The first element is the HTML DOM Object
 renderer = new THREE.WebGLRenderer({ canvas: skinDoseMap3dCanvas, preserveDrawingBuffer: true, antialias: true });
 renderer.autoClear = false;
 renderer.setClearColor( 0x000000, 0 );
