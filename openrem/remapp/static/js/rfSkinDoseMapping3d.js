@@ -27,8 +27,6 @@ var previousMousePosition3d = {
 
 
 var ongoingTouches = [];
-var touchEventCache = [];
-var prevPinchDiff = -1;
 
 function copyTouch(touch) {
   return { identifier: touch.identifier, pageX: touch.pageX, pageY: touch.pageY, clientX: touch.clientX, clientY: touch.clientY };
@@ -43,16 +41,6 @@ function ongoingTouchIndexById(idToFind) {
     }
   }
   return -1;    // not found
-}
-
-function remove_event(e) {
- // Remove this event from the target's cache
- for (var i = 0; i < touchEventCache.length; i++) {
-   if (touchEventCache[i].identifier === e.originalEvent.touches[0].identifier) {
-     touchEventCache.splice(i, 1);
-     break;
-   }
- }
 }
 
 function zoom_3d_map(d) {
@@ -129,36 +117,9 @@ skinDoseMap3dElement
         for (var i = 0; i < changedTouches.length; i++) {
             ongoingTouches.push(copyTouch(changedTouches[i]));
         }
-
-        // Cache the event to support 2-finger gestures
-        var touches = e.originalEvent.touches;
-        for (var i = 0; i < touches.length; i++) {
-            touchEventCache.push(copyTouch(touches[i]));
-        }
     })
     .on('touchmove', function(e) {
         e.preventDefault();
-
-        // Find this event in the cache and update its record with this event
-        for (var i = 0; i < touchEventCache.length; i++) {
-            if (e.originalEvent.touches[0].identifier === touchEventCache[i].identifier) {
-                touchEventCache[i] = e.originalEvent.touches[0];
-                break;
-            }
-        }
-
-        // If two pointers are down, check for pinch gestures
-        if (touchEventCache.length === 2) {
-            // Calculate the distance between the two pointers
-            var x_diff = touchEventCache[0].clientX - touchEventCache[1].clientX;
-            var y_diff = touchEventCache[0].clientY - touchEventCache[1].clientY;
-            var curDiff = Math.sqrt(x_diff*x_diff + y_diff*y_diff);
-
-            zoom_3d_map(prevPinchDiff - curDiff);
-
-            // Cache the distance for the next move event
-            prevPinchDiff = curDiff;
-        }
 
         // If one pointer is down rotate the object based on the movement
         if (ongoingTouches.length === 1) {
@@ -207,12 +168,6 @@ skinDoseMap3dElement
     })
     .on('touchend', function(e) {
         isDragging3d = false;
-
-        // Remove this pointer from the cache
-        remove_event(e);
-
-        // If the number of pointers down is less than two then reset diff tracker
-        if (touchEventCache.length < 2) prevPinchDiff = -1;
 
         var touches = e.originalEvent.changedTouches;
         for (var i = 0; i < touches.length; i++) {
