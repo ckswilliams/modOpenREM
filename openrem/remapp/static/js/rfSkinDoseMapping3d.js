@@ -48,7 +48,7 @@ function ongoingTouchIndexById(idToFind) {
 function remove_event(e) {
  // Remove this event from the target's cache
  for (var i = 0; i < touchEventCache.length; i++) {
-   if (touchEventCache[i].pointerId === e.pointerId) {
+   if (touchEventCache[i].identifier === e.originalEvent.touches[0]) {
      touchEventCache.splice(i, 1);
      break;
    }
@@ -141,8 +141,8 @@ skinDoseMap3dElement
 
         // Find this event in the cache and update its record with this event
         for (var i = 0; i < touchEventCache.length; i++) {
-            if (e.pointerId === touchEventCache[i].pointerId) {
-                touchEventCache[i] = e;
+            if (e.originalEvent.touches[0].identifier === touchEventCache[i].identifier) {
+                touchEventCache[i] = e.originalEvent.touches[0];
                 break;
             }
         }
