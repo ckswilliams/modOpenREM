@@ -71,7 +71,7 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                         } else {
                             value_to_write = this.y;
                         }
-                        return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + encodeURI(href_start + linkText + tooltip_filters) + '">Click to view</a></td></tr></table>';
+                        return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + encodeURI(href_start + linkText + tooltip_filters).replace("+", encodeURIComponent("+")) + '">Click to view</a></td></tr></table>';
                     };
                 },
                 drillup: function (e) {
