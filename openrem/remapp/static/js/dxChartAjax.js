@@ -5,10 +5,12 @@ function URLToArray(url) {
         if(!pairs[i])
             continue;
         var pair = pairs[i].split('=');
-        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]).replace(/\+/g, ' ');
+        pair[1] = pair[1].replace(/\+/g, ' ');
+        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
     }
     return request;
 }
+
 
 function ArrayToURL(array) {
     var pairs = [];

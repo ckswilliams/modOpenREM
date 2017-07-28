@@ -5,7 +5,8 @@ function URLToArray(url) {
         if(!pairs[i])
             continue;
         var pair = pairs[i].split('=');
-        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]).replace(/\+/g, ' ');
+        pair[1] = pair[1].replace(/\+/g, ' ');
+        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
     }
     return request;
 }
@@ -64,6 +65,18 @@ $(document).ready(function() {
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
                 updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, 'histogramRequestPlotDIV', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramRequestPlotDIV');
+            }
+
+            // Number of events per study chart data
+            if(typeof plotCTStudyNumEvents !== 'undefined') {
+                updateAverageChart(json.studyNameList, json.studySystemList, json.studySummaryNumEvents, json.studyHistogramDataNumEvents, plotAverageChoice, 'studyNumEventsDIV', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'studyNumEventsDIV');
+            }
+
+            // Number of events per request chart data
+            if(typeof plotCTRequestNumEvents !== 'undefined') {
+                updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummaryNumEvents, json.requestHistogramDataNumEvents, plotAverageChoice, 'requestPlotNumEventsDIV', colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, 'requestPlotNumEventsDIV');
             }
 
             // Acquisition frequency chart data start
