@@ -307,6 +307,9 @@ $('.datepicker').datepicker({
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotRFStudyDAPAccordion','plotRFStudyDAPContainer'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#plotRFStudyDAPContainer').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#plotRFStudyDAPContainer').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#plotRFStudyDAPContainer').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFStudyDAPContainer'); $('#plotRFStudyDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>

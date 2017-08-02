@@ -299,6 +299,9 @@
                             <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().viewData(false, false, true); enterFullScreen('collapseTwo', 'histogramAcquisitionPlotDLPdiv'); $('#toggle_acq_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#histogramAcquisitionPlotDLPdiv').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#histogramAcquisitionPlotDLPdiv').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#histogramAcquisitionPlotDLPdiv').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotDLPdiv'); $('#histogramAcquisitionPlotDLPdiv').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -392,6 +395,9 @@
                             <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().viewData(false, false, true); enterFullScreen('collapseCTDI', 'histogramAcquisitionPlotCTDIdiv'); $('#toggle_acq_ctdi_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_ctdi_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#histogramAcquisitionPlotCTDIdiv').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#histogramAcquisitionPlotCTDIdiv').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#histogramAcquisitionPlotCTDIdiv').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="acqctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotCTDIdiv'); $('#histogramAcquisitionPlotCTDIdiv').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -519,6 +525,9 @@
                             <a onclick="$('#histogramStudyPlotDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseThree', 'histogramStudyPlotDIV'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramStudyPlotDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramStudyPlotDIV').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#histogramStudyPlotDIV').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#histogramStudyPlotDIV').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#histogramStudyPlotDIV').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotDIV'); $('#histogramStudyPlotDIV').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -612,6 +621,9 @@
                             <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().viewData(false, false, true); enterFullScreen('collapseStudyCTDI', 'histogramStudyPlotCTDIdiv'); $('#toggle_study_ctdi_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_ctdi_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#histogramStudyPlotCTDIdiv').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#histogramStudyPlotCTDIdiv').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#histogramStudyPlotCTDIdiv').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="stu-ctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotCTDIdiv'); $('#histogramStudyPlotCTDIdiv').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -737,6 +749,9 @@
                             <a onclick="$('#histogramRequestPlotDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV'); $('#toggle_req_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramRequestPlotDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_req_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramRequestPlotDIV').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#histogramRequestPlotDIV').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#histogramRequestPlotDIV').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#histogramRequestPlotDIV').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#histogramRequestPlotDIV'); $('#histogramRequestPlotDIV').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -867,6 +882,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#studyMeanDLPOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseWeeklyStudyMeanChart', 'studyMeanDLPOverTimeDIV'); $('#toggle_study_ot_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#studyMeanDLPOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_ot_data_btn">Toggle data table</a>
+                            <a onclick="$($('#studyMeanDLPOverTimeDIV').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#studyMeanDLPOverTimeDIV').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#studyMeanDLPOverTimeDIV').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                         </div>
                     </div>
                 </div>

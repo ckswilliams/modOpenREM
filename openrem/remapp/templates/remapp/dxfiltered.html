@@ -291,6 +291,9 @@
                             <a onclick="$('#container').highcharts().viewData(false, false, true); enterFullScreen('collapseOne','container'); $('#toggle_acq_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#container').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_data_btn">Toggle data table</a>
                             <a onclick="$('#container').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#container').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#container').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#container').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container'); $('#container').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -415,6 +418,9 @@
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer'); $('#toggle_req_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_req_data_btn">Toggle data table</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#plotDXRequestMeanDAPContainer').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#plotDXRequestMeanDAPContainer').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#plotDXRequestMeanDAPContainer').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer'); $('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -540,6 +546,9 @@
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#plotDXStudyMeanDAPContainer').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#plotDXStudyMeanDAPContainer').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#plotDXStudyMeanDAPContainer').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer'); $('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -662,6 +671,9 @@
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeankVpChart', 'chartAcquisitionMeankVp'); $('#toggle_acq_kvp_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_kvp_data_btn">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#chartAcquisitionMeankVp').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#chartAcquisitionMeankVp').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#chartAcquisitionMeankVp').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp'); $('#chartAcquisitionMeankVp').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -751,6 +763,9 @@
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanmAsChart', 'chartAcquisitionMeanmAs'); $('#toggle_acq_mas_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_mas_data_btn">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="$($('#chartAcquisitionMeanmAs').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#chartAcquisitionMeanmAs').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#chartAcquisitionMeanmAs').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                             <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs'); $('#chartAcquisitionMeanmAs').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -848,6 +863,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeankVpOverTime', 'AcquisitionMeankVpOverTimeDIV'); $('#toggle_acq_kvp_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_kvp_ot_btn">Toggle data table</a>
+                            <a onclick="$($('#AcquisitionMeankVpOverTimeDIV').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#AcquisitionMeankVpOverTimeDIV').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#AcquisitionMeankVpOverTimeDIV').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -889,6 +907,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanmAsOverTime', 'AcquisitionMeanmAsOverTimeDIV'); $('#toggle_acq_mas_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_mas_ot_btn">Toggle data table</a>
+                            <a onclick="$($('#AcquisitionMeanmAsOverTimeDIV').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#AcquisitionMeanmAsOverTimeDIV').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#AcquisitionMeanmAsOverTimeDIV').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -930,6 +951,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanDAPOverTime', 'AcquisitionMeanDAPOverTimeDIV'); $('#toggle_acq_dap_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_dap_ot_btn">Toggle data table</a>
+                            <a onclick="$($('#AcquisitionMeanDAPOverTimeDIV').highcharts().series).each(function(){this.hide()})" class="btn btn-default btn-sm" role="button">Hide all series</a>
+                            <a onclick="$($('#AcquisitionMeanDAPOverTimeDIV').highcharts().series).each(function(){this.show()})" class="btn btn-default btn-sm" role="button">Show all series</a>
+                            <a onclick="$($('#AcquisitionMeanDAPOverTimeDIV').highcharts().series).each(function(){if (this.visible) {this.hide();} else {this.show()}})" class="btn btn-default btn-sm" role="button">Toggle all series</a>
                         </div>
                     </div>
                 </div>
