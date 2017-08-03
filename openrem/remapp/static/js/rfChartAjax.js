@@ -11,22 +11,22 @@ $(document).ready(function() {
         dataType: "json",
         success: function( json ) {
             // Initialise some colours to use for plotting
-            var colour_scale = chroma.scale('RdYlBu');
+            var colour_scale = chroma.scale("RdYlBu");
 
             // Study workload chart data
-            if(typeof plotRFStudyPerDayAndHour !== 'undefined') {
-                updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
+            if(typeof plotRFStudyPerDayAndHour !== "undefined") {
+                updateWorkloadChart(json.studiesPerHourInWeekdays, "piechartStudyWorkloadDIV", colour_scale);
             }
 
             // Study description frequency chart data start
-            if(typeof plotRFStudyFreq !== 'undefined') {
-                updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, 'piechartStudyDIV', colour_scale);
+            if(typeof plotRFStudyFreq !== "undefined") {
+                updateFrequencyChart(json.studyNameList, json.studySystemList, json.studySummary, urlStartStudy, "piechartStudyDIV", colour_scale);
             }
 
             // DAP per study description data
-            if( typeof plotRFStudyDAP !== 'undefined') {
-                updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, 'plotRFStudyDAPContainer', colour_scale);
-                sortChartDataToDefault(chartSorting, chartSortingDirection, 'plotRFStudyDAPContainer');
+            if( typeof plotRFStudyDAP !== "undefined") {
+                updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotRFStudyDAPContainer", colour_scale);
+                sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFStudyDAPContainer");
             }
 
             $(".ajax-progress").hide();

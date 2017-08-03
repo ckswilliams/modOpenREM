@@ -11,27 +11,27 @@ $(document).ready(function() {
         dataType: "json",
         success: function( json ) {
             // Initialise some colours to use for plotting
-            //var colour_scale = chroma.scale('RdYlBu');
-            var colour_scale = chroma.scale('Dark2');
+            //var colour_scale = chroma.scale("RdYlBu");
+            var colour_scale = chroma.scale("Dark2");
 
             // Study workload chart data
-            if(typeof plotMGStudyPerDayAndHour !== 'undefined') {
-                updateWorkloadChart(json.studiesPerHourInWeekdays, 'piechartStudyWorkloadDIV', colour_scale);
+            if(typeof plotMGStudyPerDayAndHour !== "undefined") {
+                updateWorkloadChart(json.studiesPerHourInWeekdays, "piechartStudyWorkloadDIV", colour_scale);
             }
 
             // AGD vs compressed thickness scatter plot
-            if(typeof plotMGAGDvsThickness !== 'undefined') {
-                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, 'scatterDIV1', json.AGDvsThicknessSystems, 'mm', 'mGy', [0,2], colour_scale);
+            if(typeof plotMGAGDvsThickness !== "undefined") {
+                updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, "scatterDIV1", json.AGDvsThicknessSystems, "mm", "mGy", [0,2], colour_scale);
             }
 
             // kVp vs compressed thickness scatter plot
-            if(typeof plotMGkVpvsThickness !== 'undefined') {
-                updateScatterChart(json.kVpvsThickness, json.maxThicknessAndkVp, 'scatterDIV2', json.kVpvsThicknessSystems, 'mm', 'kV', [0,0], colour_scale);
+            if(typeof plotMGkVpvsThickness !== "undefined") {
+                updateScatterChart(json.kVpvsThickness, json.maxThicknessAndkVp, "scatterDIV2", json.kVpvsThicknessSystems, "mm", "kV", [0,0], colour_scale);
             }
 
             // mAs vs compressed thickness scatter plot
-            if(typeof plotMGmAsvsThickness !== 'undefined') {
-                updateScatterChart(json.mAsvsThickness, json.maxThicknessAndmAs, 'scatterDIV3', json.mAsvsThicknessSystems, 'mm', 'mAs', [0,1], colour_scale);
+            if(typeof plotMGmAsvsThickness !== "undefined") {
+                updateScatterChart(json.mAsvsThickness, json.maxThicknessAndmAs, "scatterDIV3", json.mAsvsThicknessSystems, "mm", "mAs", [0,1], colour_scale);
             }
 
             $(".ajax-progress").hide();

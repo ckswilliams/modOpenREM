@@ -7,7 +7,7 @@ from __future__ import absolute_import
 # for relative imports by default.
 
 # Debug is now set to false - you can turn it back on in local_settings if you need to
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = False
 
 # Celery settings
