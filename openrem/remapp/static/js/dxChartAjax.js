@@ -2,7 +2,7 @@ function URLToArray(url) {
     var request = {};
     var pairs = url.substring(url.indexOf('?') + 1).split('&');
     for (var i = 0; i < pairs.length; i++) {
-        if(!pairs[i])
+        if (!pairs[i] || pairs[i].indexOf("=") === -1)
             continue;
         var pair = pairs[i].split('=');
         pair[1] = pair[1].replace(/\+/g, ' ');
