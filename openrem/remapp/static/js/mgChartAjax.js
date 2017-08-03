@@ -1,26 +1,3 @@
-function URLToArray(url) {
-    var request = {};
-    var pairs = url.substring(url.indexOf('?') + 1).split('&');
-    for (var i = 0; i < pairs.length; i++) {
-        if (!pairs[i] || pairs[i].indexOf("=") === -1)
-            continue;
-        var pair = pairs[i].split('=');
-        pair[1] = pair[1].replace(/\+/g, ' ');
-        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-    }
-    return request;
-}
-
-
-function ArrayToURL(array) {
-    var pairs = [];
-    for (var key in array)
-        if (array.hasOwnProperty(key))
-            pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(array[key]));
-    return pairs.join('&');
-}
-
-
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));

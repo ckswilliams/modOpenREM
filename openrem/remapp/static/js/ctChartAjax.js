@@ -1,26 +1,3 @@
-function URLToArray(url) {
-    var request = {};
-    var pairs = url.substring(url.indexOf('?') + 1).split('&');
-    for (var i = 0; i < pairs.length; i++) {
-        if (!pairs[i] || pairs[i].indexOf("=") === -1)
-            continue;
-        var pair = pairs[i].split('=');
-        pair[1] = pair[1].replace(/\+/g, ' ');
-        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-    }
-    return request;
-}
-
-
-function ArrayToURL(array) {
-    var pairs = [];
-    for (var key in array)
-        if (array.hasOwnProperty(key))
-            pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(array[key]));
-    return pairs.join('&');
-}
-
-
 // Code to update the page and chart data on initial page load.
 $(document).ready(function() {
     var request_data = ArrayToURL(URLToArray(this.URL));
@@ -41,30 +18,35 @@ $(document).ready(function() {
             if(typeof plotCTAcquisitionMeanDLP !== 'undefined') {
                 updateAverageChart(json.acquisitionNameList, json.acquisitionSystemList, json.acquisitionSummary, json.acquisitionHistogramData, plotAverageChoice, 'histogramAcquisitionPlotDLPdiv', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramAcquisitionPlotDLPdiv');
+                hideButtonsIfOneSeries('histogramAcquisitionPlotDLPdiv', 'acq_dlp_series_');
             }
 
             // CTDI per acquisition chart data
             if(typeof plotCTAcquisitionMeanCTDI !== 'undefined') {
                 updateAverageChart(json.acquisitionNameListCTDI, json.acquisitionSystemListCTDI, json.acquisitionSummaryCTDI, json.acquisitionHistogramDataCTDI, plotAverageChoice, 'histogramAcquisitionPlotCTDIdiv', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramAcquisitionPlotCTDIdiv');
+                hideButtonsIfOneSeries('histogramAcquisitionPlotCTDIdiv', 'acq_ctdi_series_');
             }
 
             // DLP per study chart data
             if(typeof plotCTStudyMeanDLP !== 'undefined') {
                 updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, 'histogramStudyPlotDIV', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramStudyPlotDIV');
+                hideButtonsIfOneSeries('histogramStudyPlotDIV', 'study_dlp_series_');
             }
 
             // CTDI per study chart data
             if(typeof plotCTStudyMeanCTDI !== 'undefined') {
                 updateAverageChart(json.studyNameListCTDI, json.studySystemListCTDI, json.studySummaryCTDI, json.studyHistogramDataCTDI, plotAverageChoice, 'histogramStudyPlotCTDIdiv', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramStudyPlotCTDIdiv');
+                hideButtonsIfOneSeries('histogramStudyPlotCTDIdiv', 'study_ctdi_series_');
             }
 
             // DLP per request chart data start
             if(typeof plotCTRequestMeanDLP !== 'undefined') {
                 updateAverageChart(json.requestNameList, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, 'histogramRequestPlotDIV', colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, 'histogramRequestPlotDIV');
+                hideButtonsIfOneSeries('histogramRequestPlotDIV', 'req_dlp_series_');
             }
 
             // Acquisition frequency chart data start
@@ -100,6 +82,7 @@ $(document).ready(function() {
 
                 var study_dlp_over_time = (plotAverageChoice == "mean") ? json.studyMeanDLPoverTime : json.studyMedianDLPoverTime;
                 updateOverTimeChart(json.studyNameList, study_dlp_over_time, study_line_colours, urlStartStudyOverTime, 'studyMeanDLPOverTimeDIV');
+                hideButtonsIfOneSeries('studyMeanDLPOverTimeDIV', 'study_dlp_time_series_');
             }
 
             // Study workload chart data
