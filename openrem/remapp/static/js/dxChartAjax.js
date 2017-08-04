@@ -18,30 +18,35 @@ $(document).ready(function() {
             if(typeof plotDXAcquisitionMeanDAP !== "undefined") {
                 updateAverageChart(json.acquisition_names, json.acquisitionSystemList, json.acquisitionSummary, json.acquisitionHistogramData, plotAverageChoice, "container", colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "container");
+                hideButtonsIfOneSeries("container", "acq_dap_series_");
             }
 
             // DAP per requested procedure data
             if( typeof plotDXRequestMeanDAP !== "undefined") {
                 updateAverageChart(json.request_names, json.requestSystemList, json.requestSummary, json.requestHistogramData, plotAverageChoice, "plotDXRequestMeanDAPContainer", colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotDXRequestMeanDAPContainer");
+                hideButtonsIfOneSeries("plotDXRequestMeanDAPContainer", "req_dap_series_");
             }
 
             // DAP per study description data
             if( typeof plotDXStudyMeanDAP !== "undefined") {
                 updateAverageChart(json.study_names, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotDXStudyMeanDAPContainer", colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotDXStudyMeanDAPContainer");
+                hideButtonsIfOneSeries("plotDXStudyMeanDAPContainer", "study_dap_series_");
             }
 
             // kVp chart data
             if( typeof plotDXAcquisitionMeankVp !== "undefined") {
                 updateAverageChart(json.acquisition_kvp_names, json.acquisitionkVpSystemList, json.acquisitionkVpSummary, json.acquisitionHistogramkVpData, plotAverageChoice, "chartAcquisitionMeankVp", colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "chartAcquisitionMeankVp");
+                hideButtonsIfOneSeries("chartAcquisitionMeankVp", "acq_kvp_series_");
             }
 
             // mAs chart data start
             if(typeof plotDXAcquisitionMeanmAs !== "undefined") {
                 updateAverageChart(json.acquisition_mas_names, json.acquisitionmAsSystemList, json.acquisitionmAsSummary, json.acquisitionHistogrammAsData, plotAverageChoice, "chartAcquisitionMeanmAs", colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "chartAcquisitionMeanmAs");
+                hideButtonsIfOneSeries("chartAcquisitionMeanmAs", "acq_mas_series_");
             }
 
             // Acquisition frequency chart data
@@ -76,6 +81,7 @@ $(document).ready(function() {
 
                 var acq_dap_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeanDAPoverTime : json.acquisitionMedianDAPoverTime;
                 updateOverTimeChart(json.acquisition_names, acq_dap_over_time, acquisition_line_colours, urlStartAcq, "AcquisitionMeanDAPOverTimeDIV");
+                hideButtonsIfOneSeries("AcquisitionMeanDAPOverTimeDIV", "acq_dap_over_time_series_");
             }
 
             // kVp over time chart data
@@ -93,6 +99,7 @@ $(document).ready(function() {
 
                 var acq_kvp_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeankVpoverTime : json.acquisitionMediankVpoverTime;
                 updateOverTimeChart(json.acquisition_kvp_names, acq_kvp_over_time, protocol_kvp_line_colours, urlStartAcq, "AcquisitionMeankVpOverTimeDIV");
+                hideButtonsIfOneSeries("AcquisitionMeankVpOverTimeDIV", "acq_kvp_over_time_series_");
             }
 
             // mAs over time chart data
@@ -110,6 +117,7 @@ $(document).ready(function() {
 
                 var acq_mas_over_time = (plotAverageChoice == "mean") ? json.acquisitionMeanmAsoverTime : json.acquisitionMedianmAsoverTime;
                 updateOverTimeChart(json.acquisition_mas_names, acq_mas_over_time, protocol_mas_line_colours, urlStartAcq, "AcquisitionMeanmAsOverTimeDIV");
+                hideButtonsIfOneSeries("AcquisitionMeanmAsOverTimeDIV", "acq_mas_over_time_series_");
             }
 
             // Study workload chart data

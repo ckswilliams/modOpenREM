@@ -22,16 +22,19 @@ $(document).ready(function() {
             // AGD vs compressed thickness scatter plot
             if(typeof plotMGAGDvsThickness !== "undefined") {
                 updateScatterChart(json.AGDvsThickness, json.maxThicknessAndAGD, "scatterDIV1", json.AGDvsThicknessSystems, "mm", "mGy", [0,2], colour_scale);
+                hideButtonsIfOneSeries("scatterDIV1", "agd_thick_series_");
             }
 
             // kVp vs compressed thickness scatter plot
             if(typeof plotMGkVpvsThickness !== "undefined") {
                 updateScatterChart(json.kVpvsThickness, json.maxThicknessAndkVp, "scatterDIV2", json.kVpvsThicknessSystems, "mm", "kV", [0,0], colour_scale);
+                hideButtonsIfOneSeries("scatterDIV2", "kvp_thick_series_");
             }
 
             // mAs vs compressed thickness scatter plot
             if(typeof plotMGmAsvsThickness !== "undefined") {
                 updateScatterChart(json.mAsvsThickness, json.maxThicknessAndmAs, "scatterDIV3", json.mAsvsThicknessSystems, "mm", "mAs", [0,1], colour_scale);
+                hideButtonsIfOneSeries("scatterDIV3", "mas_thick_series_");
             }
 
             $(".ajax-progress").hide();

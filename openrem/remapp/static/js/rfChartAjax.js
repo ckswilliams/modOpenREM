@@ -27,6 +27,7 @@ $(document).ready(function() {
             if( typeof plotRFStudyDAP !== "undefined") {
                 updateAverageChart(json.studyNameList, json.studySystemList, json.studySummary, json.studyHistogramData, plotAverageChoice, "plotRFStudyDAPContainer", colour_scale);
                 sortChartDataToDefault(chartSorting, chartSortingDirection, "plotRFStudyDAPContainer");
+                hideButtonsIfOneSeries("plotRFStudyDAPContainer", "study_dap_series_");
             }
 
             $(".ajax-progress").hide();
