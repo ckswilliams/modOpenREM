@@ -212,7 +212,7 @@
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
             var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result, hide_series_btn_stub;
         </script>
         <!-- End of include JavaScript for the plots -->
 
@@ -323,6 +323,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilters;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -335,7 +336,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -452,6 +453,7 @@
                 field_cat_name = 'requested_procedure';
                 tooltip_filters = tooltipFiltersRequest;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'req_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -464,7 +466,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -582,6 +584,7 @@
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -594,7 +597,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -709,6 +712,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilterskVp;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_kvp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -721,7 +725,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -803,6 +807,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersmAs;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_mas_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -815,7 +820,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 

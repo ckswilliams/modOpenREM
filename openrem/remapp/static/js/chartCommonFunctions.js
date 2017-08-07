@@ -34,6 +34,20 @@ function hideButtonsIfOneSeries(nameOfDIV, buttonIDStub) {
 }
 
 
+function hideSeriesButtons(buttonIDStub) {
+    $("#" + buttonIDStub + "hide").hide();
+    $("#" + buttonIDStub + "show").hide();
+    $("#" + buttonIDStub + "toggle").hide();
+}
+
+
+function resetSeriesButtons(buttonIDStub) {
+    $("#" + buttonIDStub + "hide").show();
+    $("#" + buttonIDStub + "show").hide();
+    $("#" + buttonIDStub + "toggle").show();
+}
+
+
 function URLToArray(url) {
     var request = {};
     var pairs = url.substring(url.indexOf("?") + 1).split("&");
