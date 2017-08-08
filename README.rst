@@ -15,10 +15,6 @@ OpenREM
 .. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
 
-.. image:: https://www.quantifiedcode.com/api/v1/project/ed6462bb44f4462189fd8777ab26e8dd/snapshot/origin:develop:HEAD/badge.svg?
-    :target: https://www.quantifiedcode.com/app/project/ed6462bb44f4462189fd8777ab26e8dd
-    :alt: QuantifiedCode issues
-
 .. image:: https://api.codacy.com/project/badge/Grade/2117af7281134e42ace3efe5fc4a5255
     :target: https://www.codacy.com/app/OpenREM/openrem?utm_source=openrem@bitbucket.org&amp;utm_medium=referral&amp;utm_content=openrem/openrem&amp;utm_campaign=Badge_Grade
 
