@@ -213,7 +213,7 @@
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
             var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result, hide_series_btn_stub;
         </script>
 
         <!-- End of include JavaScript to enable highcharts plots -->
@@ -299,6 +299,9 @@
                             <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().viewData(false, false, true); enterFullScreen('collapseTwo', 'histogramAcquisitionPlotDLPdiv'); $('#toggle_acq_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramAcquisitionPlotDLPdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('histogramAcquisitionPlotDLPdiv', 'hide', 'acq_dlp_series_')" class="btn btn-default btn-sm" role="button" id="acq_dlp_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('histogramAcquisitionPlotDLPdiv', 'show', 'acq_dlp_series_')" class="btn btn-default btn-sm" role="button" id="acq_dlp_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('histogramAcquisitionPlotDLPdiv')" class="btn btn-default btn-sm" role="button" id="acq_dlp_series_toggle">Toggle all series</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotDLPdiv'); $('#histogramAcquisitionPlotDLPdiv').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -306,7 +309,10 @@
             </div>
             <!-- End of HTML to include div container for acquisition plot -->
 
+
             <script>
+                $('#acq_dlp_series_show').hide();
+
                 var plotCTAcquisitionMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramAcquisitionPlotDLPdiv');
@@ -327,6 +333,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersAcq;
                 href_start = '/openrem/ct/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -339,7 +346,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -392,6 +399,9 @@
                             <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().viewData(false, false, true); enterFullScreen('collapseCTDI', 'histogramAcquisitionPlotCTDIdiv'); $('#toggle_acq_ctdi_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_ctdi_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramAcquisitionPlotCTDIdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('histogramAcquisitionPlotCTDIdiv', 'hide', 'acq_ctdi_series_')" class="btn btn-default btn-sm" role="button" id="acq_ctdi_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('histogramAcquisitionPlotCTDIdiv', 'show', 'acq_ctdi_series_')" class="btn btn-default btn-sm" role="button" id="acq_ctdi_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('histogramAcquisitionPlotCTDIdiv')" class="btn btn-default btn-sm" role="button" id="acq_ctdi_series_toggle">Toggle all series</a>
                             <div class="acqctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramAcquisitionPlotCTDIdiv'); $('#histogramAcquisitionPlotCTDIdiv').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -400,6 +410,8 @@
             <!-- End of HTML to include div container for acquisition CTDI plot -->
 
             <script>
+                $('#acq_ctdi_series_show').hide();
+
                 var plotCTAcquisitionMeanCTDI = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramAcquisitionPlotCTDIdiv');
@@ -420,6 +432,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersAcqCTDI;
                 href_start = '/openrem/ct/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_ctdi_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -432,7 +445,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -519,6 +532,9 @@
                             <a onclick="$('#histogramStudyPlotDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseThree', 'histogramStudyPlotDIV'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramStudyPlotDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramStudyPlotDIV').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('histogramStudyPlotDIV', 'hide', 'study_dlp_series_')" class="btn btn-default btn-sm" role="button" id="study_dlp_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('histogramStudyPlotDIV', 'show', 'study_dlp_series_')" class="btn btn-default btn-sm" role="button" id="study_dlp_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('histogramStudyPlotDIV')" class="btn btn-default btn-sm" role="button" id="study_dlp_series_toggle">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotDIV'); $('#histogramStudyPlotDIV').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -527,6 +543,8 @@
             <!-- End of HTML to include div container for study plot -->
 
             <script>
+                $('#study_dlp_series_show').hide();
+
                 var plotCTStudyMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramStudyPlotDIV');
@@ -547,6 +565,7 @@
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
                 href_start = '/openrem/ct/?studyhist=1&';
+                hide_series_btn_stub = 'study_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -559,7 +578,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -612,6 +631,9 @@
                             <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().viewData(false, false, true); enterFullScreen('collapseStudyCTDI', 'histogramStudyPlotCTDIdiv'); $('#toggle_study_ctdi_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_ctdi_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramStudyPlotCTDIdiv').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('histogramStudyPlotCTDIdiv', 'hide', 'study_ctdi_series_')" class="btn btn-default btn-sm" role="button" id="study_ctdi_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('histogramStudyPlotCTDIdiv', 'show', 'study_ctdi_series_')" class="btn btn-default btn-sm" role="button" id="study_ctdi_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('histogramStudyPlotCTDIdiv')" class="btn btn-default btn-sm" role="button" id="study_ctdi_series_toggle">Toggle all series</a>
                             <div class="stu-ctdi-hist-norm-btn"><a onclick="normaliseHistograms('#histogramStudyPlotCTDIdiv'); $('#histogramStudyPlotCTDIdiv').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -620,6 +642,8 @@
             <!-- End of HTML to include div container for study CTDI plot -->
 
             <script>
+                $('#study_ctdi_series_show').hide();
+
                 var plotCTStudyMeanCTDI = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramStudyPlotCTDIdiv');
@@ -640,6 +664,7 @@
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudyCTDI;
                 href_start = '/openrem/ct/?studyhist=1&';
+                hide_series_btn_stub = 'study_ctdi_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -652,7 +677,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -737,6 +762,9 @@
                             <a onclick="$('#histogramRequestPlotDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseRequestMeanDLP', 'histogramRequestPlotDIV'); $('#toggle_req_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#histogramRequestPlotDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_req_data_btn">Toggle data table</a>
                             <a onclick="$('#histogramRequestPlotDIV').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('histogramRequestPlotDIV', 'hide', 'req_dlp_series_')" class="btn btn-default btn-sm" role="button" id="req_dlp_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('histogramRequestPlotDIV', 'show', 'req_dlp_series_')" class="btn btn-default btn-sm" role="button" id="req_dlp_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('histogramRequestPlotDIV')" class="btn btn-default btn-sm" role="button" id="req_dlp_series_toggle">Toggle all series</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#histogramRequestPlotDIV'); $('#histogramRequestPlotDIV').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -745,6 +773,8 @@
             <!-- End of HTML to include div container for request plot -->
 
             <script>
+                $('#req_dlp_series_show').hide();
+
                 var plotCTRequestMeanDLP = true;
                 $(window).resize(function() {
                     chartSetExportSize('histogramRequestPlotDIV');
@@ -764,6 +794,7 @@
                 field_cat_name = 'requested_procedure';
                 tooltip_filters = tooltipFiltersRequest;
                 href_start = '/openrem/ct/?requesthist=1&';
+                hide_series_btn_stub = 'req_dlp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -776,7 +807,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -867,6 +898,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#studyMeanDLPOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseWeeklyStudyMeanChart', 'studyMeanDLPOverTimeDIV'); $('#toggle_study_ot_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#studyMeanDLPOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_ot_data_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('studyMeanDLPOverTimeDIV', 'hide', 'study_dlp_time_series_')" class="btn btn-default btn-sm" role="button" id="study_dlp_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('studyMeanDLPOverTimeDIV', 'show', 'study_dlp_time_series_')" class="btn btn-default btn-sm" role="button" id="study_dlp_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('studyMeanDLPOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="study_dlp_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -874,6 +908,8 @@
             <!-- End of HTML to include div container for mean study DLP per week -->
 
             <script>
+                $('#study_dlp_time_series_show').hide();
+
                 var plotCTStudyMeanDLPOverTime = true;
                 var plotCTStudyMeanDLPOverTimePeriod = '{{ request.user.userprofile.plotCTStudyMeanDLPOverTimePeriod }}';
                 $(window).resize(function() {

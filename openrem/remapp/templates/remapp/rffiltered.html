@@ -236,7 +236,7 @@ $('.datepicker').datepicker({
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
             var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result, hide_series_btn_stub;
         </script>
         <!-- End of include JavaScript to enable highcharts plots -->
 
@@ -307,6 +307,9 @@ $('.datepicker').datepicker({
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotRFStudyDAPAccordion','plotRFStudyDAPContainer'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#plotRFStudyDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('plotRFStudyDAPContainer', 'hide', 'study_dap_series_')" class="btn btn-default btn-sm" role="button" id="study_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('plotRFStudyDAPContainer', 'show', 'study_dap_series_')" class="btn btn-default btn-sm" role="button" id="study_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('plotRFStudyDAPContainer')" class="btn btn-default btn-sm" role="button" id="study_dap_series_toggle">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotRFStudyDAPContainer'); $('#plotRFStudyDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -315,6 +318,8 @@ $('.datepicker').datepicker({
             <!-- End of HTML to include div for study name plot -->
 
             <script>
+                $('#study_dap_series_show').hide();
+
                 var plotRFStudyDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotRFStudyDAPContainer');
@@ -334,6 +339,7 @@ $('.datepicker').datepicker({
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
                 href_start = '/openrem/rf/?';
+                hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -346,7 +352,7 @@ $('.datepicker').datepicker({
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 

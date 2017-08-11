@@ -245,6 +245,9 @@ $('.datepicker').datepicker({
                             <div id="scatterDIV1" style="height: auto; margin: 0 0"></div>
                             <a onclick="$('#scatterDIV1').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter1', 'scatterDIV1'); $('#toggle_scatteragd_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#scatterDIV1').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scatteragd_data_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('scatterDIV1', 'hide', 'agd_thick_series_')" class="btn btn-default btn-sm" role="button" id="agd_thick_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('scatterDIV1', 'show', 'agd_thick_series_')" class="btn btn-default btn-sm" role="button" id="agd_thick_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('scatterDIV1')" class="btn btn-default btn-sm" role="button" id="agd_thick_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -252,6 +255,8 @@ $('.datepicker').datepicker({
             <!-- End of HTML to include div container for scatter plot -->
 
             <script>
+                $('#agd_thick_series_show').hide();
+
                 var plotMGAGDvsThickness = true;
                 $(window).resize(function() {
                     chartSetExportSize('scatterDIV1');
@@ -277,6 +282,9 @@ $('.datepicker').datepicker({
                             <div id="scatterDIV2" style="height: auto; margin: 0 0"></div>
                             <a onclick="$('#scatterDIV2').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter2', 'scatterDIV2'); $('#toggle_scatterkvp_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#scatterDIV2').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scatterkvp_data_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('scatterDIV2', 'hide', 'kvp_thick_series_')" class="btn btn-default btn-sm" role="button" id="kvp_thick_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('scatterDIV2', 'show', 'kvp_thick_series_')" class="btn btn-default btn-sm" role="button" id="kvp_thick_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('scatterDIV2')" class="btn btn-default btn-sm" role="button" id="kvp_thick_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -284,6 +292,8 @@ $('.datepicker').datepicker({
             <!-- End of HTML to include div container for scatter plot -->
 
             <script>
+                $('#kvp_thick_series_show').hide();
+
                 var plotMGkVpvsThickness = true;
                 $(window).resize(function() {
                     chartSetExportSize('scatterDIV2');
@@ -309,6 +319,9 @@ $('.datepicker').datepicker({
                             <div id="scatterDIV3" style="height: auto; margin: 0 0"></div>
                             <a onclick="$('#scatterDIV3').highcharts().viewData(false, false, true); enterFullScreen('collapseScatter3', 'scatterDIV3'); $('#toggle_scattermas_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#scatterDIV3').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_scattermas_data_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('scatterDIV3', 'hide', 'mas_thick_series_')" class="btn btn-default btn-sm" role="button" id="mas_thick_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('scatterDIV3', 'show', 'mas_thick_series_')" class="btn btn-default btn-sm" role="button" id="mas_thick_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('scatterDIV3')" class="btn btn-default btn-sm" role="button" id="mas_thick_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -316,6 +329,8 @@ $('.datepicker').datepicker({
             <!-- End of HTML to include div container for scatter plot -->
 
             <script>
+                $('#mas_thick_series_show').hide();
+
                 var plotMGmAsvsThickness = true;
                 $(window).resize(function() {
                     chartSetExportSize('scatterDIV3');
