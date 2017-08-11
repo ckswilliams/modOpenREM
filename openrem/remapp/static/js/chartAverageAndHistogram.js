@@ -1,7 +1,7 @@
 function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, render_div,
                                   value_label, value_units, avg_label, cat_label, cat_counter,
                                   fld_min, fld_max, fld_multiplier, fld_cat_name,
-                                  tooltip_filters, href_start) {
+                                  tooltip_filters, href_start, hide_btn_stub) {
     var bins = [];
     var name = '';
 
@@ -33,7 +33,13 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                     if (typeof this.options.drilldown.normalise == 'undefined') this.options.drilldown.normalise = false;
 
                     var drilldownTitle;
-                    if (!e.points) drilldownTitle = 'Histogram of '; else drilldownTitle = 'Histograms of ';
+                    if (!e.points) {
+                        drilldownTitle = 'Histogram of ';
+                        hideSeriesButtons(hide_btn_stub);
+                    }
+                    else {
+                        drilldownTitle = 'Histograms of ';
+                    }
                     drilldownTitle += e.point.name + ' ' + value_label + ' values';
                     if (this.options.drilldown.normalise) drilldownTitle += ' (normalised)';
 
@@ -71,13 +77,17 @@ function chartAverageAndHistogram(default_title, norm_btn_class, instr_class, re
                         } else {
                             value_to_write = this.y;
                         }
-                        return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + encodeURI(href_start + linkText + tooltip_filters) + '">Click to view</a></td></tr></table>';
+                        return '<table style="text-align: center"><tr><td>' + value_to_write.toFixed(0) + ' ' + cat_counter + '</td></tr><tr><td><a href="' + encodeURI(href_start + linkText + tooltip_filters).replace("+", encodeURIComponent("+")) + '">Click to view</a></td></tr></table>';
                     };
                 },
                 drillup: function (e) {
                     $(norm_btn_class).css('display','none');
                     $(instr_class).css('display','block');
                     this.viewData(false, false, true);
+
+                    if (this.series.length > 2) {
+                        resetSeriesButtons(hide_btn_stub);
+                    }
 
                     this.setTitle({
                         text: default_title
