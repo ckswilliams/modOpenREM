@@ -234,6 +234,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
+        except KeyError:
+            pass
 
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
         try:
@@ -249,6 +251,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 study_events = f.qs
         except MultiValueDictKeyError:
             study_events = f.qs
+        except KeyError:
+            pass
 
     if plot_request_mean_dap or plot_request_freq:
         try:
@@ -263,6 +267,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 # The user hasn't filtered on acquisition, so we can use the faster database querying.
                 request_events = f.qs
         except MultiValueDictKeyError:
+            request_events = f.qs
+        except KeyError:
             request_events = f.qs
 
     if plot_acquisition_mean_dap or plot_acquisition_freq:
@@ -891,6 +897,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
+        except KeyError:
+            pass
 
     if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
@@ -906,6 +914,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 study_events = f.qs
         except MultiValueDictKeyError:
             study_events = f.qs
+        except KeyError:
+            study_events = f.qs
 
     if plot_request_mean_dlp or plot_request_freq:
         try:
@@ -920,6 +930,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 # The user hasn't filtered on acquisition, so we can use the faster database querying.
                 request_events = f.qs
         except MultiValueDictKeyError:
+            request_events = f.qs
+        except KeyError:
             request_events = f.qs
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
