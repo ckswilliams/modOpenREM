@@ -49,12 +49,13 @@
                 <li>Test patient indicators? {{ generalstudymoduleattr.patientmoduleattr_set.get.not_patient_indicator }}</li>
             <br>
             <table class="table table-condensed table-bordered small">
-                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th>
+                <th>Irradiation type</th><th>Total DAP (cGy.cm<sup>2</sup>)</th><th>Total dose at RP (Gy)</th><th>Total time (s)</th>
                 {% for irr_type in study_totals %}
                     <tr>
                     <td>{{ irr_type.0 }}</td>
                     <td><script>document.write({{ irr_type.1 }}.toFixed(2));</script></td>
                     <td><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></td>
+                    <td><script>document.write({{ irr_type.3 }}.toFixed(2));</script></td>
                     </tr>
                 {% endfor %}
             </table>
@@ -381,4 +382,4 @@
 </p>
 {% endif %}
 
-{% endblock %}	
+{% endblock %}
