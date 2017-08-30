@@ -35,19 +35,13 @@ django.setup()
 logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
 
-def _move_req(my_ae, remote_ae, d, study_no, series_no):
-    logger.debug(u"Requesting move association for study {0} and series {1}".format(study_no, series_no))
-    assocMove = my_ae.RequestAssociation(remote_ae)
-    logger.info(u"Move association requested for study {0} and series {1}".format(study_no, series_no))
-    move_generator = assocMove.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
+def _move_req(my_ae, remote_ae, assoc, d, study_no, series_no):
+    move_generator = assoc.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     try:
         for move_status in move_generator:
             logger.debug(u"move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
     except KeyError as e:
         logger.error(u"{0} in qrscu._move_req. Request is {1}, study {2} series {3}".format(e, d, study_no, series_no))
-    logger.debug(u"Releasing move association for study {0} and series {1}".format(study_no, series_no))
-    assocMove.Release(0)
-    logger.info(u"Move association released for study {0} and series {1}".format(study_no, series_no))
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
@@ -798,14 +792,18 @@ def movescu(query_id):
         rh = qr_scp.ip
     remote_ae = dict(Address=rh, Port=qr_scp.port, AET=qr_scp.aetitle.encode('ascii', 'ignore'))
 
+    logger.debug(u"Query_id {0}: Requesting move association".format(query_id))
+    assoc = my_ae.RequestAssociation(remote_ae)
+    logger.info(u"Query_id {0}: Move association requested".format(query_id))
+
     query.stage = u"Preparing to start move request"
     query.save()
-    logger.info(u"Preparing to start move request")
+    logger.info(u"Query_id {0}: Preparing to start move request".format(query_id))
 
     studies = query.dicomqrrspstudy_set.all()
     query.stage = u"Requesting move of {0} studies".format(studies.count())
     query.save()
-    logger.info(u"Requesting move of {0} studies".format(studies.count()))
+    logger.info(u"Query_id {0}: Requesting move of {1} studies".format(query_id, studies.count()))
 
     study_no = 0
     for study in studies:
@@ -833,14 +831,18 @@ def movescu(query_id):
             ))
             query.save()
             logger.info(u"_move_req launched")
-            _move_req(my_ae, remote_ae, d, study_no, series_no)
+            _move_req(my_ae, remote_ae, assoc, d, study_no, series_no)
 
     query.move_complete = True
     query.save()
     logger.info(u"Move complete")
 
+    logger.debug(u"Query_id {0}: Releasing move association".format(query_id))
+    assoc.Release(0)
+    logger.info(u"Query_id {0}: Move association released".format(query_id))
+
     my_ae.Quit()
-    logger.debug(u"Move AE my_ae quit")
+    logger.debug(u"Query_id {0}: Move AE my_ae quit".format(query_id))
 
     sleep(10)
     query.delete()
