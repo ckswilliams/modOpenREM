@@ -43,6 +43,7 @@
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
                 </li>
+                <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
                 <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
                 <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
                 <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>

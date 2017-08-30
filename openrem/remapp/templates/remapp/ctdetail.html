@@ -3,7 +3,7 @@
 {% block navct%}<li class="active">{% endblock %}
 
 
-{% block mainblock %}		
+{% block mainblock %}
 <h1>Detail list of events</h1>
 
 <ul>
@@ -23,11 +23,12 @@
     <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
     <li>Hospital: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.institution_name }}</li>
     <li>
-        Scanner: 
+        Scanner:
         {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer }} |
         {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
         {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
     </li>
+    <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
     <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
     <li>Comment: {{ generalstudymoduleattr.ctradiationdose_set.get.comment }} </li>
     <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
@@ -127,4 +128,4 @@
 </p>
 {% endif %}
 
-{% endblock %}	
+{% endblock %}
