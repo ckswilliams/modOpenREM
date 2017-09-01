@@ -79,7 +79,7 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
 
-def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
+def _prune_series_responses(MyAE, RemoteAE, assoc, query, all_mods, filters):
     """
     For each study level response, remove any series that we know can't be used.
     :param MyAE: Calling AE Tile
@@ -109,7 +109,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.save()
 
             if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(
-                    MyAE, RemoteAE, study, query.query_id) == 'RDSR':
+                    MyAE, RemoteAE, assoc, study, query.query_id) == 'RDSR':
                 logger.debug(u"Found RDSR in MG study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
@@ -125,7 +125,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.save()
 
             if 'SR' in study.get_modalities_in_study() and _check_sr_type_in_study(
-                    MyAE, RemoteAE, study, query.query_id) == 'RDSR':
+                    MyAE, RemoteAE, assoc, study, query.query_id) == 'RDSR':
                 logger.debug(u"Found RDSR in DX study, so keep SR and delete all other series")
                 series = study.dicomqrrspseries_set.all()
                 series.exclude(modality__exact='SR').delete()
@@ -137,7 +137,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
         elif all_mods['FL']['inc'] and any(mod in study.get_modalities_in_study() for mod in ('XA', 'RF')):
             study.modality = 'FL'
             study.save()
-            sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study, query.query_id)
+            sr_type = _check_sr_type_in_study(MyAE, RemoteAE, assoc, study, query.query_id)
             logger.debug(u"FL study, check_sr_type returned {0}".format(sr_type))
             series = study.dicomqrrspseries_set.all()
             series.exclude(modality__exact='SR').delete()
@@ -147,7 +147,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
             study.save()
             series = study.dicomqrrspseries_set.all()
             if 'SR' in study.get_modalities_in_study():
-                SR_type = _check_sr_type_in_study(MyAE, RemoteAE, study, query.query_id)
+                SR_type = _check_sr_type_in_study(MyAE, RemoteAE, assoc, study, query.query_id)
                 if SR_type == 'RDSR':
                     logger.debug(u"Found RDSR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
@@ -171,7 +171,7 @@ def _prune_series_responses(MyAE, RemoteAE, query, all_mods, filters):
                     series.filter(number_of_series_related_instances__gt=5).delete()
 
         elif all_mods['SR']['inc']:
-            sr_type = _check_sr_type_in_study(MyAE, RemoteAE, study, query.query_id)
+            sr_type = _check_sr_type_in_study(MyAE, RemoteAE, assoc, study, query.query_id)
             if sr_type == 'RDSR':
                 logger.debug(u"SR only query, found RDSR, deleted other SRs")
             elif sr_type == 'ESR':
@@ -744,7 +744,7 @@ def qrscu(
         logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
     logger.debug(u"Pruning series responses")
-    _prune_series_responses(my_ae, remote_ae, query, all_mods, filters)
+    _prune_series_responses(my_ae, remote_ae, assoc, query, all_mods, filters)
 
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
