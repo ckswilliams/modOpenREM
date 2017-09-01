@@ -831,6 +831,17 @@ def movescu(query_id):
             ))
             query.save()
             logger.info(u"_move_req launched")
+            if not assoc.is_alive:
+                logger.warning(u"Query_id {0}: Association has aborted, attempting to reconnect".format(query_id))
+                assoc.Release(0)
+                assoc = my_ae.RequestAssociation(remote_ae)
+                if not assoc.is_alive:
+                    logger.error(u"Query_id {0}: Association could not be re-established".format(query_id))
+                    assoc.Release(0)
+                    my_ae.Quit()
+                    logger.debug(u"Query_id {0}: Move AE my_ae quit".format(query_id))
+                    query.delete()
+                    exit()
             _move_req(my_ae, remote_ae, assoc, d, study_no, series_no)
 
     query.move_complete = True
