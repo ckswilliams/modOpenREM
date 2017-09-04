@@ -6,6 +6,7 @@ from openremproject.settings import DCMCONV, DCMMKDIR, JAVA_EXE, JAVA_OPTIONS, P
 import shutil
 import django
 import logging
+import traceback
 
 # setup django/OpenREM
 basepath = os.path.dirname(__file__)
@@ -17,7 +18,52 @@ django.setup()
 
 from celery import shared_task
 
-logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
+logger = logging.getLogger(
+    'remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
+
+
+def find_dose_summary_objects(folderPath, seriesNumber):
+    """ This function looks for seriesNumber in the SeriesNumber element of all
+    DICOM objects present in folderPath. When found a structure containing the
+    file name, StudyTime and InstanceNumber are added to a list. At the end of
+    the routine this list is returned.
+
+    Args:
+        folderPath: a string containing the path to the folder containing the
+        DICOM objects stationName: the seriesNumber to look for in SeriesNumber
+
+    Returns:
+        A list of structures, each containing the elements "fileName",
+        "studyTime" and "instanceNumber".
+    """
+    import dicom
+    import traceback
+    from dicom.filereader import InvalidDicomError
+
+    doseSummaryObjectList = []
+
+    for fileName in os.listdir(folderPath):
+        if os.path.isfile(os.path.join(folderPath, fileName)):
+            try:
+                dcm = dicom.read_file(os.path.join(folderPath, fileName))
+                if str(dcm.SeriesNumber) == str(seriesNumber):
+                    doseSummaryObjectList.append({"fileName": fileName, "studyTime": dcm.StudyTime, "instanceNumber": dcm.InstanceNumber})
+
+            except InvalidDicomError as e:
+                logger.debug("Invalid DICOM error: {0} when trying to read {1}".format(e.message, os.path.join(folderPath, fileName)))
+            except Exception as e:
+                logger.debug(traceback.format_exc())
+
+    return doseSummaryObjectList
+
+
+def copy_files_from_a_to_b(srcFolder, destFolder):
+    srcFiles = os.listdir(srcFolder)
+    for fileName in srcFiles:
+        fullFileName = os.path.join(srcFolder, fileName)
+        if (os.path.isfile(fullFileName)):
+            shutil.copy(fullFileName, destFolder)
+
 
 def _split_by_studyinstanceuid(dicom_path):
     """Parse a folder of files, creating a sub-folder for each StudyInstanceUID found in any DICOM files. Each DICOM
@@ -51,12 +97,11 @@ def _split_by_studyinstanceuid(dicom_path):
                     folder_list.append(subfolder_path)
 
                 shutil.copy2(os.path.join(dicom_path, filename), os.path.join(subfolder_path, str(file_counter)))
-
                 file_counter += 1
-
             except InvalidDicomError as e:
-                print 'Invalid DICOM error: {0} when trying to read {1}'.format(e.message, os.path.join(dicom_path, filename))
-                pass
+                logger.debug('Invalid DICOM error: {0} when trying to read {1}'.format(e.message, os.path.join(dicom_path, filename)))
+            except Exception as e:
+                logger.debug(traceback.format_exc())
 
     return folder_list
 
@@ -92,6 +137,8 @@ def _find_extra_info(dicom_path):
 
     from struct import unpack
 
+    logger.debug('Starting _find_extra_info routine for images in {0}'.format(dicom_path))
+
     acquisition_info = []
     acquisitions_collected = []
     study_info = {}
@@ -105,32 +152,46 @@ def _find_extra_info(dicom_path):
                     # Only look at the tags if the combination of AcquisitionNumber and AcquisitionTime is new
                     acquisition_code = str(dcm.AcquisitionNumber) + '_' + dcm.AcquisitionTime
                     if acquisition_code not in acquisitions_collected:
-                        print acquisition_code
+                        logger.debug("acquisition_code is {0}".format(acquisition_code))
                         acquisitions_collected.append(acquisition_code)
 
                         info_dictionary = {}
+
                         try:
                             info_dictionary['AcquisitionNumber'] = dcm.AcquisitionNumber
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             info_dictionary['AcquisitionTime'] = dcm.AcquisitionTime
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             info_dictionary['ProtocolName'] = dcm.ProtocolName
-                            # print dcm.ProtocolName
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             info_dictionary['ExposureTime'] = dcm.ExposureTime
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             info_dictionary['KVP'] = dcm.KVP
-                            # print dcm.KVP
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             # For some Toshiba CT scanners there is information on the detector configuration
                             if dcm.Manufacturer.lower() == 'toshiba':
@@ -138,51 +199,76 @@ def _find_extra_info(dicom_path):
                                 info_dictionary['NominalTotalCollimationWidth'] = dcm[0x7005, 0x1009].value.count('1') * float(dcm[0x7005, 0x1008].value)
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             info_dictionary['SpiralPitchFactor'] = dcm.SpiralPitchFactor
-                            # print dcm.SpiralPitchFactor
                         except AttributeError:
                             try:
                                 # For some Toshiba CT scanners, stored as a decimal string (DS)
                                 info_dictionary['SpiralPitchFactor'] = dcm[0x7005, 0x1023].value
-                                # print dcm[0x7005, 0x1023].value
                             except KeyError:
                                 pass
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             # For some Toshiba CT scanners, stored as a floating point double (FD) by the
                             # scanner, but encoded by PACS as hex
                             if dcm[0x7005, 0x1063].VR == 'FD':
                                 info_dictionary['CTDIvol'] = dcm[0x7005, 0x1063].value
+                                logger.debug('CTDIvol found in VR==FD format in dcm[0x7005,0x1063] ({0}).'.format(dcm[0x7005, 0x1063].value))
                             else:
                                 info_dictionary['CTDIvol'] = unpack('<d', ''.join(dcm[0x7005, 0x1063]))[0]
+                                logger.debug('CTDIvol unpacked from dcm[0x7005,0x1063] ({0}).'.format(unpack('<d', ''.join(dcm[0x7005, 0x1063]))[0]))
                         except KeyError:
-                            print 'There was a key error when finding CTDIvol. Trying elsewhere.'
-                            print dcm.CTDIvol
+                            logger.debug('There was a key error when finding CTDIvol. Trying elsewhere.')
                             try:
                                 info_dictionary['CTDIvol'] = dcm.CTDIvol
+                                logger.debug('CTDIvol found in dcm.CTDIvol ({0}).'.format(dcm.CTDIvol))
                             except AttributeError:
                                 pass
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
                         except TypeError:
-                            print 'There was a type error when finding CTDIvol. Trying elsewhere.'
+                            logger.debug('There was a type error when finding CTDIvol. Trying elsewhere.')
                             try:
                                 info_dictionary['CTDIvol'] = dcm.CTDIvol
+                                logger.debug('CTDIvol found in dcm.CTDIvol ({0}).'.format(dcm.CTDIvol))
                             except AttributeError:
                                 pass
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+                            pass
+
                         try:
                             info_dictionary['ExposureModulationType'] = dcm.ExposureModulationType
                         except AttributeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+
                         try:
                             # For some Toshiba CT scanners, stored as a floating point double (FD) by the
                             # scanner, but encoded by PACS as hex
                             if dcm[0x7005, 0x1040].VR == 'FD':
                                 info_dictionary['DLP'] = dcm[0x7005, 0x1040].value
+                                logger.debug('DLP found in VR==FD format in dcm[0x7005,0x1040] ({0}).'.format(dcm[0x7005, 0x1040].value))
                             else:
                                 info_dictionary['DLP'] = unpack('<d', ''.join(dcm[0x7005, 0x1040]))[0]
+                                logger.debug('DLP unpacked from dcm[0x7005,0x1040] ({0}).'.format(unpack('<d', ''.join(dcm[0x7005, 0x1040]))[0]))
                         except KeyError:
+                            logger.debug('There was a key error when finding DLP.')
                             pass
                         except TypeError:
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
 
                         acquisition_info.append(info_dictionary)
 
@@ -196,6 +282,8 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 # study_info['StudyDescription'] isn't present, so add it
                                 study_info['StudyDescription'] = dcm.StudyDescription
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
                     except AttributeError:
                         # dcm.StudyDescription isn't present. Try looking at the CodeMeaning of
                         # ProcedureCodeSequence instead
@@ -208,9 +296,15 @@ def _find_extra_info(dicom_path):
                                 except KeyError:
                                     # study_info['StudyDescription'] isn't present, so add it
                                     study_info['StudyDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
+                                except Exception as e:
+                                    logger.debug(traceback.format_exc())
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
+                    except Exception as e:
+                        logger.debug(traceback.format_exc())
 
                     try:
                         if dcm.RequestedProcedureDescription != '':
@@ -221,6 +315,8 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 # study_info['RequestedProcedureDescription'] doesn't exist yet, so create it
                                 study_info['RequestedProcedureDescription'] = dcm.RequestedProcedureDescription
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
                     except AttributeError:
                         # dcm.RequestedProcedureDescription isn't present. Try looking at the
                         # RequestedProcedureDescription of RequestAttributesSequence instead
@@ -233,16 +329,26 @@ def _find_extra_info(dicom_path):
                                 except KeyError:
                                     # study_info['RequestedProcedureDescription'] isn't present, so add it
                                     study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
+                                except Exception as e:
+                                    logger.debug(traceback.format_exc())
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
-
+                        except Exception as e:
+                            logger.debug(traceback.format_exc())
                 except AttributeError:
                     pass
+                except Exception as e:
+                    logger.debug(traceback.format_exc())
 
             except InvalidDicomError:
                 pass
+            except Exception as e:
+                logger.debug(traceback.format_exc())
 
+    logger.debug('Reached the end of _find_extra_info for images in {0}'.format(dicom_path))
+    logger.debug('study_info is: {0}'.format(study_info))
+    logger.debug('acquisition_info is: {0}'.format(acquisition_info))
     return [study_info, acquisition_info]
 
 
@@ -318,6 +424,8 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     except IOError as e:
         logger.debug('I/O error({0}): {1} when trying to read {2}'.format(e.errno, e.strerror, rdsr_file))
         return 0
+    except Exception as e:
+        logger.debug(traceback.format_exc())
 
     # Update the study-level information if it does not exist, or is an empty string.
     logger.debug('Updating study-level data')
@@ -329,6 +437,8 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                 setattr(dcm, key, val)
         except AttributeError:
             setattr(dcm, key, val)
+        except Exception as e:
+            logger.debug(traceback.format_exc())
     logger.debug('Study level data updated')
 
     # Now go through each CT Aquisition container in the rdsr file and see if any of the information should be updated.
@@ -336,9 +446,6 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     for container in dcm.ContentSequence:
         if container.ValueType == 'CONTAINER':
             if container.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
-                # print '###########################################'
-                # print container
-                # print '###########################################'
                 for container2 in container.ContentSequence:
                     # The Acquisition protocol would go in at this level I think
                     if container2.ValueType == 'CONTAINER':
@@ -362,471 +469,508 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                     if float(acquisition['CTDIvol']) == float(current_ctdi_vol) and float(acquisition['DLP']) == float(current_dlp):
                                         logger.debug('DLP and CTDIvol match')
                                         # There's a match between CTDIvol and DLP, so see if things can be updated or added.
-                                        for key, val in acquisition.items():
-                                            if key != 'CTDIvol' and key != 'DLP':
-                                                print key + ' -> ' + str(val)
-                                                ##############################################
-                                                # Code here to add / update the data...
-                                                coding = Dataset()
-                                                coding2 = Dataset()
-                                                if key == 'ProtocolName':
-                                                    # First, check if there is already a ProtocolName container that has a protocol in it.
-                                                    data_exists = False
-                                                    for container2b in container.ContentSequence:
-                                                        for container3b in container2b:
-                                                            try:
-                                                                if container3b[0].CodeValue == '125203':
-                                                                    data_exists = True
-                                                                    if container2b.TextValue == '':
-                                                                        # Update the protocol if it is blank
-                                                                        container2b.TextValue = val
-                                                            except AttributeError:
-                                                                pass
-                                                    if not data_exists:
-                                                        # If there is no protocol then add it
-                                                        #    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-                                                        #    (0040, a040) Value Type                          CS: 'TEXT'
-                                                        #    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-                                                        #       (0008, 0100) Code Value                          SH: '125203'
-                                                        #       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-                                                        #       (0008, 0104) Code Meaning                        LO: 'Acquisition Protocol'
-                                                        #       ---------
-                                                        #    (0040, a160) Text Value                          UT: 'TAP'
-                                                        # Create the inner coding bit
-                                                        coding.CodeValue = '125203'
-                                                        coding.CodingSchemeDesignator = "DCM"
-                                                        coding.CodeMeaning = "Acquisition Protocol"
-                                                        # Create the outer container bit, including the protocol name
-                                                        prot_container = Dataset()
-                                                        prot_container.RelationshipType = "CONTAINS"
-                                                        prot_container.ValueType = "TEXT"
-                                                        prot_container.TextValue = val
-                                                        # Add the coding sequence into the container.
-                                                        # Sequences are lists.
-                                                        prot_container.ConceptNameCodeSequence = Sequence([coding])
-                                                        container.ContentSequence.append(prot_container)
+                                        try:
+                                            for key, val in acquisition.items():
+                                                if key != 'CTDIvol' and key != 'DLP':
+                                                    logger.debug("{0} -> {1}".format(key, str(val)))
+                                                    ##############################################
+                                                    # Code here to add / update the data...
+                                                    coding = Dataset()
+                                                    coding2 = Dataset()
+                                                    if key == 'ProtocolName':
+                                                        # First, check if there is already a ProtocolName container that has a protocol in it.
+                                                        data_exists = False
+                                                        for container2b in container.ContentSequence:
+                                                            for container3b in container2b:
+                                                                try:
+                                                                    if container3b[0].CodeValue == '125203':
+                                                                        data_exists = True
+                                                                        if container2b.TextValue == '':
+                                                                            # Update the protocol if it is blank
+                                                                            container2b.TextValue = val
+                                                                except AttributeError:
+                                                                    pass
+                                                                except Exception as e:
+                                                                    logger.debug(traceback.format_exc())
 
-                                                if key == 'SpiralPitchFactor':
-                                                    # First, check if there is already a SpiralPitchFactor container that has a value in it.
-                                                    data_exists = False
+                                                        if not data_exists:
+                                                            # If there is no protocol then add it
+                                                            #    (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                            #    (0040, a040) Value Type                          CS: 'TEXT'
+                                                            #    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                            #       (0008, 0100) Code Value                          SH: '125203'
+                                                            #       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                            #       (0008, 0104) Code Meaning                        LO: 'Acquisition Protocol'
+                                                            #       ---------
+                                                            #    (0040, a160) Text Value                          UT: 'TAP'
+                                                            # Create the inner coding bit
+                                                            coding.CodeValue = '125203'
+                                                            coding.CodingSchemeDesignator = "DCM"
+                                                            coding.CodeMeaning = "Acquisition Protocol"
+                                                            # Create the outer container bit, including the protocol name
+                                                            prot_container = Dataset()
+                                                            prot_container.RelationshipType = "CONTAINS"
+                                                            prot_container.ValueType = "TEXT"
+                                                            prot_container.TextValue = val
+                                                            # Add the coding sequence into the container.
+                                                            # Sequences are lists.
+                                                            prot_container.ConceptNameCodeSequence = Sequence([coding])
+                                                            container.ContentSequence.append(prot_container)
 
-                                                    for container2b in container.ContentSequence:
-                                                        if container2b.ValueType == 'CONTAINER':
-                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                for container3b in container2b:
-                                                                    for container4b in container3b:
-                                                                        try:
-                                                                            if container4b.ConceptNameCodeSequence[0].CodeValue == '113828':
-                                                                                data_exists = True
-                                                                        except AttributeError:
-                                                                            pass
-                                                                if not data_exists:
-                                                                    # If there is no pitch then add it
-                                                                    #       ---------
-                                                                    #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-                                                                    #       (0040, a040) Value Type                          CS: 'NUM'
-                                                                    #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-                                                                    #          (0008, 0100) Code Value                          SH: '113828'
-                                                                    #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-                                                                    #          (0008, 0104) Code Meaning                        LO: 'Pitch Factor'
-                                                                    #          ---------
-                                                                    #       (0040, a300)  Measured Value Sequence   1 item(s) ----
-                                                                    #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-                                                                    #             (0008, 0100) Code Value                          SH: '{ratio}'
-                                                                    #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-                                                                    #             (0008, 0103) Coding Scheme Version               SH: '1.4'
-                                                                    #             (0008, 0104) Code Meaning                        LO: 'ratio'
-                                                                    #             ---------
-                                                                    #          (0040, a30a) Numeric Value                       DS: '0.6'
-                                                                    #          ---------
-                                                                    #       ---------
-                                                                    # Create the first inner coding bit
-                                                                    coding.CodeValue = '113828'
-                                                                    coding.CodingSchemeDesignator = "DCM"
-                                                                    coding.CodeMeaning = "Pitch Factor"
-                                                                    # Create the second inner coding bit
-                                                                    coding2.CodeValue = '{ratio}'
-                                                                    coding2.CodingSchemeDesignator = "UCUM"
-                                                                    coding2.CodingSchemeVersion = "1.4"
-                                                                    coding2.CodeMeaning = "ratio"
-                                                                    measurement_units_container = Dataset()
-                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
-                                                                    measurement_units_container.NumericValue = val
-                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                    # Create the outer container bit
-                                                                    pitch_container = Dataset()
-                                                                    pitch_container.RelationshipType = "CONTAINS"
-                                                                    pitch_container.ValueType = "NUM"
-                                                                    # Add the coding sequence into the container.
-                                                                    # Sequences are lists.
-                                                                    pitch_container.ConceptNameCodeSequence = Sequence([coding])
-                                                                    pitch_container.MeasuredValueSequence = measured_value_sequence
-                                                                    container2b.ContentSequence.append(pitch_container)
+                                                    if key == 'SpiralPitchFactor':
+                                                        # First, check if there is already a SpiralPitchFactor container that has a value in it.
+                                                        data_exists = False
 
-                                                if key == 'NominalSingleCollimationWidth':
-                                                    # First, check if there is already a NominalSingleCollimationWidth container that has a value in it.
-                                                    data_exists = False
+                                                        for container2b in container.ContentSequence:
+                                                            if container2b.ValueType == 'CONTAINER':
+                                                                if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                    for container3b in container2b:
+                                                                        for container4b in container3b:
+                                                                            try:
+                                                                                if container4b.ConceptNameCodeSequence[0].CodeValue == '113828':
+                                                                                    data_exists = True
+                                                                            except AttributeError:
+                                                                                pass
+                                                                            except Exception as e:
+                                                                                logger.debug(traceback.format_exc())
 
-                                                    for container2b in container.ContentSequence:
-                                                        if container2b.ValueType == 'CONTAINER':
-                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                for container3b in container2b:
-                                                                    for container4b in container3b:
-                                                                        try:
-                                                                            if container4b.ConceptNameCodeSequence[0].CodeValue == '113826':
-                                                                                data_exists = True
-                                                                        except AttributeError:
-                                                                            pass
-                                                                if not data_exists:
-                                                                    # If there is no NominalSingleCollimationWidth then add it
-                                                                    #       ---------
-                                                                    #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-                                                                    #       (0040, a040) Value Type                          CS: 'NUM'
-                                                                    #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-                                                                    #          (0008, 0100) Code Value                          SH: '113826'
-                                                                    #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-                                                                    #          (0008, 0104) Code Meaning                        LO: 'Nominal Single Collimation Width'
-                                                                    #          ---------
-                                                                    #       (0040, a300)  Measured Value Sequence   1 item(s) ----
-                                                                    #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-                                                                    #             (0008, 0100) Code Value                          SH: 'mm'
-                                                                    #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-                                                                    #             (0008, 0103) Coding Scheme Version               SH: '1.4'
-                                                                    #             (0008, 0104) Code Meaning                        LO: 'mm'
-                                                                    #             ---------
-                                                                    #          (0040, a30a) Numeric Value                       DS: '0.6'
-                                                                    #          ---------
-                                                                    #       ---------
-                                                                    # Create the first inner coding bit
-                                                                    coding.CodeValue = '113826'
-                                                                    coding.CodingSchemeDesignator = "DCM"
-                                                                    coding.CodeMeaning = "Nominal Single Collimation Width"
-                                                                    # Create the second inner coding bit
-                                                                    coding2.CodeValue = 'mm'
-                                                                    coding2.CodingSchemeDesignator = "UCUM"
-                                                                    coding2.CodingSchemeVersion = "1.4"
-                                                                    coding2.CodeMeaning = "mm"
-                                                                    measurement_units_container = Dataset()
-                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
-                                                                    measurement_units_container.NumericValue = val
-                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                    # Create the outer container bit
-                                                                    pitch_container = Dataset()
-                                                                    pitch_container.RelationshipType = "CONTAINS"
-                                                                    pitch_container.ValueType = "NUM"
-                                                                    # Add the coding sequence into the container.
-                                                                    # Sequences are lists.
-                                                                    pitch_container.ConceptNameCodeSequence = Sequence([coding])
-                                                                    pitch_container.MeasuredValueSequence = measured_value_sequence
-                                                                    container2b.ContentSequence.append(pitch_container)
+                                                                    if not data_exists:
+                                                                        # If there is no pitch then add it
+                                                                        #       ---------
+                                                                        #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                                        #       (0040, a040) Value Type                          CS: 'NUM'
+                                                                        #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                                        #          (0008, 0100) Code Value                          SH: '113828'
+                                                                        #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                                        #          (0008, 0104) Code Meaning                        LO: 'Pitch Factor'
+                                                                        #          ---------
+                                                                        #       (0040, a300)  Measured Value Sequence   1 item(s) ----
+                                                                        #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
+                                                                        #             (0008, 0100) Code Value                          SH: '{ratio}'
+                                                                        #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
+                                                                        #             (0008, 0103) Coding Scheme Version               SH: '1.4'
+                                                                        #             (0008, 0104) Code Meaning                        LO: 'ratio'
+                                                                        #             ---------
+                                                                        #          (0040, a30a) Numeric Value                       DS: '0.6'
+                                                                        #          ---------
+                                                                        #       ---------
+                                                                        # Create the first inner coding bit
+                                                                        coding.CodeValue = '113828'
+                                                                        coding.CodingSchemeDesignator = "DCM"
+                                                                        coding.CodeMeaning = "Pitch Factor"
+                                                                        # Create the second inner coding bit
+                                                                        coding2.CodeValue = '{ratio}'
+                                                                        coding2.CodingSchemeDesignator = "UCUM"
+                                                                        coding2.CodingSchemeVersion = "1.4"
+                                                                        coding2.CodeMeaning = "ratio"
+                                                                        measurement_units_container = Dataset()
+                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
+                                                                        measurement_units_container.NumericValue = val
+                                                                        measured_value_sequence = Sequence([measurement_units_container])
+                                                                        # Create the outer container bit
+                                                                        pitch_container = Dataset()
+                                                                        pitch_container.RelationshipType = "CONTAINS"
+                                                                        pitch_container.ValueType = "NUM"
+                                                                        # Add the coding sequence into the container.
+                                                                        # Sequences are lists.
+                                                                        pitch_container.ConceptNameCodeSequence = Sequence([coding])
+                                                                        pitch_container.MeasuredValueSequence = measured_value_sequence
+                                                                        container2b.ContentSequence.append(pitch_container)
 
-                                                if key == 'NominalTotalCollimationWidth':
-                                                    # First, check if there is already a NominalSingleCollimationWidth container that has a value in it.
-                                                    data_exists = False
+                                                    if key == 'NominalSingleCollimationWidth':
+                                                        # First, check if there is already a NominalSingleCollimationWidth container that has a value in it.
+                                                        data_exists = False
 
-                                                    for container2b in container.ContentSequence:
-                                                        if container2b.ValueType == 'CONTAINER':
-                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                for container3b in container2b:
-                                                                    for container4b in container3b:
-                                                                        try:
-                                                                            if container4b.ConceptNameCodeSequence[0].CodeValue == '113827':
-                                                                                data_exists = True
-                                                                        except AttributeError:
-                                                                            pass
-                                                                if not data_exists:
-                                                                    # If there is no NominalSingleCollimationWidth then add it
-                                                                    #       ---------
-                                                                    #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-                                                                    #       (0040, a040) Value Type                          CS: 'NUM'
-                                                                    #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-                                                                    #          (0008, 0100) Code Value                          SH: '113827'
-                                                                    #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-                                                                    #          (0008, 0104) Code Meaning                        LO: 'Nominal Total Collimation Width'
-                                                                    #          ---------
-                                                                    #       (0040, a300)  Measured Value Sequence   1 item(s) ----
-                                                                    #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-                                                                    #             (0008, 0100) Code Value                          SH: 'mm'
-                                                                    #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-                                                                    #             (0008, 0103) Coding Scheme Version               SH: '1.4'
-                                                                    #             (0008, 0104) Code Meaning                        LO: 'mm'
-                                                                    #             ---------
-                                                                    #          (0040, a30a) Numeric Value                       DS: '38.4'
-                                                                    #          ---------
-                                                                    #       ---------
-                                                                    # Create the first inner coding bit
-                                                                    coding.CodeValue = '113827'
-                                                                    coding.CodingSchemeDesignator = "DCM"
-                                                                    coding.CodeMeaning = "Nominal Total Collimation Width"
-                                                                    # Create the second inner coding bit
-                                                                    coding2.CodeValue = 'mm'
-                                                                    coding2.CodingSchemeDesignator = "UCUM"
-                                                                    coding2.CodingSchemeVersion = "1.4"
-                                                                    coding2.CodeMeaning = "mm"
-                                                                    measurement_units_container = Dataset()
-                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
-                                                                    measurement_units_container.NumericValue = val
-                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                    # Create the outer container bit
-                                                                    pitch_container = Dataset()
-                                                                    pitch_container.RelationshipType = "CONTAINS"
-                                                                    pitch_container.ValueType = "NUM"
-                                                                    # Add the coding sequence into the container.
-                                                                    # Sequences are lists.
-                                                                    pitch_container.ConceptNameCodeSequence = Sequence([coding])
-                                                                    pitch_container.MeasuredValueSequence = measured_value_sequence
-                                                                    container2b.ContentSequence.append(pitch_container)
+                                                        for container2b in container.ContentSequence:
+                                                            if container2b.ValueType == 'CONTAINER':
+                                                                if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                    for container3b in container2b:
+                                                                        for container4b in container3b:
+                                                                            try:
+                                                                                if container4b.ConceptNameCodeSequence[0].CodeValue == '113826':
+                                                                                    data_exists = True
+                                                                            except AttributeError:
+                                                                                pass
+                                                                    if not data_exists:
+                                                                        # If there is no NominalSingleCollimationWidth then add it
+                                                                        #       ---------
+                                                                        #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                                        #       (0040, a040) Value Type                          CS: 'NUM'
+                                                                        #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                                        #          (0008, 0100) Code Value                          SH: '113826'
+                                                                        #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                                        #          (0008, 0104) Code Meaning                        LO: 'Nominal Single Collimation Width'
+                                                                        #          ---------
+                                                                        #       (0040, a300)  Measured Value Sequence   1 item(s) ----
+                                                                        #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
+                                                                        #             (0008, 0100) Code Value                          SH: 'mm'
+                                                                        #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
+                                                                        #             (0008, 0103) Coding Scheme Version               SH: '1.4'
+                                                                        #             (0008, 0104) Code Meaning                        LO: 'mm'
+                                                                        #             ---------
+                                                                        #          (0040, a30a) Numeric Value                       DS: '0.6'
+                                                                        #          ---------
+                                                                        #       ---------
+                                                                        # Create the first inner coding bit
+                                                                        coding.CodeValue = '113826'
+                                                                        coding.CodingSchemeDesignator = "DCM"
+                                                                        coding.CodeMeaning = "Nominal Single Collimation Width"
+                                                                        # Create the second inner coding bit
+                                                                        coding2.CodeValue = 'mm'
+                                                                        coding2.CodingSchemeDesignator = "UCUM"
+                                                                        coding2.CodingSchemeVersion = "1.4"
+                                                                        coding2.CodeMeaning = "mm"
+                                                                        measurement_units_container = Dataset()
+                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
+                                                                        measurement_units_container.NumericValue = val
+                                                                        measured_value_sequence = Sequence(
+                                                                            [measurement_units_container])
+                                                                        # Create the outer container bit
+                                                                        pitch_container = Dataset()
+                                                                        pitch_container.RelationshipType = "CONTAINS"
+                                                                        pitch_container.ValueType = "NUM"
+                                                                        # Add the coding sequence into the container.
+                                                                        # Sequences are lists.
+                                                                        pitch_container.ConceptNameCodeSequence = Sequence([coding])
+                                                                        pitch_container.MeasuredValueSequence = measured_value_sequence
+                                                                        container2b.ContentSequence.append(pitch_container)
 
-                                                if key == 'ExposureModulationType':
-                                                    # First, check if there is already an ExposureModulationType container that has a value in it.
-                                                    data_exists = False
-                                                    for container2b in container.ContentSequence:
-                                                        for container3b in container2b:
-                                                            try:
-                                                                if container3b[0].CodeValue == '113842':
-                                                                    data_exists = True
-                                                                    if container2b.TextValue == '':
-                                                                        # Update the X-Ray Modulation Type if it is blank
-                                                                        container2b.TextValue = val
-                                                            except AttributeError:
-                                                                pass
-                                                    if not data_exists:
-                                                        # Create the inner coding bit
-                                                        coding.CodeValue = '113842'
-                                                        coding.CodingSchemeDesignator = "DCM"
-                                                        coding.CodeMeaning = "X-Ray Modulation Type"
-                                                        # Create the outer container bit, including the protocol name
-                                                        prot_container = Dataset()
-                                                        prot_container.RelationshipType = "CONTAINS"
-                                                        prot_container.ValueType = "TEXT"
-                                                        prot_container.TextValue = val
-                                                        # Add the coding sequence into the container.
-                                                        # Sequences are lists.
-                                                        prot_container.ConceptNameCodeSequence = Sequence([coding])
-                                                        container.ContentSequence.append(prot_container)
+                                                    if key == 'NominalTotalCollimationWidth':
+                                                        # First, check if there is already a NominalSingleCollimationWidth container that has a value in it.
+                                                        data_exists = False
 
-                                                if key == 'KVP':
-                                                    # First, check if there is already a kVp value in an x-ray source parameters container inside
-                                                    # a CT Acquisition Parameters container
-                                                    source_parameters_exists = False
-                                                    kvp_data_exists = False
+                                                        for container2b in container.ContentSequence:
+                                                            if container2b.ValueType == 'CONTAINER':
+                                                                if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
+                                                                    for container3b in container2b:
+                                                                        for container4b in container3b:
+                                                                            try:
+                                                                                if container4b.ConceptNameCodeSequence[0].CodeValue == '113827':
+                                                                                    data_exists = True
+                                                                            except AttributeError:
+                                                                                pass
+                                                                            except Exception as e:
+                                                                                logger.debug(traceback.format_exc())
 
-                                                    for container2b in container.ContentSequence:
-                                                        if container2b.ValueType == 'CONTAINER':
-                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                for container3b in container2b:
-                                                                    for container4b in container3b:
-                                                                        try:
-                                                                            if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
-                                                                                source_parameters_exists = True
+                                                                    if not data_exists:
+                                                                        # If there is no NominalSingleCollimationWidth then add it
+                                                                        #       ---------
+                                                                        #       (0040, a010) Relationship Type                   CS: 'CONTAINS'
+                                                                        #       (0040, a040) Value Type                          CS: 'NUM'
+                                                                        #       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
+                                                                        #          (0008, 0100) Code Value                          SH: '113827'
+                                                                        #          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+                                                                        #          (0008, 0104) Code Meaning                        LO: 'Nominal Total Collimation Width'
+                                                                        #          ---------
+                                                                        #       (0040, a300)  Measured Value Sequence   1 item(s) ----
+                                                                        #          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
+                                                                        #             (0008, 0100) Code Value                          SH: 'mm'
+                                                                        #             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
+                                                                        #             (0008, 0103) Coding Scheme Version               SH: '1.4'
+                                                                        #             (0008, 0104) Code Meaning                        LO: 'mm'
+                                                                        #             ---------
+                                                                        #          (0040, a30a) Numeric Value                       DS: '38.4'
+                                                                        #          ---------
+                                                                        #       ---------
+                                                                        # Create the first inner coding bit
+                                                                        coding.CodeValue = '113827'
+                                                                        coding.CodingSchemeDesignator = "DCM"
+                                                                        coding.CodeMeaning = "Nominal Total Collimation Width"
+                                                                        # Create the second inner coding bit
+                                                                        coding2.CodeValue = 'mm'
+                                                                        coding2.CodingSchemeDesignator = "UCUM"
+                                                                        coding2.CodingSchemeVersion = "1.4"
+                                                                        coding2.CodeMeaning = "mm"
+                                                                        measurement_units_container = Dataset()
+                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding2])
+                                                                        measurement_units_container.NumericValue = val
+                                                                        measured_value_sequence = Sequence([measurement_units_container])
+                                                                        # Create the outer container bit
+                                                                        pitch_container = Dataset()
+                                                                        pitch_container.RelationshipType = "CONTAINS"
+                                                                        pitch_container.ValueType = "NUM"
+                                                                        # Add the coding sequence into the container.
+                                                                        # Sequences are lists.
+                                                                        pitch_container.ConceptNameCodeSequence = Sequence([coding])
+                                                                        pitch_container.MeasuredValueSequence = measured_value_sequence
+                                                                        container2b.ContentSequence.append(pitch_container)
 
-                                                                                for container5b in container4b:
-                                                                                    try:
-                                                                                        if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113733':
-                                                                                            kvp_data_exists = True
-                                                                                    except AttributeError:
-                                                                                        pass
-                                                                        except AttributeError:
-                                                                            # Likely there's no ConceptNameCodeSequence attribute
-                                                                            pass
+                                                    if key == 'ExposureModulationType':
+                                                        # First, check if there is already an ExposureModulationType container that has a value in it.
+                                                        data_exists = False
+                                                        for container2b in container.ContentSequence:
+                                                            for container3b in container2b:
+                                                                try:
+                                                                    if container3b[0].CodeValue == '113842':
+                                                                        data_exists = True
+                                                                        if container2b.TextValue == '':
+                                                                            # Update the X-Ray Modulation Type if it is blank
+                                                                            container2b.TextValue = val
+                                                                except AttributeError:
+                                                                    pass
+                                                                except Exception as e:
+                                                                    logger.debug(traceback.format_exc())
 
-                                                                if not source_parameters_exists:
-                                                                    # There is no x-ray source parameters section, so add it
-                                                                    # Create the x-ray source container
-                                                                    source_container = Dataset()
-                                                                    source_container.RelationshipType = "CONTAINS"
-                                                                    source_container.ValueType = "CONTAINER"
-                                                                    coding = Dataset()
-                                                                    coding.CodeValue = '113831'
-                                                                    coding.CodingSchemeDesignator = "DCM"
-                                                                    coding.CodeMeaning = "CT X-Ray Source Parameters"
-                                                                    source_container.ConceptNameCodeSequence = Sequence([coding])
+                                                        if not data_exists:
+                                                            # Create the inner coding bit
+                                                            coding.CodeValue = '113842'
+                                                            coding.CodingSchemeDesignator = "DCM"
+                                                            coding.CodeMeaning = "X-Ray Modulation Type"
+                                                            # Create the outer container bit, including the protocol name
+                                                            prot_container = Dataset()
+                                                            prot_container.RelationshipType = "CONTAINS"
+                                                            prot_container.ValueType = "TEXT"
+                                                            prot_container.TextValue = val
+                                                            # Add the coding sequence into the container.
+                                                            # Sequences are lists.
+                                                            prot_container.ConceptNameCodeSequence = Sequence([coding])
+                                                            container.ContentSequence.append(prot_container)
 
-                                                                    # Create the kVp container that will go in to the x-ray source container
-                                                                    kvp_container = Dataset()
-                                                                    kvp_container.RelationshipType = "CONTAINS"
-                                                                    kvp_container.ValueType = "NUM"
-                                                                    coding2 = Dataset()
-                                                                    coding2.CodeValue = '113733'
-                                                                    coding2.CodingSchemeDesignator = "DCM"
-                                                                    coding2.CodeMeaning = "KVP"
-                                                                    kvp_container.ConceptNameCodeSequence = Sequence([coding2])
-                                                                    coding3 = Dataset()
-                                                                    coding3.CodeValue = 'kV'
-                                                                    coding3.CodingSchemeDesignator = "UCUM"
-                                                                    coding3.CodingSchemeVersion = "1.4"
-                                                                    coding3.CodeMeaning = "kV"
-                                                                    measurement_units_container = Dataset()
-                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
-                                                                    measurement_units_container.NumericValue = val
-                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                    kvp_container.MeasuredValueSequence = measured_value_sequence
+                                                    if key == 'KVP':
+                                                        # First, check if there is already a kVp value in an x-ray source parameters container inside
+                                                        # a CT Acquisition Parameters container
+                                                        source_parameters_exists = False
+                                                        kvp_data_exists = False
 
-                                                                    # Put the kVp container inside the x-ray source container
-                                                                    source_container.ContentSequence = Sequence([kvp_container])
-
-                                                                    # Add the source_container to the rdsr contents
-                                                                    try:
-                                                                        # Append it to an existing ContentSequence
-                                                                        container2b.ContentSequence.append(source_container)
-                                                                    except TypeError:
-                                                                        # ContentSequence doesn't exist, so add it
-                                                                        container2b.ContentSequence = Sequence([source_container])
-
-                                                                    source_parameters_exists = True
-                                                                    kvp_data_exists = True
-
-                                                                elif not kvp_data_exists:
-                                                                    # CT X-ray Source Parameters exists, but there is no kVp data
+                                                        for container2b in container.ContentSequence:
+                                                            if container2b.ValueType == 'CONTAINER':
+                                                                if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
                                                                     for container3b in container2b:
                                                                         for container4b in container3b:
                                                                             try:
                                                                                 if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
-                                                                                    # Create the kVp container that will go in to the x-ray source container
-                                                                                    kvp_container = Dataset()
-                                                                                    kvp_container.RelationshipType = "CONTAINS"
-                                                                                    kvp_container.ValueType = "NUM"
-                                                                                    coding2 = Dataset()
-                                                                                    coding2.CodeValue = '113733'
-                                                                                    coding2.CodingSchemeDesignator = "DCM"
-                                                                                    coding2.CodeMeaning = "KVP"
-                                                                                    kvp_container.ConceptNameCodeSequence = Sequence([coding2])
-                                                                                    coding3 = Dataset()
-                                                                                    coding3.CodeValue = 'kV'
-                                                                                    coding3.CodingSchemeDesignator = "UCUM"
-                                                                                    coding3.CodingSchemeVersion = "1.4"
-                                                                                    coding3.CodeMeaning = "kV"
-                                                                                    measurement_units_container = Dataset()
-                                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
-                                                                                    measurement_units_container.NumericValue = val
-                                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                                    kvp_container.MeasuredValueSequence = measured_value_sequence
+                                                                                    source_parameters_exists = True
 
-                                                                                    # Add the kVp container inside the x-ray source container
-                                                                                    container4b.ContentSequence.append(kvp_container)
-
-                                                                                    kvp_data_exists = True
-
+                                                                                    for container5b in container4b:
+                                                                                        try:
+                                                                                            if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113733':
+                                                                                                kvp_data_exists = True
+                                                                                        except AttributeError:
+                                                                                            pass
+                                                                                        except Exception as e:
+                                                                                            logger.debug(traceback.format_exc())
                                                                             except AttributeError:
                                                                                 # Likely there's no ConceptNameCodeSequence attribute
                                                                                 pass
+                                                                            except Exception as e:
+                                                                                logger.debug(traceback.format_exc())
 
-                                                if key == 'ExposureTime':
-                                                    # First, check if there is already an exposure time per rotation value in an x-ray source parameters container inside
-                                                    # a CT Acquisition Parameters container.
-                                                    source_parameters_exists = False
-                                                    exposure_time_per_rotation_data_exists = False
+                                                                    if not source_parameters_exists:
+                                                                        # There is no x-ray source parameters section, so add it
+                                                                        # Create the x-ray source container
+                                                                        source_container = Dataset()
+                                                                        source_container.RelationshipType = "CONTAINS"
+                                                                        source_container.ValueType = "CONTAINER"
+                                                                        coding = Dataset()
+                                                                        coding.CodeValue = '113831'
+                                                                        coding.CodingSchemeDesignator = "DCM"
+                                                                        coding.CodeMeaning = "CT X-Ray Source Parameters"
+                                                                        source_container.ConceptNameCodeSequence = Sequence([coding])
 
-                                                    for container2b in container.ContentSequence:
-                                                        if container2b.ValueType == 'CONTAINER':
-                                                            if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
-                                                                for container3b in container2b:
-                                                                    for container4b in container3b:
+                                                                        # Create the kVp container that will go in to the x-ray source container
+                                                                        kvp_container = Dataset()
+                                                                        kvp_container.RelationshipType = "CONTAINS"
+                                                                        kvp_container.ValueType = "NUM"
+                                                                        coding2 = Dataset()
+                                                                        coding2.CodeValue = '113733'
+                                                                        coding2.CodingSchemeDesignator = "DCM"
+                                                                        coding2.CodeMeaning = "KVP"
+                                                                        kvp_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                        coding3 = Dataset()
+                                                                        coding3.CodeValue = 'kV'
+                                                                        coding3.CodingSchemeDesignator = "UCUM"
+                                                                        coding3.CodingSchemeVersion = "1.4"
+                                                                        coding3.CodeMeaning = "kV"
+                                                                        measurement_units_container = Dataset()
+                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                        measurement_units_container.NumericValue = val
+                                                                        measured_value_sequence = Sequence([measurement_units_container])
+                                                                        kvp_container.MeasuredValueSequence = measured_value_sequence
+
+                                                                        # Put the kVp container inside the x-ray source container
+                                                                        source_container.ContentSequence = Sequence([kvp_container])
+
+                                                                        # Add the source_container to the rdsr contents
                                                                         try:
-                                                                            if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
-                                                                                source_parameters_exists = True
+                                                                            # Append it to an existing ContentSequence
+                                                                            container2b.ContentSequence.append(source_container)
+                                                                        except TypeError:
+                                                                            # ContentSequence doesn't exist, so add it
+                                                                            container2b.ContentSequence = Sequence([source_container])
+                                                                        except Exception as e:
+                                                                            logger.debug(traceback.format_exc())
 
-                                                                                for container5b in container4b:
-                                                                                    try:
-                                                                                        if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113843':
-                                                                                            exposure_time_per_rotation_data_exists = True
-                                                                                    except AttributeError:
-                                                                                        pass
-                                                                        except AttributeError:
-                                                                            # Likely there's no ConceptNameCodeSequence attribute
-                                                                            pass
+                                                                        source_parameters_exists = True
+                                                                        kvp_data_exists = True
 
-                                                                if not source_parameters_exists:
-                                                                    # There is no x-ray source parameters section, so add it
-                                                                    # Create the x-ray source container
-                                                                    source_container = Dataset()
-                                                                    source_container.RelationshipType = "CONTAINS"
-                                                                    source_container.ValueType = "CONTAINER"
-                                                                    coding = Dataset()
-                                                                    coding.CodeValue = '113831'
-                                                                    coding.CodingSchemeDesignator = "DCM"
-                                                                    coding.CodeMeaning = "CT X-Ray Source Parameters"
-                                                                    source_container.ConceptNameCodeSequence = Sequence([coding])
+                                                                    elif not kvp_data_exists:
+                                                                        # CT X-ray Source Parameters exists, but there is no kVp data
+                                                                        for container3b in container2b:
+                                                                            for container4b in container3b:
+                                                                                try:
+                                                                                    if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
+                                                                                        # Create the kVp container that will go in to the x-ray source container
+                                                                                        kvp_container = Dataset()
+                                                                                        kvp_container.RelationshipType = "CONTAINS"
+                                                                                        kvp_container.ValueType = "NUM"
+                                                                                        coding2 = Dataset()
+                                                                                        coding2.CodeValue = '113733'
+                                                                                        coding2.CodingSchemeDesignator = "DCM"
+                                                                                        coding2.CodeMeaning = "KVP"
+                                                                                        kvp_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                                        coding3 = Dataset()
+                                                                                        coding3.CodeValue = 'kV'
+                                                                                        coding3.CodingSchemeDesignator = "UCUM"
+                                                                                        coding3.CodingSchemeVersion = "1.4"
+                                                                                        coding3.CodeMeaning = "kV"
+                                                                                        measurement_units_container = Dataset()
+                                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                                        measurement_units_container.NumericValue = val
+                                                                                        measured_value_sequence = Sequence([measurement_units_container])
+                                                                                        kvp_container.MeasuredValueSequence = measured_value_sequence
 
-                                                                    # Create the kVp container that will go in to the x-ray source container
-                                                                    exposure_time_per_rotation_container = Dataset()
-                                                                    exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
-                                                                    exposure_time_per_rotation_container.ValueType = "NUM"
-                                                                    coding2 = Dataset()
-                                                                    coding2.CodeValue = '113843'
-                                                                    coding2.CodingSchemeDesignator = "DCM"
-                                                                    coding2.CodeMeaning = "Exposure Time per Rotation"
-                                                                    exposure_time_per_rotation_container.ConceptNameCodeSequence = Sequence([coding2])
-                                                                    coding3 = Dataset()
-                                                                    coding3.CodeValue = 's'
-                                                                    coding3.CodingSchemeDesignator = "UCUM"
-                                                                    coding3.CodingSchemeVersion = "1.4"
-                                                                    coding3.CodeMeaning = "s"
-                                                                    measurement_units_container = Dataset()
-                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
-                                                                    measurement_units_container.NumericValue = str(float(val) / 1000)
-                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                    exposure_time_per_rotation_container.MeasuredValueSequence = measured_value_sequence
+                                                                                        # Add the kVp container inside the x-ray source container
+                                                                                        container4b.ContentSequence.append(kvp_container)
 
-                                                                    # Put the exposure time per rotation container inside the x-ray source container
-                                                                    source_container.ContentSequence = Sequence([exposure_time_per_rotation_container])
+                                                                                        kvp_data_exists = True
 
-                                                                    # Add the source_container to the rdsr contents
-                                                                    try:
-                                                                        # Append it to an existing ContentSequence
-                                                                        container2b.ContentSequence.append(source_container)
-                                                                    except TypeError:
-                                                                        # ContentSequence doesn't exist, so add it
-                                                                        container2b.ContentSequence = Sequence([source_container])
+                                                                                except AttributeError:
+                                                                                    # Likely there's no ConceptNameCodeSequence attribute
+                                                                                    pass
+                                                                                except Exception as e:
+                                                                                    logger.debug(traceback.format_exc())
 
-                                                                    source_parameters_exists = True
-                                                                    exposure_time_per_rotation_data_exists = True
+                                                    if key == 'ExposureTime':
+                                                        # First, check if there is already an exposure time per rotation value in an x-ray source parameters container inside
+                                                        # a CT Acquisition Parameters container.
+                                                        source_parameters_exists = False
+                                                        exposure_time_per_rotation_data_exists = False
 
-                                                                elif not exposure_time_per_rotation_data_exists:
-                                                                    # CT X-ray Source Parameters exists, but there is no exposure time per rotation data
+                                                        for container2b in container.ContentSequence:
+                                                            if container2b.ValueType == 'CONTAINER':
+                                                                if container2b.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition Parameters':
                                                                     for container3b in container2b:
                                                                         for container4b in container3b:
                                                                             try:
                                                                                 if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
-                                                                                    # Create the exposure time per rotation container that will go in to the x-ray source container
-                                                                                    exposure_time_per_rotation_container = Dataset()
-                                                                                    exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
-                                                                                    exposure_time_per_rotation_container.ValueType = "NUM"
-                                                                                    coding2 = Dataset()
-                                                                                    coding2.CodeValue = '113843'
-                                                                                    coding2.CodingSchemeDesignator = "DCM"
-                                                                                    coding2.CodeMeaning = "Exposure Time per Rotation"
-                                                                                    exposure_time_per_rotation_container.ConceptNameCodeSequence = Sequence([coding2])
-                                                                                    coding3 = Dataset()
-                                                                                    coding3.CodeValue = 's'
-                                                                                    coding3.CodingSchemeDesignator = "UCUM"
-                                                                                    coding3.CodingSchemeVersion = "1.4"
-                                                                                    coding3.CodeMeaning = "s"
-                                                                                    measurement_units_container = Dataset()
-                                                                                    measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
-                                                                                    measurement_units_container.NumericValue = str(float(val) / 1000)
-                                                                                    measured_value_sequence = Sequence([measurement_units_container])
-                                                                                    exposure_time_per_rotation_container.MeasuredValueSequence = measured_value_sequence
+                                                                                    source_parameters_exists = True
 
-                                                                                    # Add the exposure time per rotation container inside the x-ray source container
-                                                                                    container4b.ContentSequence.append(exposure_time_per_rotation_container)
-
-                                                                                    exposure_time_per_rotation_data_exists = True
-
+                                                                                    for container5b in container4b:
+                                                                                        try:
+                                                                                            if container5b[0].ConceptNameCodeSequence[0].CodeValue == '113843':
+                                                                                                exposure_time_per_rotation_data_exists = True
+                                                                                        except AttributeError:
+                                                                                            pass
+                                                                                        except Exception as e:
+                                                                                            logger.debug(traceback.format_exc())
                                                                             except AttributeError:
                                                                                 # Likely there's no ConceptNameCodeSequence attribute
                                                                                 pass
+                                                                            except Exception as e:
+                                                                                logger.debug(traceback.format_exc())
 
-                                    # The end of updating the RDSR
-                                    ##############################################
+                                                                    if not source_parameters_exists:
+                                                                        # There is no x-ray source parameters section, so add it
+                                                                        # Create the x-ray source container
+                                                                        source_container = Dataset()
+                                                                        source_container.RelationshipType = "CONTAINS"
+                                                                        source_container.ValueType = "CONTAINER"
+                                                                        coding = Dataset()
+                                                                        coding.CodeValue = '113831'
+                                                                        coding.CodingSchemeDesignator = "DCM"
+                                                                        coding.CodeMeaning = "CT X-Ray Source Parameters"
+                                                                        source_container.ConceptNameCodeSequence = Sequence([coding])
+
+                                                                        # Create the kVp container that will go in to the x-ray source container
+                                                                        exposure_time_per_rotation_container = Dataset()
+                                                                        exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
+                                                                        exposure_time_per_rotation_container.ValueType = "NUM"
+                                                                        coding2 = Dataset()
+                                                                        coding2.CodeValue = '113843'
+                                                                        coding2.CodingSchemeDesignator = "DCM"
+                                                                        coding2.CodeMeaning = "Exposure Time per Rotation"
+                                                                        exposure_time_per_rotation_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                        coding3 = Dataset()
+                                                                        coding3.CodeValue = 's'
+                                                                        coding3.CodingSchemeDesignator = "UCUM"
+                                                                        coding3.CodingSchemeVersion = "1.4"
+                                                                        coding3.CodeMeaning = "s"
+                                                                        measurement_units_container = Dataset()
+                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                        measurement_units_container.NumericValue = str(float(val) / 1000)
+                                                                        measured_value_sequence = Sequence([measurement_units_container])
+                                                                        exposure_time_per_rotation_container.MeasuredValueSequence = measured_value_sequence
+
+                                                                        # Put the exposure time per rotation container inside the x-ray source container
+                                                                        source_container.ContentSequence = Sequence([exposure_time_per_rotation_container])
+
+                                                                        # Add the source_container to the rdsr contents
+                                                                        try:
+                                                                            # Append it to an existing ContentSequence
+                                                                            container2b.ContentSequence.append(source_container)
+                                                                        except TypeError:
+                                                                            # ContentSequence doesn't exist, so add it
+                                                                            container2b.ContentSequence = Sequence([source_container])
+                                                                        except Exception as e:
+                                                                            logger.debug(traceback.format_exc())
+
+                                                                        source_parameters_exists = True
+                                                                        exposure_time_per_rotation_data_exists = True
+
+                                                                    elif not exposure_time_per_rotation_data_exists:
+                                                                        # CT X-ray Source Parameters exists, but there is no exposure time per rotation data
+                                                                        for container3b in container2b:
+                                                                            for container4b in container3b:
+                                                                                try:
+                                                                                    if container4b.ConceptNameCodeSequence[0].CodeMeaning == 'CT X-Ray Source Parameters':
+                                                                                        # Create the exposure time per rotation container that will go in to the x-ray source container
+                                                                                        exposure_time_per_rotation_container = Dataset()
+                                                                                        exposure_time_per_rotation_container.RelationshipType = "CONTAINS"
+                                                                                        exposure_time_per_rotation_container.ValueType = "NUM"
+                                                                                        coding2 = Dataset()
+                                                                                        coding2.CodeValue = '113843'
+                                                                                        coding2.CodingSchemeDesignator = "DCM"
+                                                                                        coding2.CodeMeaning = "Exposure Time per Rotation"
+                                                                                        exposure_time_per_rotation_container.ConceptNameCodeSequence = Sequence([coding2])
+                                                                                        coding3 = Dataset()
+                                                                                        coding3.CodeValue = 's'
+                                                                                        coding3.CodingSchemeDesignator = "UCUM"
+                                                                                        coding3.CodingSchemeVersion = "1.4"
+                                                                                        coding3.CodeMeaning = "s"
+                                                                                        measurement_units_container = Dataset()
+                                                                                        measurement_units_container.MeasurementUnitsCodeSequence = Sequence([coding3])
+                                                                                        measurement_units_container.NumericValue = str(float(val) / 1000)
+                                                                                        measured_value_sequence = Sequence([measurement_units_container])
+                                                                                        exposure_time_per_rotation_container.MeasuredValueSequence = measured_value_sequence
+
+                                                                                        # Add the exposure time per rotation container inside the x-ray source container
+                                                                                        container4b.ContentSequence.append(exposure_time_per_rotation_container)
+
+                                                                                        exposure_time_per_rotation_data_exists = True
+
+                                                                                except AttributeError:
+                                                                                    # Likely there's no ConceptNameCodeSequence attribute
+                                                                                    pass
+                                                                                except Exception as e:
+                                                                                    logger.debug(traceback.format_exc())
+                                        except KeyError, e:
+                                            logger.debug(traceback.format_exc())
+                                            pass
+                                        except Exception, e:
+                                            logger.debug(traceback.format_exc())
+                                            pass
+                                            # The end of updating the RDSR
+                                            ##############################################
                                 except KeyError:
                                     # Either CTDIvol or DLP data is not present
                                     pass
                                 except ValueError:
                                     # Perhaps the contents of the DLP or CTDIvol are not values
                                     pass
-    logger.debug('Updated acquisition data')
+                                except Exception as e:
+                                    logger.debug(traceback.format_exc())
 
+    logger.debug('Updated acquisition data')
     logger.debug('Saving updated RDSR file')
     dcm.save_as(new_rdsr_file)
     logger.debug('Updated RDSR file saved')
@@ -835,8 +979,12 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
 
 @shared_task
 def rdsr_toshiba_ct_from_dose_images(folder_name):
+    import dicom
+
     rdsr_name = 'sr.dcm'
     updated_rdsr_name = 'sr_updated.dcm'
+    seriesNumber = '9000'
+    combined_rdsr_name = 'sr_combined.dcm'
 
     # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
     # first dose summary image it finds. Splitting the files by StudyInstanceUID should mean that there is only one
@@ -848,45 +996,145 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
 
     # Obtain additional information from the image tags in each folder and add this information to the RDSR file.
     for folder in folders:
-        # Make all the DICOM objects explicit VR little endian. This is required by dcmmkdir.
-        # print 'Making explicit VR little endian'
-        # _make_explicit_vr_little_endian(folder, DCMCONV)
 
-        # Now create a DICOMDIR for each sub-folder using dcmmkdir.
-        # This is required by pixelmed.jar when creating RDSRs.
-        # print 'Creating DICOMDIR files'
-        # _make_dicomdir(folder, DCMMKDIR)
+        # Check to see if there's just one dose summary in the folder
+        doseSummaryObjectInfo = find_dose_summary_objects(folder, seriesNumber)
+        logger.debug("doseSummaryObjectInfo is {0}".format(doseSummaryObjectInfo))
 
-        # Create a DICOM RDSR for the sub-folder using pixelmed.jar.
-        logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(folder))
-        combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
-        _make_dicom_rdsr(folder, combined_command, rdsr_name)
-        logger.debug('Initial DICOM RDSR object created in {0}'.format(folder))
+        # For Toshiba scanners each dose summary consistes of two objects
+        numberOfDoseSummaryObjects = len(doseSummaryObjectInfo) // 2
 
-        logger.debug('Gathering extra information from images in {0}'.format(folder))
-        extra_information = _find_extra_info(folder)
-        extra_study_information = extra_information[0]
-        print 'Extra study information is:'
-        print extra_study_information
-        extra_acquisition_information = extra_information[1]
-        print 'Extra acquisition information is:'
-        print extra_acquisition_information
-        logger.debug('Gathered extra information from images in {0}'.format(folder))
+        if numberOfDoseSummaryObjects > 1:
+            # There's more than one pair of dose summary objects, so duplicate the
+            # contents of folder numberOfDoseSummaryObjects times.
+            uniqueStudyTimes = {item["studyTime"] for item in doseSummaryObjectInfo}
+            subfolderPaths = []
+            for uniqueStudyTime in uniqueStudyTimes:
+                subfolderPath = os.path.join(folder, uniqueStudyTime)
+                subfolderPaths.append(subfolderPath)
+                if not os.path.isdir(subfolderPath):
+                    os.mkdir(subfolderPath)
+                copy_files_from_a_to_b(folder, subfolderPath)
 
-        # Use the extra information to update the initial rdsr file created by DoseUtility
-        logger.debug('Updating information in rdsr in {0}'.format(folder))
-        initial_rdsr_name_and_path = os.path.join(folder, rdsr_name)
-        updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
-        result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information, extra_acquisition_information, updated_rdsr_name_and_path)
-        logger.debug('Updated information in rdsr')
+            # Delete all but one pair of dose summary objects from each subfolder
+            for uniqueStudyTime in uniqueStudyTimes:
+                for doseSummaryObject in doseSummaryObjectInfo:
+                    if doseSummaryObject["studyTime"] != uniqueStudyTime:
+                        # Delete the corresponding doseSummaryObject file from the
+                        # x subfolder in folder
+                        os.remove(os.path.join(folder, uniqueStudyTime, doseSummaryObject["fileName"]))
 
-        # Now import the updated rdsr into OpenREM using the Toshiba extractor
-        if result == 1:
-            logger.debug('Importing updated rdsr in to OpenREM ({0})'.format(updated_rdsr_name_and_path))
-            rdsr(updated_rdsr_name_and_path)
+            # Now create an RDSR in each subfolder in subfolderPaths
+            for subFolder in subfolderPaths:
+                # Create a DICOM RDSR for the sub-folder using pixelmed.jar.
+                logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(subFolder))
+                combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
+                _make_dicom_rdsr(subFolder, combined_command, rdsr_name)
+                logger.debug('Initial DICOM RDSR object created in {0}'.format(subFolder))
+
+                logger.debug('Gathering extra information from images in {0}'.format(subFolder))
+                extra_information = _find_extra_info(subFolder)
+                extra_study_information = extra_information[0]
+                extra_acquisition_information = extra_information[1]
+                logger.debug('Gathered extra information from images in {0}'.format(subFolder))
+
+                # Use the extra information to update the initial rdsr file created by DoseUtility
+                logger.debug('Updating information in rdsr in {0}'.format(subFolder))
+                initial_rdsr_name_and_path = os.path.join(subFolder, rdsr_name)
+                updated_rdsr_name_and_path = os.path.join(subFolder, updated_rdsr_name)
+                result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information, extra_acquisition_information, updated_rdsr_name_and_path)
+                logger.debug('Updated information in rdsr')
+
+            # Now combine the data contained in the RDSRs
+            firstSubfolder = True
+            for subFolder in subfolderPaths:
+                if firstSubfolder == True:
+                    shutil.copy(os.path.join(subFolder, updated_rdsr_name), os.path.join(folder, combined_rdsr_name))
+                    combinedRDSR = dicom.read_file(os.path.join(folder, combined_rdsr_name))
+                    for contentSequence in combinedRDSR.ContentSequence:
+                        if contentSequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
+                            combinedRDSRAccumulatedDoseData = contentSequence
+                    firstSubfolder = False
+                else:
+                    currentRDSR = dicom.read_file(os.path.join(subFolder, updated_rdsr_name))
+                    for contentSequence in currentRDSR.ContentSequence:
+                        if contentSequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
+                            combinedRDSR.ContentSequence.append(contentSequence)
+                        if contentSequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
+                            # Total Number of Irradiation Events
+                            logger.debug("Trying to update total number of irradiation events")
+                            for item in contentSequence.ContentSequence:
+                                if item.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
+                                    additionalAmount = item.MeasuredValueSequence[0].NumericValue
+                                    logger.debug("Found extra events: {0}".format(additionalAmount))
+                            for item in combinedRDSRAccumulatedDoseData.ContentSequence:
+                                if item.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
+                                    logger.debug("Found current events: {0}".format(item.MeasuredValueSequence[0].NumericValue))
+                                    item.MeasuredValueSequence[0].NumericValue = str(int(item.MeasuredValueSequence[0].NumericValue + additionalAmount))
+                                    logger.debug("updated to: {0}".format(item.MeasuredValueSequence[0].NumericValue))
+
+                            # CT Dose Length Product Total
+                            logger.debug("Trying to update total DLP")
+                            for contentSeq in contentSequence.ContentSequence:
+                                if contentSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
+                                    additionalAmount = contentSeq.MeasuredValueSequence[0].NumericValue
+                                    logger.debug("Found extra DLP: {0}".format(additionalAmount))
+                                    # Find out which dosimetry phantom this value is for
+                                    for contSeq in contentSeq.ContentSequence:
+                                        if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                                            additionalType = contSeq.ConceptCodeSequence[0].CodeMeaning
+
+                            for contentSeq in combinedRDSRAccumulatedDoseData.ContentSequence:
+                                if contentSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
+                                    logger.debug("Found current total DLP: {0}".format(contentSeq.MeasuredValueSequence[0].NumericValue))
+                                    # Find out which dosimetry phantom this value is for
+                                    for contSeq in contentSeq.ContentSequence:
+                                        if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                                            totalType = contSeq.ConceptCodeSequence[0].CodeMeaning
+
+                                    # If combinedRDSR total DLP and new one use the same dosimetry phantom then just add them together.
+                                    if totalType == additionalType:
+                                        contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + additionalAmount)
+                                    # If additional DLP is to 16 cm head phantom then divide it by 2 before adding.
+                                    elif "head" in additionalType.lower():
+                                        contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + (additionalAmount/2.0))
+                                    # If current total DLP is to 16 cm head phantom then divide it by 2 before adding the 32 cm additional.
+                                    else:
+                                        contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % ((contentSeq.MeasuredValueSequence[0].NumericValue/2.0) + additionalAmount)
+                                    logger.debug("updated to: {0}".format(contentSeq.MeasuredValueSequence[0].NumericValue))
+
+            combinedRDSR.save_as(os.path.join(folder, combined_rdsr_name+'_updated'))
+            logger.debug('Importing updated combined rdsr in to OpenREM ({0})'.format(os.path.join(folder, combined_rdsr_name+'_updated')))
+            rdsr(os.path.join(folder, combined_rdsr_name+'_updated'))
             logger.debug('Imported in to OpenREM')
+
         else:
-            logger.debug('Not imported to OpenREM. Result is: {0}'.format(result))
+            # Create a DICOM RDSR for the sub-folder using pixelmed.jar.
+            logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(folder))
+            combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
+            _make_dicom_rdsr(folder, combined_command, rdsr_name)
+            logger.debug('Initial DICOM RDSR object created in {0}'.format(folder))
+
+            logger.debug('Gathering extra information from images in {0}'.format(folder))
+            extra_information = _find_extra_info(folder)
+            extra_study_information = extra_information[0]
+            extra_acquisition_information = extra_information[1]
+            logger.debug('Gathered extra information from images in {0}'.format(folder))
+
+            # Use the extra information to update the initial rdsr file created by DoseUtility
+            logger.debug('Updating information in rdsr in {0}'.format(folder))
+            initial_rdsr_name_and_path = os.path.join(folder, rdsr_name)
+            updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
+            result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information, extra_acquisition_information, updated_rdsr_name_and_path)
+            logger.debug('Updated information in rdsr')
+
+            # Now import the updated rdsr into OpenREM using the Toshiba extractor
+            if result == 1:
+                logger.debug('Importing updated rdsr in to OpenREM ({0})'.format(updated_rdsr_name_and_path))
+                rdsr(updated_rdsr_name_and_path)
+                logger.debug('Imported in to OpenREM')
+            else:
+                logger.debug('Not imported to OpenREM. Result is: {0}'.format(result))
 
     # Now delete the image folder
     logger.debug('Removing study folder')
