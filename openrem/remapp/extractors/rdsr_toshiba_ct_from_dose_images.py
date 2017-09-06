@@ -22,15 +22,15 @@ logger = logging.getLogger(
     'remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
 
 
-def find_dose_summary_objects(folderPath, seriesNumber):
-    """ This function looks for seriesNumber in the SeriesNumber element of all
-    DICOM objects present in folderPath. When found a structure containing the
-    file name, StudyTime and InstanceNumber are added to a list. At the end of
-    the routine this list is returned.
+def find_dose_summary_objects(folderPath):
+    """ This function looks for objects with a SOPClassUID of "Secondary
+    Capture Image Storage". When found a structure containing the file name,
+    StudyTime and InstanceNumber are added to a list. At the end of the routine
+    this list is returned.
 
     Args:
         folderPath: a string containing the path to the folder containing the
-        DICOM objects stationName: the seriesNumber to look for in SeriesNumber
+        DICOM objects
 
     Returns:
         A list of structures, each containing the elements "fileName",
@@ -40,13 +40,14 @@ def find_dose_summary_objects(folderPath, seriesNumber):
     import traceback
     from dicom.filereader import InvalidDicomError
 
+    sopclassuid = "Secondary Capture Image Storage"
     doseSummaryObjectList = []
 
     for fileName in os.listdir(folderPath):
         if os.path.isfile(os.path.join(folderPath, fileName)):
             try:
                 dcm = dicom.read_file(os.path.join(folderPath, fileName))
-                if str(dcm.SeriesNumber) == str(seriesNumber):
+                if str(dcm.SOPClassUID) == str(sopclassuid):
                     doseSummaryObjectList.append({"fileName": fileName, "studyTime": dcm.StudyTime, "instanceNumber": dcm.InstanceNumber})
 
             except InvalidDicomError as e:
@@ -129,6 +130,8 @@ def _find_extra_info(dicom_path):
         StudyDescription
         RequestedProcedureDescription
         DLP
+        SoftwareVersions
+        DeviceSerialNumber
 
     """
     import dicom
@@ -336,6 +339,35 @@ def _find_extra_info(dicom_path):
                             pass
                         except Exception as e:
                             logger.debug(traceback.format_exc())
+
+                    try:
+                        if dcm.SoftwareVersions != '':
+                            try:
+                                if study_info['SoftwareVersions'] == '':
+                                    # Only update study_info['SoftwareVersions'] if it's empty
+                                    study_info['SoftwareVersions'] = dcm.SoftwareVersions
+                            except KeyError:
+                                # study_info['SoftwareVersions'] doesn't exist yet, so create it
+                                study_info['SoftwareVersions'] = dcm.SoftwareVersions
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
+                    except AttributeError:
+                        pass
+
+                    try:
+                        if dcm.DeviceSerialNumber != '':
+                            try:
+                                if study_info['DeviceSerialNumber'] == '':
+                                    # Only update study_info['DeviceSerialNumber'] if it's empty
+                                    study_info['SoftwareVersions'] = dcm.DeviceSerialNumber
+                            except KeyError:
+                                # study_info['DeviceSerialNumber'] doesn't exist yet, so create it
+                                study_info['DeviceSerialNumber'] = dcm.DeviceSerialNumber
+                            except Exception as e:
+                                logger.debug(traceback.format_exc())
+                    except AttributeError:
+                        pass
+
                 except AttributeError:
                     pass
                 except Exception as e:
@@ -348,6 +380,7 @@ def _find_extra_info(dicom_path):
 
     logger.debug('Reached the end of _find_extra_info for images in {0}'.format(dicom_path))
     logger.debug('study_info is: {0}'.format(study_info))
+    print('study_info is: {0}'.format(study_info))
     logger.debug('acquisition_info is: {0}'.format(acquisition_info))
     return [study_info, acquisition_info]
 
@@ -427,13 +460,17 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     except Exception as e:
         logger.debug(traceback.format_exc())
 
-    # Update the study-level information if it does not exist, or is an empty string.
+    # Update the study-level information if it does not exist, or is an empty string. Over-write DeviceSerialNumber
+    # even if it is already present (Dose Utility generates a unique DeviceSerialNumber, but I'd prefer to use the
+    # real one)
     logger.debug('Updating study-level data')
     for key, val in additional_study_info.items():
         try:
             rdsr_val = getattr(dcm, key)
             logger.debug('{0}: {1}'.format(key, val))
             if rdsr_val == '':
+                setattr(dcm, key, val)
+            if key == 'DeviceSerialNumber':
                 setattr(dcm, key, val)
         except AttributeError:
             setattr(dcm, key, val)
@@ -983,7 +1020,6 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
 
     rdsr_name = 'sr.dcm'
     updated_rdsr_name = 'sr_updated.dcm'
-    seriesNumber = '9000'
     combined_rdsr_name = 'sr_combined.dcm'
 
     # Split the folder of images by StudyInstanceUID. This is required because pixelmed.jar will only process the
@@ -998,7 +1034,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     for folder in folders:
 
         # Check to see if there's just one dose summary in the folder
-        doseSummaryObjectInfo = find_dose_summary_objects(folder, seriesNumber)
+        doseSummaryObjectInfo = find_dose_summary_objects(folder)
         logger.debug("doseSummaryObjectInfo is {0}".format(doseSummaryObjectInfo))
 
         # For Toshiba scanners each dose summary consistes of two objects
