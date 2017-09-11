@@ -21,7 +21,6 @@ import os
 import sys
 import uuid
 import collections
-from remapp.netdicom.tools import OnAssociateRequest, OnAssociateResponse, _create_ae
 
 
 # setup django/OpenREM
@@ -34,14 +33,7 @@ django.setup()
 
 logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
-
-def _move_req(my_ae, remote_ae, assoc, d, study_no, series_no):
-    move_generator = assoc.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
-    try:
-        for move_status in move_generator:
-            logger.debug(u"move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
-    except KeyError as e:
-        logger.error(u"{0} in qrscu._move_req. Request is {1}, study {2} series {3}".format(e, d, study_no, series_no))
+from remapp.netdicom.tools import OnAssociateRequest, OnAssociateResponse, _create_ae
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
@@ -762,6 +754,16 @@ def qrscu(
         movescu.delay(str(query.query_id))
 
 
+def _move_req(my_ae, remote_ae, assoc, d, study_no, series_no):
+    move_generator = assoc.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
+    try:
+        for move_status in move_generator:
+
+            logger.debug(u"move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
+    except KeyError as e:
+        logger.error(u"{0} in qrscu._move_req. Request is {1}, study {2} series {3}".format(e, d, study_no, series_no))
+
+
 @shared_task(name='remapp.netdicom.qrscu.movescu')  # (name='remapp.netdicom.qrscu.movescu', queue='qr')
 def movescu(query_id):
     """
@@ -782,6 +784,7 @@ def movescu(query_id):
     store_scp = query.store_scp_fk
 
     my_ae = _create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
+    my_ae.MaxAssociationIdleSeconds = 2
     my_ae.start()
     logger.debug(u"Move AE my_ae {0} started".format(my_ae))
 
