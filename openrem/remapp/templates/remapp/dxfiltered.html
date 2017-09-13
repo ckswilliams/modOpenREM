@@ -212,7 +212,7 @@
             var chartSortingDirection = {{ request.user.userprofile.plotInitialSortingDirection }};
 
             var def_title, norm_btn_class, instr_class, render_div, val_label, val_units, avg_label, cat_label, cat_counter,
-                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result;
+                    field_name_min, field_name_max, field_multiplier, field_cat_name, tooltip_filters, href_start, result, hide_series_btn_stub;
         </script>
         <!-- End of include JavaScript for the plots -->
 
@@ -291,6 +291,9 @@
                             <a onclick="$('#container').highcharts().viewData(false, false, true); enterFullScreen('collapseOne','container'); $('#toggle_acq_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#container').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_data_btn">Toggle data table</a>
                             <a onclick="$('#container').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('container', 'hide', 'acq_dap_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('container', 'show', 'acq_dap_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('container')" class="btn btn-default btn-sm" role="button" id="acq_dap_series_toggle">Toggle all series</a>
                             <div class="acq-hist-norm-btn"><a onclick="normaliseHistograms('#container'); $('#container').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -299,6 +302,8 @@
             <!-- End of HTML to include div for acquisition plot -->
 
             <script>
+                $('#acq_dap_series_show').hide();
+
                 var plotDXAcquisitionMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('container');
@@ -318,6 +323,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilters;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -330,7 +336,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -415,6 +421,9 @@
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotDXRequestMeanDAPAccordion','plotDXRequestMeanDAPContainer'); $('#toggle_req_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_req_data_btn">Toggle data table</a>
                             <a onclick="$('#plotDXRequestMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('plotDXRequestMeanDAPContainer', 'hide', 'req_dap_series_')" class="btn btn-default btn-sm" role="button" id="req_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('plotDXRequestMeanDAPContainer', 'show', 'req_dap_series_')" class="btn btn-default btn-sm" role="button" id="req_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('plotDXRequestMeanDAPContainer')" class="btn btn-default btn-sm" role="button" id="req_dap_series_toggle">Toggle all series</a>
                             <div class="req-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXRequestMeanDAPContainer'); $('#plotDXRequestMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -423,6 +432,8 @@
             <!-- End of HTML to include div for requested procedure name plot -->
 
             <script>
+                $('#req_dap_series_show').hide();
+
                 var plotDXRequestMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXRequestMeanDAPContainer');
@@ -442,6 +453,7 @@
                 field_cat_name = 'requested_procedure';
                 tooltip_filters = tooltipFiltersRequest;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'req_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -454,7 +466,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -540,6 +552,9 @@
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, false, true); enterFullScreen('collapsePlotDXStudyMeanDAPAccordion','plotDXStudyMeanDAPContainer'); $('#toggle_study_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_study_data_btn">Toggle data table</a>
                             <a onclick="$('#plotDXStudyMeanDAPContainer').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('plotDXStudyMeanDAPContainer', 'hide', 'study_dap_series_')" class="btn btn-default btn-sm" role="button" id="study_dap_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('plotDXStudyMeanDAPContainer', 'show', 'study_dap_series_')" class="btn btn-default btn-sm" role="button" id="study_dap_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('plotDXStudyMeanDAPContainer')" class="btn btn-default btn-sm" role="button" id="study_dap_series_toggle">Toggle all series</a>
                             <div class="stu-hist-norm-btn"><a onclick="normaliseHistograms('#plotDXStudyMeanDAPContainer'); $('#plotDXStudyMeanDAPContainer').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -548,6 +563,8 @@
             <!-- End of HTML to include div for study name plot -->
 
             <script>
+                $('#study_dap_series_show').hide();
+
                 var plotDXStudyMeanDAP = true;
                 $(window).resize(function() {
                     chartSetExportSize('plotDXStudyMeanDAPContainer');
@@ -567,6 +584,7 @@
                 field_cat_name = 'study_description';
                 tooltip_filters = tooltipFiltersStudy;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'study_dap_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -579,7 +597,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -662,6 +680,9 @@
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeankVpChart', 'chartAcquisitionMeankVp'); $('#toggle_acq_kvp_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_kvp_data_btn">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeankVp').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeankVp', 'hide', 'acq_kvp_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeankVp', 'show', 'acq_kvp_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('chartAcquisitionMeankVp')" class="btn btn-default btn-sm" role="button" id="acq_kvp_series_toggle">Toggle all series</a>
                             <div class="kvp-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeankVp'); $('#chartAcquisitionMeankVp').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -670,6 +691,8 @@
             <!-- End of HTML to include div container for mean kVp per acquisition chart -->
 
             <script>
+                $('#acq_kvp_series_show').hide();
+
                 var plotDXAcquisitionMeankVp = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeankVp');
@@ -689,6 +712,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFilterskVp;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_kvp_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -701,7 +725,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -751,6 +775,9 @@
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanmAsChart', 'chartAcquisitionMeanmAs'); $('#toggle_acq_mas_data_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_mas_data_btn">Toggle data table</a>
                             <a onclick="$('#chartAcquisitionMeanmAs').highcharts().zoomOut();" class="btn btn-default btn-sm" role="button">Reset zoom</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeanmAs', 'hide', 'acq_mas_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('chartAcquisitionMeanmAs', 'show', 'acq_mas_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('chartAcquisitionMeanmAs')" class="btn btn-default btn-sm" role="button" id="acq_mas_series_toggle">Toggle all series</a>
                             <div class="mas-hist-norm-btn"><a onclick="normaliseHistograms('#chartAcquisitionMeanmAs'); $('#chartAcquisitionMeanmAs').highcharts().viewData(false, true);" class="btn btn-default btn-sm" role="button">Toggle normalised histograms</a></div>
                         </div>
                     </div>
@@ -759,6 +786,8 @@
             <!-- End of HTML to include div container for mean mAs per acquisition chart -->
 
             <script>
+                $('#acq_mas_series_show').hide();
+
                 var plotDXAcquisitionMeanmAs = true;
                 $(window).resize(function() {
                     chartSetExportSize('chartAcquisitionMeanmAs');
@@ -778,6 +807,7 @@
                 field_cat_name = 'acquisition_protocol';
                 tooltip_filters = tooltipFiltersmAs;
                 href_start = '/openrem/dx/?acquisitionhist=1&';
+                hide_series_btn_stub = 'acq_mas_series_';
 
             {% if request.user.userprofile.plotAverageChoice == 'both' %}
                 avg_label = 'Mean and median';
@@ -790,7 +820,7 @@
                 def_title = avg_label + ' ' + val_label + ' per ' + cat_label.toLowerCase();
                 result = chartAverageAndHistogram(def_title, norm_btn_class, instr_class, render_div, val_label,
                         val_units, avg_label, cat_label, cat_counter, field_name_min, field_name_max, field_multiplier,
-                        field_cat_name, tooltip_filters, href_start);
+                        field_cat_name, tooltip_filters, href_start, hide_series_btn_stub);
             </script>
         {% endif %}
 
@@ -848,6 +878,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeankVpOverTime', 'AcquisitionMeankVpOverTimeDIV'); $('#toggle_acq_kvp_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeankVpOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_kvp_ot_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeankVpOverTimeDIV', 'hide', 'acq_kvp_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_over_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeankVpOverTimeDIV', 'show', 'acq_kvp_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_kvp_over_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('AcquisitionMeankVpOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="acq_kvp_over_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -855,6 +888,8 @@
             <!-- End of HTML to include div container for mean acquisition protocol kVp over time -->
 
             <script>
+                $('#acq_kvp_over_time_series_show').hide();
+
                 var plotDXAcquisitionMeankVpOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeankVpOverTimeDIV');
@@ -889,6 +924,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanmAsOverTime', 'AcquisitionMeanmAsOverTimeDIV'); $('#toggle_acq_mas_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeanmAsOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_mas_ot_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanmAsOverTimeDIV', 'hide', 'acq_mas_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_over_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanmAsOverTimeDIV', 'show', 'acq_mas_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_mas_over_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('AcquisitionMeanmAsOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="acq_mas_over_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -896,6 +934,8 @@
             <!-- End of HTML to include div container for mean acquisition protocol mAs over time -->
 
             <script>
+                $('#acq_mas_over_time_series_show').hide();
+
                 var plotDXAcquisitionMeanmAsOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanmAsOverTimeDIV');
@@ -930,6 +970,9 @@
                             <p>Click on the legend entries to show or hide the corresponding series. Click and drag the mouse over a date range to zoom in.</p>
                             <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(false, false, true); enterFullScreen('collapseAcquisitionMeanDAPOverTime', 'AcquisitionMeanDAPOverTimeDIV'); $('#toggle_acq_dap_ot_btn').toggle();" class="btn btn-default btn-sm" role="button">Toggle fullscreen</a>
                             <a onclick="$('#AcquisitionMeanDAPOverTimeDIV').highcharts().viewData(true, true);" class="btn btn-default btn-sm" role="button" id="toggle_acq_dap_ot_btn">Toggle data table</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanDAPOverTimeDIV', 'hide', 'acq_dap_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_over_time_series_hide">Hide all series</a>
+                            <a onclick="hideOrShowAllSeries('AcquisitionMeanDAPOverTimeDIV', 'show', 'acq_dap_over_time_series_')" class="btn btn-default btn-sm" role="button" id="acq_dap_over_time_series_show">Show all series</a>
+                            <a onclick="toggleAllSeries('AcquisitionMeanDAPOverTimeDIV')" class="btn btn-default btn-sm" role="button" id="acq_dap_over_time_series_toggle">Toggle all series</a>
                         </div>
                     </div>
                 </div>
@@ -937,6 +980,8 @@
             <!-- End of HTML to include div container for mean acquisition protocol DAP per week -->
 
             <script>
+                $('#acq_dap_over_time_series_show').hide();
+
                 var plotDXAcquisitionMeanDAPOverTime = true;
                 $(window).resize(function() {
                     chartSetExportSize('AcquisitionMeanDAPOverTimeDIV');

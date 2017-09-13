@@ -234,6 +234,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
+        except KeyError:
+            pass
 
     if plot_study_mean_dap or plot_study_freq or plot_study_per_day_and_hour:
         try:
@@ -249,6 +251,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 study_events = f.qs
         except MultiValueDictKeyError:
             study_events = f.qs
+        except KeyError:
+            pass
 
     if plot_request_mean_dap or plot_request_freq:
         try:
@@ -263,6 +267,8 @@ def dx_plot_calculations(f, plot_acquisition_mean_dap, plot_acquisition_freq,
                 # The user hasn't filtered on acquisition, so we can use the faster database querying.
                 request_events = f.qs
         except MultiValueDictKeyError:
+            request_events = f.qs
+        except KeyError:
             request_events = f.qs
 
     if plot_acquisition_mean_dap or plot_acquisition_freq:
@@ -632,9 +638,15 @@ def rf_detail_view(request, pk=None):
             sum_dap = Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
             sum_dose_rp = Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
         ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
-        stu_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+        stu_dose_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
         stu_irr_types = stu_inc_totals.values_list('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
-        study_totals = np.column_stack((stu_irr_types, stu_totals)).tolist()
+        stu_time_totals = [None] * len(stu_irr_types)
+        for idx, irr_type in enumerate(stu_irr_types):
+            stu_time_totals[idx] = GeneralStudyModuleAttr.objects.filter(pk=pk,
+                                                  projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
+                                                  irr_type[0]).aggregate(
+                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure_time')).values()[0] / 1000
+        study_totals = np.column_stack((stu_irr_types, stu_dose_totals, stu_time_totals)).tolist()
     except:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
@@ -891,6 +903,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 exp_include = [o.study_instance_uid for o in f]
         except MultiValueDictKeyError:
             pass
+        except KeyError:
+            pass
 
     if plot_study_mean_dlp or plot_study_mean_ctdi or plot_study_freq or plot_study_mean_dlp_over_time or plot_study_per_day_and_hour:
         try:
@@ -906,6 +920,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 study_events = f.qs
         except MultiValueDictKeyError:
             study_events = f.qs
+        except KeyError:
+            study_events = f.qs
 
     if plot_request_mean_dlp or plot_request_freq:
         try:
@@ -920,6 +936,8 @@ def ct_plot_calculations(f, plot_acquisition_freq, plot_acquisition_mean_ctdi, p
                 # The user hasn't filtered on acquisition, so we can use the faster database querying.
                 request_events = f.qs
         except MultiValueDictKeyError:
+            request_events = f.qs
+        except KeyError:
             request_events = f.qs
 
     if plot_acquisition_mean_dlp or plot_acquisition_freq:
