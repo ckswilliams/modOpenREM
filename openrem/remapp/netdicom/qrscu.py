@@ -758,8 +758,12 @@ def _move_req(my_ae, remote_ae, assoc, d, study_no, series_no):
     move_generator = assoc.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     try:
         for move_status in move_generator:
-
-            logger.debug(u"move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
+            if u'Pending' in move_status:
+                logger.info(u"Move of study {0}, series {1} status is {2} "
+                            u"(i.e. one object processed)".format(
+                    study_no, series_no, move_status))
+            else:
+                logger.warning(u"Move of study {0}, series {1} status is {2}".format(study_no, series_no, move_status))
     except KeyError as e:
         logger.error(u"{0} in qrscu._move_req. Request is {1}, study {2} series {3}".format(e, d, study_no, series_no))
 
@@ -784,7 +788,6 @@ def movescu(query_id):
     store_scp = query.store_scp_fk
 
     my_ae = _create_ae(store_scp.aetitle.encode('ascii', 'ignore'))
-    my_ae.MaxAssociationIdleSeconds = 2
     my_ae.start()
     logger.debug(u"Move AE my_ae {0} started".format(my_ae))
 
@@ -811,13 +814,13 @@ def movescu(query_id):
     study_no = 0
     for study in studies:
         study_no += 1
-        logger.info(u"Mv: study_no {0}".format(study_no))
+        logger.debug(u"Mv: study_no {0}".format(study_no))
         d = Dataset()
         d.StudyInstanceUID = study.study_instance_uid
         series_no = 0
         for series in study.dicomqrrspseries_set.all():
             series_no += 1
-            logger.info(u"Mv: study no {0} series no {1}".format(study_no, series_no))
+            logger.debug(u"Mv: study no {0} series no {1}".format(study_no, series_no))
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
             if series.number_of_series_related_instances:
@@ -833,7 +836,6 @@ def movescu(query_id):
                 num_objects
             ))
             query.save()
-            logger.info(u"_move_req launched")
             if not assoc.is_alive:
                 logger.warning(u"Query_id {0}: Association has aborted, attempting to reconnect".format(query_id))
                 assoc.Release(0)
@@ -845,6 +847,7 @@ def movescu(query_id):
                     logger.debug(u"Query_id {0}: Move AE my_ae quit".format(query_id))
                     query.delete()
                     exit()
+            logger.debug(u"_move_req launched")
             _move_req(my_ae, remote_ae, assoc, d, study_no, series_no)
 
     query.move_complete = True
