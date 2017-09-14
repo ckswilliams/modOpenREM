@@ -33,7 +33,7 @@ django.setup()
 
 logger = logging.getLogger('remapp.netdicom.qrscu')  # Explicitly named so that it is still handled when using __main__
 
-from remapp.netdicom.tools import OnAssociateRequest, OnAssociateResponse, _create_ae
+from remapp.netdicom.tools import _create_ae
 
 
 def _filter(query, level, filter_name, filter_list, filter_type):
@@ -251,7 +251,6 @@ def _check_sr_type_in_study(my_ae, remote_ae, assoc, study, query_id):
 
 
 def _query_images(my_ae, remote_ae, assoc, seriesrsp, query_id):
-    from time import sleep
     from remapp.models import DicomQRRspImage
     from dicom.dataset import Dataset
 
@@ -540,8 +539,6 @@ def qrscu(
 
     from datetime import datetime
 
-    from netdicom.applicationentity import AE
-    from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
     from dicom.dataset import Dataset
     from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import GeneralStudyModuleAttr, DicomQuery, DicomRemoteQR, DicomStoreSCP
