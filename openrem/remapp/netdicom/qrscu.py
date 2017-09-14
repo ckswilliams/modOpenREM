@@ -305,7 +305,6 @@ def _query_images(my_ae, remote_ae, assoc, seriesrsp, query_id):
 
 
 def _query_series(my_ae, remote_ae, assoc, d2, studyrsp, query_id):
-    from time import sleep
     from remapp.tools.get_values import get_value_kw
     from remapp.models import DicomQRRspSeries
     d2.QueryRetrieveLevel = "SERIES"
