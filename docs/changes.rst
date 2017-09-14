@@ -5,6 +5,7 @@ OpenREM version history
 0.8.0 (?)
 ---------
 
+* `#542`_  Interface: Added display name to all detailed html pages
 * `#535`_  Interface: Fixed problem where categorie names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
