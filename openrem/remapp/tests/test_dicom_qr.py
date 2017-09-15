@@ -1113,6 +1113,7 @@ class QRSCUScriptArgParsing(TestCase):
         """
 
         from remapp.netdicom.qrscu import parse_args
+
         parsed_args = parse_args(['1', '2', '-ct', '-mg'])
 
         self.assertEqual(parsed_args['qr_id'], 1)
@@ -1120,3 +1121,24 @@ class QRSCUScriptArgParsing(TestCase):
         self.assertEqual(parsed_args['modalities'].sort(), ['MG', 'CT'].sort())
         filters = {'study_desc_exc': None, 'stationname_exc': None, 'study_desc_inc': None, 'stationname_inc': None}
         self.assertEqual(parsed_args['filters'], filters)
+
+    @patch("remapp.netdicom.tools.echoscu", _fake_echo_success)
+    def test_ct_std_exc(self):
+        """
+        Test the arg parser with modalities CT and MG
+        :return:
+        """
+
+        from remapp.netdicom.qrscu import parse_args
+
+        parsed_args = parse_args(['1', '2', '-ct', '-e "Thorax, Neck "'])
+
+        self.assertEqual(parsed_args['qr_id'], 1)
+        self.assertEqual(parsed_args['store_id'], 2)
+        self.assertEqual(parsed_args['modalities'].sort(), ['MG', 'CT'].sort())
+        filters = {'study_desc_exc': ['thorax', 'neck'],
+                   'stationname_exc': None,
+                   'study_desc_inc': None,
+                   'stationname_inc': ['mystation']}
+        self.assertEqual(parsed_args['filters'], filters)
+
