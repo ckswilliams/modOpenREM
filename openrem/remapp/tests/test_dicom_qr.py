@@ -1131,14 +1131,14 @@ class QRSCUScriptArgParsing(TestCase):
 
         from remapp.netdicom.qrscu import parse_args
 
-        parsed_args = parse_args(['1', '2', '-ct', '-e "Thorax, Neck "'])
+        parsed_args = parse_args(['1', '2', '-ct', '-e Thorax, Neck '])
 
         self.assertEqual(parsed_args['qr_id'], 1)
         self.assertEqual(parsed_args['store_id'], 2)
         self.assertEqual(parsed_args['modalities'].sort(), ['MG', 'CT'].sort())
-        filters = {'study_desc_exc': ['thorax', 'neck'],
+        filters = {'study_desc_exc': [u'thorax', u'neck'],
                    'stationname_exc': None,
                    'study_desc_inc': None,
-                   'stationname_inc': ['mystation']}
+                   'stationname_inc': None}
         self.assertEqual(parsed_args['filters'], filters)
 

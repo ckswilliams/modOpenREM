@@ -933,23 +933,24 @@ def parse_args(argv):
         parser.error(u"Incorrect data format, should be YYYY-MM-DD")
 
     if args.desc_exclude:
-        study_desc_exc = map(str.lower, map(str.strip, args.desc_exclude.split(u',')))
+
+        study_desc_exc = [x.strip().lower() for x in args.desc_exclude.split(u',')]
         logger.info(u"Study description exclude terms are {0}".format(study_desc_exc))
     else:
         study_desc_exc = None
     if args.desc_include:
-        study_desc_inc = map(str.lower, map(str.strip, args.desc_include.split(u',')))
+        study_desc_inc = [x.strip().lower() for x in args.desc_include.split(u',')]
         logger.info(u"Study description include terms are {0}".format(study_desc_inc))
     else:
         study_desc_inc = None
 
     if args.stationname_exclude:
-        stationname_exc = map(str.lower, map(str.strip, args.stationname_exclude.split(u',')))
+        stationname_exc = [x.strip().lower() for x in args.stationname_exclude.split(u',')]
         logger.info(u"Stationname exclude terms are {0}".format(stationname_exc))
     else:
         stationname_exc = None
     if args.stationname_include:
-        stationname_inc = map(str.lower, map(str.strip, args.stationname_include.split(u',')))
+        stationname_inc = [x.strip().lower() for x in args.stationname_include.split(u',')]
         logger.info(u"Stationname include terms are {0}".format(stationname_inc))
     else:
         stationname_inc = None
