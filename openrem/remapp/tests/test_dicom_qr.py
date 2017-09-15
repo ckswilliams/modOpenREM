@@ -1078,3 +1078,45 @@ class PruneSeriesResponsesCT(TestCase):
         series = studies[0].dicomqrrspseries_set.all()
         self.assertEqual(series.count(), 1)
         self.assertEqual(series[0].series_number, 4)
+
+
+def _fake_qrscu(qr_scp_pk=None, store_scp_pk=None,
+        implicit=False, explicit=False, move=False, query_id=None,
+        date_from=None, date_until=None, modalities=None, inc_sr=False, remove_duplicates=True, filters=None):
+    """
+    Check that the parsing has worked
+    """
+    pass
+
+
+def _fake_echo_success(scp_pk=None, store_scp=False, qr_scp=False):
+    """
+    Fake success return for echoscu
+    :param scp_pk:
+    :param store_scp:
+    :param qr_scp:
+    :return: str "Success"
+    """
+    return "Success"
+
+
+class QRSCUScriptArgParsing(TestCase):
+    """
+    Test the args passed on the command line are parsed properly
+    """
+
+    @patch("remapp.netdicom.tools.echoscu", _fake_echo_success)
+    def test_ct_mg(self):
+        """
+        Test the arg parser with modalities CT and MG
+        :return:
+        """
+
+        from remapp.netdicom.qrscu import parse_args
+        parsed_args = parse_args(['1', '2', '-ct', '-mg'])
+
+        self.assertEqual(parsed_args['qr_id'], 1)
+        self.assertEqual(parsed_args['store_id'], 2)
+        self.assertEqual(parsed_args['modalities'].sort(), ['MG', 'CT'].sort())
+        filters = {'study_desc_exc': None, 'stationname_exc': None, 'study_desc_inc': None, 'stationname_inc': None}
+        self.assertEqual(parsed_args['filters'], filters)

@@ -861,23 +861,17 @@ def movescu(query_id):
     query.delete()
 
 
-def qrscu_script(*args, **kwargs):
-    """Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
-
-    Args:
-        *args:
-        **kwargs:
-
-    Returns:
-
+def parse_args(argv):
+    """
+    Parse the command line args for the openrem_qr.py script.
+    :param argv: sys.argv[1:] from command line call
+    :return: Dict of processed args
     """
 
     import argparse
     import datetime
     from remapp.netdicom.tools import echoscu
 
-
-    # parse commandline
     parser = argparse.ArgumentParser(description='Query remote server and retrieve to OpenREM')
     parser.add_argument('qr_id', type=int, help='Database ID of the remote QR node')
     parser.add_argument('store_id', type=int, help='Database ID of the local store node')
@@ -903,7 +897,7 @@ def qrscu_script(*args, **kwargs):
                         help='Advanced: Query for structured report only studies. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
                         help="Advanced: Retrieve duplicates (studies that are already in database)")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     logger.info(u"qrscu script called")
 
@@ -978,12 +972,37 @@ def qrscu_script(*args, **kwargs):
         sys.exit(u"Query-retrieve aborted: DICOM nodes not ready. QR SCP echo is {0}, Store SCP echo is {1}".format(
             qr_node_up, store_node_up))
 
+    processed_args = {'qr_id': args.qr_id,
+                      'store_id': args.store_id,
+                      'modalities': modalities,
+                      'remove_duplicates': remove_duplicates,
+                      'dfrom': args.dfrom,
+                      'duntil': args.duntil,
+                      'filters': filters}
+
+    return processed_args
+
+
+def qrscu_script(args):
+    """
+    Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
+    :param args: sys.argv from command line call
+    :return:
+    """
+
+    parsed_args = parse_args(args)
     sys.exit(
-        qrscu.delay(qr_scp_pk=args.qr_id, store_scp_pk=args.store_id, move=True, modalities=modalities,
-                    remove_duplicates=remove_duplicates, date_from=args.dfrom, date_until=args.duntil,
-                    filters=filters,
+        qrscu.delay(qr_scp_pk=parsed_args['qr_id'],
+                    store_scp_pk=parsed_args['store_id'],
+                    move=True,
+                    modalities=parsed_args['modalities'],
+                    remove_duplicates=parsed_args['remove_duplicates'],
+                    date_from=parsed_args['dfrom'],
+                    date_until=parsed_args['duntil'],
+                    filters=parsed_args['filters'],
                     )
     )
 
+
 if __name__ == "__main__":
-    qrscu_script()
+    qrscu_script(sys.argv)
