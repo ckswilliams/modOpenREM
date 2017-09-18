@@ -1006,4 +1006,4 @@ def qrscu_script():
 
 
 if __name__ == "__main__":
-    qrscu_script(sys.argv)
+    qrscu_script()
