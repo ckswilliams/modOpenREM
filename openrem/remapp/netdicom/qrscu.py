@@ -984,14 +984,14 @@ def parse_args(argv):
     return processed_args
 
 
-def qrscu_script(args):
+def qrscu_script():
     """
     Query-Retrieve function that can be called by the openrem_qr.py script. Always triggers a move.
     :param args: sys.argv from command line call
     :return:
     """
 
-    parsed_args = parse_args(args)
+    parsed_args = parse_args(sys.argv[1:])
     sys.exit(
         qrscu.delay(qr_scp_pk=parsed_args['qr_id'],
                     store_scp_pk=parsed_args['store_id'],

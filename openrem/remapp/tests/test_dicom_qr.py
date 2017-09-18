@@ -1151,7 +1151,7 @@ class QRSCUScriptArgParsing(TestCase):
 
         from remapp.netdicom.qrscu import parse_args
 
-        parsed_args = parse_args(['1', '2', '-ct', '--desc_exclude Thorax, Neck ', '-g MyStn'])
+        parsed_args = parse_args(['1', '2', '-ct', '--desc_exclude', 'Thorax, Neck ', '-sni', 'MyStn'])
 
         self.assertEqual(parsed_args['qr_id'], 1)
         self.assertEqual(parsed_args['store_id'], 2)
