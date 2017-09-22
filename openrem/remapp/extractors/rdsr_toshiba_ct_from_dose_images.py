@@ -18,15 +18,19 @@ django.setup()
 
 from celery import shared_task
 
-logger = logging.getLogger(
-    'remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
-
+logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
 
 def find_dose_summary_objects(folderPath):
     """ This function looks for objects with a SOPClassUID of "Secondary
-    Capture Image Storage". When found a structure containing the file name,
-    StudyTime and InstanceNumber are added to a list. At the end of the routine
-    this list is returned.
+    Capture Image Storage" and an ImageType with a length of 2.
+
+    Dose summary objects have a 2-element ImageType:
+        ImageType is ['DERIVED', 'SECONDARY']
+    Other secondary capture storage objects have a 3-element ImageType:
+        ImageType is ['DERIVED', 'SECONDARY', 'MULTI_FORMAT_RASTER']
+        ImageType is ['DERIVED', 'SECONDARY', 'DISPLAY']
+        ImageType is ['DERIVED', 'SECONDARY', 'MPR']
+    The above are from a virtual colonoscopy study.
 
     Args:
         folderPath: a string containing the path to the folder containing the
@@ -47,7 +51,7 @@ def find_dose_summary_objects(folderPath):
         if os.path.isfile(os.path.join(folderPath, fileName)):
             try:
                 dcm = dicom.read_file(os.path.join(folderPath, fileName))
-                if str(dcm.SOPClassUID) == str(sopclassuid):
+                if str(dcm.SOPClassUID) == str(sopclassuid) and len(dcm.ImageType) == 2:
                     doseSummaryObjectList.append({"fileName": fileName, "studyTime": dcm.StudyTime, "instanceNumber": dcm.InstanceNumber})
 
             except InvalidDicomError as e:
@@ -380,7 +384,6 @@ def _find_extra_info(dicom_path):
 
     logger.debug('Reached the end of _find_extra_info for images in {0}'.format(dicom_path))
     logger.debug('study_info is: {0}'.format(study_info))
-    print('study_info is: {0}'.format(study_info))
     logger.debug('acquisition_info is: {0}'.format(acquisition_info))
     return [study_info, acquisition_info]
 
@@ -1107,7 +1110,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
                                 if item.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
                                     logger.debug("Found current events: {0}".format(item.MeasuredValueSequence[0].NumericValue))
                                     item.MeasuredValueSequence[0].NumericValue = str(int(item.MeasuredValueSequence[0].NumericValue + additionalAmount))
-                                    logger.debug("updated to: {0}".format(item.MeasuredValueSequence[0].NumericValue))
+                                    logger.debug("Updated to: {0}".format(item.MeasuredValueSequence[0].NumericValue))
 
                             # CT Dose Length Product Total
                             logger.debug("Trying to update total DLP")
@@ -1115,29 +1118,44 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
                                 if contentSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
                                     additionalAmount = contentSeq.MeasuredValueSequence[0].NumericValue
                                     logger.debug("Found extra DLP: {0}".format(additionalAmount))
-                                    # Find out which dosimetry phantom this value is for
-                                    for contSeq in contentSeq.ContentSequence:
-                                        if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
-                                            additionalType = contSeq.ConceptCodeSequence[0].CodeMeaning
+                                    extraCTDoseLengthProductTotalContentSequence = contentSeq
+                                    # If the total DLP is not zero
+                                    if float(additionalAmount):
+                                        # Find out which dosimetry phantom this value is for
+                                        for contSeq in contentSeq.ContentSequence:
+                                            if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                                                additionalType = contSeq.ConceptCodeSequence[0].CodeMeaning
 
-                            for contentSeq in combinedRDSRAccumulatedDoseData.ContentSequence:
+                            for i, contentSeq in enumerate(combinedRDSRAccumulatedDoseData.ContentSequence):
                                 if contentSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
-                                    logger.debug("Found current total DLP: {0}".format(contentSeq.MeasuredValueSequence[0].NumericValue))
-                                    # Find out which dosimetry phantom this value is for
-                                    for contSeq in contentSeq.ContentSequence:
-                                        if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
-                                            totalType = contSeq.ConceptCodeSequence[0].CodeMeaning
+                                    currentAmount = contentSeq.MeasuredValueSequence[0].NumericValue
+                                    logger.debug("Found current total DLP: {0}".format(currentAmount))
+                                    # If the total DLP is not zero
+                                    if float(currentAmount):
+                                        # Find out which dosimetry phantom this value is for
+                                        for contSeq in contentSeq.ContentSequence:
+                                            if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                                                totalType = contSeq.ConceptCodeSequence[0].CodeMeaning
 
-                                    # If combinedRDSR total DLP and new one use the same dosimetry phantom then just add them together.
-                                    if totalType == additionalType:
-                                        contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + additionalAmount)
-                                    # If additional DLP is to 16 cm head phantom then divide it by 2 before adding.
-                                    elif "head" in additionalType.lower():
-                                        contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + (additionalAmount/2.0))
-                                    # If current total DLP is to 16 cm head phantom then divide it by 2 before adding the 32 cm additional.
+                                    if currentAmount and additionalAmount:
+                                        # If combinedRDSR total DLP and new one use the same dosimetry phantom then just add them together.
+                                        if totalType == additionalType:
+                                            contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + additionalAmount)
+                                        # If additional DLP is to 16 cm head phantom then divide it by 2 before adding.
+                                        elif "head" in additionalType.lower():
+                                            contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + (additionalAmount/2.0))
+                                        # If current total DLP is to 16 cm head phantom then divide it by 2 before adding the 32 cm additional.
+                                        else:
+                                            contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % ((contentSeq.MeasuredValueSequence[0].NumericValue/2.0) + additionalAmount)
+                                        logger.debug("Updated to: {0}".format(contentSeq.MeasuredValueSequence[0].NumericValue))
+                                    elif currentAmount:
+                                        # There is no additional DLP to add
+                                        logger.debug("No additional DLP to add")
                                     else:
-                                        contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % ((contentSeq.MeasuredValueSequence[0].NumericValue/2.0) + additionalAmount)
-                                    logger.debug("updated to: {0}".format(contentSeq.MeasuredValueSequence[0].NumericValue))
+                                        # There is no current DLP, but we do have extra, so over-write the current content sequence with extraCTDoseLengthProductTotalContentSequence
+                                        logger.debug("Current total DLP is zero. Replacing with extra {0} mGy.cm.".format(additionalAmount))
+                                        combinedRDSRAccumulatedDoseData.ContentSequence[i] = extraCTDoseLengthProductTotalContentSequence
+                                        
 
             combinedRDSR.save_as(os.path.join(folder, combined_rdsr_name+'_updated'))
             logger.debug('Importing updated combined rdsr in to OpenREM ({0})'.format(os.path.join(folder, combined_rdsr_name+'_updated')))
