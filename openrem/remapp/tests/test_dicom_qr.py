@@ -25,7 +25,7 @@ fake_responses = [
     ]
 
 
-def _fake_two_modalities(my_ae, remote_ae, assoc, d, query, query_id, *args, **kwargs):
+def _fake_two_modalities(assoc, d, query, query_id, *args, **kwargs):
     """
     Mock routine that returns a set of four MG studies the first time it is called, and a set of three CT studies the
     second time  it is called.
@@ -49,7 +49,7 @@ def _fake_two_modalities(my_ae, remote_ae, assoc, d, query, query_id, *args, **k
         rsp.save()
 
 
-def _fake_all_modalities(my_ae, remote_ae, assoc, d, query, query_id, *args, **kwargs):
+def _fake_all_modalities(assoc, d, query, query_id, *args, **kwargs):
     """
     Mock routine to return a modality response that includes a study with a 'modalities in study' that does not have
     the requested modality in.
@@ -509,7 +509,7 @@ class ResponseFiltering(TestCase):
             self.assertTrue(u"goodstation" in study.station_name)
 
 
-def _fake_image_query(my_ae, remote_ae, assoc, sr, query_id):
+def _fake_image_query(assoc, sr, query_id):
     return
 
 
