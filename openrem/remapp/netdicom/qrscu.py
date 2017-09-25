@@ -145,20 +145,11 @@ def _prune_series_responses(assoc, query, all_mods, filters):
                     logger.debug(u"Found ESR in CT study, so keep SR and delete all other series")
                     series.exclude(modality__exact='SR').delete()
                 else:
-                    # non-dose SR, so check for Philips dose info series
-                    series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-                    if (series_descriptions != set([None])):
-                        series.exclude(series_description__iexact='dose info').delete()
-                    else:
-                        series.filter(number_of_series_related_instances__gt=5).delete()
+                    # non-dose SR, so check for Philips dose info
+                    _get_philips_dose_images(series)
             else:
                 # if SR not present in study, only keep Philips dose info series
-                # skip this step for PACS systems returning (only) empty seriesdescriptions
-                series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-                if (series_descriptions != set([None])):
-                    series.exclude(series_description__iexact='dose info').delete()
-                else:
-                    series.filter(number_of_series_related_instances__gt=5).delete()
+                _get_philips_dose_images(series)
 
         elif all_mods['SR']['inc']:
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -173,6 +164,19 @@ def _prune_series_responses(assoc, query, all_mods, filters):
         if (nr_series_remaining==0):
             logger.debug(u"Deleting empty study with suid {0}".format(study.study_instance_uid))
             study.delete()
+
+
+def _get_philips_dose_images(series):
+    """
+    Remove series that are not likely to be Philips Dose Info series
+    :param series: database set
+    :return: None. Entries will be removed from database
+    """
+    series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+    if series_descriptions != set([None]):
+        series.exclude(series_description__iexact='dose info').delete()
+    else:
+        series.filter(number_of_series_related_instances__gt=5).delete()
 
 
 def _prune_study_responses(query, filters):
