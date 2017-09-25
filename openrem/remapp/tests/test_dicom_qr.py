@@ -113,19 +113,6 @@ class StudyQueryLogic(TestCase):
                     'DX': {'inc': False, 'mods': ['DX', 'CR']}
                     }
         query = DicomQuery.objects.get()
-        qr_scp = DicomRemoteQR.objects.get()
-
-        # Create my_ae and remote_ae
-        aec = qr_scp.aetitle
-        aet = qr_scp.callingaet
-        ts = [
-            ExplicitVRLittleEndian,
-            ImplicitVRLittleEndian,
-            ExplicitVRBigEndian
-        ]
-        my_ae = AE(aet.encode('ascii', 'ignore'), 0, [StudyRootFindSOPClass, StudyRootMoveSOPClass,
-                                                      VerificationSOPClass], [], ts)
-        remote_ae = dict(Address=qr_scp.hostname, Port=qr_scp.port, AET=aec.encode('ascii', 'ignore'))
 
         d = Dataset()
         assoc = None
@@ -134,6 +121,7 @@ class StudyQueryLogic(TestCase):
         self.assertEqual(DicomQRRspStudy.objects.count(), 2)
         self.assertEqual(study_query_mock.call_count, 1)
         self.assertEqual(modality_matching, False)
+        self.assertEqual(modalities_returned, True)
 
     @patch("remapp.netdicom.qrscu._query_study", side_effect=_fake_two_modalities)
     def test_modality_matching(self, study_query_mock):
