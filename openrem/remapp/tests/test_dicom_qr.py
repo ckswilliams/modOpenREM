@@ -233,7 +233,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 3)
 
         assoc = None
-        qrscu._prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters)
 
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 1)
@@ -274,7 +274,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 3)
 
         assoc = None
-        qrscu._prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters)
 
         # After pruning, two series
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
@@ -309,7 +309,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 2)
 
         assoc = None
-        qrscu._prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters)
 
         # After pruning, there should be no studies left
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 0)
@@ -359,7 +359,7 @@ class QRPhilipsCT(TestCase):
         self.assertEqual(rst1.dicomqrrspseries_set.all().count(), 4)
 
         assoc = None
-        qrscu._prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        qrscu._prune_series_responses(assoc, query, all_mods, filters)
 
         # Should now have one SR series left, identified by the series description for the purposes of this test
         self.assertEqual(query.dicomqrrspstudy_set.all().count(), 1)
@@ -552,7 +552,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -617,7 +617,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -670,7 +670,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -751,7 +751,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -804,7 +804,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 0)
 
@@ -867,7 +867,7 @@ class PruneSeriesResponses(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -980,7 +980,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1005,7 +1005,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1032,7 +1032,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
@@ -1060,7 +1060,7 @@ class PruneSeriesResponsesCT(TestCase):
         all_mods = self.all_mods
         filters = self.filters
         assoc = None
-        _prune_series_responses("MyAE", "RemoteAE", assoc, query, all_mods, filters)
+        _prune_series_responses(assoc, query, all_mods, filters)
         studies = query.dicomqrrspstudy_set.all()
         self.assertEqual(studies.count(), 1)
         series = studies[0].dicomqrrspseries_set.all()
