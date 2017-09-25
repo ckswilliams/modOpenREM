@@ -424,14 +424,13 @@ def _echo(assoc, query_id):
     return echo
 
 
-def _query_for_each_modality(all_mods, query, d, MyAE, RemoteAE, assoc):
+def _query_for_each_modality(all_mods, query, d, assoc):
     """
     Uses _query_study for each modality we've asked for, and populates study level response data in the database
     :param all_mods: dict of dicts indicating which modalities to request
     :param query: DicomQuery object
     :param d: Dataset object containing StudyDate
-    :param MyAE: Calling AE Title
-    :param RemoteAE: Called AE Title
+    :param assoc: Established association with remote host
     :return: modalities_returned = whether ModalitiesInStudy is returned populated; modality_matching = whether
              responses have been filtered based on requested modality
     """
@@ -608,7 +607,7 @@ def qrscu(
             all_mods[m]['inc'] = True
 
     # query for all requested studies
-    modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae, assoc)
+    modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, assoc)
 
     # Now we have all our studies. Time to throw duplicates and away any we don't want
     logger.debug(u"Time to throw away any studies or series that are not useful before requesting moves")

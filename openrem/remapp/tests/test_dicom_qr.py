@@ -129,7 +129,7 @@ class StudyQueryLogic(TestCase):
 
         d = Dataset()
         assoc = None
-        modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae, assoc)
+        modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, assoc)
 
         self.assertEqual(DicomQRRspStudy.objects.count(), 2)
         self.assertEqual(study_query_mock.call_count, 1)
@@ -168,7 +168,7 @@ class StudyQueryLogic(TestCase):
 
         d = Dataset()
         assoc = None
-        modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, my_ae, remote_ae, assoc)
+        modalities_returned, modality_matching = _query_for_each_modality(all_mods, query, d, assoc)
 
         self.assertEqual(DicomQRRspStudy.objects.count(), 7)
         self.assertEqual(study_query_mock.call_count, 2)
