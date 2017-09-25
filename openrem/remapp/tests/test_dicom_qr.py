@@ -15,7 +15,7 @@ from remapp.models import DicomQuery, DicomQRRspStudy, DicomQRRspSeries, DicomQR
 import collections
 
 
-def _fake_check_sr_type_in_study_with_rdsr(MyAE, RemoteAE, assoc, study, query_id):
+def _fake_check_sr_type_in_study_with_rdsr(assoc, study, query_id):
     return 'RDSR'
 
 
