@@ -1,14 +1,7 @@
 # This Python file uses the following encoding: utf-8
 #!/usr/bin/python
 """
-Storage SCP example.
-
-This demonstrates a simple application entity that support a number of
-Storage service classes. For this example to work, you need an SCU
-sending to this host on specified port.
-
-For help on usage,
-python storescp.py -h
+Storage SCP
 """
 import errno
 import logging
@@ -33,9 +26,7 @@ try:
         sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
 except ImportError:
     sys.exit(u'Pynedicom > 0.8.1 needs to be installed, see http://docs.openrem.org/en/latest/install.html')
-from netdicom import AE
 from netdicom.SOPclass import StorageSOPClass, VerificationSOPClass
-from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian
 from dicom.dataset import Dataset, FileDataset
 from django.views.decorators.csrf import csrf_exempt
 
@@ -72,17 +63,20 @@ def OnReceiveStore(SOPClass, DS):
     from remapp.extractors.rdsr import rdsr
     from remapp.extractors.ct_philips import ct_philips
     from remapp.models import DicomDeleteSettings
+    from remapp.version import __netdicom_implementation_version__
+    from remapp.version import __version__ as openrem_version
     from openremproject.settings import MEDIA_ROOT
 
     try:
         logger.info(u"Received C-Store. Stn name %s, Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
                      DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
-    except:
+    except AttributeError:
         try:
             logger.info(
-                u"Received C-Store - station name missing. Modality %s, SOPClassUID %s, Study UID %s and Instance UID %s",
+                u"Received C-Store - station name missing. Modality %s, SOPClassUID %s, Study UID %s and "
+                u"Instance UID %s",
                 DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID)
-        except:
+        except AttributeError:
             logger.info(u"Received C-Store - error in logging details")
 
     if 'TransferSyntaxUID' in DS:
@@ -92,8 +86,8 @@ def OnReceiveStore(SOPClass, DS):
     file_meta = Dataset()
     file_meta.MediaStorageSOPClassUID = DS.SOPClassUID
     file_meta.MediaStorageSOPInstanceUID = DS.SOPInstanceUID
-    file_meta.ImplementationClassUID = "1.3.6.1.4.1.45593.1.0.7.0.6"
-    file_meta.ImplementationVersionName = "OpenREM_0.7.0b6"
+    file_meta.ImplementationClassUID = "1.3.6.1.4.1.45593.1.{0}".format(__netdicom_implementation_version__)
+    file_meta.ImplementationVersionName = "OpenREM_{0}".format(openrem_version)
     path = os.path.join(
         MEDIA_ROOT, "dicom_in"
     )
@@ -113,9 +107,11 @@ def OnReceiveStore(SOPClass, DS):
             ds_new.save_as(filename)
             break
         except ValueError as e:
-            # Black magic pydicom method suggested by Darcy Mason: https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
+            # Black magic pydicom method suggested by Darcy Mason:
+            # https://groups.google.com/forum/?hl=en-GB#!topic/pydicom/x_WsC2gCLck
             if "Invalid tag (0018, 7052)" in e.message or "Invalid tag (0018, 7054)" in e.message:
-                logger.info(u"Found illegal use of multiple values of filter thickness using comma. Changing before saving.")
+                logger.debug(u"Found illegal use of multiple values of filter thickness using comma. "
+                             u"Changing before saving.")
                 thickmin = dict.__getitem__(ds_new, 0x187052)
                 thickvalmin = thickmin.__getattribute__('value')
                 if ',' in thickvalmin:
@@ -129,32 +125,36 @@ def OnReceiveStore(SOPClass, DS):
                     thicknewmax = thickmax._replace(value = thickvalmax)
                     dict.__setitem__(ds_new, 0x187054, thicknewmax)
             elif "Invalid tag (01f1, 1027)" in e.message:
-                logger.warning(u"Invalid value in tag (01f1,1027), 'exposure time per rotation'. Tag value deleted. Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
-                    station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                logger.warning(u"Invalid value in tag (01f1,1027), 'exposure time per rotation'. Tag value deleted. "
+                               u"Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
+                                station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
                 priv_exp_time = dict.__getitem__(ds_new, 0x1f11027)
                 blank_val = priv_exp_time._replace(value='')
                 dict.__setitem__(ds_new, 0x1f11027, blank_val)
             elif "Invalid tag (01f1, 1033)" in e.message:
-                logger.warning(u"Invalid value in unknown private tag (01f1,1033). Tag value deleted. Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
-                    station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                logger.warning(u"Invalid value in unknown private tag (01f1,1033). Tag value deleted. "
+                               u"Stn name {0}, modality {1}, SOPClass UID {2}, Study UID {3}, Instance UID {4}".format(
+                                station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
                 priv_tag = dict.__getitem__(ds_new, 0x1f11033)
                 blank_val = priv_tag._replace(value='')
                 dict.__setitem__(ds_new, 0x1f11033, blank_val)
             else:
                 logger.error(
-                    u"ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
+                    u"ValueError on DCM save {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, "
+                    u"Instance UID {5}".format(
                         e.message, station_name, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
                 return SOPClass.Success
         except IOError as e:
             logger.error(
-                    u"IOError on DCM save {0} - does the user running storescp have write rights in the {1} folder?".format(
-                        e.message, path
-                    ))
+                    u"IOError on DCM save {0} - does the user running storescp have write rights in the {1} "
+                    u"folder?".format(e.message, path))
             return SOPClass.Success
         except:
             logger.error(
-                u"Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, Instance UID {5}".format(
-                    sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID, DS.SOPInstanceUID))
+                u"Unexpected error on DCM save: {0}. Stn name {1}, modality {2}, SOPClass UID {3}, Study UID {4}, "
+                u"Instance UID {5}".format(
+                    sys.exc_info()[0], DS.StationName, DS.Modality, DS.SOPClassUID, DS.StudyInstanceUID,
+                    DS.SOPInstanceUID))
             return SOPClass.Success
 
     logger.info(u"File %s written", filename)
@@ -182,7 +182,7 @@ def OnReceiveStore(SOPClass, DS):
         try:
             manufacturer = DS.Manufacturer
             series_description = DS.SeriesDescription
-        except:
+        except AttributeError:
             if del_settings.del_no_match:
                 os.remove(filename)
                 logger.info(u"Secondary capture object with either no manufacturer or series description. Deleted.")
@@ -205,6 +205,7 @@ def web_store(store_pk=None):
     import socket
     import time
     from remapp.models import DicomStoreSCP
+    from remapp.netdicom.tools import _create_ae
     from django.core.exceptions import ObjectDoesNotExist
 
     try:
@@ -221,41 +222,37 @@ def web_store(store_pk=None):
 
     # setup AE
     try:
-        MyAE = AE(
-            aet, port, [],
-            [StorageSOPClass, VerificationSOPClass],
-            [ExplicitVRLittleEndian, ImplicitVRLittleEndian]
-        )
-        MyAE.MaxAssociationIdleSeconds = 120
-        MyAE.MaxNumberOfAssociations = 25
-        MyAE.OnAssociateRequest = OnAssociateRequest
-        MyAE.OnAssociateResponse = OnAssociateResponse
-        MyAE.OnReceiveStore = OnReceiveStore
-        MyAE.OnReceiveEcho = OnReceiveEcho
+        my_ae = _create_ae(aet, port=port, sop_scu=[], sop_scp=[StorageSOPClass, VerificationSOPClass])
+        my_ae.MaxAssociationIdleSeconds = 120
+        my_ae.MaxNumberOfAssociations = 25
+        my_ae.OnReceiveStore = OnReceiveStore
+        my_ae.OnReceiveEcho = OnReceiveEcho
 
         # start AE
-        conf.status = u"Starting AE... AET:{0}, port:{1}".format(aet, port)
+        logger.info(u"Starting  Store SCP AE... AET:{0}, port:{1}".format(aet, port))
+        conf.status = u"Starting Store SCP AE... AET:{0}, port:{1}".format(aet, port)
         conf.save()
-        logger.info(u"Starting AE... AET:{0}, port:{1}".format(aet, port))
-        MyAE.start()
-        conf.status = u"Started AE... AET:{0}, port:{1}".format(aet, port)
+        my_ae.start()
+        conf.status = u"Started Store SCP AE... AET:{0}, port:{1}".format(aet, port)
         conf.save()
-        logger.info(u"Started AE... AET:%s, port:%s", aet, port)
+        logger.info(u"Started Store SCP AE... AET:%s, port:%s", aet, port)
 
         while 1:
             time.sleep(1)
             stay_alive = DicomStoreSCP.objects.get(pk__exact=store_pk)
             if not stay_alive.run:
-                MyAE.Quit()
-                logger.info(u"Stopped AE... AET:%s, port:%s", aet, port)
+                my_ae.Quit()
+                logger.info(u"Stopped Store SCP AE... AET:%s, port:%s", aet, port)
                 break
     except socket.error as serr:
         if serr.errno != errno.EADDRINUSE:
-            conf.status = u"Starting AE AET:{0}, port:{1} failed; see logfile".format(aet, port)
-            logger.error(u"Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+            conf.status = u"Starting Store SCP AE AET:{0}, port:{1} failed; see logfile".format(aet, port)
+            logger.error(u"Starting Store SCP AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+            conf.save()
         else:
-            conf.status = u"Starting AE AET:{0}, port:{1} failed; address already in use!".format(aet, port)
-            logger.warning(u"Starting AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+            conf.status = u"Starting Store SCP AE AET:{0}, port:{1} failed; address already in use!".format(aet, port)
+            logger.warning(u"Starting Store SCP AE AET:{0}, port:{1} failed: {2}".format(aet, port, serr))
+            conf.save()
 
 
 def _interrupt(store_pk=None):

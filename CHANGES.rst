@@ -8,6 +8,7 @@ OpenREM version history
 * `#542`_  Interface: Added display name to all detailed html pages
 * `#535`_  Interface: Fixed problem where categorie names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
+* `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
 * `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
 * `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
