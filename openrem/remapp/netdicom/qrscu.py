@@ -172,9 +172,15 @@ def _get_philips_dose_images(series):
     :param series: database set
     :return: None. Entries will be removed from database
     """
+    toshiba = False
     series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
-    if series_descriptions != set([None]):
-        series.exclude(series_description__iexact='dose info').delete()
+    if series_descriptions != {None}:
+        if series.filter(series_description__iexact='dose info'):
+            series.exclude(series_description__iexact='dose info').delete()
+        elif toshiba:
+            pass
+        else:
+            series.delete()
     else:
         series.filter(number_of_series_related_instances__gt=5).delete()
 
