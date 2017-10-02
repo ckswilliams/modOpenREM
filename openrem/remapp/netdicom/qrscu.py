@@ -71,12 +71,13 @@ def _filter(query, level, filter_name, filter_list, filter_type):
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
 
-def _prune_series_responses(assoc, query, all_mods, filters):
+def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images):
     """
     For each study level response, remove any series that we know can't be used.
     :param query: Current DicomQuery object
     :param all_mods: Ordered dict of dicts detailing modalities we are interested in
     :param filters: Include and exclude lists for StationName (and StudyDescription)
+    :param get_toshiba_images: Bool, whether to try to get Toshiba dose summary images
     :return Series level response database rows are deleted if not useful
     """
     query.stage = u"Deleting series we can't use"
@@ -146,10 +147,10 @@ def _prune_series_responses(assoc, query, all_mods, filters):
                     series.exclude(modality__exact='SR').delete()
                 else:
                     # non-dose SR, so check for Philips dose info
-                    _get_philips_dose_images(series)
+                    _get_philips_dose_images(series, get_toshiba_images)
             else:
                 # if SR not present in study, only keep Philips dose info series
-                _get_philips_dose_images(series)
+                _get_philips_dose_images(series, get_toshiba_images)
 
         elif all_mods['SR']['inc']:
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -166,18 +167,18 @@ def _prune_series_responses(assoc, query, all_mods, filters):
             study.delete()
 
 
-def _get_philips_dose_images(series):
+def _get_philips_dose_images(series, get_toshiba_images):
     """
     Remove series that are not likely to be Philips Dose Info series
     :param series: database set
+    :param get_toshiba_images: Bool, whether to try to get Toshiba dose summary images
     :return: None. Entries will be removed from database
     """
-    toshiba = False
     series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
     if series_descriptions != {None}:
         if series.filter(series_description__iexact='dose info'):
             series.exclude(series_description__iexact='dose info').delete()
-        elif toshiba:
+        elif get_toshiba_images:
             pass
         else:
             series.delete()
@@ -478,6 +479,7 @@ def qrscu(
         qr_scp_pk=None, store_scp_pk=None,
         implicit=False, explicit=False, move=False, query_id=None,
         date_from=None, date_until=None, modalities=None, inc_sr=False, remove_duplicates=True, filters=None,
+        get_toshiba_images=False,
         *args, **kwargs):
     """Query retrieve service class user function
 
@@ -497,6 +499,8 @@ def qrscu(
       inc_sr(bool, optional): Only include studies that only have structured reports in (unknown modality) (Default value = False)
       remove_duplicates(bool, optional): If True, studies that already exist in the database are removed from the query results (Default value = True)
       filters(dictionary list, optional): include and exclude lists for StationName and StudyDescription (Default value = None)
+      get_toshiba_images(bool, optional): Whether to try to get Toshiba dose summary images
+
       *args:
       **kwargs:
 
@@ -702,7 +706,7 @@ def qrscu(
         logger.info(u'Now have {0} studies'.format(study_rsp.count()))
 
     logger.debug(u"Pruning series responses")
-    _prune_series_responses(assoc, query, all_mods, filters)
+    _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
 
     study_rsp = query.dicomqrrspstudy_set.all()
     logger.info(u'Now have {0} studies'.format(study_rsp.count()))
