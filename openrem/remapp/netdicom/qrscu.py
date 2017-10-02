@@ -147,10 +147,10 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                     series.exclude(modality__exact='SR').delete()
                 else:
                     # non-dose SR, so check for Philips dose info
-                    _get_philips_dose_images(series, get_toshiba_images)
+                    _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
             else:
                 # if SR not present in study, only keep Philips dose info series
-                _get_philips_dose_images(series, get_toshiba_images)
+                _get_philips_dose_images(series, get_toshiba_images, assoc, query.query_id)
 
         elif all_mods['SR']['inc']:
             sr_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -167,7 +167,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
             study.delete()
 
 
-def _get_philips_dose_images(series, get_toshiba_images):
+def _get_philips_dose_images(series, get_toshiba_images, assoc, query_id):
     """
     Remove series that are not likely to be Philips Dose Info series
     :param series: database set
@@ -179,11 +179,35 @@ def _get_philips_dose_images(series, get_toshiba_images):
         if series.filter(series_description__iexact='dose info'):
             series.exclude(series_description__iexact='dose info').delete()
         elif get_toshiba_images:
-            pass
+            _get_toshiba_dose_images(series, assoc, query_id)
         else:
             series.delete()
     else:
         series.filter(number_of_series_related_instances__gt=5).delete()
+
+
+def _get_toshiba_dose_images(study_series, assoc, query_id):
+    """
+    Get images for Toshiba studies with no RDSR
+    :param study_series: database set
+    :return: None. Non-useful entries will be removed from database
+    """
+
+    for series in study_series:
+        _query_images(assoc, series, query_id)
+        images = series.dicomqrrspimage_set.all()
+        logger.debug(u"Query_id {0}: Query for Toshiba images. Have {1} in this series.".format(
+            query_id, images.count()))
+        if images.count() == 0:
+            logger.debug("Query_id {0}: No images in series! Deleting series.".format(query_id))
+            series.delete()
+        if images[0].sop_class_uid != '1.2.840.10008.5.1.4.1.1.7':
+            logger.debug("Query_id {0}: In non secondary capture series, SOPClassUID {1}. "
+                         "Will delete all but first image.".format(query_id, images[0].sop_class_uid))
+            images.exclude(instance_number__exact='0').delete()
+            logger.debug("Query_id {0}: Deleted other images, now {1} remaining (should be 1)".format(
+                query_id, images.count()))
+            series.image_level_move = True
 
 
 def _prune_study_responses(query, filters):
@@ -724,7 +748,7 @@ def qrscu(
         movescu.delay(str(query.query_id))
 
 
-def _move_req(my_ae, remote_ae, assoc, d, study_no, series_no):
+def _move_req(my_ae, assoc, d, study_no, series_no):
     move_generator = assoc.StudyRootMoveSOPClass.SCU(d, my_ae.getName(), 1)
     try:
         for move_status in move_generator:
@@ -818,7 +842,13 @@ def movescu(query_id):
                     query.delete()
                     exit()
             logger.debug(u"_move_req launched")
-            _move_req(my_ae, remote_ae, assoc, d, study_no, series_no)
+            if series.image_level_move:
+                d.QueryRetrieveLevel = "IMAGE"
+                for image in series.dicomqrrspimage_set.all():
+                    d.SOPInstanceUID = image.sop_instance_uid
+                    _move_req(my_ae, assoc, d, study_no, series_no)
+            else:
+                _move_req(my_ae, assoc, d, study_no, series_no)
 
     query.move_complete = True
     query.save()
@@ -867,6 +897,8 @@ def parse_args(argv):
     parser.add_argument('-sni', '--stationname_include',
                         help='Terms to include in station name, comma separated, quote whole string',
                         metavar='string')
+    parser.add_argument('-toshiba', action="store_true",
+                        help='Advanced: Attempt to retrieve CT dose summary objects and one image from each series')
     parser.add_argument('-sr', action="store_true",
                         help='Advanced: Query for structured report only studies. Cannot be used with -ct, -mg, -fl, -dx')
     parser.add_argument('-dup', action="store_true",
@@ -938,6 +970,8 @@ def parse_args(argv):
 
     remove_duplicates = not(args.dup)  # if flag, duplicates will be retrieved.
 
+    get_toshiba = args.toshiba
+
     qr_node_up = echoscu(args.qr_id, qr_scp=True)
     store_node_up = echoscu(args.store_id, store_scp=True)
 
@@ -953,7 +987,8 @@ def parse_args(argv):
                       'remove_duplicates': remove_duplicates,
                       'dfrom': args.dfrom,
                       'duntil': args.duntil,
-                      'filters': filters}
+                      'filters': filters,
+                      'get_toshiba': get_toshiba}
 
     return processed_args
 
@@ -975,6 +1010,7 @@ def qrscu_script():
                     date_from=parsed_args['dfrom'],
                     date_until=parsed_args['duntil'],
                     filters=parsed_args['filters'],
+                    get_toshiba_images=parsed_args['get_toshiba']
                     )
     )
 
