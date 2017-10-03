@@ -95,6 +95,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
                 filter_type='exclude')
 
     for study in study_rsp:
+        logger.debug("at study in study_resp in series prune. modalities in study are: {0}".format(study.get_modalities_in_study()))
         if all_mods['MG']['inc'] and 'MG' in study.get_modalities_in_study():
             study.modality = u'MG'
             study.save()
@@ -136,6 +137,7 @@ def _prune_series_responses(assoc, query, all_mods, filters, get_toshiba_images)
         elif all_mods['CT']['inc'] and 'CT' in study.get_modalities_in_study():
             study.modality = 'CT'
             study.save()
+            logger.debug("Filtering CT at series level")
             series = study.dicomqrrspseries_set.all()
             if 'SR' in study.get_modalities_in_study():
                 SR_type = _check_sr_type_in_study(assoc, study, query.query_id)
@@ -175,6 +177,7 @@ def _get_philips_dose_images(series, get_toshiba_images, assoc, query_id):
     :return: None. Entries will be removed from database
     """
     series_descriptions = set(val for dic in series.values('series_description') for val in dic.values())
+    logger.debug("In _get_philips_dose_images. series_descriptions are {0}".format(series_descriptions))
     if series_descriptions != {None}:
         if series.filter(series_description__iexact='dose info'):
             series.exclude(series_description__iexact='dose info').delete()
