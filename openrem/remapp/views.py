@@ -641,11 +641,14 @@ def rf_detail_view(request, pk=None):
         stu_dose_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
         stu_irr_types = stu_inc_totals.values_list('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
         stu_time_totals = [None] * len(stu_irr_types)
-        for idx, irr_type in enumerate(stu_irr_types):
-            stu_time_totals[idx] = GeneralStudyModuleAttr.objects.filter(pk=pk,
-                                                  projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
-                                                  irr_type[0]).aggregate(
-                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure_time')).values()[0] / 1000
+        try:
+            for idx, irr_type in enumerate(stu_irr_types):
+                stu_time_totals[idx] = GeneralStudyModuleAttr.objects.filter(pk=pk,
+                                                      projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
+                                                      irr_type[0]).aggregate(
+                    Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure_time')).values()[0] / 1000
+        except TypeError: #{TypeError}unsupported operand type(s) for /: 'NoneType' and 'int'
+            stu_time_totals[idx] = None
         study_totals = np.column_stack((stu_irr_types, stu_dose_totals, stu_time_totals)).tolist()
     except:
         messages.error(request, 'That study was not found')
