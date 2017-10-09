@@ -140,6 +140,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Pitch',
             u'E' + str(h+1) + u' No. sources',
             u'E' + str(h+1) + u' CTDIvol',
+            u'E' + str(h+1) + u' Phantom',
             u'E' + str(h+1) + u' DLP',
             u'E' + str(h+1) + u' S1 name',
             u'E' + str(h+1) + u' S1 kVp',
@@ -259,6 +260,16 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 scanning_length = s.scanninglength_set.get().scanning_length
 
+            try:
+                if s.ctdiw_phantom_type.code_value == u'113691':
+                    phantom = u'32 cm'
+                elif s.ctdiw_phantom_type.code_value == u'113690':
+                    phantom = u'16 cm'
+                else:
+                    phantom = s.ctdiw_phantom_type.code_meaning
+            except AttributeError:
+                phantom = None
+
             examdata += [
                 export_csv_prep(s.acquisition_protocol),
                 s.ct_acquisition_type,
@@ -269,6 +280,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 s.pitch_factor,
                 s.number_of_xray_sources,
                 s.mean_ctdivol,
+                phantom,
                 s.dlp,
                 ]
             if s.number_of_xray_sources > 1:
