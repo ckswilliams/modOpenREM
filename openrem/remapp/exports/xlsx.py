@@ -139,6 +139,17 @@ def _ct_common_get_data(exams, pid, name, patid):
 def _ct_get_series_data(s):
     from django.core.exceptions import ObjectDoesNotExist
     from remapp.tools.get_values import return_for_export, string_to_float
+
+    try:
+        if s.ctdiw_phantom_type.code_value == u'113691':
+            phantom = u'32 cm'
+        elif s.ctdiw_phantom_type.code_value == u'113690':
+            phantom = u'16 cm'
+        else:
+            phantom = s.ctdiw_phantom_type.code_meaning
+    except AttributeError:
+        phantom = None
+
     seriesdata = [
         str(s.acquisition_protocol),
         str(s.ct_acquisition_type),
@@ -149,6 +160,7 @@ def _ct_get_series_data(s):
         s.pitch_factor,
         s.number_of_xray_sources,
         s.mean_ctdivol,
+        phantom,
         s.dlp,
         ]
     if s.number_of_xray_sources > 1:
@@ -318,6 +330,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         u'Pitch',
         u'No. sources',
         u'CTDIvol',
+        u'Phantom',
         u'DLP',
         u'S1 name',
         u'S1 kVp',
@@ -395,6 +408,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Pitch',
             u'E' + str(h+1) + u' No. sources',
             u'E' + str(h+1) + u' CTDIvol',
+            u'E' + str(h+1) + u' Phantom',
             u'E' + str(h+1) + u' DLP',
             u'E' + str(h+1) + u' S1 name',
             u'E' + str(h+1) + u' S1 kVp',
