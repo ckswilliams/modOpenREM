@@ -51,6 +51,7 @@ OpenREM version history
 * `#458`_  Exports: Filter thicknesses are rounded to max 4 significant figures on export
 * `#454`_  Exports: Mean filter thickness now reported in exports
 * `#453`_  Imports: DX with min filter thickness greater than max have values switched on import
+* `#452`_  Exports: Added CTDIw phantom size to CT exports
 * `#450`_  Imports: DX imports with filter thickness of 0.00 are now recorded as such
 * `#449`_  Exports: Fixed a bug that prevented fluoro exports if protocol names had non-ASCII characters
 * `#448`_  Documentation: Added a diagram showing the relationship between the OpenREM system components
