@@ -80,9 +80,9 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return redirect('/openrem/export/')
-        
+        logger.error(u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return
+
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
 
@@ -387,8 +387,8 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return redirect('/openrem/export/')
+        logger.error(u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return
         
     # Get the data!
 
