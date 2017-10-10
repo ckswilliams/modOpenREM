@@ -215,10 +215,10 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
         else:
             logger.debug("Query_id {0}: In secondary capture series, SOPClassUID {1}. "
                          "Will not delete any images.".format(query_id, images[0].sop_class_uid))
-            logger.debug("Query_id {0}: Deleted other images, now {1} remaining (should be 1)".format(
+            logger.debug("Query_id {0}: {1} images in this SC series".format(
                 query_id, images.count()))
-            series.image_level_move = True
-            series.save()
+            # series.image_level_move = True
+            # series.save()
 
 
 def _prune_study_responses(query, filters):
@@ -820,12 +820,12 @@ def movescu(query_id):
     for study in studies:
         study_no += 1
         logger.debug(u"Mv: study_no {0}".format(study_no))
-        d = Dataset()
-        d.StudyInstanceUID = study.study_instance_uid
         series_no = 0
         for series in study.dicomqrrspseries_set.all():
             series_no += 1
             logger.debug(u"Mv: study no {0} series no {1}".format(study_no, series_no))
+            d = Dataset()
+            d.StudyInstanceUID = study.study_instance_uid
             d.QueryRetrieveLevel = "SERIES"
             d.SeriesInstanceUID = series.series_instance_uid
             if series.number_of_series_related_instances:
@@ -857,8 +857,10 @@ def movescu(query_id):
                 d.QueryRetrieveLevel = "IMAGE"
                 for image in series.dicomqrrspimage_set.all():
                     d.SOPInstanceUID = image.sop_instance_uid
+                    logger.debug(u"Image-level move - d is: {0}".format(d))
                     _move_req(my_ae, assoc, d, study_no, series_no)
             else:
+                logger.debug(u"Series-level move - d is: {0}".format(d))
                 _move_req(my_ae, assoc, d, study_no, series_no)
 
     query.move_complete = True
