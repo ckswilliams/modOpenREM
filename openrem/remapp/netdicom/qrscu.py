@@ -207,10 +207,18 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
         if images[0].sop_class_uid != '1.2.840.10008.5.1.4.1.1.7':
             logger.debug("Query_id {0}: In non secondary capture series, SOPClassUID {1}. "
                          "Will delete all but first image.".format(query_id, images[0].sop_class_uid))
-            images.exclude(instance_number__exact='0').delete()
+            images.exclude(sop_instance_uid__exact=images[0].sop_instance_uid).delete()
             logger.debug("Query_id {0}: Deleted other images, now {1} remaining (should be 1)".format(
                 query_id, images.count()))
             series.image_level_move = True
+            series.save()
+        else:
+            logger.debug("Query_id {0}: In secondary capture series, SOPClassUID {1}. "
+                         "Will not delete any images.".format(query_id, images[0].sop_class_uid))
+            logger.debug("Query_id {0}: Deleted other images, now {1} remaining (should be 1)".format(
+                query_id, images.count()))
+            series.image_level_move = True
+            series.save()
 
 
 def _prune_study_responses(query, filters):
