@@ -63,6 +63,26 @@ except ImportError:
     plotting = 0
 
 
+from django.template.defaultfilters import register
+
+
+@register.filter
+def multiply(value, arg):
+    """
+    Return multiplication within Django templates
+
+    :param value: the value to multiply
+    :param arg: the second value to multiply
+    :return: the multiplication
+    """
+    try:
+        value = float(value)
+        arg = float(arg)
+        return value * arg
+    except ValueError:
+        return None
+
+
 def logout_page(request):
     """
     Log users out and re-direct them to the main page.
@@ -631,28 +651,66 @@ def rf_detail_view(request, pk=None):
     from remapp.models import GeneralStudyModuleAttr
     from django.db.models import Sum
     import numpy as np
+    from django.core.exceptions import ObjectDoesNotExist
+    import operator
 
     try:
         study = GeneralStudyModuleAttr.objects.get(pk=pk)
-        stu_inc_totals = GeneralStudyModuleAttr.objects.filter(pk=pk).annotate(
-            sum_dap = Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
-            sum_dose_rp = Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
-        ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
-        stu_dose_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
-        stu_irr_types = stu_inc_totals.values_list('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
-        stu_time_totals = [None] * len(stu_irr_types)
-        try:
-            for idx, irr_type in enumerate(stu_irr_types):
-                stu_time_totals[idx] = GeneralStudyModuleAttr.objects.filter(pk=pk,
-                                                      projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
-                                                      irr_type[0]).aggregate(
-                    Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure_time')).values()[0] / 1000
-        except TypeError: #{TypeError}unsupported operand type(s) for /: 'NoneType' and 'int'
-            stu_time_totals[idx] = None
-        study_totals = np.column_stack((stu_irr_types, stu_dose_totals, stu_time_totals)).tolist()
-    except:
+    except ObjectDoesNotExist:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
+
+    # get the totals
+    irradiation_types = [(u'Fluoroscopy',), (u'Acquisition',)]
+    stu_dose_totals = [(0, 0), (0, 0)]
+    stu_time_totals = [0, 0]
+    total_dap = 0
+    total_dose = 0
+    # Iterate over the planes (for bi-plane systems, for single plane systems there is only one)
+    for dose_ds in study.projectionxrayradiationdose_set.get().accumxraydose_set.all():
+        accum_dose_ds = dose_ds.accumprojxraydose_set.get()
+        stu_dose_totals[0] = tuple(map(operator.add, stu_dose_totals[0],
+                                       (accum_dose_ds.fluoro_dose_area_product_total*1000000,
+                                        accum_dose_ds.fluoro_dose_rp_total)))
+        stu_dose_totals[1] = tuple(map(operator.add, stu_dose_totals[1],
+                                       (accum_dose_ds.acquisition_dose_area_product_total*1000000,
+                                        accum_dose_ds.acquisition_dose_rp_total)))
+        stu_time_totals[0] = stu_time_totals[0] + accum_dose_ds.total_fluoro_time
+        stu_time_totals[1] = stu_time_totals[1] + accum_dose_ds.total_acquisition_time
+        total_dap = total_dap + accum_dose_ds.dose_area_product_total
+        total_dose = total_dose + accum_dose_ds.dose_rp_total
+
+    # get info for different Acquisition Types
+    stu_inc_totals = GeneralStudyModuleAttr.objects.filter(
+            pk=pk,
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning__contains=
+            'Acquisition'
+        ).annotate(
+            sum_dap=Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
+            sum_dose_rp=Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
+        ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+    stu_dose_totals.extend(stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by(
+        'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type'))
+    acq_irr_types = stu_inc_totals.values_list(
+        'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by(
+            'projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
+    # stu_time_totals = [None] * len(stu_irr_types)
+    for _, irr_type in enumerate(acq_irr_types):
+        stu_time_totals.append(GeneralStudyModuleAttr.objects.filter(
+            pk=pk,
+            projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
+            irr_type[0]).aggregate(
+                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__irradiation_duration')
+            ).values()[0])
+    irradiation_types.extend([(u'- ' + acq_type[0],) for acq_type in acq_irr_types])
+
+    # Add the study totals
+    irradiation_types.append((u'Total',))
+    stu_dose_totals.append((total_dap*1000000, total_dose))
+    # does total duration (summed over fluoroscopy and acquisitions) means something?
+    stu_time_totals.append(stu_time_totals[0]+stu_time_totals[1])
+
+    study_totals = np.column_stack((irradiation_types, stu_dose_totals, stu_time_totals)).tolist()
 
     from remapp.models import SkinDoseMapCalcSettings
     from django.core.exceptions import ObjectDoesNotExist
