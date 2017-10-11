@@ -196,8 +196,8 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
     :return: None. Non-useful entries will be removed from database
     """
 
-    for series in study_series:
-        _query_images(assoc, series, query_id, initial_image_only=True)
+    for index, series in enumerate(study_series):
+        _query_images(assoc, series, query_id, initial_image_only=True, msg_id=index+1)
         images = series.dicomqrrspimage_set.all()
         logger.debug(u"Query_id {0}: Query for Toshiba images. Have {1} in this series.".format(
             query_id, images.count()))
@@ -292,7 +292,7 @@ def _check_sr_type_in_study(assoc, study, query_id):
         return 'no_dose_report'
 
 
-def _query_images(assoc, seriesrsp, query_id, initial_image_only=False):
+def _query_images(assoc, seriesrsp, query_id, initial_image_only=False, msg_id=None):
     from remapp.models import DicomQRRspImage
     from dicom.dataset import Dataset
 
@@ -306,9 +306,15 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False):
     d3.InstanceNumber = ''
     d3.SpecificCharacterSet = ''
 
-    logger.debug(u'Query_id {0}: query is {1}'.format(query_id, d3))
+    if initial_image_only:
+        d3.InstanceNumber = '1'
+    if not msg_id:
+        msg_id = 1
 
-    st3 = assoc.StudyRootFindSOPClass.SCU(d3, 1)
+    # logger.debug(u'Query_id {0}: query is {1}, intial_imge_only is {2}, msg_id is {3}'.format(
+    #     query_id, d3, initial_image_only, msg_id))
+
+    st3 = assoc.StudyRootFindSOPClass.SCU(d3, msg_id)
 
     query_id = uuid.uuid4()
 
@@ -329,8 +335,6 @@ def _query_images(assoc, seriesrsp, query_id, initial_image_only=False):
         if not imagesrsp.instance_number:  # just in case!!
             imagesrsp.instance_number = None  # integer so can't be ''
         imagesrsp.save()
-        if initial_image_only:
-            break
 
 
 def _query_series(assoc, d2, studyrsp, query_id):
