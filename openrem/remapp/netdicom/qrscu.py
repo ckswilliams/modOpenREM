@@ -197,7 +197,7 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
     """
 
     for series in study_series:
-        _query_images(assoc, series, query_id)
+        _query_images(assoc, series, query_id, initial_image_only=True)
         images = series.dicomqrrspimage_set.all()
         logger.debug(u"Query_id {0}: Query for Toshiba images. Have {1} in this series.".format(
             query_id, images.count()))
@@ -292,7 +292,7 @@ def _check_sr_type_in_study(assoc, study, query_id):
         return 'no_dose_report'
 
 
-def _query_images(assoc, seriesrsp, query_id):
+def _query_images(assoc, seriesrsp, query_id, initial_image_only=False):
     from remapp.models import DicomQRRspImage
     from dicom.dataset import Dataset
 
@@ -329,6 +329,8 @@ def _query_images(assoc, seriesrsp, query_id):
         if not imagesrsp.instance_number:  # just in case!!
             imagesrsp.instance_number = None  # integer so can't be ''
         imagesrsp.save()
+        if initial_image_only:
+            break
 
 
 def _query_series(assoc, d2, studyrsp, query_id):
