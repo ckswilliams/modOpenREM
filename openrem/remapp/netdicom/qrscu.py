@@ -204,6 +204,7 @@ def _get_toshiba_dose_images(study_series, assoc, query_id):
         if images.count() == 0:
             logger.debug("Query_id {0}: No images in series! Deleting series.".format(query_id))
             series.delete()
+            continue
         if images[0].sop_class_uid != '1.2.840.10008.5.1.4.1.1.7':
             logger.debug("Query_id {0}: In non secondary capture series, SOPClassUID {1}. "
                          "Will delete all but first image.".format(query_id, images[0].sop_class_uid))
