@@ -45,6 +45,7 @@ OpenREM version history
 * `#470`_  Query Retrieve: Optimised CT filtering
 * `#468`_  Query Retrieve: Station names can now be used for filtering if returned
 * `#466`_  Query Retrieve: RDSR now retrieved in preference to images for MG and DX/CR
+* `#465`_  Added newer SSDE and water equivalent diameter fields to database
 * `#464`_  Imports: DX RDSR now imported properly
 * `#463`_  Imports: Properly checks that Enhanced SR are GE dose reports before importing
 * `#460`_  Interface: Display names table now sortable
