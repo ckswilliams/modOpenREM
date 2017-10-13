@@ -1057,10 +1057,21 @@ class SizeSpecificDoseEstimation(models.Model):
     """
     # TODO: Add this to the rdsr extraction routines. Issue #168
     ct_irradiation_event_data = models.ForeignKey(CtIrradiationEventData)
-    measurement_method = models.ForeignKey(ContextID, blank=True, null=True)  # CID 10023
+    measurement_method = models.ForeignKey(ContextID, blank=True, null=True, related_name='ssde_method')  # CID 10023
     measured_lateral_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     measured_ap_dimension = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
     derived_effective_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    water_equivalent_diameter = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+    water_equivalent_diameter_method = models.ForeignKey(
+        ContextID, blank=True, null=True, related_name='ssde_wed_method')  # CID 10024
+    wed_estimate_location_z = models.DecimalField(max_digits=16, decimal_places=8, blank=True, null=True)
+
+
+class WEDSeriesOrInstances(models.Model):
+    """From TID 10013 Series or Instance used for Water Equivalent Diameter estimation
+    """
+    size_specific_dose_estimation = models.ForeignKey(SizeSpecificDoseEstimation)
+    wed_series_or_instance = models.TextField(blank=True, null=True)  # referenced UID
 
 
 class CtDoseCheckDetails(models.Model):  # TID 10015
