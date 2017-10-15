@@ -259,6 +259,18 @@ class UserProfile(models.Model):
         (DESCENDING, 'Descending'),
     )
 
+    ITEMS_PER_PAGE = (
+        (25, '25'),
+        (50, '50'),
+        (100, '100'),
+        (200, '200'),
+        (400, '400'),
+    )
+
+    itemsPerPage = models.IntegerField(null=True,
+                                       choices=ITEMS_PER_PAGE,
+                                       default=25)
+
     # This field is required.
     user = models.OneToOneField(User)
 

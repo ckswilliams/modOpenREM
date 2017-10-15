@@ -95,7 +95,7 @@ $('.datepicker').datepicker({
 
 {% block col1 %}
 
-    {% autopaginate filter.qs 50 as filter_list %}
+    {% autopaginate filter.qs request.user.userprofile.itemsPerPage as filter_list %}
     {% paginate %}
 
     <table class="table table-bordered table-hover row-clickable small">
