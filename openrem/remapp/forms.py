@@ -55,6 +55,15 @@ SORTING_DIRECTION = (
     (DESCENDING, 'Descending'),
 )
 
+ITEMS_PER_PAGE = (
+    (10, '10'),
+    (25, '25'),
+    (50, '50'),
+    (100, '100'),
+    (200, '200'),
+    (400, '400'),
+)
+
 
 class SizeUploadForm(forms.Form):
     """Form for patient size csv file upload
@@ -85,6 +94,10 @@ class SizeHeadersForm(forms.Form):
             ID_TYPES = (("acc-no", "Accession Number"), ("si-uid", "Study instance UID"))
             self.fields['id_type'] = forms.ChoiceField(
                 choices=ID_TYPES, widget=forms.Select(attrs={"class": "form-control"}))
+
+
+class itemsPerPageForm(forms.Form):
+    itemsPerPage = forms.ChoiceField(label='Items per page', choices=ITEMS_PER_PAGE, required=False)
 
 
 class DXChartOptionsForm(forms.Form):

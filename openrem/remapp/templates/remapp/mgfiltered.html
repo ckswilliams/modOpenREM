@@ -3,7 +3,7 @@
 {% block navmg%}<li class="active">{% endblock %}
 
 {% block toprow %}
-      {% load pagination_tags %}    
+      {% load pagination_tags %}
       <p>
         There are {{ filter.count }} studies in this list.
       </p>
@@ -77,6 +77,15 @@
                 <table>
                     {% csrf_token %}
                     {{ chartOptionsForm }}
+                </table>
+                <input class="btn btn-default" name="submit" type="submit" />
+            </div>
+            <div class="panel-heading">
+                <h3 class="panel-title">Table options</h3>
+            </div>
+            <div class="panel-body">
+                <table>
+                    {{ itemsPerPageForm }}
                 </table>
                 <input class="btn btn-default" name="submit" type="submit" />
             </div>
@@ -181,7 +190,7 @@ $('.datepicker').datepicker({
 
     {% paginate %}
 
- 
+
 {% endblock %}
 
 {% block plotdata %}

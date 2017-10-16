@@ -13,8 +13,8 @@
 #
 #    Additional permission under section 7 of GPLv3:
 #    You shall not make any use of the name of The Royal Marsden NHS
-#    Foundation trust in connection with this Program in any press or 
-#    other public announcement without the prior written consent of 
+#    Foundation trust in connection with this Program in any press or
+#    other public announcement without the prior written consent of
 #    The Royal Marsden NHS Foundation Trust.
 #
 #    You should have received a copy of the GNU General Public License
@@ -28,7 +28,7 @@
 
 """
 
-# Following two lines added so that sphinx autodocumentation works. 
+# Following two lines added so that sphinx autodocumentation works.
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 import json
@@ -260,6 +260,7 @@ class UserProfile(models.Model):
     )
 
     ITEMS_PER_PAGE = (
+        (10, '10'),
         (25, '25'),
         (50, '50'),
         (100, '100'),
