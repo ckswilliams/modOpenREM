@@ -286,7 +286,6 @@ class MGSummaryListFilter(django_filters.FilterSet):
     """
     date_after = django_filters.DateFilter(lookup_type='gte', label=u'Date from', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
     date_before = django_filters.DateFilter(lookup_type='lte', label=u'Date until', name='study_date', widget=forms.TextInput(attrs={'class':'datepicker'}))
-
     study_description = django_filters.CharFilter(lookup_type='icontains', label=u'Study description')
     procedure_code_meaning = django_filters.CharFilter(lookup_type='icontains', label=u'Procedure', name='procedure_code_meaning')
     requested_procedure = django_filters.CharFilter(lookup_type='icontains', label=u'Requested procedure', name='requested_procedure_code_meaning')
