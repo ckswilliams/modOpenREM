@@ -1,26 +1,26 @@
 import sys
 import os
-from glob import glob
 from openrem.remapp.extractors import rdsr
-from openremproject.settings import DCMCONV, DCMMKDIR, JAVA_EXE, JAVA_OPTIONS, PIXELMED_JAR, PIXELMED_JAR_OPTIONS
+from openremproject.settings import JAVA_EXE, JAVA_OPTIONS, PIXELMED_JAR, PIXELMED_JAR_OPTIONS
 import shutil
 import django
 import logging
 import traceback
+from celery import shared_task
 
 # setup django/OpenREM
-basepath = os.path.dirname(__file__)
-projectpath = os.path.abspath(os.path.join(basepath, "..", ".."))
-if projectpath not in sys.path:
-    sys.path.insert(1, projectpath)
+base_path = os.path.dirname(__file__)
+project_path = os.path.abspath(os.path.join(base_path, "..", ".."))
+if project_path not in sys.path:
+    sys.path.insert(1, project_path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openremproject.settings'
 django.setup()
 
-from celery import shared_task
+# logger is explicitly named so that it is still handled when using __main__
+logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')
 
-logger = logging.getLogger('remapp.extractors.rdsr_toshiba_ct_from_dose_images')  # Explicitly named so that it is still handled when using __main__
 
-def find_dose_summary_objects(folderPath):
+def find_dose_summary_objects(folder_path):
     """ This function looks for objects with a SOPClassUID of "Secondary
     Capture Image Storage" and an ImageType with a length of 2.
 
@@ -33,41 +33,43 @@ def find_dose_summary_objects(folderPath):
     The above are from a virtual colonoscopy study.
 
     Args:
-        folderPath: a string containing the path to the folder containing the
+        folder_path: a string containing the path to the folder containing the
         DICOM objects
 
     Returns:
-        A list of structures, each containing the elements "fileName",
+        A list of structures, each containing the elements "file_name",
         "studyTime" and "instanceNumber".
     """
     import dicom
     import traceback
     from dicom.filereader import InvalidDicomError
 
-    sopclassuid = "Secondary Capture Image Storage"
-    doseSummaryObjectList = []
+    sop_class_uid = "Secondary Capture Image Storage"
+    dose_summary_object_list = []
 
-    for fileName in os.listdir(folderPath):
-        if os.path.isfile(os.path.join(folderPath, fileName)):
+    for file_name in os.listdir(folder_path):
+        if os.path.isfile(os.path.join(folder_path, file_name)):
             try:
-                dcm = dicom.read_file(os.path.join(folderPath, fileName))
-                if str(dcm.SOPClassUID) == str(sopclassuid) and len(dcm.ImageType) == 2:
-                    doseSummaryObjectList.append({"fileName": fileName, "studyTime": dcm.StudyTime, "instanceNumber": dcm.InstanceNumber})
+                dcm = dicom.read_file(os.path.join(folder_path, file_name))
+                if str(dcm.SOPClassUID) == str(sop_class_uid) and len(dcm.ImageType) == 2:
+                    dose_summary_object_list.append({"file_name": file_name,
+                                                     "studyTime": dcm.StudyTime,
+                                                     "instanceNumber": dcm.InstanceNumber})
 
             except InvalidDicomError as e:
-                logger.debug("Invalid DICOM error: {0} when trying to read {1}".format(e.message, os.path.join(folderPath, fileName)))
+                logger.debug("Invalid DICOM error: {0} when trying to read {1}".format(e.message, os.path.join(folder_path, file_name)))
             except Exception as e:
                 logger.debug(traceback.format_exc())
 
-    return doseSummaryObjectList
+    return dose_summary_object_list
 
 
-def copy_files_from_a_to_b(srcFolder, destFolder):
-    srcFiles = os.listdir(srcFolder)
-    for fileName in srcFiles:
-        fullFileName = os.path.join(srcFolder, fileName)
-        if (os.path.isfile(fullFileName)):
-            shutil.copy(fullFileName, destFolder)
+def copy_files_from_a_to_b(src_folder, dest_folder):
+    src_files = os.listdir(src_folder)
+    for file_name in src_files:
+        full_file_name = os.path.join(src_folder, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, dest_folder)
 
 
 def _split_by_studyinstanceuid(dicom_path):
@@ -1037,127 +1039,129 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
     for folder in folders:
 
         # Check to see if there's just one dose summary in the folder
-        doseSummaryObjectInfo = find_dose_summary_objects(folder)
-        logger.debug("doseSummaryObjectInfo is {0}".format(doseSummaryObjectInfo))
+        dose_summary_object_info = find_dose_summary_objects(folder)
+        logger.debug("dose_summary_object_info is {0}".format(dose_summary_object_info))
 
-        # For Toshiba scanners each dose summary consistes of two objects
-        numberOfDoseSummaryObjects = len(doseSummaryObjectInfo) // 2
+        # For Toshiba scanners each dose summary consists of two objects
+        number_of_dose_summary_objects = len(dose_summary_object_info) // 2
 
-        if numberOfDoseSummaryObjects > 1:
+        if number_of_dose_summary_objects > 1:
             # There's more than one pair of dose summary objects, so duplicate the
-            # contents of folder numberOfDoseSummaryObjects times.
-            uniqueStudyTimes = {item["studyTime"] for item in doseSummaryObjectInfo}
-            subfolderPaths = []
-            for uniqueStudyTime in uniqueStudyTimes:
-                subfolderPath = os.path.join(folder, uniqueStudyTime)
-                subfolderPaths.append(subfolderPath)
-                if not os.path.isdir(subfolderPath):
-                    os.mkdir(subfolderPath)
-                copy_files_from_a_to_b(folder, subfolderPath)
+            # contents of folder number_of_dose_summary_objects times.
+            unique_study_times = {item["studyTime"] for item in dose_summary_object_info}
+            subfolder_paths = []
+            for unique_study_time in unique_study_times:
+                subfolder_path = os.path.join(folder, unique_study_time)
+                subfolder_paths.append(subfolder_path)
+                if not os.path.isdir(subfolder_path):
+                    os.mkdir(subfolder_path)
+                copy_files_from_a_to_b(folder, subfolder_path)
 
             # Delete all but one pair of dose summary objects from each subfolder
-            for uniqueStudyTime in uniqueStudyTimes:
-                for doseSummaryObject in doseSummaryObjectInfo:
-                    if doseSummaryObject["studyTime"] != uniqueStudyTime:
-                        # Delete the corresponding doseSummaryObject file from the
+            for unique_study_time in unique_study_times:
+                for dose_summary_object in dose_summary_object_info:
+                    if dose_summary_object["studyTime"] != unique_study_time:
+                        # Delete the corresponding dose_summary_object file from the
                         # x subfolder in folder
-                        os.remove(os.path.join(folder, uniqueStudyTime, doseSummaryObject["fileName"]))
+                        os.remove(os.path.join(folder, unique_study_time, dose_summary_object["fileName"]))
 
-            # Now create an RDSR in each subfolder in subfolderPaths
-            for subFolder in subfolderPaths:
+            # Now create an RDSR in each subfolder in subfolder_paths
+            for sub_folder in subfolder_paths:
                 # Create a DICOM RDSR for the sub-folder using pixelmed.jar.
-                logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(subFolder))
+                logger.debug('Trying to make initial DICOM RDSR object in {0}'.format(sub_folder))
                 combined_command = JAVA_EXE + ' ' + JAVA_OPTIONS + ' ' + PIXELMED_JAR + ' ' + PIXELMED_JAR_OPTIONS
-                _make_dicom_rdsr(subFolder, combined_command, rdsr_name)
-                logger.debug('Initial DICOM RDSR object created in {0}'.format(subFolder))
+                _make_dicom_rdsr(sub_folder, combined_command, rdsr_name)
+                logger.debug('Initial DICOM RDSR object created in {0}'.format(sub_folder))
 
-                logger.debug('Gathering extra information from images in {0}'.format(subFolder))
-                extra_information = _find_extra_info(subFolder)
+                logger.debug('Gathering extra information from images in {0}'.format(sub_folder))
+                extra_information = _find_extra_info(sub_folder)
                 extra_study_information = extra_information[0]
                 extra_acquisition_information = extra_information[1]
-                logger.debug('Gathered extra information from images in {0}'.format(subFolder))
+                logger.debug('Gathered extra information from images in {0}'.format(sub_folder))
 
                 # Use the extra information to update the initial rdsr file created by DoseUtility
-                logger.debug('Updating information in rdsr in {0}'.format(subFolder))
-                initial_rdsr_name_and_path = os.path.join(subFolder, rdsr_name)
-                updated_rdsr_name_and_path = os.path.join(subFolder, updated_rdsr_name)
-                result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information, extra_acquisition_information, updated_rdsr_name_and_path)
+                logger.debug('Updating information in rdsr in {0}'.format(sub_folder))
+                initial_rdsr_name_and_path = os.path.join(sub_folder, rdsr_name)
+                updated_rdsr_name_and_path = os.path.join(sub_folder, updated_rdsr_name)
+                result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
+                                            extra_acquisition_information, updated_rdsr_name_and_path)
                 logger.debug('Updated information in rdsr')
 
             # Now combine the data contained in the RDSRs
-            firstSubfolder = True
-            for subFolder in subfolderPaths:
-                if firstSubfolder == True:
-                    shutil.copy(os.path.join(subFolder, updated_rdsr_name), os.path.join(folder, combined_rdsr_name))
-                    combinedRDSR = dicom.read_file(os.path.join(folder, combined_rdsr_name))
-                    for contentSequence in combinedRDSR.ContentSequence:
-                        if contentSequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
-                            combinedRDSRAccumulatedDoseData = contentSequence
-                    firstSubfolder = False
+            first_subfolder = True
+            for sub_folder in subfolder_paths:
+                if first_subfolder == True:
+                    shutil.copy(os.path.join(sub_folder, updated_rdsr_name), os.path.join(folder, combined_rdsr_name))
+                    combined_rdsr = dicom.read_file(os.path.join(folder, combined_rdsr_name))
+                    for content_sequence in combined_rdsr.ContentSequence:
+                        if content_sequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
+                            combined_rdsr_accumulated_dose_data = content_sequence
+                    first_subfolder = False
                 else:
-                    currentRDSR = dicom.read_file(os.path.join(subFolder, updated_rdsr_name))
-                    for contentSequence in currentRDSR.ContentSequence:
-                        if contentSequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
-                            combinedRDSR.ContentSequence.append(contentSequence)
-                        if contentSequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
+                    current_rdsr = dicom.read_file(os.path.join(sub_folder, updated_rdsr_name))
+                    for content_sequence in current_rdsr.ContentSequence:
+                        if content_sequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Acquisition':
+                            combined_rdsr.ContentSequence.append(content_sequence)
+                        if content_sequence.ConceptNameCodeSequence[0].CodeMeaning == 'CT Accumulated Dose Data':
                             # Total Number of Irradiation Events
                             logger.debug("Trying to update total number of irradiation events")
-                            for item in contentSequence.ContentSequence:
+                            for item in content_sequence.ContentSequence:
                                 if item.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
-                                    additionalAmount = item.MeasuredValueSequence[0].NumericValue
-                                    logger.debug("Found extra events: {0}".format(additionalAmount))
-                            for item in combinedRDSRAccumulatedDoseData.ContentSequence:
+                                    additional_amount = item.MeasuredValueSequence[0].NumericValue
+                                    logger.debug("Found extra events: {0}".format(additional_amount))
+                            for item in combined_rdsr_accumulated_dose_data.ContentSequence:
                                 if item.ConceptNameCodeSequence[0].CodeMeaning == 'Total Number of Irradiation Events':
                                     logger.debug("Found current events: {0}".format(item.MeasuredValueSequence[0].NumericValue))
-                                    item.MeasuredValueSequence[0].NumericValue = str(int(item.MeasuredValueSequence[0].NumericValue + additionalAmount))
+                                    item.MeasuredValueSequence[0].NumericValue = str(int(item.MeasuredValueSequence[0].NumericValue + additional_amount))
                                     logger.debug("Updated to: {0}".format(item.MeasuredValueSequence[0].NumericValue))
 
                             # CT Dose Length Product Total
                             logger.debug("Trying to update total DLP")
-                            for contentSeq in contentSequence.ContentSequence:
-                                if contentSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
-                                    additionalAmount = contentSeq.MeasuredValueSequence[0].NumericValue
-                                    logger.debug("Found extra DLP: {0}".format(additionalAmount))
-                                    extraCTDoseLengthProductTotalContentSequence = contentSeq
+                            extra_ct_dlp_total_content_sequence = None
+                            for content_seq in content_sequence.ContentSequence:
+                                if content_seq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
+                                    additional_amount = content_seq.MeasuredValueSequence[0].NumericValue
+                                    logger.debug("Found extra DLP: {0}".format(additional_amount))
+                                    extra_ct_dlp_total_content_sequence = content_seq
                                     # If the total DLP is not zero
-                                    if float(additionalAmount):
+                                    if float(additional_amount):
                                         # Find out which dosimetry phantom this value is for
-                                        for contSeq in contentSeq.ContentSequence:
-                                            if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
-                                                additionalType = contSeq.ConceptCodeSequence[0].CodeMeaning
+                                        for cont_seq in content_seq.ContentSequence:
+                                            if cont_seq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                                                additional_type = cont_seq.ConceptCodeSequence[0].CodeMeaning
 
-                            for i, contentSeq in enumerate(combinedRDSRAccumulatedDoseData.ContentSequence):
-                                if contentSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
-                                    currentAmount = contentSeq.MeasuredValueSequence[0].NumericValue
-                                    logger.debug("Found current total DLP: {0}".format(currentAmount))
+                            for i, content_seq in enumerate(combined_rdsr_accumulated_dose_data.ContentSequence):
+                                if content_seq.ConceptNameCodeSequence[0].CodeMeaning == 'CT Dose Length Product Total':
+                                    current_amount = content_seq.MeasuredValueSequence[0].NumericValue
+                                    logger.debug("Found current total DLP: {0}".format(current_amount))
                                     # If the total DLP is not zero
-                                    if float(currentAmount):
+                                    total_type = None
+                                    if float(current_amount):
                                         # Find out which dosimetry phantom this value is for
-                                        for contSeq in contentSeq.ContentSequence:
-                                            if contSeq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
-                                                totalType = contSeq.ConceptCodeSequence[0].CodeMeaning
+                                        for cont_seq in content_seq.ContentSequence:
+                                            if cont_seq.ConceptNameCodeSequence[0].CodeMeaning == 'CTDIw Phantom Type':
+                                                total_type = cont_seq.ConceptCodeSequence[0].CodeMeaning
 
-                                    if currentAmount and additionalAmount:
-                                        # If combinedRDSR total DLP and new one use the same dosimetry phantom then just add them together.
-                                        if totalType == additionalType:
-                                            contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + additionalAmount)
+                                    if current_amount and additional_amount:
+                                        # If combined_rdsr total DLP and new one use the same dosimetry phantom then just add them together.
+                                        if total_type == additional_type:
+                                            content_seq.MeasuredValueSequence[0].NumericValue = "%.2f" % (content_seq.MeasuredValueSequence[0].NumericValue + additional_amount)
                                         # If additional DLP is to 16 cm head phantom then divide it by 2 before adding.
-                                        elif "head" in additionalType.lower():
-                                            contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % (contentSeq.MeasuredValueSequence[0].NumericValue + (additionalAmount/2.0))
+                                        elif "head" in additional_type.lower():
+                                            content_seq.MeasuredValueSequence[0].NumericValue = "%.2f" % (content_seq.MeasuredValueSequence[0].NumericValue + (additional_amount/2.0))
                                         # If current total DLP is to 16 cm head phantom then divide it by 2 before adding the 32 cm additional.
                                         else:
-                                            contentSeq.MeasuredValueSequence[0].NumericValue = "%.2f" % ((contentSeq.MeasuredValueSequence[0].NumericValue/2.0) + additionalAmount)
-                                        logger.debug("Updated to: {0}".format(contentSeq.MeasuredValueSequence[0].NumericValue))
-                                    elif currentAmount:
+                                            content_seq.MeasuredValueSequence[0].NumericValue = "%.2f" % ((content_seq.MeasuredValueSequence[0].NumericValue/2.0) + additional_amount)
+                                        logger.debug("Updated to: {0}".format(content_seq.MeasuredValueSequence[0].NumericValue))
+                                    elif current_amount:
                                         # There is no additional DLP to add
                                         logger.debug("No additional DLP to add")
                                     else:
-                                        # There is no current DLP, but we do have extra, so over-write the current content sequence with extraCTDoseLengthProductTotalContentSequence
-                                        logger.debug("Current total DLP is zero. Replacing with extra {0} mGy.cm.".format(additionalAmount))
-                                        combinedRDSRAccumulatedDoseData.ContentSequence[i] = extraCTDoseLengthProductTotalContentSequence
-                                        
+                                        # There is no current DLP, but we do have extra, so over-write the current content sequence with extra_ct_dlp_total_content_sequence
+                                        logger.debug("Current total DLP is zero. Replacing with extra {0} mGy.cm.".format(additional_amount))
+                                        combined_rdsr_accumulated_dose_data.ContentSequence[i] = extra_ct_dlp_total_content_sequence
 
-            combinedRDSR.save_as(os.path.join(folder, combined_rdsr_name+'_updated'))
+            combined_rdsr.save_as(os.path.join(folder, combined_rdsr_name+'_updated'))
             logger.debug('Importing updated combined rdsr in to OpenREM ({0})'.format(os.path.join(folder, combined_rdsr_name+'_updated')))
             rdsr(os.path.join(folder, combined_rdsr_name+'_updated'))
             logger.debug('Imported in to OpenREM')
@@ -1179,7 +1183,8 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
             logger.debug('Updating information in rdsr in {0}'.format(folder))
             initial_rdsr_name_and_path = os.path.join(folder, rdsr_name)
             updated_rdsr_name_and_path = os.path.join(folder, updated_rdsr_name)
-            result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information, extra_acquisition_information, updated_rdsr_name_and_path)
+            result = _update_dicom_rdsr(initial_rdsr_name_and_path, extra_study_information,
+                                        extra_acquisition_information, updated_rdsr_name_and_path)
             logger.debug('Updated information in rdsr')
 
             # Now import the updated rdsr into OpenREM using the Toshiba extractor
@@ -1192,7 +1197,7 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
 
     # Now delete the image folder
     logger.debug('Removing study folder')
-    shutil.rmtree(folder_name)
+    #shutil.rmtree(folder_name)
     logger.debug('Removing study folder complete')
     logger.debug('Reached end of rdsr_toshiba_ct_from_dose_images routine')
     return 0
@@ -1205,407 +1210,3 @@ if __name__ == "__main__":
         sys.exit('Error: supply exactly one argument - the folder containing the DICOM objects')
 
     sys.exit(rdsr_toshiba_ct_from_dose_images(sys.argv[1]))
-
-
-# DoseUtility validation complaints - will be useful to work out codes etc for putting in things like pitch
-# Found XRayRadiationDoseSR IOD
-# Found Root Template TID_10011 (CTRadiationDose)
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 8] NUM (113824,DCM,"Exposure Time"): within 1.12.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10014 ScanningLength/[Row 1] NUM (113825,DCM,"Scanning Length"): within 1.12.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 10] NUM (113826,DCM,"Nominal Single Collimation Width"): within 1.12.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 11] NUM (113827,DCM,"Nominal Total Collimation Width"): within 1.12.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 13] NUM (113823,DCM,"Number of X-Ray Sources"): within 1.12.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 14] CONTAINER (113831,DCM,"CT X-Ray Source Parameters"): within 1.12.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 8] NUM (113824,DCM,"Exposure Time"): within 1.13.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 10] NUM (113826,DCM,"Nominal Single Collimation Width"): within 1.13.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 11] NUM (113827,DCM,"Nominal Total Collimation Width"): within 1.13.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 12] NUM (113828,DCM,"Pitch Factor"): within 1.13.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing conditional content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 13] NUM (113823,DCM,"Number of X-Ray Sources"): within 1.13.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 14] CONTAINER (113831,DCM,"CT X-Ray Source Parameters"): within 1.13.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 8] NUM (113824,DCM,"Exposure Time"): within 1.14.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 10] NUM (113826,DCM,"Nominal Single Collimation Width"): within 1.14.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 11] NUM (113827,DCM,"Nominal Total Collimation Width"): within 1.14.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 12] NUM (113828,DCM,"Pitch Factor"): within 1.14.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing conditional content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 13] NUM (113823,DCM,"Number of X-Ray Sources"): within 1.14.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Error: Template 10013 CTIrradiationEventData/[Row 1] CONTAINER (113819,DCM,"CT Acquisition")/[Row 7] CONTAINER (113822,DCM,"CT Acquisition Parameters")/[Row 14] CONTAINER (113831,DCM,"CT X-Ray Source Parameters"): within 1.14.4: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113819,DCM,"CT Acquisition")/CONTAINER (113822,DCM,"CT Acquisition Parameters"): Missing required content item
-# Root Template Validation Complete
-# Warning: 1.11.2.1: /CONTAINER (113701,DCM,"X-Ray Radiation Dose Report")/CONTAINER (113811,DCM,"CT Accumulated Dose Data")/NUM (113813,DCM,"CT Dose Length Product Total")/CODE (113835,DCM,"CTDIw Phantom Type"): Content Item not in template
-# IOD validation complete
-
-
-
-# Example spiral CT Acquisition from a Siemens RDSR:
-# ###########################################
-# (0040, a010) Relationship Type                   CS: 'CONTAINS'
-# (0040, a040) Value Type                          CS: 'CONTAINER'
-# (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#    (0008, 0100) Code Value                          SH: '113819'
-#    (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#    (0008, 0104) Code Meaning                        LO: 'CT Acquisition'
-#    ---------
-# (0040, a050) Continuity Of Content               CS: 'SEPARATE'
-# (0040, a730)  Content Sequence   9 item(s) ----
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'TEXT'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '125203'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'Acquisition Protocol'
-#       ---------
-#    (0040, a160) Text Value                          UT: 'TAP'
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'CODE'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '123014'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'Target Region'
-#       ---------
-#    (0040, a168)  Concept Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: 'T-D4000'
-#       (0008, 0102) Coding Scheme Designator            SH: 'SRT'
-#       (0008, 0104) Code Meaning                        LO: 'Abdomen'
-#       ---------
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'CODE'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '113820'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'CT Acquisition Type'
-#       ---------
-#    (0040, a168)  Concept Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: 'P5-08001'
-#       (0008, 0102) Coding Scheme Designator            SH: 'SRT'
-#       (0008, 0104) Code Meaning                        LO: 'Spiral Acquisition'
-#       ---------
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'CODE'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: 'G-C32C'
-#       (0008, 0102) Coding Scheme Designator            SH: 'SRT'
-#       (0008, 0104) Code Meaning                        LO: 'Procedure Context'
-#       ---------
-#    (0040, a168)  Concept Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: 'P5-00100'
-#       (0008, 0102) Coding Scheme Designator            SH: 'SRT'
-#       (0008, 0104) Code Meaning                        LO: 'Diagnostic radiography with contrast media'
-#       ---------
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'UIDREF'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '113769'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'Irradiation Event UID'
-#       ---------
-#    (0040, a124) UID                                 UI: 1.3.12.2.1107.5.1.4.73491.30000013051009133670300000019
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'CONTAINER'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '113822'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'CT Acquisition Parameters'
-#       ---------
-#    (0040, a050) Continuity Of Content               CS: 'SEPARATE'
-#    (0040, a730)  Content Sequence   7 item(s) ----
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113824'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Exposure Time'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: 's'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 's'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '16.01'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113825'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Scanning Length'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: 'mm'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'mm'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '737'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113826'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Nominal Single Collimation Width'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: 'mm'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'mm'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '0.6'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113827'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Nominal Total Collimation Width'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: 'mm'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'mm'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '38.4'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113828'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Pitch Factor'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '{ratio}'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'ratio'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '0.6'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113823'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Number of X-Ray Sources'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '{X-Ray sources}'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'X-Ray sources'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '1'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'CONTAINER'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113831'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'CT X-Ray Source Parameters'
-#          ---------
-#       (0040, a050) Continuity Of Content               CS: 'SEPARATE'
-#       (0040, a730)  Content Sequence   5 item(s) ----
-#          (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#          (0040, a040) Value Type                          CS: 'TEXT'
-#          (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '113832'
-#             (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#             (0008, 0104) Code Meaning                        LO: 'Identification of the X-Ray Source'
-#             ---------
-#          (0040, a160) Text Value                          UT: 'A'
-#          ---------
-#          (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#          (0040, a040) Value Type                          CS: 'NUM'
-#          (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '113733'
-#             (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#             (0008, 0104) Code Meaning                        LO: 'KVP'
-#             ---------
-#          (0040, a300)  Measured Value Sequence   1 item(s) ----
-#             (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#                (0008, 0100) Code Value                          SH: 'kV'
-#                (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#                (0008, 0103) Coding Scheme Version               SH: '1.4'
-#                (0008, 0104) Code Meaning                        LO: 'kV'
-#                ---------
-#             (0040, a30a) Numeric Value                       DS: '120'
-#             ---------
-#          ---------
-#          (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#          (0040, a040) Value Type                          CS: 'NUM'
-#          (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '113833'
-#             (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#             (0008, 0104) Code Meaning                        LO: 'Maximum X-Ray Tube Current'
-#             ---------
-#          (0040, a300)  Measured Value Sequence   1 item(s) ----
-#             (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#                (0008, 0100) Code Value                          SH: 'mA'
-#                (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#                (0008, 0103) Coding Scheme Version               SH: '1.4'
-#                (0008, 0104) Code Meaning                        LO: 'mA'
-#                ---------
-#             (0040, a30a) Numeric Value                       DS: '560'
-#             ---------
-#          ---------
-#          (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#          (0040, a040) Value Type                          CS: 'NUM'
-#          (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '113734'
-#             (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#             (0008, 0104) Code Meaning                        LO: 'X-Ray Tube Current'
-#             ---------
-#          (0040, a300)  Measured Value Sequence   1 item(s) ----
-#             (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#                (0008, 0100) Code Value                          SH: 'mA'
-#                (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#                (0008, 0103) Coding Scheme Version               SH: '1.4'
-#                (0008, 0104) Code Meaning                        LO: 'mA'
-#                ---------
-#             (0040, a30a) Numeric Value                       DS: '176'
-#             ---------
-#          ---------
-#          (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#          (0040, a040) Value Type                          CS: 'NUM'
-#          (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: '113834'
-#             (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#             (0008, 0104) Code Meaning                        LO: 'Exposure Time per Rotation'
-#             ---------
-#          (0040, a300)  Measured Value Sequence   1 item(s) ----
-#             (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#                (0008, 0100) Code Value                          SH: 's'
-#                (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#                (0008, 0103) Coding Scheme Version               SH: '1.4'
-#                (0008, 0104) Code Meaning                        LO: 's'
-#                ---------
-#             (0040, a30a) Numeric Value                       DS: '0.5'
-#             ---------
-#          ---------
-#       ---------
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'CONTAINER'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '113829'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'CT Dose'
-#       ---------
-#    (0040, a050) Continuity Of Content               CS: 'SEPARATE'
-#    (0040, a730)  Content Sequence   3 item(s) ----
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113830'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Mean CTDIvol'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: 'mGy'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'mGy'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '9.91'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'CODE'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113835'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'CTDIw Phantom Type'
-#          ---------
-#       (0040, a168)  Concept Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113691'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'IEC Body Dosimetry Phantom'
-#          ---------
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#       (0040, a040) Value Type                          CS: 'NUM'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113838'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'DLP'
-#          ---------
-#       (0040, a300)  Measured Value Sequence   1 item(s) ----
-#          (0040, 08ea)  Measurement Units Code Sequence   1 item(s) ----
-#             (0008, 0100) Code Value                          SH: 'mGycm'
-#             (0008, 0102) Coding Scheme Designator            SH: 'UCUM'
-#             (0008, 0103) Coding Scheme Version               SH: '1.4'
-#             (0008, 0104) Code Meaning                        LO: 'mGycm'
-#             ---------
-#          (0040, a30a) Numeric Value                       DS: '708.2'
-#          ---------
-#       ---------
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'TEXT'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '121106'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'Comment'
-#       ---------
-#    (0040, a160) Text Value                          UT: 'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = Body, X-ray Modulation Type = XYZ_EC'
-#    ---------
-#    (0040, a010) Relationship Type                   CS: 'CONTAINS'
-#    (0040, a040) Value Type                          CS: 'CODE'
-#    (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '113876'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'Device Role in Procedure'
-#       ---------
-#    (0040, a168)  Concept Code Sequence   1 item(s) ----
-#       (0008, 0100) Code Value                          SH: '113859'
-#       (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#       (0008, 0104) Code Meaning                        LO: 'Irradiating Device'
-#       ---------
-#    (0040, a730)  Content Sequence   3 item(s) ----
-#       (0040, a010) Relationship Type                   CS: 'HAS PROPERTIES'
-#       (0040, a040) Value Type                          CS: 'TEXT'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113878'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Device Manufacturer'
-#          ---------
-#       (0040, a160) Text Value                          UT: 'SIEMENS'
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'HAS PROPERTIES'
-#       (0040, a040) Value Type                          CS: 'TEXT'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113879'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Device Model Name'
-#          ---------
-#       (0040, a160) Text Value                          UT: 'SOMATOM Definition Flash'
-#       ---------
-#       (0040, a010) Relationship Type                   CS: 'HAS PROPERTIES'
-#       (0040, a040) Value Type                          CS: 'TEXT'
-#       (0040, a043)  Concept Name Code Sequence   1 item(s) ----
-#          (0008, 0100) Code Value                          SH: '113880'
-#          (0008, 0102) Coding Scheme Designator            SH: 'DCM'
-#          (0008, 0104) Code Meaning                        LO: 'Device Serial Number'
-#          ---------
-#       (0040, a160) Text Value                          UT: '73491'
-#       ---------
-#    ---------
-# ###########################################
