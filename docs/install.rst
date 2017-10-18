@@ -333,4 +333,4 @@ To find out more about this, refer to the :doc:`netdicom` docs.
 
 .. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
 .. _`Java`: http://java.com/en/download/
-.. _`PixelMed Java DICOM Toolkit`:http://www.pixelmed.com/dicomtoolkit.html
+.. _`PixelMed Java DICOM Toolkit`: http://www.pixelmed.com/dicomtoolkit.html
