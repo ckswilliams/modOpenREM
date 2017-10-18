@@ -19,7 +19,7 @@ class FilterViewTests(TestCase):
         Load in all the mammo objects so there is something to filter!
         """
         PatientIDSettings.objects.create()
-        user = User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
+        User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
 
         mam1 = "test_files/MG-Im-Hologic-PropProj.dcm"
         mam2 = "test_files/MG-Im-GE-SenDS-scaled.dcm"
