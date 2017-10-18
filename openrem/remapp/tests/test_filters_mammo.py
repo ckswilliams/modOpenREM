@@ -16,7 +16,7 @@ class FilterViewTests(TestCase):
     """
     def setUp(self):
         """
-        Load in all the mammo objects so there is something to filter!
+        Load in all the mammo objects so that there is something to filter!
         """
         PatientIDSettings.objects.create()
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
