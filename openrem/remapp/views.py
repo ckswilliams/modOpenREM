@@ -444,11 +444,13 @@ def rf_summary_list_filter(request):
     from remapp.forms import RFChartOptionsForm
 
     if request.user.groups.filter(name='pidgroup'):
-        f = RFFilterPlusPid(request.GET,
-                            queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by().distinct())
+        f = RFFilterPlusPid(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
     else:
-        f = RFSummaryListFilter(request.GET,
-                                queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by().distinct())
+        f = RFSummaryListFilter(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -1093,9 +1095,13 @@ def mg_summary_list_filter(request):
         del filter_data['page']
 
     if request.user.groups.filter(name='pidgroup'):
-        f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGFilterPlusPid(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
     else:
-        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGSummaryListFilter(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
