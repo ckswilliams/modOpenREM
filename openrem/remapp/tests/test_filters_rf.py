@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-# test_filters_mammo.py
+# test_filters_rf.py
 
 import os
 from django.contrib.auth.models import User
@@ -12,11 +12,11 @@ from remapp.models import PatientIDSettings
 
 class FilterViewTests(TestCase):
     """
-    Class to test the filter views for mammography
+    Class to test the filter views for fluoroscopy
     """
     def setUp(self):
         """
-        Load in all the mammo objects so that there is something to filter!
+        Load in all the rf objects so that there is something to filter!
         """
         PatientIDSettings.objects.create()
         User.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
