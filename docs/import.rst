@@ -59,7 +59,7 @@ This extractor is designed to create a DICOM radiation dose structured report
 from the information contained in secondary capture dose summary images,
 supplemented by data stored in image tags. It requires a folder of DICOM
 objects as input (suitable data can be retrieved from a DICOM node using the
-`qrscu.py` command with the `-toshiba` switch, :ref:`qrcommandlineinterface`).
+`qrscu.py` command with the `-toshiba` switch - see :ref:`qrcommandlineinterface`).
 It creates an initial RDSR from the secondary capture dose summary, and then
 tries to enrich this with additional information contained in image tags. The
 routine attempts to extract the following information from the image tags and
@@ -89,8 +89,10 @@ cannot create RDSR objects themselves. It is known to work with:
 
     * Toshiba CX, software version V4.40ER011
     * Toshiba CXL, software version V4.51ER014
-    * Toshiba CXL, software version V4.86ER008 (this software version can produce RDSR objects directly, but may not
-    populate some fields, such as requested procedure name and study description)
+    * Toshiba CXL, software version V4.86ER008 (this software version can
+      produce RDSR objects directly, but may not populate some fields, such as
+      requested procedure name and study description)
 
-It has also been used successfully on images from a GE LightSpeed Plus scanner,
-although in this case no supplementary data is extracted from image tags.
+This extractor has also been used successfully on images from a GE LightSpeed
+Plus scanner, although in this case no supplementary data is extracted from
+image tags.
