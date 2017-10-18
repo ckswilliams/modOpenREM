@@ -19,6 +19,7 @@ OpenREM version history
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
 * `#508`_  Testing: DX sample files are now tested
+* `#507`_  Interface: Mammo now filterable by study description, procedure, requested procedure and acquisition protocol
 * `#505`_  Charts: n is now displayed on charts
 * `#504`_  Charts: Fixed issue with null values
 * `#503`_  Internationalisation: more robust decoding and use of unicode throughout
