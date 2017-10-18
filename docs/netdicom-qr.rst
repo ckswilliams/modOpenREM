@@ -148,8 +148,8 @@ example PowerShell script is shown below:
     # Run the openrem_qr.py script with yesterday's date as the to and from date
     python D:\Server_Apps\python27\Scripts\openrem_qr.py 2 1 -ct -f $dateString -t $dateString
 
-The above PowerShell script could be run by the Windows `Task Scheduler` in the early hours of each morning by running
-`powershell` with the argument `-file C:\path\to\script.ps1`.
+The above PowerShell script could be run on a regular basis by adding a task to the Windows `Task Scheduler` that
+executes the `powershell` program with an argument of `-file C:\\path\\to\\script.ps1`.
 
 .. _qrtroubleshooting:
 
