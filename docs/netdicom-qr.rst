@@ -136,7 +136,20 @@ If you want to do this regularly to catch new studies, you might like to use a s
 This script could be run once an hour using a cron job. By asking for the date an hour ago, you shouldn't miss exams
 taking place in the last hour of the day.
 
-A similar script could be created as a batch file on Windows and run using the scheduler.
+A similar script could be created as a batch file or PowerShell script on Windows and run using the scheduler. An
+example PowerShell script is shown below:
+
+.. sourcecode:: powershell
+
+    # Script to obtain all CT studies from a DICOM node on the day prior to the
+    # date the script is run and import them into OpenREM.
+    # Get yesterday's date
+    $dateString = "{0:yyyy-MM-dd}" -f (get-date).AddDays(-1)
+    # Run the openrem_qr.py script with yesterday's date as the to and from date
+    python D:\Server_Apps\python27\Scripts\openrem_qr.py 2 1 -ct -f $dateString -t $dateString
+
+The above PowerShell script could be run by the Windows `Task Scheduler` in the early hours of each morning by running
+`powershell` with the argument `-file C:\path\to\script.ps1`.
 
 .. _qrtroubleshooting:
 
