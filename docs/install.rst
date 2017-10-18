@@ -100,7 +100,7 @@ Linux example::
     MEDIA_ROOT = "/var/openrem/media/"
 
 Windows example::
-    
+
     MEDIA_ROOT = "C:/Users/myusername/Documents/OpenREM/media/"
 
 
@@ -182,7 +182,7 @@ Time zone
 ^^^^^^^^^
 
 Configure the local timezone in order to get correct times in the logfiles.
-The default timezone is set at 'Europe/London'. Valid options can be found here: 
+The default timezone is set at 'Europe/London'. Valid options can be found here:
 http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 
 .. sourcecode:: python
@@ -192,7 +192,7 @@ http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 Language
 ^^^^^^^^
 
-Configure the local language. Default language is set at us-english. Valid options can be found here: 
+Configure the local language. Default language is set at us-english. Valid options can be found here:
 http://www.i18nguy.com/unicode/language-identifiers.html
 
 .. sourcecode:: python
@@ -200,6 +200,23 @@ http://www.i18nguy.com/unicode/language-identifiers.html
     LANGUAGE_CODE = 'en-us'
 
 .. _database_creation:
+
+Toshiba CT RDSR creation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you need to create RDSR files for older Toshiba CT scanners then set the paths to the DICOM toolkit binary files,
+java.exe and pixelmed.jar file for your system:
+
+.. sourcecode:: python
+
+    # Locations of various tools for DICOM RDSR creation from CT images
+    DCMTK_PATH = 'C:/Apps/dcmtk-3.6.0-win32-i386/bin'
+    DCMCONV = os.path.join(DCMTK_PATH, 'dcmconv.exe')
+    DCMMKDIR = os.path.join(DCMTK_PATH, 'dcmmkdir.exe')
+    JAVA_EXE = 'C:/Apps/doseUtility/windows/jre/bin/java.exe'
+    JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
+    PIXELMED_JAR = 'C:/Apps/doseUtility/pixelmed.jar'
+    PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
 
 Create the database
 -------------------

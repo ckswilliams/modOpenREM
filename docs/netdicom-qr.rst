@@ -70,6 +70,8 @@ side at this stage will have no effect.
 
 The progress of the retrieve is displayed in the same place until the retrieve is complete.
 
+.. _qrcommandlineinterface:
+
 ***********************************************
 Query-retrieve using the command line interface
 ***********************************************
@@ -79,7 +81,7 @@ In a command window/shell, ``qrscu.py -h`` should present you with the following
 .. sourcecode:: console
 
     usage: qrscu.py [-h] [-ct] [-mg] [-fl] [-dx] [-f yyyy-mm-dd] [-t yyyy-mm-dd]
-                    [-e string] [-i string] [-sr] [-dup] qrid storeid
+                    [-e string] [-i string] [-sr] [-dup] [-toshiba] qrid storeid
 
     Query remote server and retrieve to OpenREM
 
@@ -105,6 +107,7 @@ In a command window/shell, ``qrscu.py -h`` should present you with the following
                             quote whole string
       -sr                   Advanced: Query for structured report only studies
       -dup                  Advanced: Retrieve studies that are already in database
+      -toshiba              Advanced: Attempt to retrieve CT dose summary objects and one image from each series
 
 As an example, if you wanted to query the PACS for DX images on the 5th April 2010 with any study descriptions including
 ``imported`` excluded, first you need to know the database IDs of the remote node and the local node you want the images
