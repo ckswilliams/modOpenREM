@@ -199,13 +199,18 @@ http://www.i18nguy.com/unicode/language-identifiers.html
 
     LANGUAGE_CODE = 'en-us'
 
-.. _database_creation:
 
 Toshiba CT RDSR creation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you need to create RDSR files for older Toshiba CT scanners then set the paths to the DICOM toolkit binary files,
-java.exe and pixelmed.jar file for your system:
+If you need to import data from older Toshiba CT scanners into OpenREM then the following tools need to be available
+on the same server as OpenREM:
+
+    * The `Offis DICOM toolkit`_
+    * `Java`_
+    * pixelmed.jar from the `PixelMed Java DICOM Toolkit`_
+
+The paths to these must be set in `local_settings.py` for your system:
 
 .. sourcecode:: python
 
@@ -217,6 +222,8 @@ java.exe and pixelmed.jar file for your system:
     JAVA_OPTIONS = '-Xms256m -Xmx512m -Xss1m -cp'
     PIXELMED_JAR = 'C:/Apps/doseUtility/pixelmed.jar'
     PIXELMED_JAR_OPTIONS = '-Djava.awt.headless=true com.pixelmed.doseocr.OCR -'
+
+.. _database_creation:
 
 Create the database
 -------------------
@@ -324,3 +331,6 @@ node (Store Service Class Provider/SCP) and possibly a query-retrieve service cl
 To find out more about this, refer to the :doc:`netdicom` docs.
 
 
+.. _`Offis DICOM toolkit`: http://dicom.offis.de/dcmtk.php.en
+.. _`Java`: http://java.com/en/download/
+.. _`PixelMed Java DICOM Toolkit`:http://www.pixelmed.com/dicomtoolkit.html
