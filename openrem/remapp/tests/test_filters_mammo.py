@@ -9,7 +9,6 @@ from remapp.extractors import mam, rdsr
 from remapp.models import PatientIDSettings
 
 
-
 class FilterViewTests(TestCase):
     """
     Class to test the filter views for mammography
