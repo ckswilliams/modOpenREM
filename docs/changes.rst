@@ -4,9 +4,9 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
-
+* `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#542`_  Interface: Added display name to all detailed html pages
-* `#535`_  Interface: Fixed problem where categorie names that included a plus symbol caused filtering and chart issues
+* `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
