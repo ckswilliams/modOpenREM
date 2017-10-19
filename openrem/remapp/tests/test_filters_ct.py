@@ -66,6 +66,30 @@ class FilterViewTests(TestCase):
         display_name = u'PHILIPS-E71E3F0'  # Display name of study with matching study description
         self.assertContains(response, display_name)
 
+    def test_filter_procedure(self):
+        """
+        Apply procedure filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get('http://test/openrem/ct/?procedure_code_meaning=abdomen', follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        display_name = u'ACC12345601'  # Display name of study with matching study description
+        self.assertContains(response, display_name)
+
+    def test_filter_requested_procedure(self):
+        """
+        Apply procedure filter
+        """
+        self.client.login(username='temporary', password='temporary')
+        response = self.client.get('http://test/openrem/ct/?requested_procedure=bones', follow=True)
+        self.assertEqual(response.status_code, 200)
+        one_responses_text = u'There are 1 studies in this list.'
+        self.assertContains(response, one_responses_text)
+        display_name = u'001234512345678'  # Display name of study with matching study description
+        self.assertContains(response, display_name)
+
     def test_filter_acquisition_protocol(self):
         """
         Apply acquisition protocol filter
