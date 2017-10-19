@@ -4,9 +4,9 @@ OpenREM version history
 
 0.8.0 (?)
 ---------
-
+* `#544`_  Interface: Added procedure, requested procedure to summary listings and details and filtering
 * `#542`_  Interface: Added display name to all detailed html pages
-* `#535`_  Interface: Fixed problem where categorie names that included a plus symbol caused filtering and chart issues
+* `#535`_  Interface: Fixed problem where category names that included a plus symbol caused filtering and chart issues
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
@@ -19,6 +19,7 @@ OpenREM version history
 * `#511`_  Testing: develop and other branches can now be deployed to dev.openrem.org and testing.openrem.org automatically
 * `#509`_  Skin dose maps: now recalculated on view if recorded height or weight has changed since last calculation
 * `#508`_  Testing: DX sample files are now tested
+* `#507`_  Interface: Mammo now filterable by study description, procedure, requested procedure and acquisition protocol
 * `#505`_  Charts: n is now displayed on charts
 * `#504`_  Charts: Fixed issue with null values
 * `#503`_  Internationalisation: more robust decoding and use of unicode throughout
