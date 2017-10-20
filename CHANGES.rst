@@ -13,6 +13,7 @@ OpenREM version history
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
 * `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
 * `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
+* `#521`_  Testing: Added tests for dual source CT imports
 * `#518`_  Importing: Fixed imports where CT Target Region isn't specified
 * `#517`_  Interface: Operator name is now displayed on the detail page for each modality, along with physician for CT and fluoro
 * `#516`_  Imports: MultiValue person names are now stored as a decoded string, not a list

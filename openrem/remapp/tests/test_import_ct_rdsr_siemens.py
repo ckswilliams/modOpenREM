@@ -39,7 +39,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.patientmoduleattr_set.get().not_patient_indicator, None)
 
         # Test that study level data is recorded correctly
-        self.assertEqual(study.study_date, datetime.date(1997, 01, 01))
+        self.assertEqual(study.study_date, datetime.date(1997, 1, 1))
         self.assertEqual(study.study_time, datetime.time(00, 00, 00))
         self.assertEqual(study.accession_number, 'ACC12345601')
         self.assertEqual(study.study_description, 'Thorax^TAP (Adult)')
@@ -55,7 +55,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.patientstudymoduleattr_set.get().patient_age, '067Y')
         self.assertAlmostEqual(study.patientstudymoduleattr_set.get().patient_age_decimal, Decimal(67.6))
 
-        #Test that irradiation time data is stored correctly
+        # Test that irradiation time data is stored correctly
         self.assertEqual(study.ctradiationdose_set.get().start_of_xray_irradiation,
             datetime.datetime(1997, 1, 1, 0, 6, 31, 737000))
         self.assertEqual(study.ctradiationdose_set.get().end_of_xray_irradiation,
@@ -66,7 +66,7 @@ class ImportCTRDSR(TestCase):
             'Diagnostic Intent')
         self.assertEqual(study.ctradiationdose_set.get().source_of_dose_information.code_meaning, 'Automated Data Collection')
 
-        #Test that device observer data is stored correctly
+        # Test that device observer data is stored correctly
         self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
             device_observer_serial_number, '00001')
         self.assertEqual(study.ctradiationdose_set.get().observercontext_set.get().
@@ -87,7 +87,7 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(study.ctradiationdose_set.get().ctaccumulateddosedata_set.get().
             ct_dose_length_product_total, Decimal(724.52))
 
-        #Test that CT event data is recorded correctly
+        # Test that CT event data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
             ctirradiationeventdata_set.order_by('id')[0].exposure_time, Decimal(8.37))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -216,7 +216,7 @@ class ImportCTRDSR(TestCase):
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.order_by('id')[3].scanninglength_set.get().scanning_length, Decimal(737))
 
-        #Test that CT Dose data is recorded correctly
+        # Test that CT Dose data is recorded correctly
         self.assertAlmostEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.order_by('id')[0].mean_ctdivol, Decimal(0.14))
         self.assertAlmostEqual(study.ctradiationdose_set.get().
@@ -258,7 +258,7 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.order_by('id')[3].ctdiw_phantom_type.code_meaning, 'IEC Body Dosimetry Phantom')
 
-        #Test that 'device participant' data is recorded correctly
+        # Test that 'device participant' data is recorded correctly
         self.assertEqual(study.ctradiationdose_set.get().
                 ctirradiationeventdata_set.order_by('id')[0].deviceparticipant_set.get().
                          device_manufacturer, 'SIEMENS')
@@ -316,9 +316,72 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.patientmoduleattr_set.get().not_patient_indicator, u'IDs: *qa* | Names: ')
 
         # Test that study level data is recorded correctly
-        self.assertEqual(study.study_date, datetime.date(2013, 06, 11))
-        self.assertEqual(study.study_time, datetime.time(14, 04, 19, 468000))
+        self.assertEqual(study.study_date, datetime.date(2013, 6, 11))
+        self.assertEqual(study.study_time, datetime.time(14, 4, 19, 468000))
         self.assertEqual(study.accession_number, '74624646290')
         self.assertEqual(study.study_description, 'Specials^PhysicsTesting (Adult)')
         self.assertEqual(study.modality_type, 'CT')
         self.assertEqual(study.referring_physician_name, u'Müller | Smith')
+
+        # Test that dual energy axial event data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].exposure_time, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].nominal_single_collimation_width, Decimal(0.6))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].nominal_total_collimation_width, Decimal(19.2))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].acquisition_protocol, 'DE_laser align')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].number_of_xray_sources, Decimal(2))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].comment,
+                'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = '
+                'Body, X-ray Modulation Type = OFF, Sn Filter (Tube B) = yes')
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                kvp, Decimal(100))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                kvp, Decimal(140))
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                maximum_xray_tube_current, Decimal(400))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                maximum_xray_tube_current, Decimal(310))
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                xray_tube_current, Decimal(399))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                xray_tube_current, Decimal(308))
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                exposure_time_per_rotation, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                exposure_time_per_rotation, Decimal(0.5))
+
+        # Test Dual source series, just exposure time per rotation
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                exposure_time_per_rotation, Decimal(0.238))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                exposure_time_per_rotation, Decimal(0.151))
+
