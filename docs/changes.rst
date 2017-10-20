@@ -10,6 +10,7 @@ OpenREM version history
 * `#534`_  Interface: Chart drilldown reported as not working - was actually due to a user's database migrations
 * `#533`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
 * `#528`_  Query Retrieve: Reduced number of simultaneous associations to one, reused for everything
+* `#526`_  Code quality: Addressed some of the code quality/style issues raised by `Codacy`_
 * `#525`_  Importing: Improved mammo import by checking compression force before converting to float
 * `#524`_  Importing: Improved mammo import by checking anode exists before converting to DICOM terms
 * `#523`_  Importing: Changed mammo import to use del_no_match instead of del_mg_im if not mammo
@@ -1346,3 +1347,4 @@ Reopened issue
 ..  _`NHSBSP specific mammography csv export`: https://bitbucket.org/jacole/openrem-visualisation/commits/0ee416511c847960523a6475ef33ac72#comment-1003330
 ..  _@rijkhorst: https://bitbucket.org/rijkhorst/
 ..  _@LuukO: https://bitbucket.org/LuukO/
+..  _Codacy: https://www.codacy.com/app/OpenREM/openrem
