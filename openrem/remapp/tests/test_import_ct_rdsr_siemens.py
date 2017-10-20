@@ -322,3 +322,66 @@ class ImportCTRDSR(TestCase):
         self.assertEqual(study.study_description, 'Specials^PhysicsTesting (Adult)')
         self.assertEqual(study.modality_type, 'CT')
         self.assertEqual(study.referring_physician_name, u'Müller | Smith')
+
+        # Test that dual energy axial event data is recorded correctly
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].exposure_time, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].nominal_single_collimation_width, Decimal(0.6))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].nominal_total_collimation_width, Decimal(19.2))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].acquisition_protocol, 'DE_laser align')
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].number_of_xray_sources, Decimal(2))
+        self.assertEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].comment,
+                'Internal technical scan parameters: Organ Characteristic = Abdomen, Body Size = Adult, Body Region = '
+                'Body, X-ray Modulation Type = OFF, Sn Filter (Tube B) = yes')
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                kvp, Decimal(100))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                kvp, Decimal(140))
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                maximum_xray_tube_current, Decimal(400))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                maximum_xray_tube_current, Decimal(310))
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                xray_tube_current, Decimal(399))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+            ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                xray_tube_current, Decimal(308))
+
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                exposure_time_per_rotation, Decimal(0.5))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[0].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                exposure_time_per_rotation, Decimal(0.5))
+
+        # Test Dual source series, just exposure time per rotation
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[0].
+                exposure_time_per_rotation, Decimal(0.238))
+        self.assertAlmostEqual(study.ctradiationdose_set.get().
+                ctirradiationeventdata_set.order_by('id')[1].ctxraysourceparameters_set.order_by(
+            'identification_of_the_xray_source')[1].
+                exposure_time_per_rotation, Decimal(0.151))
+
