@@ -19,6 +19,7 @@
                 <li>Study date: {{ generalstudymoduleattr.study_date }}</li>
                 <li>Study time: {{ generalstudymoduleattr.study_time|date:"H:i" }}</li>
                 <li>Study description: {{ generalstudymoduleattr.study_description }}</li>
+                <li>Procedure: {{ generalstudymoduleattr.procedure_code_meaning }}</li>
                 <li>Requested procedure: {{ generalstudymoduleattr.requested_procedure_code_meaning }}</li>
                 <li>Patient age: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_age_decimal|floatformat:1 }} years</li>
                 <li>Patient height and weight: {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_size|floatformat:2 }} m, {{ generalstudymoduleattr.patientstudymoduleattr_set.get.patient_weight|floatformat:1 }} kg</li>
@@ -43,6 +44,7 @@
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.manufacturer_model_name }} |
                     {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.station_name }}
                 </li>
+                <li>Display name: {{ generalstudymoduleattr.generalequipmentmoduleattr_set.get.unique_equipment_name.display_name }}</li>
                 <li>Study UID: {{ generalstudymoduleattr.study_instance_uid }}</li>
                 <li>Performing physician(s): {{ generalstudymoduleattr.performing_physician_name }}</li>
                 <li>Operator(s): {{ generalstudymoduleattr.operator_name }}</li>

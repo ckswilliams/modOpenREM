@@ -3,17 +3,23 @@ OpenREM
 #######
 ====================
 
-.. image:: https://coveralls.io/repos/bitbucket/openrem/openrem/badge.svg?branch=develop
-    :target: https://coveralls.io/bitbucket/openrem/openrem?branch=develop
-
 .. image:: https://img.shields.io/pypi/v/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
 .. image:: https://img.shields.io/pypi/pyversions/openrem.svg?
     :target: https://badge.fury.io/py/openrem
 
+Bitbucket:
+
 .. image:: https://img.shields.io/bitbucket/issues/openrem/openrem.svg?
     :target: https://bitbucket.org/openrem/openrem/issues?status=new&status=open
+
+Coveralls:
+
+.. image:: https://coveralls.io/repos/bitbucket/openrem/openrem/badge.svg?branch=develop
+    :target: https://coveralls.io/bitbucket/openrem/openrem?branch=develop
+
+Codacy:
 
 .. image:: https://api.codacy.com/project/badge/Grade/2117af7281134e42ace3efe5fc4a5255
     :target: https://www.codacy.com/app/OpenREM/openrem?utm_source=openrem@bitbucket.org&amp;utm_medium=referral&amp;utm_content=openrem/openrem&amp;utm_campaign=Badge_Grade

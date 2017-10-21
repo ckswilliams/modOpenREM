@@ -1174,6 +1174,10 @@ def rfopenskin(studyid):
             positioner_secondary_end_angle = event.irradeventxraymechanicaldata_set.get().positioner_secondary_end_angle
             column_angulation = event.irradeventxraymechanicaldata_set.get().column_angulation
 
+        xray_filter_type = u''
+        xray_filter_material = u''
+        xray_filter_thickness_minimum = u''
+        xray_filter_thickness_maximum = u''
         try:
             for filter in event.irradeventxraysourcedata_set.get().xrayfilters_set.all():
                 try:
@@ -1183,15 +1187,9 @@ def rfopenskin(studyid):
                         xray_filter_thickness_minimum = filter.xray_filter_thickness_minimum
                         xray_filter_thickness_maximum = filter.xray_filter_thickness_maximum
                 except AttributeError:
-                        xray_filter_type = u''
-                        xray_filter_material = u''
-                        xray_filter_thickness_minimum = u''
-                        xray_filter_thickness_maximum = u''
+                    pass
         except ObjectDoesNotExist:
-            xray_filter_type = u''
-            xray_filter_material = u''
-            xray_filter_thickness_minimum = u''
-            xray_filter_thickness_maximum = u''
+            pass
 
         try:
             event.irradeventxraysourcedata_set.get().kvp_set.get()

@@ -26,10 +26,14 @@
 # Includes an extra 1. after the root UID to enable future use for
 # anthing else.
 
-from celery import shared_task
 import logging
+from netdicom.applicationentity import AE
+from netdicom.SOPclass import StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass
+from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
 
 logger = logging.getLogger(__name__)
+qr_logger = logging.getLogger('remapp.netdicom.qrscu')
+
 
 # call back
 def OnAssociateResponse(association):
@@ -51,9 +55,6 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     :param kwargs:
     :return: 'AssocFail', Success or ?
     """
-    from netdicom.applicationentity import AE
-    from netdicom.SOPclass import VerificationSOPClass
-    from dicom.UID import ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian
     from remapp.models import DicomRemoteQR, DicomStoreSCP
 
     if store_scp and scp_pk:
@@ -118,3 +119,31 @@ def echoscu(scp_pk=None, store_scp=False, qr_scp=False, *args, **kwargs):
     else:
         logger.info(u"Returning EchoFail response from echo to {0} {1} {2}. Type is {3}.".format(rh, rp, aec, echo.Type))
         return "EchoFail"
+
+
+def _create_ae(aet, port=None, sop_scu=None, sop_scp=None, transfer_syntax=None):
+    """
+    Function to create an application entity
+    :param aet: string, AE Title
+    :param sop_classes: list of supported SOP classes from netdicom.SOPclass to override default set
+    :param transfer_syntax: list of supported transfer syntax from dicom.UID to override default set
+    :return: application entity object ready to be started
+    """
+    qr_logger.debug(u"Create AE called with AET {0}, port {1}, SOP SCUs {2}, SOP SCPs {3} and transfer syntax {4} "
+                 u"(None if default)".format(aet, port, sop_scu, sop_scp, transfer_syntax))
+    if port is None:
+        port = 0
+    if sop_scu is None:
+        sop_scu = [StudyRootFindSOPClass, StudyRootMoveSOPClass, VerificationSOPClass]
+    if sop_scp is None:
+        sop_scp = []
+    if transfer_syntax is None:
+        transfer_syntax = [ExplicitVRLittleEndian, ImplicitVRLittleEndian, ExplicitVRBigEndian]
+
+    qr_logger.debug(u"Creating AE with AET {0}, port {1}, SOP SCUs {2}, SOP SCPs {3} and transfer syntax {4}".format(
+        aet, port, sop_scu, sop_scp, transfer_syntax))
+    my_ae = AE(aet, port, sop_scu, sop_scp, transfer_syntax)
+    my_ae.OnAssociateResponse = OnAssociateResponse
+    my_ae.OnAssociateRequest = OnAssociateRequest
+
+    return my_ae
