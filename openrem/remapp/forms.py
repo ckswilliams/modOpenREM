@@ -258,6 +258,8 @@ class DicomQueryForm(forms.Form):
     stationname_include_field = forms.CharField(required=False,
                                          label="Only keep studies or series with these terms in the station name:",
                                          help_text="Comma separated list of terms")
+    get_toshiba_images_field = forms.BooleanField(label=u"Attempt to get Toshiba dose images", required=False,
+                                            help_text=u"Only applicable if using Toshiba RDSR generator extension")
 
     def __init__(self, *args, **kwargs):
         super(DicomQueryForm, self).__init__(*args, **kwargs)
@@ -289,6 +291,7 @@ class DicomQueryForm(forms.Form):
                         'Advanced',
                         'inc_sr_field',
                         'duplicates_field',
+                        'get_toshiba_images_field',
                         active=False
                     )
                 ),
@@ -306,6 +309,7 @@ class DicomQueryForm(forms.Form):
         mods = cleaned_data.get("modality_field")
         inc_sr = cleaned_data.get("inc_sr_field")
         qr_logger.debug("Form mods are {0}, inc_sr is {1}".format(mods, inc_sr))
+        qr_logger.debug("All form modes are {0}".format(cleaned_data))
         if inc_sr:
             self.cleaned_data['modality_field'] = None
         elif not mods:
