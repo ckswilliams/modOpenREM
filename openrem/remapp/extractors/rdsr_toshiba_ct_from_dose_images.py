@@ -41,7 +41,6 @@ def find_dose_summary_objects(folder_path):
         "studyTime" and "instanceNumber".
     """
     import dicom
-    import traceback
     from dicom.filereader import InvalidDicomError
 
     sop_class_uid = "Secondary Capture Image Storage"
@@ -58,7 +57,7 @@ def find_dose_summary_objects(folder_path):
 
             except InvalidDicomError as e:
                 logger.debug("Invalid DICOM error: {0} when trying to read {1}".format(e.message, os.path.join(folder_path, file_name)))
-            except Exception as e:
+            except Exception:
                 logger.debug(traceback.format_exc())
 
     return dose_summary_object_list
@@ -85,7 +84,6 @@ def _split_by_studyinstanceuid(dicom_path):
         original dicom_path.
 
     """
-    import shutil
     import dicom
 
     from dicom.filereader import InvalidDicomError
@@ -107,7 +105,7 @@ def _split_by_studyinstanceuid(dicom_path):
                 file_counter += 1
             except InvalidDicomError as e:
                 logger.debug('Invalid DICOM error: {0} when trying to read {1}'.format(e.message, os.path.join(dicom_path, filename)))
-            except Exception as e:
+            except Exception:
                 logger.debug(traceback.format_exc())
 
     return folder_list
@@ -170,35 +168,35 @@ def _find_extra_info(dicom_path):
                             info_dictionary['AcquisitionNumber'] = dcm.AcquisitionNumber
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
                             info_dictionary['AcquisitionTime'] = dcm.AcquisitionTime
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
                             info_dictionary['ProtocolName'] = dcm.ProtocolName
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
                             info_dictionary['ExposureTime'] = dcm.ExposureTime
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
                             info_dictionary['KVP'] = dcm.KVP
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
@@ -208,7 +206,7 @@ def _find_extra_info(dicom_path):
                                 info_dictionary['NominalTotalCollimationWidth'] = dcm[0x7005, 0x1009].value.count('1') * float(dcm[0x7005, 0x1008].value)
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
@@ -219,9 +217,9 @@ def _find_extra_info(dicom_path):
                                 info_dictionary['SpiralPitchFactor'] = dcm[0x7005, 0x1023].value
                             except KeyError:
                                 pass
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
@@ -240,7 +238,7 @@ def _find_extra_info(dicom_path):
                                 logger.debug('CTDIvol found in dcm.CTDIvol ({0}).'.format(dcm.CTDIvol))
                             except AttributeError:
                                 pass
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
                         except TypeError:
                             logger.debug('There was a type error when finding CTDIvol. Trying elsewhere.')
@@ -249,17 +247,16 @@ def _find_extra_info(dicom_path):
                                 logger.debug('CTDIvol found in dcm.CTDIvol ({0}).'.format(dcm.CTDIvol))
                             except AttributeError:
                                 pass
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
-                            pass
 
                         try:
                             info_dictionary['ExposureModulationType'] = dcm.ExposureModulationType
                         except AttributeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         try:
@@ -276,7 +273,7 @@ def _find_extra_info(dicom_path):
                             pass
                         except TypeError:
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                         acquisition_info.append(info_dictionary)
@@ -291,7 +288,7 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 # study_info['StudyDescription'] isn't present, so add it
                                 study_info['StudyDescription'] = dcm.StudyDescription
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
                     except AttributeError:
                         # dcm.StudyDescription isn't present. Try looking at the CodeMeaning of
@@ -305,14 +302,14 @@ def _find_extra_info(dicom_path):
                                 except KeyError:
                                     # study_info['StudyDescription'] isn't present, so add it
                                     study_info['StudyDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
-                                except Exception as e:
+                                except Exception:
                                     logger.debug(traceback.format_exc())
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
-                    except Exception as e:
+                    except Exception:
                         logger.debug(traceback.format_exc())
 
                     try:
@@ -324,7 +321,7 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 # study_info['RequestedProcedureDescription'] doesn't exist yet, so create it
                                 study_info['RequestedProcedureDescription'] = dcm.RequestedProcedureDescription
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
                     except AttributeError:
                         # dcm.RequestedProcedureDescription isn't present. Try looking at the
@@ -338,12 +335,12 @@ def _find_extra_info(dicom_path):
                                 except KeyError:
                                     # study_info['RequestedProcedureDescription'] isn't present, so add it
                                     study_info['RequestedProcedureDescription'] = dcm.ProcedureCodeSequence[0].CodeMeaning
-                                except Exception as e:
+                                except Exception:
                                     logger.debug(traceback.format_exc())
                         except AttributeError:
                             # dcm.ProcedureCodeSequence[0].CodeMeaning isn't present either
                             pass
-                        except Exception as e:
+                        except Exception:
                             logger.debug(traceback.format_exc())
 
                     try:
@@ -355,7 +352,7 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 # study_info['SoftwareVersions'] doesn't exist yet, so create it
                                 study_info['SoftwareVersions'] = dcm.SoftwareVersions
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
                     except AttributeError:
                         pass
@@ -369,19 +366,19 @@ def _find_extra_info(dicom_path):
                             except KeyError:
                                 # study_info['DeviceSerialNumber'] doesn't exist yet, so create it
                                 study_info['DeviceSerialNumber'] = dcm.DeviceSerialNumber
-                            except Exception as e:
+                            except Exception:
                                 logger.debug(traceback.format_exc())
                     except AttributeError:
                         pass
 
                 except AttributeError:
                     pass
-                except Exception as e:
+                except Exception:
                     logger.debug(traceback.format_exc())
 
             except InvalidDicomError:
                 pass
-            except Exception as e:
+            except Exception:
                 logger.debug(traceback.format_exc())
 
     logger.debug('Reached the end of _find_extra_info for images in {0}'.format(dicom_path))
@@ -462,7 +459,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
     except IOError as e:
         logger.debug('I/O error({0}): {1} when trying to read {2}'.format(e.errno, e.strerror, rdsr_file))
         return 0
-    except Exception as e:
+    except Exception:
         logger.debug(traceback.format_exc())
 
     # Update the study-level information if it does not exist, or is an empty string. Over-write DeviceSerialNumber
@@ -479,7 +476,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                 setattr(dcm, key, val)
         except AttributeError:
             setattr(dcm, key, val)
-        except Exception as e:
+        except Exception:
             logger.debug(traceback.format_exc())
     logger.debug('Study level data updated')
 
@@ -532,7 +529,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                             container2b.TextValue = val
                                                                 except AttributeError:
                                                                     pass
-                                                                except Exception as e:
+                                                                except Exception:
                                                                     logger.debug(traceback.format_exc())
 
                                                         if not data_exists:
@@ -573,7 +570,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                     data_exists = True
                                                                             except AttributeError:
                                                                                 pass
-                                                                            except Exception as e:
+                                                                            except Exception:
                                                                                 logger.debug(traceback.format_exc())
 
                                                                     if not data_exists:
@@ -691,7 +688,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                     data_exists = True
                                                                             except AttributeError:
                                                                                 pass
-                                                                            except Exception as e:
+                                                                            except Exception:
                                                                                 logger.debug(traceback.format_exc())
 
                                                                     if not data_exists:
@@ -750,7 +747,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                             container2b.TextValue = val
                                                                 except AttributeError:
                                                                     pass
-                                                                except Exception as e:
+                                                                except Exception:
                                                                     logger.debug(traceback.format_exc())
 
                                                         if not data_exists:
@@ -789,12 +786,12 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                                 kvp_data_exists = True
                                                                                         except AttributeError:
                                                                                             pass
-                                                                                        except Exception as e:
+                                                                                        except Exception:
                                                                                             logger.debug(traceback.format_exc())
                                                                             except AttributeError:
                                                                                 # Likely there's no ConceptNameCodeSequence attribute
                                                                                 pass
-                                                                            except Exception as e:
+                                                                            except Exception:
                                                                                 logger.debug(traceback.format_exc())
 
                                                                     if not source_parameters_exists:
@@ -839,7 +836,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                         except TypeError:
                                                                             # ContentSequence doesn't exist, so add it
                                                                             container2b.ContentSequence = Sequence([source_container])
-                                                                        except Exception as e:
+                                                                        except Exception:
                                                                             logger.debug(traceback.format_exc())
 
                                                                         source_parameters_exists = True
@@ -879,7 +876,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                 except AttributeError:
                                                                                     # Likely there's no ConceptNameCodeSequence attribute
                                                                                     pass
-                                                                                except Exception as e:
+                                                                                except Exception:
                                                                                     logger.debug(traceback.format_exc())
 
                                                     if key == 'ExposureTime':
@@ -903,12 +900,12 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                                 exposure_time_per_rotation_data_exists = True
                                                                                         except AttributeError:
                                                                                             pass
-                                                                                        except Exception as e:
+                                                                                        except Exception:
                                                                                             logger.debug(traceback.format_exc())
                                                                             except AttributeError:
                                                                                 # Likely there's no ConceptNameCodeSequence attribute
                                                                                 pass
-                                                                            except Exception as e:
+                                                                            except Exception:
                                                                                 logger.debug(traceback.format_exc())
 
                                                                     if not source_parameters_exists:
@@ -953,7 +950,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                         except TypeError:
                                                                             # ContentSequence doesn't exist, so add it
                                                                             container2b.ContentSequence = Sequence([source_container])
-                                                                        except Exception as e:
+                                                                        except Exception:
                                                                             logger.debug(traceback.format_exc())
 
                                                                         source_parameters_exists = True
@@ -993,7 +990,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                                                                 except AttributeError:
                                                                                     # Likely there's no ConceptNameCodeSequence attribute
                                                                                     pass
-                                                                                except Exception as e:
+                                                                                except Exception:
                                                                                     logger.debug(traceback.format_exc())
                                         except KeyError, e:
                                             logger.debug(traceback.format_exc())
@@ -1009,7 +1006,7 @@ def _update_dicom_rdsr(rdsr_file, additional_study_info, additional_acquisition_
                                 except ValueError:
                                     # Perhaps the contents of the DLP or CTDIvol are not values
                                     pass
-                                except Exception as e:
+                                except Exception:
                                     logger.debug(traceback.format_exc())
 
     logger.debug('Updated acquisition data')
@@ -1204,8 +1201,6 @@ def rdsr_toshiba_ct_from_dose_images(folder_name):
 
 
 if __name__ == "__main__":
-    import sys
-
     if len(sys.argv) != 2:
         sys.exit('Error: supply exactly one argument - the folder containing the DICOM objects')
 
