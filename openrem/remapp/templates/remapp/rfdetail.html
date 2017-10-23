@@ -63,7 +63,6 @@
                         <td><strong><script>document.write({{ irr_type.1 }}.toFixed(2));</script></strong></td>
                         <td><strong><script>document.write({{ irr_type.2 }}.toPrecision(3));</script></strong></td>
                         <td><strong><script>document.write({{ irr_type.3 }}.toFixed(2));</script></strong></td>
-
                     {% else %}
                         <td>{{ irr_type.0 }}</td>
                         <td><script>document.write({{ irr_type.1 }}.toFixed(2));</script></td>
@@ -343,7 +342,9 @@
   <th>Plane</th>
   <th>DAP (cGy.cm<sup>2</sup>)</th>
   <th>Dose at reference point (mGy)</th>
-  <th>Duration (ms)</th>
+  <th>Duration (ms)<br>
+      Exposure time (ms)
+  </th>
   <th>kVp</th>
   <th>mA</th>
   <th>Filters (mm)</th>
@@ -364,6 +365,14 @@
         <td>
         {% if event.irradeventxraysourcedata_set.get.irradiation_duration %}
             {{ event.irradeventxraysourcedata_set.get.irradiation_duration|multiply:1000|floatformat:1 }}
+        {% else %}
+            <i>n/a</i>
+        {% endif %}
+        <br>
+        {% if event.irradeventxraysourcedata_set.get.exposure_time %}
+            {{ event.irradeventxraysourcedata_set.get.exposure_time }}
+        {% else %}
+            <i>n/a</i>
         {% endif %}
         </td>
         <td>{{ event.irradeventxraysourcedata_set.get.kvp_set.get.kvp|floatformat:0 }}</td>
