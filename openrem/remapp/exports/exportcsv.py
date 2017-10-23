@@ -46,13 +46,11 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
     
     """
 
-    import os, sys, datetime
+    import sys
+    import datetime
     from tempfile import TemporaryFile
-    from django.conf import settings
     from django.core.files import File
-    from django.shortcuts import redirect
     from django.core.exceptions import ObjectDoesNotExist
-    from django.contrib import messages
     from remapp.models import Exports
     from remapp.tools.get_values import return_for_export, export_csv_prep
     from remapp.interface.mod_filters import ct_acq_filter
@@ -80,9 +78,9 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return redirect('/openrem/export/')
-        
+        logger.error(u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return
+
     # Get the data!
     e = ct_acq_filter(filterdict, pid=pid).qs
 
@@ -140,6 +138,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             u'E' + str(h+1) + u' Pitch',
             u'E' + str(h+1) + u' No. sources',
             u'E' + str(h+1) + u' CTDIvol',
+            u'E' + str(h+1) + u' Phantom',
             u'E' + str(h+1) + u' DLP',
             u'E' + str(h+1) + u' S1 name',
             u'E' + str(h+1) + u' S1 kVp',
@@ -259,6 +258,16 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
             else:
                 scanning_length = s.scanninglength_set.get().scanning_length
 
+            try:
+                if s.ctdiw_phantom_type.code_value == u'113691':
+                    phantom = u'32 cm'
+                elif s.ctdiw_phantom_type.code_value == u'113690':
+                    phantom = u'16 cm'
+                else:
+                    phantom = s.ctdiw_phantom_type.code_meaning
+            except AttributeError:
+                phantom = None
+
             examdata += [
                 export_csv_prep(s.acquisition_protocol),
                 s.ct_acquisition_type,
@@ -269,6 +278,7 @@ def exportCT2excel(filterdict, pid=False, name=None, patid=None, user=None):
                 s.pitch_factor,
                 s.number_of_xray_sources,
                 s.mean_ctdivol,
+                phantom,
                 s.dlp,
                 ]
             if s.number_of_xray_sources > 1:
@@ -350,12 +360,10 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
     
     """
 
-    import os, sys, datetime
+    import sys
+    import datetime
     from tempfile import TemporaryFile
-    from django.conf import settings
     from django.core.files import File
-    from django.shortcuts import redirect
-    from django.contrib import messages
     from remapp.models import GeneralStudyModuleAttr
     from remapp.models import Exports
     from remapp.interface.mod_filters import MGSummaryListFilter, MGFilterPlusPid
@@ -387,8 +395,8 @@ def exportMG2excel(filterdict, pid=False, name=None, patid=None, user=None):
         tsk.progress = u'CSV file created'
         tsk.save()
     except:
-        messages.error(request, u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
-        return redirect('/openrem/export/')
+        logger.error(u"Unexpected error creating temporary file - please contact an administrator: {0}".format(sys.exc_info()[0]))
+        return
         
     # Get the data!
 

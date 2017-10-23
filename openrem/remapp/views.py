@@ -444,9 +444,13 @@ def rf_summary_list_filter(request):
     from remapp.forms import RFChartOptionsForm
 
     if request.user.groups.filter(name='pidgroup'):
-        f = RFFilterPlusPid(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
+        f = RFFilterPlusPid(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
     else:
-        f = RFSummaryListFilter(request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF'))
+        f = RFSummaryListFilter(
+            request.GET, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='RF').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
@@ -638,9 +642,15 @@ def rf_detail_view(request, pk=None):
             sum_dap = Sum('projectionxrayradiationdose__irradeventxraydata__dose_area_product')*1000000,
             sum_dose_rp = Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__dose_rp')
         ).order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
-        stu_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
+        stu_dose_totals = stu_inc_totals.values_list('sum_dap', 'sum_dose_rp').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type')
         stu_irr_types = stu_inc_totals.values_list('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning').order_by('projectionxrayradiationdose__irradeventxraydata__irradiation_event_type').distinct()
-        study_totals = np.column_stack((stu_irr_types, stu_totals)).tolist()
+        stu_time_totals = [None] * len(stu_irr_types)
+        for idx, irr_type in enumerate(stu_irr_types):
+            stu_time_totals[idx] = GeneralStudyModuleAttr.objects.filter(pk=pk,
+                                                  projectionxrayradiationdose__irradeventxraydata__irradiation_event_type__code_meaning=
+                                                  irr_type[0]).aggregate(
+                Sum('projectionxrayradiationdose__irradeventxraydata__irradeventxraysourcedata__exposure_time')).values()[0] / 1000
+        study_totals = np.column_stack((stu_irr_types, stu_dose_totals, stu_time_totals)).tolist()
     except:
         messages.error(request, 'That study was not found')
         return redirect('/openrem/rf/')
@@ -1127,9 +1137,13 @@ def mg_summary_list_filter(request):
         del filter_data['page']
 
     if request.user.groups.filter(name='pidgroup'):
-        f = MGFilterPlusPid(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGFilterPlusPid(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
     else:
-        f = MGSummaryListFilter(filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG'))
+        f = MGSummaryListFilter(
+            filter_data, queryset=GeneralStudyModuleAttr.objects.filter(modality_type__exact='MG').order_by(
+            ).distinct())
 
     try:
         # See if the user has plot settings in userprofile
