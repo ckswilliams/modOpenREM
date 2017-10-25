@@ -116,6 +116,7 @@ def _ct_common_get_data(exams, pid, name, patid):
         exams.accession_number,
         exams.operator_name,
         exams.study_date,
+        exams.study_time,
     ]
     if pid and (name or patid):
         examdata += [
@@ -241,8 +242,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     try:
         tmpxlsx = TemporaryFile()
-        book = Workbook(tmpxlsx, {'default_date_format': settings.XLSX_DATE,
-                                 'strings_to_numbers':  False})
+        book = Workbook(tmpxlsx, {'strings_to_numbers':  False})
         tsk.progress = 'Workbook created'
         tsk.save()
     except:
@@ -258,6 +258,8 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
 
     # Create format for cells that should be text (independently from the possibility to read it as a number)
     textformat = book.add_format({'num_format': '@'})
+    dateformat = book.add_format({'num_format': settings.XLSX_DATE})
+    timeformat = book.add_format({'num_format': settings.XLSX_TIME})
 
     # Add summary sheet and all data sheet
     summarysheet = book.add_worksheet("Summary")
@@ -267,9 +269,10 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         date_column += 1
     if pid and patid:
         date_column += 1
-    wsalldata.set_column(date_column, date_column, 10)  # allow date to be displayed.
+    wsalldata.set_column(date_column, date_column, 10, dateformat)  # allow date to be displayed.
+    wsalldata.set_column(date_column+1, date_column+1, None, timeformat) # allow time to be displayed.
     if pid and (name or patid):
-        wsalldata.set_column(date_column+1, date_column+1, 10) # Birth date column
+        wsalldata.set_column(date_column+2, date_column+2, 10, dateformat) # Birth date column
     if pid and (name and patid):
         wsalldata.set_column(1, 1, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
     elif pid and (patid):
@@ -291,6 +294,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
         'Accession number',
         'Operator',
         'Study Date',
+        'Study Time',
     ]
     if pid and (name or patid):
         commonheaders += [
@@ -362,9 +366,10 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
                 'count':0,
                 'protocolname':[protocol]}
             sheetlist[tabtext]['sheet'].write_row(0,0,protocolheaders)
-            sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10) # Date column
+            sheetlist[tabtext]['sheet'].set_column(date_column, date_column, 10, dateformat) # Date column
+            sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, None, timeformat) # Time column
             if pid and (name or patid):
-                sheetlist[tabtext]['sheet'].set_column(date_column+1, date_column+1, 10) # Birth date column
+                sheetlist[tabtext]['sheet'].set_column(date_column+2, date_column+2, 10, dateformat) # Birth date column
             if pid and (name and patid):
                 sheetlist[tabtext]['sheet'].set_column(1, 1, None, textformat) # Take care patientID is inserted as text (it can look like a number with significant leading zero('s))
             elif pid and (patid):
@@ -408,7 +413,7 @@ def ctxlsx(filterdict, pid=False, name=None, patid=None, user=None):
             'E' + str(h+1) + ' Comments',
             ]
     wsalldata.write_row('A1', alldataheaders)
-    numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 8
+    numcolumns = (22 * max_events['ctradiationdose__ctaccumulateddosedata__total_number_of_irradiation_events__max']) + date_column + 11
     numrows = e.count()
     wsalldata.autofilter(0,0,numrows,numcolumns)
 
